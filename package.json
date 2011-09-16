@@ -1,0 +1,7 @@
+{
+    "name": "activity-pump",
+    "version": "0.1.0dev",
+    "dependencies": { "connect": "1.7.1" }
+}
+
+	
