@@ -16,36 +16,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-function JSONStoreException(message)
-{
-    this.message = message;
-}
+var JSONStore = Object.create(EventEmitter, {
 
-function JSONStore
-{
-}
+    connect: function(params, onSuccess)
+    {
+	throw new JSONStoreException("connect() method unimplemented.");
+    },
 
-JSONStore.prototype.create = function(type, id, value)
-{
-    throw new JSONStoreException("create() method unimplemented.");
-}
+    disconnect: function(onSuccess)
+    {
+	throw new JSONStoreException("connect() method unimplemented.");
+    },
 
-JSONStore.prototype.read = function(type, id)
-{
-    throw new JSONStoreException("read() method unimplemented.");
-}
+    create: function(type, id, value, onSuccess)
+    {
+	throw new JSONStoreException("create() method unimplemented.");
+    },
 
-JSONStore.prototype.update = function(type, id, value)
-{
-    throw new JSONStoreException("update() method unimplemented.");
-}
+    read: function(type, id, onSuccess)
+    {
+	throw new JSONStoreException("read() method unimplemented.");
+    },
 
-JSONStore.prototype.del = function(type, id)
-{
-    throw new JSONStoreException("del() method unimplemented.");
-}
+    update: function(type, id, value, onSuccess)
+    {
+	throw new JSONStoreException("update() method unimplemented.");
+    },
 
-JSONStore.prototype.search = function(type, criteria)
-{
-    throw new JSONStoreException("search() method unimplemented.");
-}
+    del: function(type, id, onSuccess)
+    {
+	throw new JSONStoreException("del() method unimplemented.");
+    },
+
+    search: function(type, criteria, onSuccess)
+    {
+	throw new JSONStoreException("search() method unimplemented.");
+    }
+});
+
+exports.JSONstore = JSONstore;

@@ -16,28 +16,53 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-function RedisJSONStore
-{
-}
+var JSONStore = require('./jsonstore').JSONStore;
+var redis = require('redis');
 
-RedisJSONStore.prototype = new JSONStore;
+var RedisJSONStore = Object.create(JSONStore, {
 
-RedisJSONStore.prototype.create = function(key, value)
-{
-}
+    connect: function(params, onSuccess)
+    {
+	this.client = redis.createClient();
+	this.client.on('connect', function() {
+	    onSuccess();
+	});
+    },
 
-RedisJSONStore.prototype.read = function(key)
-{
-}
+    disconnect: function(onSuccess)
+    {
+	this.client.quit(function(err) {
+	    onSuccess();
+	});
+    },
 
-RedisJSONStore.prototype.update = function(key, value)
-{
-}
+    create: function(type, id, value, onSuccess)
+    {
+	this.client.set(type+':'+id, value, function(err) {
+	    onSuccess();
+	});
+    },
 
-RedisJSONStore.prototype.del = function(key)
-{
-}
+    read: function(type, id, onSuccess)
+    {
+	this.client.get(type+':'+id, function(err, value) {
+	    onSuccess(value);
+	});
+    },
 
-RedisJSONStore.prototype.search = function(criteria)
-{
-}
+    update: function(type, id, value, onSuccess)
+    {
+	this.client.set(type+':'+id, value, function(err) {
+	    onSuccess();
+	});
+    },
+
+    del: function(type, id, onSuccess)
+    {
+	this.client.del(type+':'+id, function(err) {
+	    onSuccess();
+	});
+    },
+});
+
+exports.RedisJSONStore = RedisJSONStore;
