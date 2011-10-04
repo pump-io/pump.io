@@ -96,6 +96,8 @@ RedisJSONStore.prototype.del = function(type, id, onCompletion) {
     this.client.del(this.toKey(type, id), function(err, count) {
 	if (err) {
 	    onCompletion(new JSONStoreError(err));
+	} else if (count == 0) {
+	    onCompletion(new NoSuchThingError(type, id));
 	} else {
 	    onCompletion(null);
 	}
