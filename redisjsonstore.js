@@ -16,14 +16,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var store = require('./jsonstore');
-
-var JSONStore = store.JSONStore;
-var JSONStoreError = store.JSONStoreError;
-var AlreadyExistsError = store.AlreadyExistsError;
-var NoSuchThingError = store.NoSuchThingError;
-
+var jsonstore = require('./jsonstore');
 var redis = require('redis');
+
+var JSONStore = jsonstore.JSONStore;
+var JSONStoreError = jsonstore.JSONStoreError;
+var AlreadyExistsError = jsonstore.AlreadyExistsError;
+var NoSuchThingError = jsonstore.NoSuchThingError;
 
 function RedisJSONStore() {
     this.client = null;
