@@ -59,6 +59,9 @@ server = connect.createServer(
 
 	// Users
 	app.get('/user/:nickname', function(req, res, next) {
+
+	    var newUser = req.body;
+	    
 	    store.read('user', req.params.nickname, function(err, value) {
 		if (err instanceof jsonstore.NoSuchThingError) {
 		    res.writeHead(404, {'Content-Type': 'application/json'});
@@ -74,7 +77,55 @@ server = connect.createServer(
 	    });
 	});
 
-	app.put('/user/:nickname', notYetImplemented);
+	app.put('/user/:nickname', function(req, res, next) {
+
+	    var newUser = req.body;
+
+	    if (!newUser.preferredUsername) {
+		newUser.preferredUsername = req.params.nickname;
+	    } else if (newUser.preferredUsername != req.params.nickname) {
+		res.writeHead(400, {'Content-Type': 'application/json'});
+		res.end(JSON.stringify("Can't modify user nickname."));
+		return;
+	    }
+
+	    newUser.password  = bcrypt.encrypt_sync(newUser.password, bcrypt.gen_salt_sync(10));
+
+	    var now = dateFormat(new Date(), "isoDateTime", true);
+
+	    newUser.updated = now;
+
+	    store.read('user', req.params.nickname, function(err, oldUser) {
+
+		if (err instanceof jsonstore.NoSuchThingError) {
+		    res.writeHead(404, {'Content-Type': 'application/json'});
+		    res.end(JSON.stringify(err.message));
+		} else if (err) {
+		    res.writeHead(500, {'Content-Type': 'application/json'});
+		    res.end(JSON.stringify(err.message));
+		} else {
+		    // Don't overwrite these!
+		    newUser.published = oldUser.published;
+		    newUser.url       = oldUser.url;
+		    newUser.id        = oldUser.id;
+
+		    store.update('user', req.params.nickname, newUser, function(err, value) {
+			if (err instanceof jsonstore.NoSuchThingError) {
+			    res.writeHead(404, {'Content-Type': 'application/json'});
+			    res.end(JSON.stringify(err.message));
+			} else if (err) {
+			    res.writeHead(500, {'Content-Type': 'application/json'});
+			    res.end(JSON.stringify(err.message));
+			} else {
+			    value.password = 'xxxxxxxx';
+			    res.writeHead(200, {'Content-Type': 'application/json'});
+			    res.end(JSON.stringify(value));
+			}
+		    });
+		}
+	    });
+	});
+
 	app.del('/user/:nickname', notYetImplemented);
 
 	// Feeds
