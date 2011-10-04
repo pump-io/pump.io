@@ -22,6 +22,8 @@ var bcrypt  = require('bcrypt');
 
 var RedisJSONStore = require('./redisjsonstore').RedisJSONStore;
 
+var jsonstore = require('./jsonstore');
+
 function notYetImplemented(req, res, next) {
     res.writeHead(500, {'Content-Type': 'application/json'});
     res.end("\"Not yet implemented\"\n");
@@ -48,12 +50,29 @@ server = connect.createServer(
     connect.errorHandler({showMessage: true}),
     connect.query(),
     connect.router(function(app) {
+
 	// Activities
 	app.get('/activity/:id', notYetImplemented);
 	app.put('/activity/:id', notYetImplemented);
 	app.del('/activity/:id', notYetImplemented);
+
 	// Users
-	app.get('/user/:nickname', notYetImplemented);
+	app.get('/user/:nickname', function(req, res, next) {
+	    store.read('user', req.params.nickname, function(err, value) {
+		if (err instanceof jsonstore.NoSuchThingError) {
+		    res.writeHead(404, {'Content-Type': 'application/json'});
+		    res.end(JSON.stringify(err.message));
+		} else if (err) {
+		    res.writeHead(500, {'Content-Type': 'application/json'});
+		    res.end(JSON.stringify(err.message));
+		} else {
+		    delete value.password;
+		    res.writeHead(200, {'Content-Type': 'application/json'});
+		    res.end(JSON.stringify(value));
+		}
+	    });
+	});
+
 	app.put('/user/:nickname', notYetImplemented);
 	app.del('/user/:nickname', notYetImplemented);
 
