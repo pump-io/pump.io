@@ -71,7 +71,7 @@ server = connect.createServer(
 
 	app.post('/users', function (req, res, next) {
 	    var newUser = req.body;
-	    store.insert('user', newUser.preferredUsername, newUser, function(err, value) {
+	    store.create('user', newUser.preferredUsername, newUser, function(err, value) {
 		if (err) {
 		    res.writeHead(400, {'Content-Type': 'application/json'});
 		    res.end(JSON.stringify(err.message));
