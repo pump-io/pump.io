@@ -18,6 +18,8 @@
 
 var connect = require('connect');
 var uuid    = require('node-uuid');
+var bcrypt  = require('bcrypt');
+
 var RedisJSONStore = require('./redisjsonstore').RedisJSONStore;
 
 function notYetImplemented(req, res, next) {
@@ -70,12 +72,24 @@ server = connect.createServer(
 	app.get('/users', notYetImplemented);
 
 	app.post('/users', function (req, res, next) {
+
 	    var newUser = req.body;
+
+	    if (!newUser.preferredUsername || !newUser.password) {
+		res.writeHead(400, {'Content-Type': 'application/json'});
+		res.end(JSON.stringify(err.message));
+		return;
+	    }
+
+	    newUser.password = bcrypt.encrypt_sync(newUser.password, bcrypt.gen_salt_sync(10));
+
 	    store.create('user', newUser.preferredUsername, newUser, function(err, value) {
 		if (err) {
 		    res.writeHead(400, {'Content-Type': 'application/json'});
 		    res.end(JSON.stringify(err.message));
 		} else {
+		    // Hide the password for output
+		    value.password = 'xxxxxxxx';
 		    res.writeHead(200, {'Content-Type': 'application/json'});
 		    res.end(JSON.stringify(value));
 		}
