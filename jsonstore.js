@@ -156,5 +156,5 @@ exports.JSONStore = JSONStore;
 exports.JSONStoreError = JSONStoreError;
 exports.NotImplementedError = NotImplementedError;
 exports.NoSuchThingError = NoSuchThingError;
-exports.AlreadyExistsError = NoSuchThingError;
+exports.AlreadyExistsError = AlreadyExistsError;
 
