@@ -1,4 +1,4 @@
-// activitypump.js
+// server.js
 //
 // main function for activity pump application
 //
@@ -18,7 +18,7 @@
 
 var connect = require('connect');
 var uuid    = require('node-uuid');
-var store   = require('./redisjsonstore').JSONStore;
+var RedisJSONStore = require('./redisjsonstore').RedisJSONStore;
 
 function notYetImplemented(req, res, next) {
     res.writeHead(500, {'Content-Type': 'application/json'});
@@ -45,7 +45,7 @@ server = connect.createServer(
     connect.bodyParser(),
     connect.errorHandler({showMessage: true}),
     connect.query(),
-    connect.router(function(app){
+    connect.router(function(app) {
 	// Activities
 	app.get('/activity/:id', notYetImplemented);
 	app.put('/activity/:id', notYetImplemented);
@@ -71,8 +71,14 @@ server = connect.createServer(
 
 	app.post('/users', function (req, res, next) {
 	    var newUser = req.body;
-	    store.insert('user', newUser.preferredUsername, newUser, function() {
-		res.writeHead(201, 
+	    store.insert('user', newUser.preferredUsername, newUser, function(err, value) {
+		if (err) {
+		    res.writeHead(400, {'Content-Type': 'application/json'});
+		    res.end(JSON.stringify(err.message));
+		} else {
+		    res.writeHead(200, {'Content-Type': 'application/json'});
+		    res.end(JSON.stringify(value));
+		}
 	    });
 	});
 
@@ -85,8 +91,15 @@ server = connect.createServer(
     })
 );
 
-// Connect then listen
+var store = new RedisJSONStore();
 
-store.connect(function() {
-    server.listen(process.env.PORT || 8001);
+// Connect...
+
+store.connect({}, function(err) {
+    if (err) {
+	console.log("Couldn't connect to JSON store: " + err.message);
+    } else {
+	// ...then listen
+	server.listen(process.env.PORT || 8001);
+    }
 });

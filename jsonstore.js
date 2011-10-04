@@ -16,42 +16,145 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var JSONStore = Object.create(EventEmitter, {
+// I'm too much of a wuss to commit to any JSON storage mechanism right
+// now, so I'm just going to declare the interface I need and try a few
+// different systems to implement it.
 
-    connect: function(params, onSuccess)
+// A custom error for JSONStore schtuff.
+
+
+// A thing that stores JSON.
+// Basically CRUD + Search. Recognizes types of data without
+// enforcing a schema.
+
+function JSONStore() {
+}
+
+JSONStore.prototype = {
+
+    // Connect yourself on up.
+    // params: object containing any params you need
+    // onCompletion(err): function to call on completion
+
+    connect: function(params, onCompletion)
     {
-	throw new JSONStoreException("connect() method unimplemented.");
+	if (onCompletion) {
+	    onCompletion(new NotImplementedError());
+	}
     },
 
-    disconnect: function(onSuccess)
+    // Disconnect yourself.
+    // onCompletion(err): function to call on completion
+
+    disconnect: function(onCompletion)
     {
-	throw new JSONStoreException("connect() method unimplemented.");
+	if (onCompletion) {
+	    onCompletion(new NotImplementedError());
+	}
     },
 
-    create: function(type, id, value, onSuccess)
+    // Create a new thing
+    // type: string, type of thing, usually 'user' or 'activity'
+    // id: a unique ID, like a nickname or a UUID
+    // value: JavaScript value; will be JSONified
+    // onCompletion(err, value): function to call on completion
+
+    create: function(type, id, value, onCompletion)
     {
-	throw new JSONStoreException("create() method unimplemented.");
+	if (onCompletion) {
+	    onCompletion(new NotImplementedError(), null);
+	}
     },
 
-    read: function(type, id, onSuccess)
+    // Read an existing thing
+    // type: the type of thing; 'user', 'activity'
+    // id: a unique ID -- nickname or UUID or URI
+    // onCompletion(err, value): function to call on completion
+
+    read: function(type, id, onCompletion)
     {
-	throw new JSONStoreException("read() method unimplemented.");
+	if (onCompletion) {
+	    onCompletion(new NotImplementedError(), null);
+	}
     },
 
-    update: function(type, id, value, onSuccess)
+    // Update an existing thing
+    // type: the type of thing; 'user', 'activity'
+    // id: a unique ID -- nickname or UUID or URI
+    // value: the new value of the thing
+    // onCompletion(err, value): function to call on completion
+
+    update: function(type, id, value, onCompletion)
     {
-	throw new JSONStoreException("update() method unimplemented.");
+	if (onCompletion) {
+	    onCompletion(new NotImplementedError(), null);
+	}
     },
 
-    del: function(type, id, onSuccess)
+    // Delete an existing thing
+    // type: the type of thing; 'user', 'activity'
+    // id: a unique ID -- nickname or UUID or URI
+    // value: the new value of the thing
+    // onCompletion(err): function to call on completion
+
+    del: function(type, id, onCompletion)
     {
-	throw new JSONStoreException("del() method unimplemented.");
+	if (onCompletion) {
+	    onCompletion(new NotImplementedError());
+	}
     },
 
-    search: function(type, criteria, onSuccess)
+    // Search for things
+    // type: type of thing
+    // criteria: map of criteria, with exact matches, like {'subject.id':'tag:example.org,2011:evan' }
+    // onResult(value): called once per result found
+    // onCompletion(err): called once at the end of results
+
+    search: function(type, criteria, onResult, onCompletion)
     {
-	throw new JSONStoreException("search() method unimplemented.");
+	if (onCompletion) {
+	    onCompletion(new NotImplementedError());
+	}
     }
-});
+};
 
-exports.JSONstore = JSONstore;
+function JSONStoreError(message) {
+    if (message) {
+	this.message = message;
+    }
+}
+
+JSONStoreError.prototype = new Error();
+JSONStoreError.prototype.constructor = JSONStoreError;
+
+function NoSuchThingError(type, id) {
+    this.type = type;
+    this.id   = id;
+    this.message = "No such '" + type + "' with id '" + id + "'";
+}
+
+NoSuchThingError.prototype = new JSONStoreError();
+NoSuchThingError.prototype.constructor = NoSuchThingError;
+
+function AlreadyExistsError(type, id) {
+    this.type = type;
+    this.id   = id;
+    this.message = "Already have a(n) '" + type + "' with id '" + id + "'";
+}
+
+AlreadyExistsError.prototype = new JSONStoreError();
+AlreadyExistsError.prototype.constructor = AlreadyExistsError;
+
+function NotImplementedError() {
+    this.message = "Method not yet implemented.";
+}
+
+NotImplementedError.prototype = new JSONStoreError();
+NotImplementedError.prototype.constructor = NotImplementedError;
+
+exports.JSONStore = JSONStore;
+exports.JSONStoreError = JSONStoreError;
+exports.NotImplementedError = NotImplementedError;
+exports.NoSuchThingError = NoSuchThingError;
+exports.AlreadyExistsError = NoSuchThingError;
+

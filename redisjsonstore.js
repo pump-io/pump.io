@@ -16,53 +16,91 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var JSONStore = require('./jsonstore').JSONStore;
+var store = require('./jsonstore');
+
+var JSONStore = store.JSONStore;
+var JSONStoreError = store.JSONStoreError;
+var AlreadyExistsError = store.AlreadyExistsError;
+var NoSuchThingError = store.NoSuchThingError;
+
 var redis = require('redis');
 
-var RedisJSONStore = Object.create(JSONStore, {
+function RedisJSONStore() {
+    this.client = null;
+}
 
-    connect: function(params, onSuccess)
-    {
-	this.client = redis.createClient();
-	this.client.on('connect', function() {
-	    onSuccess();
-	});
-    },
+RedisJSONStore.prototype = new JSONStore();
 
-    disconnect: function(onSuccess)
-    {
-	this.client.quit(function(err) {
-	    onSuccess();
-	});
-    },
+RedisJSONStore.prototype.toKey = function(type, id) {
+    return type + ':' + id;
+}
 
-    create: function(type, id, value, onSuccess)
-    {
-	this.client.set(type+':'+id, value, function(err) {
-	    onSuccess();
-	});
-    },
+RedisJSONStore.prototype.connect = function(params, onCompletion) {
+    this.client = redis.createClient();
+    this.client.on('error', function(err) {
+	if (onCompletion) {
+	    onCompletion(new JSONStoreError(err));
+	}
+    })
+    this.client.on('connect', function() {
+	if (onCompletion) {
+	    onCompletion(null);
+	}
+    })
+};
 
-    read: function(type, id, onSuccess)
-    {
-	this.client.get(type+':'+id, function(err, value) {
-	    onSuccess(value);
-	});
-    },
+RedisJSONStore.prototype.disconnect = function(onCompletion) {
+    this.client.quit(function(err) {
+	if (err) {
+	    onCompletion(new JSONStoreError());
+	} else {
+	    onCompletion(null);
+	}
+    });
+};
 
-    update: function(type, id, value, onSuccess)
-    {
-	this.client.set(type+':'+id, value, function(err) {
-	    onSuccess();
-	});
-    },
+RedisJSONStore.prototype.create = function(type, id, value, onCompletion) {
+    this.client.setnx(this.toKey(type, id), value, function(err, result) {
+	if (err) {
+	    onCompletion(new JSONStoreError(err));
+	} else if (result == 0) {
+	    onCompletion(new AlreadyExistsError(type, id));
+	} else {
+	    onCompletion(null, value);
+	}
+    });
+};
 
-    del: function(type, id, onSuccess)
-    {
-	this.client.del(type+':'+id, function(err) {
-	    onSuccess();
-	});
-    },
-});
+RedisJSONStore.prototype.read = function(type, id, onCompletion) {
+    this.client.get(this.toKey(type, id), function(err, value) {
+	if (err) {
+	    onCompletion(new JSONStoreError(err), null);
+	} else if (value == null) {
+	    onCompletion(new NoSuchThingError(type, id), null);
+	} else {
+	    onCompletion(null, value);
+	}
+    });
+};
 
-exports.JSONStore = RedisJSONStore;
+RedisJSONStore.prototype.update = function(type, id, value, onCompletion) {
+    this.client.set(this.toKey(type, id), value, function(err) {
+	if (err) {
+	    onCompletion(new JSONStoreError(err), null);
+	} else {
+	    onCompletion(null, value);
+	}
+    });
+};
+
+RedisJSONStore.prototype.del = function(type, id, onCompletion) {
+    this.client.del(this.toKey(type, id), function(err, count) {
+	if (err) {
+	    onCompletion(new JSONStoreError(err));
+	} else {
+	    onCompletion(null);
+	}
+    });
+};
+
+exports.RedisJSONStore = RedisJSONStore;
