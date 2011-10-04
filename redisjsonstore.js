@@ -65,4 +65,4 @@ var RedisJSONStore = Object.create(JSONStore, {
     },
 });
 
-exports.RedisJSONStore = RedisJSONStore;
+exports.JSONStore = RedisJSONStore;

@@ -18,6 +18,7 @@
 
 var connect = require('connect');
 var uuid    = require('node-uuid');
+var store   = require('./redisjsonstore').JSONStore;
 
 function notYetImplemented(req, res, next) {
     res.writeHead(500, {'Content-Type': 'application/json'});
@@ -39,14 +40,10 @@ function newActivityId()
     return id;
 }
 
-function makeNewId(req, res, next)
-{
-    res.writeHead(200, {'Content-Type': 'application/json'});
-    res.end(JSON.stringify(newActivityId())+"\n");
-}
-
 server = connect.createServer(
     connect.logger(),
+    connect.bodyParser(),
+    connect.errorHandler({showMessage: true}),
     connect.query(),
     connect.router(function(app){
 	// Activities
@@ -71,12 +68,25 @@ server = connect.createServer(
 	// Global user list
 
 	app.get('/users', notYetImplemented);
-	app.post('/users', notYetImplemented);
+
+	app.post('/users', function (req, res, next) {
+	    var newUser = req.body;
+	    store.insert('user', newUser.preferredUsername, newUser, function() {
+		res.writeHead(201, 
+	    });
+	});
 
 	// Testing
 
-	app.get('/test/newid', makeNewId);
+	app.get('/test/newid', function (req, res, next) {
+	    res.writeHead(200, {'Content-Type': 'application/json'});
+	    res.end(JSON.stringify(newActivityId())+"\n");
+	});
     })
 );
 
-server.listen(process.env.PORT || 8001);
+// Connect then listen
+
+store.connect(function() {
+    server.listen(process.env.PORT || 8001);
+});
