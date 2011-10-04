@@ -60,7 +60,7 @@ RedisJSONStore.prototype.disconnect = function(onCompletion) {
 };
 
 RedisJSONStore.prototype.create = function(type, id, value, onCompletion) {
-    this.client.setnx(this.toKey(type, id), value, function(err, result) {
+    this.client.setnx(this.toKey(type, id), JSON.stringify(value), function(err, result) {
 	if (err) {
 	    onCompletion(new JSONStoreError(err));
 	} else if (result == 0) {
@@ -78,13 +78,13 @@ RedisJSONStore.prototype.read = function(type, id, onCompletion) {
 	} else if (value == null) {
 	    onCompletion(new NoSuchThingError(type, id), null);
 	} else {
-	    onCompletion(null, value);
+	    onCompletion(null, JSON.parse(value));
 	}
     });
 };
 
 RedisJSONStore.prototype.update = function(type, id, value, onCompletion) {
-    this.client.set(this.toKey(type, id), value, function(err) {
+    this.client.set(this.toKey(type, id), JSON.stringify(value), function(err) {
 	if (err) {
 	    onCompletion(new JSONStoreError(err), null);
 	} else {
