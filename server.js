@@ -19,6 +19,7 @@
 var connect = require('connect');
 var uuid    = require('node-uuid');
 var bcrypt  = require('bcrypt');
+var dateFormat = require('dateformat');
 
 var RedisJSONStore = require('./redisjsonstore').RedisJSONStore;
 
@@ -66,7 +67,7 @@ server = connect.createServer(
 		    res.writeHead(500, {'Content-Type': 'application/json'});
 		    res.end(JSON.stringify(err.message));
 		} else {
-		    delete value.password;
+		    value.password = 'xxxxxxxx';
 		    res.writeHead(200, {'Content-Type': 'application/json'});
 		    res.end(JSON.stringify(value));
 		}
@@ -100,7 +101,11 @@ server = connect.createServer(
 		return;
 	    }
 
-	    newUser.password = bcrypt.encrypt_sync(newUser.password, bcrypt.gen_salt_sync(10));
+	    newUser.password  = bcrypt.encrypt_sync(newUser.password, bcrypt.gen_salt_sync(10));
+
+	    var now = dateFormat(new Date(), "isoDateTime", true);
+
+	    newUser.published = newUser.updated = now;
 
 	    store.create('user', newUser.preferredUsername, newUser, function(err, value) {
 		if (err) {

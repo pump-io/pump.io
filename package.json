@@ -3,6 +3,7 @@
     "version": "0.1.0dev",
     "dependencies": { "connect": "1.7.1",
     		      "node-uuid": "1.2.0",
-		      "bcrypt": "0.3.2"
+		      "bcrypt": "0.3.2",
+		      "dateformat": "1.0.2-1.2.3"
 		    }
 }
