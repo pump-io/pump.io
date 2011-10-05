@@ -24,6 +24,7 @@ var dateFormat = require('dateformat');
 var RedisJSONStore = require('./redisjsonstore').RedisJSONStore;
 
 var jsonstore = require('./jsonstore');
+var AlreadyExistsError = jsonstore.AlreadyExistsError;
 
 function notYetImplemented(req, res, next) {
     res.writeHead(500, {'Content-Type': 'application/json'});
@@ -143,8 +144,61 @@ server = connect.createServer(
 
 	// Feeds
 
+	app.post('/user/:nickname/feed', function(req, res, next) {
+
+	    var activity = req.body;
+
+	    if (!activity.verb) {
+		activity.verb = "post";
+	    }
+
+	    if (!activity.object) {
+		res.writeHead(500, {'Content-Type': 'application/json'});
+		res.end(JSON.stringify("No verb or object in activity."));
+		return;
+	    }
+
+	    var now = dateFormat(new Date(), "isoDateTime", true);
+
+	    activity.published = activity.updated = now;
+
+	    store.read('user', req.params.nickname, function(err, user) {
+		if (err instanceof jsonstore.NoSuchThingError) {
+		    res.writeHead(404, {'Content-Type': 'application/json'});
+		    res.end(JSON.stringify(err.message));
+		} else if (err) {
+		    res.writeHead(500, {'Content-Type': 'application/json'});
+		    res.end(JSON.stringify(err.message));
+		} else {
+
+		    delete user.password;
+
+		    // Should we store the whole thing...?
+
+		    activity.subject = user;
+
+		    var uuid = newActivityId();
+		    var url  = makeURL('activity/'+uuid);
+
+		    activity.id = url;
+
+		    store.create('activity', uuid, activity, function(err, value) {
+			if (err instanceof AlreadyExistsError) {
+			    res.writeHead(409, {'Content-Type': 'application/json'});
+			    res.end(JSON.stringify(err.message));
+			} else if (err) {
+			    res.writeHead(400, {'Content-Type': 'application/json'});
+			    res.end(JSON.stringify(err.message));
+			} else {
+			    res.writeHead(200, {'Content-Type': 'application/json'});
+			    res.end(JSON.stringify(value));
+			}
+		    });
+		}
+	    });
+	});
+
 	app.get('/user/:nickname/feed', notYetImplemented);
-	app.post('/user/:nickname/feed', notYetImplemented);
 
 	// Inboxen
 
@@ -193,6 +247,17 @@ server = connect.createServer(
     })
 );
 
+var port     = process.env.PORT || 8001;
+var hostname = process.env.HOSTNAME || 'localhost';
+
+function makeURL(relative) {
+    if (port != 80) {
+	return 'http://'+hostname+':'+port+'/'+relative;
+    } else {
+	return 'http://'+hostname+'/'+relative;
+    }
+}
+
 var store = new RedisJSONStore();
 
 // Connect...
@@ -202,6 +267,6 @@ store.connect({}, function(err) {
 	console.log("Couldn't connect to JSON store: " + err.message);
     } else {
 	// ...then listen
-	server.listen(process.env.PORT || 8001);
+	server.listen(port, hostname);
     }
 });
