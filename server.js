@@ -16,15 +16,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var connect = require('connect');
-var uuid    = require('node-uuid');
-var bcrypt  = require('bcrypt');
-var dateFormat = require('dateformat');
-
-var RedisJSONStore = require('./redisjsonstore').RedisJSONStore;
-
-var jsonstore = require('./jsonstore');
-var AlreadyExistsError = jsonstore.AlreadyExistsError;
+var connect = require('connect'),
+    uuid    = require('node-uuid'),
+    bcrypt  = require('bcrypt'),
+    dateFormat = require('dateformat'),
+    databank = require('databank'),
+    Databank = databank.Databank,
+    AlreadyExistsError = databank.AlreadyExistsError,
+    NoSuchThingError = databank.NoSuchThingError;
 
 function notYetImplemented(req, res, next) {
     res.writeHead(500, {'Content-Type': 'application/json'});
@@ -63,8 +62,8 @@ server = connect.createServer(
 
 	    var newUser = req.body;
 	    
-	    store.read('user', req.params.nickname, function(err, value) {
-		if (err instanceof jsonstore.NoSuchThingError) {
+	    db.read('user', req.params.nickname, function(err, value) {
+		if (err instanceof NoSuchThingError) {
 		    res.writeHead(404, {'Content-Type': 'application/json'});
 		    res.end(JSON.stringify(err.message));
 		} else if (err) {
@@ -96,9 +95,9 @@ server = connect.createServer(
 
 	    newUser.updated = now;
 
-	    store.read('user', req.params.nickname, function(err, oldUser) {
+	    db.read('user', req.params.nickname, function(err, oldUser) {
 
-		if (err instanceof jsonstore.NoSuchThingError) {
+		if (err instanceof NoSuchThingError) {
 		    res.writeHead(404, {'Content-Type': 'application/json'});
 		    res.end(JSON.stringify(err.message));
 		} else if (err) {
@@ -110,8 +109,8 @@ server = connect.createServer(
 		    newUser.url       = oldUser.url;
 		    newUser.id        = oldUser.id;
 
-		    store.update('user', req.params.nickname, newUser, function(err, value) {
-			if (err instanceof jsonstore.NoSuchThingError) {
+		    db.update('user', req.params.nickname, newUser, function(err, value) {
+			if (err instanceof NoSuchThingError) {
 			    res.writeHead(404, {'Content-Type': 'application/json'});
 			    res.end(JSON.stringify(err.message));
 			} else if (err) {
@@ -128,8 +127,8 @@ server = connect.createServer(
 	});
 
 	app.del('/user/:nickname', function(req, res, next) {
-	    store.del('user', req.params.nickname, function(err) {
-		if (err instanceof jsonstore.NoSuchThingError) {
+	    db.del('user', req.params.nickname, function(err) {
+		if (err instanceof NoSuchThingError) {
 		    res.writeHead(404, {'Content-Type': 'application/json'});
 		    res.end(JSON.stringify(err.message));
 		} else if (err) {
@@ -162,8 +161,8 @@ server = connect.createServer(
 
 	    activity.published = activity.updated = now;
 
-	    store.read('user', req.params.nickname, function(err, user) {
-		if (err instanceof jsonstore.NoSuchThingError) {
+	    db.read('user', req.params.nickname, function(err, user) {
+		if (err instanceof NoSuchThingError) {
 		    res.writeHead(404, {'Content-Type': 'application/json'});
 		    res.end(JSON.stringify(err.message));
 		} else if (err) {
@@ -182,7 +181,7 @@ server = connect.createServer(
 
 		    activity.id = url;
 
-		    store.create('activity', uuid, activity, function(err, value) {
+		    db.create('activity', uuid, activity, function(err, value) {
 			if (err instanceof AlreadyExistsError) {
 			    res.writeHead(409, {'Content-Type': 'application/json'});
 			    res.end(JSON.stringify(err.message));
@@ -225,7 +224,7 @@ server = connect.createServer(
 
 	    newUser.published = newUser.updated = now;
 
-	    store.create('user', newUser.preferredUsername, newUser, function(err, value) {
+	    db.create('user', newUser.preferredUsername, newUser, function(err, value) {
 		if (err) {
 		    res.writeHead(400, {'Content-Type': 'application/json'});
 		    res.end(JSON.stringify(err.message));
@@ -258,11 +257,11 @@ function makeURL(relative) {
     }
 }
 
-var store = new RedisJSONStore();
+var db = Databank.get('redis', {});
 
 // Connect...
 
-store.connect({}, function(err) {
+db.connect({}, function(err) {
     if (err) {
 	console.log("Couldn't connect to JSON store: " + err.message);
     } else {
