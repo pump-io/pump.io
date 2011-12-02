@@ -57,7 +57,7 @@ var verbs = ['add',
 
 for (i = 0; i < verbs.length; i++) {
     verb = verbs[i];
-    Activity[verb.toUpperCase()] = verb;
+    Activity[verb.toUpperCase().replace('-', '_')] = verb;
 }
 
 Activity.newId = function ()
@@ -74,5 +74,21 @@ Activity.newId = function ()
     id = id.replace(/=/g, '');
     return id;
 };
+
+Activity.schema = { pkey: 'id', 
+		    fields: ['actor',
+			     'content',
+			     'generator',
+			     'icon',
+			     'id',
+			     'object',
+			     'published',
+			     'provider',
+			     'target',
+			     'title',
+			     'url',
+			     'updated',
+			     'verb'],
+		    indices: ['actor.id', 'object.id'] };
 
 exports.Activity = Activity;

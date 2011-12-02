@@ -16,9 +16,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var Activity = require('./model/activity').Activity;
+var Activity = require('./model/activity').Activity,
+    bcrypt  = require('bcrypt'),
+    User = require('./model/user').User;
 
 var ActivityPump = {
+    
+    db: null,
 
     initApp: function(app) {
 	// Activities
@@ -54,11 +58,8 @@ var ActivityPump = {
 	});
     },
     
-    getUser: function(req, res, next) {
-
-	var newUser = req.body;
-	
-	db.read('user', req.params.nickname, function(err, value) {
+    getUser: function(req, res) {
+	User.get(req.params.nickname, function(err, user) {
 	    if (err instanceof NoSuchThingError) {
 		res.writeHead(404, {'Content-Type': 'application/json'});
 		res.end(JSON.stringify(err.message));
@@ -66,9 +67,9 @@ var ActivityPump = {
 		res.writeHead(500, {'Content-Type': 'application/json'});
 		res.end(JSON.stringify(err.message));
 	    } else {
-		value.password = 'xxxxxxxx';
+		user.password = '<not shown>';
 		res.writeHead(200, {'Content-Type': 'application/json'});
-		res.end(JSON.stringify(value));
+		res.end(JSON.stringify(user));
 	    }
 	});
     },
@@ -77,22 +78,7 @@ var ActivityPump = {
 
 	var newUser = req.body;
 
-	if (!newUser.preferredUsername) {
-	    newUser.preferredUsername = req.params.nickname;
-	} else if (newUser.preferredUsername != req.params.nickname) {
-	    res.writeHead(400, {'Content-Type': 'application/json'});
-	    res.end(JSON.stringify("Can't modify user nickname."));
-	    return;
-	}
-
-	newUser.password  = bcrypt.encrypt_sync(newUser.password, bcrypt.gen_salt_sync(10));
-
-	var now = dateFormat(new Date(), "isoDateTime", true);
-
-	newUser.updated = now;
-
-	db.read('user', req.params.nickname, function(err, oldUser) {
-
+	User.get(req.params.nickname, function(err, user) {
 	    if (err instanceof NoSuchThingError) {
 		res.writeHead(404, {'Content-Type': 'application/json'});
 		res.end(JSON.stringify(err.message));
@@ -100,22 +86,13 @@ var ActivityPump = {
 		res.writeHead(500, {'Content-Type': 'application/json'});
 		res.end(JSON.stringify(err.message));
 	    } else {
-		// Don't overwrite these!
-		newUser.published = oldUser.published;
-		newUser.url       = oldUser.url;
-		newUser.id        = oldUser.id;
-
-		db.update('user', req.params.nickname, newUser, function(err, value) {
-		    if (err instanceof NoSuchThingError) {
-			res.writeHead(404, {'Content-Type': 'application/json'});
-			res.end(JSON.stringify(err.message));
-		    } else if (err) {
+		user.update(newUser, function(err, saved) {
+		    if (err) {
 			res.writeHead(500, {'Content-Type': 'application/json'});
 			res.end(JSON.stringify(err.message));
 		    } else {
-			value.password = 'xxxxxxxx';
 			res.writeHead(200, {'Content-Type': 'application/json'});
-			res.end(JSON.stringify(value));
+			res.end(JSON.stringify(saved));
 		    }
 		});
 	    }
@@ -123,43 +100,31 @@ var ActivityPump = {
     },
 
     delUser: function(req, res, next) {
-	    db.del('user', req.params.nickname, function(err) {
-		if (err instanceof NoSuchThingError) {
-		    res.writeHead(404, {'Content-Type': 'application/json'});
-		    res.end(JSON.stringify(err.message));
-		} else if (err) {
-		    res.writeHead(500, {'Content-Type': 'application/json'});
-		    res.end(JSON.stringify(err.message));
-		} else {
-		    res.writeHead(200, {'Content-Type': 'application/json'});
-		    res.end(JSON.stringify("Deleted."));
-		}
-	    });
+	User.del(req.params.nickname, function(err) {
+	    if (err instanceof NoSuchThingError) {
+		res.writeHead(404, {'Content-Type': 'application/json'});
+		res.end(JSON.stringify(err.message));
+	    } else if (err) {
+		res.writeHead(500, {'Content-Type': 'application/json'});
+		res.end(JSON.stringify(err.message));
+	    } else {
+		res.writeHead(200, {'Content-Type': 'application/json'});
+		res.end(JSON.stringify("Deleted."));
+	    }
+	});
     },
 
     createUser: function (req, res, next) {
 
 	var newUser = req.body;
-
-	if (!newUser.preferredUsername || !newUser.password) {
-	    res.writeHead(400, {'Content-Type': 'application/json'});
-	    res.end(JSON.stringify(err.message));
-	    return;
-	}
-
-	newUser.password  = bcrypt.encrypt_sync(newUser.password, bcrypt.gen_salt_sync(10));
-
-	var now = dateFormat(new Date(), "isoDateTime", true);
-
-	newUser.published = newUser.updated = now;
-
-	db.create('user', newUser.preferredUsername, newUser, function(err, value) {
+	
+	User.create(newUser.nickname, newUser, function(err, user) {
 	    if (err) {
 		res.writeHead(400, {'Content-Type': 'application/json'});
 		res.end(JSON.stringify(err.message));
 	    } else {
 		// Hide the password for output
-		value.password = 'xxxxxxxx';
+		user.password = 'xxxxxxxx';
 		res.writeHead(200, {'Content-Type': 'application/json'});
 		res.end(JSON.stringify(value));
 	    }
@@ -184,7 +149,7 @@ var ActivityPump = {
 
 	activity.published = activity.updated = now;
 
-	db.read('user', req.params.nickname, function(err, user) {
+	this.db.read('user', req.params.nickname, function(err, user) {
 	    if (err instanceof NoSuchThingError) {
 		res.writeHead(404, {'Content-Type': 'application/json'});
 		res.end(JSON.stringify(err.message));
@@ -204,7 +169,7 @@ var ActivityPump = {
 
 		activity.id = url;
 
-		db.create('activity', uuid, activity, function(err, value) {
+		this.db.create('activity', uuid, activity, function(err, value) {
 		    if (err instanceof AlreadyExistsError) {
 			res.writeHead(409, {'Content-Type': 'application/json'});
 			res.end(JSON.stringify(err.message));

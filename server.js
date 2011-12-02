@@ -31,6 +31,7 @@ var connect = require('connect'),
     Databank = databank.Databank,
     db = Databank.get('redis', {}),
     ActivityPump = require('./activitypump').ActivityPump;
+
 // Connect...
 
 db.connect({}, function(err) {
