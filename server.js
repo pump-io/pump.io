@@ -18,6 +18,7 @@
 
 var connect = require('connect'),
     bcrypt  = require('bcrypt'),
+    ActivityPump = require('./lib/activitypump').ActivityPump,
     server = connect.createServer(
 	connect.logger(),
 	connect.bodyParser(),
@@ -29,8 +30,7 @@ var connect = require('connect'),
     hostname = process.env.HOSTNAME || 'localhost',
     databank = require('databank'),
     Databank = databank.Databank,
-    db = Databank.get('redis', {}),
-    ActivityPump = require('./activitypump').ActivityPump;
+    db = Databank.get('redis', {});
 
 // Connect...
 
