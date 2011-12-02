@@ -16,7 +16,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var DatabankObject = require('databank').DatabankObject;
+var DatabankObject = require('databank').DatabankObject,
+    dateFormat = require('dateformat'),
+    uuid    = require('node-uuid');
 
 var Activity = DatabankObject.subClass('activity');
 
@@ -57,5 +59,20 @@ for (i = 0; i < verbs.length; i++) {
     verb = verbs[i];
     Activity[verb.toUpperCase()] = verb;
 }
+
+Activity.newId = function ()
+{
+    var buf = new Buffer(16);
+    uuid('binary', buf);
+
+    var id = buf.toString('base64');
+
+    // XXX: optimize me
+
+    id = id.replace(/\+/g, '-');
+    id = id.replace(/\//g, '_');
+    id = id.replace(/=/g, '');
+    return id;
+};
 
 exports.Activity = Activity;
