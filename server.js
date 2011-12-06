@@ -22,7 +22,7 @@ var connect = require('connect'),
     server = connect.createServer(
 	connect.logger(),
 	connect.bodyParser(),
-	connect.errorHandler({showMessage: true}),
+	connect.errorHandler({showStack: true, dumpExceptions: true}),
 	connect.query(),
 	connect.router(ActivityPump.initApp)
     ),
