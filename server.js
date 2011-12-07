@@ -30,7 +30,8 @@ var connect = require('connect'),
     hostname = process.env.HOSTNAME || 'localhost',
     databank = require('databank'),
     Databank = databank.Databank,
-    db = Databank.get('redis', {});
+    DatabankObject = databank.DatabankObject,
+    db = Databank.get('redis', {schema: {user: {pkey: 'nickname'}}});
 
 // Connect...
 
@@ -38,6 +39,7 @@ db.connect({}, function(err) {
     if (err) {
 	console.log("Couldn't connect to JSON store: " + err.message);
     } else {
+        DatabankObject.bank = db;
 	// ...then listen
 	server.listen(port, hostname);
     }
