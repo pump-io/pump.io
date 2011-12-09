@@ -33,6 +33,9 @@ var connect = require('connect'),
     DatabankObject = databank.DatabankObject,
     db = Databank.get('redis', {schema: {user: {pkey: 'nickname'}}});
 
+ActivityPump.port = port;
+ActivityPump.hostname = hostname;
+
 // Connect...
 
 db.connect({}, function(err) {
