@@ -42,7 +42,7 @@ db.connect({}, function(err) {
     if (err) {
 	console.log("Couldn't connect to JSON store: " + err.message);
     } else {
-        DatabankObject.bank = db;
+	ActivityPump.bank = DatabankObject.bank = db;
 	// ...then listen
 	server.listen(port, hostname);
     }
