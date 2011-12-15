@@ -84,8 +84,6 @@ var getJSON = function(serverURL, opts, callback) {
 	}
     }
 
-    console.log(options);
-
     http.get(options, function(res) {
 	res.on('data', function (chunk) {
 	    results = results + chunk;
