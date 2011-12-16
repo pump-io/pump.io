@@ -1,0 +1,4 @@
+// sample configuration file for activitypump
+
+exports.driver = 'disk';
+exports.params = {dir: '/tmp/activitypump/'};

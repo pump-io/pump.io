@@ -20,30 +20,37 @@ var connect = require('connect'),
     bcrypt  = require('bcrypt'),
     ActivityPump = require('./lib/activitypump').ActivityPump,
     server = connect.createServer(
-	connect.logger(),
-	connect.bodyParser(),
-	connect.errorHandler({showStack: true, dumpExceptions: true}),
-	connect.query(),
-	connect.router(ActivityPump.initApp)
+        connect.logger(),
+        connect.bodyParser(),
+        connect.errorHandler({showStack: true, dumpExceptions: true}),
+        connect.query(),
+        connect.router(ActivityPump.initApp)
     ),
     port = process.env.PORT || 8001,
     hostname = process.env.HOSTNAME || 'localhost',
     databank = require('databank'),
+    config = require('./config'),
+    params,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
-    db = Databank.get('redis', {'schema': ActivityPump.getSchema()});
+    db;
 
-ActivityPump.port = port;
-ActivityPump.hostname = hostname;
+params = config.params;
+params.schema = ActivityPump.getSchema();
+db = Databank.get(config.driver, params);
 
 // Connect...
 
 db.connect({}, function(err) {
     if (err) {
-	console.log("Couldn't connect to JSON store: " + err.message);
+        console.log("Couldn't connect to JSON store: " + err.message);
     } else {
-	ActivityPump.bank = DatabankObject.bank = db;
-	// ...then listen
-	server.listen(port, hostname);
+
+        ActivityPump.port = port;
+        ActivityPump.hostname = hostname;
+        ActivityPump.bank = DatabankObject.bank = db;
+
+        // ...then listen
+        server.listen(port, hostname);
     }
 });
