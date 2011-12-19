@@ -1,9 +1,9 @@
 {
     "name": "activity-pump",
     "version": "0.1.0dev",
-    "dependencies": { "connect": "1.7.x",
-    		      "node-uuid": "1.2.x",
-		      "bcrypt": "0.3.x",
+    "dependencies": { "connect": "1.x",
+    		      "node-uuid": "1.x",
+		      "bcrypt": "0.x",
 		      "dateformat": "1.x",
 		      "databank": "*"
 		    }
