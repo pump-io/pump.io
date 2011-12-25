@@ -35,7 +35,7 @@ body {
 /* Styles you shouldn't keep as they are for displaying this base example only */
 .content .span10,
 .content .span4 {
-    min-height: 500px;
+    min-height: 420px;
 }
 /* Give a quick and non-cross-browser friendly divider */
 .content .span4 {
