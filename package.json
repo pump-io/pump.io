@@ -5,6 +5,7 @@
     		      "node-uuid": "1.x",
 		      "bcrypt": "0.x",
 		      "dateformat": "1.x",
-		      "databank": "*"
+		      "databank": "*",
+                      "step": "*"
 		    }
 }
