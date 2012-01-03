@@ -47,14 +47,14 @@
 
       <div class="content">
         <div class="page-header">
-          <h1>Page name <small>Supporting text or tagline</small></h1>
+          <%= header %>
         </div>
         <div class="row">
           <div class="span10">
-            <h2>Main content</h2>
+            <%= content %>
           </div>
           <div class="span4">
-            <h3>Secondary content</h3>
+            <%= sidebar %>
           </div>
         </div>
       </div>
