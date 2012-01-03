@@ -50,12 +50,13 @@ db.connect({}, function(err) {
 
         server = connect.createServer(
             connect.logger(),
-            connect.bodyParser(),
-            connect.static(__dirname + '/public'),
             connect.errorHandler({showStack: true, dumpExceptions: true}),
+            connect.bodyParser(),
             connect.query(),
-            connect.router(ActivityPump.initApp),
-            connect.session({secret: (config.secret || "activitypump")})
+            connect.cookieParser(),
+            connect.session({secret: (config.secret || "activitypump")}),
+            connect.static(__dirname + '/public'),
+            connect.router(ActivityPump.initApp)
         );
 
         // ...then listen
