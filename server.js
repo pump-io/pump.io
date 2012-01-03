@@ -19,14 +19,6 @@
 var connect = require('connect'),
     bcrypt  = require('bcrypt'),
     ActivityPump = require('./lib/activitypump').ActivityPump,
-    server = connect.createServer(
-        connect.logger(),
-        connect.bodyParser(),
-        connect.static(__dirname + '/public'),
-        connect.errorHandler({showStack: true, dumpExceptions: true}),
-        connect.query(),
-        connect.router(ActivityPump.initApp)
-    ),
     port = process.env.PORT || 8001,
     hostname = process.env.HOSTNAME || 'localhost',
     databank = require('databank'),
@@ -38,18 +30,33 @@ var connect = require('connect'),
 
 params = config.params;
 params.schema = ActivityPump.getSchema();
+
 db = Databank.get(config.driver, params);
 
 // Connect...
 
 db.connect({}, function(err) {
+    var server;
+
     if (err) {
+
         console.log("Couldn't connect to JSON store: " + err.message);
+
     } else {
 
         ActivityPump.port = port;
         ActivityPump.hostname = hostname;
         ActivityPump.bank = DatabankObject.bank = db;
+
+        server = connect.createServer(
+            connect.logger(),
+            connect.bodyParser(),
+            connect.static(__dirname + '/public'),
+            connect.errorHandler({showStack: true, dumpExceptions: true}),
+            connect.query(),
+            connect.router(ActivityPump.initApp),
+            connect.session({secret: (config.secret || "activitypump")})
+        );
 
         // ...then listen
         server.listen(port, hostname);
