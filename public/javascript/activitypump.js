@@ -34,14 +34,13 @@
             },
             login: function() {
                 var view = this,
-                    params = {username: this.$("#username").val(),
-                              password: this.$("#password").val()};
+                    params = {nickname: this.$('#login input[name="nickname"]').val(),
+                              password: this.$('#login input[name="password"]').val()};
 
                 $.post("/login", params, function(user) {
-                    currentUser = user;
-                    var un = new UserNav({model: currentUser});
+                    currentUser = new User(user);
+                    var un = new UserNav({model: currentUser, el: view.el});
                     un.render();
-                    view.el.replaceWith(un.el);
                 });
                 return false;
             }
@@ -58,9 +57,8 @@
                 var view = this;
                 $.post("/logout", function(data) {
                     currentUser = null;
-                    var an = new AnonymousNav();
+                    var an = new AnonymousNav({el: view.el});
                     an.render();
-                    view.el.replaceWith(an.el);
                 });
             }
         });

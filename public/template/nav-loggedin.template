@@ -1,6 +1,6 @@
 <a class="brand" href="/<%- nickname %>/inbox">ActivityPump</a>
 <ul class="nav pull-right">
-    <li><a href="/<%- nickname %>"><%- displayName %></a></li>
+    <li><a href="/<%- nickname %>"><%- nickname %></a></li>
     <li><a href="/settings">Settings</a></li>
     <li><a href="/logout">Logout</a></li>
 </ul>

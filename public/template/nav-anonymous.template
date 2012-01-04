@@ -5,7 +5,7 @@
     <li><a href="#settings">Settings</a></li>
 </ul>
 <form id="login" action="" class="pull-right">
-    <input class="input-small" type="text" name="username" placeholder="Username">
+    <input class="input-small" type="text" name="nickname" placeholder="Username">
     <input class="input-small" type="password" name="password" placeholder="Password">
     <button class="btn" type="submit">Sign in</button>
 </form>
