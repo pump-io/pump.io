@@ -12,14 +12,16 @@
             templateName: null,
             render: function() {
                 var tmpl = '/template/'+this.templateName+'.template',
-                    view = this;
+                    view = this,
+                    json = (view.model) ? view.model.toJSON() : {};
+
                 if (!view.template) {
                     $.get(tmpl, function(data) {
                         view.template = _.template(data);
-                        $(view.el).html(view.template(view.model.toJSON()));
+                        $(view.el).html(view.template(json));
                     });
                 } else {
-                    $(view.el).html(view.template(view.model.toJSON()));
+                    $(view.el).html(view.template(json));
                 }
                 return this;
             }
@@ -55,11 +57,12 @@
             },
             logout: function() {
                 var view = this;
-                $.post("/logout", function(data) {
+                $.post("/logout", {nickname: currentUser.nickname}, function(data) {
                     currentUser = null;
                     var an = new AnonymousNav({el: view.el});
                     an.render();
                 });
+                return false;
             }
         });
 
