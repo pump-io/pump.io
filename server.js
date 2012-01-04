@@ -18,7 +18,8 @@
 
 var connect = require('connect'),
     bcrypt  = require('bcrypt'),
-    ActivityPump = require('./lib/activitypump').ActivityPump,
+    PumpAPI = require('./lib/pumpapi').PumpAPI,
+    PumpWeb = require('./lib/pumpweb').PumpWeb,
     port = process.env.PORT || 8001,
     hostname = process.env.HOSTNAME || 'localhost',
     databank = require('databank'),
@@ -29,7 +30,7 @@ var connect = require('connect'),
     db;
 
 params = config.params;
-params.schema = ActivityPump.getSchema();
+params.schema = PumpAPI.getSchema();
 
 db = Databank.get(config.driver, params);
 
@@ -44,9 +45,10 @@ db.connect({}, function(err) {
 
     } else {
 
-        ActivityPump.port = port;
-        ActivityPump.hostname = hostname;
-        ActivityPump.bank = DatabankObject.bank = db;
+        PumpAPI.port = port;
+        PumpAPI.hostname = hostname;
+
+        PumpAPI.bank = DatabankObject.bank = db;
 
         server = connect.createServer(
             connect.logger(),
@@ -56,7 +58,10 @@ db.connect({}, function(err) {
             connect.cookieParser(),
             connect.session({secret: (config.secret || "activitypump")}),
             connect.static(__dirname + '/public'),
-            connect.router(ActivityPump.initApp)
+            connect.router(function(app) {
+                PumpAPI.initApp(app);
+                PumpWeb.initApp(app);
+            })
         );
 
         // ...then listen
