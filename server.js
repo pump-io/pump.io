@@ -57,6 +57,7 @@ db.connect({}, function(err) {
             connect.query(),
             connect.cookieParser(),
             connect.session({secret: (config.secret || "activitypump")}),
+            connect.favicon(),
             connect.static(__dirname + '/public'),
             connect.router(function(app) {
                 PumpAPI.initApp(app);
