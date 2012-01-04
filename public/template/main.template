@@ -10,8 +10,8 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <link href="/css/bootstrap.css" rel="stylesheet">
-    <link href="/css/activitypump.css" rel="stylesheet">
+    <link href="/stylesheet/bootstrap.css" rel="stylesheet">
+    <link href="/stylesheet/activitypump.css" rel="stylesheet">
 
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href="images/favicon.ico">
@@ -19,7 +19,7 @@
     <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
     <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
 
-    <script src="/js/modernizr-latest.js"></script>
+    <script src="/javascript/modernizr-latest.js"></script>
 
   </head>
 
@@ -55,9 +55,9 @@
 
     </div> <!-- /container -->
 
-    <script defer src="/js/underscore-min.js"></script>
-    <script defer src="/js/backbone-min.js"></script>
-    <script defer src="/js/jquery-1.7.1.min.js"></script>
+    <script defer src="/javascript/underscore-min.js"></script>
+    <script defer src="/javascript/backbone-min.js"></script>
+    <script defer src="/javascript/jquery-1.7.1.min.js"></script>
 
   </body>
 </html>
