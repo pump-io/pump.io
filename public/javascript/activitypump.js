@@ -7,21 +7,23 @@
 
         var currentUser = null; // XXX: load from server...?
 
+        var templates = {};
+
         var TemplateView = Backbone.View.extend({
-            template: null,
             templateName: null,
             render: function() {
-                var tmpl = '/template/'+this.templateName+'.template',
+                var name = this.templateName,
+                    url = '/template/'+name+'.template',
                     view = this,
                     json = (view.model) ? view.model.toJSON() : {};
 
-                if (!view.template) {
-                    $.get(tmpl, function(data) {
-                        view.template = _.template(data);
-                        $(view.el).html(view.template(json));
+                if (!templates[name]) {
+                    $.get(url, function(data) {
+                        templates[name] = _.template(data);
+                        $(view.el).html(templates[name](json));
                     });
                 } else {
-                    $(view.el).html(view.template(json));
+                    $(view.el).html(templates[name](json));
                 }
                 return this;
             }
@@ -90,7 +92,7 @@
             },
 
             activity: function(id) {
-            },
+            }
         });
 
         var ap = new ActivityPump();
