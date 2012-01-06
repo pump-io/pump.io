@@ -36,14 +36,14 @@
     <div class="container">
 
       <div class="content">
-        <div class="page-header">
+        <div class="page-header" id="header">
           <%= header %>
         </div>
         <div class="row">
-          <div class="span10">
+          <div class="span10" id="content">
             <%= content %>
           </div>
-          <div class="span4">
+          <div class="span4" id="sidebar">
             <%= sidebar %>
           </div>
         </div>

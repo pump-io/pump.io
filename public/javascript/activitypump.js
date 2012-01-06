@@ -3,6 +3,9 @@
     $(document).ready(function() {
 
         var User = Backbone.Model.extend({
+            url: function() {
+                return "/user/" + this.get("nickname");
+            }
         });
 
         var currentUser = null; // XXX: load from server...?
@@ -68,20 +71,37 @@
             }
         });
 
+        var UserPageHeader = TemplateView.extend({
+            templateName: 'user-page-header',
+            el: '#header'
+        });
+
+        var UserPageSidebar = TemplateView.extend({
+            templateName: 'user-page-sidebar',
+            el: '#sidebar'
+        });
+
         var ActivityPump = Backbone.Router.extend({
 
             routes: {
                 "/":                 "public",    
-                "/activity/:id":     "activity",
-                "/settings":         "settings",
+                "/:nickname":        "profile",   
                 "/:nickname/inbox":  "inbox",  
-                "/:nickname":        "profile"   
+                "/activity/:id":     "activity",
+                "/settings":         "settings"
             },
 
             public: function() {
             },
 
             profile: function(nickname) {
+                var user = new User({nickname: nickname});
+                user.fetch({success: function(user, response) {
+                    var header = new UserPageHeader({model: user}),
+                        sidebar = new UserPageSidebar({model: user});
+                    header.render();
+                    sidebar.render();
+                }});
             },
 
             inbox: function(nickname) {
@@ -101,6 +121,7 @@
             navigateToHref: function(ev) {
                 var el = ev.srcElement,
                     href = $(el).attr("href");
+                console.log("Going to " + href + "...");
                 ap.navigate(href, true);
                 return false;
             }
