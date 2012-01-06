@@ -1,0 +1,8 @@
+<ul>
+<% _.each(obj, function(activity) { %>
+<li>
+<p class="activity-content"><%- activity.content %></p>
+<p class="activity-created"><%- activity.created %></p>
+</li>   
+<% }); %>
+</ul>

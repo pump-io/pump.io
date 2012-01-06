@@ -2,9 +2,39 @@
 
     $(document).ready(function() {
 
+        var Activity = Backbone.Model.extend({
+            url: function() {
+                var url = this.get("url"),
+                    uuid = this.get("uuid");
+                if (url) {
+                    return url;
+                } else if (uuid) {
+                    return "/activity/" + uuid;
+                } else {
+                    return null;
+                }
+            }
+        });
+
+        var ActivityStream = Backbone.Collection.extend({
+        });
+
+        var UserStream = Backbone.Collection.extend({
+            user: null,
+            initialize: function(models, options) {
+                this.user = options.user;
+            },
+            url: function() {
+                return "/user/" + this.user.get("nickname") + "/feed";
+            }
+        });
+
         var User = Backbone.Model.extend({
             url: function() {
                 return "/user/" + this.get("nickname");
+            },
+            getStream: function() {
+                return new UserStream([], {user: this});
             }
         });
 
@@ -81,6 +111,11 @@
             el: '#sidebar'
         });
 
+        var UserPageContent = TemplateView.extend({
+            templateName: 'user-page-content',
+            el: '#content'
+        });
+
         var ActivityPump = Backbone.Router.extend({
 
             routes: {
@@ -95,12 +130,18 @@
             },
 
             profile: function(nickname) {
-                var user = new User({nickname: nickname});
+                var user = new User({nickname: nickname}),
+                    stream = user.getStream();
+
                 user.fetch({success: function(user, response) {
-                    var header = new UserPageHeader({model: user}),
-                        sidebar = new UserPageSidebar({model: user});
-                    header.render();
-                    sidebar.render();
+                    stream.fetch({success: function(stream, response) {
+                        var header = new UserPageHeader({model: user}),
+                            sidebar = new UserPageSidebar({model: user}),
+                            content = new UserPageContent({model: stream});
+                        header.render();
+                        sidebar.render();
+                        content.render();
+                    }});
                 }});
             },
 
