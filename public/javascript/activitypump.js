@@ -71,16 +71,12 @@
         var ActivityPump = Backbone.Router.extend({
 
             routes: {
-                "":                 "public",    
-                ":nickname":        "profile",   
-                ":nickname/inbox":  "inbox",  
-                "activity/:id":     "activity",
-                "settings":         "settings"
+                "/":                 "public",    
+                "/activity/:id":     "activity",
+                "/settings":         "settings",
+                "/:nickname/inbox":  "inbox",  
+                "/:nickname":        "profile"   
             },
-
-            currentContent: null,
-            currentSidebar: null,
-            currentTitle: null,
 
             public: function() {
             },
@@ -96,6 +92,21 @@
         });
 
         var ap = new ActivityPump();
+
+        var BodyView = Backbone.View.extend({
+            el: "body",
+            events: {
+                "click a": "navigateToHref"
+            },
+            navigateToHref: function(ev) {
+                var el = ev.srcElement,
+                    href = $(el).attr("href");
+                ap.navigate(href, true);
+                return false;
+            }
+        });
+
+        var bv = new BodyView();
 
         var nav;
 
