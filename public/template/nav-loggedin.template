@@ -1,4 +1,4 @@
-<a class="brand" href="/#<%- nickname %>/inbox">ActivityPump</a>
+<a class="brand" href="/<%- nickname %>/inbox">ActivityPump</a>
 <div class="pull-right">
 <ul class="nav">
     <li><a href="/<%- nickname %>"><%- nickname %></a></li>
