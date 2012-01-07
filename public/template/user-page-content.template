@@ -2,7 +2,7 @@
 <% _.each(obj, function(activity) { %>
 <li>
 <p class="activity-content"><%- activity.content %></p>
-<p class="activity-created"><%- activity.created %></p>
+<p class="activity-created"><%- activity.published %></p>
 </li>   
 <% }); %>
 </ul>
