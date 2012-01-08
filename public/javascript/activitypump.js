@@ -17,9 +17,12 @@
         });
 
         var ActivityStream = Backbone.Collection.extend({
+            parse: function(response) {
+                return response.items;
+            }
         });
 
-        var UserStream = Backbone.Collection.extend({
+        var UserStream = ActivityStream.extend({
             user: null,
             initialize: function(models, options) {
                 this.user = options.user;
@@ -48,7 +51,7 @@
                 var name = this.templateName,
                     url = '/template/'+name+'.template',
                     view = this,
-                    json = (view.model) ? view.model.toJSON() : {};
+                    json = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model);
 
                 if (!templates[name]) {
                     $.get(url, function(data) {
@@ -137,7 +140,8 @@
                     stream.fetch({success: function(stream, response) {
                         var header = new UserPageHeader({model: user}),
                             sidebar = new UserPageSidebar({model: user}),
-                            content = new UserPageContent({model: {actor: user, stream: stream}});
+                            content = new UserPageContent({model: {actor: user.toJSON(), stream: stream.toJSON()}});
+
                         header.render();
                         sidebar.render();
                         content.render();
