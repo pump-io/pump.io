@@ -137,7 +137,7 @@
                     stream.fetch({success: function(stream, response) {
                         var header = new UserPageHeader({model: user}),
                             sidebar = new UserPageSidebar({model: user}),
-                            content = new UserPageContent({model: stream});
+                            content = new UserPageContent({model: {actor: user, stream: stream}});
                         header.render();
                         sidebar.render();
                         content.render();

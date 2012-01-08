@@ -1,7 +1,7 @@
 <ul>
-<% _.each(obj, function(activity) { %>
+<% _.each(stream, function(activity) { %>
 <li>
-<p class="activity-content"><%- (activity.content || activity.object.summary || activity.object.content || (activity.actor.displayName + " " + activity.verb + "ed " + activity.object.displayName))%></p>
+<p class="activity-content"><%- (activity.content || activity.object.summary || activity.object.content || ((activity.actor||actor).displayName + " " + activity.verb + "ed " + activity.object.displayName))%></p>
 <p class="activity-created"><%- activity.published %></p>
 </li>   
 <% }); %>
