@@ -160,7 +160,7 @@
                 "click a": "navigateToHref"
             },
             navigateToHref: function(ev) {
-                var el = ev.srcElement,
+                var el = (ev.srcElement || ev.currentTarget),
                     href = $(el).attr("href");
                 console.log("Going to " + href + "...");
                 ap.navigate(href, true);
