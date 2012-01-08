@@ -32,12 +32,25 @@
             }
         });
 
+        var UserInbox = ActivityStream.extend({
+            user: null,
+            initialize: function(models, options) {
+                this.user = options.user;
+            },
+            url: function() {
+                return "/user/" + this.user.get("nickname") + "/inbox";
+            }
+        });
+
         var User = Backbone.Model.extend({
             url: function() {
                 return "/user/" + this.get("nickname");
             },
             getStream: function() {
                 return new UserStream([], {user: this});
+            },
+            getInbox: function() {
+                return new UserInbox([], {user: this});
             }
         });
 
@@ -119,6 +132,21 @@
             el: '#content'
         });
 
+        var InboxHeader = TemplateView.extend({
+            templateName: 'inbox-header',
+            el: '#header'
+        });
+
+        var InboxSidebar = TemplateView.extend({
+            templateName: 'inbox-sidebar',
+            el: '#sidebar'
+        });
+
+        var InboxContent = TemplateView.extend({
+            templateName: 'inbox-content',
+            el: '#content'
+        });
+
         var ActivityPump = Backbone.Router.extend({
 
             routes: {
@@ -150,6 +178,20 @@
             },
 
             inbox: function(nickname) {
+                var user = new User({nickname: nickname}),
+                    inbox = user.getInbox();
+
+                user.fetch({success: function(user, response) {
+                    inbox.fetch({success: function(inbox, response) {
+                        var header = new InboxHeader({model: user}),
+                            sidebar = new InboxSidebar({model: user}),
+                            content = new InboxContent({model: {stream: inbox.toJSON()}});
+
+                        header.render();
+                        sidebar.render();
+                        content.render();
+                    }});
+                }});
             },
 
             activity: function(id) {
