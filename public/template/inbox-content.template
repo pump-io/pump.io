@@ -3,8 +3,8 @@
 <li>
 <p class="activity-content"><%- (activity.content || activity.object.summary || activity.object.content || ((activity.actor||actor).displayName + " " + activity.verb + "ed " + activity.object.displayName))%></p>
 <p class="activity-meta">
-   <a class="activity-author" href="<%- activity.actor.url %>"><%- activity.actor.displayName || activity.actor.preferredUsername %></a>
-   <a class="activity-url" href="<%- activity.url %>"><%- activity.published %></a>
+   <a class="activity-author" href="<%= activity.actor.url %>"><%- activity.actor.displayName || activity.actor.preferredUsername %></a>
+   <a class="activity-url" href="<%= activity.url %>"><%- activity.published %></a>
 </p>
 </li>   
 <% }); %>
