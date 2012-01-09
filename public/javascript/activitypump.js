@@ -4,10 +4,10 @@
 
         var Activity = Backbone.Model.extend({
             url: function() {
-                var url = this.get("url"),
+                var links = this.get("links"),
                     uuid = this.get("uuid");
-                if (url) {
-                    return url;
+                if (links && _.isObject(links) && links.self) {
+                    return links.self;
                 } else if (uuid) {
                     return "/activity/" + uuid;
                 } else {
@@ -162,14 +162,29 @@
             el: '#content'
         });
 
+        var ActivityHeader = TemplateView.extend({
+            templateName: 'activity-header',
+            el: '#header'
+        });
+
+        var ActivitySidebar = TemplateView.extend({
+            templateName: 'activity-sidebar',
+            el: '#sidebar'
+        });
+
+        var ActivityContent = TemplateView.extend({
+            templateName: 'activity-content',
+            el: '#content'
+        });
+
         var ActivityPump = Backbone.Router.extend({
 
             routes: {
-                "/":                 "public",    
-                "/:nickname":        "profile",   
-                "/:nickname/inbox":  "inbox",  
-                "/activity/:id":     "activity",
-                "/settings":         "settings"
+                "/":                       "public",    
+                "/:nickname":              "profile",   
+                "/:nickname/inbox":        "inbox",  
+                "/:nickname/activity/:id": "activity",
+                "/settings":               "settings"
             },
 
             public: function() {
@@ -216,7 +231,18 @@
                 }});
             },
 
-            activity: function(id) {
+            activity: function(nickname, id) {
+                var act = new Activity({uuid: id, userNickname: nickname});
+
+                act.fetch({success: function(act, response) {
+                    var header = new ActivityHeader({model: act}),
+                        sidebar = new ActivitySidebar({model: act}),
+                        content = new ActivityContent({model: act});
+
+                    header.render();
+                    sidebar.render();
+                    content.render();
+                }});
             }
         });
 
@@ -229,9 +255,13 @@
             },
             navigateToHref: function(ev) {
                 var el = (ev.srcElement || ev.currentTarget),
-                    href = $(el).attr("href");
-                console.log("Going to " + href + "...");
-                ap.navigate(href, true);
+                    pathname = el.pathname, // XXX: HTML5
+                    here = window.location;
+
+                if (!el.host || el.host === here.host) {
+                    ap.navigate(pathname, true);
+                }
+
                 return false;
             }
         });
