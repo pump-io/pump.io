@@ -117,6 +117,21 @@
             }
         });
 
+        var Header = TemplateView.extend({
+            templateName: 'header',
+            el: '#header'
+        });
+
+        var MainContent = TemplateView.extend({
+            templateName: 'main-content',
+            el: '#content'
+        });
+
+        var MainSidebar = TemplateView.extend({
+            templateName: 'main-sidebar',
+            el: '#sidebar'
+        });
+
         var UserPageHeader = TemplateView.extend({
             templateName: 'user-page-header',
             el: '#header'
@@ -158,6 +173,13 @@
             },
 
             public: function() {
+                var header = new Header({model: {title: "Welcome", subtitle: ""}}),
+                    sidebar = new MainSidebar({}),
+                    content = new MainContent({});
+
+                header.render();
+                sidebar.render();
+                content.render();
             },
 
             profile: function(nickname) {
