@@ -42,7 +42,24 @@
             }
         });
 
+	var Person = Backbone.Model.extend({
+	    url: function() {
+                var links = this.get("links"),
+                    uuid = this.get("uuid");
+                if (links && _.isObject(links) && links.self) {
+                    return links.self;
+                } else if (uuid) {
+                    return "/api/person/" + uuid;
+                } else {
+                    return null;
+                }
+	    }
+	});
+
         var User = Backbone.Model.extend({
+	    initialize: function() {
+		this.person = new Person(this.get("profile"));
+	    },
             url: function() {
                 return "/api/user/" + this.get("nickname");
             },
@@ -177,6 +194,38 @@
             el: '#content'
         });
 
+        var SettingsSidebar = TemplateView.extend({
+            templateName: 'settings-sidebar',
+            el: '#sidebar'
+        });
+
+        var SettingsContent = TemplateView.extend({
+            templateName: 'settings-content',
+            el: '#content',
+            events: {
+                "submit #settings": "saveSettings"
+            },
+            saveSettings: function() {
+                var view = this,
+		    user = currentUser,
+		    profile = user.profile;
+
+		user.set("password", this.$("#password").val());
+
+		user.save();
+
+		profile.save("displayName", this.$("#realname").val());
+
+		profile.set("location", { displayName: this.$("#location").val() });
+		
+		profile.set("summary", this.$("#bio").val());
+
+		profile.save();
+
+                return false;
+            }
+        });
+
         var ActivityPump = Backbone.Router.extend({
 
             routes: {
@@ -187,7 +236,17 @@
                 "/main/settings":          "settings"
             },
 
-            public: function() {
+	    settings: function() {
+                var header = new Header({model: {title: "Settings", subtitle: ""}}),
+                    sidebar = new SettingsSidebar({model: currentUser}),
+                    content = new SettingsContent({model: currentUser});
+
+                header.render();
+                sidebar.render();
+                content.render();
+	    },
+
+            "public": function() {
                 var header = new Header({model: {title: "Welcome", subtitle: ""}}),
                     sidebar = new MainSidebar({}),
                     content = new MainContent({});
