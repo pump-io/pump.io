@@ -24,7 +24,7 @@ var nickname = process.argv[2],
 var activity = {'nickname': nickname,
 		'password': password};
 
-postActivity('http://localhost:8001/users', activity, function(err, results) {
+postActivity('http://localhost:8001/api/users', activity, function(err, results) {
     if (err) {
 	console.error(err);
     } else {

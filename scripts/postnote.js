@@ -1,6 +1,6 @@
-// register.js
+// postnote.js
 //
-// Register a new user with the activity pump
+// Post a note with the given text
 //
 // Copyright 2011, StatusNet Inc.
 //
@@ -25,7 +25,7 @@ var nickname = process.argv[2],
 
 var activity,
     opts = {auth: nickname + ':' + password},
-    url = 'http://localhost:8001/user/'+nickname+'/feed';
+    url = 'http://localhost:8001/api/user/'+nickname+'/feed';
 
 activity = {'verb': 'post',
 	    'object': {

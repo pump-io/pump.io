@@ -24,10 +24,10 @@ var nickname = process.argv[2],
     password = process.argv[3],
     other = process.argv[4];
 
-getJSON('http://localhost:8001/user/'+other, function(err, otherUser) {
+getJSON('http://localhost:8001/api/user/'+other, function(err, otherUser) {
     var activity,
 	opts = {auth: nickname + ':' + password},
-	url = 'http://localhost:8001/user/'+nickname+'/feed';
+	url = 'http://localhost:8001/api/user/'+nickname+'/feed';
 
     if (err) {
 	console.error(err);
