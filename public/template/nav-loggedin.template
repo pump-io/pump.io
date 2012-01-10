@@ -1,12 +1,11 @@
 <a class="brand" href="/<%- nickname %>/inbox">ActivityPump</a>
 <ul class="nav">
     <li class="active"><a href="/<%- nickname %>/inbox">Home</a></li>
-    <li><a href="/help/about">About</a></li>
 </ul>
 <div class="pull-right">
 <ul class="nav">
     <li><a href="/<%- nickname %>"><%- nickname %></a></li>
-    <li><a href="/settings">Settings</a></li>
+    <li><a href="/main/settings">Settings</a></li>
     <form id="logout" action="" class="pull-right">
          <input type="hidden" name="nickname" value="<%- nickname %>">
          <button class="btn" type="submit">Logout</button>

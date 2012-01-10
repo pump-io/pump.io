@@ -1,7 +1,6 @@
 <a class="brand" href="/">ActivityPump</a>
 <ul class="nav">
     <li class="active"><a href="/">Home</a></li>
-    <li><a href="/help/about">About</a></li>
 </ul>
 <form id="login" action="" class="pull-right">
     <input class="input-small" type="text" name="nickname" placeholder="Username">

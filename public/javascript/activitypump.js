@@ -9,7 +9,7 @@
                 if (links && _.isObject(links) && links.self) {
                     return links.self;
                 } else if (uuid) {
-                    return "/activity/" + uuid;
+                    return "/api/activity/" + uuid;
                 } else {
                     return null;
                 }
@@ -28,7 +28,7 @@
                 this.user = options.user;
             },
             url: function() {
-                return "/user/" + this.user.get("nickname") + "/feed";
+                return "/api/user/" + this.user.get("nickname") + "/feed";
             }
         });
 
@@ -38,13 +38,13 @@
                 this.user = options.user;
             },
             url: function() {
-                return "/user/" + this.user.get("nickname") + "/inbox";
+                return "/api/user/" + this.user.get("nickname") + "/inbox";
             }
         });
 
         var User = Backbone.Model.extend({
             url: function() {
-                return "/user/" + this.get("nickname");
+                return "/api/user/" + this.get("nickname");
             },
             getStream: function() {
                 return new UserStream([], {user: this});
@@ -90,7 +90,7 @@
                     params = {nickname: this.$('#login input[name="nickname"]').val(),
                               password: this.$('#login input[name="password"]').val()};
 
-                $.post("/login", params, function(user) {
+                $.post("/main/login", params, function(user) {
                     currentUser = new User(user);
                     var un = new UserNav({model: currentUser, el: view.el});
                     un.render();
@@ -108,7 +108,7 @@
             },
             logout: function() {
                 var view = this;
-                $.post("/logout", {nickname: currentUser.nickname}, function(data) {
+                $.post("/main/logout", {nickname: currentUser.nickname}, function(data) {
                     currentUser = null;
                     var an = new AnonymousNav({el: view.el});
                     an.render();
@@ -184,7 +184,7 @@
                 "/:nickname":              "profile",   
                 "/:nickname/inbox":        "inbox",  
                 "/:nickname/activity/:id": "activity",
-                "/settings":               "settings"
+                "/main/settings":          "settings"
             },
 
             public: function() {
