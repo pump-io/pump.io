@@ -1,6 +1,6 @@
 /* ============================================================
- * bootstrap-buttons.js v1.4.0
- * http://twitter.github.com/bootstrap/javascript.html#buttons
+ * bootstrap-dropdown.js v1.4.0
+ * http://twitter.github.com/bootstrap/javascript.html#dropdown
  * ============================================================
  * Copyright 2011 Twitter, Inc.
  *
@@ -31,11 +31,9 @@
 
     $el.html( data[state] || $.fn.button.defaults[state] )
 
-    setTimeout(function () {
-      state == 'loadingText' ?
-        $el.addClass(d).attr(d, d) :
-        $el.removeClass(d).removeAttr(d)
-    }, 0)
+    state == 'loadingText' ?
+      $el.addClass(d).attr(d, d) :
+      $el.removeClass(d).removeAttr(d)
   }
 
   function toggle(el) {

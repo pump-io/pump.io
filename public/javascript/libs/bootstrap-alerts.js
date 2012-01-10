@@ -54,7 +54,6 @@
   * ====================== */
 
   var Alert = function ( content, options ) {
-    if (options == 'close') return this.close.call(content)
     this.settings = $.extend({}, $.fn.alert.defaults, options)
     this.$element = $(content)
       .delegate(this.settings.selector, 'click', this.close)
@@ -63,10 +62,7 @@
   Alert.prototype = {
 
     close: function (e) {
-      var $element = $(this)
-        , className = 'alert-message'
-
-      $element = $element.hasClass(className) ? $element : $element.parent()
+      var $element = $(this).parent('.alert-message')
 
       e && e.preventDefault()
       $element.removeClass('in')
@@ -94,16 +90,9 @@
 
     return this.each(function () {
       var $this = $(this)
-        , data
 
       if ( typeof options == 'string' ) {
-
-        data = $this.data('alert')
-
-        if (typeof data == 'object') {
-          return data[options].call( $this )
-        }
-
+        return $this.data('alert')[options]()
       }
 
       $(this).data('alert', new Alert( this, options ))
