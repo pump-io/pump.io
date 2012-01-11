@@ -58,7 +58,7 @@
 
         var User = Backbone.Model.extend({
 	    initialize: function() {
-		this.person = new Person(this.get("profile"));
+		this.profile = new Person(this.get("profile"));
 	    },
             url: function() {
                 return "/api/user/" + this.get("nickname");
@@ -200,12 +200,16 @@
         });
 
         var SettingsContent = TemplateView.extend({
+            initialize: function() {
+                _.bindAll(this, "saveSettings");
+            },
             templateName: 'settings-content',
             el: '#content',
             events: {
                 "submit #settings": "saveSettings"
             },
             saveSettings: function() {
+
                 var view = this,
 		    user = currentUser,
 		    profile = user.profile;
@@ -214,11 +218,11 @@
 
 		user.save();
 
-		profile.save("displayName", this.$("#realname").val());
+		profile.set("displayName", this.$('#settings input[name="realname"]').val());
 
-		profile.set("location", { displayName: this.$("#location").val() });
+		profile.set("location", { displayName: this.$('#settings input[name="location"]').val() });
 		
-		profile.set("summary", this.$("#bio").val());
+		profile.set("summary", this.$('#settings textarea[name="bio"]').val());
 
 		profile.save();
 
