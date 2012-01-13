@@ -35,7 +35,7 @@ getJSON('http://localhost:8001/api/user/'+other, function(err, otherUser) {
 	activity = {'verb': 'follow',
 		    'object': {
 			'objectType': 'person',
-			id: otherUser.personId
+			id: otherUser.profile.id
 		    }
 		   };
 	postActivity(url, activity, opts, function(err, results) {
