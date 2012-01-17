@@ -208,19 +208,19 @@
             saveSettings: function() {
                 var view = this,
 		    user = currentUser,
-		    profile = user.profile;
+		    person = user.person;
 
-		user.set("password", this.$("#password").val());
+		user.set("password", this.$('#settings input[name="password"]').val());
 
 		user.save();
 
-		profile.save("displayName", this.$("#realname").val());
+		person.set("displayName", this.$('#settings input[name="realname"]').val());
 
-		profile.set("location", { displayName: this.$("#location").val() });
+		person.set("location", { displayName: this.$('#settings input[name="location"]').val() });
 		
-		profile.set("summary", this.$("#bio").val());
+		person.set("summary", this.$('#settings textarea[name="bio"]').val());
 
-		profile.save();
+		person.save();
 
                 return false;
             }
