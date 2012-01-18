@@ -212,15 +212,13 @@
 		user = currentUser,
 		profile = user.profile;
 
-	    user.set("password", this.$("#password").val());
+	    user.set({"password": this.$("#password").val()});
 
 	    user.save();
 
-	    profile.set("displayName", this.$('#settings input[name="realname"]').val());
-
-	    profile.set("location", { displayName: this.$('#settings input[name="location"]').val() });
-	    
-	    profile.set("summary", this.$('#settings textarea[name="bio"]').val());
+	    profile.set({"displayName": this.$('#realname').val(),
+	                 "location": { displayName: this.$('#location').val() },
+	                 "summary": this.$('#bio').val()});
 
 	    profile.save();
 
