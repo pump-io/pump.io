@@ -53,6 +53,8 @@
     <script defer src="/javascript/underscore-min.js"></script>
     <script defer src="/javascript/backbone.js"></script>
     <script defer src="/javascript/activitypump.js"></script>
+    <script defer src="/javascript/libs/bootstrap-modal.js"></script>
+    <script defer src="/javascript/libs/bootstrap-tabs.js"></script>
 
   </body>
 </html>
