@@ -1,7 +1,9 @@
-<p class="activity-content">
-   <%- (obj.content || object.summary || object.content || (actor.displayName + " " + verb + "ed " + object.displayName)) %>
-</p>
-<p class="activity-meta">
-   <a class="activity-author" href="<%= actor.url %>"><%- actor.displayName %></a>
-   <a class="activity-url" href="<%= obj.url %>"><%- obj.published %></a>
-</p>
+<div class="span14" id="activity">
+  <p class="activity-content">
+    <%- (obj.content || object.summary || object.content || (actor.displayName + " " + verb + "ed " + object.displayName)) %>
+  </p>
+  <p class="activity-meta">
+    <a class="activity-author" href="<%= actor.url %>"><%- actor.displayName %></a>
+    <a class="activity-url" href="<%= obj.url %>"><%- obj.published %></a>
+  </p>
+</div>

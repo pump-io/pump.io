@@ -33,13 +33,8 @@
         <div class="page-header" id="header">
           <%= header %>
         </div>
-        <div class="row">
-          <div class="span10" id="content">
-            <%= content %>
-          </div>
-          <div class="span4" id="sidebar">
-            <%= sidebar %>
-          </div>
+        <div class="row" id="content">
+	  <%= content %>
         </div>
       </div>
 

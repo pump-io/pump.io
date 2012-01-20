@@ -142,19 +142,9 @@
         el: '#content'
     });
 
-    var MainSidebar = TemplateView.extend({
-        templateName: 'main-sidebar',
-        el: '#sidebar'
-    });
-
     var UserPageHeader = TemplateView.extend({
         templateName: 'user-page-header',
         el: '#header'
-    });
-
-    var UserPageSidebar = TemplateView.extend({
-        templateName: 'user-page-sidebar',
-        el: '#sidebar'
     });
 
     var UserPageContent = TemplateView.extend({
@@ -167,11 +157,6 @@
         el: '#header'
     });
 
-    var InboxSidebar = TemplateView.extend({
-        templateName: 'inbox-sidebar',
-        el: '#sidebar'
-    });
-
     var InboxContent = TemplateView.extend({
         templateName: 'inbox-content',
         el: '#content'
@@ -182,19 +167,9 @@
         el: '#header'
     });
 
-    var ActivitySidebar = TemplateView.extend({
-        templateName: 'activity-sidebar',
-        el: '#sidebar'
-    });
-
     var ActivityContent = TemplateView.extend({
         templateName: 'activity-content',
         el: '#content'
-    });
-
-    var SettingsSidebar = TemplateView.extend({
-        templateName: 'settings-sidebar',
-        el: '#sidebar'
     });
 
     var SettingsContent = TemplateView.extend({
@@ -238,21 +213,17 @@
 
 	settings: function() {
             var header = new Header({model: {title: "Settings", subtitle: ""}}),
-                sidebar = new SettingsSidebar({model: currentUser}),
                 content = new SettingsContent({model: currentUser});
 
             header.render();
-            sidebar.render();
             content.render();
 	},
 
         "public": function() {
             var header = new Header({model: {title: "Welcome", subtitle: ""}}),
-                sidebar = new MainSidebar({}),
                 content = new MainContent({});
 
             header.render();
-            sidebar.render();
             content.render();
         },
 
@@ -263,11 +234,9 @@
             user.fetch({success: function(user, response) {
                 stream.fetch({success: function(stream, response) {
                     var header = new UserPageHeader({model: user}),
-                        sidebar = new UserPageSidebar({model: user}),
                         content = new UserPageContent({model: {actor: user.toJSON(), stream: stream.toJSON()}});
 
                     header.render();
-                    sidebar.render();
                     content.render();
                 }});
             }});
@@ -280,11 +249,9 @@
             user.fetch({success: function(user, response) {
                 inbox.fetch({success: function(inbox, response) {
                     var header = new InboxHeader({model: user}),
-                        sidebar = new InboxSidebar({model: user}),
-                        content = new InboxContent({model: {stream: inbox.toJSON()}});
+                        content = new InboxContent({model: {user: user.toJSON(), stream: inbox.toJSON()}});
 
                     header.render();
-                    sidebar.render();
                     content.render();
                 }});
             }});
@@ -295,11 +262,9 @@
 
             act.fetch({success: function(act, response) {
                 var header = new ActivityHeader({model: act}),
-                    sidebar = new ActivitySidebar({model: act}),
                     content = new ActivityContent({model: act});
 
                 header.render();
-                sidebar.render();
                 content.render();
             }});
         }
