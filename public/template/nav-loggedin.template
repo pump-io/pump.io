@@ -1,3 +1,5 @@
+<% /* -*- mode: html -*- */ %>
+
 <a class="brand" href="/<%- nickname %>/inbox">ActivityPump</a>
 <ul class="nav">
   <li class="active"><a href="/<%- nickname %>/inbox">Home</a></li>
@@ -23,14 +25,19 @@
     </ul>
     <div id="post-tags" class="tab-content">
       <div class="active tab-pane" id="note">
-        <p>[Note form]</p>
+	<form id="post-note">
+	  <div class="clearfix">
+	    <label for="bio">What&apos;s up?</label>
+	    <div class="input">
+              <textarea class="span6" id="note-content" name="note" rows="5"></textarea>
+	    </div>
+	  </div><!-- /clearfix -->
+	  <input type="submit" class="btn primary" value="Save" />
+	</form>
       </div>
       <div class="tab-pane" id="photo">
         <p>[Photo form]</p>
       </div>
     </div>
-  </div>
-  <div class="modal-footer">
-    <a href="#" class="btn primary">Save</a>
   </div>
 </div>

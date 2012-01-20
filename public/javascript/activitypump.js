@@ -15,6 +15,7 @@
     });
 
     var ActivityStream = Backbone.Collection.extend({
+	model: Activity,
         parse: function(response) {
             return response.items;
         }
@@ -119,7 +120,25 @@
         classname: "nav",
         templateName: 'nav-loggedin',
         events: {
-            "click #logout": "logout"
+            "click #logout": "logout",
+            "submit #post-note": "postNote"
+        },
+        initialize: function() {
+            _.bindAll(this, "postNote");
+            _.bindAll(this, "logout");
+        },
+        postNote: function() {
+
+            var view = this,
+		user = currentUser,
+		profile = user.profile,
+		act = new Activity(),
+		stream = new UserStream({user: user});
+
+	    stream.create({object: {objectType: "note",
+				    content: this.$("#note-content").val()}});
+
+            return false;
         },
         logout: function() {
             var view = this;
