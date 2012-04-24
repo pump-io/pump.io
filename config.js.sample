@@ -2,3 +2,5 @@
 
 exports.driver = 'disk';
 exports.params = {dir: '/tmp/activitypump/'};
+exports.secret = "my dog has fleas";
+exports.noweb = false;

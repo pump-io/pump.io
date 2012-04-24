@@ -18,17 +18,19 @@
 
 var connect = require('connect'),
     bcrypt  = require('bcrypt'),
-    PumpAPI = require('./lib/pumpapi').PumpAPI,
-    PumpWeb = require('./lib/pumpweb').PumpWeb,
+    api = require('./routes/api'),
+    web = require('./routes/web'),
     port = process.env.PORT || 8001,
     hostname = process.env.HOSTNAME || 'localhost',
     databank = require('databank'),
     config = require('./config'),
     express = require('express'),
+    _ = require('underscore'),
     params,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
-    db, app;
+    db,
+    app;
 
 // Initiate the DB
 
@@ -80,6 +82,13 @@ db.connect({}, function(err) {
 
     // Routes
 
+    api.addRoutes(app);
+
+    // Use "noweb" to disable Web site (API engine only)
+
+    if (!_(config).has('noweb') || !config.noweb) {
+	web.addRoutes(app);
+    }
 
     app.listen(3000);
 });
