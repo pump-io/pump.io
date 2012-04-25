@@ -30,6 +30,7 @@ var Activity = require('../model/activity').Activity,
     sameUser = mw.sameUser,
     noUser = mw.noUser,
     getSessionUser = mw.getSessionUser,
+    checkCredentials = mw.checkCredentials,
     NoSuchThingError = databank.NoSuchThingError,
     DEFAULT_ACTIVITIES = 20,
     DEFAULT_USERS = 20;
@@ -541,6 +542,6 @@ var getBasicAuthUser = function(req, res, callback) {
     } else {
         nickname = credentials[0];
         password = credentials[1];
-	this.checkCredentials(nickname, password, callback);
+	checkCredentials(nickname, password, callback);
     }
 };
