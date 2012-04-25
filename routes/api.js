@@ -85,6 +85,14 @@ var initRoutes = function(app) {
 
 exports.initRoutes = initRoutes;
 
+var bank = null;
+
+var setBank = function(newBank) {
+    bank = newBank;
+};
+
+exports.setBank = setBank;
+
 var requester = function(type) {
 
     var Cls = Activity.toClass(type);

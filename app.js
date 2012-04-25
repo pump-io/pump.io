@@ -90,5 +90,7 @@ db.connect({}, function(err) {
 	web.addRoutes(app);
     }
 
+    api.setBank(db);
+
     app.listen(3000);
 });
