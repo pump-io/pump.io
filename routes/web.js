@@ -17,7 +17,6 @@
 // limitations under the License.
 
 var Activity = require('../model/activity').Activity,
-    connect = require('connect'),
     User = require('../model/user').User,
     databank = require('databank'),
     Step = require('step'),
@@ -62,7 +61,7 @@ var showSettings = function(req, res, next) {
         },
         function(err, page) {
             if (err) {
-                pump.showError(res, err);
+                next(err);
             } else {
                 res.writeHead(200, {'Content-Type': 'text/html'});
                 res.end(page);
@@ -87,7 +86,7 @@ var showMain = function(req, res, next) {
         },
         function(err, page) {
             if (err) {
-                pump.showError(res, err);
+                next(err);
             } else {
                 res.writeHead(200, {'Content-Type': 'text/html'});
                 res.end(page);
@@ -107,14 +106,14 @@ var handleLogin = function(req, res, next) {
 	    if (err) throw err;
 	    if (!user) {
 		// done here
-                pump.showError(res, new Error("Not authorized"), 403);
+                next(new Error("Not authorized"), 403);
 	    } else {
 		user.expand(this);
 	    }
 	},
 	function(err, user) {
             if (err) {
-                pump.showError(res, err);
+                next(err);
 	    } else {
                 req.session.nickname = user.nickname;
                 user.sanitize();
@@ -162,7 +161,7 @@ var showActivity = function(req, res, next) {
         },
         function(err, page) {
             if (err) {
-                pump.showError(res, err);
+                next(err);
             } else {
                 res.writeHead(200, {'Content-Type': 'text/html'});
                 res.end(page);
@@ -194,7 +193,7 @@ var showInbox = function(req, res, next) {
         },
         function(err, page) {
             if (err) {
-                pump.showError(res, err);
+                next(err);
             } else {
                 res.writeHead(200, {'Content-Type': 'text/html'});
                 res.end(page);
@@ -226,7 +225,7 @@ var showStream = function(req, res, next) {
         },
         function(err, page) {
             if (err) {
-                pump.showError(res, err);
+                next(err);
             } else {
                 res.writeHead(200, {'Content-Type': 'text/html'});
                 res.end(page);
