@@ -29,7 +29,10 @@ var Activity = require('../model/activity').Activity,
     mustAuth = mw.mustAuth,
     sameUser = mw.sameUser,
     noUser = mw.noUser,
-    NoSuchThingError = databank.NoSuchThingError;
+    getSessionUser = mw.getSessionUser,
+    NoSuchThingError = databank.NoSuchThingError,
+    DEFAULT_ACTIVITIES = 20,
+    DEFAULT_USERS = 20;
 
 // Initialize the app controller
 
@@ -206,7 +209,7 @@ var delUser = function(req, res, next) {
         } else if (err) {
             next(err);
         } else {
-            this.bank.decr('usercount', 0, function(err, value) {
+            bank.decr('usercount', 0, function(err, value) {
                 if (err) {
                     next(err);
                 } else {
@@ -228,11 +231,11 @@ var createUser = function (req, res, next) {
         function (err, value) {
             if (err) throw err;
             user = value;
-            pump.bank.prepend('userlist', 0, user.nickname, this);
+            bank.prepend('userlist', 0, user.nickname, this);
         },
         function (err, userList) {
             if (err) throw err;
-            pump.bank.incr('usercount', 0, this);
+            bank.incr('usercount', 0, this);
         },
         function (err, userCount) {
             if (err) {
@@ -247,17 +250,16 @@ var createUser = function (req, res, next) {
 };
 
 var listUsers = function(req, res, next) {
-    var bank = this.bank,
-        start, cnt, end;
+    var start, cnt, end;
 
     var collection = {
         displayName: "Users of this service",
-        id: this.makeURL("api/users"),
+        id: makeURL("api/users"),
         objectTypes: ["user"]
     };
 
     start = (req.query.offset) ? parseInt(req.query.offset, 10) : 0;
-    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : this.DEFAULT_USERS;
+    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_USERS;
     end = start + cnt;
 
     Step(
@@ -347,15 +349,15 @@ var userStream = function(req, res, next) {
     var collection = {
         author: req.user.profile,
         displayName: "Activities by " + (req.user.profile.displayName || req.user.nickname),
-        id: this.makeURL("api/user/" + req.user.nickname + "/feed"),
+        id: makeURL("api/user/" + req.user.nickname + "/feed"),
         objectTypes: ["activity"],
         items: []
     };
 
-    var start, cnt, end, pump = PumpAPI, bank = this.bank;
+    var start, cnt, end;
 
     start = (req.query.offset) ? parseInt(req.query.offset, 10) : 0;
-    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : pump.DEFAULT_ACTIVITIES;
+    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_ACTIVITIES;
     end = start + cnt;
 
     Step(
@@ -397,14 +399,14 @@ var userInbox = function(req, res, next) {
     var collection = {
         author: req.user.profile,
         displayName: "Activities for " + (req.user.profile.displayName || req.user.nickname),
-        id: this.makeURL("api/user/" + req.user.nickname + "/inbox"),
+        id: makeURL("api/user/" + req.user.nickname + "/inbox"),
         objectTypes: ["activity"],
         items: []
     };
-    var start, cnt, end, pump = PumpAPI, bank = this.bank;
+    var start, cnt, end;
 
     start = (req.query.offset) ? parseInt(req.query.offset, 10) : 0;
-    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : this.DEFAULT_ACTIVITIES;
+    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_ACTIVITIES;
     end = start + cnt;
 
     Step(
@@ -478,7 +480,6 @@ var getSchema = function() {
 };
     
 var distribute = function(activity, callback) {
-    var bank = this.bank;
 
     Step(
         function() {
@@ -516,12 +517,11 @@ var distribute = function(activity, callback) {
 };
 
 var getCurrentUser = function(req, res, callback) {
-    var pump = this;
 
     if (req.session.nickname) {
-        pump.getSessionUser(req, res, callback);
+        getSessionUser(req, res, callback);
     } else if (req.headers.authorization) {
-        pump.getBasicAuthUser(req, res, callback);
+        getBasicAuthUser(req, res, callback);
     } else {
         callback(null, null);
     }
