@@ -45,29 +45,9 @@ var initApp = function(app) {
 };
 
 var showSettings = function(req, res, next) {
-
-    var pump = this;
-
-    Step(
-        function() {
-            pump.runNav(req, this.parallel());
-            pump.runTemplate("header", {title: "Settings", subtitle: ""}, this.parallel());
-	    // FIXME: XSS protection with a session code in form
-            pump.runTemplate("settings-content", req.remoteUser, this.parallel());
-        },
-        function(err, nav, header, content) {
-            if (err) throw err;
-            pump.runTemplate("main", {nav: nav, header: header, content: content}, this);
-        },
-        function(err, page) {
-            if (err) {
-                next(err);
-            } else {
-                res.writeHead(200, {'Content-Type': 'text/html'});
-                res.end(page);
-            }
-        }
-    );
+    res.render("settings", {title: "Settings",
+			    nav: res.partial("nav-loggedin", req.remoteUser),
+			    user: req.remoteUser});
 };
 
 var showMain = function(req, res, next) {
