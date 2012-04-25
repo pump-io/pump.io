@@ -1,55 +1,55 @@
 <!DOCTYPE html>
-<html lang="en" class="no-js">
+<html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>ActivityPump</title>
+    <title><%- title %> - <%- site %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
 
+    <!-- Le styles -->
+    <link href="/stylesheet/bootstrap.min.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+    <link href="/stylesheet/bootstrap-responsive.min.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-
-    <link href="/stylesheet/bootstrap.css" rel="stylesheet">
-    <link href="/stylesheet/activitypump.css" rel="stylesheet">
-
-    <script src="/javascript/modernizr-latest.js"></script>
 
   </head>
 
   <body>
 
-    <div class="topbar">
-      <div class="fill">
-        <div class="container" id="topnav">
-          <%= nav %>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+	  <%= nav %>
         </div>
       </div>
     </div>
 
     <div class="container">
 
-      <div class="content">
-        <div class="page-header" id="header">
-          <%= header %>
-        </div>
-        <div class="row" id="content">
-	  <%= content %>
-        </div>
-      </div>
+      <%= body %>
+
+      <hr>
 
       <footer>
-        <p>&copy; Company 2011</p>
+	<p><a href="https://github.com/evanp/activitypump">ActivityPump</a> software available under the Apache License 2.0.</p>
       </footer>
 
     </div> <!-- /container -->
 
-    <script defer src="/javascript/jquery-1.7.1.min.js"></script>
-    <script defer src="/javascript/underscore-min.js"></script>
-    <script defer src="/javascript/backbone.js"></script>
-    <script defer src="/javascript/activitypump.js"></script>
-    <script defer src="/javascript/libs/bootstrap-modal.js"></script>
-    <script defer src="/javascript/libs/bootstrap-tabs.js"></script>
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="/javascript/bootstrap.min.js"></script>
 
   </body>
 </html>
