@@ -17,7 +17,6 @@
 // limitations under the License.
 
 var Activity = require('../model/activity').Activity,
-    connect = require('connect'),
     User = require('../model/user').User,
     Edge = require('../model/edge').Edge,
     databank = require('databank'),
