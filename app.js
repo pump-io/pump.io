@@ -35,7 +35,7 @@ var connect = require('connect'),
 // Initiate the DB
 
 params = config.params;
-params.schema = PumpAPI.getSchema();
+params.schema = api.getSchema();
 
 db = Databank.get(config.driver, params);
 
