@@ -16,14 +16,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var Activity = require('./model/activity').Activity,
-    PumpApp = require('./pumpapp').PumpApp,
+var Activity = require('../model/activity').Activity,
     connect = require('connect'),
-    User = require('./model/user').User,
+    User = require('../model/user').User,
     databank = require('databank'),
     Step = require('step'),
     _ = require('underscore'),
     fs = require('fs'),
+    mw = require('../lib/middleware'),
+    maybeAuth = mw.maybeAuth,
+    reqUser = mw.reqUser,
+    mustAuth = mw.mustAuth,
+    sameUser = mw.sameUser,
+    noUser = mw.noUser,
     NoSuchThingError = databank.NoSuchThingError;
 
 var initApp = function(app) {
@@ -40,7 +45,7 @@ var initApp = function(app) {
     app.get('/:nickname/activity/:uuid', maybeAuth, reqUser, showActivity);
 };
 
-var showSettings = function(req, res) {
+var showSettings = function(req, res, next) {
 
     var pump = this;
 
@@ -66,7 +71,7 @@ var showSettings = function(req, res) {
     );
 };
 
-var showMain = function(req, res) {
+var showMain = function(req, res, next) {
 
     var pump = this;
 

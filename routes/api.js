@@ -16,14 +16,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var Activity = require('./model/activity').Activity,
+var Activity = require('../model/activity').Activity,
     connect = require('connect'),
-    User = require('./model/user').User,
-    Edge = require('./model/edge').Edge,
+    User = require('../model/user').User,
+    Edge = require('../model/edge').Edge,
     databank = require('databank'),
     _ = require('underscore'),
-    Stream = require('./model/stream').Stream,
+    Stream = require('../model/stream').Stream,
     Step = require('step'),
+    mw = require('../lib/middleware'),
+    maybeAuth = mw.maybeAuth,
+    reqUser = mw.reqUser,
+    mustAuth = mw.mustAuth,
+    sameUser = mw.sameUser,
+    noUser = mw.noUser,
     NoSuchThingError = databank.NoSuchThingError;
 
 // Initialize the app controller
@@ -82,19 +88,18 @@ exports.initRoutes = initRoutes;
 
 var requester = function(type) {
 
-    var Cls = Activity.toClass(type),
-        pump = this;
+    var Cls = Activity.toClass(type);
 
     return function(req, res, next) {
         Cls.search({'uuid': req.params.uuid}, function(err, results) {
             if (err instanceof NoSuchThingError) {
-                pump.showError(res, err, 404);
+                next(err, 404);
             } else if (err) {
-                pump.showError(res, err);
+                next(err);
             } else if (results.length === 0) {
-                pump.showError(res, new Error("Can't find a " + type + " with ID = " + req.params.uuid), 404);
+                next(new Error("Can't find a " + type + " with ID = " + req.params.uuid), 404);
             } else if (results.length > 1) {
-                pump.showError(res, new Error("Too many " + type + " objects with ID = " + req.params.uuid), 500);
+                next(new Error("Too many " + type + " objects with ID = " + req.params.uuid), 500);
             } else {
                 req[type] = results[0];
                 next();
@@ -105,25 +110,24 @@ var requester = function(type) {
 
 var userOnly = function(req, res, next) {
     var person = req.person,
-	user = req.remoteUser,
-	pump = this;
+	user = req.remoteUser;
 
     if (person && user && user.profile && person.id === user.profile.id && user.profile.objectType === 'person') { 
         next();
     } else {
-        pump.showError(res, new Error("Only the user can modify this profile."), 403);
+        next(new Error("Only the user can modify this profile."), 403);
     }
 };
 
 var authorOnly = function(type) {
-    var pump = this;
+
     return function(req, res, next) {
         var obj = req[type];
 
         if (obj && obj.author && obj.author.id == req.remoteUser.profile.id) {
             next();
         } else {
-            pump.showError(res, new Error("Only the author can modify this object."), 403);
+            next(new Error("Only the author can modify this object."), 403);
         }
     };
 };
@@ -134,47 +138,44 @@ var actorOnly = function(req, res, next) {
     if (act && act.actor && act.actor.id == req.remoteUser.profile.id) {
         next();
     } else {
-        this.showError(res, new Error("Only the actor can modify this object."), 403);
+        next(new Error("Only the actor can modify this object."), 403);
     }
 };
 
 var getter = function(type) {
-    var pump = this;
     return function(req, res, next) {
-        pump.showData(res, req[type]);
+        res.json(req[type]);
     };
 };
 
 var putter = function(type) {
-    var pump = this;
     return function(req, res, next) {
         var obj = req[type];
         obj.update(req.body, function(err, result) {
             if (err) {
-                pump.showError(res, err);
+                next(err);
             } else {
-                pump.showData(res, result);
+                res.json(result);
             }
         });
     };
 };
 
 var deleter = function(type) {
-    var pump = this;
     return function(req, res, next) {
         var obj = req[type];
         obj.del(function(err) {
             if (err) {
-                pump.showError(res, err);
+                next(err);
             } else {
-                pump.showData(res, "Deleted");
+                res.json("Deleted");
             }
         });
     };
 };
 
-var getUser = function(req, res) {
-    this.showData(res, req.user);
+var getUser = function(req, res, next) {
+    res.json(req.user);
 };
 
 var putUser = function(req, res, next) {
@@ -183,10 +184,10 @@ var putUser = function(req, res, next) {
 
     req.user.update(newUser, function(err, saved) {
         if (err) {
-            this.showError(res, err);
+            next(err);
         } else {
             saved.sanitize();
-            this.showData(res, saved);
+            res.json(saved);
         }
     });
 };
@@ -194,15 +195,15 @@ var putUser = function(req, res, next) {
 var delUser = function(req, res, next) {
     req.user.del(function(err) {
         if (err instanceof NoSuchThingError) { // unusual
-            this.showError(res, err, 404);
+            next(err, 404);
         } else if (err) {
-            this.showError(res, err);
+            next(err);
         } else {
             this.bank.decr('usercount', 0, function(err, value) {
                 if (err) {
-                    this.showError(res, err);
+                    next(err);
                 } else {
-                    this.showData(res, "Deleted");
+                    res.json("Deleted");
                 }
             });
         }
@@ -211,7 +212,7 @@ var delUser = function(req, res, next) {
 
 var createUser = function (req, res, next) {
 
-    var user, pump = PumpAPI;
+    var user;
 
     Step(
         function () {
@@ -228,11 +229,11 @@ var createUser = function (req, res, next) {
         },
         function (err, userCount) {
             if (err) {
-                pump.showError(res, err);
+                next(err);
             } else {
                 // Hide the password for output
                 user.sanitize();
-                pump.showData(res, user);
+                res.json(user);
             }
         }
     );
@@ -240,8 +241,7 @@ var createUser = function (req, res, next) {
 
 var listUsers = function(req, res, next) {
     var bank = this.bank,
-        start, cnt, end,
-        pump = this;
+        start, cnt, end;
 
     var collection = {
         displayName: "Users of this service",
@@ -266,13 +266,13 @@ var listUsers = function(req, res, next) {
             if (err) {
                 if (err instanceof NoSuchThingError) {
                     collection.items = [];
-                    pump.showData(res, collection);
+                    res.json(collection);
                 } else {
                     throw err;
                 }
             } else if (userIds.length === 0) {
                 collection.items = [];
-                pump.showData(res, collection);
+                res.json(collection);
             } else {
                 bank.readAll('user', userIds, this);
             }
@@ -296,14 +296,14 @@ var listUsers = function(req, res, next) {
                 }
             });
             collection.items = users;
-            pump.showData(res, collection);
+            res.json(collection);
         }
     );
 };
 
 var postActivity = function(req, res, next) {
 
-    var activity = new Activity(req.body), pump = PumpAPI;
+    var activity = new Activity(req.body);
 
     Step(
         function() {
@@ -322,20 +322,20 @@ var postActivity = function(req, res, next) {
         },
         function(err) {
             if (err) {
-                pump.showError(res, err);
+                next(err);
             } else {
                 // ...then show (possibly modified) results.
-                pump.showData(res, activity);
+                res.json(activity);
                 // ...then distribute.
                 process.nextTick(function() {
-                    pump.distribute(activity, function(err) {});
+                    distribute(activity, function(err) {});
                 });
             }
         }
     );
 };
 
-userStream = function(req, res, next) {
+var userStream = function(req, res, next) {
 
     var collection = {
         author: req.user.profile,
@@ -359,7 +359,7 @@ userStream = function(req, res, next) {
         function(err, totalOutbox) {
             if (err) {
                 if (err instanceof NoSuchThingError) {
-                    pump.showData(res, collection);
+                    res.json(collection);
                 } else {
                     throw err;
                 }
@@ -369,7 +369,7 @@ userStream = function(req, res, next) {
         },
         function(err, activities) {
             if (err) {
-                pump.showError(res, err);
+                next(err);
             } else {
                 activities.forEach(function(el, i, arr) {
                     // remove internal uuid info, if any
@@ -379,7 +379,7 @@ userStream = function(req, res, next) {
 
                 collection.items = activities;
 
-                pump.showData(res, collection);
+                res.json(collection);
             }
         }
     );
@@ -408,7 +408,7 @@ var userInbox = function(req, res, next) {
         function(err, inboxCount) {
             if (err) {
                 if (err instanceof NoSuchThingError) {
-                    pump.showData(res, collection);
+                    res.json(collection);
                 } else {
                     throw err;
                 }
@@ -419,10 +419,10 @@ var userInbox = function(req, res, next) {
         },
         function(err, activities) {
             if (err) {
-                pump.showError(res, err);
+                next(err);
             } else {
                 collection.items = activities;
-                pump.showData(res, collection);
+                res.json(collection);
             }
         }
     );
