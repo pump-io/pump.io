@@ -64,11 +64,11 @@ var initRoutes = function(app) {
 
         // person
 
-	if (type === 'person') {
-	    authz = userOnly;
-	} else {
-	    authz = authorOnly(type);
-	}
+        if (type === 'person') {
+            authz = userOnly;
+        } else {
+            authz = authorOnly(type);
+        }
 
         app.get(url, maybeAuth, requester(type), getter(type));
         app.put(url, mustAuth, requester(type), authz, putter(type));
@@ -121,7 +121,7 @@ var requester = function(type) {
 
 var userOnly = function(req, res, next) {
     var person = req.person,
-	user = req.remoteUser;
+        user = req.remoteUser;
 
     if (person && user && user.profile && person.id === user.profile.id && user.profile.objectType === 'person') { 
         next();
@@ -479,7 +479,7 @@ var getSchema = function() {
 
     return schema;
 };
-    
+
 var distribute = function(activity, callback) {
 
     Step(
@@ -542,6 +542,6 @@ var getBasicAuthUser = function(req, res, callback) {
     } else {
         nickname = credentials[0];
         password = credentials[1];
-	checkCredentials(nickname, password, callback);
+        checkCredentials(nickname, password, callback);
     }
 };
