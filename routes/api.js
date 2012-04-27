@@ -37,7 +37,7 @@ var databank = require('databank'),
 
 // Initialize the app controller
 
-var initRoutes = function(app) {
+var addRoutes = function(app) {
 
     var i = 0, url, type, authz;
 

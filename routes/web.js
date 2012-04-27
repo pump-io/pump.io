@@ -30,7 +30,7 @@ var databank = require('databank'),
     checkCredentials = mw.checkCredentials,
     NoSuchThingError = databank.NoSuchThingError;
 
-var initApp = function(app) {
+var addRoutes = function(app) {
 
     app.get('/', maybeAuth, showMain);
 
