@@ -20,8 +20,6 @@ var connect = require('connect'),
     bcrypt  = require('bcrypt'),
     api = require('./routes/api'),
     web = require('./routes/web'),
-    port = process.env.PORT || 8001,
-    hostname = process.env.HOSTNAME || 'localhost',
     databank = require('databank'),
     config = require('./config'),
     express = require('express'),
@@ -30,7 +28,12 @@ var connect = require('connect'),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
     db,
-    app;
+    app,
+    port,
+    hostname;
+
+port = config.port || process.env.PORT || 8001,
+hostname = config.hostname || process.env.HOSTNAME || 'localhost';
 
 // Initiate the DB
 
@@ -92,5 +95,5 @@ db.connect({}, function(err) {
 
     api.setBank(db);
 
-    app.listen(3000);
+    app.listen(port);
 });
