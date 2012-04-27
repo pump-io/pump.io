@@ -439,7 +439,7 @@ var userInbox = function(req, res, next) {
 };
 
 var notYetImplemented = function(req, res, next) {
-    PumpAPI.showError(res, new Error("Not yet implemented"));
+    next(new Error("Not yet implemented"));
 };
 
 var makeURL = function(relative) {
