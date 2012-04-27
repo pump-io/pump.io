@@ -110,6 +110,7 @@ db.connect({}, function(err) {
     }
 
     api.setBank(db);
+    DatabankObject.bank = db;
 
     app.listen(port);
 });
