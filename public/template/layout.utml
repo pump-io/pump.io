@@ -28,12 +28,11 @@
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
-          <% if (remoteUser) { 
-                 partial('nav-loggedin');
-             } else {
-                 partial('nav-anonymous');
-             }
-           %>
+          <% if (remoteUser) { %>
+          <%= partial('nav-loggedin'); %>
+          <% } else { %>
+          <%= partial('nav-anonymous'); %>
+          <% } %>
         </div>
       </div>
     </div>
