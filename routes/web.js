@@ -160,3 +160,5 @@ var showStream = function(req, res, next) {
         }
     );
 };
+
+exports.addRoutes = addRoutes;

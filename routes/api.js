@@ -49,7 +49,8 @@ var addRoutes = function(app) {
     // Feeds
 
     app.post('/api/user/:nickname/feed', mustAuth, reqUser, sameUser, postActivity);
-    app.get('/api/user/:nickname/feed', maybeAuth, reqUser, userStream); // XXX: privileged access when authenticated
+    // XXX: privileged access when authenticated
+    app.get('/api/user/:nickname/feed', maybeAuth, reqUser, userStream);
 
     // Inboxen
 
@@ -87,7 +88,7 @@ var addRoutes = function(app) {
     app.post('/api/users', noUser, createUser);
 };
 
-exports.initRoutes = initRoutes;
+exports.addRoutes = addRoutes;
 
 var bank = null;
 
