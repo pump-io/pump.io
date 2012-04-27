@@ -16,11 +16,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var Activity = require('../model/activity').Activity,
-    User = require('../model/user').User,
-    databank = require('databank'),
+var databank = require('databank'),
     Step = require('step'),
     _ = require('underscore'),
+    Activity = require('../lib/model/activity').Activity,
+    User = require('../lib/model/user').User,
     mw = require('../lib/middleware'),
     maybeAuth = mw.maybeAuth,
     reqUser = mw.reqUser,
