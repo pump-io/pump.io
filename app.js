@@ -38,7 +38,11 @@ hostname = config.hostname || process.env.HOSTNAME || 'localhost';
 
 // Initiate the DB
 
-params = config.params;
+if (_(config).has('params')) {
+    params = config.params;
+} else {
+    params = {};
+}
 
 if (_(params).has('schema')) {
     _.extend(params.schema, schema);
