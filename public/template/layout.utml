@@ -29,9 +29,9 @@
       <div class="navbar-inner">
         <div class="container">
           <% if (remoteUser) { %>
-          <%= partial('nav-loggedin'); %>
+          <%= partial('nav-loggedin') %>
           <% } else { %>
-          <%= partial('nav-anonymous'); %>
+          <%= partial('nav-anonymous') %>
           <% } %>
         </div>
       </div>
