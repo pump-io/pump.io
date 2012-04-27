@@ -46,14 +46,14 @@ var initApp = function(app) {
 
 var showSettings = function(req, res, next) {
     res.render("settings", {title: "Settings",
-			    nav: res.partial("nav-loggedin", req.remoteUser),
-			    user: req.remoteUser});
+                            nav: res.partial("nav-loggedin", req.remoteUser),
+                            user: req.remoteUser});
 };
 
 var showMain = function(req, res, next) {
     res.render("main", {title: "Welcome",
-			nav: res.partial((req.remoteUser) ? "nav-loggedin" : "nav-anonymous", req.remoteUser),
-			user: req.remoteUser});
+                        nav: res.partial((req.remoteUser) ? "nav-loggedin" : "nav-anonymous", req.remoteUser),
+                        user: req.remoteUser});
 };
 
 var handleLogin = function(req, res, next) {
@@ -62,18 +62,18 @@ var handleLogin = function(req, res, next) {
             checkCredentials(req.body.nickname, req.body.password, this);
         },
         function(err, user) {
-	    if (err) throw err;
-	    if (!user) {
-		// done here
+            if (err) throw err;
+            if (!user) {
+                // done here
                 next(new Error("Not authorized"));
-	    } else {
-		user.expand(this);
-	    }
-	},
-	function(err, user) {
+            } else {
+                user.expand(this);
+            }
+        },
+        function(err, user) {
             if (err) {
                 next(err);
-	    } else {
+            } else {
                 req.session.nickname = user.nickname;
                 user.sanitize();
                 res.json(user);
@@ -110,9 +110,9 @@ var showActivity = function(req, res, next) {
                 next(err);
             } else {
                 res.render("activity", {title: "Welcome",
-			                nav: res.partial((req.remoteUser) ? "nav-loggedin" : "nav-anonymous",
+                                        nav: res.partial((req.remoteUser) ? "nav-loggedin" : "nav-anonymous",
                                                          req.remoteUser),
-			                user: req.remoteUser,
+                                        user: req.remoteUser,
                                         activity: activity});
             }
         }
@@ -130,9 +130,9 @@ var showInbox = function(req, res, next) {
                 next(err);
             } else {
                 res.render("inbox", {title: "Inbox",
-			             nav: res.partial((req.remoteUser) ? "nav-loggedin" : "nav-anonymous",
+                                     nav: res.partial((req.remoteUser) ? "nav-loggedin" : "nav-anonymous",
                                                       req.remoteUser),
-			             user: req.remoteUser,
+                                     user: req.remoteUser,
                                      activities: activities});
             }
         }
@@ -151,9 +151,9 @@ var showStream = function(req, res, next) {
                 next(err);
             } else {
                 res.render("user", {title: req.user.nickname,
-			            nav: res.partial((req.remoteUser) ? "nav-loggedin" : "nav-anonymous",
+                                    nav: res.partial((req.remoteUser) ? "nav-loggedin" : "nav-anonymous",
                                                      req.remoteUser),
-			            user: req.remoteUser,
+                                    user: req.remoteUser,
                                     actor: req.user.profile,
                                     activities: activities});
             }
