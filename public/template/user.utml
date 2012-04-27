@@ -1,13 +1,22 @@
-<div class="span10" id="stream">
-  <ul>
-    <% _.each(stream, function(activity) { %>
-    <li>
-      <p class="activity-content"><%- (activity.content || activity.object.summary || activity.object.content || ((activity.actor||actor).displayName + " " + activity.verb + "ed " + activity.object.displayName))%></p>
-      <p class="activity-created"><%- activity.published %></p>
-    </li>   
-    <% }); %>
-  </ul>
-</div>
-<div class="span4" id="sidebar">
-  <h3><%- actor.displayName %></h3>
+<div class="content">
+  <div class="page-header" id="header">
+    <h1><%- profile.displayName %> <small><%- nickname %></small></h1>
+    <% if (profile.location) { %><p class="location"><%- profile.location.displayName %></p><% } %>
+    <% if (profile.summary) { %><p class="summary"><%- profile.summary %></p><% } %>
+  </div>
+  <div class="row" id="content">
+    <div class="span10" id="stream">
+      <ul>
+        <% _.each(stream, function(activity) { %>
+        <li>
+          <p class="activity-content"><%- (activity.content || activity.object.summary || activity.object.content || ((activity.actor||actor).displayName + " " + activity.verb + "ed " + activity.object.displayName))%></p>
+          <p class="activity-created"><%- activity.published %></p>
+        </li>   
+        <% }); %>
+      </ul>
+    </div>
+    <div class="span4" id="sidebar">
+      <h3><%- actor.displayName %></h3>
+    </div>
+  </div>
 </div>

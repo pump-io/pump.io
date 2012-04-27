@@ -1,3 +1,0 @@
-<h1><%- profile.displayName %> <small><%- nickname %></small></h1>
-<% if (profile.location) { %><p class="location"><%- profile.location.displayName %></p><% } %>
-<% if (profile.summary) { %><p class="summary"><%- profile.summary %></p><% } %>
