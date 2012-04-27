@@ -79,6 +79,12 @@ db.connect({}, function(err) {
 	app.use(express.favicon());
 	app.use(express.session({secret: (config.secret || "activitypump")}));
 
+        app.use(function(req, res, next) { 
+            res.local('site', (config.site) ? config.site : "ActivityPump");
+            res.local('owner', (config.owner) ? config.owner : "Anonymous");
+            res.local('ownerurl', (config.ownerURL) ? config.ownerURL : false);
+            next();
+        });
 	app.use(app.router);
 
 	app.use(express.static(__dirname + '/public'));
