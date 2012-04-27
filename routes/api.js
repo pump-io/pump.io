@@ -16,13 +16,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var Activity = require('../model/activity').Activity,
-    User = require('../model/user').User,
-    Edge = require('../model/edge').Edge,
-    databank = require('databank'),
+var databank = require('databank'),
     _ = require('underscore'),
-    Stream = require('../model/stream').Stream,
     Step = require('step'),
+    Activity = require('../lib/model/activity').Activity,
+    User = require('../lib/model/user').User,
+    Edge = require('../lib/model/edge').Edge,
+    Stream = require('../lib/model/stream').Stream,
     mw = require('../lib/middleware'),
     maybeAuth = mw.maybeAuth,
     reqUser = mw.reqUser,
