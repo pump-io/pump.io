@@ -3,4 +3,9 @@
 exports.driver = 'disk';
 exports.params = {dir: '/tmp/activitypump/'};
 exports.secret = "my dog has fleas";
-exports.noweb = false;
+exports.noweb  = false;
+exports.site   = "Awesome Sauce";
+exports.owner  = "Awesome Inc.";
+exports.ownerURL = "http://example.com/";
+exports.port   = 8000;
+exports.hostname = "example.org";
