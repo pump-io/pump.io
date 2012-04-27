@@ -17,7 +17,7 @@
 // limitations under the License.
 
 var databank = require('databank'),
-    _ = require('../../public/javascript/underscore.js'),
+    _ = require('underscore'),
     DatabankObject = databank.DatabankObject,
     dateFormat = require('dateformat'),
     bcrypt  = require('bcrypt'),
