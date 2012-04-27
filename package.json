@@ -10,6 +10,7 @@
 		      "dateformat": "1.x",
 		      "databank": "*",
                       "step": "*",
-                      "qs": "*"
+                      "qs": "*",
+                      "mime": "*"
 		    }
 }
