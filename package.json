@@ -9,7 +9,7 @@
 		      "bcrypt": "0.5.x",
 		      "dateformat": "1.x",
 		      "databank": "*",
-                      "step": "*"
+                      "step": "*",
                       "qs": "*"
 		    }
 }
