@@ -450,36 +450,6 @@ var makeURL = function(relative) {
     }
 };
 
-var getSchema = function() {
-
-    var i, type, Cls, schema = {};
-
-    schema.activity = Activity.schema;
-    schema.user = User.schema;
-    schema.edge = Edge.schema;
-    schema.outbox = {'pkey': 'id'};
-    schema.outboxcount = {'pkey': 'id'};
-    schema.userlist = {'pkey': 'id'};
-    schema.usercount = {'pkey': 'id'};
-    schema.feedcount = {'pkey': 'id'};
-
-    _.extend(schema, Stream.schema);
-
-    for (i = 0; i < Activity.objectTypes.length; i++) {
-        type = Activity.objectTypes[i];
-        Cls = Activity.toClass(type);
-        if (Cls.schema) {
-            schema[type] = Cls.schema;
-        } else {
-            schema[type] = {'pkey': 'id',
-                            'fields': ['updated', 'published', 'displayName', 'url'],
-                            'indices': ['uuid', 'author.id']};
-        }
-    }
-
-    return schema;
-};
-
 var distribute = function(activity, callback) {
 
     Step(

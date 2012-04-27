@@ -24,6 +24,7 @@ var connect = require('connect'),
     config = require('./config'),
     express = require('express'),
     _ = require('underscore'),
+    schema = require('schema'),
     params,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
@@ -38,7 +39,12 @@ hostname = config.hostname || process.env.HOSTNAME || 'localhost';
 // Initiate the DB
 
 params = config.params;
-params.schema = api.getSchema();
+
+if (_(params).has('schema')) {
+    _.extend(params.schema, schema);
+} else {
+    params.schema = schema;
+}
 
 db = Databank.get(config.driver, params);
 
