@@ -26,7 +26,7 @@
 
   <div class="row">
 
-    <div class="span-one-third">
+    <div class="span4">
 
       <h2>How it works</h2>
 
@@ -41,7 +41,7 @@
 
     </div>
 
-    <div class="span-one-third">
+    <div class="span4">
 
       <h2>Featured users</h2>
 
@@ -96,7 +96,7 @@
 
     </div>
 
-    <div class="span-one-third">
+    <div class="span4">
 
       <h2>Latest activity</h2>
 
