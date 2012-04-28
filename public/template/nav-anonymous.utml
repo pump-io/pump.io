@@ -1,7 +1,7 @@
 <nav class="topbar">
   <div class="fill">
     <div class="container" id="topnav">
-      <a class="brand" href="index.html">ActivityPump</a>
+      <a class="brand" href="/">ActivityPump</a>
       <form id="login" method="get" action="" class="pull-right">
 	<input class="input-small" type="text" name="nickname" placeholder="Username">
 	<input class="input-small" type="password" name="password" placeholder="Password">
