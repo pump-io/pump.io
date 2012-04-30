@@ -54,6 +54,9 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <script src="/javascript/bootstrap.min.js"></script>
+    <script src="/javascript/underscore-min.js"></script>
+    <script src="/javascript/backbone-min.js"></script>
+    <script src="/javascript/activitypump.js"></script>
 
   </body>
 </html>
