@@ -24,6 +24,7 @@ var connect = require('connect'),
     api = require('./routes/api'),
     web = require('./routes/web'),
     schema = require('./lib/schema'),
+    HTTPError = require('./lib/httperror').HTTPError,
     config = require('./config'),
     params,
     Databank = databank.Databank,
@@ -92,11 +93,27 @@ db.connect({}, function(err) {
     });
 
     app.configure('development', function() {
-	app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+        app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
     });
 
     app.configure('production', function() {
-	app.use(express.errorHandler());
+        app.use(express.errorHandler());
+    });
+
+    app.error(function(err, req, res, next) {
+        if (err instanceof HTTPError) {
+            res.statusCode = err.code;
+            if (req.accepts('html')) {
+                res.render('error', {error: err});
+            } else if (req.accepts('json')) {
+                res.json({error: err.message});
+            } else {
+                res.writeHead(err.code, {'Content-Type': 'text/plain'});
+                res.end(err.message);
+            }
+        } else {
+            next(err);
+        }
     });
 
     // Routes
