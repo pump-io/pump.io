@@ -22,6 +22,10 @@ var databank = require('databank'),
     Activity = require('../lib/model/activity').Activity,
     User = require('../lib/model/user').User,
     mw = require('../lib/middleware'),
+    he = require('../lib/httperror'),
+    HTTPError = he.HTTPError,
+    HTTPClientError = he.HTTPClientError,
+    HTTPServerError = he.HTTPServerError,
     maybeAuth = mw.maybeAuth,
     reqUser = mw.reqUser,
     mustAuth = mw.mustAuth,
@@ -58,10 +62,15 @@ var handleLogin = function(req, res, next) {
             checkCredentials(req.body.nickname, req.body.password, this);
         },
         function(err, user) {
-            if (err) throw err;
-            if (!user) {
+            if (err) {
+                if (err instanceof NoSuchThingError) {
+                    next(new HTTPClientError("Not authorized", 403));
+                } else {
+                    throw err;
+                }
+            } else if (!user) {
                 // done here
-                next(new Error("Not authorized"));
+                next(new HTTPClientError("Not authorized", 403));
             } else {
                 user.expand(this);
             }
