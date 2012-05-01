@@ -98,7 +98,7 @@ db.connect({}, function(err) {
                 res.statusCode = err.code;
                 res.json({error: err.message});
             } else if (req.accepts('html')) {
-                res.render('error', {status: err.code, error: err});
+                res.render('error', {status: err.code, error: err, title: "Error"});
             } else {
                 res.writeHead(err.code, {'Content-Type': 'text/plain'});
                 res.end(err.message);
