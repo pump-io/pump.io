@@ -92,14 +92,6 @@ db.connect({}, function(err) {
 
     });
 
-    app.configure('development', function() {
-        app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-    });
-
-    app.configure('production', function() {
-        app.use(express.errorHandler());
-    });
-
     app.error(function(err, req, res, next) {
         if (err instanceof HTTPError) {
             res.statusCode = err.code;
@@ -114,6 +106,14 @@ db.connect({}, function(err) {
         } else {
             next(err);
         }
+    });
+
+    app.configure('development', function() {
+        app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+    });
+
+    app.configure('production', function() {
+        app.use(express.errorHandler());
     });
 
     // Routes
