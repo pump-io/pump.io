@@ -2,6 +2,7 @@
     "name": "activity-pump",
     "version": "0.1.0dev",
     "dependencies": { "connect": "1.x",
+		      "connect-auth": "*",
                       "express": "*",
                       "utml": "*",
                       "underscore": "*", 
