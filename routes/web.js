@@ -17,6 +17,7 @@
 // limitations under the License.
 
 var databank = require('databank'),
+    url = require('url'),
     Step = require('step'),
     _ = require('underscore'),
     Activity = require('../lib/model/activity').Activity,
@@ -160,4 +161,35 @@ var showStream = function(req, res, next) {
     );
 };
 
+var authenticate = function(req, res) {
+    // XXX: I think there's an easier way to get this, but leave it for now.
+    var parsedUrl = url.parse(req.originalUrl, true);
+    res.render('authentication', {token: parsedUrl.query.oauth_token, error: false});
+};
+
+var authorize = function(err, req, res, authorized, authResults, application, user) {  
+
+    var self = this;
+    
+    if(err) {
+        res.render('authentication', {token: authResults.token, error: "Incorrect username or password"});
+    } else {
+        res.render('authorization', {token: authResults.token,
+                                     verifier: authResults.verifier,
+                                     user: user,
+                                     application: application});
+    }
+};  
+
+var authorizationFinished = function(err, req, res, result) {
+    res.render('authorization-finished', {token: result.token,
+                                          verifier: result.verifier});
+};
+
 exports.addRoutes = addRoutes;
+
+// Need these for OAuth shenanigans
+
+exports.authenticate = authenticate;
+exports.authorize = authorize;
+exports.authorizationFinished = authorizationFinished;

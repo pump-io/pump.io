@@ -17,6 +17,7 @@
 // limitations under the License.
 
 var connect = require('connect'),
+    auth = require('connect-auth'),
     bcrypt  = require('bcrypt'),
     databank = require('databank'),
     express = require('express'),
@@ -25,6 +26,7 @@ var connect = require('connect'),
     web = require('./routes/web'),
     schema = require('./lib/schema'),
     HTTPError = require('./lib/httperror').HTTPError,
+    Provider = require('./lib/provider').Provider,
     config = require('./config'),
     params,
     Databank = databank.Databank,
@@ -34,7 +36,7 @@ var connect = require('connect'),
     port,
     hostname;
 
-port = config.port || process.env.PORT || 8001,
+port = config.port || process.env.PORT || 8001;
 hostname = config.hostname || process.env.HOSTNAME || 'localhost';
 
 // Initiate the DB
@@ -62,23 +64,40 @@ db.connect({}, function(err) {
 
     if (err) {
         console.log("Couldn't connect to JSON store: " + err.message);
-	process.exit(1);
+        process.exit(1);
     }
 
     // Configuration
 
     app.configure(function() {
 
-	// Templates are in public
-	app.set('views', __dirname + '/public/template');
-	app.set('view engine', 'utml');
-	app.use(express.logger());
-	app.use(express.bodyParser());
-	app.use(express.cookieParser());
-	app.use(express.query());
-	app.use(express.methodOverride());
-	app.use(express.favicon());
-	app.use(express.session({secret: (config.secret || "activitypump")}));
+        // Templates are in public
+        app.set('views', __dirname + '/public/template');
+        app.set('view engine', 'utml');
+        app.use(express.logger());
+        app.use(express.bodyParser());
+        app.use(express.cookieParser());
+        app.use(express.query());
+        app.use(express.methodOverride());
+        app.use(express.session({secret: (config.secret || "activitypump")}));
+
+        var provider = new Provider();
+
+        app.use(auth([auth.Oauth({name: "client",
+                                  oauth_provider: provider,
+                                  oauth_protocol: 'http',
+                                  authenticate_provider: null,
+                                  authorize_provider: null,
+                                  authorization_finished_provider: null
+                                 }),
+                      auth.Oauth({name: "user",
+                                  oauth_provider: provider,
+                                  oauth_protocol: 'http',
+                                  authenticate_provider: web.authenticate,
+                                  authorize_provider: web.authorize,
+                                  authorization_finished_provider: web.authorizationFinished
+                                 })
+                     ]));
 
         app.use(function(req, res, next) { 
             res.local('site', (config.site) ? config.site : "ActivityPump");
@@ -86,9 +105,11 @@ db.connect({}, function(err) {
             res.local('ownerurl', (config.ownerURL) ? config.ownerURL : false);
             next();
         });
-	app.use(app.router);
 
-	app.use(express.static(__dirname + '/public'));
+        app.use(app.router);
+
+        app.use(express.favicon());
+        app.use(express['static'](__dirname + '/public'));
 
     });
 
@@ -114,7 +135,7 @@ db.connect({}, function(err) {
     // Use "noweb" to disable Web site (API engine only)
 
     if (!_(config).has('noweb') || !config.noweb) {
-	web.addRoutes(app);
+        web.addRoutes(app);
     }
 
     api.setBank(db);
