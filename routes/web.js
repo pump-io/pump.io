@@ -64,13 +64,13 @@ var handleLogin = function(req, res, next) {
         function(err, user) {
             if (err) {
                 if (err instanceof NoSuchThingError) {
-                    next(new HTTPClientError("Not authorized", 403));
+                    next(new HTTPError("Not authorized", 403));
                 } else {
                     throw err;
                 }
             } else if (!user) {
                 // done here
-                next(new HTTPClientError("Not authorized", 403));
+                next(new HTTPError("Not authorized", 403));
             } else {
                 user.expand(this);
             }
