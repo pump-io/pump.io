@@ -1,4 +1,4 @@
-<h1>Error <%- err.code %></h1>
+<h1>Error <%- error.code %></h1>
 
-<p><%- err.message %></p>
+<p><%- error.message %></p>
 
