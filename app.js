@@ -94,7 +94,7 @@ db.connect({}, function(err) {
 
     app.error(function(err, req, res, next) {
         if (err instanceof HTTPError) {
-            if (req.xhr()) {
+            if (req.xhr) {
                 res.statusCode = err.code;
                 res.json({error: err.message});
             } else if (req.accepts('html')) {
