@@ -19,18 +19,16 @@
 var databank = require('databank'),
     _ = require('underscore'),
     Step = require('step'),
+    HTTPError = require('../lib/httperror').HTTPError,
     Activity = require('../lib/model/activity').Activity,
     User = require('../lib/model/user').User,
     Edge = require('../lib/model/edge').Edge,
     Stream = require('../lib/model/stream').Stream,
+    Client = require('../lib/model/client').Client,
     mw = require('../lib/middleware'),
-    maybeAuth = mw.maybeAuth,
     reqUser = mw.reqUser,
-    mustAuth = mw.mustAuth,
     sameUser = mw.sameUser,
     noUser = mw.noUser,
-    getSessionUser = mw.getSessionUser,
-    checkCredentials = mw.checkCredentials,
     NoSuchThingError = databank.NoSuchThingError,
     DEFAULT_ACTIVITIES = 20,
     DEFAULT_USERS = 20;
@@ -42,19 +40,19 @@ var addRoutes = function(app) {
     var i = 0, url, type, authz;
 
     // Users
-    app.get('/api/user/:nickname', maybeAuth, reqUser, getUser);
-    app.put('/api/user/:nickname', mustAuth, reqUser, sameUser, putUser);
-    app.del('/api/user/:nickname', mustAuth, reqUser, sameUser, delUser);
+    app.get('/api/user/:nickname', clientAuth, reqUser, getUser);
+    app.put('/api/user/:nickname', userAuth, reqUser, sameUser, putUser);
+    app.del('/api/user/:nickname', userAuth, reqUser, sameUser, delUser);
 
     // Feeds
 
-    app.post('/api/user/:nickname/feed', mustAuth, reqUser, sameUser, postActivity);
+    app.post('/api/user/:nickname/feed', userAuth, reqUser, sameUser, postActivity);
     // XXX: privileged access when authenticated
-    app.get('/api/user/:nickname/feed', maybeAuth, reqUser, userStream);
+    app.get('/api/user/:nickname/feed', clientAuth, reqUser, userStream);
 
     // Inboxen
 
-    app.get('/api/user/:nickname/inbox', mustAuth, reqUser, sameUser, userInbox);
+    app.get('/api/user/:nickname/inbox', userAuth, reqUser, sameUser, userInbox);
     app.post('/api/user/:nickname/inbox', notYetImplemented);
 
     for (i = 0; i < Activity.objectTypes.length; i++) {
@@ -71,21 +69,21 @@ var addRoutes = function(app) {
             authz = authorOnly(type);
         }
 
-        app.get(url, maybeAuth, requester(type), getter(type));
-        app.put(url, mustAuth, requester(type), authz, putter(type));
-        app.del(url, mustAuth, requester(type), authz, deleter(type));
+        app.get(url, clientAuth, requester(type), getter(type));
+        app.put(url, userAuth, requester(type), authz, putter(type));
+        app.del(url, userAuth, requester(type), authz, deleter(type));
     }
     
     // Activities
 
-    app.get('/api/activity/:uuid', maybeAuth, requester('activity'), getter('activity'));
-    app.put('/api/activity/:uuid', mustAuth, requester('activity'), actorOnly, putter('activity'));
-    app.del('/api/activity/:uuid', mustAuth, requester('activity'), actorOnly, deleter('activity'));
+    app.get('/api/activity/:uuid', clientAuth, requester('activity'), getter('activity'));
+    app.put('/api/activity/:uuid', userAuth, requester('activity'), actorOnly, putter('activity'));
+    app.del('/api/activity/:uuid', userAuth, requester('activity'), actorOnly, deleter('activity'));
 
     // Global user list
 
-    app.get('/api/users', maybeAuth, listUsers);
-    app.post('/api/users', noUser, createUser);
+    app.get('/api/users', clientAuth, listUsers);
+    app.post('/api/users', clientAuth, createUser);
 };
 
 exports.addRoutes = addRoutes;
@@ -97,6 +95,69 @@ var setBank = function(newBank) {
 };
 
 exports.setBank = setBank;
+
+// Accept either 2-legged or 3-legged OAuth
+var clientAuth = function(req, res, next) {
+
+    req.client = null;
+    res.local('client', null); // init to null
+
+    req.authenticate(['client', 'user'], function(error, authenticated) { 
+
+        if (error) {
+            next(error);
+            return;
+        }
+
+        if (!authenticated) {
+            next(new HTTPError("Not authenticated", 403));
+            return;
+        }
+
+        req.client = req.getAuthDetails().user;
+        res.local('client', req.client); // init to null
+
+        next();
+    });
+};
+
+// Accept only 3-legged OAuth
+// XXX: It would be nice to merge these two functions
+
+var userAuth = function(req, res, next) {
+
+    req.remoteUser = null;
+    res.local('remoteUser', null); // init to null
+    req.client = null;
+    res.local('client', null); // init to null
+
+    req.authenticate(['user'], function(error, authenticated) { 
+
+        if (error) {
+            next(error);
+            return;
+        }
+
+        if (!authenticated) {
+            next(new HTTPError("Not authenticated", 403));
+            return;
+        }
+
+        req.remoteUser = req.getAuthDetails().user;
+        res.local('remoteUser', req.remoteUser);
+
+        Client.get(req.param.oauth_consumer_key, function(err, client) {
+            if (err) {
+                next(err);
+            } else {
+                req.client = client;
+                res.local('client', client);
+                // WIN
+                next();
+            }
+        });
+    });
+};
 
 var requester = function(type) {
 
@@ -486,33 +547,4 @@ var distribute = function(activity, callback) {
             }
         }
     );
-};
-
-var getCurrentUser = function(req, res, callback) {
-
-    if (req.session.nickname) {
-        getSessionUser(req, res, callback);
-    } else if (req.headers.authorization) {
-        getBasicAuthUser(req, res, callback);
-    } else {
-        callback(null, null);
-    }
-};
-
-var getBasicAuthUser = function(req, res, callback) {
-    var authorization = req.headers.authorization;
-    var parts = authorization.split(' '), 
-        scheme = parts[0],
-        credentials = new Buffer(parts[1], 'base64').toString().split(':'),
-        nickname,
-        password,
-        user;
-
-    if ('Basic' != scheme) {
-        callback(new Error("Unknown auth scheme " + scheme), null);
-    } else {
-        nickname = credentials[0];
-        password = credentials[1];
-        checkCredentials(nickname, password, callback);
-    }
 };
