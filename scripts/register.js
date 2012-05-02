@@ -29,6 +29,8 @@ var _ = require('underscore'),
         .describe('p', "Password for user")
         .describe('s', "Server name (default 'localhost')")
         .describe('P', "Port (default 8001)")
+        .default('P', 8001)
+        .default('s', 'localhost')
         .argv;
 
 var user = {'nickname': argv.u,
