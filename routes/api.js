@@ -166,13 +166,13 @@ var requester = function(type) {
     return function(req, res, next) {
         Cls.search({'uuid': req.params.uuid}, function(err, results) {
             if (err instanceof NoSuchThingError) {
-                next(err, 404);
+                next(new HTTPError(err.message, 404));
             } else if (err) {
                 next(err);
             } else if (results.length === 0) {
-                next(new Error("Can't find a " + type + " with ID = " + req.params.uuid), 404);
+                next(new HTTPError("Can't find a " + type + " with ID = " + req.params.uuid, 404));
             } else if (results.length > 1) {
-                next(new Error("Too many " + type + " objects with ID = " + req.params.uuid), 500);
+                next(new HTTPError("Too many " + type + " objects with ID = " + req.params.uuid, 500));
             } else {
                 req[type] = results[0];
                 next();
@@ -188,7 +188,7 @@ var userOnly = function(req, res, next) {
     if (person && user && user.profile && person.id === user.profile.id && user.profile.objectType === 'person') { 
         next();
     } else {
-        next(new Error("Only the user can modify this profile."), 403);
+        next(new HTTPError("Only the user can modify this profile.", 403));
     }
 };
 
@@ -200,7 +200,7 @@ var authorOnly = function(type) {
         if (obj && obj.author && obj.author.id == req.remoteUser.profile.id) {
             next();
         } else {
-            next(new Error("Only the author can modify this object."), 403);
+            next(new HTTPError("Only the author can modify this object.", 403));
         }
     };
 };
@@ -211,7 +211,7 @@ var actorOnly = function(req, res, next) {
     if (act && act.actor && act.actor.id == req.remoteUser.profile.id) {
         next();
     } else {
-        next(new Error("Only the actor can modify this object."), 403);
+        next(new HTTPError("Only the actor can modify this object.", 403));
     }
 };
 
@@ -268,7 +268,7 @@ var putUser = function(req, res, next) {
 var delUser = function(req, res, next) {
     req.user.del(function(err) {
         if (err instanceof NoSuchThingError) { // unusual
-            next(err, 404);
+            next(new HTTPError(err.message, 404));
         } else if (err) {
             next(err);
         } else {
@@ -501,7 +501,7 @@ var userInbox = function(req, res, next) {
 };
 
 var notYetImplemented = function(req, res, next) {
-    next(new Error("Not yet implemented"));
+    next(new HTTPError("Not yet implemented", 500));
 };
 
 var makeURL = function(relative) {
