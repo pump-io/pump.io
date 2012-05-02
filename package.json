@@ -12,6 +12,8 @@
 		      "databank": "*",
                       "step": "*",
                       "qs": "*",
-                      "mime": "*"
+                      "mime": "*",
+                      "oauth": "*",
+                      "optimist": "*"
 		    }
 }
