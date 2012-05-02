@@ -1,8 +1,8 @@
-// register.js
+// common.js
 //
-// Register a new user with the activity pump
+// Common utilities for activityspam scripts
 //
-// Copyright 2011, StatusNet Inc.
+// Copyright 2011, 2012 StatusNet Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,84 +17,64 @@
 // limitations under the License.
 
 var url = require('url'),
-    http = require('http');
+    config = require('./config'),
+    OAuth = require('oauth').OAuth,
+    _ = require('underscore');
 
-var postActivity = function(serverUrl, activity, opts, callback) {
+var postJSON = function(serverUrl, payload, callback) {
 
-    var prop;
-    var results = '';
-    var toSend = JSON.stringify(activity);
+    var req, oa, parts, toSend, pair;
 
-    var parts = url.parse(serverUrl);
+    if (!callback) {
+        callback = postReport(payload);
+    }
+    
+    parts = url.parse(serverUrl);
 
-    var options = {
-	host: parts.hostname,
-	port: parts.port,
-	method: 'POST',
-	path: (parts.search) ? parts.pathname+'?'+parts.search : parts.pathname,
-	headers: {'content-type': 'application/json',
-		  'user-agent': 'activitypump/0.1.0dev'}
-    };
-
-    if (opts && typeof opts == 'function') {
-	callback = opts;
-    } else if (opts && typeof opts == 'object') {
-	for (prop in opts) {
-	    options[prop] = opts[prop];
-	}
+    if (!_(config).has('hosts') ||
+        !_(config.hosts).has(parts.hostname)) {
+        callback(new Error("No OAuth key for " + parts.hostname), null);
+        return;
     }
 
-    var req = http.request(options, function(res) {
-	res.on('data', function (chunk) {
-	    results = results + chunk;
-	});
-	res.on('end', function () {
-	    callback(null, results);
-	});
-    });
+    pair = config.hosts[parts.hostname];
 
-    req.on('error', function(e) {
-	callback(e, null);
-    });
+    oa = new OAuth(null, // request token N/A for 2-legged OAuth
+                   null, // access token N/A for 2-legged OAuth
+                   pair.key,
+                   pair.secret,
+                   "1.0",
+                   null,
+                   "HMAC-SHA1",
+                   null, // nonce size; use default
+                   {"User-Agent": "activitypump/0.1"});
+    
+    toSend = JSON.stringify(payload);
 
-    req.write(toSend);
-    req.end();
+    oa.post(serverUrl, null, null, toSend, 'application/json', function(err, data, response) {
+        // Our callback has swapped args to OAuth module's
+        callback(err, response, data);
+    });
 };
 
-var getJSON = function(serverURL, opts, callback) {
-
-    var results = '', prop;
-
-    var parts = url.parse(serverURL);
-
-    var options = {
-	host: parts.hostname,
-	port: parts.port,
-	method: 'GET',
-	path: (parts.search) ? parts.pathname+'?'+parts.search : parts.pathname,
-	headers: {'content-type': 'application/json',
-		  'user-agent': 'activitypump/0.1.0dev'}
+var postReport = function(payload) {
+    return function(err, res, body) {
+        if (err) {
+            if (_(payload).has('id')) {
+                console.log("Error posting payload " + payload.id);
+            } else {
+                console.log("Error posting payload");
+            }
+            console.error(err);
+        } else {
+            if (_(payload).has('id')) {
+                console.log("Results of posting " + payload.id + ": " + body);
+            } else {
+                console.log("Results of posting: " + body);
+            }
+        }
     };
-
-    if (opts && typeof opts == 'function') {
-	callback = opts;
-    } else if (opts && typeof opts == 'object') {
-	for (prop in opts) {
-	    options[prop] = opts[prop];
-	}
-    }
-
-    http.get(options, function(res) {
-	res.on('data', function (chunk) {
-	    results = results + chunk;
-	});
-	res.on('end', function () {
-	    callback(null, JSON.parse(results));
-	});
-    }).on('error', function(e) {
-	callback(e, null);
-    }).end();
 };
 
-exports.postActivity = postActivity;
-exports.getJSON = getJSON;
+exports.postJSON = postJSON;
+exports.postReport = postReport;
