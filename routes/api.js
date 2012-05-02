@@ -84,6 +84,10 @@ var addRoutes = function(app) {
 
     app.get('/api/users', clientAuth, listUsers);
     app.post('/api/users', clientAuth, createUser);
+
+    // Client registration
+
+    app.post('/api/client/registration', clientReg);
 };
 
 exports.addRoutes = addRoutes;
@@ -547,4 +551,93 @@ var distribute = function(activity, callback) {
             }
         }
     );
+};
+
+var clientReg = function (req, res, next) {
+
+    var params = req.params,
+        props = {},
+        type;
+
+    if (!_(params).has('type')) {
+        next(new HTTPError("No registration type provided", 400));
+        return;
+    }
+
+    type = params.type;
+    
+    if (_(params).has('client_id')) {
+        if (type !== 'client_update') {
+            // XXX: log this
+            next(new HTTPError("Only set client_id for update.", 400));
+            return;
+        }
+        props.consumer_key = params.client_id;
+    }
+
+    if (_(params).has('client_secret')) {
+        if (type !== 'client_update') {
+            // XXX: log this
+            next(new HTTPError("Only set client_secret for update.", 400));
+            return;
+        }
+        props.secret = params.client_secret;
+    }
+
+    if (_(params).has('contacts')) {
+        props.contacts = params.contacts.split(" ");
+    }
+
+    if (_(params).has('application_type')) {
+        props.type = params.application_type;
+    } else {
+        props.type = null;
+    }
+
+    if (_(params).has('application_name')) {
+        props.title = params.application_name;
+    }
+
+    if (_(params).has('logo_url')) {
+        // XXX: copy logo?
+        props.logo_url = params.logo_url;
+    }
+
+    if (_(params).has('redirect_uris')) {
+        props.redirect_uris = params.redirect_uris.split(" ");
+    }
+
+    if (type === 'client_associate') {
+        Client.create(props, function(err, client) {
+            if (err) {
+                next(err);
+            } else {
+                res.json({client_id: client.consumer_key,
+                          client_secret: client.secret,
+                          expires_at: 0});
+            }
+        });
+    } else if (type === 'client_update') {
+        Client.get(props.consumer_key, function(err, client) {
+            if (err) {
+                next(err);
+            } else if (client.secret !== props.secret) {
+                // XXX: log this
+                next(new HTTPError("Unauthorized", 403));
+            } else {
+                client.update(props, function(err, client) {
+                    if (err) {
+                        next(err);
+                    } else {
+                        res.json({client_id: client.consumer_key,
+                                  client_secret: client.secret,
+                                  expires_at: 0});
+                    }
+                });
+            }
+        });
+    } else {
+        next(new HTTPError("Invalid registration type", 400));
+        return;
+    }
 };
