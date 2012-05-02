@@ -16,19 +16,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var postActivity = require('./common').postActivity;
+var _ = require('underscore'),
+    postJSON = require('./common').postJSON,
+    argv = require('optimist')
+        .usage('Usage: $0 -u <nickname> -p <num>')
+        .demand(['u','p'])
+        .alias('u', 'username')
+        .alias('p', 'password')
+        .alias('s', 'server')
+        .alias('P', 'port')
+        .describe('u', "Username to register")
+        .describe('p', "Password for user")
+        .describe('s', "Server name (default 'localhost')")
+        .describe('P', "Port (default 8001)")
+        .argv;
 
-var nickname = process.argv[2],
-    password = process.argv[3];
+var user = {'nickname': argv.u,
+            'password': argv.p};
 
-var activity = {'nickname': nickname,
-		'password': password};
+var server = (_(argv).has('s')) ? argv.s : 'localhost';
+var port = (_(argv).has('p')) ? argv.p : 8001;
 
-postActivity('http://localhost:8001/api/users', activity, function(err, results) {
+postJSON('http://'+server+':'+port+'/api/users', user, function(err, results) {
     if (err) {
-	console.error(err);
+        console.error(err);
     } else {
-	console.log(results);
+        console.log(results);
     }
 });
-
