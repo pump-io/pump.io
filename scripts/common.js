@@ -16,7 +16,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var url = require('url'),
+var http = require('http'),
+    querystring = require('querystring'),
+    url = require('url'),
     config = require('./config'),
     OAuth = require('oauth').OAuth,
     _ = require('underscore');
@@ -76,5 +78,47 @@ var postReport = function(payload) {
     };
 };
 
+var postArgs = function(serverUrl, args, callback) {
+
+    var requestBody = querystring.stringify(args);
+
+    var parts = url.parse(serverUrl);
+
+    // An object of options to indicate where to post to
+    var options = {
+        host: parts.hostname,
+        port: parts.port,
+        path: parts.path,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': requestBody.length,
+            'User-Agent': 'activitypump/0.1.0dev'
+        }
+    };
+
+    // Set up the request
+
+    var req = http.request(options, function(res) {
+        var body = '';
+        var err = null;
+        res.setEncoding('utf8');
+        res.on('data', function(chunk) {
+            body = body + chunk;
+        });
+        res.on('error', function(err) {
+            callback(err, null, null);
+        });
+        res.on('end', function() {
+            callback(err, res, body);
+        });
+    });
+
+    // post the data
+    req.write(requestBody);
+    req.end();
+};
+
 exports.postJSON = postJSON;
 exports.postReport = postReport;
+exports.postArgs = postArgs;
