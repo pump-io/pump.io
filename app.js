@@ -80,6 +80,7 @@ db.connect({}, function(err) {
         app.use(express.query());
         app.use(express.methodOverride());
         app.use(express.session({secret: (config.secret || "activitypump")}));
+        app.use(express.favicon());
 
         var provider = new Provider();
 
@@ -108,7 +109,6 @@ db.connect({}, function(err) {
 
         app.use(app.router);
 
-        app.use(express.favicon());
         app.use(express['static'](__dirname + '/public'));
 
     });
