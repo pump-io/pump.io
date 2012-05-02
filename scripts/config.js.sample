@@ -1,0 +1,6 @@
+exports.hosts = {
+    "example.com": {key: "111",
+		    secret: "222"},
+    "example.org": {key: "333",
+		    secret: "444"}
+};
