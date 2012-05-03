@@ -20,12 +20,37 @@ var assert = require('assert'),
     vows = require('vows');
 
 vows.describe('httperror module interface').addBatch({
-    'When we check for a test suite': {
+    'When we require the http error module': {
         topic: function() { 
-            return false;
+            return require('../lib/httperror');
         },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
+        'we get an object': function(httperror) {
+            assert.isObject(httperror);
+        },
+        'which includes HTTPError': function(httperror) {
+            assert.includes(httperror, 'HTTPError');
+        },
+        'and we get its HTTPError export': {
+            topic: function(httperror) {
+                return httperror.HTTPError;
+            },
+            'it exists': function(HTTPError) {
+                assert.isFunction(HTTPError);
+            },
+            'and we create an HTTPError': {
+                topic: function(HTTPError) {
+                    return new HTTPError("Message", 404);
+                },
+                'it looks about right': function(err) {
+                    assert.includes(err, 'message');
+                    assert.includes(err, 'code');
+                    assert.isString(err.message);
+                    assert.isNumber(err.code);
+                    assert.equals(err.message, "Message");
+                    assert.equals(err.code, 404);
+                }
+            }
+            
         }
     }
 }).export(module);
