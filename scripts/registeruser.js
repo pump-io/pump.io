@@ -36,8 +36,8 @@ var _ = require('underscore'),
 var user = {'nickname': argv.u,
             'password': argv.p};
 
-var server = (_(argv).has('s')) ? argv.s : 'localhost';
-var port = (_(argv).has('p')) ? argv.p : 8001;
+var server = argv.s;
+var port = argv.P;
 
 postJSON('http://'+server+':'+port+'/api/users', user, function(err, results) {
     if (err) {
