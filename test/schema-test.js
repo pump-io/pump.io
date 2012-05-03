@@ -19,13 +19,87 @@
 var assert = require('assert'),
     vows = require('vows');
 
+var types = [
+    'activity',
+    'user',
+    'client',
+    'requesttoken',
+    'accesstoken',
+    'edge',
+    'usercount',
+    'userlist',
+    'stream',
+    'streamcount',
+    'streamsegments',
+    'streamsegment',
+    'streamsegmentcount',
+    'article',
+    'audio',
+    'badge',
+    'bookmark',
+    'collection',
+    'comment',
+    'event',
+    'file',
+    'group',
+    'image',
+    'note',
+    'person',
+    'place',
+    'product',
+    'question',
+    'review',
+    'service',
+    'video'
+];
+
 vows.describe('schema module interface').addBatch({
-    'When we check for a test suite': {
+    'When we require the schema module': {
         topic: function() { 
-            return false;
+            return require('../lib/schema');
         },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
+        'we get a module': function(schemamodule) {
+            assert.isObject(schemamodule);
+        },
+        'and we get its schema': {
+            topic: function(schemamodule) {
+                return schemamodule.schema;
+            },
+            'it exists': function(schema) {
+                assert.isObject(schema);
+            },
+            'it has all the types we expect': function(schema) {
+                var i, type;
+                for (i = 0; i < types.length; i++) {
+                    type = types[i];
+                    assert.include(schema, type);
+                }
+            },
+            'it has no types we do not expect': function(schema) {
+                var prop;
+                for (prop in schema) {
+                    if (schema.hasOwnProperty(prop)) {
+                        assert.include(types, prop);
+                    }
+                }
+            },
+            'all its types are objects': function(schema) {
+                var prop;
+                for (prop in schema) {
+                    if (schema.hasOwnProperty(prop)) {
+                        assert.isObject(schema[prop]);
+                    }
+                }
+            },
+            'all its types have pkeys': function(schema) {
+                var prop;
+                for (prop in schema) {
+                    if (schema.hasOwnProperty(prop)) {
+                        assert.include(schema[prop], 'pkey');
+                        assert.isString(schema[prop].pkey);
+                    }
+                }
+            }
         }
     }
 }).export(module);
