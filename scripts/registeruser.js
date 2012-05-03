@@ -39,10 +39,10 @@ var user = {'nickname': argv.u,
 var server = argv.s;
 var port = argv.P;
 
-postJSON('http://'+server+':'+port+'/api/users', user, function(err, results) {
+postJSON('http://'+server+':'+port+'/api/users', user, function(err, result, body) {
     if (err) {
         console.error(err);
     } else {
-        console.log(results);
+        console.log(body);
     }
 });
