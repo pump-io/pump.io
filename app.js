@@ -16,9 +16,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var connect = require('connect'),
-    auth = require('connect-auth'),
-    bcrypt  = require('bcrypt'),
+var auth = require('connect-auth'),
     databank = require('databank'),
     express = require('express'),
     _ = require('underscore'),
