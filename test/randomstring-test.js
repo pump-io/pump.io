@@ -17,7 +17,7 @@ vows.describe('randomstring module interface').addBatch({
                 assert.isFunction(randomString);
             },
             'we can get a random string': {
-                topic: function(rs, randomString) {
+                topic: function(randomString) {
                     randomString(16, this.callback);
                 },
                 'without an error': function(err, value) {
