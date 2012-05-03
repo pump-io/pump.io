@@ -15,5 +15,9 @@
                       "mime": "*",
                       "oauth": "*",
                       "optimist": "*"
-		    }
+		    },
+    "devDependencies": {
+        "vows"    :  "*",
+        "api-easy" : "*"
+    }
 }
