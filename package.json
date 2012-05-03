@@ -14,10 +14,10 @@
                       "qs": "*",
                       "mime": "*",
                       "oauth": "*",
-                      "optimist": "*"
+                      "optimist": "*",
+                      "api-easy": "0.2.x"
 		    },
-    "devDependencies": {
-        "vows"    :  "*",
-        "api-easy" : "*"
+    "scripts": {
+        "test": "vows test/*-test.js"
     }
 }
