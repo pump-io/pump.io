@@ -46,8 +46,8 @@ vows.describe('httperror module interface').addBatch({
                     assert.includes(err, 'code');
                     assert.isString(err.message);
                     assert.isNumber(err.code);
-                    assert.equals(err.message, "Message");
-                    assert.equals(err.code, 404);
+                    assert.equal(err.message, "Message");
+                    assert.equal(err.code, 404);
                 }
             }
             
