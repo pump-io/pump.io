@@ -555,7 +555,7 @@ var distribute = function(activity, callback) {
 
 var clientReg = function (req, res, next) {
 
-    var params = req.params,
+    var params = req.body,
         props = {},
         type;
 
