@@ -1,4 +1,4 @@
-// server.js
+// app.js
 //
 // main function for activity pump application
 //
@@ -26,126 +26,128 @@ var auth = require('connect-auth'),
     HTTPError = require('./lib/httperror').HTTPError,
     Provider = require('./lib/provider').Provider,
     URLMaker = require('./lib/urlmaker').URLMaker,
-    config = require('./config'),
-    params,
     Databank = databank.Databank,
-    DatabankObject = databank.DatabankObject,
-    db,
-    app,
-    port,
-    hostname;
+    DatabankObject = databank.DatabankObject;
 
-port = config.port || process.env.PORT || 8001;
-hostname = config.hostname || process.env.HOSTNAME || 'localhost';
+var runServer = function(config) {
 
-// Initiate the DB
+    var params,
+        port = config.port || process.env.PORT || 8001,
+        hostname = config.hostname || process.env.HOSTNAME || 'localhost',
+        db;
 
-if (_(config).has('params')) {
-    params = config.params;
-} else {
-    params = {};
-}
+    // Initiate the DB
 
-if (_(params).has('schema')) {
-    _.extend(params.schema, schema);
-} else {
-    params.schema = schema;
-}
-
-db = Databank.get(config.driver, params);
-
-// Connect...
-
-db.connect({}, function(err) {
-
-    var server;
-    var app = module.exports = express.createServer();
-
-    if (err) {
-        console.log("Couldn't connect to JSON store: " + err.message);
-        process.exit(1);
+    if (_(config).has('params')) {
+        params = config.params;
+    } else {
+        params = {};
     }
 
-    // Configuration
+    if (_(params).has('schema')) {
+        _.extend(params.schema, schema);
+    } else {
+        params.schema = schema;
+    }
 
-    app.configure(function() {
+    db = Databank.get(config.driver, params);
 
-        // Templates are in public
-        app.set('views', __dirname + '/public/template');
-        app.set('view engine', 'utml');
-        app.use(express.logger());
-        app.use(express.bodyParser());
-        app.use(express.cookieParser());
-        app.use(express.query());
-        app.use(express.methodOverride());
-        app.use(express.session({secret: (config.secret || "activitypump")}));
-        app.use(express.favicon());
+    // Connect...
 
-        var provider = new Provider();
+    db.connect({}, function(err) {
 
-        app.use(function(req, res, next) { 
-            res.local('site', (config.site) ? config.site : "ActivityPump");
-            res.local('owner', (config.owner) ? config.owner : "Anonymous");
-            res.local('ownerurl', (config.ownerURL) ? config.ownerURL : false);
-            // Initialize null
-            res.local('remoteUser', null);
-            res.local('user', null);
-            res.local('client', null);
-            next();
+        var app = express.createServer();
+
+        if (err) {
+            console.log("Couldn't connect to JSON store: " + err.message);
+            process.exit(1);
+        }
+
+        // Configuration
+
+        app.configure(function() {
+
+            // Templates are in public
+            app.set('views', __dirname + '/public/template');
+            app.set('view engine', 'utml');
+            app.use(express.logger());
+            app.use(express.bodyParser());
+            app.use(express.cookieParser());
+            app.use(express.query());
+            app.use(express.methodOverride());
+            app.use(express.session({secret: (config.secret || "activitypump")}));
+            app.use(express.favicon());
+
+            var provider = new Provider();
+
+            app.use(function(req, res, next) { 
+                res.local('site', (config.site) ? config.site : "ActivityPump");
+                res.local('owner', (config.owner) ? config.owner : "Anonymous");
+                res.local('ownerurl', (config.ownerURL) ? config.ownerURL : false);
+                // Initialize null
+                res.local('remoteUser', null);
+                res.local('user', null);
+                res.local('client', null);
+                next();
+            });
+
+            app.use(auth([auth.Oauth({name: "client",
+                                      oauth_provider: provider,
+                                      oauth_protocol: 'http',
+                                      authenticate_provider: null,
+                                      authorize_provider: null,
+                                      authorization_finished_provider: null
+                                     }),
+                          auth.Oauth({name: "user",
+                                      oauth_provider: provider,
+                                      oauth_protocol: 'http',
+                                      authenticate_provider: web.authenticate,
+                                      authorize_provider: web.authorize,
+                                      authorization_finished_provider: web.authorizationFinished
+                                     })
+                         ]));
+
+            app.use(app.router);
+
+            app.use(express['static'](__dirname + '/public'));
+
         });
 
-        app.use(auth([auth.Oauth({name: "client",
-                                  oauth_provider: provider,
-                                  oauth_protocol: 'http',
-                                  authenticate_provider: null,
-                                  authorize_provider: null,
-                                  authorization_finished_provider: null
-                                 }),
-                      auth.Oauth({name: "user",
-                                  oauth_provider: provider,
-                                  oauth_protocol: 'http',
-                                  authenticate_provider: web.authenticate,
-                                  authorize_provider: web.authorize,
-                                  authorization_finished_provider: web.authorizationFinished
-                                 })
-                     ]));
-
-        app.use(app.router);
-
-        app.use(express['static'](__dirname + '/public'));
-
-    });
-
-    app.error(function(err, req, res, next) {
-        if (err instanceof HTTPError) {
-            if (req.xhr) {
-                res.json({error: err.message}, err.code);
-            } else if (req.accepts('html')) {
-                res.render('error', {status: err.code, error: err, title: "Error"});
+        app.error(function(err, req, res, next) {
+            if (err instanceof HTTPError) {
+                if (req.xhr) {
+                    res.json({error: err.message}, err.code);
+                } else if (req.accepts('html')) {
+                    res.render('error', {status: err.code, error: err, title: "Error"});
+                } else {
+                    res.writeHead(err.code, {'Content-Type': 'text/plain'});
+                    res.end(err.message);
+                }
             } else {
-                res.writeHead(err.code, {'Content-Type': 'text/plain'});
-                res.end(err.message);
+                next(err);
             }
-        } else {
-            next(err);
+        });
+
+        // Routes
+
+        api.addRoutes(app);
+
+        // Use "noweb" to disable Web site (API engine only)
+
+        if (!_(config).has('noweb') || !config.noweb) {
+            web.addRoutes(app);
         }
+
+        api.setBank(db);
+        DatabankObject.bank = db;
+
+        URLMaker.hostname = hostname;
+        URLMaker.port = port;
+
+        app.listen(port);
     });
+};
 
-    // Routes
+var config = require('./config');
 
-    api.addRoutes(app);
-
-    // Use "noweb" to disable Web site (API engine only)
-
-    if (!_(config).has('noweb') || !config.noweb) {
-        web.addRoutes(app);
-    }
-
-    api.setBank(db);
-    DatabankObject.bank = db;
-
-    URLMaker.hostname = hostname;
-    URLMaker.port = port;
-
-    app.listen(port);
-});
+runServer(config);
