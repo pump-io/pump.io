@@ -87,7 +87,7 @@ var addRoutes = function(app) {
 
     // Client registration
 
-    app.post('/api/client/registration', clientReg);
+    app.post('/api/client/register', clientReg);
 };
 
 exports.addRoutes = addRoutes;
