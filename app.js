@@ -27,6 +27,7 @@ var connect = require('connect'),
     schema = require('./lib/schema').schema,
     HTTPError = require('./lib/httperror').HTTPError,
     Provider = require('./lib/provider').Provider,
+    URLMaker = require('./lib/urlmaker').URLMaker,
     config = require('./config'),
     params,
     Databank = databank.Databank,
@@ -144,6 +145,9 @@ db.connect({}, function(err) {
 
     api.setBank(db);
     DatabankObject.bank = db;
+
+    URLMaker.hostname = hostname;
+    URLMaker.port = port;
 
     app.listen(port);
 });

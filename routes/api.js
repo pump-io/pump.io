@@ -26,6 +26,7 @@ var databank = require('databank'),
     Stream = require('../lib/model/stream').Stream,
     Client = require('../lib/model/client').Client,
     mw = require('../lib/middleware'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
     reqUser = mw.reqUser,
     sameUser = mw.sameUser,
     noUser = mw.noUser,
@@ -321,7 +322,7 @@ var listUsers = function(req, res, next) {
 
     var collection = {
         displayName: "Users of this service",
-        id: makeURL("api/users"),
+        id: URLMaker.makeURL("api/users"),
         objectTypes: ["user"]
     };
 
@@ -416,7 +417,7 @@ var userStream = function(req, res, next) {
     var collection = {
         author: req.user.profile,
         displayName: "Activities by " + (req.user.profile.displayName || req.user.nickname),
-        id: makeURL("api/user/" + req.user.nickname + "/feed"),
+        id: URLMaker.makeURL("api/user/" + req.user.nickname + "/feed"),
         objectTypes: ["activity"],
         items: []
     };
@@ -466,7 +467,7 @@ var userInbox = function(req, res, next) {
     var collection = {
         author: req.user.profile,
         displayName: "Activities for " + (req.user.profile.displayName || req.user.nickname),
-        id: makeURL("api/user/" + req.user.nickname + "/inbox"),
+        id: URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox"),
         objectTypes: ["activity"],
         items: []
     };
@@ -506,14 +507,6 @@ var userInbox = function(req, res, next) {
 
 var notYetImplemented = function(req, res, next) {
     next(new HTTPError("Not yet implemented", 500));
-};
-
-var makeURL = function(relative) {
-    if (this.port != 80) {
-        return 'http://'+this.hostname+':'+this.port+'/'+relative;
-    } else {
-        return 'http://'+this.hostname+'/'+relative;
-    }
 };
 
 var distribute = function(activity, callback) {
