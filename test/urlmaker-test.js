@@ -52,7 +52,7 @@ vows.describe('urlmaker module interface').addBatch({
                 topic: function(URLMaker) {
                     URLMaker.hostname = 'example.com';
                     URLMaker.port     = 3001;
-                    return URLMaker.makeURL('/login');
+                    return URLMaker.makeURL('login');
                 },
                 'it exists': function(url) {
                     assert.isString(url);
@@ -69,7 +69,7 @@ vows.describe('urlmaker module interface').addBatch({
                 topic: function(URLMaker) {
                     URLMaker.hostname = 'example.com';
                     URLMaker.port     = 80;
-                    return URLMaker.makeURL('/login');
+                    return URLMaker.makeURL('login');
                 },
                 'it exists': function(url) {
                     assert.isString(url);
