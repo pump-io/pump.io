@@ -17,7 +17,7 @@
 // limitations under the License.
 
 var _ = require('underscore'),
-    postArgs = require('common').postArgs;
+    postArgs = require('./common').postArgs;
 
 var argv = require('optimist')
         .usage("Usage: $0 -t title -e email [-w|-n]")
