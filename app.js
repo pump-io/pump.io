@@ -84,6 +84,17 @@ db.connect({}, function(err) {
 
         var provider = new Provider();
 
+        app.use(function(req, res, next) { 
+            res.local('site', (config.site) ? config.site : "ActivityPump");
+            res.local('owner', (config.owner) ? config.owner : "Anonymous");
+            res.local('ownerurl', (config.ownerURL) ? config.ownerURL : false);
+            // Initialize null
+            res.local('remoteUser', null);
+            res.local('user', null);
+            res.local('client', null);
+            next();
+        });
+
         app.use(auth([auth.Oauth({name: "client",
                                   oauth_provider: provider,
                                   oauth_protocol: 'http',
@@ -99,13 +110,6 @@ db.connect({}, function(err) {
                                   authorization_finished_provider: web.authorizationFinished
                                  })
                      ]));
-
-        app.use(function(req, res, next) { 
-            res.local('site', (config.site) ? config.site : "ActivityPump");
-            res.local('owner', (config.owner) ? config.owner : "Anonymous");
-            res.local('ownerurl', (config.ownerURL) ? config.ownerURL : false);
-            next();
-        });
 
         app.use(app.router);
 
