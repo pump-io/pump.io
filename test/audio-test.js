@@ -38,7 +38,7 @@ vows.describe('audio module interface').addBatch({
             return require('../lib/model/audio');
         },
         'there is one': function(audio) {
-            assert.isTrue(audio);
+            assert.isObject(audio);
         },
         'it has an Audio export': function(audio) {
             assert.includes(audio, 'Audio');
