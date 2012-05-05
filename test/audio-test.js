@@ -130,15 +130,6 @@ vows.describe('audio module interface').addBatch({
                     assert.isString(syr.published);
                     assert.isString(syr.updated); // required for new object?
                 },
-                'it has the update method': function(err, syr) {
-                    assert.isFunction(syr.update);
-                },
-                'it has the del method': function(err, syr) {
-                    assert.isFunction(syr.del);
-                },
-                'it has the save method': function(err, syr) {
-                    assert.isFunction(syr.save);
-                },
                 'and we modify it': {
                     topic: function(syr) {
                         syr.displayName = "Shake Your Rump (Extended Mix)";
