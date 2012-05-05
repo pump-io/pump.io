@@ -51,40 +51,29 @@ vows.describe('audio module interface').addBatch({
                 assert.isFunction(Audio);
             },
             'it has an init method': function(Audio) {
-                assert.includes(Audio, 'init');
                 assert.isFunction(Audio.init);
             },
             'it has a bank method': function(Audio) {
-                assert.includes(Audio, 'bank');
                 assert.isFunction(Audio.bank);
             },
             'it has a get method': function(Audio) {
-                assert.includes(Audio, 'get');
                 assert.isFunction(Audio.get);
             },
             'it has a search method': function(Audio) {
-                assert.includes(Audio, 'search');
                 assert.isFunction(Audio.search);
             },
             'it has a pkey method': function(Audio) {
-                assert.includes(Audio, 'pkey');
                 assert.isFunction(Audio.pkey);
             },
             'it has a create method': function(Audio) {
-                assert.includes(Audio, 'create');
                 assert.isFunction(Audio.create);
             },
             'it has a readAll method': function(Audio) {
-                assert.includes(Audio, 'readAll');
                 assert.isFunction(Audio.readAll);
             },
             'its type is "audio"': function(Audio) {
-                assert.includes(Audio, 'type');
                 assert.isString(Audio.type);
                 assert.equal(Audio.type, 'audio');
-            },
-            'it has a schema property': function(Audio) {
-                assert.includes(Audio, 'schema');
             },
             'and we get its schema': {
                 topic: function(Audio) {
