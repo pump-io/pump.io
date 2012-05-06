@@ -19,8 +19,8 @@
 var assert = require('assert'),
     vows = require('vows'),
     databank = require('databank'),
-    Step = require('step'),
     URLMaker = require('../lib/urlmaker').URLMaker,
+    modelBatch = reuqire('./lib/model').modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
@@ -32,125 +32,34 @@ URLMaker.hostname = "example.net";
 
 DatabankObject.bank = Databank.get('memory', {});
 
-vows.describe('audio module interface').addBatch({
-    'When we require the audio module': {
-        topic: function() { 
-            return require('../lib/model/audio');
-        },
-        'there is one': function(audio) {
-            assert.isObject(audio);
-        },
-        'it has an Audio export': function(audio) {
-            assert.includes(audio, 'Audio');
-        },
-        'and we get its Audio export': {
-            topic: function(audio) {
-                return audio.Audio;
-            },
-            'it is a function': function(Audio) {
-                assert.isFunction(Audio);
-            },
-            'it has an init method': function(Audio) {
-                assert.isFunction(Audio.init);
-            },
-            'it has a bank method': function(Audio) {
-                assert.isFunction(Audio.bank);
-            },
-            'it has a get method': function(Audio) {
-                assert.isFunction(Audio.get);
-            },
-            'it has a search method': function(Audio) {
-                assert.isFunction(Audio.search);
-            },
-            'it has a pkey method': function(Audio) {
-                assert.isFunction(Audio.pkey);
-            },
-            'it has a create method': function(Audio) {
-                assert.isFunction(Audio.create);
-            },
-            'it has a readAll method': function(Audio) {
-                assert.isFunction(Audio.readAll);
-            },
-            'its type is "audio"': function(Audio) {
-                assert.isString(Audio.type);
-                assert.equal(Audio.type, 'audio');
-            },
-            'and we get its schema': {
-                topic: function(Audio) {
-                    return Audio.schema;
-                },
-                'it exists': function(schema) {
-                    assert.isObject(schema);
-                },
-                'it has the right pkey': function(schema) {
-                    assert.includes(schema, 'pkey');
-                    assert.equal(schema.pkey, 'id');
-                },
-                'it has the right fields': function(schema) {
-                    var fields = ['author',
-                                  'displayName',
-                                  'embedCode',
-                                  'published',
-                                  'stream',
-                                  'summary',
-                                  'updated'
-                                 ],
-                        i, field;
-                    assert.includes(schema, 'fields');
-                    for (i = 0; i < fields.length; i++) {
-                        assert.includes(schema.fields, fields[i]);
-                    }
-                    for (i = 0; i < schema.fields.length; i++) {
-                        assert.includes(fields, schema.fields[i]);
-                    }
-                }
-            },
-            'and we create an instance': {
-                topic: function(Audio) {
-                    var props = {
-                        displayName: "Shake Your Rump",
-                        url: "http://example.com/beastie-boys/pauls-boutique/2",
-                        stream: {
-                            url: "http://example.com/beastie-boys/pauls-boutique/shake-your-rump.ogg",
-                            duration: 388
-                        }
-                    };
-                    Audio.create(props, this.callback);
-                },
-                'it works correctly': function(err, syr) {
-                    assert.ifError(err);
-                    assert.isObject(syr);
-                    assert.isString(syr.id);
-                    assert.equal(syr.displayName, "Shake Your Rump");
-                    assert.equal(syr.url, "http://example.com/beastie-boys/pauls-boutique/2");
-                    assert.isObject(syr.stream);
-                    assert.equal(syr.stream.url, 
-                                 "http://example.com/beastie-boys/pauls-boutique/shake-your-rump.ogg");
-                    assert.equal(syr.stream.duration, 388);
-                    assert.isString(syr.published);
-                    assert.isString(syr.updated); // required for new object?
-                },
-                'and we modify it': {
-                    topic: function(syr) {
-                        syr.displayName = "Shake Your Rump (Extended Mix)";
-                        syr.save(this.callback);
-                    },
-                    'it is modified': function(err, syrx) {
-                        assert.ifError(err);
-                        assert.equal(syrx.displayName, "Shake Your Rump (Extended Mix)");
-                        assert.isString(syrx.updated);
-                    },
-                    'and we delete it': {
-                        topic: function(syrx) {
-                            syrx.del(this.callback);
-                        },
-                        'it works': function(err, syrx) {
-                            assert.ifError(err);
-                        }
-                    }
-                }
-            }
+var suite = vows.describe('audio module interface');
+
+var testSchema = {
+    pkey: "id",
+    fields: ['author',
+             'displayName',
+             'embedCode',
+             'published',
+             'stream',
+             'summary',
+             'updated']
+};
+
+var testData = {
+    'create': {
+        displayName: "Shake Your Rump",
+        url: "http://example.com/beastie-boys/pauls-boutique/2",
+        stream: {
+            url: "http://example.com/beastie-boys/pauls-boutique/shake-your-rump.ogg",
+            duration: 388
         }
+    },
+    'update': {
+        displayName: "Shake Your Rump (Extended Mix)"
     }
-}).export(module);
+};
+
+suite.addBatch(modelBatch('audio', 'Audio', testSchema, testData));
+
+suite.export(module);
 
