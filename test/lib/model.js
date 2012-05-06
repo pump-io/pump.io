@@ -29,7 +29,7 @@ var modelBatch = function(suite, typeName, className, testSchema, testData) {
     return {
         'When we require the module': {
             topic: function() { 
-                return require('../lib/model/'+typeName);
+                return require('../../lib/model/'+typeName);
             },
             'there is one': function(mod) {
                 assert.isObject(mod);
