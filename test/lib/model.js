@@ -20,7 +20,7 @@ var assert = require('assert'),
     vows = require('vows'),
     databank = require('databank'),
     Step = require('step'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
+    URLMaker = require('../../lib/urlmaker').URLMaker,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
