@@ -39,7 +39,7 @@ var modelBatch = function(suite, typeName, className, testSchema, testData) {
             },
             'and we get its class export': {
                 topic: function(mod) {
-                    return mod[className];
+                    return mod[className] || null;
                 },
                 'it is a function': function(Cls) {
                     assert.isFunction(Cls);
