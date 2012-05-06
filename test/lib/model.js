@@ -65,7 +65,7 @@ var modelBatch = function(typeName, className, testSchema, testData) {
                 'it has a readAll method': function(Cls) {
                     assert.isFunction(Cls.readAll);
                 },
-                'its type is "mod"': function(Cls) {
+                'its type is correct': function(Cls) {
                     assert.isString(Cls.type);
                     assert.equal(Cls.type, typeName);
                 },
