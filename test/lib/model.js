@@ -24,7 +24,7 @@ var assert = require('assert'),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var modelBatch = function(suite, typeName, className, testSchema, testData) {
+var modelBatch = function(typeName, className, testSchema, testData) {
 
     return {
         'When we require the module': {
