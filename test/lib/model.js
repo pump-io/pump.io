@@ -29,7 +29,7 @@ var modelBatch = function(typeName, className, testSchema, testData) {
     return {
         'When we require the module': {
             topic: function() { 
-                return require('../../lib/model/'+typeName);
+                return require('../../lib/model/'+typeName) || null;
             },
             'there is one': function(mod) {
                 assert.isObject(mod);
@@ -71,7 +71,7 @@ var modelBatch = function(typeName, className, testSchema, testData) {
                 },
                 'and we get its schema': {
                     topic: function(Cls) {
-                        return Cls.schema;
+                        return Cls.schema || null;
                     },
                     'it exists': function(schema) {
                         assert.isObject(schema);
