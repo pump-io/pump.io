@@ -154,6 +154,8 @@ var modelBatch = function(typeName, className, testSchema, testData) {
             }
         }
     };
+
+    return batch;
 };
 
 exports.modelBatch = modelBatch;
