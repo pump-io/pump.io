@@ -17,16 +17,50 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('badge module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
-        },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
+// Need this to make IDs
+
+URLMaker.hostname = "example.net";
+
+// Dummy databank
+
+DatabankObject.bank = Databank.get('memory', {});
+
+var suite = vows.describe('badge module interface');
+
+var testSchema = {
+    pkey: "id",
+    fields: ['author',
+             'displayName',
+             'image',
+             'published',
+             'summary',
+             'updated',
+             'url']
+};
+
+var testData = {
+    'create': {
+        displayName: "Unit TestX0r",
+        url: "http://example.com/badge/unit-testx0r",
+        summary: "Ran 3 or more unit tests, automatically!",
+        image: {
+            url: "http://example.com/images/badges/unit-testx0r",
+            height: 350,
+            width: 350
         }
+    },
+    'update': {
+        summary: "Ran 5 or more unit tests, automatically!"
     }
-}).export(module);
+};
 
+suite.addBatch(modelBatch('badge', 'Badge', testSchema, testData));
+
+suite.export(module);
