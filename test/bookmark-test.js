@@ -17,16 +17,52 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('bookmark module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
+// Need this to make IDs
+
+URLMaker.hostname = "example.net";
+
+// Dummy databank
+
+DatabankObject.bank = Databank.get('memory', {});
+
+var suite = vows.describe('bookmark module interface');
+
+var testSchema = {
+    pkey: "id",
+    fields: ['author',
+             'content',
+             'displayName',
+             'image',
+             'published',
+             'targetUrl',
+             'updated',
+             'url']
+};
+
+var testData = {
+    'create': {
+        displayName: "Google Home Page",
+        url: "http://example.com/bookmark/google-home-page",
+        content: "Main search page for Google",
+        image: {
+            url: "http://example.com/images/bookmarks/google-home-page",
+            height: 140,
+            width: 140
         },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
-        }
+        targetUrl: "http://www.google.com/"
+    },
+    'update': {
+        content: "Main search page for Google in the US"
     }
-}).export(module);
+};
 
+suite.addBatch(modelBatch('bookmark', 'Bookmark', testSchema, testData));
+
+suite.export(module);
