@@ -31,7 +31,7 @@ var modelBatch = function(typeName, className, testSchema, testData) {
     var classKey = 'and we get its '+className+' class export';
     var instKey;
 
-    if ("aeiouAEIOU".indexOf(typeName.charCodeAt(0)) !== -1) {
+    if ("aeiouAEIOU".indexOf(typeName.charAt(0)) !== -1) {
         instKey = 'and we create an '+typeName+' instance';
     } else {
         instKey = 'and we create a '+typeName+' instance';
