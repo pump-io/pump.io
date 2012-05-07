@@ -29,7 +29,13 @@ var modelBatch = function(typeName, className, testSchema, testData) {
     var batch = {};
     var typeKey = 'When we require the '+typeName+' module';
     var classKey = 'and we get its '+className+' class export';
-    var instKey = 'and we create a(n) '+typeName+' instance';
+    var instKey;
+
+    if ("aeiouAEIOU".indexOf(typeName.charCodeAt(0)) !== -1) {
+        instKey = 'and we create an '+typeName+' instance';
+    } else {
+        instKey = 'and we create a '+typeName+' instance';
+    }
 
     batch[typeKey] = {
         topic: function() { 
