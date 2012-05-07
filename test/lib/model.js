@@ -1,6 +1,6 @@
-// audio-test.js
+// model.js
 //
-// Test the audio module
+// Test utility for databankobject model modules
 //
 // Copyright 2012, StatusNet Inc.
 //
