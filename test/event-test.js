@@ -17,16 +17,68 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('event module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
+// Need this to make IDs
+
+URLMaker.hostname = "example.net";
+
+// Dummy databank
+
+DatabankObject.bank = Databank.get('memory', {});
+
+var suite = vows.describe('event module interface');
+
+var testSchema = {
+    pkey: "id",
+    fields: ['attending',
+             'author',
+             'displayName',
+             'endTime',
+             'location',
+             'maybeAttending',
+             'notAttending',
+             'published',
+             'startTime',
+             'summary',
+             'updated',
+             'url']
+};
+
+var testData = {
+    'create': {
+        displayName: "Federation Hackfest 2012",
+        url: "http://example.com/event/federation-hackfest-2012",
+        summary: "Come hack with us!",
+        location: {
+            displayName: "Empire State Building",
+            address: {
+                streetAddress: "350 5th Avenue",
+                locality: "New York",
+                region: "New York",
+                country: "USA"
+            }
         },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
-        }
+        startTime: "2012-10-14T23:00:00Z",
+        endTime: "2012-10-15T03:00:00Z",
+        attending: [
+            {
+                id: "acct:evan@example.net",
+                displayName: "Evan Prodromou",
+                objectType: "person"
+            }
+        ]
+    },
+    'update': {
+        summary: "Come <strong>hack</strong> with us!"
     }
-}).export(module);
+};
 
+suite.addBatch(modelBatch('event', 'Event', testSchema, testData));
+
+suite.export(module);
