@@ -17,16 +17,51 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('place module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
+// Need this to make IDs
+
+URLMaker.hostname = "example.net";
+
+// Dummy databank
+
+DatabankObject.bank = Databank.get('memory', {});
+
+var suite = vows.describe('place module interface');
+
+var testSchema = {
+    pkey: "id",
+    fields: ['displayName',
+             'position',
+             'address',
+             'published',
+             'updated',
+             'url']
+};
+
+var testData = {
+    'create': {
+        displayName: "Torchy's Tacos",
+        position: "+30.2516492-97.7540501/",
+        address: {
+            streetAddress: "South 1st Street",
+            locality: "Austin",
+            region: "Texas",
+            postalCode: "78704",
+            country: "USA"
         },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
-        }
+        url: "http://nominatim.openstreetmap.org/details.php?place_id=9576945"
+    },
+    'update': {
+        displayName: "Torchy's Tacos on South 1st"
     }
-}).export(module);
+};
 
+suite.addBatch(modelBatch('place', 'Place', testSchema, testData));
+
+suite.export(module);
