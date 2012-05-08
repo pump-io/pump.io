@@ -17,16 +17,47 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('person module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
-        },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
+// Need this to make IDs
+
+URLMaker.hostname = "example.net";
+
+// Dummy databank
+
+DatabankObject.bank = Databank.get('memory', {});
+
+var suite = vows.describe('person module interface');
+
+var testSchema = {
+    pkey: "id",
+    fields: ['displayName',
+             'image',
+             'published',
+             'updated',
+             'url']
+};
+
+var testData = {
+    'create': {
+        displayName: "George Washington",
+        image: {
+            url: "http://www.georgewashington.si.edu/portrait/images/face.jpg",
+            width: 83,
+            height: 120
         }
+    },
+    'update': {
+        displayName: "President George Washington"
     }
-}).export(module);
+};
+
+suite.addBatch(modelBatch('person', 'Person', testSchema, testData));
+
+suite.export(module);
 
