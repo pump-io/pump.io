@@ -17,16 +17,58 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('comment module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
+// Need this to make IDs
+
+URLMaker.hostname = "example.net";
+
+// Dummy databank
+
+DatabankObject.bank = Databank.get('memory', {});
+
+var suite = vows.describe('comment module interface');
+
+var testSchema = {
+    pkey: "id",
+    fields: ['author',
+             'content',
+             'displayName',
+             'inReplyTo',
+             'published',
+             'summary',
+             'updated',
+             'url']
+};
+
+var testData = {
+    'create': {
+        author: {
+            id: "acct:evan@example.net",
+            displayName: "Evan Prodromou",
+            objectType: "person"
         },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
-        }
+        displayName: "Great spec!",
+        url: "http://example.com/comment/activity-stream-spec#comment1",
+        content: "Nice job on the <strong>spec</strong>!",
+        inReplyTo: [
+            {
+                url: "http://activitystrea.ms/specs/json/1.0/",
+                objectType: "article",
+                displayName: "JSON Activity Streams 1.0"
+            }
+        ]
+    },
+    'update': {
+        content: "<strong>Nice job</strong> on the spec!"
     }
-}).export(module);
+};
 
+suite.addBatch(modelBatch('comment', 'Comment', testSchema, testData));
+
+suite.export(module);
