@@ -17,16 +17,55 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('image module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
+// Need this to make IDs
+
+URLMaker.hostname = "example.net";
+
+// Dummy databank
+
+DatabankObject.bank = Databank.get('memory', {});
+
+var suite = vows.describe('image module interface');
+
+var testSchema = {
+    pkey: "id",
+    fields: ['author',
+             'displayName',
+             'image',
+             'fullImage',
+             'published',
+             'summary',
+             'updated',
+             'url']
+};
+
+var testData = {
+    'create': {
+        displayName: "At the Beach",
+        summary: "Us at the beach last year.",
+        image: {
+            url: "http://example.com/images/thumbnails/at-the-beach.png",
+            height: 150,
+            width: 150
         },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
+        fullImage: {
+            url: "http://example.com/images/at-the-beach.jpeg",
+            height: 1500,
+            width: 1500
         }
+    },
+    'update': {
+        displayName: "Us at the Beach"
     }
-}).export(module);
+};
 
+suite.addBatch(modelBatch('image', 'Image', testSchema, testData));
+
+suite.export(module);
