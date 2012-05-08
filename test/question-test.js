@@ -17,16 +17,45 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('question module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
-        },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
-        }
+// Need this to make IDs
+
+URLMaker.hostname = "example.net";
+
+// Dummy databank
+
+DatabankObject.bank = Databank.get('memory', {});
+
+var suite = vows.describe('question module interface');
+
+var testSchema = {
+    pkey: "id",
+    fields: ['author',
+             'content',
+             'displayName',
+             'options',
+             'published',
+             'updated',
+             'url']
+};
+
+var testData = {
+    'create': {
+        displayName: "What's the greatest programming editor?",
+        content: "What do you think is the greatest programming editor?",
+        url: "http://example.com/questions/greatest-programming-editor"
+    },
+    'update': {
+        displayName: "What is the greatest programming editor?"
     }
-}).export(module);
+};
 
+suite.addBatch(modelBatch('question', 'Question', testSchema, testData));
+
+suite.export(module);
