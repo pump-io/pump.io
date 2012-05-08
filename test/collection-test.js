@@ -17,16 +17,51 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('collection module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
+// Need this to make IDs
+
+URLMaker.hostname = "example.net";
+
+// Dummy databank
+
+DatabankObject.bank = Databank.get('memory', {});
+
+var suite = vows.describe('collection module interface');
+
+var testSchema = {
+    pkey: "id",
+    fields: ['author',
+             'displayName',
+             'image',
+             'objectTypes',
+             'published',
+             'summary',
+             'updated',
+             'url']
+};
+
+var testData = {
+    'create': {
+        displayName: "Vacation 2011",
+        url: "http://example.com/collection/photos/vacation-2011",
+        image: {
+            url: "http://example.com/images/collections/vacation-2011.jpg",
+            height: 140,
+            width: 140
         },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
-        }
+        objectTypes: ["image", "video"]
+    },
+    'update': {
+        displayName: "Vacation Summer 2011"
     }
-}).export(module);
+};
 
+suite.addBatch(modelBatch('collection', 'Collection', testSchema, testData));
+
+suite.export(module);
