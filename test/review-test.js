@@ -17,16 +17,48 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('review module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
-        },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
-        }
+// Need this to make IDs
+
+URLMaker.hostname = "example.net";
+
+// Dummy databank
+
+DatabankObject.bank = Databank.get('memory', {});
+
+var suite = vows.describe('review module interface');
+
+var testSchema = {
+    pkey: "id",
+    fields: ['author',
+             'content',
+             'displayName',
+             'published',
+             'rating',
+             'updated',
+             'url']
+};
+
+var testData = {
+    'create': {
+        displayName: "My review of your blog",
+        content: "I hate your blog. It's incredibly terrible and bad.",
+        url: "http://example.com/reviews/i-hate-your-blog",
+        rating: 0.5
+    },
+    'update': {
+        rating: 0.0
     }
-}).export(module);
+};
+
+suite.addBatch(modelBatch('review', 'Review', testSchema, testData));
+
+suite.export(module);
+
 
