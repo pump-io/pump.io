@@ -17,16 +17,57 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('video module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
+// Need this to make IDs
+
+URLMaker.hostname = "example.net";
+
+// Dummy databank
+
+DatabankObject.bank = Databank.get('memory', {});
+
+var suite = vows.describe('video module interface');
+
+var testSchema = {
+    pkey: "id",
+    fields: ['author',
+             'displayName',
+             'embedCode',
+             'published',
+             'stream',
+             'summary',
+             'updated',
+             'url']
+};
+
+var testData = {
+    'create': {
+        displayName: "Watch me dunk a basketball",
+        summary: "I can dunk!",
+        embedCode: "<video>"+
+            "<source type='video/ogg' "+
+            "src='http://example.com/videos/watch-me-dunk-a-basketball.ogv' >"+
+            "</video>",
+        stream: {
+            url: "http://example.com/videos/watch-me-dunk-a-basketball.ogv",
+            duration: 77,
+            width: 320,
+            height: 480
         },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
-        }
+        url: "http://example.com/videos/watch-me-dunk-a-basketball.html"
+    },
+    'update': {
+        displayName: "Watch me almost dunk a basketball",
+        summary: "So close!"
     }
-}).export(module);
+};
 
+suite.addBatch(modelBatch('video', 'Video', testSchema, testData));
+
+suite.export(module);
