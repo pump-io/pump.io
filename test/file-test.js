@@ -17,16 +17,46 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('file module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
-        },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
-        }
+// Need this to make IDs
+
+URLMaker.hostname = "example.net";
+
+// Dummy databank
+
+DatabankObject.bank = Databank.get('memory', {});
+
+var suite = vows.describe('file module interface');
+
+var testSchema = {
+    pkey: "id",
+    fields: ['author',
+             'displayName',
+             'fileUrl',
+             'published',
+             'mimeType',
+             'updated',
+             'url']
+};
+
+var testData = {
+    'create': {
+        displayName: "2012 Q1 Sales",
+        fileUrl: "http://example.com/files/2012-q1-sales.xls",
+        mimeType: "application/vnd.ms-excel",
+        url: "http://example.com/pages/2012-q1-sales"
+    },
+    'update': {
+        displayName: "2012 Q1 Sales (Revised)"
     }
-}).export(module);
+};
 
+suite.addBatch(modelBatch('file', 'File', testSchema, testData));
+
+suite.export(module);
