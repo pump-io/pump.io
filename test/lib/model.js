@@ -21,6 +21,7 @@ var assert = require('assert'),
     databank = require('databank'),
     Step = require('step'),
     URLMaker = require('../../lib/urlmaker').URLMaker,
+    schema = require('../../lib/schema').schema,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
@@ -39,7 +40,22 @@ var modelBatch = function(typeName, className, testSchema, testData) {
 
     batch[typeKey] = {
         topic: function() { 
-            return require('../../lib/model/'+typeName) || null;
+
+            var cb = this.callback;
+            // Need this to make IDs
+
+            URLMaker.hostname = "example.net";
+
+            // Dummy databank
+
+            var params = {schema: schema};
+
+            var db = Databank.get('memory', params);
+
+            db.connect({}, function(err) {
+                DatabankObject.bank = db;
+                cb(require('../../lib/model/'+typeName) || null);
+            });
         },
         'there is one': function(mod) {
             assert.isObject(mod);
