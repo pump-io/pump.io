@@ -63,6 +63,4 @@ suite.addBatch({
     }
 });
 
-db.connect({}, function(err) {
-    suite.export(module);
-});
+suite.export(module);
