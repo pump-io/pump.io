@@ -17,16 +17,43 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('accesstoken module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
-        },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
-        }
+// Need this to make IDs
+
+URLMaker.hostname = "example.net";
+
+// Dummy databank
+
+DatabankObject.bank = Databank.get('memory', {});
+
+var suite = vows.describe('access token interface');
+
+var testSchema = {
+    pkey: 'token',
+    fields: ['token_secret',
+             'consumer_key',
+             'username',
+             'created',
+             'updated'],
+    indices: ['username', 'consumer_key']
+};
+
+var testData = {
+    'create': {
+        consumer_key: "AAAAAAAAAAAAAAAAAAAAAA",
+        username: "evan"
+    },
+    'update': {
+        consumer_key: "AAAAAAAAAAAAAAAAAAAAAB"
     }
-}).export(module);
+};
 
+suite.addBatch(modelBatch('accesstoken', 'AccessToken', testSchema, testData));
+
+suite.export(module);
