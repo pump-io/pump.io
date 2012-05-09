@@ -21,6 +21,7 @@ var assert = require('assert'),
     databank = require('databank'),
     URLMaker = require('../lib/urlmaker').URLMaker,
     modelBatch = require('./lib/model').modelBatch,
+    AccessToken = require('./lib/model/accesstoken').AccessToken,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
@@ -30,7 +31,11 @@ URLMaker.hostname = "example.net";
 
 // Dummy databank
 
-DatabankObject.bank = Databank.get('memory', {});
+var params = {schema: {}};
+
+params.schema.accesstoken = AccessToken.schema;
+
+DatabankObject.bank = Databank.get('memory', params);
 
 var suite = vows.describe('access token interface');
 
