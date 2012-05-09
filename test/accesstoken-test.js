@@ -35,7 +35,8 @@ var params = {schema: {}};
 
 params.schema.accesstoken = AccessToken.schema;
 
-DatabankObject.bank = Databank.get('memory', params);
+var db = Databank.get('memory', params);
+DatabankObject.bank = db;
 
 var suite = vows.describe('access token interface');
 
@@ -75,4 +76,6 @@ suite.addBatch({
     }
 });
 
-suite.export(module);
+db.connect({}, function(err) {
+    suite.export(module);
+});
