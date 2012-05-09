@@ -24,14 +24,6 @@ var assert = require('assert'),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-// Need this to make IDs
-
-URLMaker.hostname = "example.net";
-
-// Dummy databank
-
-DatabankObject.bank = Databank.get('memory', {});
-
 var suite = vows.describe('audio module interface');
 
 var testSchema = {
