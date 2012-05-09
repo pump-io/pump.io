@@ -283,7 +283,7 @@ vows.describe('schema module interface').addBatch({
                     }
                 },
                 'it works': function(err, comment) {
-                    assert.isObject(comment);
+                    assert.ifError(err);
                 },
                 'it exists': function(err, comment) {
                     assert.isObject(comment);
