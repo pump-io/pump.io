@@ -53,8 +53,13 @@ var modelBatch = function(typeName, className, testSchema, testData) {
             var db = Databank.get('memory', params);
 
             db.connect({}, function(err) {
+                var mod;
+
                 DatabankObject.bank = db;
-                cb(require('../../lib/model/'+typeName) || null);
+                
+                mod = require('../../lib/model/'+typeName) || null;
+
+                cb(mod);
             });
         },
         'there is one': function(mod) {
