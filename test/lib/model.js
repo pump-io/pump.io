@@ -167,7 +167,7 @@ var modelBatch = function(typeName, className, testSchema, testData) {
             },
             'modified fields are modified': function(err, updated) {
                 var prop;
-                for (prop in testData.create) {
+                for (prop in testData.update) {
                     assert.equal(updated[prop], testData.update[prop]); 
                 }
             },
