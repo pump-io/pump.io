@@ -17,16 +17,66 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('requesttoken module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
+// Need this to make IDs
+
+URLMaker.hostname = "example.net";
+
+// Dummy databank
+
+DatabankObject.bank = Databank.get('memory', {});
+
+var suite = vows.describe('request token interface');
+
+var testSchema = {
+    pkey: 'token',
+    fields: ['consumer_key',
+             'callback',
+             'used',
+             'token_secret',
+             'verifier',
+             'authenticated',
+             'username',
+             'access_token',
+             'created',
+             'updated'],
+    indices: ['access_token']
+};
+
+var testData = {
+    'create': {
+        consumer_key: "AAAAAAAAAAAAAAAAAAAAAA",
+        callback: "http://example.com/callback"
+    },
+    'update': {
+        access_token: "BBBBBBBBBBBBBBBBBBBB",
+        used: true
+    }
+};
+
+suite.addBatch(modelBatch('requesttoken', 'RequestToken', testSchema, testData));
+
+suite.addBatch({
+    'When we create a new requesttoken': {
+        topic: function() {
+            var RequestToken = require('../lib/model/requesttoken').RequestToken;
+            RequestToken.create({consumer_key: "AAAAAAAA",
+                                callback: "http://example.com/callback"},
+                          this.callback);
         },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
+        'token_secret is automatically created': function(err, requestToken) {
+            assert.isString(requestToken.token_secret);
+        },
+        'verifier is automatically created': function(err, requestToken) {
+            assert.isString(requestToken.verifier);
         }
     }
-}).export(module);
+});
 
+suite.export(module);
