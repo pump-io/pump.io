@@ -21,7 +21,7 @@ var assert = require('assert'),
     databank = require('databank'),
     URLMaker = require('../lib/urlmaker').URLMaker,
     modelBatch = require('./lib/model').modelBatch,
-    AccessToken = require('./lib/model/accesstoken').AccessToken,
+    AccessToken = require('../lib/model/accesstoken').AccessToken,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
