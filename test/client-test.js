@@ -17,16 +17,65 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('client module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
+// Need this to make IDs
+
+URLMaker.hostname = "example.net";
+
+// Dummy databank
+
+DatabankObject.bank = Databank.get('memory', {});
+
+var suite = vows.describe('client module interface');
+
+var testSchema = {
+    pkey: 'consumer_key',
+    fields: ['title',
+             'description',
+             'host',
+             'secret',
+             'contacts',
+             'logo_url',
+             'redirect_uris',
+             'type',
+             'created',
+             'updated'],
+    indices: ['title']
+};
+
+var testData = {
+    'create': {
+        title: "MyApp",
+        description: "an app I made",
+        host: "example.com",
+        contacts: ["evan@example.com"],
+        type: "web"
+    },
+    'update': {
+        contacts: ["evan@example.com", "jerry@example.com"]
+    }
+};
+
+suite.addBatch(modelBatch('client', 'Client', testSchema, testData));
+
+suite.addBatch({
+    'When we create a new client': {
+        topic: function() {
+            var Client = require('../lib/model/client').Client;
+            Client.create({title: "Another App",
+                           description: "another app"},
+                          this.callback);
         },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
+        'secret is automatically created': function(err, client) {
+            assert.isString(client.secret);
         }
     }
-}).export(module);
+});
 
+suite.export(module);
