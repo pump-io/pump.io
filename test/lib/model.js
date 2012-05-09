@@ -59,13 +59,13 @@ var modelBatch = function(typeName, className, testSchema, testData) {
                 
                 mod = require('../../lib/model/'+typeName) || null;
 
-                cb(mod);
+                cb(null, mod);
             });
         },
-        'there is one': function(mod) {
+        'there is one': function(err, mod) {
             assert.isObject(mod);
         },
-        'it has a class export': function(mod) {
+        'it has a class export': function(err, mod) {
             assert.includes(mod, className);
         }
     };
