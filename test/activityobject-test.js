@@ -21,7 +21,7 @@ var assert = require('assert'),
     databank = require('databank'),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
-    schema = require('../../lib/schema').schema,
+    schema = require('../lib/schema').schema,
     URLMaker = require('../lib/urlmaker').URLMaker;
 
 vows.describe('schema module interface').addBatch({
