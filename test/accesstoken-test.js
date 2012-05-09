@@ -25,19 +25,6 @@ var assert = require('assert'),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-// Need this to make IDs
-
-URLMaker.hostname = "example.net";
-
-// Dummy databank
-
-var params = {schema: {}};
-
-params.schema.accesstoken = AccessToken.schema;
-
-var db = Databank.get('memory', params);
-DatabankObject.bank = db;
-
 var suite = vows.describe('access token interface');
 
 var testSchema = {
