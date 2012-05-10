@@ -225,6 +225,7 @@ vows.describe('schema module interface').addBatch({
             'and we ensure a new activityobject object': {
                 topic: function(ActivityObject) {
                     var props = {
+                        id: 'urn:uuid:2b7cc63f-dd9a-438f-b6d3-846fee2634bf',
                         objectType: ActivityObject.GROUP,
                         displayName: "ActivityPump Devs"
                     };
