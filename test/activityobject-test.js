@@ -277,8 +277,8 @@ vows.describe('schema module interface').addBatch({
                         }
                     });
                 },
-                teardown: function(comment) {
-                    if (comment) {
+                teardown: function(err, comment) {
+                    if (!err && comment) {
                         comment.del(function(err) {});
                     }
                 },
