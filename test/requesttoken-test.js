@@ -52,23 +52,19 @@ var testData = {
     }
 };
 
-suite.addBatch(modelBatch('requesttoken', 'RequestToken', testSchema, testData));
+var mb = modelBatch('requesttoken', 'RequestToken', testSchema, testData);
 
-suite.addBatch({
-    'When we create a new requesttoken': {
-        topic: function() {
-            var RequestToken = require('../lib/model/requesttoken').RequestToken;
-            RequestToken.create({consumer_key: "AAAAAAAA",
-                                callback: "http://example.com/callback"},
-                          this.callback);
-        },
-        'token_secret is automatically created': function(err, requestToken) {
-            assert.isString(requestToken.token_secret);
-        },
-        'verifier is automatically created': function(err, requestToken) {
-            assert.isString(requestToken.verifier);
-        }
-    }
-});
+mb['When we require the requesttoken module']
+  ['and we get its RequestToken class export']
+  ['and we create a requesttoken instance']
+  ['auto-generated fields are there'] = function(err, created) {
+      assert.isString(created.token);
+      assert.isString(created.token_secret);
+      assert.isString(created.verifier);
+      assert.isString(created.created);
+      assert.isString(created.updated);
+};
+
+suite.addBatch(mb);
 
 suite.export(module);
