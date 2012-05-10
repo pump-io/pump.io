@@ -147,6 +147,8 @@ var modelBatch = function(typeName, className, testSchema, testData) {
             assert.isObject(created);
         },
         'auto-generated fields are there': function(err, created) {
+            assert.isString(created.objectType);
+            assert.equal(created.objectType, typeName);
             assert.isString(created.id);
             assert.isString(created.published);
             assert.isString(created.updated); // required for new object?
