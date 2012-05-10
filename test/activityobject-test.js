@@ -176,7 +176,7 @@ vows.describe('schema module interface').addBatch({
                     ActivityObject.createObject(props, this.callback);
                 },
                 teardown: function(article) {
-                    if (article) {
+                    if (article && article.del) {
                         article.del(function(err) {});
                     }
                 },
@@ -232,7 +232,7 @@ vows.describe('schema module interface').addBatch({
                     ActivityObject.ensureObject(props, this.callback);
                 },
                 teardown: function(group) {
-                    if (group) {
+                    if (group && group.del) {
                         group.del(function(err) {});
                     }
                 },
@@ -279,7 +279,7 @@ vows.describe('schema module interface').addBatch({
                     });
                 },
                 teardown: function(comment) {
-                    if (comment) {
+                    if (comment && comment.del) {
                         comment.del(function(err) {});
                     }
                 },
