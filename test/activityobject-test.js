@@ -274,9 +274,7 @@ vows.describe('schema module interface').addBatch({
                             cb(err, null);
                         } else {
                             DatabankObject.copy(p, comment);
-                            ActivityObject.ensureObject(p, function(err, value) {
-                                cb(err, value);
-                            });
+                            ActivityObject.ensureObject(p, cb);
                         }
                     });
                 },
