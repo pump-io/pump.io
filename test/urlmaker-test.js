@@ -45,9 +45,6 @@ vows.describe('urlmaker module interface').addBatch({
                 assert.include(URLMaker, 'makeURL');
                 assert.isFunction(URLMaker.makeURL);
             },
-            'it throws an error without initializing': function(URLMaker) {
-                assert.throws(function() {return URLMaker.makeURL('/login'); }, Error);
-            },
             'and we make an URL': {
                 topic: function(URLMaker) {
                     URLMaker.hostname = 'example.com';
