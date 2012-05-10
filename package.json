@@ -1,6 +1,9 @@
 {
     "name": "activity-pump",
     "version": "0.1.0dev",
+    "devDependencies": {
+        "vows": "0.6.x"
+    },
     "dependencies": { "connect": "1.x",
 		      "connect-auth": "*",
                       "express": "*",
