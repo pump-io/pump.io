@@ -32,7 +32,9 @@ var testSchema = {
              'image',
              'published',
              'updated',
-             'url']
+             'url',
+             'uuid'],
+    indices: ['uuid']
 };
 
 var testData = {
