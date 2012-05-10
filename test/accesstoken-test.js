@@ -62,20 +62,4 @@ mb['When we require the accesstoken module']
       assert.isString(created.updated);
 };
 
-suite.addBatch(mb);
-
-suite.addBatch({
-    'When we create a new accesstoken': {
-        topic: function() {
-            var AccessToken = require('../lib/model/accesstoken').AccessToken;
-            AccessToken.create({consumer_key: "AAAAAAAA",
-                                callback: "http://example.com/callback"},
-                          this.callback);
-        },
-        'token_secret is automatically created': function(err, accessToken) {
-            assert.isString(accessToken.token_secret);
-        }
-    }
-});
-
 suite.export(module);
