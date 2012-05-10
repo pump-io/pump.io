@@ -54,20 +54,18 @@ var testData = {
     }
 };
 
-suite.addBatch(modelBatch('client', 'Client', testSchema, testData));
+var mb = modelBatch('client', 'Client', testSchema, testData);
 
-suite.addBatch({
-    'When we create a new client': {
-        topic: function() {
-            var Client = require('../lib/model/client').Client;
-            Client.create({title: "Another App",
-                           description: "another app"},
-                          this.callback);
-        },
-        'secret is automatically created': function(err, client) {
-            assert.isString(client.secret);
-        }
-    }
-});
+mb['When we require the client module']
+  ['and we get its Client class export']
+  ['and we create an client instance']
+  ['auto-generated fields are there'] = function(err, created) {
+      assert.isString(created.consumer_key);
+      assert.isString(created.secret);
+      assert.isString(created.created);
+      assert.isString(created.updated);
+};
+
+suite.addBatch(mb);
 
 suite.export(module);
