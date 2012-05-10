@@ -58,7 +58,7 @@ var mb = modelBatch('client', 'Client', testSchema, testData);
 
 mb['When we require the client module']
   ['and we get its Client class export']
-  ['and we create an client instance']
+  ['and we create a client instance']
   ['auto-generated fields are there'] = function(err, created) {
       assert.isString(created.consumer_key);
       assert.isString(created.secret);
