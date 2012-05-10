@@ -47,7 +47,22 @@ var testData = {
     }
 };
 
-suite.addBatch(modelBatch('accesstoken', 'AccessToken', testSchema, testData));
+// XXX: hack hack hack
+// modelBatch hard-codes ActivityObject-style
+
+var mb = modelBatch('accesstoken', 'AccessToken', testSchema, testData);
+
+mb['When we require the accesstoken module']
+  ['and we get its AccessToken class export']
+  ['and we create an accesstoken instance']
+  ['auto-generated fields are there'] = function(err, created) {
+      assert.isString(created.token);
+      assert.isString(created.token_secret);
+      assert.isString(created.created);
+      assert.isString(created.updated);
+};
+
+suite.addBatch(mb);
 
 suite.addBatch({
     'When we create a new accesstoken': {
