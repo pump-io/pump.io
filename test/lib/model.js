@@ -125,14 +125,17 @@ var modelBatch = function(typeName, className, testSchema, testData) {
                 }
             },
             'it has the right indices': function(schema) {
-                var fields = testSchema.fields,
+                var indices = testSchema.indices,
                     i, field;
-                assert.includes(schema, 'fields');
-                for (i = 0; i < fields.length; i++) {
-                    assert.includes(schema.fields, fields[i]);
-                }
-                for (i = 0; i < schema.fields.length; i++) {
-                    assert.includes(fields, schema.fields[i]);
+
+                if (indices) {
+                    assert.includes(schema, 'indices');
+                    for (i = 0; i < indices.length; i++) {
+                        assert.includes(schema.indices, indices[i]);
+                    }
+                    for (i = 0; i < schema.indices.length; i++) {
+                        assert.includes(indices, schema.indices[i]);
+                    }
                 }
             }
         }
