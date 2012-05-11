@@ -50,27 +50,27 @@ var mb = modelBatch('stream', 'Stream', testSchema, testData);
 // This class has a weird schema format
 
 mb['When we require the stream module']
-  ['and we get its Stream class export']
-  ['and we get its schema']
-  ['topic'] = function(Stream) {
-          return Stream.schema.stream || null;
-      };
+['and we get its Stream class export']
+['and we get its schema']
+['topic'] = function(Stream) {
+    return Stream.schema.stream || null;
+};
 
 mb['When we require the stream module']
-  ['and we get its Stream class export']
-  ['and we create a stream instance']
-  ['auto-generated fields are there'] = function(err, created) {
-      // No auto-gen fields, so...
-      assert.isTrue(true);
-  };
+['and we get its Stream class export']
+['and we create a stream instance']
+['auto-generated fields are there'] = function(err, created) {
+    // No auto-gen fields, so...
+    assert.isTrue(true);
+};
 
 mb['When we require the stream module']
-  ['and we get its Stream class export']
-  ['and we create a stream instance']
-  ['and we modify it']
-  ['it is modified'] = function(err, updated) {
-      assert.ifError(err);
-  };
+['and we get its Stream class export']
+['and we create a stream instance']
+['and we modify it']
+['it is modified'] = function(err, updated) {
+    assert.ifError(err);
+};
 
 suite.addBatch(mb);
 
@@ -125,9 +125,55 @@ suite.addBatch({
         },
         'it has a getActivities() method': function(err, stream) {
             assert.isFunction(stream.getActivities);
+        },
+        'and we create a single activity': {
+            topic: function(stream) {
+                var Activity = require('../lib/model/activity').Activity,
+                    props = {
+                        actor: {
+                            id: "urn:uuid:8f64087d-fffc-4fe0-9848-c18ae611cafd",
+                            displayName: "Delbert Fnorgledap",
+                            objectType: "person"
+                        },
+                        verb: "post",
+                        object: {
+                            objectType: "note",
+                            content: "Feeling groovy."
+                        }
+                    };
+
+
+                Activity.create(props, this.callback);
+            },
+            'it works': function(err, activity) {
+                assert.ifError(err);
+                assert.isObject(activity);
+            },
+            'and we deliver it to the stream': {
+                topic: function(activity, stream) {
+                    stream.deliver(activity, this.callback);
+                },
+                'it works': function(err) {
+                    assert.ifError(err);
+                },
+                "and we get the stream's activities": {
+                    topic: function(activity, stream) {
+                        stream.getActivities(0, 100, this.callback);
+                    },
+                    'it works': function(err, activities) {
+                        assert.ifError(err);
+                        assert.isArray(activities);
+                        assert.isTrue(activities.length > 0);
+                    },
+                    'our activity is in there': function(err, activities, activity) {
+                        assert.isTrue(activities.some(function(item) {
+                            return item.id == activity.id;
+                        }));
+                    }
+                }
+            }
         }
     }
 });
 
 suite.export(module);
-
