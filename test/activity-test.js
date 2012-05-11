@@ -20,6 +20,7 @@ var assert = require('assert'),
     vows = require('vows'),
     databank = require('databank'),
     URLMaker = require('../lib/urlmaker').URLMaker,
+    schema = require('../lib/schema').schema,
     modelBatch = require('./lib/model').modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
@@ -65,6 +66,37 @@ var testData = {
     }
 };
 
+var testVerbs = ['add',
+                 'cancel',
+                 'checkin',
+                 'delete',
+                 'favorite',
+                 'follow',
+                 'give',
+                 'ignore',
+                 'invite',
+                 'join',
+                 'leave',
+                 'like',
+                 'make-friend',
+                 'play',
+                 'post',
+                 'receive',
+                 'remove',
+                 'remove-friend',
+                 'request-friend',
+                 'rsvp-maybe',
+                 'rsvp-no',
+                 'rsvp-yes',
+                 'save',
+                 'share',
+                 'stop-following',
+                 'tag',
+                 'unfavorite',
+                 'unlike',
+                 'unsave',
+                 'update'];
+
 var mb = modelBatch('activity', 'Activity', testSchema, testData);
 
 mb['When we require the activity module']
@@ -78,4 +110,57 @@ mb['When we require the activity module']
 };
 
 suite.addBatch(mb);
+
+suite.addBatch({
+    'When we get the Activity class': {
+        topic: function() {
+            var cb = this.callback;
+            // Need this to make IDs
+
+            URLMaker.hostname = "example.net";
+
+            // Dummy databank
+
+            var params = {schema: schema};
+
+            var db = Databank.get('memory', params);
+
+            db.connect({}, function(err) {
+
+                var mod;
+
+                if (err) {
+                    cb(err, null);
+                    return;
+                }
+
+                DatabankObject.bank = db;
+                
+                mod = require('../lib/model/activity');
+
+                if (!mod) {
+                    cb(new Error("No module"), null);
+                    return;
+                }
+
+                cb(null, mod.Activity);
+            });
+        },
+        'it works': function(err, Activity) {
+            assert.ifError(err);
+            assert.isObject(Activity);
+        },
+        'it has the right verbs': function(err, Activity) {
+            var i;
+            assert.isArray(Activity.verbs);
+            for (i = 0; i < testVerbs.length; i++) {
+                assert.includes(Activity.verbs, testVerbs[i]);
+            }
+            for (i = 0; i < Activity.verbs.length; i++) {
+                assert.includes(testVerbs, Activity.verbs[i]);
+            }
+        }
+    }
+});
+
 suite.export(module);
