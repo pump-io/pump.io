@@ -17,16 +17,54 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('activity module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
+var suite = vows.describe('activity module interface');
+
+var testSchema = {
+    pkey: 'id', 
+    fields: ['actor',
+             'content',
+             'generator',
+             'icon',
+             'id',
+             'object',
+             'published',
+             'provider',
+             'target',
+             'title',
+             'url',
+             'uuid',
+             'updated',
+             'verb'],
+    indices: ['actor.id', 'object.id', 'uuid']
+};
+
+var testData = {
+    'create': {
+        actor: {
+            id: "urn:uuid:8f64087d-fffc-4fe0-9848-c18ae611cafd",
+            displayName: "Delbert Fnorgledap",
+            objectType: "person"
         },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
+        verb: "post",
+        object: {
+            objectType: "note",
+            content: "Feeling groovy."
+        }
+    },
+    'update': {
+        mood: {
+            displayName: "groovy"
         }
     }
-}).export(module);
+};
 
+suite.addBatch(modelBatch('activity', 'Activity', testSchema, testData));
+
+suite.export(module);
