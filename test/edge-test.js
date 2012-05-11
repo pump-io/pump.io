@@ -66,4 +66,6 @@ mb['When we require the edge module']
       assert.isString(created.updated);
 };
 
+suite.addBatch(mb);
+
 suite.export(module);
