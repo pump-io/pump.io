@@ -79,17 +79,11 @@ suite.addBatch({
         'and we check the credentials for a non-existent user': {
             topic: function(user, User) {
                 var cb = this.callback;
-                User.checkCredentials('nosuchuser', 'passw0rd', function(err, value) {
-                    if (err) {
-                        cb(null, err);
-                    } else {
-                        cb(new Error("No error thrown"), null);
-                    }
-                });
+                User.checkCredentials('nosuchuser', 'passw0rd', this.callback);
             },
-            'it fails correctly': function(err, thrown) {
+            'it returns null': function(err, found) {
                 assert.ifError(err);
-                assert.isObject(thrown);
+                assert.isNull(found);
             }
         },
         'and we create a user': {
@@ -120,17 +114,11 @@ suite.addBatch({
             'and we check the credentials with the wrong password': {
                 topic: function(user, User) {
                     var cb = this.callback;
-                    User.checkCredentials('tom', '654321', function(err, value) {
-                        if (err) {
-                            cb(null, err);
-                        } else {
-                            cb(new Error("No error thrown"), null);
-                        }
-                    });
+                    User.checkCredentials('tom', '654321', this.callback);
                 },
-                'it fails correctly': function(err, thrown) {
+                'it returns null': function(err, found) {
                     assert.ifError(err);
-                    assert.isObject(thrown);
+                    assert.isNull(found);
                 }
             },
             'and we try to retrieve it from the person id': {
