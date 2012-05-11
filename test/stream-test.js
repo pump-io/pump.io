@@ -21,7 +21,7 @@ var assert = require('assert'),
     databank = require('databank'),
     URLMaker = require('../lib/urlmaker').URLMaker,
     modelBatch = require('./lib/model').modelBatch,
-    schema = require('../../lib/schema').schema,
+    schema = require('../lib/schema').schema,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
