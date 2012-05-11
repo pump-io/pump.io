@@ -148,7 +148,7 @@ suite.addBatch({
         },
         'it works': function(err, Activity) {
             assert.ifError(err);
-            assert.isObject(Activity);
+            assert.isFunction(Activity);
         },
         'it has the right verbs': function(err, Activity) {
             var i;
