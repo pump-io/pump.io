@@ -29,9 +29,7 @@ var suite = vows.describe('stream interface');
 // XXX: check other types
 
 var testSchema = {
-    pkey: "name",
-    fields: [],
-    indices: []
+    pkey: "name"
 };
 
 var testData = {
