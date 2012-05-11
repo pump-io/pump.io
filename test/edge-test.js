@@ -17,16 +17,53 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('edge module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
+var suite = vows.describe('edge module interface');
+
+var testSchema = {
+    pkey: 'id', 
+    fields: ['from',
+	     'to',
+	     'published',
+	     'updated'],
+    indices: ['from.id', 'to.id']
+};
+
+var testData = {
+    'create': {
+        from: {
+            id: "http://example.org/people/evan",
+            displayName: "Evan Prodromou",
+            objectType: "person"
         },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
+        to: {
+            id: "urn:uuid:8f64087d-fffc-4fe0-9848-c18ae611cafd",
+            displayName: "Delbert Fnorgledap",
+            objectType: "person"
         }
+    },
+    'update': {
+        type: "friend" // XXX: is there a real reason to update...?
     }
-}).export(module);
+};
 
+// XXX: hack hack hack
+// modelBatch hard-codes ActivityObject-style
+
+var mb = modelBatch('edge', 'AccessToken', testSchema, testData);
+
+mb['When we require the edge module']
+  ['and we get its Edge class export']
+  ['and we create an edge instance']
+  ['auto-generated fields are there'] = function(err, created) {
+      assert.isString(created.id);
+      assert.isString(created.published);
+      assert.isString(created.updated);
+};
+
+suite.export(module);
