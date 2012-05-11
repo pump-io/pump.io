@@ -62,4 +62,6 @@ mb['When we require the accesstoken module']
       assert.isString(created.updated);
 };
 
+suite.addBatch(mb);
+
 suite.export(module);
