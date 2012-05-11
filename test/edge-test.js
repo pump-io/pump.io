@@ -28,9 +28,9 @@ var suite = vows.describe('edge module interface');
 var testSchema = {
     pkey: 'id', 
     fields: ['from',
-	     'to',
-	     'published',
-	     'updated'],
+             'to',
+             'published',
+             'updated'],
     indices: ['from.id', 'to.id']
 };
 
@@ -58,12 +58,12 @@ var testData = {
 var mb = modelBatch('edge', 'Edge', testSchema, testData);
 
 mb['When we require the edge module']
-  ['and we get its Edge class export']
-  ['and we create an edge instance']
-  ['auto-generated fields are there'] = function(err, created) {
-      assert.isString(created.id);
-      assert.isString(created.published);
-      assert.isString(created.updated);
+['and we get its Edge class export']
+['and we create an edge instance']
+['auto-generated fields are there'] = function(err, created) {
+    assert.isString(created.id);
+    assert.isString(created.published);
+    assert.isString(created.updated);
 };
 
 suite.addBatch(mb);
