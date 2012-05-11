@@ -102,6 +102,27 @@ suite.addBatch({
             'it works': function(user) {
                 assert.isObject(user);
             },
+            'it has the sanitize() method': function(user) {
+                assert.isFunction(user.sanitize);
+            },
+            'it has the getProfile() method': function(user) {
+                assert.isFunction(user.getProfile);
+            },
+            'it has the getStream() method': function(user) {
+                assert.isFunction(user.getStream);
+            },
+            'it has the getInbox() method': function(user) {
+                assert.isFunction(user.getInbox);
+            },
+            'it has the expand() method': function(user) {
+                assert.isFunction(user.expand);
+            },
+            'it has the addToOutbox() method': function(user) {
+                assert.isFunction(user.addToOutbox);
+            },
+            'it has the addToInbox() method': function(user) {
+                assert.isFunction(user.addToInbox);
+            },
             'and we check the credentials with the right password': {
                 topic: function(user, User) {
                     User.checkCredentials('tom', '123456', this.callback);
