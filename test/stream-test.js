@@ -17,16 +17,55 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('stream module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
-        },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
-        }
+var suite = vows.describe('stream interface');
+
+// XXX: check other types
+
+var testSchema = {
+    pkey: "name",
+    fields: [],
+    indices: []
+};
+
+var testData = {
+    create: {
+        name: "evan-inbox"
+    },
+    update: {
+        something: "value" // Not clear what we update here
     }
-}).export(module);
+};
+
+// XXX: hack hack hack
+// modelBatch hard-codes ActivityObject-style
+
+var mb = modelBatch('stream', 'Stream', testSchema, testData);
+
+// This class has a weird schema format
+
+mb['When we require the stream module']
+  ['and we get its Stream class export']
+  ['and we get its schema']
+  ['topic'] = function(Stream) {
+          return Stream.schema.stream || null;
+      };
+
+mb['When we require the stream module']
+  ['and we get its Stream class export']
+  ['and we create an stream instance']
+  ['auto-generated fields are there'] = function(err, created) {
+      // No auto-gen fields, so...
+      assert.isTrue(true);
+  };
+
+suite.addBatch(mb);
+
+suite.export(module);
 
