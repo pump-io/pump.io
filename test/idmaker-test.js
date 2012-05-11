@@ -1,6 +1,6 @@
 // idmaker-test.js
 //
-// Test the urlmaker module
+// Test the idmaker module
 //
 // Copyright 2012, StatusNet Inc.
 //
