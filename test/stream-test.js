@@ -21,6 +21,7 @@ var assert = require('assert'),
     databank = require('databank'),
     URLMaker = require('../lib/urlmaker').URLMaker,
     modelBatch = require('./lib/model').modelBatch,
+    schema = require('../../lib/schema').schema,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
@@ -72,6 +73,61 @@ mb['When we require the stream module']
   };
 
 suite.addBatch(mb);
+
+suite.addBatch({
+    'When we create a new stream': {
+        topic: function() {
+            var cb = this.callback;
+            // Need this to make IDs
+
+            URLMaker.hostname = "example.net";
+
+            // Dummy databank
+
+            var params = {schema: schema};
+
+            var db = Databank.get('memory', params);
+
+            db.connect({}, function(err) {
+
+                var Stream, mod;
+
+                if (err) {
+                    cb(err, null);
+                    return;
+                }
+
+                DatabankObject.bank = db;
+                
+                mod = require('../lib/model/stream');
+
+                if (!mod) {
+                    cb(new Error("No module"), null);
+                    return;
+                }
+
+                Stream = mod.Stream;
+
+                if (!Stream) {
+                    cb(new Error("No class"), null);
+                    return;
+                }
+
+                Stream.create({name: 'test'}, cb);
+            });
+        },
+        'it works': function(err, stream) {
+            assert.ifError(err);
+            assert.isObject(stream);
+        },
+        'it has a deliver() method': function(err, stream) {
+            assert.isFunction(stream.deliver);
+        },
+        'it has a getActivities() method': function(err, stream) {
+            assert.isFunction(stream.getActivities);
+        }
+    }
+});
 
 suite.export(module);
 
