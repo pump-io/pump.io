@@ -77,7 +77,7 @@ suite.addBatch({
             assert.isFunction(User.checkCredentials);
         },
         'and we check the credentials for a non-existent user': {
-            topic: function(user, User) {
+            topic: function(User) {
                 var cb = this.callback;
                 User.checkCredentials('nosuchuser', 'passw0rd', this.callback);
             },
