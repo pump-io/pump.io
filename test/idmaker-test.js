@@ -48,7 +48,7 @@ vows.describe('idmaker module interface').addBatch({
                     assert.equal(id, encodeURIComponent(id));
                 },
                 'it looks big enough for 128 bits of data': function(id) {
-                    assert.isTrue(id.length >= (128/8));
+                    assert.isTrue(id.length >= 16);
                 }
             }
         }
