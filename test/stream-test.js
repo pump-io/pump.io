@@ -63,6 +63,14 @@ mb['When we require the stream module']
       assert.isTrue(true);
   };
 
+mb['When we require the stream module']
+  ['and we get its Stream class export']
+  ['and we create a stream instance']
+  ['and we modify it']
+  ['it is modified'] = function(err, updated) {
+      assert.ifError(err);
+  };
+
 suite.addBatch(mb);
 
 suite.export(module);
