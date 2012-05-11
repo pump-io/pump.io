@@ -59,7 +59,7 @@ mb['When we require the stream module']
 
 mb['When we require the stream module']
   ['and we get its Stream class export']
-  ['and we create an stream instance']
+  ['and we create a stream instance']
   ['auto-generated fields are there'] = function(err, created) {
       // No auto-gen fields, so...
       assert.isTrue(true);
