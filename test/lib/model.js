@@ -162,7 +162,7 @@ var modelBatch = function(typeName, className, testSchema, testData) {
         'passed-in fields are there': function(err, created) {
             var prop;
             for (prop in testData.create) {
-                assert.equal(created[prop], testData.create[prop]); 
+                assert.deepEqual(created[prop], testData.create[prop]); 
             }
         },
         'and we modify it': {
@@ -176,7 +176,7 @@ var modelBatch = function(typeName, className, testSchema, testData) {
             'modified fields are modified': function(err, updated) {
                 var prop;
                 for (prop in testData.update) {
-                    assert.equal(updated[prop], testData.update[prop]); 
+                    assert.deepEqual(updated[prop], testData.update[prop]); 
                 }
             },
             'and we delete it': {
