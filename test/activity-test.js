@@ -65,6 +65,17 @@ var testData = {
     }
 };
 
-suite.addBatch(modelBatch('activity', 'Activity', testSchema, testData));
+var mb = modelBatch('activity', 'Activity', testSchema, testData);
 
+mb['When we require the activity module']
+['and we get its Activity class export']
+['and we create an activity instance']
+['auto-generated fields are there'] = function(err, created) {
+    assert.isString(created.id);
+    assert.isString(created.uuid);
+    assert.isString(created.published);
+    assert.isString(created.updated);
+};
+
+suite.addBatch(mb);
 suite.export(module);
