@@ -66,9 +66,6 @@ vows.describe('schema module interface').addBatch({
             'it exists': function(ActivityObject) {
                 assert.isFunction(ActivityObject);
             },
-            'it has a newId member': function(ActivityObject) {
-                assert.isFunction(ActivityObject.newId);
-            },
             'it has a makeURI member': function(ActivityObject) {
                 assert.isFunction(ActivityObject.makeURI);
             },
@@ -109,14 +106,6 @@ vows.describe('schema module interface').addBatch({
                 assert.equal(ActivityObject.REVIEW, 'review');
                 assert.equal(ActivityObject.SERVICE, 'service');
                 assert.equal(ActivityObject.VIDEO, 'video');
-            },
-            'and we make a new ID': {
-                topic: function(ActivityObject) {
-                    return ActivityObject.newId();
-                },
-                'it returns a string': function(id) {
-                    assert.isString(id);
-                }
             },
             'and we make a new URI': {
                 topic: function(ActivityObject) {
