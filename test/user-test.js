@@ -28,9 +28,9 @@ var suite = vows.describe('user module interface');
 var testSchema = {
     'pkey': 'nickname',
     'fields': ['passwordHash',
-	       'published',
-	       'updated',
-	       'profile'],
+               'published',
+               'updated',
+               'profile'],
     'indices': ['profile.id']};
 
 var testData = {
@@ -52,14 +52,99 @@ var testData = {
 var mb = modelBatch('user', 'User', testSchema, testData);
 
 mb['When we require the user module']
-  ['and we get its User class export']
-  ['and we create an user instance']
-  ['auto-generated fields are there'] = function(err, created) {
-      assert.isString(created.passwordHash);
-      assert.isString(created.published);
-      assert.isString(created.updated);
+['and we get its User class export']
+['and we create an user instance']
+['auto-generated fields are there'] = function(err, created) {
+    assert.isString(created.passwordHash);
+    assert.isString(created.published);
+    assert.isString(created.updated);
 };
 
 suite.addBatch(mb);
+
+suite.addBatch({
+    'When we get the User class': {
+        topic: function() {
+            return require('../lib/model/user').User;
+        },
+        'it exists': function(User) {
+            assert.isFunction(User);
+        },
+        'it has a fromPerson() method': function(User) {
+            assert.isFunction(User.fromPerson);
+        },
+        'it has a checkCredentials() method': function(User) {
+            assert.isFunction(User.checkCredentials);
+        },
+        'and we check the credentials for a non-existent user': {
+            topic: function(user, User) {
+                var cb = this.callback;
+                User.checkCredentials('nosuchuser', 'passw0rd', function(err, value) {
+                    if (err) {
+                        cb(null, err);
+                    } else {
+                        cb(new Error("No error thrown"), null);
+                    }
+                });
+            },
+            'it fails correctly': function(err, thrown) {
+                assert.ifError(err);
+                assert.isObject(thrown);
+            }
+        },
+        'and we create a user': {
+            topic: function(User) {
+                var props = {
+                    nickname: 'tom',
+                    password: '123456'
+                };
+                User.create(props, this.callback);
+            },
+            teardown: function(user) {
+                if (user && user.del) {
+                    user.del(this.callback);
+                }
+            },
+            'it works': function(user) {
+                assert.isObject(user);
+            },
+            'and we check the credentials with the right password': {
+                topic: function(user, User) {
+                    User.checkCredentials('tom', '123456', this.callback);
+                },
+                'it works': function(err, user) {
+                    assert.ifError(err);
+                    assert.isObject(user);
+                }
+            },
+            'and we check the credentials with the wrong password': {
+                topic: function(user, User) {
+                    var cb = this.callback;
+                    User.checkCredentials('tom', '654321', function(err, value) {
+                        if (err) {
+                            cb(null, err);
+                        } else {
+                            cb(new Error("No error thrown"), null);
+                        }
+                    });
+                },
+                'it fails correctly': function(err, thrown) {
+                    assert.ifError(err);
+                    assert.isObject(thrown);
+                }
+            },
+            'and we try to retrieve it from the person id': {
+                topic: function(user, User) {
+                    User.fromPerson(user.profile.id, this.callback);
+                },
+                'it works': function(err, found) {
+                    assert.ifError(err);
+                    assert.isObject(found);
+                    assert.equal(found.nickname, 'tom');
+                }
+            }
+        }
+    }
+});
 
 suite.export(module);
