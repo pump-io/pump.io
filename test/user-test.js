@@ -96,7 +96,7 @@ suite.addBatch({
             },
             teardown: function(user) {
                 if (user && user.del) {
-                    user.del(this.callback);
+                    user.del(function(err) {});
                 }
             },
             'it works': function(user) {
