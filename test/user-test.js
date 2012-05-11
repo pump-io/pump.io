@@ -17,16 +17,49 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    databank = require('databank'),
+    modelBatch = require('./lib/model').modelBatch,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
-vows.describe('user module interface').addBatch({
-    'When we check for a test suite': {
-        topic: function() { 
-            return false;
-        },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
+var suite = vows.describe('user module interface');
+
+var testSchema = {
+    'pkey': 'nickname',
+    'fields': ['passwordHash',
+	       'published',
+	       'updated',
+	       'profile'],
+    'indices': ['profile.id']};
+
+var testData = {
+    'create': {
+        nickname: "evan",
+        password: "trustno1",
+        profile: {
+            displayName: "Evan Prodromou"
         }
+    },
+    'update': {
+        password: "correct horse battery staple" // the most secure password! see http://xkcd.com/936/
     }
-}).export(module);
+};
 
+// XXX: hack hack hack
+// modelBatch hard-codes ActivityObject-style
+
+var mb = modelBatch('user', 'User', testSchema, testData);
+
+mb['When we require the user module']
+  ['and we get its User class export']
+  ['and we create an user instance']
+  ['auto-generated fields are there'] = function(err, created) {
+      assert.isString(created.passwordHash);
+      assert.isString(created.published);
+      assert.isString(created.updated);
+};
+
+suite.addBatch(mb);
+
+suite.export(module);
