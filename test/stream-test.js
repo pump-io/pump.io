@@ -74,6 +74,8 @@ mb['When we require the stream module']
 
 suite.addBatch(mb);
 
+var act1 = null;
+
 suite.addBatch({
     'When we create a new stream': {
         topic: function() {
@@ -151,6 +153,7 @@ suite.addBatch({
             },
             'and we deliver it to the stream': {
                 topic: function(activity, stream) {
+                    act1 = activity;
                     stream.deliver(activity, this.callback);
                 },
                 'it works': function(err) {
@@ -165,9 +168,9 @@ suite.addBatch({
                         assert.isArray(activities);
                         assert.isTrue(activities.length > 0);
                     },
-                    'our activity is in there': function(err, activities, activity) {
+                    'our activity is in there': function(err, activities) {
                         assert.isTrue(activities.some(function(item) {
-                            return item.id == activity.id;
+                            return item.id == act1.id;
                         }));
                     }
                 }
