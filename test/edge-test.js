@@ -55,7 +55,7 @@ var testData = {
 // XXX: hack hack hack
 // modelBatch hard-codes ActivityObject-style
 
-var mb = modelBatch('edge', 'AccessToken', testSchema, testData);
+var mb = modelBatch('edge', 'Edge', testSchema, testData);
 
 mb['When we require the edge module']
   ['and we get its Edge class export']
