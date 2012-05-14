@@ -266,6 +266,9 @@ suite.addBatch({
                 'it exists': function(err, note) {
                     assert.ifError(err);
                     assert.isObject(note);
+                },
+                'it has the right author': function(err, note) {
+                    assert.equal(note.author.id, "urn:uuid:8f64087d-fffc-4fe0-9848-c18ae611cafd");
                 }
             },
             'and we save() the activity': {
