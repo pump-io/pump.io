@@ -20,6 +20,7 @@ var assert = require('assert'),
     vows = require('vows'),
     databank = require('databank'),
     Step = require('step'),
+    _ = require('underscore'),
     URLMaker = require('../lib/urlmaker').URLMaker,
     schema = require('../lib/schema').schema,
     modelBatch = require('./lib/model').modelBatch,
@@ -108,6 +109,28 @@ mb['When we require the activity module']
     assert.isString(created.uuid);
     assert.isString(created.published);
     assert.isString(created.updated);
+};
+
+// Since actor, object will have some auto-created stuff, we only
+// check that their attributes match
+
+mb['When we require the activity module']
+['and we get its Activity class export']
+['and we create an activity instance']
+['passed-in fields are there'] = function(err, created) {
+    var prop, orig = testData.create, child, cprop;
+    for (prop in _(orig).keys()) {
+        if (_.isObject(orig[prop])) {
+            assert.include(created, prop);
+            child = orig[prop];
+            for (cprop in _(child).keys()) {
+                assert.include(created[prop], cprop);
+                assert.equal(created[prop][cprop], child[cprop]);
+            }
+        } else {
+            assert.equal(created[prop], orig[prop]);
+        }
+    }
 };
 
 suite.addBatch(mb);
