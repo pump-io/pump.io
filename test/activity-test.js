@@ -216,68 +216,107 @@ suite.addBatch({
             assert.equal(Activity.UNSAVE, 'unsave');
             assert.equal(Activity.UPDATE, 'update');
         },
-        'and we create a new post activity': {
+        'and we create an instance': {
             topic: function(Activity) {
-                var props = {
-                    actor: {
-                        id: "urn:uuid:8f64087d-fffc-4fe0-9848-c18ae611cafd",
-                        displayName: "Delbert Fnorgledap",
-                        objectType: "person"
-                    },
-                    verb: "post",
-                    object: {
-                        objectType: "note",
-                        content: "Feeling groovy."
+                return new Activity({});
+            },
+            'it has the expand() method': function(activity) {
+                assert.isFunction(activity.expand);
+            },
+            'it has the expandActor() method': function(activity) {
+                assert.isFunction(activity.expandActor);
+            },
+            'it has the expandObject() method': function(activity) {
+                assert.isFunction(activity.expandObject);
+            }
+        },
+        'and we apply() a new post activity': {
+            topic: function(Activity) {
+                var cb = this.callback,
+                    act = new Activity({
+                        actor: {
+                            id: "urn:uuid:8f64087d-fffc-4fe0-9848-c18ae611cafd",
+                            displayName: "Delbert Fnorgledap",
+                            objectType: "person"
+                        },
+                        verb: "post",
+                        object: {
+                            objectType: "note",
+                            content: "Feeling groovy."
+                        }
+                    });
+                
+                act.apply(function(err) {
+                    if (err) {
+                        cb(err, null);
+                    } else {
+                        cb(null, act);
                     }
-                };
-                Activity.create(props, this.callback);
+                });
             },
             'it works': function(err, activity) {
                 assert.ifError(err);
                 assert.isObject(activity);
-                assert.instanceOf(activity,
-                                  require('../lib/model/activity').Activity);
             },
-            'it has the expand() method': function(err, activity) {
-                assert.isFunction(activity.expand);
-            },
-            'it has the expandActor() method': function(err, activity) {
-                assert.isFunction(activity.expandActor);
-            },
-            'it has the expandObject() method': function(err, activity) {
-                assert.isFunction(activity.expandObject);
-            },
-            'its object properties have ids': function(err, activity) {
-                assert.isString(activity.actor.id);
-                assert.isString(activity.object.id);
-            },
-            'its object properties are objects': function(err, activity) {
-                assert.isObject(activity.actor);
-                assert.instanceOf(activity.actor, require('../lib/model/person').Person);
-                assert.isObject(activity.object);
-                assert.instanceOf(activity.object, require('../lib/model/note').Note);
-            },
-            'its object properties are expanded': function(err, activity) {
-                assert.isString(activity.actor.displayName);
-                assert.isString(activity.object.content);
-            },
-            'and we get the stored activity': {
-                topic: function(activity, Activity) {
-                    Activity.get(activity.id, this.callback);
+            'and we fetch its object': {
+                topic: function(activity) {
+                    var Note = require('../lib/model/note').Note;
+                    Note.get(activity.object.id, this.callback);
                 },
-                'it works': function(err, copy) {
+                'it exists': function(err, note) {
                     assert.ifError(err);
-                    assert.isObject(copy);
+                    assert.isObject(note);
+                }
+            },
+            'and we save() the activity': {
+                topic: function(activity) {
+                    var cb = this.callback;
+                    activity.save(function(err) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, activity);
+                        }
+                    });
                 },
-                'its object properties are expanded': function(err, activity) {
-                    assert.isString(activity.actor.displayName);
-                    assert.isString(activity.object.content);
+                'it works': function(err, activity) {
+                    assert.ifError(err);
+                    assert.isObject(activity);
+                    assert.instanceOf(activity,
+                                      require('../lib/model/activity').Activity);
+                },
+                'its object properties have ids': function(err, activity) {
+                    assert.isString(activity.actor.id);
+                    assert.isString(activity.object.id);
                 },
                 'its object properties are objects': function(err, activity) {
                     assert.isObject(activity.actor);
                     assert.instanceOf(activity.actor, require('../lib/model/person').Person);
                     assert.isObject(activity.object);
                     assert.instanceOf(activity.object, require('../lib/model/note').Note);
+                },
+                'its object properties are expanded': function(err, activity) {
+                    assert.isString(activity.actor.displayName);
+                    assert.isString(activity.object.content);
+                },
+                'and we get the stored activity': {
+                    topic: function(activity, Activity) {
+                        Activity.get(activity.id, this.callback);
+                    },
+                    'it works': function(err, copy) {
+                        assert.ifError(err);
+                        assert.isObject(copy);
+                    },
+                    'its object properties are expanded': function(err, activity) {
+                        assert.isString(activity.actor.displayName);
+                        assert.isString(activity.object.content);
+                    },
+                    'its object properties are objects': function(err, activity) {
+                        assert.isObject(activity.actor);
+                        assert.instanceOf(activity.actor, require('../lib/model/person').Person);
+                        assert.isObject(activity.object);
+                        assert.instanceOf(activity.object, require('../lib/model/note').Note);
+                    }
                 }
             }
         },
