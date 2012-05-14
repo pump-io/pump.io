@@ -131,6 +131,14 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
+                'and we use previousRequestToken() on a used token': {
+                    topic: function(provider) {
+                        return false;
+                    },
+                    'it fails correctly': function(result) {
+                        assert.isTrue(result);
+                    }
+                },
                 'and we use tokenByConsumer() on an unknown consumer key': {
                     topic: function(provider) {
                         var cb = this.callback;
@@ -221,6 +229,31 @@ vows.describe('provider module interface').addBatch({
                         if (results && results.requestToken && results.requestToken.del) {
                             results.requestToken.del(function(err) {});
                         }
+                    }
+                },
+                'and we use applicationByConsumerKey() on an invalid key': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+                        provider.applicationByConsumerKey("BOGUSCONSUMERKEY", function(err, result) {
+                            if (err) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Got unexpected results"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we use applicationByConsumerKey() on a valid key': {
+                    topic: function(provider) {
+                        provider.applicationByConsumerKey(testClient.consumer_key, this.callback);
+                    },
+                    'it works': function(err, client) {
+                        assert.ifError(err);
+                        assert.isObject(client);
+                        assert.instanceOf(client, Client);
                     }
                 }
             }
