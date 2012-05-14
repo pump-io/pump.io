@@ -212,7 +212,7 @@ vows.describe('provider module interface').addBatch({
                     'results are correct': function(err, results) {
                         assert.isArray(results.tokens);
                         assert.lengthOf(results.tokens, 1);
-                        assert.equal(results.tokens[0], results.requestToken.token);
+                        assert.equal(results.tokens[0].token, results.requestToken.token);
                     },
                     teardown: function(results) {
                         if (results && results.client && results.client.del) {
