@@ -311,6 +311,118 @@ suite.addBatch({
                     }
                 }
             }
+        },
+        'and we create a new user and get its inbox': {
+            topic: function(User) {
+                var cb = this.callback,
+                    user = null,
+                    props = {
+                        nickname: 'maurice',
+                        password: 'cappadoccia'
+                    };
+
+                Step(
+                    function() {
+                        User.create(props, this);
+                    },
+                    function(err, results) {
+                        if (err) throw err;
+                        user = results;
+                        user.getInbox(0, 20, this);
+                    },
+                    function(err, activities) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(err, {user: user,
+                                     activities: activities});
+                        }
+                    }
+                );
+            },
+            teardown: function(results) {
+                if (results) {
+                    results.user.del(function(err) {});
+                }
+            },
+            'it works': function(err, results) {
+                assert.ifError(err);
+                assert.isObject(results.user);
+                assert.isArray(results.activities);
+            },
+            'it is empty': function(err, results) {
+                assert.lengthOf(results.activities, 0);
+            },
+            'and we add an activity to its inbox': {
+                topic: function(results) {
+                    var cb = this.callback,
+                        user = results.user,
+                        props = {
+                            actor: {
+                                id: "urn:uuid:8f7be1de-3f48-4a54-bf3f-b4fc18f3ae77",
+                                objectType: "person",
+                                displayName: "Abraham Lincoln"
+                            },
+                            verb: "post",
+                            object: {
+                                objectType: "note",
+                                content: "Remember to get eggs, bread, and milk."
+                            }
+                        },
+                        Activity = require('../lib/model/activity').Activity,
+                        act = new Activity(props);
+                    
+                    Step(
+                        function() {
+                            act.apply(user.profile, this);
+                        },
+                        function(err) {
+                            if (err) throw err;
+                            act.save(this);
+                        },
+                        function(err) {
+                            if (err) throw err;
+                            user.addToInbox(act, this);
+                        },
+                        function(err) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                cb(null, {user: user,
+                                          activity: act});
+                            }
+                        }
+                    );
+                },
+                'it works': function(err, results) {
+                    assert.ifError(err);
+                },
+                'and we get the user stream': {
+                    topic: function(results) {
+                        var cb = this.callback,
+                            user = results.user,
+                            activity = results.activity;
+
+                        user.getInbox(0, 20, function(err, activities) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                cb(null, {user: user,
+                                          activity: activity,
+                                          activities: activities});
+                            }
+                        });
+                    },
+                    'it works': function(err, results) {
+                        assert.ifError(err);
+                        assert.isArray(results.activities);
+                    },
+                    'it includes the added activity': function(err, results) {
+                        assert.lengthOf(results.activities, 1);
+                        assert.equal(results.activities[0].id, results.activity.id);
+                    }
+                }
+            }
         }
     }
 });
