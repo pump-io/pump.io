@@ -276,9 +276,9 @@ suite.addBatch({
                     function(err, bob) {
                         if (err) throw err;
                         users.bob = bob;
-                        var act = new Activity({actor: {id: users.alice.profile.id, objectType: "person"},
+                        var act = new Activity({actor: users.alice.profile,
                                                 verb: "follow",
-                                                object: {id: users.bob.profile.id, objectType: "person"}});
+                                                object: users.bob.profile});
                         act.apply(this);
                     },
                     function(err) {
