@@ -19,6 +19,7 @@
 var assert = require('assert'),
     vows = require('vows'),
     databank = require('databank'),
+    _ = require('underscore'),
     modelBatch = require('./lib/model').modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
@@ -151,6 +152,37 @@ suite.addBatch({
                     assert.isObject(found);
                     assert.equal(found.nickname, 'tom');
                 }
+            }
+        },
+        'and we create a user and sanitize it': {
+            topic: function(User) {
+                var cb = this.callback,
+                    props = {
+                        nickname: 'dick',
+                        password: 'foobar'
+                    };
+                    
+                User.create(props, function(err, user) {
+                    if (err) {
+                        cb(err, null);
+                    } else {
+                        user.sanitize();
+                        cb(null, user);
+                    }
+                });
+            },
+            teardown: function(user) {
+                if (user) {
+                    user.del(function(err) {});
+                }
+            },
+            'it works': function(err, user) {
+                assert.ifError(err);
+                assert.isObject(user);
+            },
+            'it is sanitized': function(err, user) {
+                assert.isFalse(_(user).has('password'));
+                assert.isFalse(_(user).has('passwordHash'));
             }
         }
     }
