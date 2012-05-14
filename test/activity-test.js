@@ -324,7 +324,7 @@ suite.addBatch({
                         var act = new Activity({actor: users.alice.profile,
                                                 verb: "stop-following",
                                                 object: users.bob.profile});
-                        act.apply(users.alice.profile, this);
+                        act.apply(users.alice.profile, this.callback);
                     },
                     'it works': function(err) {
                         assert.ifError(err);
