@@ -21,9 +21,13 @@ var assert = require('assert'),
     databank = require('databank'),
     schema = require('../lib/schema'),
     URLMaker = require('../lib/urlmaker').URLMaker,
+    Client = require('../lib/method/client').Client,
+    RequestToken = require('../lib/method/requesttoken').RequestToken,
     methodContext = require('./lib/methods').methodContext,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
+
+var testClient = null;
 
 vows.describe('provider module interface').addBatch({
 
@@ -45,10 +49,16 @@ vows.describe('provider module interface').addBatch({
                 var mod;
 
                 DatabankObject.bank = db;
-                
-                mod = require('../lib/provider');
 
-                cb(null, mod);
+                Client.create({title: "Test App", description: "App for testing"}, function(err, client) {
+                    if (err) {
+                        cb(err, null);
+                    } else {
+                        testClient = client;
+                        mod = require('../lib/provider');
+                        cb(null, mod);
+                    }
+                });
             });
         },
         'there is one': function(err, mod) {
@@ -80,8 +90,48 @@ vows.describe('provider module interface').addBatch({
                                                            'associateTokenToUser',
                                                            'generateRequestToken',
                                                            'generateAccessToken',
-                                                           'cleanRequestTokens'])
-           }
+                                                           'cleanRequestTokens']),
+                'and we use previousRequestToken() on a previously unseen token': {
+                    topic: function(provider) {
+                        provider.previousRequestToken("ZZZZZZZZZZZZZZZZZZZZZ", this.callback);
+                    },
+                    'it returns correct value': function(err, token) {
+                        assert.ifError(err);
+                        assert.isString(token);
+                        assert.equal(token, "ZZZZZZZZZZZZZZZZZZZZZ");
+                    }
+                },
+                'and we use previousRequestToken() on a previously seen token': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/12345/'};
+
+                        RequestToken.create(props, function(err, rt) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                provider.previousRequestToken(rt.token, function(err, token) {
+                                    if (err) { // this is correct!
+                                        cb(null, rt);
+                                    } else {
+                                        cb(new Error("Didn't throw an error"), null);
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err, rt) {
+                        assert.ifError(err);
+                        assert.isObject(rt);
+                    },
+                    teardown: function(requestToken) {
+                        if (requestToken && requestToken.del) {
+                            requestToken.del(function(err) {});
+                        }
+                    }
+                }
+            }
         }
     }
 }).export(module);
