@@ -32,7 +32,7 @@ var methodContext = function(methods) {
         if ("aeiouAEIOU".indexOf(m.charAt(0)) !== -1) {
             k = 'it has an '+m+' method';
         } else {
-            k = 'it has a '+typeName+' method';
+            k = 'it has a '+m+' method';
         }
         context[k] = function(obj) {
             assert.isFunction(obj[methods[i]]);
