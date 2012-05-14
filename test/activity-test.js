@@ -19,6 +19,7 @@
 var assert = require('assert'),
     vows = require('vows'),
     databank = require('databank'),
+    Step = require('step'),
     URLMaker = require('../lib/urlmaker').URLMaker,
     schema = require('../lib/schema').schema,
     modelBatch = require('./lib/model').modelBatch,
@@ -191,6 +192,132 @@ suite.addBatch({
             assert.equal(Activity.UNLIKE, 'unlike');
             assert.equal(Activity.UNSAVE, 'unsave');
             assert.equal(Activity.UPDATE, 'update');
+        }
+    },
+    'and we create a new post activity': {
+        topic: function(Activity) {
+            var props = {
+                actor: {
+                    id: "urn:uuid:8f64087d-fffc-4fe0-9848-c18ae611cafd",
+                    displayName: "Delbert Fnorgledap",
+                    objectType: "person"
+                },
+                verb: "post",
+                object: {
+                    objectType: "note",
+                    content: "Feeling groovy."
+                }
+            };
+            Activity.create(props, this.callback);
+        },
+        'it works': function(err, activity) {
+            assert.ifError(err);
+            assert.isObject(activity);
+        },
+        'it has the expand() method': function(err, activity) {
+            assert.isFunction(activity.expand);
+        },
+        'it has the expandActor() method': function(err, activity) {
+            assert.isFunction(activity.expandActor);
+        },
+        'it has the expandObject() method': function(err, activity) {
+            assert.isFunction(activity.expandObject);
+        },
+        'its object properties have ids': function(err, activity) {
+            assert.isString(activity.actor.id);
+            assert.isString(activity.object.id);
+        },
+        'its object properties are objects': function(err, activity) {
+            assert.isObject(activity.actor);
+            assert.instanceOf(activity.actor, require('../lib/model/person').Person);
+            assert.isObject(activity.object);
+            assert.instanceOf(activity.object, require('../lib/model/note').Note);
+        },
+        'its object properties are expanded': function(err, activity) {
+            assert.isString(activity.actor.displayName);
+            assert.isString(activity.object.content);
+        },
+        'and we get the stored activity': {
+            topic: function(activity, Activity) {
+                Activity.get(activity.id, this.callback);
+            },
+            'it works': function(err, copy) {
+                assert.ifError(err);
+                assert.isObject(copy);
+            },
+            'its object properties are expanded': function(err, activity) {
+                assert.isString(activity.actor.displayName);
+                assert.isString(activity.object.content);
+            },
+            'its object properties are objects': function(err, activity) {
+                assert.isObject(activity.actor);
+                assert.instanceOf(activity.actor, require('../lib/model/person').Person);
+                assert.isObject(activity.object);
+                assert.instanceOf(activity.object, require('../lib/model/note').Note);
+            }
+        }
+    },
+    'and we apply() a new follow activity': {
+        topic: function(Activity) {
+            var User = require('../lib/model/user').User,
+                users = {},
+                cb = this.callback;
+
+            Step(
+                function() {
+                    User.create({nickname: "alice", password: "monkey"}, this);
+                },
+                function(err, alice) {
+                    if (err) throw err;
+                    users.alice = alice;
+                    User.create({nickname: "bob", password: "bob123"}, this);
+                },
+                function(err, bob) {
+                    if (err) throw err;
+                    users.bob = bob;
+                    var act = new Activity({actor: {id: users.alice.profile.id, objectType: "person"},
+                                            verb: "follow",
+                                            object: {id: users.bob.profile.id, objectType: "person"}});
+                    act.apply(this);
+                },
+                function(err) {
+                    if (err) {
+                        cb(err, null);
+                    } else {
+                        cb(null, users);
+                    }
+                }
+            );
+        },
+        teardown: function(users) {
+            Step(
+                function() {
+                    users.alice.del(this.parallel());
+                    users.bob.del(this.parallel());
+                },
+                function(err) {
+                    // ignore
+                }
+            );
+        },
+        'it works': function(err, users) {
+            assert.ifError(err);
+            assert.isObject(users);
+            assert.isObject(users.alice);
+            assert.isObject(users.bob);
+        },
+        'and we search for a resulting edge': {
+            topic: function(users) {
+                var Edge = require('../lib/model/edge').Edge;
+                Edge.search({"from.id": users.alice.profile.id,
+                             "to.id": users.bob.profile.id},
+                            this.callback);
+            },
+            'it exists': function(err, edges) {
+                assert.ifError(err);
+                assert.isArray(edges);
+                assert.lengthOf(edges, 1);
+            }
         }
     }
 });
