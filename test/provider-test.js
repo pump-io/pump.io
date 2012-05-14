@@ -17,15 +17,45 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    methodContext = require('./lib/methods').methodContext;
 
 vows.describe('provider module interface').addBatch({
-    'When we check for a test suite': {
+    'When we get the provider module': {
         topic: function() { 
-            return false;
+            return require('../lib/provider');
         },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
+        'there is one': function(mod) {
+            assert.isObject(mod);
+        },
+        'and we get its Provider export': {
+            topic: function(mod) {
+                return mod.Provider;
+            },
+            'it exists': function(Provider) {
+                assert.isFunction(Provider);
+            },
+            'and we create a new Provider': {
+                topic: function(Provider) {
+                    return new Provider();
+                },
+                'it exists': function(provider) {
+                    assert.isObject(provider);
+                },
+                'and we check its methods': methodContext(['previousRequestToken',
+                                                           'tokenByConsumer',
+                                                           'applicationByConsumerKey',
+                                                           'fetchAuthorizationInformation',
+                                                           'validToken',
+                                                           'tokenByTokenAndVerifier',
+                                                           'validateNotReplay',
+                                                           'userIdByToken',
+                                                           'authenticateUser',
+                                                           'associateTokenToUser',
+                                                           'generateRequestToken',
+                                                           'generateAccessToken',
+                                                           'cleanRequestTokens'])
+           }
         }
     }
 }).export(module);
