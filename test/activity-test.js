@@ -213,6 +213,8 @@ suite.addBatch({
         'it works': function(err, activity) {
             assert.ifError(err);
             assert.isObject(activity);
+            assert.instanceOf(activity,
+                              require('../lib/model/activity').Activity);
         },
         'it has the expand() method': function(err, activity) {
             assert.isFunction(activity.expand);
