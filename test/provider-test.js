@@ -383,10 +383,10 @@ vows.describe('provider module interface').addBatch({
                                                 cb(err, null);
                                             } else {
                                                 provider.fetchAuthorizationInformation("francine", rt.token, function(err, app, found) {
-                                                    if (err) { // this is correct
+                                                    if (err) {
+                                                        cb(err, null);
+                                                    } else { // this is correct
                                                         cb(null, {user: user, rt: rt, app: app, found: found});
-                                                    } else {
-                                                        cb(new Error("Unexpected authorization information"), null);
                                                     }
                                                 });
                                             }
