@@ -152,6 +152,17 @@ suite.addBatch({
                     assert.isObject(found);
                     assert.equal(found.nickname, 'tom');
                 }
+            },
+            'and we try to get its profile': {
+                topic: function(user) {
+                    user.getProfile(this.callback);
+                },
+                'it works': function(err, profile) {
+                    assert.ifError(err);
+                    assert.isObject(profile);
+                    assert.instanceOf(profile,
+                                      require('../lib/model/person').Person);
+                }
             }
         },
         'and we create a user and sanitize it': {
