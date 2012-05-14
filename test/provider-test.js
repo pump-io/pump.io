@@ -101,7 +101,7 @@ vows.describe('provider module interface').addBatch({
                         assert.equal(token, "ZZZZZZZZZZZZZZZZZZZZZ");
                     }
                 },
-                'and we use previousRequestToken() on a previously seen token': {
+                'and we use previousRequestToken() on an existing but unused token': {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
@@ -112,10 +112,10 @@ vows.describe('provider module interface').addBatch({
                                 cb(err, null);
                             } else {
                                 provider.previousRequestToken(rt.token, function(err, token) {
-                                    if (err) { // this is correct!
-                                        cb(null, rt);
+                                    if (err) {
+                                        cb(err, rt);
                                     } else {
-                                        cb(new Error("Didn't throw an error"), null);
+                                        cb(null, rt);
                                     }
                                 });
                             }
