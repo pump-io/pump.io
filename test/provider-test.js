@@ -130,6 +130,98 @@ vows.describe('provider module interface').addBatch({
                             requestToken.del(function(err) {});
                         }
                     }
+                },
+                'and we use tokenByConsumer() on an unknown consumer key': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+                        provider.tokenByConsumer("BOGUSCONSUMERKEY", function(err, tokens) {
+                            if (err) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Got unexpected tokens"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we use tokenByConsumer() on a consumer key with no request tokens': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+
+                        Client.create({title: "No requests client"}, function(err, client) {
+                            if (err) {
+                                cb(err, null);
+                                return;
+                            }
+                            provider.tokenByConsumer(client.consumer_key, function(err, tokens) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    cb(null, {client: client,
+                                              tokens: tokens});
+                                }
+                            });
+                        });
+                    },
+                    'it works': function(err, results) {
+                        assert.ifError(err);
+                    },
+                    'results are empty': function(err, results) {
+                        assert.isArray(results.tokens);
+                        assert.lengthOf(results.tokens, 0);
+                    },
+                    teardown: function(results) {
+                        if (results && results.client && results.client.del) {
+                            results.client.del(function(err) {});
+                        }
+                    }
+                },
+                'and we use tokenByConsumer() on a consumer key with a single request token': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+
+                        Client.create({title: "Single request client"}, function(err, client) {
+                            if (err) {
+                                cb(err, null);
+                                return;
+                            }
+                            var props = {consumer_key: client.consumer_key, callback: 'http://example.com/madeup/endpoint'};
+
+                            RequestToken.create(props, function(err, rt) {
+                                if (err) {
+                                    cb(err, null);
+                                    return;
+                                }
+                                provider.tokenByConsumer(client.consumer_key, function(err, tokens) {
+                                    if (err) {
+                                        cb(err, null);
+                                    } else {
+                                        cb(null, {client: client,
+                                                  requestToken: rt,
+                                                  tokens: tokens});
+                                    }
+                                });
+                            });
+                        });
+                    },
+                    'it works': function(err, results) {
+                        assert.ifError(err);
+                    },
+                    'results are correct': function(err, results) {
+                        assert.isArray(results.tokens);
+                        assert.lengthOf(results.tokens, 1);
+                        assert.equal(results.tokens[0], results.requestToken.token);
+                    },
+                    teardown: function(results) {
+                        if (results && results.client && results.client.del) {
+                            results.client.del(function(err) {});
+                        }
+                        if (results && results.requestToken && results.requestToken.del) {
+                            results.requestToken.del(function(err) {});
+                        }
+                    }
                 }
             }
         }
