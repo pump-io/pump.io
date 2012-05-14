@@ -279,7 +279,7 @@ suite.addBatch({
                         var act = new Activity({actor: users.alice.profile,
                                                 verb: "follow",
                                                 object: users.bob.profile});
-                        act.apply(this);
+                        act.apply(users.alice.profile, this);
                     },
                     function(err) {
                         if (err) {
