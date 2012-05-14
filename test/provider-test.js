@@ -18,14 +18,40 @@
 
 var assert = require('assert'),
     vows = require('vows'),
-    methodContext = require('./lib/methods').methodContext;
+    databank = require('databank'),
+    schema = require('../lib/schema'),
+    URLMaker = require('../lib/urlmaker').URLMaker,
+    methodContext = require('./lib/methods').methodContext,
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
 vows.describe('provider module interface').addBatch({
+
     'When we get the provider module': {
+
         topic: function() { 
-            return require('../lib/provider');
+            var cb = this.callback;
+            // Need this to make IDs
+
+            URLMaker.hostname = "example.net";
+
+            // Dummy databank
+
+            var params = {schema: schema};
+
+            var db = Databank.get('memory', params);
+
+            db.connect({}, function(err) {
+                var mod;
+
+                DatabankObject.bank = db;
+                
+                mod = require('../lib/provider');
+
+                cb(null, mod);
+            });
         },
-        'there is one': function(mod) {
+        'there is one': function(err, mod) {
             assert.isObject(mod);
         },
         'and we get its Provider export': {
