@@ -23,6 +23,7 @@ var assert = require('assert'),
     URLMaker = require('../lib/urlmaker').URLMaker,
     Client = require('../lib/model/client').Client,
     RequestToken = require('../lib/model/requesttoken').RequestToken,
+    User = require('../lib/model/user').User,
     methodContext = require('./lib/methods').methodContext,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
@@ -254,6 +255,174 @@ vows.describe('provider module interface').addBatch({
                         assert.ifError(err);
                         assert.isObject(client);
                         assert.instanceOf(client, Client);
+                    },
+                    'it has the right fields': function(err, client) {
+                        assert.isString(client.consumer_key);
+                        assert.isString(client.secret);
+                    }
+                },
+                'and we use fetchAuthorizationInformation() with a nonexistent username and existent token': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            username = "nonexistent",
+                            props = {consumer_key: testClient.consumer_key, callback: 'http://example.com/madeup/endpoint'};
+
+                        RequestToken.create(props, function(err, rt) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                provider.fetchAuthorizationInformation(username, rt.token, function(err, app, user) {
+                                    if (err) { // this is correct
+                                        cb(null, rt);
+                                    } else {
+                                        cb(new Error("Unexpected authorization information"), null);
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err, rt) {
+                        assert.ifError(err);
+                        assert.isObject(rt);
+                        assert.instanceOf(rt, RequestToken);
+                    },
+                    teardown: function(rt) {
+                        if (rt && rt.del) {
+                            rt.del(function(err) {});
+                        }
+                    }
+                },
+                'and we use fetchAuthorizationInformation() with a existent username and unassociated token': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+
+                        User.create({nickname: "david", password: "letmein"}, function(err, user) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                var props = {consumer_key: testClient.consumer_key, callback: 'http://example.com/madeup/endpoint'};
+
+                                RequestToken.create(props, function(err, rt) {
+                                    if (err) {
+                                        cb(err, null);
+                                    } else {
+                                        provider.fetchAuthorizationInformation("david", rt.token, function(err, app, found) {
+                                            if (err) { // this is correct
+                                                cb(null, {user: user, rt: rt});
+                                            } else {
+                                                cb(new Error("Unexpected authorization information"), null);
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err, results) {
+                        assert.ifError(err);
+                        assert.isObject(results);
+                        assert.isObject(results.rt);
+                        assert.isObject(results.user);
+                        assert.instanceOf(results.rt, RequestToken);
+                        assert.instanceOf(results.user, User);
+                    },
+                    teardown: function(results) {
+                        if (results && results.rt && results.rt.del) {
+                            results.rt.del(function(err) {});
+                        }
+                        if (results && results.user && results.user.del) {
+                            results.user.del(function(err) {});
+                        }
+                    }
+                },
+                'and we use fetchAuthorizationInformation() with a existent username and non-existent token': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+
+                        User.create({nickname: "ernie", password: "letmein"}, function(err, user) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                provider.fetchAuthorizationInformation("ernie", "bogusrequesttoken", function(err, app, found) {
+                                    if (err) { // this is correct
+                                        cb(null, user);
+                                    } else {
+                                        cb(new Error("Unexpected authorization information"), null);
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err, user) {
+                        assert.ifError(err);
+                        assert.isObject(user);
+                        assert.instanceOf(user, User);
+                    },
+                    teardown: function(user) {
+                        if (user && user.del) {
+                            user.del(function(err) {});
+                        }
+                    }
+                },
+                'and we use fetchAuthorizationInformation() with a existent username and associated token': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+
+                        User.create({nickname: "francine", password: "monkey"}, function(err, user) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                var props = {consumer_key: testClient.consumer_key, callback: 'http://example.com/madeup/endpoint'};
+
+                                RequestToken.create(props, function(err, rt) {
+                                    if (err) {
+                                        cb(err, null);
+                                    } else {
+                                        provider.associateTokenToUser("francine", rt.token, function(err, res) {
+                                            if (err) {
+                                                cb(err, null);
+                                            } else {
+                                                provider.fetchAuthorizationInformation("francine", rt.token, function(err, app, found) {
+                                                    if (err) { // this is correct
+                                                        cb(null, {user: user, rt: rt, app: app, found: found});
+                                                    } else {
+                                                        cb(new Error("Unexpected authorization information"), null);
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    'it works': function(err, results) {
+                        assert.ifError(err);
+                        assert.isObject(results);
+                        assert.isObject(results.rt);
+                        assert.isObject(results.user);
+                        assert.isObject(results.app);
+                        assert.isObject(results.found);
+                        assert.instanceOf(results.rt, RequestToken);
+                        assert.instanceOf(results.user, User);
+                        assert.instanceOf(results.app, Client);
+                        assert.instanceOf(results.found, RequestToken);
+                        assert.equal(results.rt.token, results.found.token);
+                        assert.equal(results.rt.token_secret, results.found.token_secret);
+                    },
+                    'results have right properties': function(err, results) {
+                        assert.isString(results.app.title);
+                        assert.isString(results.app.description);
+                        assert.isString(results.found.token);
+                        assert.isString(results.found.username);
+                    },
+                    teardown: function(results) {
+                        if (results && results.rt && results.rt.del) {
+                            results.rt.del(function(err) {});
+                        }
+                        if (results && results.user && results.user.del) {
+                            results.user.del(function(err) {});
+                        }
                     }
                 }
             }
