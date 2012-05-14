@@ -20,6 +20,7 @@ var assert = require('assert'),
     vows = require('vows'),
     databank = require('databank'),
     _ = require('underscore'),
+    Step = require('step'),
     modelBatch = require('./lib/model').modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
@@ -194,6 +195,48 @@ suite.addBatch({
             'it is sanitized': function(err, user) {
                 assert.isFalse(_(user).has('password'));
                 assert.isFalse(_(user).has('passwordHash'));
+            }
+        },
+        'and we create a new user and get its stream': {
+            topic: function(User) {
+                var cb = this.callback,
+                    user = null,
+                    props = {
+                        nickname: 'harry',
+                        password: 'un1c0rn'
+                    };
+
+                Step(
+                    function() {
+                        User.create(props, this);
+                    },
+                    function(err, results) {
+                        if (err) throw err;
+                        user = results;
+                        user.getStream(0, 20, this);
+                    },
+                    function(err, activities) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(err, {user: user,
+                                     activities: activities});
+                        }
+                    }
+                );
+            },
+            teardown: function(results) {
+                if (results) {
+                    results.user.del(function(err) {});
+                }
+            },
+            'it works': function(err, results) {
+                assert.ifError(err);
+                assert.isObject(results.user);
+                assert.isArray(results.activities);
+            },
+            'it is empty': function(err, results) {
+                assert.lengthOf(results.activities, 0);
             }
         }
     }
