@@ -237,6 +237,79 @@ suite.addBatch({
             },
             'it is empty': function(err, results) {
                 assert.lengthOf(results.activities, 0);
+            },
+            'and we add an activity to its stream': {
+                topic: function(results) {
+                    var cb = this.callback,
+                        user = results.user,
+                        props = {
+                            verb: "checkin",
+                            object: {
+                                objectType: "place",
+                                displayName: "Les Folies",
+                                url: "http://nominatim.openstreetmap.org/details.php?place_id=5001033",
+                                position: "+45.5253965-73.5818537/",
+                                address: {
+                                    streetAddress: "701 Mont-Royal Est",
+                                    locality: "Montreal",
+                                    region: "Quebec",
+                                    postalCode: "H2J 2T5"
+                                }
+                            }
+                        },
+                        Activity = require('../lib/model/activity').Activity,
+                        act = new Activity(props);
+                    
+                    Step(
+                        function() {
+                            act.apply(user.profile, this);
+                        },
+                        function(err) {
+                            if (err) throw err;
+                            act.save(this);
+                        },
+                        function(err) {
+                            if (err) throw err;
+                            user.addToOutbox(act, this);
+                        },
+                        function(err) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                cb(null, {user: user,
+                                          activity: act});
+                            }
+                        }
+                    );
+                },
+                'it works': function(err, results) {
+                    assert.ifError(err);
+                },
+                'and we get the user stream': {
+                    topic: function(results) {
+                        var cb = this.callback,
+                            user = results.user,
+                            activity = results.activity;
+
+                        user.getStream(0, 20, function(err, activities) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                cb(null, {user: user,
+                                          activity: activity,
+                                          activities: activities});
+                            }
+                        });
+                    },
+                    'it works': function(err, results) {
+                        assert.ifError(err);
+                        assert.isArray(results.activities);
+                    },
+                    'it includes the added activity': function(err, results) {
+                        assert.lengthOf(results.activities, 1);
+                        assert.equal(results.activities[0].id, results.activity.id);
+                    }
+                }
             }
         }
     }
