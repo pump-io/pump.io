@@ -159,6 +159,38 @@ suite.addBatch({
             for (i = 0; i < Activity.verbs.length; i++) {
                 assert.includes(testVerbs, Activity.verbs[i]);
             }
+        },
+        'it has a const-like member for each verb': function(err, Activity) {
+            assert.equal(Activity.ADD, 'add');
+            assert.equal(Activity.CANCEL, 'cancel');
+            assert.equal(Activity.CHECKIN, 'checkin');
+            assert.equal(Activity.DELETE, 'delete');
+            assert.equal(Activity.FAVORITE, 'favorite');
+            assert.equal(Activity.FOLLOW, 'follow');
+            assert.equal(Activity.GIVE, 'give');
+            assert.equal(Activity.IGNORE, 'ignore');
+            assert.equal(Activity.INVITE, 'invite');
+            assert.equal(Activity.JOIN, 'join');
+            assert.equal(Activity.LEAVE, 'leave');
+            assert.equal(Activity.LIKE, 'like');
+            assert.equal(Activity.MAKE_FRIEND, 'make-friend');
+            assert.equal(Activity.PLAY, 'play');
+            assert.equal(Activity.POST, 'post');
+            assert.equal(Activity.RECEIVE, 'receive');
+            assert.equal(Activity.REMOVE, 'remove');
+            assert.equal(Activity.REMOVE_FRIEND, 'remove-friend');
+            assert.equal(Activity.REQUEST_FRIEND, 'request-friend');
+            assert.equal(Activity.RSVP_MAYBE, 'rsvp-maybe');
+            assert.equal(Activity.RSVP_NO, 'rsvp-no');
+            assert.equal(Activity.RSVP_YES, 'rsvp-yes');
+            assert.equal(Activity.SAVE, 'save');
+            assert.equal(Activity.SHARE, 'share');
+            assert.equal(Activity.STOP_FOLLOWING, 'stop-following');
+            assert.equal(Activity.TAG, 'tag');
+            assert.equal(Activity.UNFAVORITE, 'unfavorite');
+            assert.equal(Activity.UNLIKE, 'unlike');
+            assert.equal(Activity.UNSAVE, 'unsave');
+            assert.equal(Activity.UPDATE, 'update');
         }
     }
 });
