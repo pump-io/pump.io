@@ -303,7 +303,7 @@ suite.addBatch({
                     assert.isString(activity.object.content);
                 },
                 'and we get the stored activity': {
-                    topic: function(activity, Activity) {
+                    topic: function(saved, activity, Activity) {
                         Activity.get(activity.id, this.callback);
                     },
                     'it works': function(err, copy) {
