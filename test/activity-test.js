@@ -246,7 +246,7 @@ suite.addBatch({
                         }
                     });
                 
-                act.apply(function(err) {
+                act.apply(null, function(err) {
                     if (err) {
                         cb(err, null);
                     } else {
