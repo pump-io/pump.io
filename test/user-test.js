@@ -397,7 +397,7 @@ suite.addBatch({
                 'it works': function(err, results) {
                     assert.ifError(err);
                 },
-                'and we get the user stream': {
+                'and we get the user inbox': {
                     topic: function(results) {
                         var cb = this.callback,
                             user = results.user,
