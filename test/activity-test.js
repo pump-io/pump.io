@@ -318,6 +318,30 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.isArray(edges);
                     assert.lengthOf(edges, 1);
+                },
+                'and we apply() a stop-following activity': {
+                    topic: function(edges, users, Activity) {
+                        var act = new Activity({actor: users.alice.profile,
+                                                verb: "stop-following",
+                                                object: users.bob.profile});
+                        act.apply(users.alice.profile, this);
+                    },
+                    'it works': function(err) {
+                        assert.ifError(err);
+                    },
+                    'and we check for the resulting edge again': {
+                        topic: function(edges, users, Activity) {
+                            var Edge = require('../lib/model/edge').Edge;
+                            Edge.search({"from.id": users.alice.profile.id,
+                                         "to.id": users.bob.profile.id},
+                                        this.callback);
+                        },
+                        'it does not exist': function(err, edges) {
+                            assert.ifError(err);
+                            assert.isArray(edges);
+                            assert.lengthOf(edges, 0);
+                        }
+                    }
                 }
             }
         }
