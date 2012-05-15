@@ -1409,6 +1409,51 @@ vows.describe('provider module interface').addBatch({
                             results.rt.del(function(err) {});
                         }
                     }
+                },
+                'and we call generateRequestToken with an invalid consumer key': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+                        provider.generateRequestToken("NOT A KEY", "http://example.com/callback", function(err, rt) {
+                            if (err) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we call generateRequestToken with a valid consumer key and an invalid callback url': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+                        provider.generateRequestToken(testClient.consumer_key, "NOT A VALID URL", function(err, rt) {
+                            if (err) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we call generateRequestToken with a valid consumer key and a valid callback url': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+                        provider.generateRequestToken(testClient.consumer_key, "http://example.com/callback", function(err, rt) {
+                            if (err) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
                 }
             }
         }
