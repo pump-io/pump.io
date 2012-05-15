@@ -729,7 +729,7 @@ vows.describe('provider module interface').addBatch({
                                         if (err) {
                                             cb(null, {at: at, rt: rt, user: user});
                                         } else {
-                                            cb(err, null);
+                                            cb(new Error("Unexpected success"), null);
                                         }
                                     });
                                 }
@@ -790,7 +790,7 @@ vows.describe('provider module interface').addBatch({
                                         if (err) {
                                             cb(null, {at: at, rt: rt, user: user});
                                         } else {
-                                            cb(err, null);
+                                            cb(new Error("Unexpected success"), null);
                                         }
                                     });
                                 }
@@ -856,7 +856,7 @@ vows.describe('provider module interface').addBatch({
                                         if (err) {
                                             cb(null, {at: at, rt: rt, user: user});
                                         } else {
-                                            cb(err, null);
+                                            cb(new Error("Unexpected success"), null);
                                         }
                                     });
                                 }
