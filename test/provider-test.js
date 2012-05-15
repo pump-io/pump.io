@@ -559,7 +559,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    'it fails correctly': function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(rt) {
@@ -588,7 +588,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    'it fails correctly': function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(rt) {
@@ -667,7 +667,7 @@ vows.describe('provider module interface').addBatch({
                             results.rt.del(function(err) {});
                         }
                     }
-                },
+                }
             }
         }
     }
