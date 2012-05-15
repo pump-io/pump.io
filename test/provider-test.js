@@ -25,6 +25,7 @@ var assert = require('assert'),
     randomString = require('../lib/randomstring').randomString,
     Client = require('../lib/model/client').Client,
     RequestToken = require('../lib/model/requesttoken').RequestToken,
+    AccessToken = require('../lib/model/accesstoken').AccessToken,
     User = require('../lib/model/user').User,
     methodContext = require('./lib/methods').methodContext,
     Databank = databank.Databank,
@@ -1464,6 +1465,150 @@ vows.describe('provider module interface').addBatch({
                     teardown: function(rt) {
                         if (rt && rt.del) {
                             rt.del(ignore);
+                        }
+                    }
+                },
+                'and we call generateAccessToken() with an invalid request token': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+                        provider.generateAccessToken("NOT A TOKEN", function(err, at) {
+                            if (err) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we call generateAccessToken() with an unassociated request token': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+                        provider.generateRequestToken(testClient.consumer_key, "http://example.com/callback", function(err, rt) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                provider.generateAccessToken(rt.token, function(err, at) {
+                                    if (err) {
+                                        cb(null, rt);
+                                    } else {
+                                        cb(new Error("Unexpected success"));
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err, rt) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(rt) {
+                        if (rt && rt.del) {
+                            rt.del(ignore);
+                        }
+                    }
+                },
+                'and we call generateAccessToken() with an already-used request token': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+
+                        User.create({nickname: "ulysses", password: "sgrant"}, function(err, user) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                provider.generateRequestToken(testClient.consumer_key, "http://example.com/callback", function(err, rt) {
+                                    if (err) {
+                                        cb(err, null);
+                                    } else {
+                                        provider.associateTokenToUser("ulysses", rt.token, function(err, newt) {
+                                            if (err) {
+                                                cb(err, null);
+                                            } else {
+                                                provider.generateAccessToken(rt.token, function(err, at) {
+                                                    if (err) {
+                                                        cb(err, null);
+                                                    } else {
+                                                        // Double-dip!
+                                                        provider.generateAccessToken(rt.token, function(err, at) {
+                                                            if (err) {
+                                                                cb(null, {rt: rt, user: user, at: at});
+                                                            } else {
+                                                                cb(new Error("Unexpected success"));
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err, results) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(results) {
+                        if (results && results.user && results.user.del) {
+                            results.user.del(ignore);
+                        }
+                        if (results && results.rt && results.rt.del) {
+                            results.rt.del(ignore);
+                        }
+                        if (results && results.at && results.at.del) {
+                            results.at.del(ignore);
+                        }
+                    }
+                },
+                'and we call generateAccessToken() with an associated request token': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+
+                        User.create({nickname: "valentine", password: "sday"}, function(err, user) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                provider.generateRequestToken(testClient.consumer_key, "http://example.com/callback", function(err, rt) {
+                                    if (err) {
+                                        cb(err, null);
+                                    } else {
+                                        provider.associateTokenToUser("valentine", rt.token, function(err, newt) {
+                                            if (err) {
+                                                cb(err, null);
+                                            } else {
+                                                provider.generateAccessToken(rt.token, function(err, at) {
+                                                    if (err) {
+                                                        cb(err, null);
+                                                    } else {
+                                                        cb(null, {rt: rt, user: user, at: at});
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    'it works': function(err, results) {
+                        assert.ifError(err);
+                        assert.isObject(results.at);
+                        assert.instanceOf(results.at, AccessToken);
+                    },
+                    'it has the right properties': function(err, results) {
+                        assert.isString(results.at.access_token);
+                        assert.isString(results.at.token_secret);
+                    },
+                    teardown: function(results) {
+                        if (results && results.user && results.user.del) {
+                            results.user.del(ignore);
+                        }
+                        if (results && results.rt && results.rt.del) {
+                            results.rt.del(ignore);
+                        }
+                        if (results && results.at && results.at.del) {
+                            results.at.del(ignore);
                         }
                     }
                 }
