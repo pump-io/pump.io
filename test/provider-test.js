@@ -31,6 +31,7 @@ var assert = require('assert'),
     DatabankObject = databank.DatabankObject;
 
 var testClient = null;
+var ignore = function(err) {};
 
 vows.describe('provider module interface').addBatch({
 
@@ -130,7 +131,7 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(requestToken) {
                         if (requestToken && requestToken.del) {
-                            requestToken.del(function(err) {});
+                            requestToken.del(ignore);
                         }
                     }
                 },
@@ -185,7 +186,7 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(results) {
                         if (results && results.client && results.client.del) {
-                            results.client.del(function(err) {});
+                            results.client.del(ignore);
                         }
                     }
                 },
@@ -227,10 +228,10 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(results) {
                         if (results && results.client && results.client.del) {
-                            results.client.del(function(err) {});
+                            results.client.del(ignore);
                         }
                         if (results && results.requestToken && results.requestToken.del) {
-                            results.requestToken.del(function(err) {});
+                            results.requestToken.del(ignore);
                         }
                     }
                 },
@@ -290,7 +291,7 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(rt) {
                         if (rt && rt.del) {
-                            rt.del(function(err) {});
+                            rt.del(ignore);
                         }
                     }
                 },
@@ -330,10 +331,10 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(results) {
                         if (results && results.rt && results.rt.del) {
-                            results.rt.del(function(err) {});
+                            results.rt.del(ignore);
                         }
                         if (results && results.user && results.user.del) {
-                            results.user.del(function(err) {});
+                            results.user.del(ignore);
                         }
                     }
                 },
@@ -362,7 +363,7 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(user) {
                         if (user && user.del) {
-                            user.del(function(err) {});
+                            user.del(ignore);
                         }
                     }
                 },
@@ -420,10 +421,10 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(results) {
                         if (results && results.rt && results.rt.del) {
-                            results.rt.del(function(err) {});
+                            results.rt.del(ignore);
                         }
                         if (results && results.user && results.user.del) {
-                            results.user.del(function(err) {});
+                            results.user.del(ignore);
                         }
                     }
                 },
@@ -467,7 +468,7 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(rt) {
                         if (rt && rt.del) {
-                            rt.del(function(err) {});
+                            rt.del(ignore);
                         }
                     }
                 },
@@ -517,13 +518,13 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(results) {
                         if (results && results.user && results.user.del) {
-                            results.user.del(function(err) {});
+                            results.user.del(ignore);
                         }
                         if (results && results.rt && results.rt.del) {
-                            results.rt.del(function(err) {});
+                            results.rt.del(ignore);
                         }
                         if (results && results.at && results.at.del) {
-                            results.at.del(function(err) {});
+                            results.at.del(ignore);
                         }
                     }
                 },
@@ -567,7 +568,7 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(rt) {
                         if (rt && rt.del) {
-                            rt.del(function(err) {});
+                            rt.del(ignore);
                         }
                     }
                 },
@@ -596,7 +597,7 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(rt) {
                         if (rt && rt.del) {
-                            rt.del(function(err) {});
+                            rt.del(ignore);
                         }
                     }
                 },
@@ -631,10 +632,10 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(results) {
                         if (results && results.rt1 && results.rt1.del) {
-                            results.rt1.del(function(err) {});
+                            results.rt1.del(ignore);
                         }
                         if (results && results.rt2 && results.rt2.del) {
-                            results.rt2.del(function(err) {});
+                            results.rt2.del(ignore);
                         }
                     }
                 },
@@ -667,7 +668,7 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(results) {
                         if (results && results.rt && results.rt.del) {
-                            results.rt.del(function(err) {});
+                            results.rt.del(ignore);
                         }
                     }
                 },
@@ -743,13 +744,13 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(results) {
                         if (results && results.user && results.user.del) {
-                            results.user.del(function(err) {});
+                            results.user.del(ignore);
                         }
                         if (results && results.rt && results.rt.del) {
-                            results.rt.del(function(err) {});
+                            results.rt.del(ignore);
                         }
                         if (results && results.at && results.at.del) {
-                            results.at.del(function(err) {});
+                            results.at.del(ignore);
                         }
                     }
                 },
@@ -806,13 +807,13 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(results) {
                         if (results && results.user && results.user.del) {
-                            results.user.del(function(err) {});
+                            results.user.del(ignore);
                         }
                         if (results && results.rt && results.rt.del) {
-                            results.rt.del(function(err) {});
+                            results.rt.del(ignore);
                         }
                         if (results && results.at && results.at.del) {
-                            results.at.del(function(err) {});
+                            results.at.del(ignore);
                         }
                     }
                 },
@@ -876,13 +877,13 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(results) {
                         if (results && results.user && results.user.del) {
-                            results.user.del(function(err) {});
+                            results.user.del(ignore);
                         }
                         if (results && results.rt && results.rt.del) {
-                            results.rt.del(function(err) {});
+                            results.rt.del(ignore);
                         }
                         if (results && results.at && results.at.del) {
-                            results.at.del(function(err) {});
+                            results.at.del(ignore);
                         }
                     }
                 },
@@ -939,13 +940,13 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(results) {
                         if (results && results.user && results.user.del) {
-                            results.user.del(function(err) {});
+                            results.user.del(ignore);
                         }
                         if (results && results.rt && results.rt.del) {
-                            results.rt.del(function(err) {});
+                            results.rt.del(ignore);
                         }
                         if (results && results.at && results.at.del) {
-                            results.at.del(function(err) {});
+                            results.at.del(ignore);
                         }
                     }
                 },
@@ -1005,10 +1006,10 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(results) {
                         if (results && results.user && results.user.del) {
-                            results.user.del(function(err) {});
+                            results.user.del(ignore);
                         }
                         if (results && results.rt && results.rt.del) {
-                            results.rt.del(function(err) {});
+                            results.rt.del(ignore);
                         }
                     }
                 },
@@ -1062,13 +1063,13 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(results) {
                         if (results && results.user && results.user.del) {
-                            results.user.del(function(err) {});
+                            results.user.del(ignore);
                         }
                         if (results && results.rt && results.rt.del) {
-                            results.rt.del(function(err) {});
+                            results.rt.del(ignore);
                         }
                         if (results && results.at && results.at.del) {
-                            results.at.del(function(err) {});
+                            results.at.del(ignore);
                         }
                     }
                 },
@@ -1117,7 +1118,7 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(user) {
                         if (user && user.del) {
-                            user.del(function(err) {});
+                            user.del(ignore);
                         }
                     }
                 },
@@ -1151,7 +1152,7 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(user) {
                         if (user && user.del) {
-                            user.del(function(err) {});
+                            user.del(ignore);
                         }
                     }
                 },
@@ -1195,13 +1196,13 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(results) {
                         if (results && results.user1 && results.user1.del) {
-                            results.user1.del(function(err) {});
+                            results.user1.del(ignore);
                         }
                         if (results && results.user2 && results.user2.del) {
-                            results.user2.del(function(err) {});
+                            results.user2.del(ignore);
                         }
                         if (results && results.rt && results.rt.del) {
-                            results.rt.del(function(err) {});
+                            results.rt.del(ignore);
                         }
                     }
                 },
@@ -1240,10 +1241,10 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(results) {
                         if (results && results.user && results.user.del) {
-                            results.user.del(function(err) {});
+                            results.user.del(ignore);
                         }
                         if (results && results.rt && results.rt.del) {
-                            results.rt.del(function(err) {});
+                            results.rt.del(ignore);
                         }
                     }
                 },
@@ -1285,7 +1286,7 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(user) {
                         if (user && user.del) {
-                            user.del(function(err) {});
+                            user.del(ignore);
                         }
                     }
                 },
@@ -1314,7 +1315,7 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(rt) {
                         if (rt && rt.del) {
-                            rt.del(function(err) {});
+                            rt.del(ignore);
                         }
                     }
                 },
@@ -1358,13 +1359,13 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(results) {
                         if (results && results.user1 && results.user1.del) {
-                            results.user1.del(function(err) {});
+                            results.user1.del(ignore);
                         }
                         if (results && results.user2 && results.user2.del) {
-                            results.user2.del(function(err) {});
+                            results.user2.del(ignore);
                         }
                         if (results && results.rt && results.rt.del) {
-                            results.rt.del(function(err) {});
+                            results.rt.del(ignore);
                         }
                     }
                 },
@@ -1403,10 +1404,10 @@ vows.describe('provider module interface').addBatch({
                     },
                     teardown: function(results) {
                         if (results && results.user && results.user.del) {
-                            results.user.del(function(err) {});
+                            results.user.del(ignore);
                         }
                         if (results && results.rt && results.rt.del) {
-                            results.rt.del(function(err) {});
+                            results.rt.del(ignore);
                         }
                     }
                 },
@@ -1445,14 +1446,25 @@ vows.describe('provider module interface').addBatch({
                         var cb = this.callback;
                         provider.generateRequestToken(testClient.consumer_key, "http://example.com/callback", function(err, rt) {
                             if (err) {
-                                cb(null);
+                                cb(err, null);
                             } else {
-                                cb(new Error("Unexpected success"));
+                                cb(null, rt);
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    'it works': function(err, rt) {
                         assert.ifError(err);
+                        assert.isObject(rt);
+                        assert.instanceOf(rt, RequestToken);
+                    },
+                    'it has the right attributes': function(err, rt) {
+                        assert.isString(rt.token);
+                        assert.isString(rt.token_secret);
+                    },
+                    teardown: function(rt) {
+                        if (rt && rt.del) {
+                            rt.del(ignore);
+                        }
                     }
                 }
             }
