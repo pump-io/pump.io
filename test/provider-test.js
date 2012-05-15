@@ -19,8 +19,10 @@
 var assert = require('assert'),
     vows = require('vows'),
     databank = require('databank'),
+    Step = require('step'),
     schema = require('../lib/schema'),
     URLMaker = require('../lib/urlmaker').URLMaker,
+    randomString = require('../lib/randomstring').randomString,
     Client = require('../lib/model/client').Client,
     RequestToken = require('../lib/model/requesttoken').RequestToken,
     User = require('../lib/model/user').User,
@@ -665,6 +667,274 @@ vows.describe('provider module interface').addBatch({
                     teardown: function(results) {
                         if (results.rt && results.rt.del) {
                             results.rt.del(function(err) {});
+                        }
+                    }
+                },
+                'and we call validateNotReplay() with an invalid access token': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            ts = Number(Date.now()/1000).toString(10);
+
+                        randomString(8, function(err, nonce) {
+                            provider.validateNotReplay("NOT AN ACCESS TOKEN", ts, nonce, function(err, token) {
+                                if (err) {
+                                    cb(null);
+                                } else {
+                                    cb(new Error("Unexpected success"));
+                                }
+                            });
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we call validateNotReplay() with a valid access token and a long-expired timestamp': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            ts = Number((Date.now()/1000) - (24*60*60*365)).toString(10),
+                            props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'},
+                            user, rt, at;
+
+                        Step(
+                            function() {
+                                User.create({nickname: "harvey", password: "123456"}, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                user = results;
+                                RequestToken.create(props, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                rt = results;
+                                provider.associateTokenToUser(user.nickname, rt.token, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                provider.generateAccessToken(rt.token, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                at = results;
+                                randomString(8, this);
+                            },
+                            function(err, nonce) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    provider.validateNotReplay(at.token, ts, nonce, function(err, token) {
+                                        if (err) {
+                                            cb(null, {at: at, rt: rt, user: user});
+                                        } else {
+                                            cb(err, null);
+                                        }
+                                    });
+                                }
+                            }
+                        );
+                    },
+                    'it fails correctly': function(err, results) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(results) {
+                        if (results.user && results.user.del) {
+                            results.user.del(function(err) {});
+                        }
+                        if (results.rt && results.rt.del) {
+                            results.rt.del(function(err) {});
+                        }
+                        if (results.at && results.at.del) {
+                            results.at.del(function(err) {});
+                        }
+                    }
+                },
+                'and we call validateNotReplay() with a valid access token and a far-future timestamp': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            ts = Number((Date.now()/1000) + (24*60*60*365)).toString(10),
+                            props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'},
+                            user, rt, at;
+
+                        Step(
+                            function() {
+                                User.create({nickname: "ignace", password: "123456"}, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                user = results;
+                                RequestToken.create(props, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                rt = results;
+                                provider.associateTokenToUser(user.nickname, rt.token, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                provider.generateAccessToken(rt.token, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                at = results;
+                                randomString(8, this);
+                            },
+                            function(err, nonce) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    provider.validateNotReplay(at.token, ts, nonce, function(err, token) {
+                                        if (err) {
+                                            cb(null, {at: at, rt: rt, user: user});
+                                        } else {
+                                            cb(err, null);
+                                        }
+                                    });
+                                }
+                            }
+                        );
+                    },
+                    'it fails correctly': function(err, results) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(results) {
+                        if (results.user && results.user.del) {
+                            results.user.del(function(err) {});
+                        }
+                        if (results.rt && results.rt.del) {
+                            results.rt.del(function(err) {});
+                        }
+                        if (results.at && results.at.del) {
+                            results.at.del(function(err) {});
+                        }
+                    }
+                },
+                'and we call validateNotReplay() with a valid access token and a good timestamp and a used nonce': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            ts = Number((Date.now()/1000)).toString(10),
+                            props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'},
+                            user, rt, at, nonce;
+
+                        Step(
+                            function() {
+                                User.create({nickname: "ignace", password: "123456"}, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                user = results;
+                                RequestToken.create(props, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                rt = results;
+                                provider.associateTokenToUser(user.nickname, rt.token, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                provider.generateAccessToken(rt.token, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                at = results;
+                                randomString(8, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                nonce = results;
+                                provider.validateNotReplay(at.token, ts, nonce, this);
+                            },
+                            function(err, token) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    provider.validateNotReplay(at.token, ts, nonce, function(err, token) {
+                                        if (err) {
+                                            cb(null, {at: at, rt: rt, user: user});
+                                        } else {
+                                            cb(err, null);
+                                        }
+                                    });
+                                }
+                            }
+                        );
+                    },
+                    'it fails correctly': function(err, results) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(results) {
+                        if (results.user && results.user.del) {
+                            results.user.del(function(err) {});
+                        }
+                        if (results.rt && results.rt.del) {
+                            results.rt.del(function(err) {});
+                        }
+                        if (results.at && results.at.del) {
+                            results.at.del(function(err) {});
+                        }
+                    }
+                },
+                'and we call validateNotReplay() with a valid access token and a good timestamp and an unused nonce': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            ts = Number((Date.now()/1000)).toString(10),
+                            props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'},
+                            user, rt, at;
+
+                        Step(
+                            function() {
+                                User.create({nickname: "ignace", password: "123456"}, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                user = results;
+                                RequestToken.create(props, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                rt = results;
+                                provider.associateTokenToUser(user.nickname, rt.token, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                provider.generateAccessToken(rt.token, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                at = results;
+                                randomString(8, this);
+                            },
+                            function(err, nonce) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    provider.validateNotReplay(at.token, ts, nonce, function(err, token) {
+                                        if (err) {
+                                            cb(err, null);
+                                        } else {
+                                            cb(null, {at: at, rt: rt, user: user});
+                                        }
+                                    });
+                                }
+                            }
+                        );
+                    },
+                    'it works': function(err, results) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(results) {
+                        if (results.user && results.user.del) {
+                            results.user.del(function(err) {});
+                        }
+                        if (results.rt && results.rt.del) {
+                            results.rt.del(function(err) {});
+                        }
+                        if (results.at && results.at.del) {
+                            results.at.del(function(err) {});
                         }
                     }
                 }
