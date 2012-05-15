@@ -424,104 +424,104 @@ vows.describe('provider module interface').addBatch({
                             results.user.del(function(err) {});
                         }
                     }
-                }
-            },
-            'and we call validToken() with an invalid token': {
-                topic: function(provider) {
-                    var cb = this.callback;
-                    provider.validToken("NOT A VALID TOKEN", function(err, token) {
-                        if (err) { // correct
-                            cb(null);
-                        } else {
-                            cb(new Error("Unexpected result"));
-                        }
-                    });
                 },
-                'it fails correctly': function(err) {
-                    assert.ifError(err);
-                }
-            },
-            'and we call validToken() with a request token': {
-                topic: function(provider) {
-                    var cb = this.callback,
-                        props = {consumer_key: testClient.consumer_key,
-                                 callback: 'http://example.com/callback/abc123/'};
-
-                    RequestToken.create(props, function(err, rt) {
-                        if (err) {
-                            cb(err, null);
-                        } else {
-                            provider.validToken(rt.token, function(err, token) {
-                                if (err) {
-                                    cb(null, rt);
-                                } else {
-                                    cb(new Error("Unexpected result"), null);
-                                }
-                            });
-                        }
-                    });
-                },
-                'it fails correctly': function(err, rt) {
-                    assert.ifError(err);
-                },
-                teardown: function(rt) {
-                    if (rt && rt.del) {
-                        rt.del(function(err) {});
+                'and we call validToken() with an invalid token': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+                        provider.validToken("NOT A VALID TOKEN", function(err, token) {
+                            if (err) { // correct
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected result"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
                     }
-                }
-            },
-            'and we call validToken() with a valid access token': {
-                topic: function(provider) {
-                    var cb = this.callback,
-                        props = {consumer_key: testClient.consumer_key,
-                                 callback: 'http://example.com/callback/abc123/'},
-                        user, rt, at;
+                },
+                'and we call validToken() with a request token': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'};
 
-                    Step(
-                        function() {
-                            User.create({nickname: "gerald", password: "123456"}, this);
-                        },
-                        function(err, results) {
-                            if (err) throw err;
-                            user = results;
-                            RequestToken.create(props, this);
-                        },
-                        function(err, results) {
-                            if (err) throw err;
-                            rt = results;
-                            provider.associateTokenToUser(user.nickname, rt.token, this);
-                        },
-                        function(err, results) {
-                            if (err) throw err;
-                            provider.generateAccessToken(rt.token, this);
-                        },
-                        function(err, results) {
-                            if (err) throw err;
-                            at = results;
-                            provider.validToken(at.token, this);
-                        },
-                        function(err, results) {
+                        RequestToken.create(props, function(err, rt) {
                             if (err) {
                                 cb(err, null);
                             } else {
-                                cb(null, {user: user,
-                                          rt: rt,
-                                          at: at});
+                                provider.validToken(rt.token, function(err, token) {
+                                    if (err) {
+                                        cb(null, rt);
+                                    } else {
+                                        cb(new Error("Unexpected result"), null);
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err, rt) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(rt) {
+                        if (rt && rt.del) {
+                            rt.del(function(err) {});
                         }
-                    });
-                },
-                'it works': function(err, results) {
-                    assert.ifError(err);
-                },
-                teardown: function(results) {
-                    if (results.user && results.user.del) {
-                        results.user.del(function(err) {});
                     }
-                    if (results.rt && results.rt.del) {
-                        results.rt.del(function(err) {});
-                    }
-                    if (results.at && results.at.del) {
-                        results.at.del(function(err) {});
+                },
+                'and we call validToken() with a valid access token': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'},
+                            user, rt, at;
+
+                        Step(
+                            function() {
+                                User.create({nickname: "gerald", password: "123456"}, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                user = results;
+                                RequestToken.create(props, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                rt = results;
+                                provider.associateTokenToUser(user.nickname, rt.token, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                provider.generateAccessToken(rt.token, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                at = results;
+                                provider.validToken(at.token, this);
+                            },
+                            function(err, results) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    cb(null, {user: user,
+                                              rt: rt,
+                                              at: at});
+                                }
+                            });
+                    },
+                    'it works': function(err, results) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(results) {
+                        if (results.user && results.user.del) {
+                            results.user.del(function(err) {});
+                        }
+                        if (results.rt && results.rt.del) {
+                            results.rt.del(function(err) {});
+                        }
+                        if (results.at && results.at.del) {
+                            results.at.del(function(err) {});
+                        }
                     }
                 }
             }
