@@ -1246,6 +1246,169 @@ vows.describe('provider module interface').addBatch({
                             results.rt.del(function(err) {});
                         }
                     }
+                },
+                'and we call associateTokenUser with an invalid username and an invalid token': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+                        provider.associateTokenUser("nonexistentuser", "badtoken", function(err, rt) {
+                            if (err) { // correct
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we call associateTokenUser with a valid username and an invalid token': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+                        
+                        User.create({nickname: "ronald", password: "mcdonald"}, function(err, user) {
+                            if (err) {
+                                cb(err, null);
+                            } else { 
+                                provider.associateTokenUser(user.nickname, "badtoken", function(err, newt) {
+                                    if (err) { // should fail
+                                        cb(null, user);
+                                    } else {
+                                        cb(new Error("Unexpected success"));
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    'it works correctly': function(err, results) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(user) {
+                        if (user && user.del) {
+                            user.del(function(err) {});
+                        }
+                    }
+                },
+                'and we call associateTokenUser with a invalid username and a valid token': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'};
+                        
+                        RequestToken.create(props, function(err, rt) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                provider.associateTokenUser("nonexistentuser", rt.token, function(err, newt) {
+                                    if (err) {
+                                        cb(null, rt);
+                                    } else { // should succeed here
+                                        cb(err, null);
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err, rt) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(rt) {
+                        if (rt && rt.del) {
+                            rt.del(function(err) {});
+                        }
+                    }
+                },
+                'and we call associateTokenUser with a valid username and a used token': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'},
+                            user1, user2, rt;
+                        
+                        Step(
+                            function() {
+                                User.create({nickname: "samuel", password: "dinosaur"}, this.parallel());
+                                User.create({nickname: "samantha", password: "wombat"}, this.parallel());
+                                RequestToken.create(props, this.parallel());
+                            },
+                            function(err, res1, res2, res3) {
+                                if (err) throw err;
+                                user1 = res1;
+                                user2 = res2;
+                                rt = res3;
+                                provider.associateTokenToUser(user2.nickname, rt.token, this);
+                            },
+                            function(err, results) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    provider.associateTokenToUser(user1.nickname, rt.token, function(err, newt) {
+                                        if (err) { // correct
+                                            cb(null, {user1: user1, user2: user2, rt: rt});
+                                        } else {
+                                            cb(new Error("Unexpected success"), null);
+                                        }
+                                    });
+                                }
+                            }
+                        );
+                    },
+                    'it fails correctly': function(err, results) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(results) {
+                        if (results && results.user1 && results.user1.del) {
+                            results.user1.del(function(err) {});
+                        }
+                        if (results && results.user2 && results.user2.del) {
+                            results.user2.del(function(err) {});
+                        }
+                        if (results && results.rt && results.rt.del) {
+                            results.rt.del(function(err) {});
+                        }
+                    }
+                },
+                'and we call associateTokenUser with a valid username and an unused token': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'},
+                            user,rt;
+                        
+                        Step(
+                            function() {
+                                User.create({nickname: "thomas", password: "aquinas"}, this.parallel());
+                                RequestToken.create(props, this.parallel());
+                            },
+                            function(err, res1, res2) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    user = res1;
+                                    rt = res2;
+                                    provider.associateTokenToUser(user.nickname, rt.token, function(err, newt) {
+                                        if (err) {
+                                            cb(err, null);
+                                        } else { // should succeed here
+                                            cb(null, {user: user, rt: rt, newt: newt});
+                                        }
+                                    });
+                                }
+                            }
+                        );
+                    },
+                    'it works correctly': function(err, results) {
+                        assert.ifError(err);
+                        assert.equal(results.newt.token, results.rt.token);
+                    },
+                    teardown: function(results) {
+                        if (results && results.user && results.user.del) {
+                            results.user.del(function(err) {});
+                        }
+                        if (results && results.rt && results.rt.del) {
+                            results.rt.del(function(err) {});
+                        }
+                    }
                 }
             }
         }
