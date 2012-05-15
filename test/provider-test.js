@@ -523,9 +523,152 @@ vows.describe('provider module interface').addBatch({
                             results.at.del(function(err) {});
                         }
                     }
-                }
+                },
+                'and we call tokenByTokenAndVerifier() with bad token and bad verifier': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+                        provider.tokenByTokenAndVerifier("NOT A TOKEN", "NOT A VERIFIER", function(err, token) {
+                            if (err) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we call tokenByTokenAndVerifier() with bad token and good verifier': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'};
+
+                        RequestToken.create(props, function(err, rt) {
+                            if (err) {
+                                cb(err);
+                            } else {
+                                provider.tokenByTokenAndVerifier("NOT A TOKEN", rt.verifier, function(err, newt) {
+                                    if (err) {
+                                        cb(null, rt);
+                                    } else {
+                                        cb(new Error("Unexpected success"), null);
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(rt) {
+                        if (rt && rt.del) {
+                            rt.del(function(err) {});
+                        }
+                    }
+                },
+                'and we call tokenByTokenAndVerifier() with good token and bad verifier': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'};
+
+                        RequestToken.create(props, function(err, rt) {
+                            if (err) {
+                                cb(err);
+                            } else {
+                                provider.tokenByTokenAndVerifier(rt.token, "NOT A VERIFIER", function(err, newt) {
+                                    if (err) {
+                                        cb(null, rt);
+                                    } else {
+                                        cb(new Error("Unexpected success"), null);
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(rt) {
+                        if (rt && rt.del) {
+                            rt.del(function(err) {});
+                        }
+                    }
+                },
+                'and we call tokenByTokenAndVerifier() with good token and wrong verifier': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'};
+
+                        RequestToken.create(props, function(err, rt1) {
+                            if (err) {
+                                cb(err);
+                            } else {
+                                RequestToken.create(props, function(err, rt2) {
+                                    if (err) {
+                                        cb(err);
+                                    } else {
+                                        provider.tokenByTokenAndVerifier(rt1.token, rt2.verifier, function(err, newt) {
+                                            if (err) {
+                                                cb(null, {rt1: rt1, rt2: rt2});
+                                            } else {
+                                                cb(new Error("Unexpected success"), null);
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err, results) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(results) {
+                        if (results.rt1 && results.rt1.del) {
+                            results.rt1.del(function(err) {});
+                        }
+                        if (results.rt2 && results.rt2.del) {
+                            results.rt2.del(function(err) {});
+                        }
+                    }
+                },
+                'and we call tokenByTokenAndVerifier() with good token and good verifier': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'};
+
+                        RequestToken.create(props, function(err, rt) {
+                            if (err) {
+                                cb(err);
+                            } else {
+                                provider.tokenByTokenAndVerifier(rt.token, rt.verifier, function(err, newt) {
+                                    if (err) {
+                                        cb(err, null);
+                                    } else {
+                                        cb(null, {rt: rt, newt: newt});
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    'it works': function(err, results) {
+                        assert.ifError(err);
+                        assert.isObject(results.newt);
+                        assert.instanceOf(results.newt, RequestToken);
+                        assert.equal(results.rt.token, results.newt.token);
+                        assert.equal(results.rt.verifier, results.newt.verifier);
+                    },
+                    teardown: function(results) {
+                        if (results.rt && results.rt.del) {
+                            results.rt.del(function(err) {});
+                        }
+                    }
+                },
             }
         }
     }
 }).export(module);
-
