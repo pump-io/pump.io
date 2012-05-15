@@ -509,19 +509,20 @@ vows.describe('provider module interface').addBatch({
                                               rt: rt,
                                               at: at});
                                 }
-                            });
+                            }
+                        );
                     },
                     'it works': function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(results) {
-                        if (results.user && results.user.del) {
+                        if (results && results.user && results.user.del) {
                             results.user.del(function(err) {});
                         }
-                        if (results.rt && results.rt.del) {
+                        if (results && results.rt && results.rt.del) {
                             results.rt.del(function(err) {});
                         }
-                        if (results.at && results.at.del) {
+                        if (results && results.at && results.at.del) {
                             results.at.del(function(err) {});
                         }
                     }
@@ -629,10 +630,10 @@ vows.describe('provider module interface').addBatch({
                         assert.ifError(err);
                     },
                     teardown: function(results) {
-                        if (results.rt1 && results.rt1.del) {
+                        if (results && results.rt1 && results.rt1.del) {
                             results.rt1.del(function(err) {});
                         }
-                        if (results.rt2 && results.rt2.del) {
+                        if (results && results.rt2 && results.rt2.del) {
                             results.rt2.del(function(err) {});
                         }
                     }
@@ -665,7 +666,7 @@ vows.describe('provider module interface').addBatch({
                         assert.equal(results.rt.verifier, results.newt.verifier);
                     },
                     teardown: function(results) {
-                        if (results.rt && results.rt.del) {
+                        if (results && results.rt && results.rt.del) {
                             results.rt.del(function(err) {});
                         }
                     }
@@ -739,13 +740,13 @@ vows.describe('provider module interface').addBatch({
                         assert.ifError(err);
                     },
                     teardown: function(results) {
-                        if (results.user && results.user.del) {
+                        if (results && results.user && results.user.del) {
                             results.user.del(function(err) {});
                         }
-                        if (results.rt && results.rt.del) {
+                        if (results && results.rt && results.rt.del) {
                             results.rt.del(function(err) {});
                         }
-                        if (results.at && results.at.del) {
+                        if (results && results.at && results.at.del) {
                             results.at.del(function(err) {});
                         }
                     }
@@ -800,13 +801,13 @@ vows.describe('provider module interface').addBatch({
                         assert.ifError(err);
                     },
                     teardown: function(results) {
-                        if (results.user && results.user.del) {
+                        if (results && results.user && results.user.del) {
                             results.user.del(function(err) {});
                         }
-                        if (results.rt && results.rt.del) {
+                        if (results && results.rt && results.rt.del) {
                             results.rt.del(function(err) {});
                         }
-                        if (results.at && results.at.del) {
+                        if (results && results.at && results.at.del) {
                             results.at.del(function(err) {});
                         }
                     }
@@ -866,13 +867,13 @@ vows.describe('provider module interface').addBatch({
                         assert.ifError(err);
                     },
                     teardown: function(results) {
-                        if (results.user && results.user.del) {
+                        if (results && results.user && results.user.del) {
                             results.user.del(function(err) {});
                         }
-                        if (results.rt && results.rt.del) {
+                        if (results && results.rt && results.rt.del) {
                             results.rt.del(function(err) {});
                         }
-                        if (results.at && results.at.del) {
+                        if (results && results.at && results.at.del) {
                             results.at.del(function(err) {});
                         }
                     }
@@ -927,13 +928,13 @@ vows.describe('provider module interface').addBatch({
                         assert.ifError(err);
                     },
                     teardown: function(results) {
-                        if (results.user && results.user.del) {
+                        if (results && results.user && results.user.del) {
                             results.user.del(function(err) {});
                         }
-                        if (results.rt && results.rt.del) {
+                        if (results && results.rt && results.rt.del) {
                             results.rt.del(function(err) {});
                         }
-                        if (results.at && results.at.del) {
+                        if (results && results.at && results.at.del) {
                             results.at.del(function(err) {});
                         }
                     }
