@@ -948,6 +948,125 @@ vows.describe('provider module interface').addBatch({
                             results.at.del(function(err) {});
                         }
                     }
+                },
+                'and we call userIdByToken() with an invalid access token': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+                        provider.userIdByToken("NOT AN ACCESS TOKEN", function(err, userId) {
+                            if (err) { // correct
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we call userIdByToken() with a valid request token': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'},
+                            user, rt;
+
+                        Step(
+                            function() {
+                                User.create({nickname: "larry", password: "123456"}, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                user = results;
+                                RequestToken.create(props, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                rt = results;
+                                provider.associateTokenToUser(user.nickname, rt.token, this);
+                            },
+                            function(err, results) {
+                                if (err) {
+                                    cb(err);
+                                } else {
+                                    provider.userIdByToken(rt.token, function(err, userId) {
+                                        if (err) { // correct
+                                            cb(null, {user: user, rt: rt});
+                                        } else {
+                                            cb(new Error("Unexpected success"));
+                                        }
+                                    });
+                                }
+                            }
+                        );
+                    },
+                    'it fails correctly': function(err, results) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(results) {
+                        if (results && results.user && results.user.del) {
+                            results.user.del(function(err) {});
+                        }
+                        if (results && results.rt && results.rt.del) {
+                            results.rt.del(function(err) {});
+                        }
+                    }
+                },
+                'and we call userIdByToken() with a valid access token': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'},
+                            user, rt, at;
+
+                        Step(
+                            function() {
+                                User.create({nickname: "larry", password: "123456"}, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                user = results;
+                                RequestToken.create(props, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                rt = results;
+                                provider.associateTokenToUser(user.nickname, rt.token, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                provider.generateAccessToken(rt.token, this);
+                            },
+                            function(err, results) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    at = results;
+                                    provider.userIdByToken(at.token, function(err, userId) {
+                                        if (err) { // correct
+                                            cb(err, null);
+                                        } else {
+                                            cb(null, {user: user, rt: rt, at: at});
+                                        }
+                                    });
+                                }
+                            }
+                        );
+                    },
+                    'it works': function(err, results) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(results) {
+                        if (results && results.user && results.user.del) {
+                            results.user.del(function(err) {});
+                        }
+                        if (results && results.rt && results.rt.del) {
+                            results.rt.del(function(err) {});
+                        }
+                        if (results && results.at && results.at.del) {
+                            results.at.del(function(err) {});
+                        }
+                    }
                 }
             }
         }
