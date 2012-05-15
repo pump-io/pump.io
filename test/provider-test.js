@@ -677,7 +677,7 @@ vows.describe('provider module interface').addBatch({
                             ts = Number(Date.now()/1000).toString(10);
 
                         randomString(8, function(err, nonce) {
-                            provider.validateNotReplay("NOT AN ACCESS TOKEN", ts, nonce, function(err, token) {
+                            provider.validateNotReplay("NOT AN ACCESS TOKEN", ts, nonce, function(err, isNotReplay) {
                                 if (err) {
                                     cb(null);
                                 } else {
@@ -725,11 +725,13 @@ vows.describe('provider module interface').addBatch({
                                 if (err) {
                                     cb(err, null);
                                 } else {
-                                    provider.validateNotReplay(at.token, ts, nonce, function(err, token) {
+                                    provider.validateNotReplay(at.token, ts, nonce, function(err, isNotReplay) {
                                         if (err) {
-                                            cb(null, {at: at, rt: rt, user: user});
-                                        } else {
+                                            cb(err, null);
+                                        } else if (isNotReplay) {
                                             cb(new Error("Unexpected success"), null);
+                                        } else {
+                                            cb(null, {at: at, rt: rt, user: user});
                                         }
                                     });
                                 }
@@ -786,11 +788,13 @@ vows.describe('provider module interface').addBatch({
                                 if (err) {
                                     cb(err, null);
                                 } else {
-                                    provider.validateNotReplay(at.token, ts, nonce, function(err, token) {
+                                    provider.validateNotReplay(at.token, ts, nonce, function(err, isNotReplay) {
                                         if (err) {
-                                            cb(null, {at: at, rt: rt, user: user});
-                                        } else {
+                                            cb(err, null);
+                                        } else if (isNotReplay) {
                                             cb(new Error("Unexpected success"), null);
+                                        } else {
+                                            cb(null, {at: at, rt: rt, user: user});
                                         }
                                     });
                                 }
@@ -848,15 +852,19 @@ vows.describe('provider module interface').addBatch({
                                 nonce = results;
                                 provider.validateNotReplay(at.token, ts, nonce, this);
                             },
-                            function(err, token) {
+                            function(err, isNotReplay) {
                                 if (err) {
                                     cb(err, null);
+                                } else if (!isNotReplay) {
+                                    cb(new Error("Unexpected failure on first validation"), null);
                                 } else {
                                     provider.validateNotReplay(at.token, ts, nonce, function(err, token) {
                                         if (err) {
-                                            cb(null, {at: at, rt: rt, user: user});
-                                        } else {
+                                            cb(err, null);
+                                        } else if (isNotReplay) {
                                             cb(new Error("Unexpected success"), null);
+                                        } else {
+                                            cb(null, {at: at, rt: rt, user: user});
                                         }
                                     });
                                 }
@@ -913,9 +921,11 @@ vows.describe('provider module interface').addBatch({
                                 if (err) {
                                     cb(err, null);
                                 } else {
-                                    provider.validateNotReplay(at.token, ts, nonce, function(err, token) {
+                                    provider.validateNotReplay(at.token, ts, nonce, function(err, isNotReplay) {
                                         if (err) {
                                             cb(err, null);
+                                        } else if (!isNotReplay) {
+                                            cb(new Error("Unexpected failure"), null);
                                         } else {
                                             cb(null, {at: at, rt: rt, user: user});
                                         }
