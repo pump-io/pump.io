@@ -40,6 +40,8 @@ var testSchema = {
 var testData = {
     'create': {
         consumer_key: "AAAAAAAAAAAAAAAAAAAAAA",
+        request_token: "BBBBBBBBBBBBBBBBBBBBBB",
+        username: "jordan",
         callback: "http://example.com/callback"
     },
     'update': {
