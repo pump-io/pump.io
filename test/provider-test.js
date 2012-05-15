@@ -1046,7 +1046,7 @@ vows.describe('provider module interface').addBatch({
                                         if (err) { // correct
                                             cb(err, null);
                                         } else {
-                                            cb(null, {user: user, rt: rt, at: at});
+                                            cb(null, {user: user, rt: rt, at: at, id: userId});
                                         }
                                     });
                                 }
@@ -1055,6 +1055,10 @@ vows.describe('provider module interface').addBatch({
                     },
                     'it works': function(err, results) {
                         assert.ifError(err);
+                    },
+                    'it has the right properties': function(err, results) {
+                        assert.isString(results.id.id);
+                        assert.equal(results.user.nickname, results.id.id);
                     },
                     teardown: function(results) {
                         if (results && results.user && results.user.del) {
