@@ -1021,7 +1021,7 @@ vows.describe('provider module interface').addBatch({
 
                         Step(
                             function() {
-                                User.create({nickname: "larry", password: "123456"}, this);
+                                User.create({nickname: "mary", password: "123456"}, this);
                             },
                             function(err, results) {
                                 if (err) throw err;
