@@ -1070,6 +1070,181 @@ vows.describe('provider module interface').addBatch({
                         if (results && results.at && results.at.del) {
                             results.at.del(function(err) {});
                         }
+                    },
+                    'and we call authenticateUser with a non-existent username': {
+                        topic: function(provider) {
+                            var cb = this.callback;
+                            provider.authenticateUser("nonexistentuser", "badpassword", "badtoken", function(err, rt) {
+                                if (err) { // correct
+                                    cb(null);
+                                } else {
+                                    cb(new Error("Unexpected success"));
+                                }
+                            });
+                        },
+                        'it fails correctly': function(err) {
+                            assert.ifError(err);
+                        }
+                    },
+                    'and we call authenticateUser with a good username and non-matching password': {
+                        topic: function(provider) {
+                            var cb = this.callback,
+                                user;
+                            
+                            Step(
+                                function() {
+                                    User.create({nickname: "nancy", password: "changeme"}, this);
+                                },
+                                function(err, results) {
+                                    if (err) {
+                                        cb(err, null);
+                                    } else {
+                                        user = results;
+                                        provider.authenticateUser("nancy", "badpass", "badtoken", function(err, rt) {
+                                            if (err) { // correct
+                                                cb(null, user);
+                                            } else {
+                                                cb(new Error("Unexpected success"), null);
+                                            }
+                                        });
+                                    }
+                                }
+                            );
+                        },
+                        'it fails correctly': function(err, user) {
+                            assert.ifError(err);
+                        },
+                        teardown: function(user) {
+                            if (user && user.del) {
+                                user.del(function(err) {});
+                            }
+                        }
+                    },
+                    'and we call authenticateUser with a good username and good password and non-existent token': {
+                        topic: function(provider) {
+                            var cb = this.callback,
+                                user;
+                            
+                            Step(
+                                function() {
+                                    User.create({nickname: "oliver", password: "followThe$"}, this);
+                                },
+                                function(err, results) {
+                                    if (err) {
+                                        cb(err, null);
+                                    } else {
+                                        user = results;
+                                        provider.authenticateUser("oliver", "followThe$", "badtoken", function(err, rt) {
+                                            if (err) { // correct
+                                                cb(null, user);
+                                            } else {
+                                                cb(new Error("Unexpected success"), null);
+                                            }
+                                        });
+                                    }
+                                }
+                            );
+                        },
+                        'it fails correctly': function(err, user) {
+                            assert.ifError(err);
+                        },
+                        teardown: function(user) {
+                            if (user && user.del) {
+                                user.del(function(err) {});
+                            }
+                        }
+                    },
+                    'and we call authenticateUser with a good username and good password and already-assigned token': {
+                        topic: function(provider) {
+                            var cb = this.callback,
+                                props = {consumer_key: testClient.consumer_key,
+                                         callback: 'http://example.com/callback/abc123/'},
+                                user1, user2, rt;
+                            
+                            Step(
+                                function() {
+                                    User.create({nickname: "paul", password: "austrian"}, this.parallel());
+                                    User.create({nickname: "pauline", password: "freezy"}, this.parallel());
+                                    RequestToken.create(props, this.parallel());
+                                },
+                                function(err, res1, res2, res3) {
+                                    if (err) throw err;
+                                    user1 = res1;
+                                    user2 = res2;
+                                    rt = res3;
+                                    provider.associateTokenToUser(user2.nickname, rt.token, this);
+                                },
+                                function(err, results) {
+                                    if (err) {
+                                        cb(err, null);
+                                    } else {
+                                        provider.authenticateUser(user1.nickname, "austrian", rt.token, function(err, newt) {
+                                            if (err) { // correct
+                                                cb(null, {user1: user1, user2: user2, rt: rt});
+                                            } else {
+                                                cb(new Error("Unexpected success"), null);
+                                            }
+                                        });
+                                    }
+                                }
+                            );
+                        },
+                        'it fails correctly': function(err, results) {
+                            assert.ifError(err);
+                        },
+                        teardown: function(results) {
+                            if (results && results.user1 && results.user1.del) {
+                                results.user1.del(function(err) {});
+                            }
+                            if (results && results.user2 && results.user2.del) {
+                                results.user2.del(function(err) {});
+                            }
+                            if (results && results.rt && results.rt.del) {
+                                results.rt.del(function(err) {});
+                            }
+                        }
+                    },
+                    'and we call authenticateUser with a good username and good password and an unused request token': {
+                        topic: function(provider) {
+                            var cb = this.callback,
+                                props = {consumer_key: testClient.consumer_key,
+                                         callback: 'http://example.com/callback/abc123/'},
+                                user,rt;
+                            
+                            Step(
+                                function() {
+                                    User.create({nickname: "quincy", password: "adams"}, this.parallel());
+                                    RequestToken.create(props, this.parallel());
+                                },
+                                function(err, res1, res2) {
+                                    if (err) {
+                                        cb(err, null);
+                                    } else {
+                                        user = res1;
+                                        rt = res2;
+                                        provider.authenticateUser(user.nickname, "adams", rt.token, function(err, newt) {
+                                            if (err) {
+                                                cb(err, null);
+                                            } else { // should succeed here
+                                                cb(null, {user: user, rt: rt, newt: newt});
+                                            }
+                                        });
+                                    }
+                                }
+                            );
+                        },
+                        'it works correctly': function(err, results) {
+                            assert.ifError(err);
+                            assert.equal(results.newt.token, results.rt.token);
+                        },
+                        teardown: function(results) {
+                            if (results && results.user && results.user.del) {
+                                results.user.del(function(err) {});
+                            }
+                            if (results && results.rt && results.rt.del) {
+                                results.rt.del(function(err) {});
+                            }
+                        }
                     }
                 }
             }
