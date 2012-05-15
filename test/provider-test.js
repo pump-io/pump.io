@@ -1247,10 +1247,10 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call associateTokenUser with an invalid username and an invalid token': {
+                'and we call associateTokenToUser with an invalid username and an invalid token': {
                     topic: function(provider) {
                         var cb = this.callback;
-                        provider.associateTokenUser("nonexistentuser", "badtoken", function(err, rt) {
+                        provider.associateTokenToUser("nonexistentuser", "badtoken", function(err, rt) {
                             if (err) { // correct
                                 cb(null);
                             } else {
@@ -1262,7 +1262,7 @@ vows.describe('provider module interface').addBatch({
                         assert.ifError(err);
                     }
                 },
-                'and we call associateTokenUser with a valid username and an invalid token': {
+                'and we call associateTokenToUser with a valid username and an invalid token': {
                     topic: function(provider) {
                         var cb = this.callback;
                         
@@ -1270,7 +1270,7 @@ vows.describe('provider module interface').addBatch({
                             if (err) {
                                 cb(err, null);
                             } else { 
-                                provider.associateTokenUser(user.nickname, "badtoken", function(err, newt) {
+                                provider.associateTokenToUser(user.nickname, "badtoken", function(err, newt) {
                                     if (err) { // should fail
                                         cb(null, user);
                                     } else {
@@ -1289,7 +1289,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call associateTokenUser with a invalid username and a valid token': {
+                'and we call associateTokenToUser with a invalid username and a valid token': {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
@@ -1299,7 +1299,7 @@ vows.describe('provider module interface').addBatch({
                             if (err) {
                                 cb(err, null);
                             } else {
-                                provider.associateTokenUser("nonexistentuser", rt.token, function(err, newt) {
+                                provider.associateTokenToUser("nonexistentuser", rt.token, function(err, newt) {
                                     if (err) {
                                         cb(null, rt);
                                     } else { // should succeed here
@@ -1318,7 +1318,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call associateTokenUser with a valid username and a used token': {
+                'and we call associateTokenToUser with a valid username and a used token': {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
@@ -1368,7 +1368,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call associateTokenUser with a valid username and an unused token': {
+                'and we call associateTokenToUser with a valid username and an unused token': {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
