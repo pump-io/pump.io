@@ -908,7 +908,7 @@ vows.describe('provider module interface').addBatch({
                                 } else if (!isNotReplay) {
                                     cb(new Error("Unexpected failure on first validation"), null);
                                 } else {
-                                    provider.validateNotReplay(at.access_token, ts, nonce, function(err, token) {
+                                    provider.validateNotReplay(at.access_token, ts, nonce, function(err, isNotReplay) {
                                         if (err) {
                                             cb(err, null);
                                         } else if (isNotReplay) {
