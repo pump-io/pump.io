@@ -28,7 +28,7 @@ var assert = require('assert'),
 var suite = vows.describe('access token interface');
 
 var testSchema = {
-    pkey: 'token',
+    pkey: 'access_token',
     fields: ['token_secret',
              'consumer_key',
              'username',
@@ -58,7 +58,7 @@ mb['When we require the accesstoken module']
   ['and we get its AccessToken class export']
   ['and we create an accesstoken instance']
   ['auto-generated fields are there'] = function(err, created) {
-      assert.isString(created.token);
+      assert.isString(created.access_token);
       assert.isString(created.token_secret);
       assert.isString(created.created);
       assert.isString(created.updated);
