@@ -1708,7 +1708,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it fails correctly': function(err) {
+                    'it fails correctly': function(err, rt) {
                         assert.ifError(err);
                     },
                     teardown: function(rt) {
