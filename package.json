@@ -2,7 +2,8 @@
     "name": "activity-pump",
     "version": "0.1.0dev",
     "devDependencies": {
-        "vows": "0.6.x"
+        "vows": "0.6.x",
+        "node-mocks-http": "0.x"
     },
     "dependencies": { "connect": "1.x",
 		      "connect-auth": "*",
