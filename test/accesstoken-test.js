@@ -31,10 +31,11 @@ var testSchema = {
     pkey: 'access_token',
     fields: ['token_secret',
              'consumer_key',
+             'request_token',
              'username',
              'created',
              'updated'],
-    indices: ['username', 'consumer_key']
+    indices: ['username', 'consumer_key', 'request_token']
 };
 
 var testData = {
