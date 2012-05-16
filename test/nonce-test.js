@@ -64,4 +64,56 @@ mb['When we require the nonce module']
 
 suite.addBatch(mb);
 
+var ACCESSTOKEN1 = "BBBBBBBBBBBBBBBBBBBBBB";
+var NONCE1 = "YYYYYY";
+var NONCE2 = "YYYYYZ";
+var ACCESSTOKEN2 = "CCCCCCCCCCCCCCCCCCCCCC";
+
+suite.addBatch({
+    "When we get the Nonce class": {
+        topic: function() {
+            return require("../lib/model/nonce").Nonce;
+        },
+        "it works": function(Nonce) {
+            assert.isFunction(Nonce);
+        },
+        "and we check if a brand-new nonce has been seen before": {
+            topic: function(Nonce) {
+                Nonce.seenBefore(ACCESSTOKEN1, NONCE1, this.callback);
+            },
+            "it has not": function(err, seen) {
+                assert.ifError(err);
+                assert.isFalse(seen);
+            },
+            "and we check if the same nonce has been seen again": {
+                topic: function(Nonce) {
+                    Nonce.seenBefore(ACCESSTOKEN1, NONCE1, this.callback);
+                },
+                "it has": function(err, seen) {
+                    assert.ifError(err);
+                    assert.isTrue(seen);
+                }
+            },
+            "and we check if the same nonce has been seen with a different token": {
+                topic: function(Nonce) {
+                    Nonce.seenBefore(ACCESSTOKEN2, NONCE1, this.callback);
+                },
+                "it has not": function(err, seen) {
+                    assert.ifError(err);
+                    assert.isFalse(seen);
+                }
+            },
+            "and we check if a different nonce has been seen with a the same token": {
+                topic: function(Nonce) {
+                    Nonce.seenBefore(ACCESSTOKEN1, NONCE2, this.callback);
+                },
+                "it has not": function(err, seen) {
+                    assert.ifError(err);
+                    assert.isFalse(seen);
+                }
+            }
+        }
+    }
+});
+
 suite.export(module);
