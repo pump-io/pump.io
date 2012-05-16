@@ -501,7 +501,7 @@ vows.describe('provider module interface').addBatch({
                             function(err, results) {
                                 if (err) throw err;
                                 at = results;
-                                provider.validToken(at.token, this);
+                                provider.validToken(at.access_token, this);
                             },
                             function(err, results) {
                                 if (err) {
@@ -727,7 +727,7 @@ vows.describe('provider module interface').addBatch({
                                 if (err) {
                                     cb(err, null);
                                 } else {
-                                    provider.validateNotReplay(at.token, ts, nonce, function(err, isNotReplay) {
+                                    provider.validateNotReplay(at.access_token, ts, nonce, function(err, isNotReplay) {
                                         if (err) {
                                             cb(err, null);
                                         } else if (isNotReplay) {
@@ -790,7 +790,7 @@ vows.describe('provider module interface').addBatch({
                                 if (err) {
                                     cb(err, null);
                                 } else {
-                                    provider.validateNotReplay(at.token, ts, nonce, function(err, isNotReplay) {
+                                    provider.validateNotReplay(at.access_token, ts, nonce, function(err, isNotReplay) {
                                         if (err) {
                                             cb(err, null);
                                         } else if (isNotReplay) {
@@ -852,7 +852,7 @@ vows.describe('provider module interface').addBatch({
                             function(err, results) {
                                 if (err) throw err;
                                 nonce = results;
-                                provider.validateNotReplay(at.token, ts, nonce, this);
+                                provider.validateNotReplay(at.access_token, ts, nonce, this);
                             },
                             function(err, isNotReplay) {
                                 if (err) {
@@ -860,7 +860,7 @@ vows.describe('provider module interface').addBatch({
                                 } else if (!isNotReplay) {
                                     cb(new Error("Unexpected failure on first validation"), null);
                                 } else {
-                                    provider.validateNotReplay(at.token, ts, nonce, function(err, token) {
+                                    provider.validateNotReplay(at.access_token, ts, nonce, function(err, token) {
                                         if (err) {
                                             cb(err, null);
                                         } else if (isNotReplay) {
@@ -923,7 +923,7 @@ vows.describe('provider module interface').addBatch({
                                 if (err) {
                                     cb(err, null);
                                 } else {
-                                    provider.validateNotReplay(at.token, ts, nonce, function(err, isNotReplay) {
+                                    provider.validateNotReplay(at.access_token, ts, nonce, function(err, isNotReplay) {
                                         if (err) {
                                             cb(err, null);
                                         } else if (!isNotReplay) {
@@ -1044,7 +1044,7 @@ vows.describe('provider module interface').addBatch({
                                     cb(err, null);
                                 } else {
                                     at = results;
-                                    provider.userIdByToken(at.token, function(err, userId) {
+                                    provider.userIdByToken(at.access_token, function(err, userId) {
                                         if (err) { // correct
                                             cb(err, null);
                                         } else {
