@@ -138,10 +138,58 @@ vows.describe('provider module interface').addBatch({
                 },
                 'and we use previousRequestToken() on a used token': {
                     topic: function(provider) {
-                        return false;
+                        var cb = this.callback,
+                            props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'},
+                            user, rt, at;
+
+                        Step(
+                            function() {
+                                User.create({nickname: "charlie", password: "hacker"}, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                user = results;
+                                RequestToken.create(props, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                rt = results;
+                                provider.associateTokenToUser(user.nickname, rt.token, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                provider.generateAccessToken(rt.token, this);
+                            },
+                            function(err, results) {
+                                if (err) {
+                                    cb(err, null);
+                                    return;
+                                }
+                                at = results;
+                                provider.previousRequestToken(rt.token, function(err, newt) {
+                                    if (err) {
+                                        cb(null, {user: user, rt: rt, at: at});
+                                    } else {
+                                        cb(new Error("Unexpected success"), null);
+                                    }
+                                });
+                            }
+                        );
                     },
-                    'it fails correctly': function(result) {
-                        assert.isTrue(result);
+                    'it fails correctly': function(err, results) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(results) {
+                        if (results && results.user && results.user.del) {
+                            results.user.del(ignore);
+                        }
+                        if (results && results.rt && results.rt.del) {
+                            results.rt.del(ignore);
+                        }
+                        if (results && results.at && results.at.del) {
+                            results.at.del(ignore);
+                        }
                     }
                 },
                 'and we use tokenByConsumer() on an unknown consumer key': {
