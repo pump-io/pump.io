@@ -1653,6 +1653,205 @@ vows.describe('provider module interface').addBatch({
                             results.at.del(ignore);
                         }
                     }
+                },
+                'and we use tokenByTokenAndConsumer() on an invalid token and invalid consumer key': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+                        provider.tokenByTokenAndConsumer("BADTOKEN", "BADCONSUMER", function(err, rt) {
+                            if (err) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we use tokenByTokenAndConsumer() on an invalid token and valid consumer key': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+                        provider.tokenByTokenAndConsumer("BADTOKEN", testClient.consumer_key, function(err, rt) {
+                            if (err) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we use tokenByTokenAndConsumer() on a valid token and invalid consumer key': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+                        var props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'};
+                        Step(
+                            function() {
+                                RequestToken.create(props, this);
+                            },
+                            function(err, rt) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    provider.tokenByTokenAndConsumer(rt.token, "BADCONSUMER", function(err, newt) {
+                                        if (err) {
+                                            cb(null, rt);
+                                        } else {
+                                            cb(new Error("Unexpected success"), null);
+                                        }
+                                    });
+                                }
+                            }
+                        );
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(rt) {
+                        if (rt && rt.del) {
+                            rt.del(ignore);
+                        }
+                    }
+                },
+                'and we use tokenByTokenAndConsumer() on a valid token and mismatched consumer key': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+                        var props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'};
+                        Step(
+                            function() {
+                                RequestToken.create(props, this.parallel());
+                                Client.create({title: "Another App", description: "Whatever"}, this.parallel());
+                            },
+                            function(err, rt, client) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    provider.tokenByTokenAndConsumer(rt.token, client.consumer_key, function(err, newt) {
+                                        if (err) {
+                                            cb(null, {rt: rt, client: client});
+                                        } else {
+                                            cb(new Error("Unexpected success"), null);
+                                        }
+                                    });
+                                }
+                            }
+                        );
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    },
+                    teardown: function(results) {
+                        if (results.rt && results.rt.del) {
+                            results.rt.del(ignore);
+                        }
+                        if (results.client && results.client.del) {
+                            results.client.del(ignore);
+                        }
+                    }
+                },
+                'and we use tokenByTokenAndConsumer() on a valid token and matching consumer key': {
+                    topic: function(provider) {
+                        var cb = this.callback, rt, client;
+
+                        Step(
+                            function() {
+                                Client.create({title: "Successful App", description: "Whatever"}, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                client = results;
+                                var props = {consumer_key: client.consumer_key,
+                                             callback: 'http://example.com/callback/abc123/'};
+                                RequestToken.create(props, this);
+                            },
+                            function(err, results) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    rt = results;
+                                    provider.tokenByTokenAndConsumer(rt.token, client.consumer_key, function(err, newt) {
+                                        if (err) {
+                                            cb(err, null);
+                                        } else {
+                                            cb(null, {rt: rt, client: client, newt: newt});
+                                        }
+                                    });
+                                }
+                            }
+                        );
+                    },
+                    'it works': function(err, results) {
+                        assert.ifError(err);
+                    },
+                    'it returns the correct token': function(err, results) {
+                        assert.equal(results.client.consumer_key, results.newt.consumer_key);
+                        assert.equal(results.rt.token, results.newt.token);
+                    },
+                    teardown: function(results) {
+                        if (results.rt && results.rt.del) {
+                            results.rt.del(ignore);
+                        }
+                        if (results.client && results.client.del) {
+                            results.client.del(ignore);
+                        }
+                    }
+                },
+                'and we use tokenByTokenAndConsumer() on a valid token and matching consumer key with multiple tokens': {
+                    topic: function(provider) {
+                        var cb = this.callback, rt1, rt2, client;
+
+                        Step(
+                            function() {
+                                Client.create({title: "Popular App", description: "Whatever"}, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                client = results;
+                                var props = {consumer_key: client.consumer_key,
+                                             callback: 'http://example.com/callback/abc123/'};
+                                RequestToken.create(props, this.parallel());
+                                RequestToken.create(props, this.parallel());
+                            },
+                            function(err, res1, res2) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    rt1 = res1;
+                                    rt2 = res2;
+                                    provider.tokenByTokenAndConsumer(rt1.token, client.consumer_key, function(err, newt) {
+                                        if (err) {
+                                            cb(err, null);
+                                        } else {
+                                            cb(null, {rt1: rt1, rt2: rt2, client: client, newt: newt});
+                                        }
+                                    });
+                                }
+                            }
+                        );
+                    },
+                    'it works': function(err, results) {
+                        assert.ifError(err);
+                    },
+                    'it returns the correct token': function(err, results) {
+                        assert.equal(results.client.consumer_key, results.newt.consumer_key);
+                        assert.equal(results.rt1.token, results.newt.token);
+                    },
+                    teardown: function(results) {
+                        if (results.rt1 && results.rt1.del) {
+                            results.rt1.del(ignore);
+                        }
+                        if (results.rt2 && results.rt2.del) {
+                            results.rt2.del(ignore);
+                        }
+                        if (results.client && results.client.del) {
+                            results.client.del(ignore);
+                        }
+                    }
                 }
             }
         }
