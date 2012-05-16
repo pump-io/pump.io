@@ -86,7 +86,7 @@ suite.addBatch({
                 assert.isFalse(seen);
             },
             "and we check if the same nonce has been seen again": {
-                topic: function(Nonce) {
+                topic: function(ignore, Nonce) {
                     Nonce.seenBefore(ACCESSTOKEN1, NONCE1, this.callback);
                 },
                 "it has": function(err, seen) {
@@ -95,7 +95,7 @@ suite.addBatch({
                 }
             },
             "and we check if the same nonce has been seen with a different token": {
-                topic: function(Nonce) {
+                topic: function(ignore, Nonce) {
                     Nonce.seenBefore(ACCESSTOKEN2, NONCE1, this.callback);
                 },
                 "it has not": function(err, seen) {
@@ -104,7 +104,7 @@ suite.addBatch({
                 }
             },
             "and we check if a different nonce has been seen with a the same token": {
-                topic: function(Nonce) {
+                topic: function(ignore, Nonce) {
                     Nonce.seenBefore(ACCESSTOKEN1, NONCE2, this.callback);
                 },
                 "it has not": function(err, seen) {
