@@ -25,6 +25,7 @@ var types = [
     'client',
     'requesttoken',
     'accesstoken',
+    'nonce',
     'edge',
     'usercount',
     'userlist',
