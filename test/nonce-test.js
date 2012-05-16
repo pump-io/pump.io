@@ -54,6 +54,14 @@ mb['When we require the nonce module']
       assert.isNumber(created.timestamp);
 };
 
+mb['When we require the nonce module']
+['and we get its Nonce class export']
+['and we create a nonce instance']
+['and we modify it']
+['it is modified'] = function(err, updated) {
+    assert.ifError(err);
+};
+
 suite.addBatch(mb);
 
 suite.export(module);
