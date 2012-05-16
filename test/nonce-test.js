@@ -103,7 +103,7 @@ suite.addBatch({
                     assert.isFalse(seen);
                 }
             },
-            "and we check if a different nonce has been seen with a the same token": {
+            "and we check if a different nonce has been seen with the same token": {
                 topic: function(ignore, Nonce) {
                     Nonce.seenBefore(ACCESSTOKEN1, NONCE2, this.callback);
                 },
