@@ -48,7 +48,7 @@ var mb = modelBatch('nonce', 'Nonce', testSchema, testData);
 
 mb['When we require the nonce module']
   ['and we get its Nonce class export']
-  ['and we create an nonce instance']
+  ['and we create a nonce instance']
   ['auto-generated fields are there'] = function(err, created) {
       assert.isString(created.token_nonce);
       assert.isString(created.timestamp);
