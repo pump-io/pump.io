@@ -17,16 +17,25 @@
 // limitations under the License.
 
 var assert = require('assert'),
-    vows = require('vows');
+    vows = require('vows'),
+    methodContext = require('./lib/methods').methodContext;
 
 vows.describe('middleware module interface').addBatch({
-    'When we check for a test suite': {
+    'When we require the middleware module': {
         topic: function() { 
-            return false;
+            return require('../lib/middleware');
         },
-        'there is one': function(tsExists) {
-            assert.isTrue(tsExists);
-        }
+        'there is one': function(mw) {
+            assert.isObject(mw);
+        },
+        'and we check its exports': methodContext(['reqUser',
+                                                   'sameUser',
+                                                   'maybeAuth',
+                                                   'mustAuth',
+                                                   'noUser',
+                                                   'getCurrentUser',
+                                                   'getSessionUser',
+                                                   'checkCredentials'])
     }
 }).export(module);
 
