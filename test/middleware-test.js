@@ -45,20 +45,26 @@ vows.describe('middleware module interface').addBatch({
 
             var db = Databank.get('memory', params);
 
-            db.connect({}, function(err) {
-                var mw;
-
-                DatabankObject.bank = db;
-
-                User.create({nickname: "robby", password: "kangaroo"}, function(err, user) {
+            Step(
+                function() {
+                    db.connect({}, this);
+                },
+                function(err) {
+                    if (err) throw err;
+                    DatabankObject.bank = db;
+                    User.create({nickname: "robby", password: "kangaroo"}, this.parallel());
+                    User.create({nickname: "maya", password: "mangopickle"}, this.parallel());
+                },
+                function(err, user1, user2) {
+                    var mw;
                     if (err) {
                         cb(err, null);
                     } else {
                         mw = require('../lib/middleware');
                         cb(null, mw);
                     }
-                });
-            });
+                }
+            );
         },
         'there is one': function(err, mw) {
             assert.ifError(err);
