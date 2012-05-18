@@ -53,7 +53,7 @@ vows.describe('middleware module interface').addBatch({
 
                 DatabankObject.bank = db;
 
-                mod = require('../lib/provider');
+                mod = require('../lib/middleware');
                 cb(null, mod);
             });
         },
