@@ -28,6 +28,8 @@ var assert = require('assert'),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
+var robby, maya;
+
 vows.describe('middleware module interface').addBatch({
 
     'When we load the module': {
@@ -60,6 +62,8 @@ vows.describe('middleware module interface').addBatch({
                     if (err) {
                         cb(err, null);
                     } else {
+                        robby = user1;
+                        maya = user2;
                         mw = require('../lib/middleware');
                         cb(null, mw);
                     }
@@ -159,6 +163,96 @@ vows.describe('middleware module interface').addBatch({
                 });
             },
             'it works': function(err) {
+                assert.ifError(err);
+            }
+        },
+        'and we use sameUser() with remoteUser but no user': {
+            topic: function(mw) {
+                var cb = this.callback,
+                    req = httpMocks.createRequest({method: 'get',
+                                                   url: '/api/user/',
+                                                   params: {},
+                                                   remoteUser: maya
+                                                  }),
+                    res = httpMocks.createResponse();
+                
+                mw.sameUser(req, res, function(err) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success!"));
+                    }
+                });
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        'and we use sameUser() with user but no remoteUser': {
+            topic: function(mw) {
+                var cb = this.callback,
+                    req = httpMocks.createRequest({method: 'get',
+                                                   url: '/api/user/robby',
+                                                   params: {nickname: "robby"},
+                                                   user: robby
+                                                  }),
+                    res = httpMocks.createResponse();
+                
+                mw.sameUser(req, res, function(err) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success!"));
+                    }
+                });
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        'and we use sameUser() with user not matching remoteUser': {
+            topic: function(mw) {
+                var cb = this.callback,
+                    req = httpMocks.createRequest({method: 'get',
+                                                   url: '/api/user/robby',
+                                                   params: {nickname: "robby"},
+                                                   user: robby,
+                                                   remoteUser: maya
+                                                  }),
+                    res = httpMocks.createResponse();
+                
+                mw.sameUser(req, res, function(err) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success!"));
+                    }
+                });
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        'and we use sameUser() with user matching remoteUser': {
+            topic: function(mw) {
+                var cb = this.callback,
+                    req = httpMocks.createRequest({method: 'get',
+                                                   url: '/api/user/robby',
+                                                   params: {nickname: "robby"},
+                                                   user: robby,
+                                                   remoteUser: robby
+                                                  }),
+                    res = httpMocks.createResponse();
+                
+                mw.sameUser(req, res, function(err) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success!"));
+                    }
+                });
+            },
+            'it fails correctly': function(err) {
                 assert.ifError(err);
             }
         }
