@@ -20,12 +20,9 @@ var assert = require('assert'),
     vows = require('vows'),
     databank = require('databank'),
     Step = require('step'),
+    httpMocks = require('http-mock'),
     schema = require('../lib/schema'),
     URLMaker = require('../lib/urlmaker').URLMaker,
-    randomString = require('../lib/randomstring').randomString,
-    Client = require('../lib/model/client').Client,
-    RequestToken = require('../lib/model/requesttoken').RequestToken,
-    AccessToken = require('../lib/model/accesstoken').AccessToken,
     User = require('../lib/model/user').User,
     methodContext = require('./lib/methods').methodContext,
     Databank = databank.Databank,
@@ -49,16 +46,23 @@ vows.describe('middleware module interface').addBatch({
             var db = Databank.get('memory', params);
 
             db.connect({}, function(err) {
-                var mod;
+                var mw;
 
                 DatabankObject.bank = db;
 
-                mod = require('../lib/middleware');
-                cb(null, mod);
+                User.create({nickname: "robby", password: "kangaroo"}, function(err, user) {
+                    if (err) {
+                        cb(err, null);
+                    } else {
+                        mw = require('../lib/middleware');
+                        cb(null, mw);
+                    }
+                });
             });
         },
-        'there is one': function(mod) {
-            assert.isObject(mod);
+        'there is one': function(err, mw) {
+            assert.ifError(err);
+            assert.isObject(mw);
         },
         'and we check its methods': methodContext(['maybeAuth',
                                                    'reqUser',
@@ -67,7 +71,91 @@ vows.describe('middleware module interface').addBatch({
                                                    'noUser',
                                                    'checkCredentials',
                                                    'getCurrentUser',
-                                                   'getSessionUser'])
+                                                   'getSessionUser']),
+        'and we use reqUser with no nickname param': {
+            topic: function(mw) {
+                var cb = this.callback,
+                    req = httpMocks.createRequest({method: 'get',
+                                                   url: '/api/user/',
+                                                   params: {}
+                                                  }),
+                    res = httpMocks.createResponse();
+                
+                mw.reqUser(req, res, function(err) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success!"));
+                    }
+                });
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        'and we use reqUser with an invalid nickname param': {
+            topic: function(mw) {
+                var cb = this.callback,
+                    req = httpMocks.createRequest({method: 'get',
+                                                   url: '/api/user/notanickname',
+                                                   params: {nickname: "notanickname"}
+                                                  }),
+                    res = httpMocks.createResponse();
+                
+                mw.reqUser(req, res, function(err) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success!"));
+                    }
+                });
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        'and we use reqUser with a nickname param only off by case': {
+            topic: function(mw) {
+                var cb = this.callback,
+                    req = httpMocks.createRequest({method: 'get',
+                                                   url: '/api/user/Robby',
+                                                   params: {nickname: "Robby"}
+                                                  }),
+                    res = httpMocks.createResponse();
+                
+                mw.reqUser(req, res, function(err) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success!"));
+                    }
+                });
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        'and we use reqUser with a valid nickname param': {
+            topic: function(mw) {
+                var cb = this.callback,
+                    req = httpMocks.createRequest({method: 'get',
+                                                   url: '/api/user/robby',
+                                                   params: {nickname: "robby"}
+                                                  }),
+                    res = httpMocks.createResponse();
+                
+                mw.reqUser(req, res, function(err) {
+                    if (err) {
+                        cb(err);
+                    } else {
+                        cb(null);
+                    }
+                });
+            },
+            'it works': function(err) {
+                assert.ifError(err);
+            }
+        }
     }
 }).export(module);
 
