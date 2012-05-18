@@ -29,7 +29,6 @@ var databank = require('databank'),
     URLMaker = require('../lib/urlmaker').URLMaker,
     reqUser = mw.reqUser,
     sameUser = mw.sameUser,
-    noUser = mw.noUser,
     NoSuchThingError = databank.NoSuchThingError,
     DEFAULT_ACTIVITIES = 20,
     DEFAULT_USERS = 20;
