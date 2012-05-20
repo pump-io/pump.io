@@ -33,10 +33,10 @@ var assert = require('assert'),
 
 var ignore = function(err) {};
 
-vows.describe('app module interface').addBatch({
+var suite = vows.describe('app module interface');
 
+suite.addBatch({
     'When we get the app module': {
-
         topic: function() { 
             return require('../lib/app');
         },
@@ -47,4 +47,28 @@ vows.describe('app module interface').addBatch({
             assert.isFunction(mod.makeApp);
         }
     }
-}).export(module);
+});
+
+suite.addBatch({
+    'When we makeApp()': {
+        topic: function() {
+            var config = {port: 4815,
+                          hostname: 'localhost',
+                          driver: 'memory',
+                          params: {}
+                         },
+                makeApp = require('../lib/app').makeApp;
+
+            makeApp(config, this.callback);
+        },
+        'it works': function(err, app) {
+            assert.ifError(err);
+            assert.isObject(app);
+        },
+        'app has the run() method': function(err, app) {
+            assert.isFunction(app.run);
+        }
+    }
+});
+
+suite.export(module);
