@@ -21,6 +21,7 @@ var databank = require('databank'),
     Step = require('step'),
     HTTPError = require('../lib/httperror').HTTPError,
     Activity = require('../lib/model/activity').Activity,
+    ActivityObject = require('../lib/model/activityobject').ActivityObject,
     User = require('../lib/model/user').User,
     Edge = require('../lib/model/edge').Edge,
     Stream = require('../lib/model/stream').Stream,
@@ -55,9 +56,9 @@ var addRoutes = function(app) {
     app.get('/api/user/:nickname/inbox', userAuth, reqUser, sameUser, userInbox);
     app.post('/api/user/:nickname/inbox', notYetImplemented);
 
-    for (i = 0; i < Activity.objectTypes.length; i++) {
+    for (i = 0; i < ActivityObject.objectTypes.length; i++) {
 
-        type = Activity.objectTypes[i];
+        type = ActivityObject.objectTypes[i];
 
         url = '/api/' + type + '/' + ':uuid';
 
