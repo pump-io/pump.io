@@ -47,4 +47,4 @@ vows.describe('app module interface').addBatch({
             assert.isFunction(mod.makeApp);
         }
     }
-});
+}).export(module);
