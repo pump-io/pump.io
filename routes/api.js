@@ -166,7 +166,7 @@ var userAuth = function(req, res, next) {
 
 var requester = function(type) {
 
-    var Cls = Activity.toClass(type);
+    var Cls = ActivityObject.toClass(type);
 
     return function(req, res, next) {
         Cls.search({'uuid': req.params.uuid}, function(err, results) {
