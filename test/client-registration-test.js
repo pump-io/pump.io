@@ -126,6 +126,26 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.equal(res.statusCode, 400);
                 }
+            },
+            'and we register to associate with an empty client description': {
+                topic: function() {
+                    httputil.post('localhost',
+                                  4815,
+                                  '/api/client/register',
+                                  {type: 'client_associate'},
+                                  this.callback);
+                },
+                'it works': function(err, res, body) {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 200);
+                },
+                'it has the right results': function(err, res, body) {
+                    var parsed = JSON.parse(body);
+                    assert.ifError(err);
+                    assert.include(parsed, 'client_id');
+                    assert.include(parsed, 'client_secret');
+                    assert.include(parsed, 'expires_at');
+                }
             }
         }
     }
