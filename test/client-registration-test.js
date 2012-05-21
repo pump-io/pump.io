@@ -110,6 +110,22 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.equal(res.statusCode, 400);
                 }
+            },
+            'and we register to associate with an access token set': {
+                topic: function() {
+                    httputil.post('localhost',
+                                  4815,
+                                  '/api/client/register',
+                                  {application_name: "I have a token!",
+                                   type: 'client_associate',
+                                   access_token: "SOMETOKEN"
+                                  },
+                                  this.callback);
+                },
+                'it fails correctly': function(err, res, body) {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 400);
+                }
             }
         }
     }
