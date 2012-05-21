@@ -161,10 +161,30 @@ suite.addBatch({
             regFail({application_name: "Bad Logo URL",
                         type: 'client_associate',
                         logo_url: "BAD URL"}),
+            'and we register to associate with a multiple logo URLs':
+            regFail({application_name: "Too many Logo URLs",
+                        type: 'client_associate',
+                        logo_url: "http://example.com/my-logo-url.jpg http://example.com/my-logo-url.jpg"}),
             'and we register to associate with a valid logo_url':
             regSucceed({application_name: "Good Logo URL",
                         type: 'client_associate',
-                        logo_url: "http://example.com/my-logo-url.jpg"})
+                        logo_url: "http://example.com/my-logo-url.jpg"}),
+            'and we register to associate with non-url redirect uri set':
+            regFail({application_name: "Bad Redirect",
+                     type: 'client_associate',
+                     redirect_uris: "validate"}),
+            'and we register to associate with bad separator in redirect_uris':
+            regFail({application_name: "Comma Redirect",
+                     type: 'client_associate',
+                     redirect_uris: "http://example.org/redirect,http://example.org/redirect2"}),
+            'and we register to associate with a single valid redirect_uri':
+            regSucceed({application_name: "One Redirect",
+                     type: 'client_associate',
+                     redirect_uris: "http://example.org/redirect"}),
+            'and we register to associate with multiple valid redirect_uris':
+            regSucceed({application_name: "Several Redirects",
+                        type: 'client_associate',
+                        redirect_uris: "http://example.org/redirect http://example.org/redirect2 http://example.org/redirect3"})
         }
     }
 });
