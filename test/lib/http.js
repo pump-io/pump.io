@@ -17,6 +17,7 @@
 // limitations under the License.
 
 var http = require('http'),
+    querystring = require('querystring'),
     _ = require('underscore');
 
 var options = function(host, port, path, callback) {
@@ -25,7 +26,10 @@ var options = function(host, port, path, callback) {
         host: host,
         port: port,
         path: path,
-        method: 'OPTIONS'
+        method: 'OPTIONS',
+        headers: {
+            'User-Agent': 'activitypump-test/0.1.0dev'
+        }
     };
 
     var req = http.request(reqOpts, function(res) {
@@ -53,4 +57,44 @@ var options = function(host, port, path, callback) {
     req.end();
 };
 
+var post = function(host, port, path, params, callback) {
+
+    var requestBody = querystring.stringify(params);
+
+    var reqOpts = {
+        host: host,
+        port: port,
+        path: path,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': requestBody.length,
+            'User-Agent': 'activitypump-test/0.1.0dev'
+        }
+    };
+
+    var req = http.request(reqOpts, function(res) {
+        var body = '';
+        res.setEncoding('utf8');
+        res.on('data', function(chunk) {
+            body = body + chunk;
+        });
+        res.on('error', function(err) {
+            callback(err, null, null);
+        });
+        res.on('end', function() {
+            callback(null, res, body);
+        });
+    });
+
+    req.on('error', function(err) {
+        callback(err, null, null);
+    });
+
+    req.write(requestBody);
+
+    req.end();
+};
+
 exports.options = options;
+exports.post = post;

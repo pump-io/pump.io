@@ -66,6 +66,19 @@ suite.addBatch({
             },
             'it supports POST': function(err, allow, res, body) {
                 assert.include(allow, 'POST');
+            },
+            'and we register with no type': {
+                topic: function() {
+                    httputil.post('localhost',
+                                  4815,
+                                  '/api/client/register',
+                                  {application_name: "Typeless"},
+                                  this.callback);
+                },
+                'it fails correctly': function(err, res, body) {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 400);
+                }
             }
         }
     }
