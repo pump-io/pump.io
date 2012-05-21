@@ -144,7 +144,19 @@ suite.addBatch({
             'and we register to associate with non-email contacts set':
             regFail({application_name: "Bad Contact",
                      type: 'client_associate',
-                     contacts: "http://example.com/contact-form"})
+                     contacts: "http://example.com/contact-form"}),
+            'and we register to associate with bad separator in contacts':
+            regFail({application_name: "Comma Contact",
+                     type: 'client_associate',
+                     contacts: "john@example.com,sue@example.net"}),
+            'and we register to associate with a single valid contact':
+            regSucceed({application_name: "One Contact",
+                     type: 'client_associate',
+                     contacts: "john@example.com"}),
+            'and we register to associate with multiple valid contacts':
+            regSucceed({application_name: "Several Contacts",
+                        type: 'client_associate',
+                        contacts: "john@example.com sue@example.net eric@example.com"})
         }
     }
 });
