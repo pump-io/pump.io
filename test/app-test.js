@@ -80,8 +80,9 @@ suite.addBatch({
                 });
             },
             'it works': function(err, app) {
+                var addr = app.address();
                 assert.ifError(err);
-                assert.equal(app.address().port, 4815);
+                assert.equal(addr.port, 4815);
             },
             teardown: function(app) {
                 app.close();
