@@ -140,7 +140,11 @@ suite.addBatch({
             regSucceed({application_name: "Native app",
                         type: 'client_associate',
                         application_type: "native"
-                       })
+                       }),
+            'and we register to associate with non-email contacts set':
+            regFail({application_name: "Bad Contact",
+                     type: 'client_associate',
+                     contacts: "http://example.com/contact-form"})
         }
     }
 });
