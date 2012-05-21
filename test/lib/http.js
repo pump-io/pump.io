@@ -28,7 +28,7 @@ var options = function(host, port, path, callback) {
         method: 'OPTIONS'
     };
 
-    var req = http.request(options, function(res) {
+    var req = http.request(reqOpts, function(res) {
         var body = '';
         res.setEncoding('utf8');
         res.on('data', function(chunk) {
