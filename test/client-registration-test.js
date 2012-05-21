@@ -24,7 +24,7 @@ var ignore = function(err) {};
 
 var suite = vows.describe('client registration API');
 
-var regFail = function(params) {
+var assocFail = function(params) {
     return {
         topic: function() {
             httputil.post('localhost',
@@ -40,7 +40,7 @@ var regFail = function(params) {
     };
 };
 
-var regSucceed = function(params) {
+var assocSucceed = function(params) {
     return {
         topic: function() {
             httputil.post('localhost',
@@ -106,85 +106,85 @@ suite.addBatch({
             'it supports POST': function(err, allow, res, body) {
                 assert.include(allow, 'POST');
             },
-            'and we register with no type': regFail({application_name: "Typeless"}),
+            'and we register with no type': assocFail({application_name: "Typeless"}),
             'and we register with an unknown type': 
-            regFail({application_name: "Frobnicator",
-                     type: 'client_frobnicate'
-                    }),
+            assocFail({application_name: "Frobnicator",
+                       type: 'client_frobnicate'
+                      }),
             'and we register to associate with a client ID already set': 
-            regFail({application_name: "Jump The Gun",
-                     type: 'client_associate',
-                     client_id: "I MADE IT MYSELF"
-                    }),
+            assocFail({application_name: "Jump The Gun",
+                       type: 'client_associate',
+                       client_id: "I MADE IT MYSELF"
+                      }),
             'and we register to associate with a client secret set': 
-            regFail({application_name: "Psst",
-                     type: 'client_associate',
-                     client_secret: "I hate corn."
-                    }),
+            assocFail({application_name: "Psst",
+                       type: 'client_associate',
+                       client_secret: "I hate corn."
+                      }),
             'and we register to associate with an unknown application type': 
-            regFail({application_name: "Scoodly",
-                     type: 'client_associate',
-                     application_type: "unknown"
-                    }),
+            assocFail({application_name: "Scoodly",
+                       type: 'client_associate',
+                       application_type: "unknown"
+                      }),
             'and we register to associate with an empty client description':
-            regSucceed({type: 'client_associate'}),
+            assocSucceed({type: 'client_associate'}),
             'and we register to associate with an application name':
-            regSucceed({application_name: "Valiant",
-                        type: 'client_associate'}),
+            assocSucceed({application_name: "Valiant",
+                          type: 'client_associate'}),
             'and we register to associate with application type web':
-            regSucceed({application_name: "Web app",
-                        type: 'client_associate',
-                        application_type: "web"
-                       }),
+            assocSucceed({application_name: "Web app",
+                          type: 'client_associate',
+                          application_type: "web"
+                         }),
             'and we register to associate with application type native':
-            regSucceed({application_name: "Native app",
-                        type: 'client_associate',
-                        application_type: "native"
-                       }),
+            assocSucceed({application_name: "Native app",
+                          type: 'client_associate',
+                          application_type: "native"
+                         }),
             'and we register to associate with non-email contacts set':
-            regFail({application_name: "Bad Contact",
-                     type: 'client_associate',
-                     contacts: "http://example.com/contact-form"}),
+            assocFail({application_name: "Bad Contact",
+                       type: 'client_associate',
+                       contacts: "http://example.com/contact-form"}),
             'and we register to associate with bad separator in contacts':
-            regFail({application_name: "Comma Contact",
-                     type: 'client_associate',
-                     contacts: "john@example.com,sue@example.net"}),
+            assocFail({application_name: "Comma Contact",
+                       type: 'client_associate',
+                       contacts: "john@example.com,sue@example.net"}),
             'and we register to associate with a single valid contact':
-            regSucceed({application_name: "One Contact",
-                     type: 'client_associate',
-                     contacts: "john@example.com"}),
+            assocSucceed({application_name: "One Contact",
+                          type: 'client_associate',
+                          contacts: "john@example.com"}),
             'and we register to associate with multiple valid contacts':
-            regSucceed({application_name: "Several Contacts",
-                        type: 'client_associate',
-                        contacts: "john@example.com sue@example.net eric@example.com"}),
+            assocSucceed({application_name: "Several Contacts",
+                          type: 'client_associate',
+                          contacts: "john@example.com sue@example.net eric@example.com"}),
             'and we register to associate with an invalid logo_url':
-            regFail({application_name: "Bad Logo URL",
-                        type: 'client_associate',
-                        logo_url: "BAD URL"}),
+            assocFail({application_name: "Bad Logo URL",
+                       type: 'client_associate',
+                       logo_url: "BAD URL"}),
             'and we register to associate with a multiple logo URLs':
-            regFail({application_name: "Too many Logo URLs",
-                        type: 'client_associate',
-                        logo_url: "http://example.com/my-logo-url.jpg http://example.com/my-logo-url.jpg"}),
+            assocFail({application_name: "Too many Logo URLs",
+                       type: 'client_associate',
+                       logo_url: "http://example.com/my-logo-url.jpg http://example.com/my-logo-url.jpg"}),
             'and we register to associate with a valid logo_url':
-            regSucceed({application_name: "Good Logo URL",
-                        type: 'client_associate',
-                        logo_url: "http://example.com/my-logo-url.jpg"}),
+            assocSucceed({application_name: "Good Logo URL",
+                          type: 'client_associate',
+                          logo_url: "http://example.com/my-logo-url.jpg"}),
             'and we register to associate with non-url redirect uri set':
-            regFail({application_name: "Bad Redirect",
-                     type: 'client_associate',
-                     redirect_uris: "validate"}),
+            assocFail({application_name: "Bad Redirect",
+                       type: 'client_associate',
+                       redirect_uris: "validate"}),
             'and we register to associate with bad separator in redirect_uris':
-            regFail({application_name: "Comma Redirect",
-                     type: 'client_associate',
-                     redirect_uris: "http://example.org/redirect,http://example.org/redirect2"}),
+            assocFail({application_name: "Comma Redirect",
+                       type: 'client_associate',
+                       redirect_uris: "http://example.org/redirect,http://example.org/redirect2"}),
             'and we register to associate with a single valid redirect_uri':
-            regSucceed({application_name: "One Redirect",
-                     type: 'client_associate',
-                     redirect_uris: "http://example.org/redirect"}),
+            assocSucceed({application_name: "One Redirect",
+                          type: 'client_associate',
+                          redirect_uris: "http://example.org/redirect"}),
             'and we register to associate with multiple valid redirect_uris':
-            regSucceed({application_name: "Several Redirects",
-                        type: 'client_associate',
-                        redirect_uris: "http://example.org/redirect http://example.org/redirect2 http://example.org/redirect3"})
+            assocSucceed({application_name: "Several Redirects",
+                          type: 'client_associate',
+                          redirect_uris: "http://example.org/redirect http://example.org/redirect2 http://example.org/redirect3"})
         }
     }
 });
