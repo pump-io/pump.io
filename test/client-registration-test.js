@@ -79,6 +79,21 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.equal(res.statusCode, 400);
                 }
+            },
+            'and we register with an unknown type': {
+                topic: function() {
+                    httputil.post('localhost',
+                                  4815,
+                                  '/api/client/register',
+                                  {application_name: "Frobnicator",
+                                   type: 'client_frobnicate'
+                                  },
+                                  this.callback);
+                },
+                'it fails correctly': function(err, res, body) {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 400);
+                }
             }
         }
     }
