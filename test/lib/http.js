@@ -52,3 +52,5 @@ var options = function(host, port, path, callback) {
 
     req.end();
 };
+
+exports.options = options;
