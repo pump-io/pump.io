@@ -111,14 +111,14 @@ suite.addBatch({
                     assert.equal(res.statusCode, 400);
                 }
             },
-            'and we register to associate with an access token set': {
+            'and we register to associate with a client secret set': {
                 topic: function() {
                     httputil.post('localhost',
                                   4815,
                                   '/api/client/register',
-                                  {application_name: "I have a token!",
+                                  {application_name: "Psst",
                                    type: 'client_associate',
-                                   access_token: "SOMETOKEN"
+                                   client_secret: "I hate corn."
                                   },
                                   this.callback);
                 },
