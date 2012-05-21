@@ -18,21 +18,61 @@
 
 var assert = require('assert'),
     vows = require('vows'),
+    Step = require('step'),
+    _ = require('underscore'),
     httputil = require('./lib/http');
 
 var ignore = function(err) {};
 
 var suite = vows.describe('client registration API');
 
+var assoc = function(params) {
+    return function() {
+        httputil.post('localhost',
+                      4815,
+                      '/api/client/register',
+                      params,
+                      this.callback);
+    };
+};
+
+var update = function(initial, params) {
+    return function() {
+        var cb = this.callback;
+        Step(
+            function() {
+                httputil.post('localhost',
+                              4815,
+                              '/api/client/register',
+                              initial,
+                              this);
+            },
+            function(err, res, body) {
+                if (err) throw err;
+                if (res.statusCode != 200) throw new Error("Bad assoc");
+                var reg = JSON.parse(body);
+                _.extend(params, {client_id: reg.client_id,
+                                  client_secret: reg.client_secret});
+                httputil.post('localhost',
+                              4815,
+                              '/api/client/register',
+                              params,
+                              this);
+            },
+            function(err, res, body) {
+                if (err) {
+                    cb(err, null, null);
+                } else {
+                    cb(null, res, body);
+                }
+            }
+        );
+    };
+};
+
 var assocFail = function(params) {
     return {
-        topic: function() {
-            httputil.post('localhost',
-                          4815,
-                          '/api/client/register',
-                          params,
-                          this.callback);
-        },
+        topic: assoc(params),
         'it fails correctly': function(err, res, body) {
             assert.ifError(err);
             assert.equal(res.statusCode, 400);
@@ -40,15 +80,36 @@ var assocFail = function(params) {
     };
 };
 
+var updateFail = function(initial, params) {
+    return {
+        topic: update(params),
+        'it fails correctly': function(err, res, body) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 400);
+        }
+    };
+};
+
+var updateSucceed = function(initial, params) {
+    return {
+        topic: update(params),
+        'it works': function(err, res, body) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 200);
+        },
+        'it has the right results': function(err, res, body) {
+            var parsed = JSON.parse(body);
+            assert.ifError(err);
+            assert.include(parsed, 'client_id');
+            assert.include(parsed, 'client_secret');
+            assert.include(parsed, 'expires_at');
+        }
+    };
+};
+
 var assocSucceed = function(params) {
     return {
-        topic: function() {
-            httputil.post('localhost',
-                          4815,
-                          '/api/client/register',
-                          params,
-                          this.callback);
-        },
+        topic: assoc(params),
         'it works': function(err, res, body) {
             assert.ifError(err);
             assert.equal(res.statusCode, 200);
