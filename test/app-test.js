@@ -67,6 +67,24 @@ suite.addBatch({
         },
         'app has the run() method': function(err, app) {
             assert.isFunction(app.run);
+        },
+        'and we app.run()': {
+            topic: function(app) {
+                var cb = this.callback;
+                app.run(function(err) {
+                    if (err) {
+                        cb(err, null);
+                    } else {
+                        cb(null, app);
+                    }
+                });
+            },
+            'it works': function(err) {
+                assert.ifError(err);
+            },
+            teardown: function(app) {
+                app.close();
+            }
         }
     }
 });
