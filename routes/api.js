@@ -568,6 +568,11 @@ var clientReg = function (req, res, next) {
         props.consumer_key = params.client_id;
     }
 
+    if (_(params).has('access_token')) {
+        next(new HTTPError("access_token not needed for registration.", 400));
+        return;
+    }
+
     if (_(params).has('client_secret')) {
         if (type !== 'client_update') {
             // XXX: log this
