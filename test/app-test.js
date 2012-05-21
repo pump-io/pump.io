@@ -81,6 +81,7 @@ suite.addBatch({
             },
             'it works': function(err, app) {
                 assert.ifError(err);
+                assert.equal(app.address().port, 4815);
             },
             teardown: function(app) {
                 app.close();
