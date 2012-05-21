@@ -19,6 +19,7 @@
 var databank = require('databank'),
     _ = require('underscore'),
     Step = require('step'),
+    check = require('validator').check,
     HTTPError = require('../lib/httperror').HTTPError,
     Activity = require('../lib/model/activity').Activity,
     ActivityObject = require('../lib/model/activityobject').ActivityObject,
@@ -584,6 +585,17 @@ var clientReg = function (req, res, next) {
 
     if (_(params).has('contacts')) {
         props.contacts = params.contacts.split(" ");
+        if (!props.contacts.every(function(contact) {
+                try {
+                    check(contact).isEmail();
+                    return true;
+                } catch (err) {
+                    return false;
+                }
+            })) {
+            next(new HTTPError("contacts must be space-separate email addresses.", 400));
+            return;
+        }
     }
 
     if (_(params).has('application_type')) {
