@@ -587,6 +587,10 @@ var clientReg = function (req, res, next) {
     }
 
     if (_(params).has('application_type')) {
+        if (params.application_type !== 'web' && params.application_type !== 'native') {
+            next(new HTTPError("Unknown application_type.", 400));
+            return;
+        }
         props.type = params.application_type;
     } else {
         props.type = null;
