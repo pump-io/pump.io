@@ -55,7 +55,8 @@ suite.addBatch({
             var config = {port: 4815,
                           hostname: 'localhost',
                           driver: 'memory',
-                          params: {}
+                          params: {},
+                          nologger: true
                          },
                 makeApp = require('../lib/app').makeApp;
 
