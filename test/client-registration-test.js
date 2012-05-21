@@ -94,6 +94,22 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.equal(res.statusCode, 400);
                 }
+            },
+            'and we register to associate with a client ID already set': {
+                topic: function() {
+                    httputil.post('localhost',
+                                  4815,
+                                  '/api/client/register',
+                                  {application_name: "Jump The Gun",
+                                   type: 'client_associate',
+                                   client_id: "I MADE IT MYSELF"
+                                  },
+                                  this.callback);
+                },
+                'it fails correctly': function(err, res, body) {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 400);
+                }
             }
         }
     }
