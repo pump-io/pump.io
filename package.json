@@ -19,7 +19,7 @@
                       "mime": "*",
                       "oauth": "*",
                       "optimist": "*",
-                      "api-easy": "0.2.x"
+                      "validator": "*"
 		    },
     "scripts": {
         "test": "vows test/*-test.js"
