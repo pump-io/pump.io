@@ -156,7 +156,15 @@ suite.addBatch({
             'and we register to associate with multiple valid contacts':
             regSucceed({application_name: "Several Contacts",
                         type: 'client_associate',
-                        contacts: "john@example.com sue@example.net eric@example.com"})
+                        contacts: "john@example.com sue@example.net eric@example.com"}),
+            'and we register to associate with an invalid logo_url':
+            regFail({application_name: "Bad Logo URL",
+                        type: 'client_associate',
+                        logo_url: "BAD URL"}),
+            'and we register to associate with a valid logo_url':
+            regSucceed({application_name: "Good Logo URL",
+                        type: 'client_associate',
+                        logo_url: "http://example.com/my-logo-url.jpg"})
         }
     }
 });
