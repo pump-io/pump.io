@@ -79,7 +79,7 @@ suite.addBatch({
                     }
                 });
             },
-            'it works': function(err) {
+            'it works': function(err, app) {
                 assert.ifError(err);
             },
             teardown: function(app) {
