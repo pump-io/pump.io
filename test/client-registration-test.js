@@ -24,6 +24,45 @@ var ignore = function(err) {};
 
 var suite = vows.describe('client registration API');
 
+var regFail = function(params) {
+    return {
+        topic: function() {
+            httputil.post('localhost',
+                          4815,
+                          '/api/client/register',
+                          params,
+                          this.callback);
+        },
+        'it fails correctly': function(err, res, body) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 400);
+        }
+    };
+};
+
+var regSucceed = function(params) {
+    return {
+        topic: function() {
+            httputil.post('localhost',
+                          4815,
+                          '/api/client/register',
+                          params,
+                          this.callback);
+        },
+        'it works': function(err, res, body) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 200);
+        },
+        'it has the right results': function(err, res, body) {
+            var parsed = JSON.parse(body);
+            assert.ifError(err);
+            assert.include(parsed, 'client_id');
+            assert.include(parsed, 'client_secret');
+            assert.include(parsed, 'expires_at');
+        }
+    };
+};
+
 suite.addBatch({
     'When we set up the app': {
         topic: function() {
@@ -67,86 +106,41 @@ suite.addBatch({
             'it supports POST': function(err, allow, res, body) {
                 assert.include(allow, 'POST');
             },
-            'and we register with no type': {
-                topic: function() {
-                    httputil.post('localhost',
-                                  4815,
-                                  '/api/client/register',
-                                  {application_name: "Typeless"},
-                                  this.callback);
-                },
-                'it fails correctly': function(err, res, body) {
-                    assert.ifError(err);
-                    assert.equal(res.statusCode, 400);
-                }
-            },
-            'and we register with an unknown type': {
-                topic: function() {
-                    httputil.post('localhost',
-                                  4815,
-                                  '/api/client/register',
-                                  {application_name: "Frobnicator",
-                                   type: 'client_frobnicate'
-                                  },
-                                  this.callback);
-                },
-                'it fails correctly': function(err, res, body) {
-                    assert.ifError(err);
-                    assert.equal(res.statusCode, 400);
-                }
-            },
-            'and we register to associate with a client ID already set': {
-                topic: function() {
-                    httputil.post('localhost',
-                                  4815,
-                                  '/api/client/register',
-                                  {application_name: "Jump The Gun",
-                                   type: 'client_associate',
-                                   client_id: "I MADE IT MYSELF"
-                                  },
-                                  this.callback);
-                },
-                'it fails correctly': function(err, res, body) {
-                    assert.ifError(err);
-                    assert.equal(res.statusCode, 400);
-                }
-            },
-            'and we register to associate with a client secret set': {
-                topic: function() {
-                    httputil.post('localhost',
-                                  4815,
-                                  '/api/client/register',
-                                  {application_name: "Psst",
-                                   type: 'client_associate',
-                                   client_secret: "I hate corn."
-                                  },
-                                  this.callback);
-                },
-                'it fails correctly': function(err, res, body) {
-                    assert.ifError(err);
-                    assert.equal(res.statusCode, 400);
-                }
-            },
-            'and we register to associate with an empty client description': {
-                topic: function() {
-                    httputil.post('localhost',
-                                  4815,
-                                  '/api/client/register',
-                                  {type: 'client_associate'},
-                                  this.callback);
-                },
-                'it works': function(err, res, body) {
-                    assert.ifError(err);
-                    assert.equal(res.statusCode, 200);
-                },
-                'it has the right results': function(err, res, body) {
-                    var parsed = JSON.parse(body);
-                    assert.ifError(err);
-                    assert.include(parsed, 'client_id');
-                    assert.include(parsed, 'client_secret');
-                    assert.include(parsed, 'expires_at');
-                }
-            }
+            'and we register with no type': regFail({application_name: "Typeless"}),
+            'and we register with an unknown type': 
+            regFail({application_name: "Frobnicator",
+                     type: 'client_frobnicate'
+                    }),
+            'and we register to associate with a client ID already set': 
+            regFail({application_name: "Jump The Gun",
+                     type: 'client_associate',
+                     client_id: "I MADE IT MYSELF"
+                    }),
+            'and we register to associate with a client secret set': 
+            regFail({application_name: "Psst",
+                     type: 'client_associate',
+                     client_secret: "I hate corn."
+                    }),
+            'and we register to associate with an unknown application type': 
+            regFail({application_name: "Scoodly",
+                     type: 'client_associate',
+                     application_type: "unknown"
+                    }),
+            'and we register to associate with an empty client description':
+            regSucceed({type: 'client_associate'}),
+            'and we register to associate with an application name':
+            regSucceed({application_name: "Valiant",
+                        type: 'client_associate'}),
+            'and we register to associate with application type web':
+            regSucceed({application_name: "Web app",
+                        type: 'client_associate',
+                        application_type: "web"
+                       }),
+            'and we register to associate with application type native':
+            regSucceed({application_name: "Native app",
+                        type: 'client_associate',
+                        application_type: "native"
+                       })
         }
     }
 });
