@@ -613,12 +613,28 @@ var clientReg = function (req, res, next) {
     }
 
     if (_(params).has('logo_url')) {
-        // XXX: copy logo?
-        props.logo_url = params.logo_url;
+        try {
+            check(params.logo_url).isUrl();
+            props.logo_url = params.logo_url;
+        } catch (e) {
+            next(new HTTPError("Invalid logo_url.", 400));
+            return;
+        }
     }
 
     if (_(params).has('redirect_uris')) {
         props.redirect_uris = params.redirect_uris.split(" ");
+        if (!props.redirect_uris.every(function(uri) {
+                try {
+                    check(uri).isUrl();
+                    return true;
+                } catch (err) {
+                    return false;
+                }
+            })) {
+            next(new HTTPError("redirect_uris must be space-separated URLs.", 400));
+            return;
+        }
     }
 
     if (type === 'client_associate') {
