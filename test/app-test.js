@@ -80,8 +80,10 @@ suite.addBatch({
                 });
             },
             'it works': function(err, app) {
-                var addr = app.address();
                 assert.ifError(err);
+            },
+            'app is listening on correct port': function(err, app) {
+                var addr = app.address();
                 assert.equal(addr.port, 4815);
             },
             teardown: function(app) {
