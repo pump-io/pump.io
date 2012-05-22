@@ -49,7 +49,7 @@ var update = function(initial, params) {
             },
             function(err, res, body) {
                 if (err) throw err;
-                if (res.statusCode != 200) throw new Error("Bad assoc");
+                if (res.statusCode !== 200) throw new Error("Bad assoc");
                 var reg = JSON.parse(body);
                 _.extend(params, {client_id: reg.client_id,
                                   client_secret: reg.client_secret});
