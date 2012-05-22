@@ -346,7 +346,13 @@ suite.addBatch({
                     assert.ifError(err);
                 }
             }
-        }
+        },
+        'and we update with the right client information':
+        updateSucceed({type: "client_associate",
+                       application_name: "Good update"},
+                      {type: "client_update",
+                       application_name: "Good update",
+                       application_type: "native"})
     }
 });
 
