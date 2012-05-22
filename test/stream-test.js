@@ -312,6 +312,15 @@ suite.addBatch({
                 for (i = 0; i < 500; i++) {
                     assert.lengthOf(chunks[i], 20);
                 }
+            },
+            "there are no duplicates": function(err, chunks) {
+                var i, j, seen = {};
+                for (i = 0; i < chunks.length; i++) {
+                    for (j = 0; j < chunks[i].length; j++) {
+                        assert.isUndefined(seen[chunks[i][j].id]);
+                        seen[chunks[i][j].id] = true;
+                    }
+                }
             }
         },
         "and we get all the activities in big chunks": {
@@ -341,6 +350,15 @@ suite.addBatch({
                 assert.lengthOf(chunks, 20);
                 for (i = 0; i < 20; i++) {
                     assert.lengthOf(chunks[i], 500);
+                }
+            },
+            "there are no duplicates": function(err, chunks) {
+                var i, j, seen = {};
+                for (i = 0; i < chunks.length; i++) {
+                    for (j = 0; j < chunks[i].length; j++) {
+                        assert.isUndefined(seen[chunks[i][j].id]);
+                        seen[chunks[i][j].id] = true;
+                    }
                 }
             }
         },
@@ -372,6 +390,15 @@ suite.addBatch({
                 for (i = 0; i < 10000; i++) {
                     assert.lengthOf(chunks[i], 1);
                 }
+            },
+            "there are no duplicates": function(err, chunks) {
+                var i, j, seen = {};
+                for (i = 0; i < chunks.length; i++) {
+                    for (j = 0; j < chunks[i].length; j++) {
+                        assert.isUndefined(seen[chunks[i][j].id]);
+                        seen[chunks[i][j].id] = true;
+                    }
+                }
             }
         },
         "and we get all the activities at once": {
@@ -384,6 +411,13 @@ suite.addBatch({
             },
             "results have right size": function(err, chunk) {
                 assert.lengthOf(chunk, 10000);
+            },
+            "there are no duplicates": function(err, chunk) {
+                var i, seen = {};
+                for (i = 0; i < chunk.length; i++) {
+                    assert.isUndefined(seen[chunk[i].id]);
+                    seen[chunk[i].id] = true;
+                }
             }
         }
     }
