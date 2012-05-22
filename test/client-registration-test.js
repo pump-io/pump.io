@@ -430,8 +430,7 @@ suite.addBatch({
         'and we update with multiple valid redirect_uris':
         updateSucceed({type: 'client_associate'},
                       {type: 'client_update',
-                       redirect_uris: "http://example.org/redirect http://example.org/redirect2 http://example.org/redirect3"}),
-
+                       redirect_uris: "http://example.org/redirect http://example.org/redirect2 http://example.org/redirect3"})
     }
 });
 
