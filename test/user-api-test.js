@@ -70,6 +70,30 @@ suite.addBatch({
             'it supports POST': function(err, allow, res, body) {
                 assert.include(allow, 'GET');
             }
+        },
+        'and we create a client using the api': {
+            topic: function() {
+                var cb = this.callback;
+                httputil.post('localhost', 4815, '/api/client/register', {type: 'client_associate'}, function(err, res, body) {
+                    var cl;
+                    if (err) {
+                        cb(err, null);
+                    } else {
+                        try {
+                            cl = JSON.parse(body);
+                            cb(null, cl);
+                        } catch (err) {
+                            cb(err, null);
+                        }
+                    }
+                });
+            },
+            'it works': function(err, cl) {
+                assert.ifError(err);
+                assert.isObject(cl);
+                assert.isString(cl.client_id);
+                assert.isString(cl.client_secret);
+            }
         }
     }
 });
