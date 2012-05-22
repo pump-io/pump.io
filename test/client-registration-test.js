@@ -352,7 +352,86 @@ suite.addBatch({
                        application_name: "Good update"},
                       {type: "client_update",
                        application_name: "Good update",
-                       application_type: "native"})
+                       application_type: "native"}),
+        'and we update with a new client title':
+        updateSucceed({type: "client_associate",
+                       application_name: "Original title"},
+                      {type: "client_update",
+                       application_name: "Updated title"}),
+        'and we update with an unknown application type': 
+        updateFail({type: "client_associate",
+                    application_name: "Unknown app type"},
+                   {application_name: "Unknown app type",
+                    type: 'client_associate',
+                    application_type: "unknown"
+                   }),
+        'and we update with an empty client description':
+        updateSucceed({type: 'client_associate'},
+                      {type: 'client_update'}),
+        'and we update with an application name':
+        updateSucceed({type: 'client_associate'},
+                      {application_name: "Valiant",
+                      type: 'client_update'}),
+        'and we update with application type web':
+        updateSucceed({type: 'client_associate'},
+                      {application_name: "Web app",
+                      type: 'client_update',
+                      application_type: "web"
+                     }),
+        'and we update with application type native':
+        updateSucceed({type: 'client_associate'},
+                      {application_name: "Native app",
+                      type: 'client_update',
+                      application_type: "native"
+                     }),
+        'and we update with non-email contacts set':
+        updateFail({type: 'client_associate'},
+                   {type: 'client_update',
+                    contacts: "http://example.com/contact-form"}),
+        'and we update with bad separator in contacts':
+        updateFail({type: 'client_associate'},
+                   {type: 'client_update',
+                    contacts: "john@example.com,sue@example.net"}),
+        'and we update with a single valid contact':
+        updateSucceed({type: 'client_associate'},
+                      {type: 'client_update',
+                       contacts: "john@example.com"}),
+        'and we update with multiple valid contacts':
+        updateSucceed({type: 'client_associate'},
+                      {application_name: "Several Contacts",
+                       type: 'client_update',
+                       contacts: "john@example.com sue@example.net eric@example.com"}),
+        'and we update with an invalid logo_url':
+        updateFail({type: 'client_associate'},
+                   {type: 'client_update',
+                    logo_url: "BAD URL"}),
+        'and we update with a multiple logo URLs':
+        updateFail({type: 'client_associate'},
+                   {application_name: "Too many Logo URLs Update",
+                    type: 'client_update',
+                    logo_url: "http://example.com/my-logo-url.jpg http://example.com/my-logo-url.jpg"}),
+        'and we update with a valid logo_url':
+        updateSucceed({type: 'client_associate'},
+                      {application_name: "Good Logo URL Update",
+                       type: 'client_update',
+                       logo_url: "http://example.com/my-logo-url.jpg"}),
+        'and we update with non-url redirect uri set':
+        updateFail({type: 'client_associate'},
+                   {type: 'client_update',
+                    redirect_uris: "validate"}),
+        'and we update with bad separator in redirect_uris':
+        updateFail({type: 'client_associate'},
+                   {type: 'client_update',
+                    redirect_uris: "http://example.org/redirect,http://example.org/redirect2"}),
+        'and we update with a single valid redirect_uri':
+        updateSucceed({type: 'client_associate'},
+                      {type: 'client_update',
+                       redirect_uris: "http://example.org/redirect"}),
+        'and we update with multiple valid redirect_uris':
+        updateSucceed({type: 'client_associate'},
+                      {type: 'client_update',
+                       redirect_uris: "http://example.org/redirect http://example.org/redirect2 http://example.org/redirect3"}),
+
     }
 });
 
