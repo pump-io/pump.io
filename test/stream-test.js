@@ -308,9 +308,9 @@ suite.addBatch({
             },
             "results have right size": function(err, chunks) {
                 var i;
-                assert.length(chunks, 500);
+                assert.lengthOf(chunks, 500);
                 for (i = 0; i < 500; i++) {
-                    assert.length(chunks[i], 20);
+                    assert.lengthOf(chunks[i], 20);
                 }
             }
         },
@@ -338,9 +338,9 @@ suite.addBatch({
             },
             "results have right size": function(err, chunks) {
                 var i;
-                assert.length(chunks, 20);
+                assert.lengthOf(chunks, 20);
                 for (i = 0; i < 20; i++) {
-                    assert.length(chunks[i], 500);
+                    assert.lengthOf(chunks[i], 500);
                 }
             }
         },
@@ -368,9 +368,9 @@ suite.addBatch({
             },
             "results have right size": function(err, chunks) {
                 var i;
-                assert.length(chunks, 10000);
+                assert.lengthOf(chunks, 10000);
                 for (i = 0; i < 10000; i++) {
-                    assert.length(chunks[i], 1);
+                    assert.lengthOf(chunks[i], 1);
                 }
             }
         },
@@ -383,7 +383,7 @@ suite.addBatch({
                 assert.ifError(err);
             },
             "results have right size": function(err, chunk) {
-                assert.length(chunk, 10000);
+                assert.lengthOf(chunk, 10000);
             }
         }
     }
