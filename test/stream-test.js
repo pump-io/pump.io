@@ -19,6 +19,7 @@
 var assert = require('assert'),
     vows = require('vows'),
     databank = require('databank'),
+    Step = require('step'),
     URLMaker = require('../lib/urlmaker').URLMaker,
     modelBatch = require('./lib/model').modelBatch,
     schema = require('../lib/schema').schema,
@@ -175,6 +176,88 @@ suite.addBatch({
                     }
                 }
             }
+        }
+    }
+});
+
+suite.addBatch({
+    'When we deliver a lot of activities to a stream': {
+        topic: function() {
+            var cb = this.callback,
+                Activity = require('../lib/model/activity').Activity,
+                actor = {
+                    id: "urn:uuid:c484d84e-6afa-4c51-ac9a-f8738d48569c",
+                    displayName: "Counter",
+                    objectType: "service"
+                };
+
+            // Need this to make IDs
+
+            URLMaker.hostname = "example.net";
+
+            // Dummy databank
+
+            var params = {schema: schema};
+
+            var db = Databank.get('memory', params);
+
+            var stream = null;
+
+            Step(
+                function() {
+                    db.connect({}, this);
+                },
+                function(err) {
+                    if (err) throw err;
+
+                    DatabankObject.bank = db;
+                
+                    var Stream = require('../lib/model/stream').Stream;
+
+                    Stream.create({name: 'scale-test'}, this);
+                },
+                function(err, results) {
+                    var i, act, group = this.group();
+                    if (err) throw err;
+                    stream = results;
+                    var addNew = function(act, callback) {
+                        Activity.create(act, function(err, results) {
+                            if (err) {
+                                callback(err, null);
+                            } else {
+                                stream.deliver(results, function(err) {
+                                    if (err) {
+                                        callback(err, null);
+                                    } else {
+                                        callback(err, results);
+                                    }
+                                });
+                            }
+                        });
+                    };
+                    for (i = 0; i < 10000; i++) {
+                        act = {actor: actor,
+                               verb: "post",
+                               object: {
+                                   objectType: "note",
+                                   content: "Note #" + i
+                               }
+                              };
+                        addNew(act, group());
+                    }
+                },
+                function(err, activities) {
+                    if (err) {
+                        cb(err, null);
+                    } else {
+                        cb(err, stream);
+                    }
+                }
+            );
+        },
+        'it works': function(err, stream) {
+            assert.ifError(err);
+            assert.isObject(stream);
         }
     }
 });
