@@ -291,7 +291,7 @@ suite.addBatch({
                     function() {
                         var i, group = this.group();
                         for (i = 0; i < 500; i++) { 
-                            stream.getActivities(i * 20, (i+1)*20 - 1, group());
+                            stream.getActivities(i * 20, (i+1)*20, group());
                         }
                     },
                     function(err, chunks) {
@@ -321,7 +321,7 @@ suite.addBatch({
                     function() {
                         var i, group = this.group();
                         for (i = 0; i < 20; i++) { 
-                            stream.getActivities(i * 500, (i+1)*500 - 1, group());
+                            stream.getActivities(i * 500, (i+1)*500, group());
                         }
                     },
                     function(err, chunks) {
@@ -351,7 +351,7 @@ suite.addBatch({
                     function() {
                         var i, group = this.group();
                         for (i = 0; i < 10000; i++) { 
-                            stream.getActivities(i, i, group());
+                            stream.getActivities(i, i+1, group());
                         }
                     },
                     function(err, chunks) {
@@ -377,7 +377,7 @@ suite.addBatch({
         "and we get all the activities at once": {
             topic: function(stream) {
                 var cb = this.callback;
-                stream.getActivities(0, 9999, cb);
+                stream.getActivities(0, 10000, cb);
             },
             "it works": function(err, chunk) {
                 assert.ifError(err);
