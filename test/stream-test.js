@@ -284,14 +284,14 @@ suite.addBatch({
                 assert.equal(cnt, 10000);
             }
         },
-        "and we get all the activities": {
+        "and we get all the activities in little chunks": {
             topic: function(stream) {
                 var cb = this.callback;
                 Step(
                     function() {
                         var i, group = this.group();
                         for (i = 0; i < 500; i++) { 
-                            stream.getActivities(i * 20, (i+1)*20, group());
+                            stream.getActivities(i * 20, (i+1)*20 - 1, group());
                         }
                     },
                     function(err, chunks) {
@@ -311,6 +311,36 @@ suite.addBatch({
                 assert.length(chunks, 500);
                 for (i = 0; i < 500; i++) {
                     assert.length(chunks[i], 20);
+                }
+            }
+        },
+        "and we get all the activities in big chunks": {
+            topic: function(stream) {
+                var cb = this.callback;
+                Step(
+                    function() {
+                        var i, group = this.group();
+                        for (i = 0; i < 20; i++) { 
+                            stream.getActivities(i * 500, (i+1)*500 - 1, group());
+                        }
+                    },
+                    function(err, chunks) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, chunks);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, chunks) {
+                assert.ifError(err);
+            },
+            "results have right size": function(err, chunks) {
+                var i;
+                assert.length(chunks, 20);
+                for (i = 0; i < 20; i++) {
+                    assert.length(chunks[i], 500);
                 }
             }
         }
