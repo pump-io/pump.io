@@ -253,8 +253,94 @@ suite.addBatch({
                                   '/api/client/register',
                                   {application_name: "Not Yet Associated",
                                    type: 'client_update',
-                                   client_id: "IMADETHISUP"},
+                                   client_id: "IMADETHISUP",
+                                   client_secret: "MADEUPTHISTOO"},
                                   this.callback);
+                },
+                'it fails correctly': function(err, res, body) {
+                    assert.ifError(err);
+                }
+            },
+            'and we update with no client_secret': {
+                topic: function() {
+                    var cb = this.callback;
+                    Step(
+                        function() {
+                            httputil.post('localhost',
+                                          4815,
+                                          '/api/client/register',
+                                          {
+                                              application_name: 'No Secret',
+                                              type: 'client_associate'
+                                          },
+                                          this);
+                        },
+                        function(err, res, body) {
+                            if (err) throw err;
+                            if (res.statusCode != 200) throw new Error("Bad assoc");
+                            var reg = JSON.parse(body);
+                            httputil.post('localhost',
+                                          4815,
+                                          '/api/client/register',
+                                          {
+                                              application_name: 'No Secret',
+                                              logo_url: 'http://example.com/my-logo-url.jpg',
+                                              type: 'client_update',
+                                              client_id: reg.client_id
+                                          },
+                                          this);
+                        },
+                        function(err, res, body) {
+                            if (err) {
+                                cb(err, null, null);
+                            } else {
+                                cb(null, res, body);
+                            }
+                        }
+                    );
+                },
+                'it fails correctly': function(err, res, body) {
+                    assert.ifError(err);
+                }
+            },
+            'and we update with the wrong client_secret': {
+                topic: function() {
+                    var cb = this.callback;
+                    Step(
+                        function() {
+                            httputil.post('localhost',
+                                          4815,
+                                          '/api/client/register',
+                                          {
+                                              application_name: 'Wrong Secret',
+                                              type: 'client_associate'
+                                          },
+                                          this);
+                        },
+                        function(err, res, body) {
+                            if (err) throw err;
+                            if (res.statusCode != 200) throw new Error("Bad assoc");
+                            var reg = JSON.parse(body);
+                            httputil.post('localhost',
+                                          4815,
+                                          '/api/client/register',
+                                          {
+                                              application_name: 'Wrong Secret',
+                                              logo_url: 'http://example.com/my-logo-url.jpg',
+                                              type: 'client_update',
+                                              client_id: reg.client_id,
+                                              client_secret: 'SOMECRAP'
+                                          },
+                                          this);
+                        },
+                        function(err, res, body) {
+                            if (err) {
+                                cb(err, null, null);
+                            } else {
+                                cb(null, res, body);
+                            }
+                        }
+                    );
                 },
                 'it fails correctly': function(err, res, body) {
                     assert.ifError(err);
