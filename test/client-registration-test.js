@@ -51,8 +51,8 @@ var update = function(initial, params) {
                 if (err) throw err;
                 if (res.statusCode !== 200) throw new Error("Bad assoc");
                 var reg = JSON.parse(body);
-                _.extend(params, {client_id: reg.client_id,
-                                  client_secret: reg.client_secret});
+                params = _.extend(params, {client_id: reg.client_id,
+                                           client_secret: reg.client_secret});
                 httputil.post('localhost',
                               4815,
                               '/api/client/register',
