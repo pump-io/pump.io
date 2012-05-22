@@ -291,7 +291,7 @@ suite.addBatch({
                     function() {
                         var i, group = this.group();
                         for (i = 0; i < 500; i++) { 
-                            stream.getActivities(i * 20, 20, group());
+                            stream.getActivities(i * 20, (i+1)*20, group());
                         }
                     },
                     function(err, chunks) {
