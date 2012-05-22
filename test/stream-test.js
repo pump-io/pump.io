@@ -419,6 +419,63 @@ suite.addBatch({
                     seen[chunk[i].id] = true;
                 }
             }
+        },
+        "and we try to get activities starting at a negative number": {
+            topic: function(stream) {
+                var cb = this.callback;
+                stream.getActivities(-10, 20, function(err, activities) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success!"));
+                    }
+                });
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        "and we try to get activities ending at a negative number": {
+            topic: function(stream) {
+                var cb = this.callback;
+                stream.getActivities(10, -20, function(err, activities) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success!"));
+                    }
+                });
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        "and we try to get activities with start after the end": {
+            topic: function(stream) {
+                var cb = this.callback;
+                stream.getActivities(110, 100, function(err, activities) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success!"));
+                    }
+                });
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        "and we try to get activities start and end equal": {
+            topic: function(stream) {
+                var cb = this.callback;
+                stream.getActivities(50, 50, cb);
+            },
+            'it works': function(err, results) {
+                assert.ifError(err);
+            },
+            'results are empty': function(err, results) {
+                assert.isEmpty(results);
+            }
         }
     }
 });
