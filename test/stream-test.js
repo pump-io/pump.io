@@ -283,6 +283,36 @@ suite.addBatch({
             "it gives the right value (10000)": function(err, cnt) {
                 assert.equal(cnt, 10000);
             }
+        },
+        "and we get all the activities": {
+            topic: function(stream) {
+                var cb = this.callback;
+                Step(
+                    function() {
+                        var i, group = this.group();
+                        for (i = 0; i < 500; i++) { 
+                            stream.getActivities(i * 20, 20, group());
+                        }
+                    },
+                    function(err, chunks) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, chunks);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, chunks) {
+                assert.ifError(err);
+            },
+            "results have right size": function(err, chunks) {
+                var i;
+                assert.length(chunks, 500);
+                for (i = 0; i < 500; i++) {
+                    assert.length(chunks[i], 20);
+                }
+            }
         }
     }
 });
