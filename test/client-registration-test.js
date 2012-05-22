@@ -245,7 +245,21 @@ suite.addBatch({
             'and we register to associate with multiple valid redirect_uris':
             assocSucceed({application_name: "Several Redirects",
                           type: 'client_associate',
-                          redirect_uris: "http://example.org/redirect http://example.org/redirect2 http://example.org/redirect3"})
+                          redirect_uris: "http://example.org/redirect http://example.org/redirect2 http://example.org/redirect3"}),
+            'and we try to update without associating first': {
+                topic: function() {
+                    httputil.post('localhost',
+                                  4815,
+                                  '/api/client/register',
+                                  {application_name: "Not Yet Associated",
+                                   type: 'client_update',
+                                   client_id: "IMADETHISUP"},
+                                  this.callback);
+                },
+                'it fails correctly': function(err, res, body) {
+                    assert.ifError(err);
+                }
+            }
         }
     }
 });
