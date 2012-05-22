@@ -129,6 +129,9 @@ suite.addBatch({
         'it has a getActivities() method': function(err, stream) {
             assert.isFunction(stream.getActivities);
         },
+        'it has a count() method': function(err, stream) {
+            assert.isFunction(stream.count);
+        },
         'and we create a single activity': {
             topic: function(stream) {
                 var Activity = require('../lib/model/activity').Activity,
@@ -173,6 +176,17 @@ suite.addBatch({
                         assert.isTrue(activities.some(function(item) {
                             return item.id == act1.id;
                         }));
+                    }
+                },
+                "and we count the stream's activities": {
+                    topic: function(activity, stream) {
+                        stream.count(this.callback);
+                    },
+                    'it works': function(err, cnt) {
+                        assert.ifError(err);
+                    },
+                    'it has the right value (1)': function(err, cnt) {
+                        assert.equal(cnt, 1);
                     }
                 }
             }
