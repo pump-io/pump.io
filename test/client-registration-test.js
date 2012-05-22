@@ -82,7 +82,7 @@ var assocFail = function(params) {
 
 var updateFail = function(initial, params) {
     return {
-        topic: update(params),
+        topic: update(initial, params),
         'it fails correctly': function(err, res, body) {
             assert.ifError(err);
             assert.equal(res.statusCode, 400);
@@ -92,7 +92,7 @@ var updateFail = function(initial, params) {
 
 var updateSucceed = function(initial, params) {
     return {
-        topic: update(params),
+        topic: update(initial, params),
         'it works': function(err, res, body) {
             assert.ifError(err);
             assert.equal(res.statusCode, 200);
