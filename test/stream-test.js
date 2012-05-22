@@ -343,6 +343,48 @@ suite.addBatch({
                     assert.length(chunks[i], 500);
                 }
             }
+        },
+        "and we get all the activities one at a time": {
+            topic: function(stream) {
+                var cb = this.callback;
+                Step(
+                    function() {
+                        var i, group = this.group();
+                        for (i = 0; i < 10000; i++) { 
+                            stream.getActivities(i, i, group());
+                        }
+                    },
+                    function(err, chunks) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, chunks);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, chunks) {
+                assert.ifError(err);
+            },
+            "results have right size": function(err, chunks) {
+                var i;
+                assert.length(chunks, 10000);
+                for (i = 0; i < 10000; i++) {
+                    assert.length(chunks[i], 1);
+                }
+            }
+        },
+        "and we get all the activities at once": {
+            topic: function(stream) {
+                var cb = this.callback;
+                stream.getActivities(0, 9999, cb);
+            },
+            "it works": function(err, chunk) {
+                assert.ifError(err);
+            },
+            "results have right size": function(err, chunk) {
+                assert.length(chunk, 10000);
+            }
         }
     }
 });
