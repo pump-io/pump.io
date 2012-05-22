@@ -272,6 +272,17 @@ suite.addBatch({
         'it works': function(err, stream) {
             assert.ifError(err);
             assert.isObject(stream);
+        },
+        "and we count the number of elements": {
+            topic: function(stream) {
+                stream.count(this.callback);
+            },
+            "it works": function(err, cnt) {
+                assert.ifError(err);
+            },
+            "it gives the right value (10000)": function(err, cnt) {
+                assert.equal(cnt, 10000);
+            }
         }
     }
 });
