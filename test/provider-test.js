@@ -89,7 +89,7 @@ vows.describe('provider module interface').addBatch({
                                                            'fetchAuthorizationInformation',
                                                            'validToken',
                                                            'tokenByTokenAndVerifier',
-                                                           'validateNotReplay',
+                                                           'validateNotReplayClient',
                                                            'userIdByToken',
                                                            'authenticateUser',
                                                            'associateTokenToUser',
@@ -715,13 +715,13 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call validateNotReplay() with an invalid access token': {
+                'and we call validateNotReplayClient() with an invalid consumer key and invalid access token': {
                     topic: function(provider) {
                         var cb = this.callback,
                             ts = Number(Date.now()/1000).toString(10);
 
                         randomString(8, function(err, nonce) {
-                            provider.validateNotReplay("NOT AN ACCESS TOKEN", ts, nonce, function(err, isNotReplay) {
+                            provider.validateNotReplayClient("NOT A CONSUMER KEY", "NOT AN ACCESS TOKEN", ts, nonce, function(err, isNotReplay) {
                                 if (err) {
                                     cb(null);
                                 } else {
@@ -734,7 +734,45 @@ vows.describe('provider module interface').addBatch({
                         assert.ifError(err);
                     }
                 },
-                'and we call validateNotReplay() with a valid access token and a long-expired timestamp': {
+                'and we call validateNotReplayClient() with an invalid consumer key and invalid access token': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            ts = Number(Date.now()/1000).toString(10);
+
+                        randomString(8, function(err, nonce) {
+                            provider.validateNotReplayClient("NOT A CONSUMER KEY", "NOT AN ACCESS TOKEN", ts, nonce, function(err, isNotReplay) {
+                                if (err) {
+                                    cb(null);
+                                } else {
+                                    cb(new Error("Unexpected success"));
+                                }
+                            });
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we call validateNotReplayClient() with a valid consumer key and invalid access token': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            ts = Number(Date.now()/1000).toString(10);
+
+                        randomString(8, function(err, nonce) {
+                            provider.validateNotReplayClient(testClient.consumer_key, "NOT AN ACCESS TOKEN", ts, nonce, function(err, isNotReplay) {
+                                if (err) {
+                                    cb(null);
+                                } else {
+                                    cb(new Error("Unexpected success"));
+                                }
+                            });
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we call validateNotReplay() with a valid consumer key and access token and a long-expired timestamp': {
                     topic: function(provider) {
                         var cb = this.callback,
                             ts = Number((Date.now()/1000) - (24*60*60*365)).toString(10),
@@ -769,7 +807,7 @@ vows.describe('provider module interface').addBatch({
                                 if (err) {
                                     cb(err, null);
                                 } else {
-                                    provider.validateNotReplay(at.access_token, ts, nonce, function(err, isNotReplay) {
+                                    provider.validateNotReplayClient(testClient.consumer_key, at.access_token, ts, nonce, function(err, isNotReplay) {
                                         if (err) {
                                             cb(err, null);
                                         } else if (isNotReplay) {
@@ -832,7 +870,7 @@ vows.describe('provider module interface').addBatch({
                                 if (err) {
                                     cb(err, null);
                                 } else {
-                                    provider.validateNotReplay(at.access_token, ts, nonce, function(err, isNotReplay) {
+                                    provider.validateNotReplayClient(testClient.consumer_key, at.access_token, ts, nonce, function(err, isNotReplay) {
                                         if (err) {
                                             cb(err, null);
                                         } else if (isNotReplay) {
@@ -894,7 +932,7 @@ vows.describe('provider module interface').addBatch({
                             function(err, results) {
                                 if (err) throw err;
                                 nonce = results;
-                                provider.validateNotReplay(at.access_token, ts, nonce, this);
+                                provider.validateNotReplayClient(testClient.consumer_key, at.access_token, ts, nonce, this);
                             },
                             function(err, isNotReplay) {
                                 if (err) {
@@ -902,7 +940,7 @@ vows.describe('provider module interface').addBatch({
                                 } else if (!isNotReplay) {
                                     cb(new Error("Unexpected failure on first validation"), null);
                                 } else {
-                                    provider.validateNotReplay(at.access_token, ts, nonce, function(err, isNotReplay) {
+                                    provider.validateNotReplayClient(testClient.consumer_key, at.access_token, ts, nonce, function(err, isNotReplay) {
                                         if (err) {
                                             cb(err, null);
                                         } else if (isNotReplay) {
@@ -965,7 +1003,7 @@ vows.describe('provider module interface').addBatch({
                                 if (err) {
                                     cb(err, null);
                                 } else {
-                                    provider.validateNotReplay(at.access_token, ts, nonce, function(err, isNotReplay) {
+                                    provider.validateNotReplayClient(testClient.consumer_key, at.access_token, ts, nonce, function(err, isNotReplay) {
                                         if (err) {
                                             cb(err, null);
                                         } else if (!isNotReplay) {
