@@ -29,18 +29,21 @@ var suite = vows.describe('nonce module interface');
 var testSchema = {
     pkey: 'token_nonce',
     fields: ['nonce',
+             'consumer_key',
              'access_token',
              'timestamp'],
-    indices: ['access_token']
+    indices: ['consumer_key']
 };
 
 var testData = {
     'create': {
+        consumer_key: "ZZZZZZZZZZZZZZZZZZZZZZZ",
         access_token: "AAAAAAAAAAAAAAAAAAAAAAA",
-        nonce: "BBBBBB"
+        nonce: "BBBBBB",
+        timestamp: 1337801665
     },
     'update': {
-        timestamp: Date.now()
+        timestamp: 1337801765
     }
 };
 
@@ -51,7 +54,6 @@ mb['When we require the nonce module']
   ['and we create a nonce instance']
   ['auto-generated fields are there'] = function(err, created) {
       assert.isString(created.token_nonce);
-      assert.isNumber(created.timestamp);
 };
 
 mb['When we require the nonce module']
