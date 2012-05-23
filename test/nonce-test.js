@@ -68,15 +68,21 @@ suite.addBatch(mb);
 
 var CONSUMERKEY1 = "ZZZZZZZZZZZZZZZZZZZZZZ";
 var CONSUMERKEY2 = "YYYYYYYYYYYYYYYYYYYYYY";
+var CONSUMERKEY3 = "XXXXXXXXXXXXXXXXXXXXXX";
+var CONSUMERKEY4 = "WWWWWWWWWWWWWWWWWWWWWW";
 
 var ACCESSTOKEN1 = "BBBBBBBBBBBBBBBBBBBBBB";
 var ACCESSTOKEN2 = "CCCCCCCCCCCCCCCCCCCCCC";
 
 var NONCE1 = "YYYYYY";
 var NONCE2 = "YYYYYZ";
+var NONCE3 = "YYYYZZ";
+var NONCE4 = "YYYZZZ";
 
 var TIMESTAMP1 = 1337801665;
 var TIMESTAMP2 = 1337801666;
+var TIMESTAMP3 = 1337801667;
+var TIMESTAMP4 = 1337801668;
 
 suite.addBatch({
     "When we get the Nonce class": {
@@ -124,6 +130,51 @@ suite.addBatch({
             "and we check if the same nonce has been seen with a different timestamp": {
                 topic: function(ignore, Nonce) {
                     Nonce.seenBefore(CONSUMERKEY1, ACCESSTOKEN1, NONCE1, TIMESTAMP2, this.callback);
+                },
+                "it has not": function(err, seen) {
+                    assert.ifError(err);
+                    assert.isFalse(seen);
+                }
+            }
+        },
+        "and we check if a brand-new nonce has been seen with just a consumer key": {
+            topic: function(Nonce) {
+                Nonce.seenBefore(CONSUMERKEY3, null, NONCE3, TIMESTAMP3, this.callback);
+            },
+            "it has not": function(err, seen) {
+                assert.ifError(err);
+                assert.isFalse(seen);
+            },
+            "and we check if the same nonce has been seen again": {
+                topic: function(ignore, Nonce) {
+                    Nonce.seenBefore(CONSUMERKEY3, null, NONCE3, TIMESTAMP3, this.callback);
+                },
+                "it has": function(err, seen) {
+                    assert.ifError(err);
+                    assert.isTrue(seen);
+                }
+            },
+            "and we check if the same nonce has been seen with a different consumer key": {
+                topic: function(ignore, Nonce) {
+                    Nonce.seenBefore(CONSUMERKEY4, null, NONCE3, TIMESTAMP3, this.callback);
+                },
+                "it has not": function(err, seen) {
+                    assert.ifError(err);
+                    assert.isFalse(seen);
+                }
+            },
+            "and we check if a new different nonce has been seen with the same consumer key": {
+                topic: function(ignore, Nonce) {
+                    Nonce.seenBefore(CONSUMERKEY3, null, NONCE4, TIMESTAMP3, this.callback);
+                },
+                "it has not": function(err, seen) {
+                    assert.ifError(err);
+                    assert.isFalse(seen);
+                }
+            },
+            "and we check if the same nonce has been seen with a different timestamp": {
+                topic: function(ignore, Nonce) {
+                    Nonce.seenBefore(CONSUMERKEY3, null, NONCE3, TIMESTAMP4, this.callback);
                 },
                 "it has not": function(err, seen) {
                     assert.ifError(err);
