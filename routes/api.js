@@ -108,12 +108,17 @@ var clientAuth = function(req, res, next) {
     req.client = null;
     res.local('client', null); // init to null
 
-    req.authenticate(['client', 'user'], function(error, authenticated) { 
+    req.authenticate(['client'], function(error, authenticated) { 
 
-        if (error || !authenticated) {
+        if (error) {
+            next(error);
             return;
         }
 
+        if (!authenticated) {
+            return;
+        }
+        
         req.client = req.getAuthDetails().user;
         res.local('client', req.client); // init to null
 
