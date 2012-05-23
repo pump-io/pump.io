@@ -79,10 +79,10 @@ var NONCE2 = "YYYYYZ";
 var NONCE3 = "YYYYZZ";
 var NONCE4 = "YYYZZZ";
 
-var TIMESTAMP1 = 1337801665;
-var TIMESTAMP2 = 1337801666;
-var TIMESTAMP3 = 1337801667;
-var TIMESTAMP4 = 1337801668;
+var TIMESTAMP1 = Math.floor(Date.now()/1000);
+var TIMESTAMP2 = Math.floor(Date.now()/1000) + 5;
+var TIMESTAMP3 = Math.floor(Date.now()/1000) + 10;
+var TIMESTAMP4 = Math.floor(Date.now()/1000) + 15;
 
 suite.addBatch({
     "When we get the Nonce class": {
