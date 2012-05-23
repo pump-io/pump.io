@@ -66,10 +66,17 @@ mb['When we require the nonce module']
 
 suite.addBatch(mb);
 
+var CONSUMERKEY1 = "ZZZZZZZZZZZZZZZZZZZZZZ";
+var CONSUMERKEY2 = "YYYYYYYYYYYYYYYYYYYYYY";
+
 var ACCESSTOKEN1 = "BBBBBBBBBBBBBBBBBBBBBB";
+var ACCESSTOKEN2 = "CCCCCCCCCCCCCCCCCCCCCC";
+
 var NONCE1 = "YYYYYY";
 var NONCE2 = "YYYYYZ";
-var ACCESSTOKEN2 = "CCCCCCCCCCCCCCCCCCCCCC";
+
+var TIMESTAMP1 = 1337801665;
+var TIMESTAMP2 = 1337801666;
 
 suite.addBatch({
     "When we get the Nonce class": {
@@ -81,7 +88,7 @@ suite.addBatch({
         },
         "and we check if a brand-new nonce has been seen before": {
             topic: function(Nonce) {
-                Nonce.seenBefore(ACCESSTOKEN1, NONCE1, this.callback);
+                Nonce.seenBefore(CONSUMERKEY1, ACCESSTOKEN1, NONCE1, TIMESTAMP1, this.callback);
             },
             "it has not": function(err, seen) {
                 assert.ifError(err);
@@ -89,16 +96,16 @@ suite.addBatch({
             },
             "and we check if the same nonce has been seen again": {
                 topic: function(ignore, Nonce) {
-                    Nonce.seenBefore(ACCESSTOKEN1, NONCE1, this.callback);
+                    Nonce.seenBefore(CONSUMERKEY1, ACCESSTOKEN1, NONCE1, TIMESTAMP1, this.callback);
                 },
                 "it has": function(err, seen) {
                     assert.ifError(err);
                     assert.isTrue(seen);
                 }
             },
-            "and we check if the same nonce has been seen with a different token": {
+            "and we check if the same nonce has been seen with a different access token": {
                 topic: function(ignore, Nonce) {
-                    Nonce.seenBefore(ACCESSTOKEN2, NONCE1, this.callback);
+                    Nonce.seenBefore(CONSUMERKEY2, ACCESSTOKEN2, NONCE1, TIMESTAMP1, this.callback);
                 },
                 "it has not": function(err, seen) {
                     assert.ifError(err);
@@ -107,7 +114,16 @@ suite.addBatch({
             },
             "and we check if a different nonce has been seen with the same token": {
                 topic: function(ignore, Nonce) {
-                    Nonce.seenBefore(ACCESSTOKEN1, NONCE2, this.callback);
+                    Nonce.seenBefore(CONSUMERKEY1, ACCESSTOKEN1, NONCE2, TIMESTAMP1, this.callback);
+                },
+                "it has not": function(err, seen) {
+                    assert.ifError(err);
+                    assert.isFalse(seen);
+                }
+            },
+            "and we check if the same nonce has been seen with a different timestamp": {
+                topic: function(ignore, Nonce) {
+                    Nonce.seenBefore(CONSUMERKEY1, ACCESSTOKEN1, NONCE1, TIMESTAMP2, this.callback);
                 },
                 "it has not": function(err, seen) {
                     assert.ifError(err);
