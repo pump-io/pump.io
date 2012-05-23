@@ -117,14 +117,14 @@ suite.addBatch({
                         resp = function(err, res, body) {
                             var user;
                             if (err) {
-                                cb(err, null);
+                                cb(new Error(err.data), null);
                             } else {
                                 try {
                                     user = JSON.parse(body);
                                     cb(null, user);
                                 } catch (err) {
                                     cb(err, null);
-                                }
+                               }
                             }
                         };
                     httputil.postJSON('http://localhost:4815/api/users', 
