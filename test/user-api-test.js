@@ -75,10 +75,10 @@ suite.addBatch({
             topic: function() {
                 var cb = this.callback;
                 httputil.postJSON('http://localhost:4815/api/users', {}, {nickname: 'nocred', password: 'nobadge'}, function(err, res, body) {
-                    if (err) {
-                        cb(err);
-                    } else if (res.statusCode === 401) {
+                    if (err && err.statusCode === 401) {
                         cb(null);
+                    } else if (err) {
+                        cb(err);
                     } else {
                         cb(new Error("Unexpected success"));
                     }
