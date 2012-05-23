@@ -734,23 +734,65 @@ vows.describe('provider module interface').addBatch({
                         assert.ifError(err);
                     }
                 },
-                'and we call validateNotReplayClient() with an invalid consumer key and invalid access token': {
+                'and we call validateNotReplay() with an invalid consumer key and valid access token and a good timestamp and an unused nonce': {
                     topic: function(provider) {
                         var cb = this.callback,
-                            ts = Number(Date.now()/1000).toString(10);
+                            ts = Number((Date.now()/1000)).toString(10),
+                            props = {consumer_key: testClient.consumer_key,
+                                     callback: 'http://example.com/callback/abc123/'},
+                            user, rt, at;
 
-                        randomString(8, function(err, nonce) {
-                            provider.validateNotReplayClient("NOT A CONSUMER KEY", "NOT AN ACCESS TOKEN", ts, nonce, function(err, isNotReplay) {
+                        Step(
+                            function() {
+                                User.create({nickname: "isadora", password: "123456"}, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                user = results;
+                                RequestToken.create(props, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                rt = results;
+                                provider.associateTokenToUser(user.nickname, rt.token, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                provider.generateAccessToken(rt.token, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                at = results;
+                                randomString(8, this);
+                            },
+                            function(err, nonce) {
                                 if (err) {
-                                    cb(null);
+                                    cb(err, null);
                                 } else {
-                                    cb(new Error("Unexpected success"));
+                                    provider.validateNotReplayClient("NOTACONSUMERKEY", at.access_token, ts, nonce, function(err, isNotReplay) {
+                                        if (err) {
+                                            cb(null, {at: at, rt: rt, user: user});
+                                        } else {
+                                            cb(new Error("Unexpected success"));
+                                        }
+                                    });
                                 }
-                            });
-                        });
+                            }
+                        );
                     },
-                    'it fails correctly': function(err) {
+                    'it works': function(err, results) {
                         assert.ifError(err);
+                    },
+                    teardown: function(results) {
+                        if (results && results.user && results.user.del) {
+                            results.user.del(ignore);
+                        }
+                        if (results && results.rt && results.rt.del) {
+                            results.rt.del(ignore);
+                        }
+                        if (results && results.at && results.at.del) {
+                            results.at.del(ignore);
+                        }
                     }
                 },
                 'and we call validateNotReplayClient() with a valid consumer key and invalid access token': {
