@@ -734,7 +734,7 @@ vows.describe('provider module interface').addBatch({
                         assert.ifError(err);
                     }
                 },
-                'and we call validateNotReplay() with an invalid consumer key and valid access token and a good timestamp and an unused nonce': {
+                'and we call validateNotReplayClient() with an invalid consumer key and valid access token and a good timestamp and an unused nonce': {
                     topic: function(provider) {
                         var cb = this.callback,
                             ts = Number((Date.now()/1000)).toString(10),
@@ -814,7 +814,7 @@ vows.describe('provider module interface').addBatch({
                         assert.ifError(err);
                     }
                 },
-                'and we call validateNotReplay() with a valid consumer key and access token and a long-expired timestamp': {
+                'and we call validateNotReplayClient() with a valid consumer key and access token and a long-expired timestamp': {
                     topic: function(provider) {
                         var cb = this.callback,
                             ts = Number((Date.now()/1000) - (24*60*60*365)).toString(10),
@@ -877,7 +877,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call validateNotReplay() with a valid access token and a far-future timestamp': {
+                'and we call validateNotReplayClient() with a valid access token and a far-future timestamp': {
                     topic: function(provider) {
                         var cb = this.callback,
                             ts = Number((Date.now()/1000) + (24*60*60*365)).toString(10),
@@ -940,7 +940,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call validateNotReplay() with a valid access token and a good timestamp and a used nonce': {
+                'and we call validateNotReplayClient() with a valid access token and a good timestamp and a used nonce': {
                     topic: function(provider) {
                         var cb = this.callback,
                             ts = Number((Date.now()/1000)).toString(10),
@@ -1010,7 +1010,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call validateNotReplay() with a valid access token and a good timestamp and an unused nonce': {
+                'and we call validateNotReplayClient() with a valid access token and a good timestamp and an unused nonce': {
                     topic: function(provider) {
                         var cb = this.callback,
                             ts = Number((Date.now()/1000)).toString(10),
