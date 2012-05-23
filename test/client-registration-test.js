@@ -98,8 +98,9 @@ var updateSucceed = function(initial, params) {
             assert.equal(res.statusCode, 200);
         },
         'it has the right results': function(err, res, body) {
-            var parsed = JSON.parse(body);
+            var parsed;
             assert.ifError(err);
+            parsed = JSON.parse(body);
             assert.include(parsed, 'client_id');
             assert.include(parsed, 'client_secret');
             assert.include(parsed, 'expires_at');
@@ -115,8 +116,9 @@ var assocSucceed = function(params) {
             assert.equal(res.statusCode, 200);
         },
         'it has the right results': function(err, res, body) {
-            var parsed = JSON.parse(body);
+            var parsed;
             assert.ifError(err);
+            parsed = JSON.parse(body);
             assert.include(parsed, 'client_id');
             assert.include(parsed, 'client_secret');
             assert.include(parsed, 'expires_at');
