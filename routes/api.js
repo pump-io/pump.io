@@ -110,13 +110,7 @@ var clientAuth = function(req, res, next) {
 
     req.authenticate(['client', 'user'], function(error, authenticated) { 
 
-        if (error) {
-            next(error);
-            return;
-        }
-
-        if (!authenticated) {
-            next(new HTTPError("Not authenticated", 403));
+        if (error || !authenticated) {
             return;
         }
 
