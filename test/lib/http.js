@@ -18,7 +18,8 @@
 
 var http = require('http'),
     querystring = require('querystring'),
-    _ = require('underscore');
+    _ = require('underscore'),
+    OAuth = require('oauth').OAuth;
 
 var options = function(host, port, path, callback) {
 
@@ -96,5 +97,28 @@ var post = function(host, port, path, params, callback) {
     req.end();
 };
 
+var postJSON = function(serverUrl, cred, payload, callback) {
+
+    var oa, toSend;
+
+    oa = new OAuth(null, // request endpoint N/A for 2-legged OAuth
+                   null, // access endpoint N/A for 2-legged OAuth
+                   cred.consumer_key,
+                   cred.consumer_secret,
+                   "1.0",
+                   null,
+                   "HMAC-SHA1",
+                   null, // nonce size; use default
+                   {"User-Agent": "activitypump-test/0.1.0"});
+    
+    toSend = JSON.stringify(payload);
+
+    oa.post(serverUrl, cred.token, cred.token_secret, toSend, 'application/json', function(err, data, response) {
+        // Our callback has swapped args to OAuth module's
+        callback(err, response, data);
+    });
+};
+
 exports.options = options;
 exports.post = post;
+exports.postJSON = postJSON;

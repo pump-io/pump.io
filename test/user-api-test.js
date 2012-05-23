@@ -74,7 +74,7 @@ suite.addBatch({
         'and we try to register a user with no OAuth credentials': {
             topic: function() {
                 var cb = this.callback;
-                httputil.post('localhost', 4815, '/api/users', {nickname: 'nocred', password: 'nobadge'}, function(err, res, body) {
+                httputil.postJSON('http://localhost:4815/api/users', {}, {nickname: 'nocred', password: 'nobadge'}, function(err, res, body) {
                     if (err) {
                         cb(err);
                     } else if (res.statusCode === 401) {
