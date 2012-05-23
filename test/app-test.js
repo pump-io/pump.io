@@ -88,7 +88,9 @@ suite.addBatch({
                 assert.equal(addr.port, 4815);
             },
             teardown: function(app) {
-                app.close();
+                if (app && app.close) {
+                    app.close();
+                }
             }
         }
     }
