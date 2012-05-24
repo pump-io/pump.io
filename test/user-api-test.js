@@ -438,6 +438,55 @@ suite.addBatch({
                     'it has our valid user': function(err, collection) {
                         var user = collection.items[0];
                         assert.equal(user.nickname, "echo");
+                    },
+                    'and we add a few more users': {
+                        topic: function(ignore1, ignore2, cl) {
+                            var cb = this.callback;
+
+                            Step(
+                                function() {
+                                    var i, group = this.group();
+                                    for (i = 0; i < 49; i++) { // have 1 already, total = 50
+                                        register(cl, {nickname: "foxtrot"+i, password: "badpass"}, group());
+                                    }
+                                },
+                                function(err) {
+                                    if (err) throw err;
+                                    httputil.getJSON('http://localhost:4815/api/users',
+                                                     {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
+                                                     this);
+                                },
+                                function(err, collection) {
+                                    if (err) {
+                                        cb(err, null);
+                                    } else {
+                                        cb(null, collection);
+                                    }
+                                }
+                            );
+                        },
+                        'it works': function(err, collection) {
+                            assert.ifError(err);
+                        },
+                        'it has the right top-level properties': function(err, collection) {
+                            assert.isObject(collection);
+                            assert.include(collection, 'displayName');
+                            assert.isString(collection.displayName);
+                            assert.include(collection, 'id');
+                            assert.isString(collection.id);
+                            assert.include(collection, 'objectTypes');
+                            assert.isArray(collection.objectTypes);
+                            assert.lengthOf(collection.objectTypes, 1);
+                            assert.include(collection.objectTypes, 'user');
+                            assert.include(collection, 'totalCount');
+                            assert.isNumber(collection.totalCount);
+                            assert.include(collection, 'items');
+                            assert.isArray(collection.items);
+                        },
+                        'it has the right number of elements': function(err, collection) {
+                            assert.equal(collection.totalCount, 50);
+                            assert.lengthOf(collection.items, 20);
+                        }
                     }
                 }
             }
