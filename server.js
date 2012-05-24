@@ -23,7 +23,7 @@ makeApp(config, function(err, app) {
     if (err) {
         console.log(err);
     } else {
-        app.run();
+        app.run(function(err) {});
     }
 });
 
