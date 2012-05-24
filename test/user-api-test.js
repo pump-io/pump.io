@@ -388,6 +388,57 @@ suite.addBatch({
                 'it is empty': function(err, collection) {
                     assert.equal(collection.totalCount, 0);
                     assert.isEmpty(collection.items);
+                },
+                'and we add a user': {
+                    topic: function(ignore, cl) {
+                        var cb = this.callback;
+                        register(cl, {nickname: "echo", password: "echoooooooo"}, function(err, res, body) {
+                            if (err) {
+                                cb(new Error(err.data), null);
+                            } else {
+                                httputil.getJSON('http://localhost:4815/api/users',
+                                                 {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
+                                                 cb);
+                            }
+                        });
+                    },
+                    'it works': function(err, collection) {
+                        assert.ifError(err);
+                    },
+                    'it has the right top-level properties': function(err, collection) {
+                        assert.isObject(collection);
+                        assert.include(collection, 'displayName');
+                        assert.isString(collection.displayName);
+                        assert.include(collection, 'id');
+                        assert.isString(collection.id);
+                        assert.include(collection, 'objectTypes');
+                        assert.isArray(collection.objectTypes);
+                        assert.lengthOf(collection.objectTypes, 1);
+                        assert.include(collection.objectTypes, 'user');
+                        assert.include(collection, 'totalCount');
+                        assert.isNumber(collection.totalCount);
+                        assert.include(collection, 'items');
+                        assert.isArray(collection.items);
+                    },
+                    'it has one element': function(err, collection) {
+                        assert.equal(collection.totalCount, 1);
+                        assert.lengthOf(collection.items, 1);
+                    },
+                    'it has a valid user': function(err, collection) {
+                        var user = collection.items[0];
+                        assert.include(user, 'nickname');
+                        assert.include(user, 'published');
+                        assert.include(user, 'updated');
+                        assert.include(user, 'profile');
+                        assert.isObject(user.profile);
+                        assert.include(user.profile, 'id');
+                        assert.include(user.profile, 'objectType');
+                        assert.equal(user.profile.objectType, 'person');
+                    },
+                    'it has our valid user': function(err, collection) {
+                        var user = collection.items[0];
+                        assert.equal(user.nickname, "echo");
+                    }
                 }
             }
         }
