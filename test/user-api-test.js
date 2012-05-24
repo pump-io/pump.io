@@ -306,4 +306,92 @@ suite.addBatch({
     }
 });
 
+suite.addBatch({
+    'When we set up the app': {
+        topic: function() {
+            var cb = this.callback,
+                config = {port: 4815,
+                          hostname: 'localhost',
+                          driver: 'memory',
+                          params: {},
+                          nologger: true
+                         },
+                makeApp = require('../lib/app').makeApp;
+
+            makeApp(config, function(err, app) {
+                if (err) {
+                    cb(err, null);
+                } else {
+                    app.run(function(err) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, app);
+                        }
+                    });
+                }
+            });
+        },
+        teardown: function(app) {
+            app.close();
+        },
+        'it works': function(err, app) {
+            assert.ifError(err);
+        },
+        'and we create a client using the api': {
+            topic: function() {
+                var cb = this.callback;
+                httputil.post('localhost', 4815, '/api/client/register', {type: 'client_associate'}, function(err, res, body) {
+                    var cl;
+                    if (err) {
+                        cb(err, null);
+                    } else {
+                        try {
+                            cl = JSON.parse(body);
+                            cb(null, cl);
+                        } catch (err) {
+                            cb(err, null);
+                        }
+                    }
+                });
+            },
+            'it works': function(err, cl) {
+                assert.ifError(err);
+                assert.isObject(cl);
+                assert.isString(cl.client_id);
+                assert.isString(cl.client_secret);
+            },
+            'and we get an empty user list': {
+                topic: function(cl) {
+                    httputil.getJSON('http://localhost:4815/api/users',
+                                     {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
+                                     this);
+                },
+                'it works': function(err, collection) {
+                    assert.ifError(err);
+                },
+                'it has the right top-level properties': function(err, collection) {
+                    assert.isObject(collection);
+                    assert.include(collection, 'displayName');
+                    assert.isString(collection.displayName);
+                    assert.include(collection, 'id');
+                    assert.isString(collection.id);
+                    assert.include(collection, 'objectTypes');
+                    assert.isArray(collection.objectTypes);
+                    assert.length(collection.objectTypes, 1);
+                    assert.include(collection.objectTypes, 'user');
+                    assert.include(collection, 'totalCount');
+                    assert.isNumber(collection.totalCount);
+                    assert.include(collection, 'items');
+                    assert.isArray(collection.items);
+                },
+                'it is empty': function(err, collection) {
+                    assert.equal(collection.totalCount, 0);
+                    assert.isEmpty(collection.items);
+                }
+            }
+        }
+    }
+});
+
 suite.export(module);
