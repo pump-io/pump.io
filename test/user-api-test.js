@@ -68,7 +68,7 @@ suite.addBatch({
                 assert.include(allow, 'GET');
             },
             'it supports POST': function(err, allow, res, body) {
-                assert.include(allow, 'GET');
+                assert.include(allow, 'POST');
             }
         },
         'and we try to register a user with no OAuth credentials': {
