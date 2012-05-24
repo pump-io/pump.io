@@ -24,6 +24,71 @@ var assert = require('assert'),
 
 var suite = vows.describe('user API');
 
+var register = function(params) {
+    return function(cl) {
+        var cb = this.callback,
+            resp = function(err, res, body) {
+                var user;
+                if (err) {
+                    cb(new Error(err.data), null);
+                } else {
+                    try {
+                        user = JSON.parse(body);
+                        cb(null, user);
+                    } catch (err) {
+                        cb(err, null);
+                    }
+                }
+            };
+        httputil.postJSON('http://localhost:4815/api/users', 
+                          {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
+                          params,
+                          resp);
+    };
+};
+
+var registerSucceed = function(params) {
+    return {
+        topic: register(params),
+        'it works': function(err, user) {
+            assert.ifError(err);
+            assert.isObject(user);
+        },
+        'results are correct': function(err, user) {
+            assert.include(user, 'nickname');
+            assert.include(user, 'published');
+            assert.include(user, 'updated');
+            assert.include(user, 'profile');
+            assert.isObject(user.profile);
+            assert.include(user.profile, 'id');
+            assert.include(user.profile, 'objectType');
+            assert.equal(user.profile.objectType, 'person');
+        }
+    };
+};
+
+var registerFail = function(params) {
+    return {
+        topic: function(cl) {
+            var cb = this.callback,
+                resp = function(err, res, body) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success"));
+                    }
+                };
+            httputil.postJSON('http://localhost:4815/api/users', 
+                              {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
+                              params,
+                              resp);
+        },
+        'it fails correctly': function(err) {
+            assert.ifError(err);
+        }
+    };
+};
+
 suite.addBatch({
     'When we set up the app': {
         topic: function() {
@@ -111,42 +176,14 @@ suite.addBatch({
                 assert.isString(cl.client_id);
                 assert.isString(cl.client_secret);
             },
-            'and we register a user with those client credentials': {
-                topic: function(cl) {
-                    var cb = this.callback,
-                        resp = function(err, res, body) {
-                            var user;
-                            if (err) {
-                                cb(new Error(err.data), null);
-                            } else {
-                                try {
-                                    user = JSON.parse(body);
-                                    cb(null, user);
-                                } catch (err) {
-                                    cb(err, null);
-                               }
-                            }
-                        };
-                    httputil.postJSON('http://localhost:4815/api/users', 
-                                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
-                                      {nickname: 'withcred', password: 'verysecret'},
-                                      resp);
-                },
-                'it works': function(err, user) {
-                    assert.ifError(err);
-                    assert.isObject(user);
-                },
-                'results are correct': function(err, user) {
-                    assert.include(user, 'nickname');
-                    assert.include(user, 'published');
-                    assert.include(user, 'updated');
-                    assert.include(user, 'profile');
-                    assert.isObject(user.profile);
-                    assert.include(user.profile, 'id');
-                    assert.include(user.profile, 'objectType');
-                    assert.equal(user.profile.objectType, 'person');
-                }
-            }
+            'and we register a user with nickname and password': 
+            registerSucceed({nickname: 'withcred', password: 'verysecret'}),
+            'and we register a user with nickname and no password': 
+            registerFail({nickname: 'nopass'}),
+            'and we register a user with password and no nickname': 
+            registerFail({password: 'toosecret'}),
+            'and we register a user with no data': 
+            registerFail({})
         }
     }
 });
