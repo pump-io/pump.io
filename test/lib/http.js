@@ -119,6 +119,36 @@ var postJSON = function(serverUrl, cred, payload, callback) {
     });
 };
 
+var getJSON = function(serverUrl, cred, callback) {
+
+    var oa, toSend;
+
+    oa = new OAuth(null, // request endpoint N/A for 2-legged OAuth
+                   null, // access endpoint N/A for 2-legged OAuth
+                   cred.consumer_key,
+                   cred.consumer_secret,
+                   "1.0",
+                   null,
+                   "HMAC-SHA1",
+                   null, // nonce size; use default
+                   {"User-Agent": "activitypump-test/0.1.0"});
+    
+    oa.get(serverUrl, cred.token, cred.token_secret, function(err, data, response) {
+        var results;
+        if (err) {
+            callback(new Error(err.data), null);
+        } else {
+            try {
+                results = JSON.parse(data);
+                callback(null, results);
+            } catch (err) {
+                callback(err, null);
+            }
+        }
+    });
+};
+
 exports.options = options;
 exports.post = post;
 exports.postJSON = postJSON;
+exports.getJSON = getJSON;
