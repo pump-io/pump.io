@@ -365,7 +365,7 @@ suite.addBatch({
                 topic: function(cl) {
                     httputil.getJSON('http://localhost:4815/api/users',
                                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
-                                     this);
+                                     this.callback);
                 },
                 'it works': function(err, collection) {
                     assert.ifError(err);
