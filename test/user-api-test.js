@@ -276,7 +276,7 @@ suite.addBatch({
                                {nickname: "charlie", password: "mccarthy"}),
             'and we try to register with URL-encoded params': {
                 topic: function(cl) {
-                    var oa, toSend, cb;
+                    var oa, toSend, cb = this.callback;
 
                     oa = new OAuth(null, // request endpoint N/A for 2-legged OAuth
                                    null, // access endpoint N/A for 2-legged OAuth
