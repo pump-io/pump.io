@@ -341,7 +341,8 @@ var listUsers = function(req, res, next) {
         },
         function(err, userIds) {
             if (err) {
-                if (err instanceof NoSuchThingError) {
+                if (err instanceof NoSuchThingError) { // may catch err in prev func
+                    collection.totalCount = 0;
                     collection.items = [];
                     res.json(collection);
                 } else {
