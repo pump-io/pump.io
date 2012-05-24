@@ -378,7 +378,7 @@ suite.addBatch({
                     assert.isString(collection.id);
                     assert.include(collection, 'objectTypes');
                     assert.isArray(collection.objectTypes);
-                    assert.length(collection.objectTypes, 1);
+                    assert.lengthOf(collection.objectTypes, 1);
                     assert.include(collection.objectTypes, 'user');
                     assert.include(collection, 'totalCount');
                     assert.isNumber(collection.totalCount);
