@@ -20,6 +20,8 @@ var assert = require('assert'),
     vows = require('vows'),
     Step = require('step'),
     _ = require('underscore'),
+    querystring = require('querystring'),
+    OAuth = require('oauth').OAuth,
     httputil = require('./lib/http');
 
 var suite = vows.describe('user API');
@@ -271,7 +273,35 @@ suite.addBatch({
                                   {nickname: "baker", password: "flour"}),
             'and we register two users with the same nickname':
             doubleRegisterFail({nickname: "charlie", password: "parker"},
-                               {nickname: "charlie", password: "mccarthy"})
+                               {nickname: "charlie", password: "mccarthy"}),
+            'and we try to register with URL-encoded params': {
+                topic: function(cl) {
+                    var oa, toSend, cb;
+
+                    oa = new OAuth(null, // request endpoint N/A for 2-legged OAuth
+                                   null, // access endpoint N/A for 2-legged OAuth
+                                   cl.client_id, 
+                                   cl.client_secret, 
+                                   "1.0",
+                                   null,
+                                   "HMAC-SHA1",
+                                   null, // nonce size; use default
+                                   {"User-Agent": "activitypump-test/0.1.0"});
+                    
+                    toSend = querystring.stringify({nickname: "delta", password: "dawn"});
+
+                    oa.post('http://localhost:4815/api/users', null, null, toSend, 'application/x-www-form-urlencoded', function(err, data, response) {
+                        if (err) {
+                            cb(null);
+                        } else {
+                            cb(new Error("Unexpected success"));
+                        }
+                    });
+                },
+                'it fails correctly': function(err) {
+                    assert.ifError(err);
+                }
+            }
         }
     }
 });
