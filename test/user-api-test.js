@@ -24,32 +24,32 @@ var assert = require('assert'),
 
 var suite = vows.describe('user API');
 
-var register = function(params) {
-    return function(cl) {
-        var cb = this.callback,
-            resp = function(err, res, body) {
-                var user;
-                if (err) {
-                    cb(new Error(err.data), null);
-                } else {
-                    try {
-                        user = JSON.parse(body);
-                        cb(null, user);
-                    } catch (err) {
-                        cb(err, null);
-                    }
-                }
-            };
-        httputil.postJSON('http://localhost:4815/api/users', 
-                          {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
-                          params,
-                          resp);
-    };
+var register = function(cl, params, callback) {
+    httputil.postJSON('http://localhost:4815/api/users', 
+                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
+                      params,
+                      callback);
 };
 
 var registerSucceed = function(params) {
     return {
-        topic: register(params),
+        topic: function(cl) {
+            var cb = this.callback,
+                resp = function(err, res, body) {
+                    var user;
+                    if (err) {
+                        cb(new Error(err.data), null);
+                    } else {
+                        try {
+                            user = JSON.parse(body);
+                            cb(null, user);
+                        } catch (err) {
+                            cb(err, null);
+                        }
+                    }
+                };
+            register(cl, params, resp);
+        },
         'it works': function(err, user) {
             assert.ifError(err);
             assert.isObject(user);
@@ -78,10 +78,92 @@ var registerFail = function(params) {
                         cb(new Error("Unexpected success"));
                     }
                 };
-            httputil.postJSON('http://localhost:4815/api/users', 
-                              {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
-                              params,
-                              resp);
+            register(cl, params, resp);
+        },
+        'it fails correctly': function(err) {
+            assert.ifError(err);
+        }
+    };
+};
+
+var doubleRegisterSucceed = function(first, second) {
+    return {
+        topic: function(cl) {
+            var user1, user2, cb = this.callback;
+
+            Step(
+                function() {
+                    register(cl, first, this);
+                },
+                function(err, res, body) {
+                    if (err) throw err;
+                    user1 = JSON.parse(body); // may throw
+                    register(cl, second, this);
+                },
+                function(err, res, body) {
+                    if (err) throw err;
+                    user2 = JSON.parse(body); // may throw
+                    this(null);
+                },
+                function(err) {
+                    if (err) {
+                        cb(err, null);
+                    } else {
+                        cb(null, user1, user2);
+                    }
+                }
+            );
+        },
+        'it works': function(err, user1, user2) {
+            assert.ifError(err);
+        },
+        'user1 is correct': function(err, user1, user2) {
+            assert.include(user1, 'nickname');
+            assert.include(user1, 'published');
+            assert.include(user1, 'updated');
+            assert.include(user1, 'profile');
+            assert.isObject(user1.profile);
+            assert.include(user1.profile, 'id');
+            assert.include(user1.profile, 'objectType');
+            assert.equal(user1.profile.objectType, 'person');
+        },
+        'user2 is correct': function(err, user1, user2) {
+            assert.include(user2, 'nickname');
+            assert.include(user2, 'published');
+            assert.include(user2, 'updated');
+            assert.include(user2, 'profile');
+            assert.isObject(user2.profile);
+            assert.include(user2.profile, 'id');
+            assert.include(user2.profile, 'objectType');
+            assert.equal(user2.profile.objectType, 'person');
+        }
+    };
+};
+
+var doubleRegisterFail = function(first, second) {
+    return {
+        topic: function(cl) {
+            var cb = this.callback;
+
+            Step(
+                function() {
+                    register(cl, first, this);
+                },
+                function(err, res, body) {
+                    if (err) {
+                        cb(new Error(err.data));
+                        return;
+                    }
+                    register(cl, second, this);
+                },
+                function(err, res, body) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success"));
+                    }
+                }
+            );
         },
         'it fails correctly': function(err) {
             assert.ifError(err);
@@ -183,7 +265,13 @@ suite.addBatch({
             'and we register a user with password and no nickname': 
             registerFail({password: 'toosecret'}),
             'and we register a user with no data': 
-            registerFail({})
+            registerFail({}),
+            'and we register two unrelated users':
+            doubleRegisterSucceed({nickname: "able", password: "isuream"},
+                                  {nickname: "baker", password: "flour"}),
+            'and we register two users with the same nickname':
+            doubleRegisterFail({nickname: "charlie", password: "parker"},
+                               {nickname: "charlie", password: "mccarthy"})
         }
     }
 });
