@@ -100,7 +100,7 @@ suite.addBatch({
                         if (err) {
                             cb(new Error(err.data), null);
                         } else {
-                            cb({token: token, token_secret: secret});
+                            cb(null, {token: token, token_secret: secret});
                         }
                     });
                 },
