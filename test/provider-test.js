@@ -2190,7 +2190,6 @@ vows.describe('provider module interface').addBatch({
                         assert.include(res, 'client');
                         assert.include(res, 'before');
                         assert.include(res, 'after');
-                        assert.include(res, 'outdated');
                     },
                     'all were deleted': function(err, res) {
                         assert.isEmpty(res.after);
