@@ -531,40 +531,50 @@ suite.addBatch({
                                 }
                             }
                         },
-                        'and we fetch an group of users with offset': {
+                        'and we fetch all users in groups of 10': {
                             topic: function(ignore1, ignore2, ignore3, cl) {
+
                                 var cb = this.callback;
-                                httputil.getJSON('http://localhost:4815/api/users?start=40',
-                                                 {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
-                                                 cb);
+                                Step(
+                                    function() {
+                                        var i, group = this.group();
+                                        for (i = 0; i < 50; i += 10) {
+                                            httputil.getJSON('http://localhost:4815/api/users?start='+i+'&cnt=10',
+                                                             {consumer_key: cl.client_id, 
+                                                              consumer_secret: cl.client_secret},
+                                                             group());
+                                            }
+                                    },
+                                    function(err, collections) {
+                                        var j, chunks = [];
+                                        if (err) {
+                                            cb(err, null);
+                                        } else {
+                                            for (j = 0; j < collections.length; j++) {
+                                                chunks[j] = collections[j].items;
+                                            }
+                                            cb(null, chunks);
+                                        }
+                                    }
+                                );
                             },
-                            'it works': function(err, collection) {
+                            'it works': function(err, chunks) {
                                 assert.ifError(err);
                             },
-                            'it has the right top-level properties': function(err, collection) {
-                                assert.isObject(collection);
-                                assert.include(collection, 'displayName');
-                                assert.isString(collection.displayName);
-                                assert.include(collection, 'id');
-                                assert.isString(collection.id);
-                                assert.include(collection, 'objectTypes');
-                                assert.isArray(collection.objectTypes);
-                                assert.lengthOf(collection.objectTypes, 1);
-                                assert.include(collection.objectTypes, 'user');
-                                assert.include(collection, 'totalCount');
-                                assert.isNumber(collection.totalCount);
-                                assert.include(collection, 'items');
-                                assert.isArray(collection.items);
+                            'it has the right number of elements': function(err, chunks) {
+                                var i;
+                                assert.lengthOf(chunks, 5);
+                                for (i = 0; i < chunks.length; i++) {
+                                    assert.lengthOf(chunks[i], 10);
+                                }
                             },
-                            'it has the right number of elements': function(err, collection) {
-                                assert.equal(collection.totalCount, 50);
-                                assert.lengthOf(collection.items, 10);
-                            },
-                            'there are no duplicates': function(err, collection) {
-                                var i, seen = {}, items = collection.items;
-                                for (i = 0; i < items.length; i++) {
-                                    assert.isUndefined(seen[items[i].nickname]);
-                                    seen[items[i].nickname] = true;
+                            'there are no duplicates': function(err, chunks) {
+                                var i, j, seen = {};
+                                for (i = 0; i < chunks.length; i++) {
+                                    for (j = 0; j < chunks[i].length; j++) {
+                                        assert.isUndefined(seen[chunks[i][j].nickname]);
+                                        seen[chunks[i][j].nickname] = true;
+                                    }
                                 }
                             }
                         }
