@@ -493,6 +493,43 @@ suite.addBatch({
                                 assert.isUndefined(seen[items[i].nickname]);
                                 seen[items[i].nickname] = true;
                             }
+                        },
+                        'and we fetch all users': {
+                            topic: function(ignore1, ignore2, ignore3, cl) {
+                                var cb = this.callback;
+                                httputil.getJSON('http://localhost:4815/api/users?cnt=50',
+                                                 {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
+                                                 cb);
+                            },
+                            'it works': function(err, collection) {
+                                assert.ifError(err);
+                            },
+                            'it has the right top-level properties': function(err, collection) {
+                                assert.isObject(collection);
+                                assert.include(collection, 'displayName');
+                                assert.isString(collection.displayName);
+                                assert.include(collection, 'id');
+                                assert.isString(collection.id);
+                                assert.include(collection, 'objectTypes');
+                                assert.isArray(collection.objectTypes);
+                                assert.lengthOf(collection.objectTypes, 1);
+                                assert.include(collection.objectTypes, 'user');
+                                assert.include(collection, 'totalCount');
+                                assert.isNumber(collection.totalCount);
+                                assert.include(collection, 'items');
+                                assert.isArray(collection.items);
+                            },
+                            'it has the right number of elements': function(err, collection) {
+                                assert.equal(collection.totalCount, 50);
+                                assert.lengthOf(collection.items, 50);
+                            },
+                            'there are no duplicates': function(err, collection) {
+                                var i, seen = {}, items = collection.items;
+                                for (i = 0; i < items.length; i++) {
+                                    assert.isUndefined(seen[items[i].nickname]);
+                                    seen[items[i].nickname] = true;
+                                }
+                            }
                         }
                     }
                 }
