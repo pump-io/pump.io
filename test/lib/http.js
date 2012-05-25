@@ -32,13 +32,18 @@ var endpoint = function(url, methods) {
             assert.equal(res.statusCode, 200);
         }
     };
+
+    var checkMethod = function(method) {
+        return function(err, allow, res, body) {
+            assert.include(allow, method);
+        };
+    };
     var i;
 
     for (i = 0; i < methods.length; i++) {
-        context['it supports '+methods[i]] = function(err, allow, res, body) {
-            assert.include(allow, methods[i]);
-        };
+        context['it supports '+methods[i]] = checkMethod(methods[i]);
     }
+
     return context;
 };
 
