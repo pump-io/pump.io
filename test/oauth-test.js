@@ -82,6 +82,38 @@ suite.addBatch({
                 assert.isObject(cl);
                 assert.isString(cl.client_id);
                 assert.isString(cl.client_secret);
+            },
+            'and we request a request token': {
+                topic: function(cl) {
+                    var cb = this.callback, 
+                        oa = new OAuth('http://localhost:4815/oauth/request_token',
+                                       'http://localhost:4815/oauth/access_token',
+                                       cl.client_id,
+                                       cl.client_secret,
+                                       "1.0",
+                                       null,
+                                       "HMAC-SHA1",
+                                       null, // nonce size; use default
+                                       {"User-Agent": "activitypump-test/0.1.0"});
+                    
+                    oa.getOAuthRequestToken(function(err, token, secret) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb({token: token, token_secret: secret});
+                        }
+                    });
+                },
+                'it works': function(err, cred) {
+                    assert.ifError(err);
+                    assert.isObject(cred);
+                },
+                'it has the right results': function(err, cred) {
+                    assert.include(cred, 'token');
+                    assert.isString(cred.token);
+                    assert.include(cred, 'token_secret');
+                    assert.isString(cred.token_secret);
+                }
             }
         }
     }
