@@ -539,7 +539,7 @@ suite.addBatch({
                                     function() {
                                         var i, group = this.group();
                                         for (i = 0; i < 50; i += 10) {
-                                            httputil.getJSON('http://localhost:4815/api/users?start='+i+'&cnt=10',
+                                            httputil.getJSON('http://localhost:4815/api/users?offset='+i+'&cnt=10',
                                                              {consumer_key: cl.client_id, 
                                                               consumer_secret: cl.client_secret},
                                                              group());
