@@ -90,8 +90,8 @@ suite.addBatch({
                                        'http://localhost:4815/oauth/access_token',
                                        cl.client_id,
                                        cl.client_secret,
-                                       "1.0",
-                                       null,
+                                       "1.0a",
+                                       "oob",
                                        "HMAC-SHA1",
                                        null, // nonce size; use default
                                        {"User-Agent": "activitypump-test/0.1.0"});
