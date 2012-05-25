@@ -98,7 +98,7 @@ suite.addBatch({
                     
                     oa.getOAuthRequestToken(function(err, token, secret) {
                         if (err) {
-                            cb(err, null);
+                            cb(new Error(err.data), null);
                         } else {
                             cb({token: token, token_secret: secret});
                         }
