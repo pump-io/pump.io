@@ -90,7 +90,7 @@ suite.addBatch({
                                        'http://localhost:4815/oauth/access_token',
                                        cl.client_id,
                                        cl.client_secret,
-                                       "1.0a",
+                                       "1.0",
                                        "oob",
                                        "HMAC-SHA1",
                                        null, // nonce size; use default
