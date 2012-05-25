@@ -20,6 +20,8 @@ var assert = require('assert'),
     vows = require('vows'),
     databank = require('databank'),
     Step = require('step'),
+    _ = require('underscore'),
+    dateFormat = require('dateformat'),
     schema = require('../lib/schema'),
     URLMaker = require('../lib/urlmaker').URLMaker,
     randomString = require('../lib/randomstring').randomString,
@@ -1930,6 +1932,273 @@ vows.describe('provider module interface').addBatch({
                         }
                         if (results.client && results.client.del) {
                             results.client.del(ignore);
+                        }
+                    }
+                },
+                'and we use cleanRequestTokens() on an invalid consumer key': {
+                    topic: function(provider) {
+                        var cb = this.callback;
+                        provider.cleanRequestTokens("NOTACONSUMERKEY", function(err) {
+                            if (err) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected success!"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we use cleanRequestTokens() on a consumer key with no request tokens': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            client;
+                        
+                        Step(
+                            function() {
+                                Client.create({title: "No requests app"}, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                client = results;
+                                provider.cleanRequestTokens(client.consumer_key, this);
+                            },
+                            function(err) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    cb(null, client);
+                                }
+                            }
+                        );
+                    },
+                    'it works': function(err, client) {
+                        assert.ifError(err);
+                        assert.isObject(client);
+                    },
+                    teardown: function(client) {
+                        if (client && client.del) {
+                            client.del(ignore);
+                        }
+                    }
+                },
+                'and we use cleanRequestTokens() on a consumer key with no out-of-date tokens': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            client,
+                            before,
+                            after;
+                        
+                        Step(
+                            function() {
+                                Client.create({title: "No out of date requests app"}, this);
+                            },
+                            function(err, results) {
+                                var i, group = this.group();
+                                if (err) throw err;
+                                client = results;
+                                for (i = 0; i < 5; i++) {
+                                    provider.generateRequestToken(client.consumer_key,
+                                                                  "http://localhost/callback",
+                                                                  group());
+                                }
+                            },
+                            function(err, rts) {
+                                if (err) throw err;
+                                before = rts;
+                                provider.cleanRequestTokens(client.consumer_key, this);
+                            },
+                            function(err) {
+                                if (err) throw err;
+                                RequestToken.search({consumer_key: client.consumer_key}, this);
+                            },
+                            function(err, rts) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    after = rts;
+                                    cb(null, {client: client, before: before, after: after});
+                                }
+                            }
+                        );
+                    },
+                    'it works': function(err, res) {
+                        assert.ifError(err);
+                        assert.isObject(res);
+                        assert.include(res, 'client');
+                        assert.include(res, 'before');
+                        assert.include(res, 'after');
+                    },
+                    'nothing was deleted': function(err, res) {
+                        var b = res.before, a = res.after, i;
+                        for (i = 0; i < b.length; i++) {
+                            assert.include(a, b[i].token);
+                        }
+                    },
+                    teardown: function(res) {
+                        var i;
+                        if (res.client && res.client.del) {
+                            res.client.del(ignore);
+                        }
+                        if (res.before && res.before.length) {
+                            for (i = 0; i < res.before.length; i++) {
+                                res.before[i].del(ignore);
+                            }
+                        }
+                    }
+                },
+                'and we use cleanRequestTokens() on a consumer key with mixed out-of-date tokens': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            client,
+                            before,
+                            outdated,
+                            after;
+                        
+                        Step(
+                            function() {
+                                Client.create({title: "Some out-of-date requests app"}, this);
+                            },
+                            function(err, results) {
+                                var i, group = this.group();
+                                if (err) throw err;
+                                client = results;
+                                for (i = 0; i < 10; i++) {
+                                    provider.generateRequestToken(client.consumer_key,
+                                                                  "http://localhost/callback",
+                                                                  group());
+                                }
+                            },
+                            function(err, rts) {
+                                var i, 
+                                    touched = Date(Date.now() - 10 * 24 * 3600),
+                                    bank = RequestToken.bank(),
+                                    group = this.group();
+                                if (err) throw err;
+                                before = rts;
+                                outdated = {};
+                                for (i = 0; i < 5; i++) {
+                                    outdated[before[i].token] = true;
+                                    bank.update('requesttoken', before[i].token, {updated: touched}, group());
+                                }
+                            },
+                            function(err, tks) {
+                                if (err) throw err;
+                                provider.cleanRequestTokens(client.consumer_key, this);
+                            },
+                            function(err) {
+                                if (err) throw err;
+                                RequestToken.search({consumer_key: client.consumer_key}, this);
+                            },
+                            function(err, rts) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    after = rts;
+                                    cb(null, {client: client, before: before, after: after, outdated: outdated});
+                                }
+                            }
+                        );
+                    },
+                    'it works': function(err, res) {
+                        assert.ifError(err);
+                        assert.isObject(res);
+                        assert.include(res, 'client');
+                        assert.include(res, 'before');
+                        assert.include(res, 'after');
+                        assert.include(res, 'outdated');
+                    },
+                    'some were deleted': function(err, res) {
+                        var b = res.before,
+                            a = res.after,
+                            o = res.outdated,
+                            i;
+                        for (i = 0; i < b.length; i++) {
+                            if (o[b[i].token]) {
+                                assert.isUndefined(a[b[i].token]);
+                            } else {
+                                assert.include(a, b[i].token);
+                            }
+                        }
+                    },
+                    teardown: function(res) {
+                        var i, id;
+                        if (res.client && res.client.del) {
+                            res.client.del(ignore);
+                        }
+                        if (res.after) {
+                            for (id in res.after) {
+                                res.after[id].del(ignore);
+                            }
+                        }
+                    }
+                },
+                'and we use cleanRequestTokens() on a consumer key with only out-of-date tokens': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            client,
+                            before,
+                            after;
+                        
+                        Step(
+                            function() {
+                                Client.create({title: "Only out-of-date requests app"}, this);
+                            },
+                            function(err, results) {
+                                var i, group = this.group();
+                                if (err) throw err;
+                                client = results;
+                                for (i = 0; i < 10; i++) {
+                                    provider.generateRequestToken(client.consumer_key,
+                                                                  "http://localhost/callback",
+                                                                  group());
+                                }
+                            },
+                            function(err, rts) {
+                                var i, 
+                                    touched = Date(Date.now() - 10 * 24 * 3600),
+                                    bank = RequestToken.bank(),
+                                    group = this.group();
+                                if (err) throw err;
+                                before = rts;
+                                for (i = 0; i < 10; i++) {
+                                    bank.update('requesttoken', before[i].token, {updated: touched}, group());
+                                }
+                            },
+                            function(err, tks) {
+                                if (err) throw err;
+                                provider.cleanRequestTokens(client.consumer_key, this);
+                            },
+                            function(err) {
+                                if (err) throw err;
+                                RequestToken.search({consumer_key: client.consumer_key}, this);
+                            },
+                            function(err, rts) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    after = rts;
+                                    cb(null, {client: client, before: before, after: after});
+                                }
+                            }
+                        );
+                    },
+                    'it works': function(err, res) {
+                        assert.ifError(err);
+                        assert.isObject(res);
+                        assert.include(res, 'client');
+                        assert.include(res, 'before');
+                        assert.include(res, 'after');
+                        assert.include(res, 'outdated');
+                    },
+                    'all were deleted': function(err, res) {
+                        assert.isEmpty(res.after);
+                    },
+                    teardown: function(res) {
+                        var i;
+                        if (res.client && res.client.del) {
+                            res.client.del(ignore);
                         }
                     }
                 }
