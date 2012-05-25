@@ -53,4 +53,4 @@ vows.describe('idmaker module interface').addBatch({
             }
         }
     }
-}).export(module);
+})['export'](module);

@@ -49,4 +49,4 @@ var testData = {
 
 suite.addBatch(modelBatch('service', 'Service', testSchema, testData));
 
-suite.export(module);
+suite['export'](module);

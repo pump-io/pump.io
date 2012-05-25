@@ -62,4 +62,4 @@ var testData = {
 
 suite.addBatch(modelBatch('video', 'Video', testSchema, testData));
 
-suite.export(module);
+suite['export'](module);

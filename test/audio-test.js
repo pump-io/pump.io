@@ -53,5 +53,5 @@ var testData = {
 
 suite.addBatch(modelBatch('audio', 'Audio', testSchema, testData));
 
-suite.export(module);
+suite['export'](module);
 

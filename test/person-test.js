@@ -53,5 +53,5 @@ var testData = {
 
 suite.addBatch(modelBatch('person', 'Person', testSchema, testData));
 
-suite.export(module);
+suite['export'](module);
 

@@ -68,4 +68,4 @@ mb['When we require the edge module']
 
 suite.addBatch(mb);
 
-suite.export(module);
+suite['export'](module);

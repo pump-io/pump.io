@@ -81,5 +81,5 @@ vows.describe('urlmaker module interface').addBatch({
             }
         }
     }
-}).export(module);
+})['export'](module);
 

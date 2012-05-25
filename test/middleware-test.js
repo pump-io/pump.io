@@ -257,5 +257,5 @@ vows.describe('middleware module interface').addBatch({
             }
         }
     }
-}).export(module);
+})['export'](module);
 

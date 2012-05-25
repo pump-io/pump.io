@@ -57,4 +57,4 @@ var testData = {
 
 suite.addBatch(modelBatch('bookmark', 'Bookmark', testSchema, testData));
 
-suite.export(module);
+suite['export'](module);

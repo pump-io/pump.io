@@ -47,4 +47,4 @@ var testData = {
 
 suite.addBatch(modelBatch('group', 'Group', testSchema, testData));
 
-suite.export(module);
+suite['export'](module);

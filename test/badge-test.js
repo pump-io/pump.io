@@ -55,4 +55,4 @@ var testData = {
 
 suite.addBatch(modelBatch('badge', 'Badge', testSchema, testData));
 
-suite.export(module);
+suite['export'](module);

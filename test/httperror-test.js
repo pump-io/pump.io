@@ -53,5 +53,5 @@ vows.describe('httperror module interface').addBatch({
             
         }
     }
-}).export(module);
+})['export'](module);
 

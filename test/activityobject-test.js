@@ -295,5 +295,5 @@ vows.describe('schema module interface').addBatch({
             }
         }
     }
-}).export(module);
+})['export'](module);
 

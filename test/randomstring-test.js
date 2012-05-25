@@ -50,5 +50,5 @@ vows.describe('randomstring module interface').addBatch({
             }
         }
     }
-}).export(module);
+})['export'](module);
 

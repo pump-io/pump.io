@@ -1936,4 +1936,4 @@ vows.describe('provider module interface').addBatch({
             }
         }
     }
-}).export(module);
+})['export'](module);

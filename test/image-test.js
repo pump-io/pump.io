@@ -60,4 +60,4 @@ var testData = {
 
 suite.addBatch(modelBatch('image', 'Image', testSchema, testData));
 
-suite.export(module);
+suite['export'](module);

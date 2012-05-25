@@ -67,4 +67,4 @@ mb['When we require the accesstoken module']
 
 suite.addBatch(mb);
 
-suite.export(module);
+suite['export'](module);

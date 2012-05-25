@@ -51,6 +51,6 @@ var testData = {
 
 suite.addBatch(modelBatch('review', 'Review', testSchema, testData));
 
-suite.export(module);
+suite['export'](module);
 
 
