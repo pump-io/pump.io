@@ -534,7 +534,7 @@ suite.addBatch({
                         'and we fetch an group of users with offset': {
                             topic: function(ignore1, ignore2, ignore3, cl) {
                                 var cb = this.callback;
-                                httputil.getJSON('http://localhost:4815/api/users?start=20',
+                                httputil.getJSON('http://localhost:4815/api/users?start=40',
                                                  {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
                                                  cb);
                             },
@@ -558,7 +558,7 @@ suite.addBatch({
                             },
                             'it has the right number of elements': function(err, collection) {
                                 assert.equal(collection.totalCount, 50);
-                                assert.lengthOf(collection.items, 30);
+                                assert.lengthOf(collection.items, 10);
                             },
                             'there are no duplicates': function(err, collection) {
                                 var i, seen = {}, items = collection.items;
