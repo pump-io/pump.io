@@ -60,12 +60,30 @@ suite.addBatch({
         'it works': function(err, app) {
             assert.ifError(err);
         },
-        'and we check the request token endpoint': 
-        httputil.endpoint('/oauth/request_token', ['GET', 'POST']),
-        'and we check the access token endpoint':
-        httputil.endpoint('/oauth/authorize', ['GET', 'POST']),
-        'and we check the authorization endpoint':
-        httputil.endpoint('/oauth/access_token', ['GET', 'POST'])
+        'and we create a client using the api': {
+            topic: function() {
+                var cb = this.callback;
+                httputil.post('localhost', 4815, '/api/client/register', {type: 'client_associate'}, function(err, res, body) {
+                    var cl;
+                    if (err) {
+                        cb(err, null);
+                    } else {
+                        try {
+                            cl = JSON.parse(body);
+                            cb(null, cl);
+                        } catch (err) {
+                            cb(err, null);
+                        }
+                    }
+                });
+            },
+            'it works': function(err, cl) {
+                assert.ifError(err);
+                assert.isObject(cl);
+                assert.isString(cl.client_id);
+                assert.isString(cl.client_secret);
+            }
+        }
     }
 });
 
