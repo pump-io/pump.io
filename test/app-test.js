@@ -60,6 +60,8 @@ suite.addBatch({
                          },
                 makeApp = require('../lib/app').makeApp;
 
+            process.env.NODE_ENV = 'test';
+
             makeApp(config, this.callback);
         },
         'it works': function(err, app) {

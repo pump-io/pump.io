@@ -138,6 +138,8 @@ suite.addBatch({
                          },
                 makeApp = require('../lib/app').makeApp;
 
+            process.env.NODE_ENV = 'test';
+
             makeApp(config, function(err, app) {
                 if (err) {
                     cb(err, null);
