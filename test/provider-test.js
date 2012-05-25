@@ -2031,9 +2031,16 @@ vows.describe('provider module interface').addBatch({
                         assert.include(res, 'after');
                     },
                     'nothing was deleted': function(err, res) {
-                        var b = res.before, a = res.after, i;
+                        var b = res.before,
+                            a = res.after,
+                            i,
+                            matchT = function(tok) {
+                                return function(rt) {
+                                    return (rt.token === tok);
+                                };
+                            };
                         for (i = 0; i < b.length; i++) {
-                            assert.include(a, b[i].token);
+                            assert.isTrue(a.some(matchT(b[i].token)));
                         }
                     },
                     teardown: function(res) {
@@ -2113,12 +2120,18 @@ vows.describe('provider module interface').addBatch({
                         var b = res.before,
                             a = res.after,
                             o = res.outdated,
-                            i;
+                            i,
+                            matchT = function(tok) {
+                                return function(rt) {
+                                    return (rt.token === tok);
+                                };
+                            };
+
                         for (i = 0; i < b.length; i++) {
                             if (o[b[i].token]) {
                                 assert.isUndefined(a[b[i].token]);
                             } else {
-                                assert.include(a, b[i].token);
+                                assert.isTrue(a.some(matchT(b[i].token)));
                             }
                         }
                     },
