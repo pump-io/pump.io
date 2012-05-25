@@ -17,9 +17,30 @@
 // limitations under the License.
 
 var http = require('http'),
+    assert = require('assert'),
     querystring = require('querystring'),
     _ = require('underscore'),
     OAuth = require('oauth').OAuth;
+
+var endpoint = function(url, methods) {
+    var context = {
+        topic: function() {
+            options('localhost', 4815, url, this.callback);
+        },
+        'it exists': function(err, allow, res, body) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 200);
+        }
+    };
+    var i;
+
+    for (i = 0; i < methods.length; i++) {
+        context['it supports '+methods[i]] = function(err, allow, res, body) {
+            assert.include(allow, methods[i]);
+        };
+    }
+    return context;
+};
 
 var options = function(host, port, path, callback) {
 
@@ -152,3 +173,4 @@ exports.options = options;
 exports.post = post;
 exports.postJSON = postJSON;
 exports.getJSON = getJSON;
+exports.endpoint = endpoint;
