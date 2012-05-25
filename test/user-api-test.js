@@ -486,6 +486,13 @@ suite.addBatch({
                         'it has the right number of elements': function(err, collection) {
                             assert.equal(collection.totalCount, 50);
                             assert.lengthOf(collection.items, 20);
+                        },
+                        'there are no duplicates': function(err, collection) {
+                            var i, seen = {}, items = collection.items;
+                            for (i = 0; i < items.length; i++) {
+                                assert.isUndefined(seen[items[i].nickname]);
+                                seen[items[i].nickname] = true;
+                            }
                         }
                     }
                 }
