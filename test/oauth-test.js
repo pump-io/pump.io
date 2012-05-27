@@ -21,6 +21,7 @@ var assert = require('assert'),
     Step = require('step'),
     _ = require('underscore'),
     querystring = require('querystring'),
+    http = require('http'),
     OAuth = require('oauth').OAuth,
     httputil = require('./lib/http');
 
@@ -171,6 +172,23 @@ suite.addBatch({
                     assert.isString(cred.token);
                     assert.include(cred, 'token_secret');
                     assert.isString(cred.token_secret);
+                },
+                'and we use that token to get the authorization form': {
+                    topic: function(rt, cl) {
+                        var cb = this.callback;
+                        http.get("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, function(res) {
+                            if (res.statusCode === 200) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Incorrect status code"));
+                            }
+                        }).on('error', function(err) {
+                            cb(err);
+                        });
+                    },
+                    'it works': function(err) {
+                        assert.ifError(err);
+                    }
                 }
             }
         }
