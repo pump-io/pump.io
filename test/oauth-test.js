@@ -82,6 +82,24 @@ suite.addBatch({
         'it works': function(err, app) {
             assert.ifError(err);
         },
+        'and we request a token with an invalid client_id': {
+            topic: function(cl) {
+                var cb = this.callback,
+                    badcl = {client_id: "NOTACLIENTID",
+                             client_secret: "NOTTHERIGHTSECRET"};
+
+                requestToken(badcl, function(err, rt) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success"));
+                    }
+                });
+            },
+            'it fails correctly': function(err, cred) {
+                assert.ifError(err);
+            }
+        },
         'and we create a client using the api': {
             topic: function() {
                 var cb = this.callback;
@@ -105,7 +123,25 @@ suite.addBatch({
                 assert.isString(cl.client_id);
                 assert.isString(cl.client_secret);
             },
-            'and we request a request token': {
+            'and we request a token with a valid client_id and invalid client_secret': {
+                topic: function(cl) {
+                    var cb = this.callback,
+                        badcl = {client_id: cl.client_id,
+                                 client_secret: "NOTTHERIGHTSECRET"};
+
+                    requestToken(badcl, function(err, rt) {
+                        if (err) {
+                            cb(null);
+                        } else {
+                            cb(new Error("Unexpected success"));
+                        }
+                    });
+                },
+                'it fails correctly': function(err, cred) {
+                    assert.ifError(err);
+                }
+            },
+            'and we request a request token with valid client_id and client_secret': {
                 topic: function(cl) {
                     requestToken(cl, this.callback);
                 },
