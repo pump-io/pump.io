@@ -151,11 +151,25 @@ suite.addBatch({
             },
             'and we create a user using the API': {
                 topic: function(cl) {
-                    
+                    var cb = this.callback,
+                        resp = function(err, res, body) {
+                            var user;
+                            if (err) {
+                                cb(new Error(err.data), null);
+                            } else {
+                                try {
+                                    user = JSON.parse(body);
+                                    cb(null, user);
+                                } catch (err) {
+                                    cb(err, null);
+                                }
+                            }
+                        };
+
                     httputil.postJSON('http://localhost:4815/api/users', 
                                       {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
                                       {nickname: "alice", password: "Wh1t3|R4bb1t"},
-                                      this.callback);
+                                      resp);
                 },
                 'it works': function(err, user) {
                     assert.ifError(err);
