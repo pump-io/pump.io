@@ -149,40 +149,53 @@ suite.addBatch({
                 assert.isString(cl.client_id);
                 assert.isString(cl.client_secret);
             },
-            'and we request a request token with valid client_id and client_secret': {
+            'and we create a user using the API': {
                 topic: function(cl) {
-                    requestToken(cl, this.callback);
+                    
+                    httputil.postJSON('http://localhost:4815/api/users', 
+                                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
+                                      {nickname: "alice", password: "Wh1t3|R4bb1t"},
+                                      this.callback);
                 },
-                'it works': function(err, cred) {
+                'it works': function(err, user) {
                     assert.ifError(err);
-                    assert.isObject(cred);
+                    assert.isObject(user);
                 },
-                'it has the right results': function(err, cred) {
-                    assert.include(cred, 'token');
-                    assert.isString(cred.token);
-                    assert.include(cred, 'token_secret');
-                    assert.isString(cred.token_secret);
-                },
-                'and we use that token to get the authorization form': {
-                    topic: function(rt, cl) {
-                        var cb = this.callback,
-                            options = {
-                                host: 'localhost',
-                                port: 4815,
-                                path: "/oauth/authorize?oauth_token=" + rt.token
-                            };
-                        http.get(options, function(res) {
-                            if (res.statusCode === 200) {
-                                cb(null);
-                            } else {
-                                cb(new Error("Incorrect status code"));
-                            }
-                        }).on('error', function(err) {
-                            cb(err);
-                        });
+                'and we request a request token with valid client_id and client_secret': {
+                    topic: function(user, cl) {
+                        requestToken(cl, this.callback);
                     },
-                    'it works': function(err) {
+                    'it works': function(err, cred) {
                         assert.ifError(err);
+                        assert.isObject(cred);
+                    },
+                    'it has the right results': function(err, cred) {
+                        assert.include(cred, 'token');
+                        assert.isString(cred.token);
+                        assert.include(cred, 'token_secret');
+                        assert.isString(cred.token_secret);
+                    },
+                    'and we use that token to get the authorization form': {
+                        topic: function(rt, user, cl) {
+                            var cb = this.callback,
+                                options = {
+                                    host: 'localhost',
+                                    port: 4815,
+                                    path: "/oauth/authorize?oauth_token=" + rt.token
+                                };
+                            http.get(options, function(res) {
+                                if (res.statusCode === 200) {
+                                    cb(null);
+                                } else {
+                                    cb(new Error("Incorrect status code"));
+                                }
+                            }).on('error', function(err) {
+                                cb(err);
+                            });
+                        },
+                        'it works': function(err) {
+                            assert.ifError(err);
+                        }
                     }
                 }
             }
