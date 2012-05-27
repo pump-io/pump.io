@@ -25,8 +25,6 @@ var assert = require('assert'),
     OAuth = require('oauth').OAuth,
     httputil = require('./lib/http');
 
-var suite = vows.describe('user API');
-
 var requestToken = function(cl, cb) {
     var oa;
     oa = new OAuth('http://localhost:4815/oauth/request_token',
@@ -46,8 +44,9 @@ var requestToken = function(cl, cb) {
             cb(null, {token: token, token_secret: secret});
         }
     });
-
 };
+
+var suite = vows.describe('OAuth authorization');
 
 suite.addBatch({
     'When we set up the app': {
@@ -83,38 +82,47 @@ suite.addBatch({
         'it works': function(err, app) {
             assert.ifError(err);
         },
-        'and we request a token with no Authorization': {
+        'and we try to get the authorization form without a request token': {
             topic: function() {
-                var cb = this.callback;
-                httputil.post('localhost', 4815, '/oauth/request_token', {}, function(err, res, body) {
-                    if (err) {
-                        cb(err);
-                    } else if (res.statusCode === 400) {
+                var cb = this.callback,
+                    options = {
+                        host: 'localhost',
+                        port: 4815,
+                        path: "/oauth/authorize"
+                    };
+                http.get(options, function(res) {
+                    if (res.statusCode >= 400 && res.statusCode < 500) {
                         cb(null);
                     } else {
-                        cb(new Error("Unexpected success"));
+                        cb(new Error("Unexpected status code"));
                     }
+                }).on('error', function(err) {
+                    cb(err);
                 });
             },
-            'it fails correctly': function(err, cred) {
+            'it fails correctly': function(err) {
                 assert.ifError(err);
             }
         },
-        'and we request a token with an invalid client_id': {
+        'and we try to get the authorization form with an invalid request token': {
             topic: function() {
                 var cb = this.callback,
-                    badcl = {client_id: "NOTACLIENTID",
-                             client_secret: "NOTTHERIGHTSECRET"};
-
-                requestToken(badcl, function(err, rt) {
-                    if (err) {
+                    options = {
+                        host: 'localhost',
+                        port: 4815,
+                        path: "/oauth/authorize?oauth_token=NOTAREQUESTTOKEN"
+                    };
+                http.get(options, function(res) {
+                    if (res.statusCode >= 400 && res.statusCode < 500) {
                         cb(null);
                     } else {
-                        cb(new Error("Unexpected success"));
+                        cb(new Error("Unexpected status code"));
                     }
+                }).on('error', function(err) {
+                    cb(err);
                 });
             },
-            'it fails correctly': function(err, cred) {
+            'it fails correctly': function(err) {
                 assert.ifError(err);
             }
         },
@@ -140,24 +148,6 @@ suite.addBatch({
                 assert.isObject(cl);
                 assert.isString(cl.client_id);
                 assert.isString(cl.client_secret);
-            },
-            'and we request a token with a valid client_id and invalid client_secret': {
-                topic: function(cl) {
-                    var cb = this.callback,
-                        badcl = {client_id: cl.client_id,
-                                 client_secret: "NOTTHERIGHTSECRET"};
-
-                    requestToken(badcl, function(err, rt) {
-                        if (err) {
-                            cb(null);
-                        } else {
-                            cb(new Error("Unexpected success"));
-                        }
-                    });
-                },
-                'it fails correctly': function(err, cred) {
-                    assert.ifError(err);
-                }
             },
             'and we request a request token with valid client_id and client_secret': {
                 topic: function(cl) {
@@ -199,5 +189,3 @@ suite.addBatch({
         }
     }
 });
-
-suite['export'](module);
