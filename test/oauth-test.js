@@ -26,6 +26,28 @@ var assert = require('assert'),
 
 var suite = vows.describe('user API');
 
+var requestToken = function(cl, cb) {
+    var oa;
+    oa = new OAuth('http://localhost:4815/oauth/request_token',
+                   'http://localhost:4815/oauth/access_token',
+                   cl.client_id,
+                   cl.client_secret,
+                   "1.0",
+                   "oob",
+                   "HMAC-SHA1",
+                   null, // nonce size; use default
+                   {"User-Agent": "activitypump-test/0.1.0"});
+    
+    oa.getOAuthRequestToken(function(err, token, secret) {
+        if (err) {
+            cb(new Error(err.data), null);
+        } else {
+            cb(null, {token: token, token_secret: secret});
+        }
+    });
+
+};
+
 suite.addBatch({
     'When we set up the app': {
         topic: function() {
@@ -85,24 +107,7 @@ suite.addBatch({
             },
             'and we request a request token': {
                 topic: function(cl) {
-                    var cb = this.callback, 
-                        oa = new OAuth('http://localhost:4815/oauth/request_token',
-                                       'http://localhost:4815/oauth/access_token',
-                                       cl.client_id,
-                                       cl.client_secret,
-                                       "1.0",
-                                       "oob",
-                                       "HMAC-SHA1",
-                                       null, // nonce size; use default
-                                       {"User-Agent": "activitypump-test/0.1.0"});
-                    
-                    oa.getOAuthRequestToken(function(err, token, secret) {
-                        if (err) {
-                            cb(new Error(err.data), null);
-                        } else {
-                            cb(null, {token: token, token_secret: secret});
-                        }
-                    });
+                    requestToken(cl, this.callback);
                 },
                 'it works': function(err, cred) {
                     assert.ifError(err);
