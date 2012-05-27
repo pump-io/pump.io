@@ -175,8 +175,13 @@ suite.addBatch({
                 },
                 'and we use that token to get the authorization form': {
                     topic: function(rt, cl) {
-                        var cb = this.callback;
-                        http.get("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, function(res) {
+                        var cb = this.callback,
+                            options = {
+                                host: 'localhost',
+                                port: 4815,
+                                path: "/oauth/authorize?oauth_token=" + rt.token
+                            };
+                        http.get(options, function(res) {
                             if (res.statusCode === 200) {
                                 cb(null);
                             } else {
