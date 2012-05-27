@@ -168,7 +168,7 @@ suite.addBatch({
 
                     httputil.postJSON('http://localhost:4815/api/users', 
                                       {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
-                                      {nickname: "alice", password: "Wh1t3|R4bb1t"},
+                                      {nickname: "alice", password: "whiterabbit"},
                                       resp);
                 },
                 'it works': function(err, user) {
