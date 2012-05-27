@@ -162,7 +162,7 @@ var showStream = function(req, res, next) {
 var authenticate = function(req, res) {
     // XXX: I think there's an easier way to get this, but leave it for now.
     var parsedUrl = url.parse(req.originalUrl, true);
-    res.render('authentication', {token: parsedUrl.query.oauth_token, error: false});
+    res.render('authentication', {title: "Authentication", token: parsedUrl.query.oauth_token, error: false});
 };
 
 var authorize = function(err, req, res, authorized, authResults, application, user) {  
