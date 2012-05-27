@@ -82,8 +82,23 @@ suite.addBatch({
         'it works': function(err, app) {
             assert.ifError(err);
         },
+        'and we request a token with no Authorization': {
+            topic: function() {
+                var cb = this.callback;
+                httputil.post('localhost', 4815, '/oauth/request_token', {}, function(err, res, body) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success"));
+                    }
+                });
+            },
+            'it fails correctly': function(err, cred) {
+                assert.ifError(err);
+            }
+        },
         'and we request a token with an invalid client_id': {
-            topic: function(cl) {
+            topic: function() {
                 var cb = this.callback,
                     badcl = {client_id: "NOTACLIENTID",
                              client_secret: "NOTTHERIGHTSECRET"};
