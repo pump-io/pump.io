@@ -23,7 +23,7 @@ var assert = require('assert'),
     querystring = require('querystring'),
     http = require('http'),
     OAuth = require('oauth').OAuth,
-    Browser = request('zombie'),
+    Browser = require('zombie'),
     httputil = require('./lib/http');
 
 var requestToken = function(cl, cb) {
