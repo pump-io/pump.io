@@ -87,6 +87,8 @@ suite.addBatch({
                 var cb = this.callback;
                 httputil.post('localhost', 4815, '/oauth/request_token', {}, function(err, res, body) {
                     if (err) {
+                        cb(err);
+                    } else if (res.statusCode === 400) {
                         cb(null);
                     } else {
                         cb(new Error("Unexpected success"));
