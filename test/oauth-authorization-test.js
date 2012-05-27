@@ -23,6 +23,7 @@ var assert = require('assert'),
     querystring = require('querystring'),
     http = require('http'),
     OAuth = require('oauth').OAuth,
+    Browser = request('zombie'),
     httputil = require('./lib/http');
 
 var requestToken = function(cl, cb) {
@@ -189,7 +190,7 @@ suite.addBatch({
                         assert.include(cred, 'token_secret');
                         assert.isString(cred.token_secret);
                     },
-                    'and we use that token to get the authorization form': {
+                    'and we use that token to get the authentication form': {
                         topic: function(rt, user, cl) {
                             var cb = this.callback,
                                 options = {
@@ -209,6 +210,24 @@ suite.addBatch({
                         },
                         'it works': function(err) {
                             assert.ifError(err);
+                        },
+                        'and we submit the authentication form': {
+                            topic: function(rt, user, cl) {
+                                var cb = this.callback;
+                                Browser.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, function(err, browser) {
+                                    if (err) {
+                                        cb(err, null);
+                                    } else {
+                                        browser.fill("username", "alice");
+                                        browser.fill("password", "whiterabbit");
+                                        browser.pressButton("Login", cb);
+                                    }
+                                });
+                            },
+                            'it works': function(err, browser) {
+                                assert.ok(browser.success);
+                                assert.equal(browser.location.pathname, "/oauth/authorize");
+                            }
                         }
                     }
                 }
