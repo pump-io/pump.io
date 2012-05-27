@@ -21,6 +21,7 @@ var databank = require('databank'),
     Step = require('step'),
     _ = require('underscore'),
     Activity = require('../lib/model/activity').Activity,
+    RequestToken = require('../lib/model/requesttoken').RequestToken,
     User = require('../lib/model/user').User,
     mw = require('../lib/middleware'),
     he = require('../lib/httperror'),
@@ -161,8 +162,20 @@ var showStream = function(req, res, next) {
 
 var authenticate = function(req, res) {
     // XXX: I think there's an easier way to get this, but leave it for now.
-    var parsedUrl = url.parse(req.originalUrl, true);
-    res.render('authentication', {title: "Authentication", token: parsedUrl.query.oauth_token, error: false});
+    var parsedUrl = url.parse(req.originalUrl, true),
+        token = parsedUrl.query.oauth_token;
+
+    if (!token) {
+        throw new HTTPError("Must provide an oauth_token", 400);
+    } else {
+        RequestToken.get(token, function(err, rt) {
+            if (err) {
+                throw new HTTPError("Invalid oauth_token", 400);
+            } else {
+                res.render('authentication', {title: "Authentication", token: token, error: false});
+            }
+        });
+    }
 };
 
 var authorize = function(err, req, res, authorized, authResults, application, user) {  
