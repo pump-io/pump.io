@@ -182,10 +182,14 @@ var authorize = function(err, req, res, authorized, authResults, application, us
 
     var self = this;
     
-    if(err) {
-        res.render('authentication', {token: authResults.token, nologin: true, error: "Incorrect username or password"});
+    if (err) {
+        res.render('authentication', {title: "Authentication",
+                                      token: authResults.token,
+                                      nologin: true,
+                                      error: err.message});
     } else {
-        res.render('authorization', {token: authResults.token,
+        res.render('authorization', {title: "Authorization",
+                                     token: authResults.token,
                                      verifier: authResults.verifier,
                                      user: user,
                                      application: application});
