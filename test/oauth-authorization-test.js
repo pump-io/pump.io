@@ -220,7 +220,7 @@ suite.addBatch({
                                     } else {
                                         browser.fill("username", "alice");
                                         browser.fill("password", "whiterabbit");
-                                        browser.pressButton("Login", cb);
+                                        browser.pressButton("submit", cb);
                                     }
                                 });
                             },
