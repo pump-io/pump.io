@@ -30,6 +30,8 @@
         <div class="container">
           <% if (remoteUser) { %>
           <%= partial('nav-loggedin') %>
+          <% } else if (nologin) { %>
+          <%= partial('nav-nologin') %>
           <% } else { %>
           <%= partial('nav-anonymous') %>
           <% } %>
