@@ -227,6 +227,15 @@ suite.addBatch({
                             'it works': function(err, browser) {
                                 assert.ok(browser.success);
                                 assert.equal(browser.location.pathname, "/oauth/authorize");
+                            },
+                            'and we submit the authorization form': {
+                                topic: function(browser, rt, user, cl) {
+                                    var cb = this.callback;
+                                    browser.pressButton("Authorize", cb);
+                                },
+                                'it works': function(err, browser) {
+                                    assert.ok(browser.success);
+                                }
                             }
                         }
                     }
