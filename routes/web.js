@@ -172,7 +172,7 @@ var authenticate = function(req, res) {
             if (err) {
                 throw new HTTPError("Invalid oauth_token", 400);
             } else {
-                res.render('authentication', {title: "Authentication", token: token, error: false});
+                res.render('authentication', {title: "Authentication", token: token, nologin: true, error: false});
             }
         });
     }
@@ -183,7 +183,7 @@ var authorize = function(err, req, res, authorized, authResults, application, us
     var self = this;
     
     if(err) {
-        res.render('authentication', {token: authResults.token, error: "Incorrect username or password"});
+        res.render('authentication', {token: authResults.token, nologin: true, error: "Incorrect username or password"});
     } else {
         res.render('authorization', {token: authResults.token,
                                      verifier: authResults.verifier,
