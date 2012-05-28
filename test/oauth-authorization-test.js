@@ -253,6 +253,40 @@ suite.addBatch({
                                 'results include token and verifier': function(err, results) {
                                     assert.isString(results.token);
                                     assert.isString(results.verifier);
+                                },
+                                'and we try to get an access token': {
+                                    topic: function(pair, browser, rt, user, cl) {
+                                        var cb = this.callback,
+                                            oa;
+
+                                        oa = new OAuth('http://localhost:4815/oauth/request_token',
+                                                       'http://localhost:4815/oauth/access_token',
+                                                       cl.client_id,
+                                                       cl.client_secret,
+                                                       "1.0",
+                                                       "oob",
+                                                       "HMAC-SHA1",
+                                                       null, // nonce size; use default
+                                                       {"User-Agent": "activitypump-test/0.1.0"});
+                                        
+                                        oa.getOAuthAccessToken(pair.token, rt.token_secret, pair.verifier, function(err, token, secret) {
+                                            if (err) {
+                                                cb(new Error(err.data), null);
+                                            } else {
+                                                cb(null, {token: token, token_secret: secret});
+                                            }
+                                        });
+                                    },
+                                    'it works': function(err, pair) {
+                                        assert.ifError(err);
+                                    },
+                                    'results are correct': function(err, pair) {
+                                        assert.isObject(pair);
+                                        assert.include(pair, 'token');
+                                        assert.isString(pair.token);
+                                        assert.include(pair, 'token_secret');
+                                        assert.isString(pair.token_secret);
+                                    }
                                 }
                             }
                         }
