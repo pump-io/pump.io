@@ -206,9 +206,17 @@ suite.addBatch({
                             topic: function(browser) {
                                 var cb = this.callback;
                                 browser.fill("username", "alice", function(err) {
-                                    browser.fill("password", "whiterabbit", function(err) {
-                                        browser.pressButton("Login", cb);
-                                    });
+                                    if (err) {
+                                        cb(err);
+                                    } else {
+                                        browser.fill("password", "whiterabbit", function(err) {
+                                            if (err) {
+                                                cb(err);
+                                            } else {
+                                                browser.pressButton("Login", cb);
+                                            }
+                                        });
+                                    }
                                 });
                             },
                             'it works': function(err, browser) {
