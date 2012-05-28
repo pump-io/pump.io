@@ -473,6 +473,77 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
+                'and we use fetchAuthorizationInformation() with a client without a title': {
+                    topic: function(provider) {
+                        var cb = this.callback,
+                            user, rt, client;
+
+                        Step(
+                            function() {
+                                Client.create({}, this);
+                            },
+                            function(err, cl) {
+                                if (err) throw err;
+                                client = cl;
+                                User.create({nickname: "franklin", password: "mint"}, this);
+                            },
+                            function(err, u) {
+                                if (err) throw err;
+                                user = u;
+                                var props = {consumer_key: testClient.consumer_key,
+                                             callback: 'http://example.com/madeup/endpoint'};
+                                RequestToken.create(props, this);
+                            },
+                            function(err, requesttoken) {
+                                if (err) throw err;
+                                rt = requesttoken;
+                                provider.associateTokenToUser("franklin", rt.token, this);
+                            },
+                            function(err, res) {
+                                if (err) throw err;
+                                provider.fetchAuthorizationInformation("franklin", rt.token, this);
+                            },
+                            function(err, app, found) {
+                                if (err) {
+                                    cb(err, null);
+                                } else { // this is correct
+                                    cb(null, {user: user, rt: rt, app: app, found: found});
+                                }
+                            }
+                        );
+                    },
+                    'it works': function(err, results) {
+                        assert.ifError(err);
+                        assert.isObject(results);
+                        assert.isObject(results.rt);
+                        assert.isObject(results.user);
+                        assert.isObject(results.app);
+                        assert.isObject(results.found);
+                        assert.instanceOf(results.rt, RequestToken);
+                        assert.instanceOf(results.user, User);
+                        assert.instanceOf(results.app, Client);
+                        assert.instanceOf(results.found, RequestToken);
+                        assert.equal(results.rt.token, results.found.token);
+                        assert.equal(results.rt.token_secret, results.found.token_secret);
+                    },
+                    'results have right properties': function(err, results) {
+                        assert.isString(results.app.title);
+                        assert.isString(results.app.description);
+                        assert.isString(results.found.token);
+                        assert.isString(results.found.username);
+                    },
+                    teardown: function(results) {
+                        if (results && results.rt && results.rt.del) {
+                            results.rt.del(ignore);
+                        }
+                        if (results && results.user && results.user.del) {
+                            results.user.del(ignore);
+                        }
+                        if (results && results.app && results.app.del) {
+                            results.app.del(ignore);
+                        }
+                    }
+                },
                 'and we call validToken() with an invalid token': {
                     topic: function(provider) {
                         var cb = this.callback;
