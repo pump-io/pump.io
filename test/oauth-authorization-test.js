@@ -218,9 +218,9 @@ suite.addBatch({
                                     if (err) {
                                         cb(err, null);
                                     } else {
-                                        browser.fill("username", "alice");
-                                        browser.fill("password", "whiterabbit");
-                                        browser.pressButton("submit", cb);
+                                        browser.fill("username", "alice")
+                                            .fill("password", "whiterabbit")
+                                            .pressButton("submit", cb);
                                     }
                                 });
                             },
