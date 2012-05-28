@@ -226,6 +226,8 @@ suite.addBatch({
                             },
                             'it works': function(err, browser) {
                                 assert.ok(browser.success);
+                            },
+                            'it has the right location': function(err, browser) {
                                 assert.equal(browser.location.pathname, "/oauth/authorize");
                             },
                             'it contains the authorization form': function(err, browser) {
