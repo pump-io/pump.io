@@ -3,8 +3,14 @@
 <input type="hidden" name="oauth_token" value="<%- token %>"/> 
 <input type="hidden" name="oauth_verifier" value="<%- verifier %>"/> 
 
+<p>
+Your authorization is complete, but the program you are using does not
+take the authorization tokens directly. Check the program or service&apos;s
+documentation for details on how to input these data.
+</p>
+
 <table>            
-  <tr><td>Token</td><td><%- token %></td></tr>    
-  <tr><td>Verifier</td><td><%- verifier %></td></tr>    
+  <tr><td>Token</td><td id="token"><%- token %></td></tr>    
+  <tr><td>Verifier</td><td id="verifier"><%- verifier %></td></tr>    
 </table>
 
