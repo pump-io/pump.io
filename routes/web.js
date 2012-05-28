@@ -185,6 +185,7 @@ var authorize = function(err, req, res, authorized, authResults, application, us
     if (err) {
         res.render('authentication', {title: "Authentication",
                                       token: authResults.token,
+                                      status: 400,
                                       nologin: true,
                                       error: err.message});
     } else {
