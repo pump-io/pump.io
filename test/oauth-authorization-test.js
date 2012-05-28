@@ -213,7 +213,7 @@ suite.addBatch({
                                             if (err) {
                                                 cb(err);
                                             } else {
-                                                browser.pressButton("form#oauth-authentication > input[type=submit]", function(err) {
+                                                browser.pressButton("#authenticate", function(err) {
                                                     cb(err, browser);
                                                 });
                                             }
