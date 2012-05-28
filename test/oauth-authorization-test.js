@@ -255,9 +255,11 @@ suite.addBatch({
                                     assert.isString(results.verifier);
                                 },
                                 'and we try to get an access token': {
-                                    topic: function(pair, browser1, browser2, rt, user, cl) {
+                                    topic: function(pair) {
                                         var cb = this.callback,
-                                            oa;
+                                            oa,
+                                            rt = arguments[5],
+                                            cl = arguments[7];
 
                                         oa = new OAuth('http://localhost:4815/oauth/request_token',
                                                        'http://localhost:4815/oauth/access_token',
