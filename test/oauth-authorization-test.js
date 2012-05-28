@@ -228,6 +228,9 @@ suite.addBatch({
                                 assert.ok(browser.success);
                                 assert.equal(browser.location.pathname, "/oauth/authorize");
                             },
+                            'it contains the authorization form': function(err, browser) {
+                                assert.ok(browser.query("form#authorize"));
+                            },
                             'and we submit the authorization form': {
                                 topic: function(browser, rt, user, cl) {
                                     var cb = this.callback;
