@@ -200,7 +200,8 @@ var authorize = function(err, req, res, authorized, authResults, application, rt
 };  
 
 var authorizationFinished = function(err, req, res, result) {
-    res.render('authorization-finished', {token: result.token,
+    res.render('authorization-finished', {title: "Authorization Finished",
+                                          token: result.token,
                                           verifier: result.verifier});
 };
 
