@@ -213,7 +213,9 @@ suite.addBatch({
                                             if (err) {
                                                 cb(err);
                                             } else {
-                                                browser.pressButton("Login", cb);
+                                                browser.pressButton("Login", function(err) {
+                                                    cb(err, browser);
+                                                });
                                             }
                                         });
                                     }
