@@ -193,6 +193,7 @@ suite.addBatch({
                     'and we get the authentication form': {
                         topic: function(rt) {
                             var cb = this.callback;
+                            Browser.runScripts = false;
                             Browser.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, cb);
                         },
                         'it works': function(err, browser) {
