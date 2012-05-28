@@ -225,6 +225,7 @@ suite.addBatch({
                                 });
                             },
                             'it works': function(err, browser) {
+                                assert.ifError(err);
                                 assert.ok(browser.success);
                             },
                             'it has the right location': function(err, browser) {
