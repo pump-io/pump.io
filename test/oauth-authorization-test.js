@@ -255,7 +255,7 @@ suite.addBatch({
                                     assert.isString(results.verifier);
                                 },
                                 'and we try to get an access token': {
-                                    topic: function(pair, browser, rt, user, cl) {
+                                    topic: function(pair, browser1, browser2, rt, user, cl) {
                                         var cb = this.callback,
                                             oa;
 
