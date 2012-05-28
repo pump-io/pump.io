@@ -20,7 +20,7 @@
       </div>
     </div>
     <div class="form-actions">
-      <input type="submit" name="submit" class="btn btn-primary" value="Login" />
+      <input type="submit" name="submit" id="authenticate" class="btn btn-primary" value="Login" />
     </div>
   </fieldset>
 </form>
