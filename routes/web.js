@@ -178,7 +178,7 @@ var authenticate = function(req, res) {
     }
 };
 
-var authorize = function(err, req, res, authorized, authResults, application, user) {  
+var authorize = function(err, req, res, authorized, authResults, application, rt) {  
 
     var self = this;
     
@@ -189,11 +189,13 @@ var authorize = function(err, req, res, authorized, authResults, application, us
                                       nologin: true,
                                       error: err.message});
     } else {
-        res.render('authorization', {title: "Authorization",
-                                     token: authResults.token,
-                                     verifier: authResults.verifier,
-                                     user: user,
-                                     application: application});
+        User.get(rt.username, function(err, user) {
+            res.render('authorization', {title: "Authorization",
+                                         token: authResults.token,
+                                         verifier: authResults.verifier,
+                                         user: user,
+                                         application: application});
+        });
     }
 };  
 
