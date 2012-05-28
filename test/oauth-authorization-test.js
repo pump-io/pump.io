@@ -190,40 +190,25 @@ suite.addBatch({
                         assert.include(cred, 'token_secret');
                         assert.isString(cred.token_secret);
                     },
-                    'and we use that token to get the authentication form': {
-                        topic: function(rt, user, cl) {
-                            var cb = this.callback,
-                                options = {
-                                    host: 'localhost',
-                                    port: 4815,
-                                    path: "/oauth/authorize?oauth_token=" + rt.token
-                                };
-                            http.get(options, function(res) {
-                                if (res.statusCode === 200) {
-                                    cb(null);
-                                } else {
-                                    cb(new Error("Incorrect status code"));
-                                }
-                            }).on('error', function(err) {
-                                cb(err);
-                            });
+                    'and we get the authentication form': {
+                        topic: function(rt) {
+                            var cb = this.callback;
+                            Browser.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, cb);
                         },
-                        'it works': function(err) {
+                        'it works': function(err, browser) {
                             assert.ifError(err);
+                            assert.ok(browser.success);
+                        },
+                        'it contains the login form': function(err, browser) {
+                            assert.ok(browser.query("form#login"));
                         },
                         'and we submit the authentication form': {
-                            topic: function(rt, user, cl) {
+                            topic: function(browser) {
                                 var cb = this.callback;
-                                Browser.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, function(err, browser) {
-                                    if (err) {
-                                        cb(err, null);
-                                    } else {
-                                        browser.fill("username", "alice", function(err) {
-                                            browser.fill("password", "whiterabbit", function(err) {
-                                                    browser.pressButton("submit", cb);
-                                            });
-                                        });
-                                    }
+                                browser.fill("username", "alice", function(err) {
+                                    browser.fill("password", "whiterabbit", function(err) {
+                                        browser.pressButton("Login", cb);
+                                    });
                                 });
                             },
                             'it works': function(err, browser) {
