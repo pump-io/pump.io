@@ -200,7 +200,7 @@ suite.addBatch({
                             assert.ok(browser.success);
                         },
                         'it contains the login form': function(err, browser) {
-                            assert.ok(browser.query("form#login"));
+                            assert.ok(browser.query("form#oauth-authentication"));
                         },
                         'and we submit the authentication form': {
                             topic: function(browser) {
