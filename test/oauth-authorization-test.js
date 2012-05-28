@@ -235,11 +235,24 @@ suite.addBatch({
                             'and we submit the authorization form': {
                                 topic: function(browser) {
                                     var cb = this.callback;
-                                    browser.pressButton("Authorize", cb);
+                                    browser.pressButton("Authorize", function(err) {
+                                        if (err) {
+                                            cb(err, null);
+                                        } else if (!browser.success) {
+                                            cb(new Error("Browser not successful"), null);
+                                        } else {
+                                            cb(null, {token: browser.text("#token"),
+                                                      verifier: browser.text("#verifier")});
+                                                      
+                                        }
+                                    });
                                 },
-                                'it works': function(err, browser) {
+                                'it works': function(err, results) {
                                     assert.ifError(err);
-                                    assert.ok(browser.success);
+                                },
+                                'results include token and verifier': function(err, results) {
+                                    assert.isString(results.token);
+                                    assert.isString(results.verifier);
                                 }
                             }
                         }
