@@ -234,6 +234,7 @@ suite.addBatch({
                                     browser.pressButton("Authorize", cb);
                                 },
                                 'it works': function(err, browser) {
+                                    assert.ifError(err);
                                     assert.ok(browser.success);
                                 }
                             }
