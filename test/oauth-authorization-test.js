@@ -222,7 +222,7 @@ suite.addBatch({
                                 assert.ok(browser.query("form#authorize"));
                             },
                             'and we submit the authorization form': {
-                                topic: function(browser, rt, user, cl) {
+                                topic: function(browser) {
                                     var cb = this.callback;
                                     browser.pressButton("Authorize", cb);
                                 },
