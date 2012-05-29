@@ -353,9 +353,12 @@ suite.addBatch({
             },
             'and we get an empty user list': {
                 topic: function(cl) {
+                    var cb = this.callback;
                     httputil.getJSON('http://localhost:4815/api/users',
                                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
-                                     this.callback);
+                                     function(err, coll, resp) {
+                                         cb(err, coll);
+                                     });
                 },
                 'it works': function(err, collection) {
                     assert.ifError(err);
