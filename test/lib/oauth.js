@@ -131,18 +131,8 @@ var register = function(cl, nickname, password, callback) {
     httputil.postJSON('http://localhost:4815/api/users', 
                       {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
                       {nickname: nickname, password: password},
-                      function(err, res, body) {
-                          var user;
-                          if (err) {
-                              callback(new Error(err.data), null);
-                          } else {
-                              try {
-                                  user = JSON.parse(body);
-                                  callback(null, user);
-                              } catch (err) {
-                                  callback(err, null);
-                              }
-                          }
+                      function(err, body, res) {
+                          callback(err, body);
                       });
 };
 
