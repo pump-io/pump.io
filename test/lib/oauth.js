@@ -86,9 +86,15 @@ var accessToken = function(cl, user, cb) {
         function(err, br) {
             if (err) throw err;
             if (!br.success) throw new Error("Bad auth result");
-            br.fill("username", user.nickname)
-                .fill("password", user.password)
-                .pressButton("#authenticate", this);
+            br.fill("username", user.nickname, this);
+        },
+        function(err, br) {
+            if (err) throw err;
+            br.fill("password", user.password, this);
+        },
+        function(err, br) {
+            if (err) throw err;
+            br.pressButton("#authenticate", this);
         },
         function(err, br) {
             if (err) throw err;
