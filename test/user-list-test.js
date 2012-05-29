@@ -36,27 +36,13 @@ var register = function(cl, params, callback) {
 var registerSucceed = function(params) {
     return {
         topic: function(cl) {
-            var cb = this.callback,
-                resp = function(err, res, body) {
-                    var user;
-                    if (err) {
-                        cb(new Error(err.data), null);
-                    } else {
-                        try {
-                            user = JSON.parse(body);
-                            cb(null, user);
-                        } catch (err) {
-                            cb(err, null);
-                        }
-                    }
-                };
-            register(cl, params, resp);
+            register(cl, params, this.callback);
         },
-        'it works': function(err, user) {
+        'it works': function(err, user, resp) {
             assert.ifError(err);
             assert.isObject(user);
         },
-        'results are correct': function(err, user) {
+        'results are correct': function(err, user, resp) {
             assert.include(user, 'nickname');
             assert.include(user, 'published');
             assert.include(user, 'updated');
@@ -72,17 +58,9 @@ var registerSucceed = function(params) {
 var registerFail = function(params) {
     return {
         topic: function(cl) {
-            var cb = this.callback,
-                resp = function(err, res, body) {
-                    if (err) {
-                        cb(null);
-                    } else {
-                        cb(new Error("Unexpected success"));
-                    }
-                };
-            register(cl, params, resp);
+            register(cl, params, this.callback);
         },
-        'it fails correctly': function(err) {
+        'it fails correctly': function(err, user, resp) {
             assert.ifError(err);
         }
     };
@@ -97,14 +75,14 @@ var doubleRegisterSucceed = function(first, second) {
                 function() {
                     register(cl, first, this);
                 },
-                function(err, res, body) {
+                function(err, doc, res) {
                     if (err) throw err;
-                    user1 = JSON.parse(body); // may throw
+                    user1 = doc;
                     register(cl, second, this);
                 },
-                function(err, res, body) {
+                function(err, doc, res) {
                     if (err) throw err;
-                    user2 = JSON.parse(body); // may throw
+                    user2 = doc;
                     this(null);
                 },
                 function(err) {
@@ -151,14 +129,14 @@ var doubleRegisterFail = function(first, second) {
                 function() {
                     register(cl, first, this);
                 },
-                function(err, res, body) {
+                function(err, doc, res) {
                     if (err) {
-                        cb(new Error(err.data));
+                        cb(err);
                         return;
                     }
                     register(cl, second, this);
                 },
-                function(err, res, body) {
+                function(err, doc, res) {
                     if (err) {
                         cb(null);
                     } else {
@@ -225,7 +203,7 @@ suite.addBatch({
         'and we try to register a user with no OAuth credentials': {
             topic: function() {
                 var cb = this.callback;
-                httputil.postJSON('http://localhost:4815/api/users', {}, {nickname: 'nocred', password: 'nobadge'}, function(err, res, body) {
+                httputil.postJSON('http://localhost:4815/api/users', {}, {nickname: 'nocred', password: 'nobadge'}, function(err, body, res) {
                     if (err && err.statusCode === 401) {
                         cb(null);
                     } else if (err) {
@@ -394,9 +372,9 @@ suite.addBatch({
                 'and we add a user': {
                     topic: function(ignore, cl) {
                         var cb = this.callback;
-                        register(cl, {nickname: "echo", password: "echoooooooo"}, function(err, res, body) {
+                        register(cl, {nickname: "echo", password: "echoooooooo"}, function(err, body, res) {
                             if (err) {
-                                cb(new Error(err.data), null);
+                                cb(err, null);
                             } else {
                                 httputil.getJSON('http://localhost:4815/api/users',
                                                  {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
