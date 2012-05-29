@@ -22,14 +22,18 @@ var http = require('http'),
     _ = require('underscore'),
     OAuth = require('oauth').OAuth;
 
-var OAuthError = function(obj) {
-    Error.captureStackTrace(this, OAuthError);
-    this.name = "OAuthError";  
+var OAuthJSONError = function(obj) {
+    Error.captureStackTrace(this, OAuthJSONError);
+    this.name = "OAuthJSONError";  
     _.extend(this, obj);
 };
 
-OAuthError.prototype = new Error();  
-OAuthError.prototype.constructor = OAuthError;
+OAuthJSONError.prototype = new Error();  
+OAuthJSONError.prototype.constructor = OAuthJSONError;
+
+OAuthJSONError.prototype.toString = function() {
+    return "OAuthJSONError (" + this.statusCode + "):" + this.data;
+};
 
 var endpoint = function(url, methods) {
     var context = {
@@ -136,7 +140,7 @@ var jsonHandler = function(callback) {
     return function(err, data, response) {
         var obj;
         if (err) {
-            callback(new OAuthError(err), null, null);
+            callback(new OAuthJSONError(err), null, null);
         } else {
             try {
                 obj = JSON.parse(data);
