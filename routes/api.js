@@ -119,7 +119,7 @@ var clientAuth = function(req, res, next) {
             return;
         }
         
-        req.client = req.getAuthDetails().user;
+        req.client = req.getAuthDetails().user.client;
         res.local('client', req.client); // init to null
 
         next();
@@ -148,19 +148,13 @@ var userAuth = function(req, res, next) {
             return;
         }
 
-        req.remoteUser = req.getAuthDetails().user;
+        req.remoteUser = req.getAuthDetails().user.user;
         res.local('remoteUser', req.remoteUser);
 
-        Client.get(req.param.oauth_consumer_key, function(err, client) {
-            if (err) {
-                next(err);
-            } else {
-                req.client = client;
-                res.local('client', client);
-                // WIN
-                next();
-            }
-        });
+        req.client = req.getAuthDetails().user.client;
+        res.local('client', req.client);
+
+        next();
     });
 };
 
