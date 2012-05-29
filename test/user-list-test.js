@@ -391,7 +391,9 @@ suite.addBatch({
                             } else {
                                 httputil.getJSON('http://localhost:4815/api/users',
                                                  {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
-                                                 cb);
+                                                 function(err, coll, resp) {
+                                                     cb(err, coll);
+                                                 });
                             }
                         });
                     },
@@ -449,7 +451,7 @@ suite.addBatch({
                                                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
                                                      this);
                                 },
-                                function(err, collection) {
+                                function(err, collection, resp) {
                                     if (err) {
                                         cb(err, null);
                                     } else {
