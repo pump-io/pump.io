@@ -198,7 +198,7 @@ suite.addBatch({
                     var cb = this.callback;
                     Step(
                         function() {
-                            register("yankee", "doodle", this);
+                            register(cl, "yankee", "doodle", this);
                         },
                         function(err, user2) {
                             if (err) throw err;
@@ -354,7 +354,7 @@ suite.addBatch({
                     
                     Step(
                         function() {
-                            register("themistocles", "salamis", this);
+                            register(cl, "themistocles", "salamis", this);
                         },
                         function(err, res) {
                             if (err) throw err;
@@ -687,7 +687,7 @@ suite.addBatch({
                     var cb = this.callback;
                     Step(
                         function() {
-                            register("napoleon", "third", this);
+                            register(cl, "napoleon", "third", this);
                         },
                         function(err, res) {
                             if (err) throw err;
