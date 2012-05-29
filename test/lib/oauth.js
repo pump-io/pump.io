@@ -70,13 +70,14 @@ var newClient = function(cb) {
 };
 
 var accessToken = function(cl, user, cb) {
-    var rt, browser;
+    var rt;
 
     Step(
         function() {
             requestToken(cl, this);
         },
         function(err, res) {
+            var browser;
             if (err) throw err;
             rt = res;
             browser = new Browser();
@@ -85,21 +86,21 @@ var accessToken = function(cl, user, cb) {
         },
         function(err, br) {
             if (err) throw err;
-            if (!browser.success) throw new Error("Bad auth result");
-            browser.fill("username", user.nickname)
+            if (!br.success) throw new Error("Bad auth result");
+            br.fill("username", user.nickname)
                 .fill("password", user.password)
                 .pressButton("#authenticate", this);
         },
         function(err, br) {
             if (err) throw err;
-            if (!browser.success) throw new Error("Bad auth result");
-            browser.pressButton("Authorize", this);
+            if (!br.success) throw new Error("Bad auth result");
+            br.pressButton("Authorize", this);
         },
         function(err, br) {
             var oa, verifier;
             if (err) throw err;
-            if (!browser.success) throw new Error("Bad auth result");
-            verifier = browser.text("#verifier");
+            if (!br.success) throw new Error("Bad auth result");
+            verifier = br.text("#verifier");
             oa = new OAuth('http://localhost:4815/oauth/request_token',
                            'http://localhost:4815/oauth/access_token',
                            cl.client_id,
