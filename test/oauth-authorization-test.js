@@ -24,46 +24,12 @@ var assert = require('assert'),
     http = require('http'),
     OAuth = require('oauth').OAuth,
     Browser = require('zombie'),
-    httputil = require('./lib/http');
+    httputil = require('./lib/http'),
+    oauthutil = require('./lib/oauth'),
+    requestToken = oauthutil.requestToken,
+    newClient = oauthutil.newClient;
 
 var ignore = function(err) {};
-
-var requestToken = function(cl, cb) {
-    var oa;
-    oa = new OAuth('http://localhost:4815/oauth/request_token',
-                   'http://localhost:4815/oauth/access_token',
-                   cl.client_id,
-                   cl.client_secret,
-                   "1.0",
-                   "oob",
-                   "HMAC-SHA1",
-                   null, // nonce size; use default
-                   {"User-Agent": "activitypump-test/0.1.0"});
-    
-    oa.getOAuthRequestToken(function(err, token, secret) {
-        if (err) {
-            cb(new Error(err.data), null);
-        } else {
-            cb(null, {token: token, token_secret: secret});
-        }
-    });
-};
-
-var newClient = function(cb) {
-    httputil.post('localhost', 4815, '/api/client/register', {type: 'client_associate'}, function(err, res, body) {
-        var cl;
-        if (err) {
-            cb(err, null);
-        } else {
-            try {
-                cl = JSON.parse(body);
-                cb(null, cl);
-            } catch (err) {
-                cb(err, null);
-            }
-        }
-    });
-};
 
 var suite = vows.describe('OAuth authorization');
 
