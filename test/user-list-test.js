@@ -26,6 +26,16 @@ var assert = require('assert'),
 
 var suite = vows.describe('user API');
 
+var invert = function(callback) {
+    return function(err) {
+        if (err) {
+            callback(null);
+        } else {
+            callback(new Error("Unexpected success"));
+        }
+    };
+};
+
 var register = function(cl, params, callback) {
     httputil.postJSON('http://localhost:4815/api/users', 
                       {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
@@ -58,9 +68,9 @@ var registerSucceed = function(params) {
 var registerFail = function(params) {
     return {
         topic: function(cl) {
-            register(cl, params, this.callback);
+            register(cl, params, invert(this.callback));
         },
-        'it fails correctly': function(err, user, resp) {
+        'it fails correctly': function(err) {
             assert.ifError(err);
         }
     };
