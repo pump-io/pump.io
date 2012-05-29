@@ -775,7 +775,7 @@ suite.addBatch({
                                 httputil.delJSON('http://localhost:4815/api/user/victor',
                                                  {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
                                                   token: pair.token, token_secret: pair.token_secret},
-                                                 invert(cb));
+                                                 cb);
                             }
                         }
                     );
