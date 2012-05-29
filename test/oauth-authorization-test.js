@@ -26,6 +26,8 @@ var assert = require('assert'),
     Browser = require('zombie'),
     httputil = require('./lib/http');
 
+var ignore = function(err) {};
+
 var requestToken = function(cl, cb) {
     var oa;
     oa = new OAuth('http://localhost:4815/oauth/request_token',
@@ -43,6 +45,22 @@ var requestToken = function(cl, cb) {
             cb(new Error(err.data), null);
         } else {
             cb(null, {token: token, token_secret: secret});
+        }
+    });
+};
+
+var newClient = function(cb) {
+    httputil.post('localhost', 4815, '/api/client/register', {type: 'client_associate'}, function(err, res, body) {
+        var cl;
+        if (err) {
+            cb(err, null);
+        } else {
+            try {
+                cl = JSON.parse(body);
+                cb(null, cl);
+            } catch (err) {
+                cb(err, null);
+            }
         }
     });
 };
@@ -127,22 +145,223 @@ suite.addBatch({
                 assert.ifError(err);
             }
         },
-        'and we create a client using the api': {
+        'and we try to get an access token without any OAuth credentials': {
             topic: function() {
                 var cb = this.callback;
-                httputil.post('localhost', 4815, '/api/client/register', {type: 'client_associate'}, function(err, res, body) {
-                    var cl;
+                httputil.post('localhost', 4815, '/oauth/access_token', {}, function(err, res, body) {
                     if (err) {
-                        cb(err, null);
+                        cb(err);
+                    } else if (res.statusCode === 400) {
+                        cb(null);
                     } else {
-                        try {
-                            cl = JSON.parse(body);
-                            cb(null, cl);
-                        } catch (err) {
-                            cb(err, null);
-                        }
+                        cb(new Error("Unexpected success"));
                     }
                 });
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        'and we try to get an access token with an invalid client key': {
+            topic: function() {
+                var cb = this.callback,
+                    oa;
+
+                oa = new OAuth('http://localhost:4815/oauth/request_token',
+                               'http://localhost:4815/oauth/access_token',
+                               "NOTACLIENT",
+                               "NOTASECRET",
+                               "1.0",
+                               "oob",
+                               "HMAC-SHA1",
+                               null, // nonce size; use default
+                               {"User-Agent": "activitypump-test/0.1.0"});
+                                        
+                oa.getOAuthAccessToken("NOTATOKEN", "NOTATOKENSECRET", "NOTAVERIFIER", function(err, token, secret) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success"));
+                    }
+                });
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        'and we try to get an access token with an valid client key and invalid client secret': {
+            topic: function() {
+                var cb = this.callback;
+                Step(
+                    function() {
+                        newClient(this);
+                    },
+                    function(err, cl) {
+                        if (err) throw err;
+                        var oa = new OAuth('http://localhost:4815/oauth/request_token',
+                                           'http://localhost:4815/oauth/access_token',
+                                           cl.client_id,
+                                           "NOTASECRET",
+                                           "1.0",
+                                           "oob",
+                                           "HMAC-SHA1",
+                                           null, // nonce size; use default
+                                           {"User-Agent": "activitypump-test/0.1.0"});
+                        
+                        oa.getOAuthAccessToken("NOTATOKEN", "NOTATOKENSECRET", "NOTAVERIFIER", function(err, token, secret) {
+                            if (err) {
+                                cb(null, cl);
+                            } else {
+                                cb(new Error("Unexpected success"), null);
+                            }
+                        });
+                    }
+                );
+            },
+            'it fails correctly': function(err, cl) {
+                assert.ifError(err);
+            },
+            teardown: function(cl) {
+                if (cl && cl.del) {
+                    cl.del(ignore);
+                }
+            }
+        },
+        'and we try to get an access token with an valid client key and valid client secret and invalid request token': {
+            topic: function() {
+                var cb = this.callback;
+                Step(
+                    function() {
+                        newClient(this);
+                    },
+                    function(err, cl) {
+                        if (err) throw err;
+                        var oa = new OAuth('http://localhost:4815/oauth/request_token',
+                                           'http://localhost:4815/oauth/access_token',
+                                           cl.client_id,
+                                           cl.client_secret,
+                                           "1.0",
+                                           "oob",
+                                           "HMAC-SHA1",
+                                           null, // nonce size; use default
+                                           {"User-Agent": "activitypump-test/0.1.0"});
+                        
+                        oa.getOAuthAccessToken("NOTATOKEN", "NOTATOKENSECRET", "NOTAVERIFIER", function(err, token, secret) {
+                            if (err) {
+                                cb(null, cl);
+                            } else {
+                                cb(new Error("Unexpected success"), null);
+                            }
+                        });
+                    }
+                );
+            },
+            'it fails correctly': function(err, cl) {
+                assert.ifError(err);
+            },
+            teardown: function(cl) {
+                if (cl && cl.del) {
+                    cl.del(ignore);
+                }
+            }
+        },
+        'and we try to get an access token with an valid client key and valid client secret and valid request token and invalid request token secret': {
+            topic: function() {
+                var cb = this.callback,
+                    cl;
+
+                Step(
+                    function() {
+                        newClient(this);
+                    },
+                    function(err, client) {
+                        if (err) throw err;
+                        cl = client;
+                        requestToken(cl, this);
+                    },
+                    function(err, rt) {
+                        var oa = new OAuth('http://localhost:4815/oauth/request_token',
+                                           'http://localhost:4815/oauth/access_token',
+                                           cl.client_id,
+                                           cl.client_secret,
+                                           "1.0",
+                                           "oob",
+                                           "HMAC-SHA1",
+                                           null, // nonce size; use default
+                                           {"User-Agent": "activitypump-test/0.1.0"});
+                        
+                        oa.getOAuthAccessToken(rt.token, "NOTATOKENSECRET", "NOTAVERIFIER", function(err, token, secret) {
+                            if (err) {
+                                cb(null, {cl: cl, rt: rt});
+                            } else {
+                                cb(new Error("Unexpected success"), null);
+                            }
+                        });
+                    }
+                );
+            },
+            'it fails correctly': function(err, res) {
+                assert.ifError(err);
+            },
+            teardown: function(res) {
+                if (res.cl && res.cl.del) {
+                    res.cl.del(ignore);
+                }
+                if (res.rt && res.rt.del) {
+                    res.rt.del(ignore);
+                }
+            }
+        },
+        'and we try to get an access token with an valid client key and valid client secret and valid request token and valid request token secret and invalid verifier': {
+            topic: function() {
+                var cb = this.callback,
+                    cl;
+
+                Step(
+                    function() {
+                        newClient(this);
+                    },
+                    function(err, client) {
+                        if (err) throw err;
+                        cl = client;
+                        requestToken(cl, this);
+                    },
+                    function(err, rt) {
+                        var oa = new OAuth('http://localhost:4815/oauth/request_token',
+                                           'http://localhost:4815/oauth/access_token',
+                                           cl.client_id,
+                                           cl.client_secret,
+                                           "1.0",
+                                           "oob",
+                                           "HMAC-SHA1",
+                                           null, // nonce size; use default
+                                           {"User-Agent": "activitypump-test/0.1.0"});
+                        
+                        oa.getOAuthAccessToken(rt.token, rt.token_secret, "NOTAVERIFIER", function(err, token, secret) {
+                            if (err) {
+                                cb(null, {cl: cl, rt: rt});
+                            } else {
+                                cb(new Error("Unexpected success"), null);
+                            }
+                        });
+                    }
+                );
+            },
+            'it fails correctly': function(err, res) {
+                assert.ifError(err);
+            },
+            teardown: function(res) {
+                if (res.cl && res.cl.del) {
+                    res.cl.del(ignore);
+                }
+                if (res.rt && res.rt.del) {
+                    res.rt.del(ignore);
+                }
+            }
+        },
+        'and we create a client using the api': {
+            topic: function() {
+                newClient(this.callback);
             },
             'it works': function(err, cl) {
                 assert.ifError(err);
