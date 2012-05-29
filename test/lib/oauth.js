@@ -118,7 +118,6 @@ var accessToken = function(cl, user, cb) {
 };
 
 var register = function(cl, nickname, password, callback) {
-    var cb = this.callback;
 
     httputil.postJSON('http://localhost:4815/api/users', 
                       {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
@@ -126,13 +125,13 @@ var register = function(cl, nickname, password, callback) {
                       function(err, res, body) {
                           var user;
                           if (err) {
-                              cb(new Error(err.data), null);
+                              callback(new Error(err.data), null);
                           } else {
                               try {
                                   user = JSON.parse(body);
-                                  cb(null, user);
+                                  callback(null, user);
                               } catch (err) {
-                                  cb(err, null);
+                                  callback(err, null);
                               }
                           }
                       });
