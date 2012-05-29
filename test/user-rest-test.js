@@ -249,27 +249,38 @@ suite.addBatch({
 
 suite.addBatch({
     'When we set up the app': {
+
         topic: function() {
             var cb = this.callback;
-            setupApp(function(err) {
+            setupApp(function(err, app) {
                 if (err) {
-                    cb(err, null);
+                    cb(err, null, null);
                 } else {
-                    newClient(cb);
+                    newClient(function(err, cl) {
+                        if (err) {
+                            cb(err, null, null);
+                        } else {
+                            cb(err, cl, app);
+                        }
+                    });
                 }
             });
         },
 
-        'it works': function(err, cl) {
+        'it works': function(err, cl, app) {
             assert.ifError(err);
             assert.isObject(cl);
         },
 
-        teardown: function(cl) {
+        teardown: function(cl, app) {
             if (cl && cl.del) {
                 cl.del(function(err) {});
             }
+            if (app) {
+                app.close();
+            }
         },
+
         'and we try to put a non-existent user': {
 
             topic: function(cl) {
@@ -425,25 +436,35 @@ suite.addBatch({
 
 suite.addBatch({
     'When we set up the app': {
+
         topic: function() {
             var cb = this.callback;
-            setupApp(function(err) {
+            setupApp(function(err, app) {
                 if (err) {
-                    cb(err, null);
+                    cb(err, null, null);
                 } else {
-                    newClient(cb);
+                    newClient(function(err, cl) {
+                        if (err) {
+                            cb(err, null, null);
+                        } else {
+                            cb(err, cl, app);
+                        }
+                    });
                 }
             });
         },
 
-        'it works': function(err, cl) {
+        'it works': function(err, cl, app) {
             assert.ifError(err);
             assert.isObject(cl);
         },
 
-        teardown: function(cl) {
+        teardown: function(cl, app) {
             if (cl && cl.del) {
                 cl.del(function(err) {});
+            }
+            if (app) {
+                app.close();
             }
         },
         'and we register a user': {
@@ -497,25 +518,35 @@ suite.addBatch({
 
 suite.addBatch({
     'When we set up the app': {
+
         topic: function() {
             var cb = this.callback;
-            setupApp(function(err) {
+            setupApp(function(err, app) {
                 if (err) {
-                    cb(err, null);
+                    cb(err, null, null);
                 } else {
-                    newClient(cb);
+                    newClient(function(err, cl) {
+                        if (err) {
+                            cb(err, null, null);
+                        } else {
+                            cb(err, cl, app);
+                        }
+                    });
                 }
             });
         },
 
-        'it works': function(err, cl) {
+        'it works': function(err, cl, app) {
             assert.ifError(err);
             assert.isObject(cl);
         },
 
-        teardown: function(cl) {
+        teardown: function(cl, app) {
             if (cl && cl.del) {
                 cl.del(function(err) {});
+            }
+            if (app) {
+                app.close();
             }
         },
         'and we register a user': {
@@ -604,26 +635,36 @@ suite.addBatch({
 });
 
 suite.addBatch({
-    'and we set up the app': {
+    'When we set up the app': {
+
         topic: function() {
             var cb = this.callback;
-            setupApp(function(err) {
+            setupApp(function(err, app) {
                 if (err) {
-                    cb(err, null);
+                    cb(err, null, null);
                 } else {
-                    newClient(cb);
+                    newClient(function(err, cl) {
+                        if (err) {
+                            cb(err, null, null);
+                        } else {
+                            cb(err, cl, app);
+                        }
+                    });
                 }
             });
         },
 
-        'it works': function(err, cl) {
+        'it works': function(err, cl, app) {
             assert.ifError(err);
             assert.isObject(cl);
         },
 
-        teardown: function(cl) {
+        teardown: function(cl, app) {
             if (cl && cl.del) {
                 cl.del(function(err) {});
+            }
+            if (app) {
+                app.close();
             }
         },
         'and we register a user': {
