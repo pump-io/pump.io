@@ -145,6 +145,28 @@ var postJSON = function(serverUrl, cred, payload, callback) {
     });
 };
 
+var putJSON = function(serverUrl, cred, payload, callback) {
+
+    var oa, toSend;
+
+    oa = new OAuth(null, // request endpoint N/A for 2-legged OAuth
+                   null, // access endpoint N/A for 2-legged OAuth
+                   cred.consumer_key,
+                   cred.consumer_secret,
+                   "1.0",
+                   null,
+                   "HMAC-SHA1",
+                   null, // nonce size; use default
+                   {"User-Agent": "activitypump-test/0.1.0"});
+    
+    toSend = JSON.stringify(payload);
+
+    oa.put(serverUrl, cred.token, cred.token_secret, toSend, 'application/json', function(err, data, response) {
+        // Our callback has swapped args to OAuth module's
+        callback(err, response, data);
+    });
+};
+
 var getJSON = function(serverUrl, cred, callback) {
 
     var oa, toSend;
@@ -174,8 +196,30 @@ var getJSON = function(serverUrl, cred, callback) {
     });
 };
 
+var delJSON = function(serverUrl, cred, callback) {
+
+    var oa, toSend;
+
+    oa = new OAuth(null, // request endpoint N/A for 2-legged OAuth
+                   null, // access endpoint N/A for 2-legged OAuth
+                   cred.consumer_key,
+                   cred.consumer_secret,
+                   "1.0",
+                   null,
+                   "HMAC-SHA1",
+                   null, // nonce size; use default
+                   {"User-Agent": "activitypump-test/0.1.0"});
+    
+    oa['delete'](serverUrl, cred.token, cred.token_secret, function(err, data, response) {
+        // Our callback has swapped args to OAuth module's
+        callback(err, response, data);
+    });
+};
+
 exports.options = options;
 exports.post = post;
 exports.postJSON = postJSON;
 exports.getJSON = getJSON;
+exports.putJSON = putJSON;
+exports.delJSON = delJSON;
 exports.endpoint = endpoint;
