@@ -91,7 +91,7 @@ suite.addBatch({
             },
 
             'and we get the options on the user api endpoint': 
-            httputil.endpoint('/api/user/zardoz', ['GET', 'POST', 'DELETE']),
+            httputil.endpoint('/api/user/zardoz', ['GET', 'PUT', 'DELETE']),
 
             'and we GET the user data without OAuth credentials': {
                 topic: function() {
