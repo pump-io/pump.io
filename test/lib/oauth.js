@@ -60,5 +60,148 @@ var newClient = function(cb) {
     });
 };
 
+var accessToken = function(cl, user, cb) {
+    var rt, browser;
+
+    Step(
+        function() {
+            requestToken(cl, this);
+        },
+        function(err, res) {
+            if (err) throw err;
+            rt = res;
+            browser = new Browser();
+            browser.runScripts = false;
+            browser.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, this);
+        },
+        function(err, br) {
+            if (err) throw err;
+            if (!browser.success) throw new Error("Bad auth result");
+            browser.fill("username", user.nickname)
+                .fill("password", user.password)
+                .pressButton("#authenticate", this);
+        },
+        function(err, br) {
+            if (err) throw err;
+            if (!browser.success) throw new Error("Bad auth result");
+            browser.pressButton("Authorize", this);
+        },
+        function(err, br) {
+            var oa, verifier;
+            if (err) throw err;
+            if (!browser.success) throw new Error("Bad auth result");
+            verifier = browser.text("#verifier");
+            oa = new OAuth('http://localhost:4815/oauth/request_token',
+                           'http://localhost:4815/oauth/access_token',
+                           cl.client_id,
+                           cl.client_secret,
+                           "1.0",
+                           "oob",
+                           "HMAC-SHA1",
+                           null, // nonce size; use default
+                           {"User-Agent": "activitypump-test/0.1.0"});
+                                        
+            oa.getOAuthAccessToken(rt.token, rt.token_secret, verifier, this);
+        },
+        function(err, token, secret) {
+            if (err) {
+                if (err instanceof Error) {
+                    cb(err, null);
+                } else {
+                    cb(new Error(err.data), null);
+                }
+            } else {
+                cb(null, {token: token, token_secret: secret});
+            }
+        }
+    );
+};
+
+var register = function(cl, nickname, password, callback) {
+    var cb = this.callback;
+
+    httputil.postJSON('http://localhost:4815/api/users', 
+                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
+                      {nickname: nickname, password: password},
+                      function(err, res, body) {
+                          var user;
+                          if (err) {
+                              cb(new Error(err.data), null);
+                          } else {
+                              try {
+                                  user = JSON.parse(body);
+                                  cb(null, user);
+                              } catch (err) {
+                                  cb(err, null);
+                              }
+                          }
+                      });
+};
+
+var newCredentials = function(nickname, password, cb) {
+    var cl, user;
+
+    Step(
+        function() {
+            newClient(this);
+        },
+        function(err, res) {
+            if (err) throw err;
+            cl = res;
+            register(nickname, password, this);
+        },
+        function(err, res) {
+            if (err) throw err;
+            user = {nickname: nickname, password: password};
+            accessToken(cl, user, this);
+        },
+        function(err, res) {
+            if (err) {
+                cb(err);
+            } else {
+                _.extend(cl, res);
+                cb(err, cl);
+            }
+        }
+    );
+};
+
+var setupApp = function(callback) {
+
+    var cb = callback,
+        config = {port: 4815,
+                  hostname: 'localhost',
+                  driver: 'memory',
+                  params: {},
+                  nologger: true
+                 },
+        app = null,
+        makeApp = require('../../lib/app').makeApp;
+
+    process.env.NODE_ENV = 'test';
+
+    Step(
+        function() {
+            makeApp(config, this);
+        },
+        function(err, res) {
+            if (err) throw err;
+            app = res;
+            app.run(this);
+        },
+        function(err) {
+            if (err) {
+                cb(err, null);
+            } else {
+                cb(null, app);
+            }
+        }
+    );
+};
+
 exports.requestToken = requestToken;
 exports.newClient = newClient;
+exports.register = register;
+exports.newCredentials = newCredentials;
+exports.accessToken = accessToken;
+exports.setupApp = setupApp;
