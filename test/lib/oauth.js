@@ -23,6 +23,15 @@ var Step = require('step'),
     Browser = require('zombie'),
     httputil = require('./http');
 
+var OAuthError = function(obj) {
+    Error.captureStackTrace(this, OAuthError);
+    this.name = "OAuthError";  
+    _.extend(this, obj);
+};
+
+OAuthError.prototype = new Error();  
+OAuthError.prototype.constructor = OAuthError;
+
 var requestToken = function(cl, cb) {
     var oa;
     oa = new OAuth('http://localhost:4815/oauth/request_token',
@@ -37,7 +46,7 @@ var requestToken = function(cl, cb) {
     
     oa.getOAuthRequestToken(function(err, token, secret) {
         if (err) {
-            cb(new Error(err.data), null);
+            cb(new OAuthError(err), null);
         } else {
             cb(null, {token: token, token_secret: secret});
         }
