@@ -507,6 +507,35 @@ suite.addBatch({
                                         assert.isString(pair.token);
                                         assert.include(pair, 'token_secret');
                                         assert.isString(pair.token_secret);
+                                    },
+                                    'and we try to get another access token with the same data': {
+                                        topic: function() {
+                                            var cb = this.callback,
+                                                oa,
+                                                pair = arguments[1],
+                                                rt = arguments[6],
+                                                cl = arguments[8];
+
+                                            oa = new OAuth('http://localhost:4815/oauth/request_token',
+                                                           'http://localhost:4815/oauth/access_token',
+                                                           cl.client_id,
+                                                           cl.client_secret,
+                                                           "1.0",
+                                                           "oob",
+                                                           "HMAC-SHA1",
+                                                           null, // nonce size; use default
+                                                           {"User-Agent": "activitypump-test/0.1.0"});
+                                            oa.getOAuthAccessToken(pair.token, rt.token_secret, pair.verifier, function(err, token, secret) {
+                                                if (err) {
+                                                    cb(null);
+                                                } else {
+                                                    cb(new Error("Unexpected success"));
+                                                }
+                                            });
+                                        },
+                                        'it fails correctly': function(err) {
+                                            assert.ifError(err);
+                                        }
                                     }
                                 }
                             }
