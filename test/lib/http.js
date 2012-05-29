@@ -22,6 +22,15 @@ var http = require('http'),
     _ = require('underscore'),
     OAuth = require('oauth').OAuth;
 
+var OAuthError = function(obj) {
+    Error.captureStackTrace(this, OAuthError);
+    this.name = "OAuthError";  
+    _.extend(this, obj);
+};
+
+OAuthError.prototype = new Error();  
+OAuthError.prototype.constructor = OAuthError;
+
 var endpoint = function(url, methods) {
     var context = {
         topic: function() {
@@ -127,7 +136,7 @@ var jsonHandler = function(callback) {
     return function(err, data, response) {
         var obj;
         if (err) {
-            callback(new Error(err.data), null, null);
+            callback(new OAuthError(err), null, null);
         } else {
             try {
                 obj = JSON.parse(data);
