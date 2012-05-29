@@ -780,7 +780,7 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err) {
+                'it works': function(err, body, result) {
                     assert.ifError(err);
                 }
             }
