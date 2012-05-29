@@ -21,7 +21,7 @@ var Step = require('step'),
     http = require('http'),
     OAuth = require('oauth').OAuth,
     Browser = require('zombie'),
-    httputil = require('./lib/http');
+    httputil = require('./http');
 
 var requestToken = function(cl, cb) {
     var oa;
