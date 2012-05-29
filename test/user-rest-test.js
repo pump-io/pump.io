@@ -352,7 +352,7 @@ suite.addBatch({
                                      {nickname: 'xerxes', password: 'corinth'},
                                      invert(this.callback));
                 },
-                'it works': function(err) {
+                'it fails correctly': function(err) {
                     assert.ifError(err);
                 }
             },
