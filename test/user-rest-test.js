@@ -481,6 +481,8 @@ suite.addBatch({
                 'it works': function(err, pair) {
                     assert.ifError(err);
                     assert.isObject(pair);
+                    assert.isString(pair.token);
+                    assert.isString(pair.token_secret);
                 },
                 'and we PUT third-party user data': {
                     topic: function(pair, user, cl) {
