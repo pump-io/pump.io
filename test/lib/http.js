@@ -123,6 +123,22 @@ var post = function(host, port, path, params, callback) {
     req.end();
 };
 
+var jsonHandler = function(callback) {
+    return function(err, data, response) {
+        var obj;
+        if (err) {
+            callback(new Error(err.data), null, null);
+        } else {
+            try {
+                obj = JSON.parse(data);
+                callback(null, obj, response);
+            } catch (e) {
+                callback(e, null, null);
+            }
+        }
+    };
+};
+
 var postJSON = function(serverUrl, cred, payload, callback) {
 
     var oa, toSend;
@@ -139,10 +155,7 @@ var postJSON = function(serverUrl, cred, payload, callback) {
     
     toSend = JSON.stringify(payload);
 
-    oa.post(serverUrl, cred.token, cred.token_secret, toSend, 'application/json', function(err, data, response) {
-        // Our callback has swapped args to OAuth module's
-        callback(err, response, data);
-    });
+    oa.post(serverUrl, cred.token, cred.token_secret, toSend, 'application/json', jsonHandler(callback));
 };
 
 var putJSON = function(serverUrl, cred, payload, callback) {
@@ -161,10 +174,7 @@ var putJSON = function(serverUrl, cred, payload, callback) {
     
     toSend = JSON.stringify(payload);
 
-    oa.put(serverUrl, cred.token, cred.token_secret, toSend, 'application/json', function(err, data, response) {
-        // Our callback has swapped args to OAuth module's
-        callback(err, response, data);
-    });
+    oa.put(serverUrl, cred.token, cred.token_secret, toSend, 'application/json', jsonHandler(callback));
 };
 
 var getJSON = function(serverUrl, cred, callback) {
@@ -181,19 +191,7 @@ var getJSON = function(serverUrl, cred, callback) {
                    null, // nonce size; use default
                    {"User-Agent": "activitypump-test/0.1.0"});
     
-    oa.get(serverUrl, cred.token, cred.token_secret, function(err, data, response) {
-        var results;
-        if (err) {
-            callback(new Error(err.data), null);
-        } else {
-            try {
-                results = JSON.parse(data);
-                callback(null, results);
-            } catch (err) {
-                callback(err, null);
-            }
-        }
-    });
+    oa.get(serverUrl, cred.token, cred.token_secret, jsonHandler(callback));
 };
 
 var delJSON = function(serverUrl, cred, callback) {
@@ -210,10 +208,7 @@ var delJSON = function(serverUrl, cred, callback) {
                    null, // nonce size; use default
                    {"User-Agent": "activitypump-test/0.1.0"});
     
-    oa['delete'](serverUrl, cred.token, cred.token_secret, function(err, data, response) {
-        // Our callback has swapped args to OAuth module's
-        callback(err, response, data);
-    });
+    oa['delete'](serverUrl, cred.token, cred.token_secret, jsonHandler(callback));
 };
 
 exports.options = options;
