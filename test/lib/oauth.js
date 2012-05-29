@@ -32,6 +32,10 @@ var OAuthError = function(obj) {
 OAuthError.prototype = new Error();  
 OAuthError.prototype.constructor = OAuthError;
 
+OAuthError.prototype.toString = function() {
+    return "OAuthError (" + this.statusCode + "):" + this.data;
+};
+
 var requestToken = function(cl, cb) {
     var oa;
     oa = new OAuth('http://localhost:4815/oauth/request_token',
@@ -85,7 +89,7 @@ var accessToken = function(cl, user, cb) {
         },
         function(err, br) {
             if (err) throw err;
-            if (!br.success) throw new Error("Bad auth result");
+            if (!br.success) throw new OAuthError({statusCode: br.statusCode, data: br.error});
             br.fill("username", user.nickname, this);
         },
         function(err, br) {
@@ -98,13 +102,13 @@ var accessToken = function(cl, user, cb) {
         },
         function(err, br) {
             if (err) throw err;
-            if (!br.success) throw new Error("Bad auth result");
+            if (!br.success) throw new OAuthError({statusCode: br.statusCode, data: br.error});
             br.pressButton("Authorize", this);
         },
         function(err, br) {
             var oa, verifier;
             if (err) throw err;
-            if (!br.success) throw new Error("Bad auth result");
+            if (!br.success) throw new OAuthError({statusCode: br.statusCode, data: br.error});
             verifier = br.text("#verifier");
             oa = new OAuth('http://localhost:4815/oauth/request_token',
                            'http://localhost:4815/oauth/access_token',
