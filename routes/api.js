@@ -144,7 +144,6 @@ var userAuth = function(req, res, next) {
         }
 
         if (!authenticated) {
-            next(new HTTPError("Not authenticated", 403));
             return;
         }
 
