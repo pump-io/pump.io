@@ -113,6 +113,7 @@ var accessToken = function(cl, user, cb) {
             oa.getOAuthAccessToken(rt.token, rt.token_secret, verifier, this);
         },
         function(err, token, secret, res) {
+            var pair;
             if (err) {
                 if (err instanceof Error) {
                     cb(err, null);
@@ -120,7 +121,8 @@ var accessToken = function(cl, user, cb) {
                     cb(new Error(err.data), null);
                 }
             } else {
-                cb(null, {token: token, token_secret: secret});
+                pair = {token: token, token_secret: secret};
+                cb(null, pair);
             }
         }
     );
