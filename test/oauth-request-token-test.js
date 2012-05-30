@@ -25,7 +25,9 @@ var assert = require('assert'),
     OAuth = require('oauth').OAuth,
     httputil = require('./lib/http'),
     oauthutil = require('./lib/oauth'),
+    accessToken = oauthutil.accessToken,
     requestToken = oauthutil.requestToken,
+    register = oauthutil.register,
     setupApp = oauthutil.setupApp,
     newClient = oauthutil.newClient,
     newCredentials = oauthutil.newCredentials;
@@ -233,17 +235,26 @@ suite.addBatch({
         'it works': function(err, app) {
             assert.ifError(err);
         },
-        'and we get a request token after getting credentials': {
+        'and we get a request token after getting an access token': {
             topic: function() {
-                var cb = this.callback;
+                var cb = this.callback,
+                    cl;
                 Step(
                     function() {
-                        // Goes through the whole rigamarole
-                        newCredentials("mary", "lamb", this);
+                        newClient(this);
                     },
-                    function(err, cred) {
+                    function(err, res) {
                         if (err) throw err;
-                        requestToken({client_id: cred.consumer_key, client_secret: cred.consumer_secret}, this);
+                        cl = res;
+                        register(cl, "mary", "lamb", this);
+                    },
+                    function(err, user) {
+                        if (err) throw err;
+                        accessToken(cl, {nickname: "mary", password: "lamb"}, this);
+                    },
+                    function(err, pair) {
+                        if (err) throw err;
+                        requestToken(cl, this);
                     },
                     function(err, rt) {
                         if (err) {
@@ -254,8 +265,9 @@ suite.addBatch({
                     }
                 );
             },
-            'it works': function(err, cred) {
+            'it works': function(err, rt) {
                 assert.ifError(err);
+                assert.isObject(rt);
             }
         }
     }
