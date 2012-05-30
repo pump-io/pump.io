@@ -55,24 +55,26 @@ suite.addBatch({
                         if (err) {
                             cb(err, null, null);
                         } else {
-                            cb(err, cl, app);
+                            // sneaky, but we just need it for teardown
+                            cl.app = app;
+                            cb(err, cl);
                         }
                     });
                 }
             });
         },
 
-        'it works': function(err, cl, app) {
+        'it works': function(err, cl) {
             assert.ifError(err);
             assert.isObject(cl);
         },
 
-        teardown: function(cl, app) {
+        teardown: function(cl) {
             if (cl && cl.del) {
                 cl.del(function(err) {});
             }
-            if (app) {
-                app.close();
+            if (cl.app) {
+                cl.app.close();
             }
         },
 
