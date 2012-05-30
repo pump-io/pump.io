@@ -169,8 +169,9 @@ var newCredentials = function(nickname, password, cb) {
             if (err) {
                 cb(err);
             } else {
-                _.extend(cl, res);
-                cb(err, cl);
+                _.extend(res, {consumer_key: cl.client_id,
+                               consumer_secret: cl.client_secret});
+                cb(err, res);
             }
         }
     );
