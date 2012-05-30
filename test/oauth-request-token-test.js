@@ -172,4 +172,49 @@ suite.addBatch({
     }
 });
 
+// A batch to test parallel requests
+
+suite.addBatch({
+    'When we set up the app': {
+        topic: function() {
+            setupApp(this.callback);
+        },
+        teardown: function(app) {
+            if (app && app.close) {
+                app.close();
+            }
+        },
+        'it works': function(err, app) {
+            assert.ifError(err);
+        },
+        'and we create a client using the api': {
+            topic: function() {
+                newClient(this.callback);
+            },
+            'it works': function(err, cl) {
+                assert.ifError(err);
+            },
+            'and we get many request tokens in parallel': {
+                topic: function(cl) {
+                    var cb = this.callback;
+                    Step(
+                        function() {
+                            var i, group = this.group();
+                            for (i = 0; i < 20; i++) {
+                                requestToken(cl, group());
+                            }
+                        },
+                        function(err, rts) {
+                            cb(err);
+                        }
+                    );
+                },
+                'it works': function(err) {
+                    assert.ifError(err);
+                }
+            }
+        }
+    }
+});
+
 suite['export'](module);
