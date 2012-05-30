@@ -89,7 +89,7 @@ var accessToken = function(cl, user, cb) {
         },
         function(err, br) {
             if (err) throw err;
-            if (!br.success) throw new OAuthError({statusCode: br.statusCode, data: br.error});
+            if (!br.success) throw new OAuthError({statusCode: br.statusCode, data: br.text("#error")});
             br.fill("username", user.nickname, this);
         },
         function(err, br) {
@@ -102,13 +102,13 @@ var accessToken = function(cl, user, cb) {
         },
         function(err, br) {
             if (err) throw err;
-            if (!br.success) throw new OAuthError({statusCode: br.statusCode, data: br.error});
+            if (!br.success) throw new OAuthError({statusCode: br.statusCode, data: br.text("#error")});
             br.pressButton("Authorize", this);
         },
         function(err, br) {
             var oa, verifier;
             if (err) throw err;
-            if (!br.success) throw new OAuthError({statusCode: br.statusCode, data: br.error});
+            if (!br.success) throw new OAuthError({statusCode: br.statusCode, data: br.text("#error")});
             verifier = br.text("#verifier");
             oa = new OAuth('http://localhost:4815/oauth/request_token',
                            'http://localhost:4815/oauth/access_token',
