@@ -170,7 +170,7 @@ var authenticate = function(req, res) {
     } else {
         RequestToken.get(token, function(err, rt) {
             if (err) {
-                throw new HTTPError("Invalid oauth_token", 400);
+                throw new HTTPError(err.toString(), 400);
             } else {
                 res.render('authentication', {title: "Authentication", token: token, nologin: true, error: false});
             }
