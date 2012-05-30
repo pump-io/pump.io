@@ -488,11 +488,14 @@ suite.addBatch({
                 },
                 'and we PUT third-party user data': {
                     topic: function(pair, user, cl) {
+                        var cb = this.callback;
                         httputil.putJSON('http://localhost:4815/api/user/c3po',
                                          {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
                                           token: pair.token, token_secret: pair.token_secret},
                                          {nickname: 'c3po', password: 'ihateanakin', langs: 6000000},
-                                         this.callback);
+                                         function(err, body, res) {
+                                             cb(err, body);
+                                         });
                     },
                     'it works': function(err, res) {
                         assert.ifError(err);
