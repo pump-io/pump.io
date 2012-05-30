@@ -44,6 +44,7 @@ var testData = {
         }
     },
     'update': {
+        nickname: "evan",
         password: "correct horse battery staple" // the most secure password! see http://xkcd.com/936/
     }
 };
