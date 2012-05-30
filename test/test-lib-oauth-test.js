@@ -103,6 +103,23 @@ suite.addBatch({
                         }
                     }
                 }
+            },
+            'and we get new credentials': {
+                topic: function(app, oauth) {
+                    oauth.newCredentials("jasper", "johns", this.callback);
+                },
+                'it works': function(err, cred) {
+                    assert.ifError(err);
+                    assert.isObject(cred);
+                    assert.include(cred, 'consumer_key');
+                    assert.isString(cred.consumer_key);
+                    assert.include(cred, 'consumer_secret');
+                    assert.isString(cred.consumer_secret);
+                    assert.include(cred, 'token');
+                    assert.isString(cred.token);
+                    assert.include(cred, 'token_secret');
+                    assert.isString(cred.token_secret);
+                }
             }
         }
     }
