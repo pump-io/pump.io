@@ -63,14 +63,14 @@ suite.addBatch({
                         var i, group = this.group();
                         if (err) throw err;
                         cl = res;
-                        for (i = 0; i < 100; i++) {
+                        for (i = 0; i < 25; i++) {
                             register(cl, "testuser"+i, "password"+i, group());
                         }
                     },
                     function(err, users) {
                         var i, group = this.group();
                         if (err) throw err;
-                        for (i = 0; i < 100; i++) {
+                        for (i = 0; i < 25; i++) {
                             accessToken(cl, {nickname: "testuser"+i, password: "password"+i}, group());
                         }
                     },
@@ -87,7 +87,7 @@ suite.addBatch({
                 var i;
                 assert.ifError(err);
                 assert.isArray(pairs);
-                assert.lengthOf(pairs, 100);
+                assert.lengthOf(pairs, 25);
                 for (i = 0; i < pairs.length; i++) {
                     assert.include(pairs[i], 'token');
                     assert.isString(pairs[i].token);
