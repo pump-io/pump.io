@@ -26,7 +26,8 @@ var assert = require('assert'),
     httputil = require('./lib/http'),
     oauthutil = require('./lib/oauth'),
     requestToken = oauthutil.requestToken,
-    setupApp = oauthutil.setupApp;
+    setupApp = oauthutil.setupApp,
+    newClient = oauthutil.newClient;
 
 var suite = vows.describe('user API');
 
@@ -80,20 +81,7 @@ suite.addBatch({
         },
         'and we create a client using the api': {
             topic: function() {
-                var cb = this.callback;
-                httputil.post('localhost', 4815, '/api/client/register', {type: 'client_associate'}, function(err, res, body) {
-                    var cl;
-                    if (err) {
-                        cb(err, null);
-                    } else {
-                        try {
-                            cl = JSON.parse(body);
-                            cb(null, cl);
-                        } catch (err) {
-                            cb(err, null);
-                        }
-                    }
-                });
+                newClient(this.callback);
             },
             'it works': function(err, cl) {
                 assert.ifError(err);
