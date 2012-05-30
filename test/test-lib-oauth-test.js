@@ -32,9 +32,9 @@ suite.addBatch({
         'it works': function(oauth) {
             assert.isObject(oauth);
         },
-        'it has a requestToken() export': function(oauth) {
-            assert.isTrue(_(oauth).has('requestToken'));
-            assert.isFunction(oauth.requestToken);
+        'it has a setupApp() export': function(oauth) {
+            assert.isTrue(_(oauth).has('setupApp'));
+            assert.isFunction(oauth.setupApp);
         },
         'it has a newClient() export': function(oauth) {
             assert.isTrue(_(oauth).has('newClient'));
@@ -44,6 +44,10 @@ suite.addBatch({
             assert.isTrue(_(oauth).has('register'));
             assert.isFunction(oauth.register);
         },
+        'it has a requestToken() export': function(oauth) {
+            assert.isTrue(_(oauth).has('requestToken'));
+            assert.isFunction(oauth.requestToken);
+        },
         'it has a newCredentials() export': function(oauth) {
             assert.isTrue(_(oauth).has('newCredentials'));
             assert.isFunction(oauth.newCredentials);
@@ -52,9 +56,54 @@ suite.addBatch({
             assert.isTrue(_(oauth).has('accessToken'));
             assert.isFunction(oauth.accessToken);
         },
-        'it has a setupApp() export': function(oauth) {
-            assert.isTrue(_(oauth).has('setupApp'));
-            assert.isFunction(oauth.setupApp);
+        'and we setup the app': {
+            topic: function(oauth) {
+                oauth.setupApp(this.callback);
+            },
+            'it works': function(err, app) {
+                assert.ifError(err);
+                assert.isObject(app);
+            },
+            teardown: function(app) {
+                if (app && app.close) {
+                    app.close();
+                }
+            },
+            'and we create a new client': {
+                topic: function(app, oauth) {
+                    oauth.newClient(this.callback);
+                },
+                'it works': function(err, client) {
+                    assert.ifError(err);
+                    assert.isObject(client);
+                    assert.include(client, 'client_id');
+                    assert.isString(client.client_id);
+                    assert.include(client, 'client_secret');
+                    assert.isString(client.client_secret);
+                },
+                'and we register a new user': {
+                    topic: function(client, app, oauth) {
+                        oauth.register(client, "alice", "waters", this.callback);
+                    },
+                    'it works': function(err, user) {
+                        assert.ifError(err);
+                        assert.isObject(user);
+                    },
+                    'and we get a new access token': {
+                        topic: function(user, client, app, oauth) {
+                            oauth.accessToken(client, {nickname: "alice", password: "waters"}, this.callback);
+                        },
+                        'it works': function(err, pair) {
+                            assert.ifError(err);
+                            assert.isObject(pair);
+                            assert.include(pair, 'token');
+                            assert.isString(pair.token);
+                            assert.include(pair, 'token_secret');
+                            assert.isString(pair.token_secret);
+                        }
+                    }
+                }
+            }
         }
     }
 });
