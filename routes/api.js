@@ -103,10 +103,16 @@ var setBank = function(newBank) {
 exports.setBank = setBank;
 
 // Accept either 2-legged or 3-legged OAuth
+
 var clientAuth = function(req, res, next) {
 
     req.client = null;
     res.local('client', null); // init to null
+
+    if (hasToken(req)) {
+        userAuth(req, res, next);
+        return;
+    }
 
     req.authenticate(['client'], function(error, authenticated) { 
 
@@ -124,6 +130,13 @@ var clientAuth = function(req, res, next) {
 
         next();
     });
+};
+
+var hasToken = function(req) {
+    return (req &&
+            (_(req.headers).has('authorization') && req.headers.authorization.match(/oauth_token/)) ||
+            (req.query && req.query.oauth_token) ||
+            (req.body && req.headers['content-type'] === 'application/x-www-form-urlencoded' && req.body.oauth_token));
 };
 
 // Accept only 3-legged OAuth
