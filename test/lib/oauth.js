@@ -158,7 +158,7 @@ var newCredentials = function(nickname, password, cb) {
         function(err, res) {
             if (err) throw err;
             cl = res;
-            register(nickname, password, this);
+            register(cl, nickname, password, this);
         },
         function(err, res) {
             if (err) throw err;
