@@ -1,6 +1,6 @@
-// oauth-test.js
+// oauth-request-token-test.js
 //
-// Test the client registration API
+// Test the OAuth request token interface
 //
 // Copyright 2012, StatusNet Inc.
 //
@@ -120,6 +120,52 @@ suite.addBatch({
                     assert.isString(cred.token);
                     assert.include(cred, 'token_secret');
                     assert.isString(cred.token_secret);
+                }
+            }
+        }
+    }
+});
+
+// A batch to test parallel requests
+
+suite.addBatch({
+    'When we set up the app': {
+        topic: function() {
+            setupApp(this.callback);
+        },
+        teardown: function(app) {
+            if (app && app.close) {
+                app.close();
+            }
+        },
+        'it works': function(err, app) {
+            assert.ifError(err);
+        },
+        'and we create a client using the api': {
+            topic: function() {
+                newClient(this.callback);
+            },
+            'it works': function(err, cl) {
+                assert.ifError(err);
+            },
+            'and we get two request tokens in series': {
+                topic: function(cl) {
+                    var cb = this.callback;
+                    Step(
+                        function() {
+                            requestToken(cl, this);
+                        },
+                        function(err, rt1) {
+                            if (err) throw err;
+                            requestToken(cl, this);
+                        },
+                        function(err, rt2) {
+                            cb(err);
+                        }
+                    );
+                },
+                'it works': function(err) {
+                    assert.ifError(err);
                 }
             }
         }
