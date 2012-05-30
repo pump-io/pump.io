@@ -1,4 +1,4 @@
-// http.js
+/ http.js
 //
 // HTTP utilities for testing
 //
@@ -156,8 +156,8 @@ var postJSON = function(serverUrl, cred, payload, callback) {
 
     var oa, toSend;
 
-    oa = new OAuth(null, // request endpoint N/A for 2-legged OAuth
-                   null, // access endpoint N/A for 2-legged OAuth
+    oa = new OAuth('http://localhost:4815/oauth/request_token',
+                   'http://localhost:4815/oauth/access_token',
                    cred.consumer_key,
                    cred.consumer_secret,
                    "1.0",
@@ -175,8 +175,8 @@ var putJSON = function(serverUrl, cred, payload, callback) {
 
     var oa, toSend;
 
-    oa = new OAuth(null, // request endpoint N/A for 2-legged OAuth
-                   null, // access endpoint N/A for 2-legged OAuth
+    oa = new OAuth('http://localhost:4815/oauth/request_token',
+                   'http://localhost:4815/oauth/access_token',
                    cred.consumer_key,
                    cred.consumer_secret,
                    "1.0",
@@ -194,8 +194,8 @@ var getJSON = function(serverUrl, cred, callback) {
 
     var oa, toSend;
 
-    oa = new OAuth(null, // request endpoint N/A for 2-legged OAuth
-                   null, // access endpoint N/A for 2-legged OAuth
+    oa = new OAuth('http://localhost:4815/oauth/request_token',
+                   'http://localhost:4815/oauth/access_token',
                    cred.consumer_key,
                    cred.consumer_secret,
                    "1.0",
@@ -211,8 +211,8 @@ var delJSON = function(serverUrl, cred, callback) {
 
     var oa, toSend;
 
-    oa = new OAuth(null, // request endpoint N/A for 2-legged OAuth
-                   null, // access endpoint N/A for 2-legged OAuth
+    oa = new OAuth('http://localhost:4815/oauth/request_token',
+                   'http://localhost:4815/oauth/access_token',
                    cred.consumer_key,
                    cred.consumer_secret,
                    "1.0",
