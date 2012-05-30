@@ -27,7 +27,8 @@ var assert = require('assert'),
     oauthutil = require('./lib/oauth'),
     requestToken = oauthutil.requestToken,
     setupApp = oauthutil.setupApp,
-    newClient = oauthutil.newClient;
+    newClient = oauthutil.newClient,
+    newCredentials = oauthutil.newCredentials;
 
 var suite = vows.describe('user API');
 
@@ -212,6 +213,49 @@ suite.addBatch({
                 'it works': function(err) {
                     assert.ifError(err);
                 }
+            }
+        }
+    }
+});
+
+// A batch to test request token after access token
+
+suite.addBatch({
+    'When we set up the app': {
+        topic: function() {
+            setupApp(this.callback);
+        },
+        teardown: function(app) {
+            if (app && app.close) {
+                app.close();
+            }
+        },
+        'it works': function(err, app) {
+            assert.ifError(err);
+        },
+        'and we get a request token after getting credentials': {
+            topic: function() {
+                var cb = this.callback;
+                Step(
+                    function() {
+                        // Goes through the whole rigamarole
+                        newCredentials("mary", "lamb", this);
+                    },
+                    function(err, cred) {
+                        if (err) throw err;
+                        requestToken({client_id: cred.consumer_key, client_secret: cred.consumer_secret}, this);
+                    },
+                    function(err, rt) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, rt);
+                        }
+                    }
+                );
+            },
+            'it works': function(err, cred) {
+                assert.ifError(err);
             }
         }
     }
