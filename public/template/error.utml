@@ -1,4 +1,4 @@
 <h1>Error <%- error.code %></h1>
 
-<p class="error"><%- error.message %></p>
+<p id="error"><%- error.message %></p>
 
