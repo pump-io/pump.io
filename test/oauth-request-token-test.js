@@ -23,62 +23,22 @@ var assert = require('assert'),
     querystring = require('querystring'),
     http = require('http'),
     OAuth = require('oauth').OAuth,
-    httputil = require('./lib/http');
+    httputil = require('./lib/http'),
+    oauthutil = require('./lib/oauth'),
+    requestToken = oauthutil.requestToken,
+    setupApp = oauthutil.setupApp;
 
 var suite = vows.describe('user API');
-
-var requestToken = function(cl, cb) {
-    var oa;
-    oa = new OAuth('http://localhost:4815/oauth/request_token',
-                   'http://localhost:4815/oauth/access_token',
-                   cl.client_id,
-                   cl.client_secret,
-                   "1.0",
-                   "oob",
-                   "HMAC-SHA1",
-                   null, // nonce size; use default
-                   {"User-Agent": "activitypump-test/0.1.0"});
-    
-    oa.getOAuthRequestToken(function(err, token, secret) {
-        if (err) {
-            cb(new Error(err.data), null);
-        } else {
-            cb(null, {token: token, token_secret: secret});
-        }
-    });
-
-};
 
 suite.addBatch({
     'When we set up the app': {
         topic: function() {
-            var cb = this.callback,
-                config = {port: 4815,
-                          hostname: 'localhost',
-                          driver: 'memory',
-                          params: {},
-                          nologger: true
-                         },
-                makeApp = require('../lib/app').makeApp;
-
-            process.env.NODE_ENV = 'test';
-
-            makeApp(config, function(err, app) {
-                if (err) {
-                    cb(err, null);
-                } else {
-                    app.run(function(err) {
-                        if (err) {
-                            cb(err, null);
-                        } else {
-                            cb(null, app);
-                        }
-                    });
-                }
-            });
+            setupApp(this.callback);
         },
         teardown: function(app) {
-            app.close();
+            if (app && app.close) {
+                app.close();
+            }
         },
         'it works': function(err, app) {
             assert.ifError(err);
