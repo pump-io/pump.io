@@ -84,7 +84,7 @@ var accessToken = function(cl, user, cb) {
             var browser;
             if (err) throw err;
             rt = res;
-            browser = new Browser({runScripts: false});
+            browser = new Browser({runScripts: false, waitFor: 60000});
             browser.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, this);
         },
         function(err, br) {
