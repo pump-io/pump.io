@@ -63,7 +63,55 @@ suite.addBatch({
             'and we check the feed endpoint': 
             httputil.endpoint('/api/user/dora/feed', ['GET', 'POST']),
             'and we check the inbox endpoint': 
-            httputil.endpoint('/api/user/dora/inbox', ['GET', 'POST'])
+            httputil.endpoint('/api/user/dora/inbox', ['GET', 'POST']),
+            'and we get the feed of a new user': {
+                topic: function(cred) {
+                    httputil.getJSON('http://localhost:4815/api/user/dora/feed', cred, this.callback);
+                },
+                'it works': function(err, feed) {
+                    assert.ifError(err);
+                },
+                'it has the right members': function(err, feed) {
+                    assert.include(feed, 'author');
+                    assert.include(feed.author, 'id');
+                    assert.include(feed.author, 'displayName');
+                    assert.include(feed.author, 'objectType');
+                    assert.include(feed, 'totalCount');
+                    assert.include(feed, 'items');
+                    assert.include(feed, 'displayName');
+                    assert.include(feed, 'id');
+                    assert.include(feed, 'objectTypes');
+                    assert.include(feed.objectTypes, 'activity');
+                },
+                'it is empty': function(err, feed) {
+                    assert.equal(feed.totalCount, 0);
+                    assert.isEmpty(feed.items);
+                },
+                'and we get the inbox of a new user': {
+                    topic: function(cred) {
+                        httputil.getJSON('http://localhost:4815/api/user/dora/inbox', cred, this.callback);
+                    },
+                    'it works': function(err, feed) {
+                        assert.ifError(err);
+                    },
+                    'it has the right members': function(err, feed) {
+                        assert.include(feed, 'author');
+                        assert.include(feed.author, 'id');
+                        assert.include(feed.author, 'displayName');
+                        assert.include(feed.author, 'objectType');
+                        assert.include(feed, 'totalCount');
+                        assert.include(feed, 'items');
+                        assert.include(feed, 'displayName');
+                        assert.include(feed, 'id');
+                        assert.include(feed, 'objectTypes');
+                        assert.include(feed.objectTypes, 'activity');
+                    },
+                    'it is empty': function(err, feed) {
+                        assert.equal(feed.totalCount, 0);
+                        assert.isEmpty(feed.items);
+                    }
+                }
+            }
         }
     }
 });
