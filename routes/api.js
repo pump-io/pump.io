@@ -494,6 +494,7 @@ var userInbox = function(req, res, next) {
         function(err, inboxCount) {
             if (err) {
                 if (err instanceof NoSuchThingError) {
+                    collection.totalCount = 0;
                     res.json(collection);
                 } else {
                     throw err;
