@@ -126,7 +126,7 @@ suite.addBatch({
                                         content: 'Hello, world!'
                                     }
                                 };
-                            httputil.postJSON('http://localhost:4815/api/user/dora/feed', cred, function(err, feed, result) {
+                            httputil.postJSON('http://localhost:4815/api/user/dora/feed', cred, act, function(err, feed, result) {
                                 cb(err, feed);
                             });
                         },
