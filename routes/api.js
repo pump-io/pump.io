@@ -443,11 +443,13 @@ var userStream = function(req, res, next) {
         function(err, totalOutbox) {
             if (err) {
                 if (err instanceof NoSuchThingError) {
+                    collection.totalCount = 0;
                     res.json(collection);
                 } else {
                     throw err;
                 }
             } else {
+                collection.totalCount = totalOutbox;
                 req.user.getStream(start, end, this);
             }
         },
