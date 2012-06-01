@@ -66,7 +66,10 @@ suite.addBatch({
             httputil.endpoint('/api/user/dora/inbox', ['GET', 'POST']),
             'and we get the feed of a new user': {
                 topic: function(cred) {
-                    httputil.getJSON('http://localhost:4815/api/user/dora/feed', cred, this.callback);
+                    var cb = this.callback;
+                    httputil.getJSON('http://localhost:4815/api/user/dora/feed', cred, function(err, feed, result) {
+                        cb(err, feed);
+                    });
                 },
                 'it works': function(err, feed) {
                     assert.ifError(err);
@@ -89,7 +92,10 @@ suite.addBatch({
                 },
                 'and we get the inbox of a new user': {
                     topic: function(feed, cred) {
-                        httputil.getJSON('http://localhost:4815/api/user/dora/inbox', cred, this.callback);
+                        var cb = this.callback;
+                        httputil.getJSON('http://localhost:4815/api/user/dora/inbox', cred, function(err, feed, result) {
+                            cb(err, feed);
+                        });
                     },
                     'it works': function(err, inbox) {
                         assert.ifError(err);
@@ -112,14 +118,17 @@ suite.addBatch({
                     },
                     'and we post a new activity': {
                         topic: function(inbox, feed, cred) {
-                            var act = {
-                                verb: 'post',
-                                object: {
-                                    objectType: 'note',
-                                    content: 'Hello, world!'
-                                }
-                            };
-                            httputil.postJSON('http://localhost:4815/api/user/dora/feed', cred, this.callback);
+                            var cb = this.callback,
+                                act = {
+                                    verb: 'post',
+                                    object: {
+                                        objectType: 'note',
+                                        content: 'Hello, world!'
+                                    }
+                                };
+                            httputil.postJSON('http://localhost:4815/api/user/dora/feed', cred, function(err, feed, result) {
+                                cb(err, feed);
+                            });
                         },
                         'it works': function(err, act) {
                             assert.ifError(err);
