@@ -237,8 +237,8 @@ suite.addBatch({
                                 assert.isObject(res);
                                 assert.include(res, 'inbox');
                                 assert.include(res, 'act');
-                                var feed = res.feed, act = res.act;
-                                assert.equal(feed.items[0].id, act.id);
+                                var inbox = res.inbox, act = res.act;
+                                assert.equal(inbox.items[0].id, act.id);
                             }
                         }
                     }
