@@ -197,7 +197,7 @@ suite.addBatch({
                                 assert.equal(feed.items[0].id, act.id);
                             }
                         },
-                        'and we get the inbox of a new user': {
+                        'and we read the inbox': {
                             topic: function(act, inbox, feed, cred) {
                                 var cb = this.callback;
                                 httputil.getJSON('http://localhost:4815/api/user/dora/inbox', cred, function(err, newb) {
