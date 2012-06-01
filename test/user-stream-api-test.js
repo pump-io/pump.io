@@ -33,7 +33,7 @@ var ignore = function(err) {};
 
 var suite = vows.describe('User stream API test');
 
-// A batch to test lots of parallel access token requests
+// A batch for testing the read access to the API
 
 suite.addBatch({
     'When we set up the app': {
@@ -88,27 +88,150 @@ suite.addBatch({
                     assert.isEmpty(feed.items);
                 },
                 'and we get the inbox of a new user': {
-                    topic: function(cred) {
+                    topic: function(feed, cred) {
                         httputil.getJSON('http://localhost:4815/api/user/dora/inbox', cred, this.callback);
                     },
-                    'it works': function(err, feed) {
+                    'it works': function(err, inbox) {
                         assert.ifError(err);
                     },
-                    'it has the right members': function(err, feed) {
-                        assert.include(feed, 'author');
-                        assert.include(feed.author, 'id');
-                        assert.include(feed.author, 'displayName');
-                        assert.include(feed.author, 'objectType');
-                        assert.include(feed, 'totalCount');
-                        assert.include(feed, 'items');
-                        assert.include(feed, 'displayName');
-                        assert.include(feed, 'id');
-                        assert.include(feed, 'objectTypes');
-                        assert.include(feed.objectTypes, 'activity');
+                    'it has the right members': function(err, inbox) {
+                        assert.include(inbox, 'author');
+                        assert.include(inbox.author, 'id');
+                        assert.include(inbox.author, 'displayName');
+                        assert.include(inbox.author, 'objectType');
+                        assert.include(inbox, 'totalCount');
+                        assert.include(inbox, 'items');
+                        assert.include(inbox, 'displayName');
+                        assert.include(inbox, 'id');
+                        assert.include(inbox, 'objectTypes');
+                        assert.include(inbox.objectTypes, 'activity');
                     },
-                    'it is empty': function(err, feed) {
-                        assert.equal(feed.totalCount, 0);
-                        assert.isEmpty(feed.items);
+                    'it is empty': function(err, inbox) {
+                        assert.equal(inbox.totalCount, 0);
+                        assert.isEmpty(inbox.items);
+                    },
+                    'and we post a new activity': {
+                        topic: function(inbox, feed, cred) {
+                            var act = {
+                                verb: 'post',
+                                object: {
+                                    objectType: 'note',
+                                    content: 'Hello, world!'
+                                }
+                            };
+                            httputil.postJSON('http://localhost:4815/api/user/dora/feed', cred, this.callback);
+                        },
+                        'it works': function(err, act) {
+                            assert.ifError(err);
+                        },
+                        'results look right': function(err, act) {
+                            assert.isObject(act);
+                            assert.include(act, 'id');
+                            assert.isString(act.id);
+                            assert.include(act, 'actor');
+                            assert.isObject(act.actor);
+                            assert.include(act.actor, 'id');
+                            assert.isString(act.actor.id);
+                            assert.include(act, 'verb');
+                            assert.isString(act.verb);
+                            assert.include(act, 'object');
+                            assert.isObject(act.object);
+                            assert.include(act.object, 'id');
+                            assert.isString(act.object.id);
+                            assert.include(act, 'published');
+                            assert.isString(act.published);
+                            assert.include(act, 'updated');
+                            assert.isString(act.updated);
+                        },
+                        'and we read the feed': {
+                            topic: function(act, inbox, feed, cred) {
+                                var cb = this.callback;
+
+                                httputil.getJSON('http://localhost:4815/api/user/dora/feed', cred, function(err, newf) {
+                                    if (err) {
+                                        cb(err);
+                                    } else {
+                                        cb(null, {act: act, feed: newf});
+                                    }
+                                });
+                            },
+                            'it works': function(err, res) {
+                                assert.ifError(err);
+                            },
+                            'it has the right members': function(err, res) {
+                                assert.isObject(res);
+                                assert.include(res, 'feed');
+                                var feed = res.feed;
+                                assert.include(feed, 'author');
+                                assert.include(feed.author, 'id');
+                                assert.include(feed.author, 'displayName');
+                                assert.include(feed.author, 'objectType');
+                                assert.include(feed, 'totalCount');
+                                assert.include(feed, 'items');
+                                assert.include(feed, 'displayName');
+                                assert.include(feed, 'id');
+                                assert.include(feed, 'objectTypes');
+                                assert.include(feed.objectTypes, 'activity');
+                            },
+                            'it has one object': function(err, res) {
+                                assert.isObject(res);
+                                assert.include(res, 'feed');
+                                var feed = res.feed;
+                                assert.equal(feed.totalCount, 1);
+                                assert.lengthOf(feed.items, 1);
+                            },
+                            'it has our activity': function(err, res) {
+                                assert.isObject(res);
+                                assert.include(res, 'feed');
+                                assert.include(res, 'act');
+                                var feed = res.feed, act = res.act;
+                                assert.equal(feed.items[0].id, act.id);
+                            }
+                        },
+                        'and we get the inbox of a new user': {
+                            topic: function(act, inbox, feed, cred) {
+                                var cb = this.callback;
+                                httputil.getJSON('http://localhost:4815/api/user/dora/inbox', cred, function(err, newb) {
+                                    if (err) {
+                                        cb(err);
+                                    } else {
+                                        cb(null, {act: act, inbox: newb});
+                                    }
+                                });
+                            },
+                            'it works': function(err, res) {
+                                assert.ifError(err);
+                            },
+                            'it has the right members': function(err, res) {
+                                assert.isObject(res);
+                                assert.include(res, 'inbox');
+                                var inbox = res.inbox;
+                                assert.include(inbox, 'author');
+                                assert.include(inbox.author, 'id');
+                                assert.include(inbox.author, 'displayName');
+                                assert.include(inbox.author, 'objectType');
+                                assert.include(inbox, 'totalCount');
+                                assert.include(inbox, 'items');
+                                assert.include(inbox, 'displayName');
+                                assert.include(inbox, 'id');
+                                assert.include(inbox, 'objectTypes');
+                                assert.include(inbox.objectTypes, 'activity');
+                            },
+                            'it has one item': function(err, res) {
+                                assert.isObject(res);
+                                assert.include(res, 'inbox');
+                                var inbox = res.inbox;
+                                assert.equal(inbox.totalCount, 1);
+                                assert.lengthOf(inbox.items, 1);
+                            },
+                            'it has our activity': function(err, res) {
+                                assert.isObject(res);
+                                assert.include(res, 'inbox');
+                                assert.include(res, 'act');
+                                var feed = res.feed, act = res.act;
+                                assert.equal(feed.items[0].id, act.id);
+                            }
+                        }
                     }
                 }
             }
