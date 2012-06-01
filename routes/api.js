@@ -402,7 +402,8 @@ var postActivity = function(req, res, next) {
         function(err, saved) {
             if (err) throw err;
             activity = saved;
-            req.user.addToOutbox(activity, this);
+            req.user.addToOutbox(activity, this.parallel());
+            req.user.addToInbox(activity, this.parallel());
         },
         function(err) {
             if (err) {
