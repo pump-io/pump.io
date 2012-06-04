@@ -370,6 +370,54 @@ suite.addBatch({
                 'it fails correctly': function(err) {
                     assert.ifError(err);
                 }
+            },
+            "and we try to post an activity with a default verb": {
+                topic: function(cred, app) {
+                    var cb = this.callback,
+                        act = {
+                            object: {
+                                objectType: 'note',
+                                content: 'Hello, llama!'
+                            }
+                        };
+                    httputil.postJSON('http://localhost:4815/api/user/diego/feed', cred, act, function(err, posted, result) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, posted);
+                        }
+                    });
+                },
+                'it works': function(err, act) {
+                    assert.ifError(err);
+                },
+                'it has the right verb': function(err, act) {
+                    assert.equal(act.verb, 'post');
+                }
+            },
+            "and we try to post an activity with a default object type": {
+                topic: function(cred, app) {
+                    var cb = this.callback,
+                        act = {
+                            verb: "post",
+                            object: {
+                                content: 'Hello, llama!'
+                            }
+                        };
+                    httputil.postJSON('http://localhost:4815/api/user/diego/feed', cred, act, function(err, na, result) {
+                        if (err) {
+                            cb(err);
+                        } else {
+                            cb(null);
+                        }
+                    });
+                },
+                'it works': function(err) {
+                    assert.ifError(err);
+                },
+                'it has the right object type': function(err, act) {
+                    assert.equal(act.object.objectType, 'note');
+                }
             }
         }
     }
