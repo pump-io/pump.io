@@ -290,7 +290,9 @@ suite.addBatch({
                             }
                         };
                     httputil.postJSON('http://localhost:4815/api/user/diego/feed', cred, act, function(err, feed, result) {
-                        if (result.statusCode < 400 || result.statusCode >= 500) {
+                        if (err) {
+                            cb(null);
+                        } else if (result.statusCode < 400 || result.statusCode >= 500) {
                             cb(new Error("Unexpected result"));
                         } else {
                             cb(null);
