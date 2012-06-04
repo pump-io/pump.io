@@ -389,6 +389,15 @@ var postActivity = function(req, res, next) {
 
     var activity = new Activity(req.body);
 
+    if (!_(activity).has('actor')) {
+        activity.actor = req.user.profile;
+    }
+
+    if (activity.actor.id !== req.user.profile.id) {
+        next(new HTTPError("Invalid actor", 400));
+        return;
+    }
+
     Step(
         function() {
             // First, apply the activity
