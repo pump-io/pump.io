@@ -301,7 +301,7 @@ suite.addBatch({
                     assert.ifError(err);
                 }
             },
-            "and we try to post a notice with no object": {
+            "and we try to post an activity with no object": {
                 topic: function(cred, app) {
                     var cb = this.callback,
                         act = {
