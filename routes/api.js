@@ -395,17 +395,17 @@ var postActivity = function(req, res, next) {
         activity.actor = req.user.profile;
     }
 
-    // Default verb
-
-    if (!_(activity).has('verb') || _(activity.verb).isNull()) {
-        activity.verb = "post";
-    }
-
     // If the actor is incorrect, error
 
     if (activity.actor.id !== req.user.profile.id) {
         next(new HTTPError("Invalid actor", 400));
         return;
+    }
+
+    // Default verb
+
+    if (!_(activity).has('verb') || _(activity.verb).isNull()) {
+        activity.verb = "post";
     }
 
     Step(
