@@ -281,6 +281,7 @@ suite.addBatch({
                         act = {
                             actor: {
                                 id: "urn:uuid:66822a4d-9f72-4168-8d5a-0b1319afeeb1",
+                                objectType: "person",
                                 displayName: "Not Diego"
                             },
                             verb: 'post',
