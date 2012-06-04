@@ -27,6 +27,8 @@ var assert = require('assert'),
     httputil = require('./lib/http'),
     oauthutil = require('./lib/oauth'),
     setupApp = oauthutil.setupApp,
+    register = oauthutil.register,
+    accessToken = oauthutil.accessToken,
     newCredentials = oauthutil.newCredentials;
 
 var ignore = function(err) {};
@@ -319,6 +321,53 @@ suite.addBatch({
                             cb(null);
                         }
                     });
+                },
+                'it fails correctly': function(err) {
+                    assert.ifError(err);
+                }
+            },
+            "and we try to post an activity as a different user": {
+                topic: function(cred, app) {
+                    var cb = this.callback,
+                        act = {
+                            verb: 'post',
+                            object: {
+                                objectType: 'note',
+                                content: 'To the rescue!'
+                            }
+                        };
+                    Step(
+                        function() {
+                            register("boots", "bananas", this);
+                        },
+                        function(err, user) {
+                            if (err) throw err;
+                            accessToken({client_id: cred.consumer_key,
+                                         client_secret: cred.consumer_secret},
+                                        {nickname: "boots",
+                                         password: "bananas"},
+                                        this);
+                        },
+                        function(err, pair) {
+                            var nuke;
+                            if (err) {
+                                cb(err);
+                            } else {
+                                nuke = _(cred).clone();
+                                _(nuke).extend(pair);
+
+                                httputil.postJSON('http://localhost:4815/api/user/diego/feed', nuke, act, function(err, feed, result) {
+                                    if (err) {
+                                        cb(null);
+                                    } else if (result.statusCode < 400 || result.statusCode >= 500) {
+                                        cb(new Error("Unexpected result"));
+                                    } else {
+                                        cb(null);
+                                    }
+                                });
+                            }
+                        }
+                    );
                 },
                 'it fails correctly': function(err) {
                     assert.ifError(err);
