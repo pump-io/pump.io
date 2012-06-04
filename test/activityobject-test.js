@@ -299,7 +299,7 @@ vows.describe('schema module interface').addBatch({
                 topic: function(ActivityObject) {
                     var cb = this.callback,
                         Note = require('../lib/model/note').Note,
-                        Person = require('../lib/model/note').Person,
+                        Person = require('../lib/model/person').Person,
                         props = {
                             objectType: ActivityObject.NOTE,
                             content: "HELLO WORLD"
@@ -337,7 +337,7 @@ vows.describe('schema module interface').addBatch({
                 topic: function(ActivityObject) {
                     var cb = this.callback,
                         Note = require('../lib/model/note').Note,
-                        Person = require('../lib/model/note').Person,
+                        Person = require('../lib/model/person').Person,
                         props = {
                             objectType: ActivityObject.NOTE,
                             content: "HELLO WORLD"
@@ -376,7 +376,7 @@ vows.describe('schema module interface').addBatch({
                 topic: function(ActivityObject) {
                     var cb = this.callback,
                         Note = require('../lib/model/note').Note,
-                        Person = require('../lib/model/note').Person,
+                        Person = require('../lib/model/person').Person,
                         props = {
                             objectType: ActivityObject.NOTE,
                             content: "HELLO WORLD"
@@ -418,7 +418,7 @@ vows.describe('schema module interface').addBatch({
                 topic: function(ActivityObject) {
                     var cb = this.callback,
                         Note = require('../lib/model/note').Note,
-                        Person = require('../lib/model/note').Person,
+                        Person = require('../lib/model/person').Person,
                         props = {
                             objectType: ActivityObject.NOTE,
                             content: "HELLO WORLD"
