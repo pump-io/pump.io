@@ -19,6 +19,7 @@
 var assert = require('assert'),
     vows = require('vows'),
     databank = require('databank'),
+    Step = require('step'),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
     schema = require('../lib/schema').schema,
@@ -286,11 +287,175 @@ vows.describe('schema module interface').addBatch({
                     assert.equal(comment.content, "FIRST POST");
                     assert.equal(comment.inReplyTo.url, "http://example.net/articles/3");
                     assert.equal(comment.inReplyTo.objectType, "article");
+
                 },
                 'it has the right auto-created attributes': function(err, comment) {
                     assert.isString(comment.id);
                     assert.isString(comment.published);
                     assert.isString(comment.updated);
+                }
+            },
+            'and we create an activityobject with an author': {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Note = require('../lib/model/note').Note,
+                        Person = require('../lib/model/note').Person,
+                        props = {
+                            objectType: ActivityObject.NOTE,
+                            content: "HELLO WORLD"
+                        },
+                        author;
+
+                    Step(
+                        function() {
+                            Person.create({displayName: 'peter', preferredUsername: 'p65'}, this);
+                        },
+                        function(err, person) {
+                            if (err) throw err;
+                            author = props.author = person;
+                            Note.create(props, this);
+                        },
+                        function(err, note) {
+                            cb(err, note, author);
+                        }
+                    );
+                },
+                'it works': function(err, object, author) {
+                    assert.ifError(err);
+                    assert.isObject(object);
+                },
+                'results contain the author information': function(err, object, author) {
+                    assert.ifError(err);
+                    assert.isObject(object.author);
+                    assert.equal(object.author.id, author.id);
+                    assert.equal(object.author.objectType, author.objectType);
+                    assert.equal(object.author.displayName, author.displayName);
+                    assert.equal(object.author.preferredUsername, author.preferredUsername);
+                }
+            },
+            'and we create an activityobject with an author reference': {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Note = require('../lib/model/note').Note,
+                        Person = require('../lib/model/note').Person,
+                        props = {
+                            objectType: ActivityObject.NOTE,
+                            content: "HELLO WORLD"
+                        },
+                        author;
+
+                    Step(
+                        function() {
+                            Person.create({displayName: 'quincy', preferredUsername: 'qbert'}, this);
+                        },
+                        function(err, person) {
+                            if (err) throw err;
+                            author = person;
+                            props.author = {id: person.id, objectType: person.objectType};
+                            Note.create(props, this);
+                        },
+                        function(err, note) {
+                            cb(err, note, author);
+                        }
+                    );
+                },
+                'it works': function(err, object, author) {
+                    assert.ifError(err);
+                    assert.isObject(object);
+                },
+                'results contain the author information': function(err, object, author) {
+                    assert.ifError(err);
+                    assert.isObject(object.author);
+                    assert.equal(object.author.id, author.id);
+                    assert.equal(object.author.objectType, author.objectType);
+                    assert.equal(object.author.displayName, author.displayName);
+                    assert.equal(object.author.preferredUsername, author.preferredUsername);
+                }
+            },
+            'and we update an activityobject with an author': {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Note = require('../lib/model/note').Note,
+                        Person = require('../lib/model/note').Person,
+                        props = {
+                            objectType: ActivityObject.NOTE,
+                            content: "HELLO WORLD"
+                        },
+                        author;
+                    Step(
+                        function() {
+                            Person.create({displayName: 'randy', preferredUsername: 'rman99'}, this);
+                        },
+                        function(err, person) {
+                            if (err) throw err;
+                            author = person;
+                            props.author = person;
+                            Note.create(props, this);
+                        },
+                        function(err, note) {
+                            if (err) throw err;
+                            note.update({summary: "A helpful greeting"}, this);
+                        },
+                        function(err, note) {
+                            cb(err, note, author);
+                        }
+                    );
+                },
+                'it works': function(err, object, author) {
+                    assert.ifError(err);
+                    assert.isObject(object);
+                },
+                'results contain the author information': function(err, object, author) {
+                    assert.ifError(err);
+                    assert.isObject(object.author);
+                    assert.equal(object.author.id, author.id);
+                    assert.equal(object.author.objectType, author.objectType);
+                    assert.equal(object.author.displayName, author.displayName);
+                    assert.equal(object.author.preferredUsername, author.preferredUsername);
+                }
+            },
+            'and we update an activityobject with an author reference': {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Note = require('../lib/model/note').Note,
+                        Person = require('../lib/model/note').Person,
+                        props = {
+                            objectType: ActivityObject.NOTE,
+                            content: "HELLO WORLD"
+                        },
+                        author;
+
+                    Step(
+                        function() {
+                            Person.create({displayName: 'steven', preferredUsername: 'billabong'}, this);
+                        },
+                        function(err, person) {
+                            if (err) throw err;
+                            author = person;
+                            props.author = person;
+                            Note.create(props, this);
+                        },
+                        function(err, note) {
+                            if (err) throw err;
+                            note.author = {id: note.author.id, objectType: note.author.objectType};
+                            note.update({summary: "A helpful greeting"}, this);
+                        },
+                        function(err, note) {
+                            cb(err, note, author);
+                        }
+                    );
+                },
+                'it works': function(err, object, author) {
+                    assert.ifError(err);
+                    assert.isObject(object);
+                },
+                'results contain the author information': function(err, object, author) {
+                    assert.ifError(err);
+                    assert.isObject(object.author);
+                    assert.equal(object.author.id, author.id);
+                    assert.equal(object.author.objectType, author.objectType);
+                    assert.equal(object.author.displayName, author.displayName);
+                    assert.equal(object.author.preferredUsername, author.preferredUsername);
                 }
             }
         }
