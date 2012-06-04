@@ -98,7 +98,7 @@ suite.addBatch({
                                     consumer_key: cl.client_id,
                                     consumer_secret: cl.client_secret,
                                     token: pair.token,
-                                    secret: pair.secret
+                                    token_secret: pair.token_secret
                                 };
 
                             httputil.postJSON('http://localhost:4815/api/user/frodo/feed', cred, act, function(err, act, result) {
@@ -148,7 +148,7 @@ suite.addBatch({
                                         consumer_key: cl.client_id,
                                         consumer_secret: cl.client_secret,
                                         token: pair.token,
-                                        secret: pair.secret
+                                        token_secret: pair.token_secret
                                     };
                                 // ID == JSON representation URL
                                 httputil.getJSON(act.object.id, cred, function(err, note) {
