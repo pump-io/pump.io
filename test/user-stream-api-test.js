@@ -329,6 +329,8 @@ suite.addBatch({
             "and we try to post an activity as a different user": {
                 topic: function(cred, app) {
                     var cb = this.callback,
+                        cl = {client_id: cred.consumer_key,
+                              client_secret: cred.consumer_secret},
                         act = {
                             verb: 'post',
                             object: {
@@ -338,15 +340,11 @@ suite.addBatch({
                         };
                     Step(
                         function() {
-                            register("boots", "bananas", this);
+                            register(cl, "boots", "bananas", this);
                         },
                         function(err, user) {
                             if (err) throw err;
-                            accessToken({client_id: cred.consumer_key,
-                                         client_secret: cred.consumer_secret},
-                                        {nickname: "boots",
-                                         password: "bananas"},
-                                        this);
+                            accessToken(cl, {nickname: "boots", password: "bananas"}, this);
                         },
                         function(err, pair) {
                             var nuke;
