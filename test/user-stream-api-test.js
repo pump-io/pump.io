@@ -248,4 +248,79 @@ suite.addBatch({
     }
 });
 
+// Test some "bad" kinds of activity
+
+suite.addBatch({
+    'When we set up the app': {
+        topic: function() {
+            setupApp(this.callback);
+        },
+        teardown: function(app) {
+            if (app && app.close) {
+                app.close();
+            }
+        },
+        'it works': function(err, app) {
+            assert.ifError(err);
+        },
+        'and we get new credentials': {
+            topic: function(app) {
+                newCredentials("diego", "rescue", this.callback);
+            },
+            'it works': function(err, cred) {
+                assert.ifError(err);
+                assert.isObject(cred);
+                assert.isString(cred.consumer_key);
+                assert.isString(cred.consumer_secret);
+                assert.isString(cred.token);
+                assert.isString(cred.token_secret);
+            },
+            "and we try to post a notice with a different actor": {
+                topic: function(cred, app) {
+                    var cb = this.callback,
+                        act = {
+                            actor: {
+                                id: "urn:uuid:66822a4d-9f72-4168-8d5a-0b1319afeeb1",
+                                displayName: "Not Diego"
+                            },
+                            verb: 'post',
+                            object: {
+                                objectType: 'note',
+                                content: 'To the rescue!'
+                            }
+                        };
+                    httputil.postJSON('http://localhost:4815/api/user/diego/feed', cred, act, function(err, feed, result) {
+                        if (result.statusCode < 400 || result.statusCode >= 500) {
+                            cb(new Error("Unexpected result"));
+                        } else {
+                            cb(null);
+                        }
+                    });
+                },
+                'it fails correctly': function(err) {
+                    assert.ifError(err);
+                }
+            },
+            "and we try to post a notice with no object": {
+                topic: function(cred, app) {
+                    var cb = this.callback,
+                        act = {
+                            verb: 'noop'
+                        };
+                    httputil.postJSON('http://localhost:4815/api/user/diego/feed', cred, act, function(err, feed, result) {
+                        if (result.statusCode < 400 || result.statusCode >= 500) {
+                            cb(new Error("Unexpected result"));
+                        } else {
+                            cb(null);
+                        }
+                    });
+                },
+                'it fails correctly': function(err) {
+                    assert.ifError(err);
+                }
+            }
+        }
+    }
+});
+
 suite['export'](module);
