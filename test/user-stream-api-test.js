@@ -275,7 +275,7 @@ suite.addBatch({
                 assert.isString(cred.token);
                 assert.isString(cred.token_secret);
             },
-            "and we try to post a notice with a different actor": {
+            "and we try to post an activity with a different actor": {
                 topic: function(cred, app) {
                     var cb = this.callback,
                         act = {
