@@ -232,7 +232,7 @@ suite.addBatch({
                         
                         Step(
                             function() {
-                                newCredentials("harold", "1077", this.callback);
+                                newCredentials("harold", "1077", this);
                             },
                             function(err, pair) {
                                 var nuke;
@@ -365,7 +365,7 @@ suite.addBatch({
                         
                         Step(
                             function() {
-                                newCredentials("ignace", "katt", this.callback);
+                                newCredentials("ignace", "katt", this);
                             },
                             function(err, pair) {
                                 var nuke;
@@ -539,7 +539,7 @@ suite.addBatch({
                         
                         Step(
                             function() {
-                                newCredentials("jeremy", "bentham", this.callback);
+                                newCredentials("jeremy", "bentham", this);
                             },
                             function(err, pair) {
                                 var nuke;
