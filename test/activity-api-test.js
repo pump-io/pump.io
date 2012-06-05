@@ -20,6 +20,7 @@ var assert = require('assert'),
     vows = require('vows'),
     Step = require('step'),
     _ = require('underscore'),
+    http = require('http'),
     urlparse = require('url').parse,
     httputil = require('./lib/http'),
     oauthutil = require('./lib/oauth'),
@@ -207,12 +208,457 @@ suite.addBatch({
                         }
                     }
                 }
+            },
+            'and we post another activity': {
+                topic: function(cred) {
+                    var cb = this.callback,
+                        act = {
+                            verb: "post",
+                            object: {
+                                objectType: "note",
+                                content: "Hello, world!"
+                            }
+                        };
+                    httputil.postJSON("http://localhost:4815/api/user/gerold/feed", cred, act, function(err, act, response) {
+                        cb(err, act);
+                    });
+                },
+                'and we GET the activity with different credentials than the author': {
+                    topic: function(act, cred) {
+                        var cb = this.callback;
+                        
+                        Step(
+                            function() {
+                                newCredentials("harold", "1077", this.callback);
+                            },
+                            function(err, pair) {
+                                var nuke;
+                                if (err) throw err;
+                                nuke = _(cred).clone();
+                                _(nuke).extend(pair);
+                                httputil.getJSON(act.id, nuke, this);
+                            },
+                            function(err, doc, res) {
+                                cb(err, doc, act);
+                            }
+                        );
+                    },
+                    'it works': function(err, doc, act) {
+                        assert.ifError(err);
+                        assertValid(doc);
+                    }
+                },
+                'and we GET the activity with no credentials': {
+                    topic: function(act, cred) {
+                        var cb = this.callback;
+                        http.get(act.id, function(err, response) {
+                            if (err) {
+                                cb(err);
+                            } else if (response.statusCode < 400 || response.statusCode >= 500) {
+                                cb(new Error("Unexpected response code " + response.statusCode));
+                            } else {
+                                cb(null);
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we GET the activity with invalid consumer key': {
+                    topic: function(act, cred) {
+                        var cb = this.callback,
+                            nuke = _(cred).clone();
+                        nuke.consumer_key = "NOTAKEY";
+                        httputil.getJSON(act.id, nuke, function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected results"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we GET the activity with invalid consumer secret': {
+                    topic: function(act, cred) {
+                        var cb = this.callback,
+                            nuke = _(cred).clone();
+                        nuke.consumer_secret = "NOTASECRET";
+                        httputil.getJSON(act.id, nuke, function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected results"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we GET the activity with invalid token': {
+                    topic: function(act, cred) {
+                        var cb = this.callback,
+                            nuke = _(cred).clone();
+                        nuke.token = "NOTATOKEN";
+                        httputil.getJSON(act.id, nuke, function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected results"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we GET the activity with invalid token secret': {
+                    topic: function(act, cred) {
+                        var cb = this.callback,
+                            nuke = _(cred).clone();
+                        nuke.token_secret = "NOTATOKENSECRET";
+                        httputil.getJSON(act.id, nuke, function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected results"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                }
+            },
+            'and we post yet another activity': {
+                topic: function(cred) {
+                    var cb = this.callback,
+                        act = {
+                            verb: "post",
+                            object: {
+                                objectType: "note",
+                                content: "Hello, world!"
+                            }
+                        };
+                    httputil.postJSON("http://localhost:4815/api/user/gerold/feed", cred, act, function(err, act, response) {
+                        cb(err, act);
+                    });
+                },
+                'and we PUT the activity with different credentials than the author': {
+                    topic: function(act, cred) {
+                        var cb = this.callback,
+                            newact = JSON.parse(JSON.stringify(act));
+                       
+                        newact['mood'] = {
+                            displayName: "Friendly"
+                        };
+                        
+                        Step(
+                            function() {
+                                newCredentials("ignace", "katt", this.callback);
+                            },
+                            function(err, pair) {
+                                var nuke;
+                                if (err) throw err;
+                                nuke = _(cred).clone();
+                                _(nuke).extend(pair);
+                                httputil.putJSON(act.id, nuke, newact, this);
+                            },
+                            function(err, doc, res) {
+                                if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                    cb(null);
+                                } else {
+                                    cb(new Error("Unexpected results!"));
+                                }
+                            }
+                        );
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we PUT the activity with no credentials': {
+                    topic: function(act, cred) {
+                        var cb = this.callback,
+                            parsed = urlparse(act.id),
+                            options = {
+                                host: 'localhost',
+                                port: 4815,
+                                path: parsed.path,
+                                method: "PUT",
+                                headers: {
+                                    'User-Agent': 'activitypump-test/0.1.0dev',
+                                    'Content-Type': 'application/json'
+                                }
+                            },
+                            newact = JSON.parse(JSON.stringify(act));
+                       
+                        newact['mood'] = {
+                            displayName: "Friendly"
+                        };
+
+                        var req = http.request(options, function(res) {
+                            if (res.statusCode >= 400 && res.statusCode < 500) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected status code"));
+                            }
+                        }).on('error', function(err) {
+                            cb(err);
+                        });
+                        req.write(JSON.stringify(newact));
+                        req.end();
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we PUT the activity with invalid consumer key': {
+                    topic: function(act, cred) {
+                        var cb = this.callback,
+                            nuke = _(cred).clone(),
+                            newact = JSON.parse(JSON.stringify(act));
+                       
+                        newact['mood'] = {
+                            displayName: "Friendly"
+                        };
+                        nuke.consumer_key = "NOTAKEY";
+
+                        httputil.putJSON(act.id, nuke, newact, function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected results"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we PUT the activity with invalid consumer secret': {
+                    topic: function(act, cred) {
+                        var cb = this.callback,
+                            nuke = _(cred).clone(),
+                            newact = JSON.parse(JSON.stringify(act));
+                       
+                        newact['mood'] = {
+                            displayName: "Friendly"
+                        };
+                        nuke.consumer_secret = "NOTASECRET";
+
+                        httputil.putJSON(act.id, nuke, newact, function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected results"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we PUT the activity with invalid token': {
+                    topic: function(act, cred) {
+                        var cb = this.callback,
+                            nuke = _(cred).clone(),
+                            newact = JSON.parse(JSON.stringify(act));
+                       
+                        newact['mood'] = {
+                            displayName: "Friendly"
+                        };
+                        nuke.token = "NOTATOKEN";
+
+                        httputil.putJSON(act.id, nuke, newact, function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected results"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we PUT the activity with invalid token secret': {
+                    topic: function(act, cred) {
+                        var cb = this.callback,
+                            nuke = _(cred).clone(),
+                            newact = JSON.parse(JSON.stringify(act));
+                       
+                        newact['mood'] = {
+                            displayName: "Friendly"
+                        };
+                        nuke.token_secret = "NOTATOKENSECRET";
+
+                        httputil.putJSON(act.id, nuke, newact, function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected results"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                }
+            },
+            'and we post still another activity': {
+                topic: function(cred) {
+                    var cb = this.callback,
+                        act = {
+                            verb: "post",
+                            object: {
+                                objectType: "note",
+                                content: "Hello, world!"
+                            }
+                        };
+                    httputil.postJSON("http://localhost:4815/api/user/gerold/feed", cred, act, function(err, act, response) {
+                        cb(err, act);
+                    });
+                },
+                'and we DELETE the activity with different credentials than the author': {
+                    topic: function(act, cred) {
+                        var cb = this.callback;
+                        
+                        Step(
+                            function() {
+                                newCredentials("jeremy", "bentham", this.callback);
+                            },
+                            function(err, pair) {
+                                var nuke;
+                                if (err) throw err;
+                                nuke = _(cred).clone();
+                                _(nuke).extend(pair);
+                                httputil.delJSON(act.id, nuke, this);
+                            },
+                            function(err, doc, res) {
+                                if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                    cb(null);
+                                } else {
+                                    cb(new Error("Unexpected results!"));
+                                }
+                            }
+                        );
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we DELETE the activity with no credentials': {
+                    topic: function(act, cred) {
+                        var cb = this.callback,
+                            parsed = urlparse(act.id),
+                            options = {
+                                host: 'localhost',
+                                port: 4815,
+                                path: act.id,
+                                method: "DELETE",
+                                headers: {
+                                    'User-Agent': 'activitypump-test/0.1.0dev'
+                                }
+                            };
+                        var req = http.request(options, function(res) {
+                            if (res.statusCode >= 400 && res.statusCode < 500) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected status code"));
+                            }
+                        }).on('error', function(err) {
+                            cb(err);
+                        });
+                        req.end();
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we DELETE the activity with invalid consumer key': {
+                    topic: function(act, cred) {
+                        var cb = this.callback,
+                            nuke = _(cred).clone();
+                       
+                        nuke.consumer_key = "NOTAKEY";
+
+                        httputil.delJSON(act.id, nuke, function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected results"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we DELETE the activity with invalid consumer secret': {
+                    topic: function(act, cred) {
+                        var cb = this.callback,
+                            nuke = _(cred).clone();
+                       
+                        nuke.consumer_secret = "NOTASECRET";
+
+                        httputil.delJSON(act.id, nuke, function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected results"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we DELETE the activity with invalid token': {
+                    topic: function(act, cred) {
+                        var cb = this.callback,
+                            nuke = _(cred).clone();
+                       
+                        nuke.token = "NOTATOKEN";
+
+                        httputil.delJSON(act.id, nuke, function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected results"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                'and we DELETE the activity with invalid token secret': {
+                    topic: function(act, cred) {
+                        var cb = this.callback,
+                            nuke = _(cred).clone();
+                       
+                        nuke.token_secret = "NOTATOKENSECRET";
+
+                        httputil.delJSON(act.id, nuke, function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected results"));
+                            }
+                        });
+                    },
+                    'it fails correctly': function(err) {
+                        assert.ifError(err);
+                    }
+                }
             }
         }
     }
-});
-
-suite.addBatch({
 });
 
 suite['export'](module);
