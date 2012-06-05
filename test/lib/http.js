@@ -32,7 +32,7 @@ OAuthJSONError.prototype = new Error();
 OAuthJSONError.prototype.constructor = OAuthJSONError;
 
 OAuthJSONError.prototype.toString = function() {
-    return "OAuthJSONError (" + this.statusCode + "):" + this.data;
+    return "OAuthJSONError (" + this.statusCode + "): " + this.data;
 };
 
 var endpoint = function(url, methods) {
