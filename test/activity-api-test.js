@@ -124,17 +124,13 @@ suite.addBatch({
                         assert.isString(got.published);
                         assert.include(got, 'updated');
                         assert.isString(got.updated);
-                        assert.include(got, 'mood');
-                        assert.isString(got.mood);
-                        assert.include(got.mood, 'displayName');
-                        assert.isString(got.mood.displayName);
                     },
                     'it has the correct data': function(err, res) {
                         var got = res.got, posted = res.posted;
                         assert.equal(got.id, posted.id);
                         assert.equal(got.verb, posted.verb);
                         assert.equal(got.published, posted.published);
-                        assert.notEqual(got.updated, posted.updated);
+                        assert.equal(got.updated, posted.updated);
                         assert.equal(got.actor.id, posted.actor.id);
                         assert.equal(got.actor.objectType, posted.actor.objectType);
                         assert.equal(got.actor.displayName, posted.actor.displayName);
