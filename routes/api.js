@@ -172,7 +172,8 @@ var userAuth = function(req, res, next) {
 
 var requester = function(type) {
 
-    var Cls = ActivityObject.toClass(type);
+    var Cls = ActivityObject.toClass(type),
+        obj = null;
 
     return function(req, res, next) {
         Cls.search({'uuid': req.params.uuid}, function(err, results) {
@@ -185,8 +186,15 @@ var requester = function(type) {
             } else if (results.length > 1) {
                 next(new HTTPError("Too many " + type + " objects with ID = " + req.params.uuid, 500));
             } else {
-                req[type] = results[0];
-                next();
+                obj = results[0];
+                obj.expandAuthor(function(err) {
+                    if (err) {
+                        next(err);
+                    } else {
+                        req[type] = obj;
+                        next();
+                    }
+                });
             }
         });
     };
