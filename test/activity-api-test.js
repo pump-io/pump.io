@@ -265,14 +265,14 @@ suite.addBatch({
                                 }
                             };
                         
-                        http.get(options, function(err, response) {
-                            if (err) {
-                                cb(err);
-                            } else if (response.statusCode < 400 || response.statusCode >= 500) {
+                        http.get(options, function(response) {
+                            if (response.statusCode < 400 || response.statusCode >= 500) {
                                 cb(new Error("Unexpected response code " + response.statusCode));
                             } else {
                                 cb(null);
                             }
+                        }).on('error', function(err) {
+                            cb(err);
                         });
                     },
                     'it fails correctly': function(err) {
