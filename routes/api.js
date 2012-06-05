@@ -78,9 +78,9 @@ var addRoutes = function(app) {
     
     // Activities
 
-    app.get('/api/activity/:uuid', clientAuth, requester('activity'), getter('activity'));
-    app.put('/api/activity/:uuid', userAuth, requester('activity'), actorOnly, putter('activity'));
-    app.del('/api/activity/:uuid', userAuth, requester('activity'), actorOnly, deleter('activity'));
+    app.get('/api/activity/:uuid', clientAuth, reqActivity, getActivity);
+    app.put('/api/activity/:uuid', userAuth, reqActivity, actorOnly, putActivity);
+    app.del('/api/activity/:uuid', userAuth, reqActivity, actorOnly, delActivity);
 
     // Global user list
 
@@ -290,6 +290,47 @@ var delUser = function(req, res, next) {
                     res.json("Deleted");
                 }
             });
+        }
+    });
+};
+
+var reqActivity = function(req, res, next) {
+    Activity.search({'uuid': req.params.uuid}, function(err, results) {
+        if (err instanceof NoSuchThingError) {
+            next(new HTTPError(err.message, 404));
+        } else if (err) {
+            next(err);
+        } else if (results.length === 0) {
+            next(new HTTPError("Can't find an activity with ID = " + req.params.uuid, 404));
+        } else if (results.length > 1) {
+            next(new HTTPError("Too many activities with ID = " + req.params.uuid, 500));
+        } else {
+            req.activity = results[0];
+            next();
+        }
+    });
+};
+
+var getActivity = function(req, res, next) {
+    res.json(req.activity);
+};
+
+var putActivity = function(req, res, next) {
+    req.activity.update(req.body, function(err, result) {
+        if (err) {
+            next(err);
+        } else {
+            res.json(result);
+        }
+    });
+};
+
+var delActivity = function(req, res, next) {
+    req.activity.del(function(err) {
+        if (err) {
+            next(err);
+        } else {
+            res.json("Deleted");
         }
     });
 };
