@@ -150,15 +150,16 @@ suite.addBatch({
                             // wait 2000 ms to make sure updated != published
                             setTimeout(function() {
                                 httputil.putJSON(act.id, cred, newact, function(err, contents, result) {
-                                    cb(err, contents, act);
+                                    cb(err, {newact: contents, act: act});
                                 });
                             }, 2000);
                         },
-                        'it works': function(err, newact, act) {
+                        'it works': function(err, res) {
                             assert.ifError(err);
-                            assert.isObject(newact);
+                            assert.isObject(res.newact);
                         },
-                        'results look right': function(err, newact) {
+                        'results look right': function(err, res) {
+                            var newact = res.newact, act = res.act;
                             assert.isObject(newact);
                             assert.include(newact, 'id');
                             assert.isString(newact.id);
@@ -181,7 +182,8 @@ suite.addBatch({
                             assert.include(newact.mood, 'displayName');
                             assert.isString(newact.mood.displayName);
                         },
-                        'it has the correct data': function(err, newact, act) {
+                        'it has the correct data': function(err, res) {
+                            var newact = res.newact, act = res.act;
                             assert.equal(newact.id, act.id);
                             assert.equal(newact.verb, act.verb);
                             assert.equal(newact.published, act.published);
@@ -195,6 +197,19 @@ suite.addBatch({
                             assert.equal(newact.object.published, act.object.published);
                             assert.equal(newact.object.updated, act.object.updated);
                             assert.equal(newact.mood.displayName, "Friendly");
+                        },
+                        'and we DELETE the activity': {
+                            topic: function(put, got, posted, cred) {
+                                var cb = this.callback;
+
+                                httputil.delJSON(posted.id, cred, function(err, doc, result) {
+                                    cb(err, doc);
+                                });
+                            },
+                            'it works': function(err, doc) {
+                                assert.ifError(err);
+                                assert.equal(doc, "Deleted");
+                            }
                         }
                     }
                 }
