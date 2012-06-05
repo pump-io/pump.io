@@ -28,8 +28,6 @@ var assert = require('assert'),
     accessToken = oauthutil.accessToken,
     newCredentials = oauthutil.newCredentials;
 
-var ignore = function(err) {};
-
 var suite = vows.describe('Activity API test');
 
 // A batch for testing the read access to the API
@@ -86,11 +84,122 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.equal(res.statusCode, 200);
                     },
+                    'it allows GET': function(err, allow, res, body) {
+                        assert.include(allow, 'GET');
+                    },
                     'it allows PUT': function(err, allow, res, body) {
                         assert.include(allow, 'PUT');
                     },
                     'it allows DELETE': function(err, allow, res, body) {
                         assert.include(allow, 'DELETE');
+                    }
+                },
+                'and we GET the activity': {
+                    topic: function(posted, cred) {
+                        var cb = this.callback;
+                        httputil.getJSON(posted.id, cred, function(err, got, result) {
+                            cb(err, {got: got, posted: posted});
+                        });
+                    },
+                    'it works': function(err, res) {
+                        assert.ifError(err);
+                        assert.isObject(res.got);
+                    },
+                    'results look right': function(err, res) {
+                        var got = res.got;
+                        assert.isObject(got);
+                        assert.include(got, 'id');
+                        assert.isString(got.id);
+                        assert.include(got, 'actor');
+                        assert.isObject(got.actor);
+                        assert.include(got.actor, 'id');
+                        assert.isString(got.actor.id);
+                        assert.include(got, 'verb');
+                        assert.isString(got.verb);
+                        assert.include(got, 'object');
+                        assert.isObject(got.object);
+                        assert.include(got.object, 'id');
+                        assert.isString(got.object.id);
+                        assert.include(got, 'published');
+                        assert.isString(got.published);
+                        assert.include(got, 'updated');
+                        assert.isString(got.updated);
+                        assert.include(got, 'mood');
+                        assert.isString(got.mood);
+                        assert.include(got.mood, 'displayName');
+                        assert.isString(got.mood.displayName);
+                    },
+                    'it has the correct data': function(err, res) {
+                        var got = res.got, posted = res.posted;
+                        assert.equal(got.id, posted.id);
+                        assert.equal(got.verb, posted.verb);
+                        assert.equal(got.published, posted.published);
+                        assert.notEqual(got.updated, posted.updated);
+                        assert.equal(got.actor.id, posted.actor.id);
+                        assert.equal(got.actor.objectType, posted.actor.objectType);
+                        assert.equal(got.actor.displayName, posted.actor.displayName);
+                        assert.equal(got.object.id, posted.object.id);
+                        assert.equal(got.object.objectType, posted.object.objectType);
+                        assert.equal(got.object.content, posted.object.content);
+                        assert.equal(got.object.published, posted.object.published);
+                        assert.equal(got.object.updated, posted.object.updated);
+                    },
+                    'and we PUT a new version of the activity': {
+                        topic: function(got, act, cred) {
+                            var cb = this.callback,
+                                newact = JSON.parse(JSON.stringify(act));
+                            newact['mood'] = {
+                                displayName: "Friendly"
+                            };
+                            // wait 2000 ms to make sure updated != published
+                            setTimeout(function() {
+                                httputil.putJSON(act.id, cred, newact, function(err, contents, result) {
+                                    cb(err, contents, act);
+                                });
+                            }, 2000);
+                        },
+                        'it works': function(err, newact, act) {
+                            assert.ifError(err);
+                            assert.isObject(newact);
+                        },
+                        'results look right': function(err, newact) {
+                            assert.isObject(newact);
+                            assert.include(newact, 'id');
+                            assert.isString(newact.id);
+                            assert.include(newact, 'actor');
+                            assert.isObject(newact.actor);
+                            assert.include(newact.actor, 'id');
+                            assert.isString(newact.actor.id);
+                            assert.include(newact, 'verb');
+                            assert.isString(newact.verb);
+                            assert.include(newact, 'object');
+                            assert.isObject(newact.object);
+                            assert.include(newact.object, 'id');
+                            assert.isString(newact.object.id);
+                            assert.include(newact, 'published');
+                            assert.isString(newact.published);
+                            assert.include(newact, 'updated');
+                            assert.isString(newact.updated);
+                            assert.include(newact, 'mood');
+                            assert.isString(newact.mood);
+                            assert.include(newact.mood, 'displayName');
+                            assert.isString(newact.mood.displayName);
+                        },
+                        'it has the correct data': function(err, newact, act) {
+                            assert.equal(newact.id, act.id);
+                            assert.equal(newact.verb, act.verb);
+                            assert.equal(newact.published, act.published);
+                            assert.notEqual(newact.updated, act.updated);
+                            assert.equal(newact.actor.id, act.actor.id);
+                            assert.equal(newact.actor.objectType, act.actor.objectType);
+                            assert.equal(newact.actor.displayName, act.actor.displayName);
+                            assert.equal(newact.object.id, act.object.id);
+                            assert.equal(newact.object.objectType, act.object.objectType);
+                            assert.equal(newact.object.content, act.object.content);
+                            assert.equal(newact.object.published, act.object.published);
+                            assert.equal(newact.object.updated, act.object.updated);
+                            assert.equal(newact.mood.displayName, "Friendly");
+                        }
                     }
                 }
             }
