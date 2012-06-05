@@ -253,8 +253,19 @@ suite.addBatch({
                 },
                 'and we GET the activity with no credentials': {
                     topic: function(act, cred) {
-                        var cb = this.callback;
-                        http.get(act.id, function(err, response) {
+                        var cb = this.callback,
+                            parsed = urlparse(act.id),
+                            options = {
+                                host: 'localhost',
+                                port: 4815,
+                                path: parsed.path,
+                                headers: {
+                                    'User-Agent': 'activitypump-test/0.1.0dev',
+                                    'Content-Type': 'application/json'
+                                }
+                            };
+                        
+                        http.get(options, function(err, response) {
                             if (err) {
                                 cb(err);
                             } else if (response.statusCode < 400 || response.statusCode >= 500) {
