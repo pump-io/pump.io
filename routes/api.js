@@ -295,6 +295,7 @@ var delUser = function(req, res, next) {
 };
 
 var reqActivity = function(req, res, next) {
+    var act = null;
     Activity.search({'uuid': req.params.uuid}, function(err, results) {
         if (err instanceof NoSuchThingError) {
             next(new HTTPError(err.message, 404));
@@ -305,8 +306,15 @@ var reqActivity = function(req, res, next) {
         } else if (results.length > 1) {
             next(new HTTPError("Too many activities with ID = " + req.params.uuid, 500));
         } else {
-            req.activity = results[0];
-            next();
+            act = results[0];
+            act.expand(function(err) {
+                if (err) {
+                    next(err);
+                } else {
+                    req.activity = act;
+                    next();
+                }
+            });
         }
     });
 };
