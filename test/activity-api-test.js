@@ -568,7 +568,7 @@ suite.addBatch({
                             options = {
                                 host: 'localhost',
                                 port: 4815,
-                                path: act.id,
+                                path: parsed.path,
                                 method: "DELETE",
                                 headers: {
                                     'User-Agent': 'activitypump-test/0.1.0dev'
