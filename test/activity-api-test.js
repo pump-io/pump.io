@@ -287,6 +287,8 @@ suite.addBatch({
                         httputil.getJSON(act.id, nuke, function(err, doc, response) {
                             if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
                                 cb(null);
+                            } else if (err && err.statusCode) {
+                                cb(new Error("Unexpected status code: " + err.statusCode));
                             } else {
                                 cb(new Error("Unexpected results"));
                             }
@@ -304,6 +306,8 @@ suite.addBatch({
                         httputil.getJSON(act.id, nuke, function(err, doc, response) {
                             if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
                                 cb(null);
+                            } else if (err && err.statusCode) {
+                                cb(new Error("Unexpected status code: " + err.statusCode));
                             } else {
                                 cb(new Error("Unexpected results"));
                             }
@@ -321,6 +325,8 @@ suite.addBatch({
                         httputil.getJSON(act.id, nuke, function(err, doc, response) {
                             if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
                                 cb(null);
+                            } else if (err && err.statusCode) {
+                                cb(new Error("Unexpected status code: " + err.statusCode));
                             } else {
                                 cb(new Error("Unexpected results"));
                             }
@@ -338,6 +344,8 @@ suite.addBatch({
                         httputil.getJSON(act.id, nuke, function(err, doc, response) {
                             if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
                                 cb(null);
+                            } else if (err && err.statusCode) {
+                                cb(new Error("Unexpected status code: " + err.statusCode));
                             } else {
                                 cb(new Error("Unexpected results"));
                             }
@@ -388,6 +396,8 @@ suite.addBatch({
                             function(err, doc, res) {
                                 if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
                                     cb(null);
+                                } else if (err && err.statusCode) {
+                                    cb(new Error("Unexpected status code: " + err.statusCode));
                                 } else {
                                     cb(new Error("Unexpected results!"));
                                 }
@@ -422,7 +432,7 @@ suite.addBatch({
                             if (res.statusCode >= 400 && res.statusCode < 500) {
                                 cb(null);
                             } else {
-                                cb(new Error("Unexpected status code"));
+                                cb(new Error("Unexpected status code: " + res.statusCode));
                             }
                         }).on('error', function(err) {
                             cb(err);
@@ -448,6 +458,8 @@ suite.addBatch({
                         httputil.putJSON(act.id, nuke, newact, function(err, doc, response) {
                             if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
                                 cb(null);
+                            } else if (err && err.statusCode) {
+                                cb(new Error("Unexpected status code: " + err.statusCode));
                             } else {
                                 cb(new Error("Unexpected results"));
                             }
@@ -471,6 +483,8 @@ suite.addBatch({
                         httputil.putJSON(act.id, nuke, newact, function(err, doc, response) {
                             if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
                                 cb(null);
+                            } else if (err && err.statusCode) {
+                                cb(new Error("Unexpected status code: " + err.statusCode));
                             } else {
                                 cb(new Error("Unexpected results"));
                             }
@@ -494,6 +508,8 @@ suite.addBatch({
                         httputil.putJSON(act.id, nuke, newact, function(err, doc, response) {
                             if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
                                 cb(null);
+                            } else if (err && err.statusCode) {
+                                cb(new Error("Unexpected status code: " + err.statusCode));
                             } else {
                                 cb(new Error("Unexpected results"));
                             }
@@ -517,6 +533,8 @@ suite.addBatch({
                         httputil.putJSON(act.id, nuke, newact, function(err, doc, response) {
                             if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
                                 cb(null);
+                            } else if (err && err.statusCode) {
+                                cb(new Error("Unexpected status code: " + err.statusCode));
                             } else {
                                 cb(new Error("Unexpected results"));
                             }
@@ -562,6 +580,8 @@ suite.addBatch({
                             function(err, doc, res) {
                                 if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
                                     cb(null);
+                                } else if (err && err.statusCode) {
+                                    cb(new Error("Unexpected status code: " + err.statusCode));
                                 } else {
                                     cb(new Error("Unexpected results!"));
                                 }
@@ -589,7 +609,7 @@ suite.addBatch({
                             if (res.statusCode >= 400 && res.statusCode < 500) {
                                 cb(null);
                             } else {
-                                cb(new Error("Unexpected status code"));
+                                cb(new Error("Unexpected status code: " + res.statusCode));
                             }
                         }).on('error', function(err) {
                             cb(err);
@@ -610,6 +630,8 @@ suite.addBatch({
                         httputil.delJSON(act.id, nuke, function(err, doc, response) {
                             if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
                                 cb(null);
+                            } else if (err && err.statusCode) {
+                                cb(new Error("Unexpected status code: " + err.statusCode));
                             } else {
                                 cb(new Error("Unexpected results"));
                             }
@@ -629,6 +651,8 @@ suite.addBatch({
                         httputil.delJSON(act.id, nuke, function(err, doc, response) {
                             if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
                                 cb(null);
+                            } else if (err && err.statusCode) {
+                                cb(new Error("Unexpected status code: " + err.statusCode));
                             } else {
                                 cb(new Error("Unexpected results"));
                             }
@@ -648,6 +672,8 @@ suite.addBatch({
                         httputil.delJSON(act.id, nuke, function(err, doc, response) {
                             if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
                                 cb(null);
+                            } else if (err && err.statusCode) {
+                                cb(new Error("Unexpected status code: " + err.statusCode));
                             } else {
                                 cb(new Error("Unexpected results"));
                             }
@@ -667,6 +693,8 @@ suite.addBatch({
                         httputil.delJSON(act.id, nuke, function(err, doc, response) {
                             if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
                                 cb(null);
+                            } else if (err && err.statusCode) {
+                                cb(new Error("Unexpected status code: " + err.statusCode));
                             } else {
                                 cb(new Error("Unexpected results"));
                             }
