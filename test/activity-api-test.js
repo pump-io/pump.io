@@ -155,7 +155,7 @@ suite.addBatch({
                         topic: function(got, act, cred) {
                             var cb = this.callback,
                                 newact = JSON.parse(JSON.stringify(act));
-                            newact['mood'] = {
+                            newact.mood = {
                                 displayName: "Friendly"
                             };
                             // wait 2000 ms to make sure updated != published
@@ -369,8 +369,8 @@ suite.addBatch({
                     topic: function(act, cred) {
                         var cb = this.callback,
                             newact = JSON.parse(JSON.stringify(act));
-                       
-                        newact['mood'] = {
+                        
+                        newact.mood = {
                             displayName: "Friendly"
                         };
                         
@@ -413,8 +413,8 @@ suite.addBatch({
                                 }
                             },
                             newact = JSON.parse(JSON.stringify(act));
-                       
-                        newact['mood'] = {
+                        
+                        newact.mood = {
                             displayName: "Friendly"
                         };
 
@@ -439,8 +439,8 @@ suite.addBatch({
                         var cb = this.callback,
                             nuke = _(cred).clone(),
                             newact = JSON.parse(JSON.stringify(act));
-                       
-                        newact['mood'] = {
+                        
+                        newact.mood = {
                             displayName: "Friendly"
                         };
                         nuke.consumer_key = "NOTAKEY";
@@ -462,8 +462,8 @@ suite.addBatch({
                         var cb = this.callback,
                             nuke = _(cred).clone(),
                             newact = JSON.parse(JSON.stringify(act));
-                       
-                        newact['mood'] = {
+                        
+                        newact.mood = {
                             displayName: "Friendly"
                         };
                         nuke.consumer_secret = "NOTASECRET";
@@ -485,8 +485,8 @@ suite.addBatch({
                         var cb = this.callback,
                             nuke = _(cred).clone(),
                             newact = JSON.parse(JSON.stringify(act));
-                       
-                        newact['mood'] = {
+                        
+                        newact.mood = {
                             displayName: "Friendly"
                         };
                         nuke.token = "NOTATOKEN";
@@ -508,8 +508,8 @@ suite.addBatch({
                         var cb = this.callback,
                             nuke = _(cred).clone(),
                             newact = JSON.parse(JSON.stringify(act));
-                       
-                        newact['mood'] = {
+                        
+                        newact.mood = {
                             displayName: "Friendly"
                         };
                         nuke.token_secret = "NOTATOKENSECRET";
@@ -604,7 +604,7 @@ suite.addBatch({
                     topic: function(act, cred) {
                         var cb = this.callback,
                             nuke = _(cred).clone();
-                       
+                        
                         nuke.consumer_key = "NOTAKEY";
 
                         httputil.delJSON(act.id, nuke, function(err, doc, response) {
@@ -623,7 +623,7 @@ suite.addBatch({
                     topic: function(act, cred) {
                         var cb = this.callback,
                             nuke = _(cred).clone();
-                       
+                        
                         nuke.consumer_secret = "NOTASECRET";
 
                         httputil.delJSON(act.id, nuke, function(err, doc, response) {
@@ -642,7 +642,7 @@ suite.addBatch({
                     topic: function(act, cred) {
                         var cb = this.callback,
                             nuke = _(cred).clone();
-                       
+                        
                         nuke.token = "NOTATOKEN";
 
                         httputil.delJSON(act.id, nuke, function(err, doc, response) {
@@ -661,7 +661,7 @@ suite.addBatch({
                     topic: function(act, cred) {
                         var cb = this.callback,
                             nuke = _(cred).clone();
-                       
+                        
                         nuke.token_secret = "NOTATOKENSECRET";
 
                         httputil.delJSON(act.id, nuke, function(err, doc, response) {
