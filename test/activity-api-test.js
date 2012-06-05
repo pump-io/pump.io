@@ -28,9 +28,35 @@ var assert = require('assert'),
     accessToken = oauthutil.accessToken,
     newCredentials = oauthutil.newCredentials;
 
+var assertValid = function(act) {
+    assert.isObject(act);
+    assert.include(act, 'id');
+    assert.isString(act.id);
+    assert.include(act, 'actor');
+    assert.isObject(act.actor);
+    assert.include(act.actor, 'id');
+    assert.isString(act.actor.id);
+    assert.include(act.actor, 'objectType');
+    assert.isString(act.actor.objectType);
+    assert.include(act.actor, 'displayName');
+    assert.isString(act.actor.displayName);
+    assert.include(act, 'verb');
+    assert.isString(act.verb);
+    assert.include(act, 'object');
+    assert.isObject(act.object);
+    assert.include(act.object, 'id');
+    assert.isString(act.object.id);
+    assert.include(act.object, 'objectType');
+    assert.isString(act.object.objectType);
+    assert.include(act, 'published');
+    assert.isString(act.published);
+    assert.include(act, 'updated');
+    assert.isString(act.updated);
+};
+
 var suite = vows.describe('Activity API test');
 
-// A batch for testing the read access to the API
+// A batch for testing the read-write access to the API
 
 suite.addBatch({
     'When we set up the app': {
@@ -107,23 +133,7 @@ suite.addBatch({
                     },
                     'results look right': function(err, res) {
                         var got = res.got;
-                        assert.isObject(got);
-                        assert.include(got, 'id');
-                        assert.isString(got.id);
-                        assert.include(got, 'actor');
-                        assert.isObject(got.actor);
-                        assert.include(got.actor, 'id');
-                        assert.isString(got.actor.id);
-                        assert.include(got, 'verb');
-                        assert.isString(got.verb);
-                        assert.include(got, 'object');
-                        assert.isObject(got.object);
-                        assert.include(got.object, 'id');
-                        assert.isString(got.object.id);
-                        assert.include(got, 'published');
-                        assert.isString(got.published);
-                        assert.include(got, 'updated');
-                        assert.isString(got.updated);
+                        assertValid(got);
                     },
                     'it has the correct data': function(err, res) {
                         var got = res.got, posted = res.posted;
@@ -160,23 +170,7 @@ suite.addBatch({
                         },
                         'results look right': function(err, res) {
                             var newact = res.newact, act = res.act;
-                            assert.isObject(newact);
-                            assert.include(newact, 'id');
-                            assert.isString(newact.id);
-                            assert.include(newact, 'actor');
-                            assert.isObject(newact.actor);
-                            assert.include(newact.actor, 'id');
-                            assert.isString(newact.actor.id);
-                            assert.include(newact, 'verb');
-                            assert.isString(newact.verb);
-                            assert.include(newact, 'object');
-                            assert.isObject(newact.object);
-                            assert.include(newact.object, 'id');
-                            assert.isString(newact.object.id);
-                            assert.include(newact, 'published');
-                            assert.isString(newact.published);
-                            assert.include(newact, 'updated');
-                            assert.isString(newact.updated);
+                            assertValid(newact);
                             assert.include(newact, 'mood');
                             assert.isObject(newact.mood);
                             assert.include(newact.mood, 'displayName');
@@ -216,6 +210,9 @@ suite.addBatch({
             }
         }
     }
+});
+
+suite.addBatch({
 });
 
 suite['export'](module);
