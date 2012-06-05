@@ -177,7 +177,7 @@ suite.addBatch({
                             assert.include(newact, 'updated');
                             assert.isString(newact.updated);
                             assert.include(newact, 'mood');
-                            assert.isString(newact.mood);
+                            assert.isObject(newact.mood);
                             assert.include(newact.mood, 'displayName');
                             assert.isString(newact.mood.displayName);
                         },
