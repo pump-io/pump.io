@@ -223,6 +223,9 @@ suite.addBatch({
                         cb(err, act);
                     });
                 },
+                'it works': function(err, act) {
+                    assert.ifError(err);
+                },
                 'and we GET the activity with different credentials than the author': {
                     topic: function(act, cred) {
                         var cb = this.callback;
@@ -347,6 +350,9 @@ suite.addBatch({
                     httputil.postJSON("http://localhost:4815/api/user/gerold/feed", cred, act, function(err, act, response) {
                         cb(err, act);
                     });
+                },
+                'it works': function(err, act) {
+                    assert.ifError(err);
                 },
                 'and we PUT the activity with different credentials than the author': {
                     topic: function(act, cred) {
@@ -523,6 +529,9 @@ suite.addBatch({
                     httputil.postJSON("http://localhost:4815/api/user/gerold/feed", cred, act, function(err, act, response) {
                         cb(err, act);
                     });
+                },
+                'it works': function(err, act) {
+                    assert.ifError(err);
                 },
                 'and we DELETE the activity with different credentials than the author': {
                     topic: function(act, cred) {
