@@ -1,12 +1,12 @@
 <% /* -*- mode: html -*- */ %>
 
-<a class="brand" href="/<%- user.nickname %>/inbox">ActivityPump</a>
+<a class="brand" href="/<%- remoteUser.nickname %>/inbox">ActivityPump</a>
 <ul class="nav">
-  <li class="active"><a href="/<%- user.nickname %>/inbox">Home</a></li>
+  <li class="active"><a href="/<%- remoteUser.nickname %>/inbox">Home</a></li>
 </ul>
 <div class="pull-right">
   <ul class="nav">
-    <li><a href="/<%- user.nickname %>"><%- user.nickname %></a></li>
+    <li><a href="/<%- remoteUser.nickname %>"><%- remoteUser.nickname %></a></li>
     <li><a href="/main/settings">Settings</a></li>
     <li><button href="#" data-controls-modal="modal-post" data-backdrop="true" data-keyboard="true" class="btn">Post</button></li>
     <li><button href="#" id="logout" class="btn">Logout</button></li>
