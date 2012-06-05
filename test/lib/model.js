@@ -160,9 +160,16 @@ var modelBatch = function(typeName, className, testSchema, testData) {
             assert.isString(created.updated); // required for new object?
         },
         'passed-in fields are there': function(err, created) {
-            var prop;
+            var prop, aprop;
             for (prop in testData.create) {
-                assert.deepEqual(created[prop], testData.create[prop]); 
+                // Author may have auto-created properties
+                if (prop === 'author') {
+                    for (aprop in testData.create.author) {
+                        assert.deepEqual(created.author[aprop], testData.create.author[aprop]);
+                    }
+                } else {
+                    assert.deepEqual(created[prop], testData.create[prop]); 
+                }
             }
         },
         'and we modify it': {
