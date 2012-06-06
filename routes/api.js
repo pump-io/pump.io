@@ -187,7 +187,7 @@ var requester = function(type) {
                 next(new HTTPError("Too many " + type + " objects with ID = " + req.params.uuid, 500));
             } else {
                 obj = results[0];
-                obj.expandAuthor(function(err) {
+                obj.expand(function(err) {
                     if (err) {
                         next(err);
                     } else {
