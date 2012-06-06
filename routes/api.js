@@ -535,9 +535,11 @@ var userStream = function(req, res, next) {
                 next(err);
             } else {
                 activities.forEach(function(el, i, arr) {
-                    // remove internal uuid info, if any
-                    delete el.actor;
-                    delete el.uuid;
+                    if (el) {
+                        // remove internal uuid info, if any
+                        delete el.actor;
+                        delete el.uuid;
+                    }
                 });
 
                 collection.items = activities;
