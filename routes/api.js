@@ -537,8 +537,12 @@ var userStream = function(req, res, next) {
                 activities.forEach(function(el, i, arr) {
                     if (_(el).isObject()) {
                         // remove internal uuid info, if any
-                        delete el.actor;
-                        delete el.uuid;
+                        if (_(el).has('actor')) {
+                            delete el.actor;
+                        }
+                        if (_(el).has('uuid')) {
+                            delete el.uuid;
+                        }
                     }
                 });
 
