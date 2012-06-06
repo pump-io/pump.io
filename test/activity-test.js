@@ -222,12 +222,6 @@ suite.addBatch({
             },
             'it has the expand() method': function(activity) {
                 assert.isFunction(activity.expand);
-            },
-            'it has the expandActor() method': function(activity) {
-                assert.isFunction(activity.expandActor);
-            },
-            'it has the expandObject() method': function(activity) {
-                assert.isFunction(activity.expandObject);
             }
         },
         'and we apply() a new post activity': {
