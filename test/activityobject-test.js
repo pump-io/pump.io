@@ -25,7 +25,7 @@ var assert = require('assert'),
     schema = require('../lib/schema').schema,
     URLMaker = require('../lib/urlmaker').URLMaker;
 
-vows.describe('schema module interface').addBatch({
+vows.describe('activityobject class interface').addBatch({
     'When we require the activityobject module': {
         topic: function() { 
             var cb = this.callback;
