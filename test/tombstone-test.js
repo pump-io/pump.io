@@ -187,7 +187,7 @@ suite.addBatch({
                 assert.equal(ts.objectType, person.objectType);
                 assert.equal(ts.id, person.id);
                 assert.equal(ts.uuid, person.uuid);
-                assert.equal(ts.published, person.published);
+                assert.equal(ts.created, person.published);
                 assert.equal(ts.updated, person.updated);
                 assert.isString(ts.deleted);
                 assert.match(ts.deleted, /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
