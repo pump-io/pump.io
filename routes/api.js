@@ -180,19 +180,16 @@ var requester = function(type) {
             obj = null;
 
         Cls.search({'uuid': uuid}, function(err, results) {
-            if (err instanceof NoSuchThingError) {
-                Tombstone.lookup(type, uuid, function(err2, ts) {
-                    if (err2 instanceof NoSuchThingError) {
-                        next(new HTTPError(err.message, 404));
-                    } else {
-                        // Last-Modified?
-                        next(new HTTPError(err.message, 410));
-                    }
-                });
-            } else if (err) {
+            if (err) {
                 next(err);
             } else if (results.length === 0) {
-                next(new HTTPError("Can't find a " + type + " with ID = " + req.params.uuid, 404));
+                Tombstone.lookup(type, uuid, function(err, ts) {
+                    if (err instanceof NoSuchThingError) {
+                        next(new HTTPError("Can't find a " + type + " with ID = " + uuid, 404));
+                    } else {
+                        next(new HTTPError("The " + type + " with ID = " + uuid + " was deleted", 410));
+                    }
+                });
             } else if (results.length > 1) {
                 next(new HTTPError("Too many " + type + " objects with ID = " + req.params.uuid, 500));
             } else {
@@ -325,17 +322,17 @@ var reqActivity = function(req, res, next) {
     var act = null,
         uuid = req.params.uuid;
     Activity.search({'uuid': uuid}, function(err, results) {
-        if (err instanceof NoSuchThingError || (!err && results.length === 0)) {
-            Tombstone.lookup('activity', uuid, function(err2, ts) {
-                if (err2 instanceof NoSuchThingError) {
-                    next(new HTTPError(err.message, 404));
+        if (err) {
+            next(err);
+        } else if (results.length === 0) { // not found
+            Tombstone.lookup('activity', uuid, function(err, ts) {
+                if (err instanceof NoSuchThingError) {
+                    next(new HTTPError("Can't find an activity with id " + uuid, 404));
                 } else {
                     // Last-Modified?
-                    next(new HTTPError(err.message, 410));
+                    next(new HTTPError("That activity was deleted.", 410));
                 }
             });
-        } else if (err) {
-            next(err);
         } else if (results.length > 1) {
             next(new HTTPError("Too many activities with ID = " + req.params.uuid, 500));
         } else {
