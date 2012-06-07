@@ -48,22 +48,22 @@ vows.describe('stamper module interface').addBatch({
                     assert.isString(ts);
                 },
                 'it looks correct': function(ts) {
-                    assert.match(ts, /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/);
+                    assert.match(ts, /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
                 }
             },
             'and we make a timestamp with a date argument': {
                 topic: function(Stamper) {
-                    var d = new Date(2000, 1, 1, 12, 34, 56);
+                    var d = Date.UTC(2000, 1, 1, 12, 34, 56);
                     return Stamper.stamp(d);
                 },
                 'it works': function(ts) {
                     assert.isString(ts);
                 },
                 'it looks correct': function(ts) {
-                    assert.match(ts, /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/);
+                    assert.match(ts, /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
                 },
                 'it contains our date': function(ts) {
-                    assert.equal(ts, '2000-01-01T12:34:56Z');
+                    assert.equal(ts, '2000-01-01T12:34:56');
                 }
             },
             'and we unstamp a timestamp': {
