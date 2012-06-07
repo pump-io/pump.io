@@ -51,7 +51,8 @@ var types = [
     'question',
     'review',
     'service',
-    'video'
+    'video',
+    'tombstone'
 ];
 
 vows.describe('schema module interface').addBatch({
