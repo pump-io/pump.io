@@ -322,10 +322,18 @@ var delUser = function(req, res, next) {
 };
 
 var reqActivity = function(req, res, next) {
-    var act = null;
-    Activity.search({'uuid': req.params.uuid}, function(err, results) {
+    var act = null,
+        uuid = req.params.uuid;
+    Activity.search({'uuid': uuid}, function(err, results) {
         if (err instanceof NoSuchThingError) {
-            next(new HTTPError(err.message, 404));
+            Tombstone.lookup('activity', uuid, function(err2, ts) {
+                if (err2 instanceof NoSuchThingError) {
+                    next(new HTTPError(err.message, 404));
+                } else {
+                    // Last-Modified?
+                    next(new HTTPError(err.message, 410));
+                }
+            });
         } else if (err) {
             next(err);
         } else if (results.length === 0) {
@@ -361,13 +369,23 @@ var putActivity = function(req, res, next) {
 };
 
 var delActivity = function(req, res, next) {
-    req.activity.del(function(err) {
-        if (err) {
-            next(err);
-        } else {
-            res.json("Deleted");
+    var act = req.activity;
+    Step(
+        function() {
+            act.del(this);
+        },
+        function(err) {
+            if (err) throw err;
+            Tombstone.markFull(act, 'activity', act.uuid, this);
+        },
+        function(err) {
+            if (err) {
+                next(err);
+            } else {
+                res.json("Deleted");
+            }
         }
-    });
+    );
 };
 
 var createUser = function (req, res, next) {
