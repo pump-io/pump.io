@@ -760,6 +760,48 @@ suite.addBatch({
                     assert.isString(act.mood.displayName);
                     assert.equal(act.mood.displayName, "Merry");
                 }
+            },
+            'and we DELETE an activity then GET it': {
+                topic: function(cred) {
+                    var cb = this.callback,
+                        act = {
+                            verb: "play",
+                            object: {
+                                objectType: "video",
+                                id: "http://example.net/video/autotune-the-news-5",
+                                displayName: "Autotune The News 5"
+                            }
+                        },
+                        id;
+
+                    Step(
+                        function() {
+                            httputil.postJSON("http://localhost:4815/api/user/gerold/feed", cred, act, this);
+                        },
+                        function(err, posted, resp) {
+                            if (err) throw err;
+                            id = posted.id;
+                            httputil.delJSON(id, cred, this);
+                        },
+                        function(err, doc, resp) {
+                            if (err) throw err;
+                            httputil.getJSON(id, cred, this);
+                        },
+                        function(err, got, resp) {
+                            if (err && err.statusCode && err.statusCode == 410) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                'it fails with a 410 Gone status code': function(err, act) {
+                    // Should this be 410 Gone?
+                    assert.ifError(err);
+                }
             }
         }
     }
