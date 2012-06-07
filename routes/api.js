@@ -325,7 +325,7 @@ var reqActivity = function(req, res, next) {
     var act = null,
         uuid = req.params.uuid;
     Activity.search({'uuid': uuid}, function(err, results) {
-        if (err instanceof NoSuchThingError) {
+        if (err instanceof NoSuchThingError || (!err && results.length === 0)) {
             Tombstone.lookup('activity', uuid, function(err2, ts) {
                 if (err2 instanceof NoSuchThingError) {
                     next(new HTTPError(err.message, 404));
@@ -336,8 +336,6 @@ var reqActivity = function(req, res, next) {
             });
         } else if (err) {
             next(err);
-        } else if (results.length === 0) {
-            next(new HTTPError("Can't find an activity with ID = " + req.params.uuid, 404));
         } else if (results.length > 1) {
             next(new HTTPError("Too many activities with ID = " + req.params.uuid, 500));
         } else {
