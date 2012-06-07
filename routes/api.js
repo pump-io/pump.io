@@ -27,6 +27,7 @@ var databank = require('databank'),
     Edge = require('../lib/model/edge').Edge,
     Stream = require('../lib/model/stream').Stream,
     Client = require('../lib/model/client').Client,
+    Tombstone = require('../lib/model/tombstone').Tombstone,
     mw = require('../lib/middleware'),
     URLMaker = require('../lib/urlmaker').URLMaker,
     reqUser = mw.reqUser,
@@ -172,13 +173,22 @@ var userAuth = function(req, res, next) {
 
 var requester = function(type) {
 
-    var Cls = ActivityObject.toClass(type),
-        obj = null;
+    var Cls = ActivityObject.toClass(type);
 
     return function(req, res, next) {
-        Cls.search({'uuid': req.params.uuid}, function(err, results) {
+        var uuid = req.params.uuid,
+            obj = null;
+
+        Cls.search({'uuid': uuid}, function(err, results) {
             if (err instanceof NoSuchThingError) {
-                next(new HTTPError(err.message, 404));
+                Tombstone.lookup(type, uuid, function(err2, ts) {
+                    if (err2 instanceof NoSuchThingError) {
+                        next(new HTTPError(err.message, 404));
+                    } else {
+                        // Last-Modified?
+                        next(new HTTPError(err.message, 410));
+                    }
+                });
             } else if (err) {
                 next(err);
             } else if (results.length === 0) {
@@ -256,13 +266,22 @@ var putter = function(type) {
 var deleter = function(type) {
     return function(req, res, next) {
         var obj = req[type];
-        obj.del(function(err) {
-            if (err) {
-                next(err);
-            } else {
-                res.json("Deleted");
+        Step(
+            function() {
+                obj.del(this);
+            },
+            function(err) {
+                if (err) throw err;
+                Tombstone.mark(obj, this);
+            },
+            function(err) {
+                if (err) {
+                    next(err);
+                } else {
+                    res.json("Deleted");
+                }
             }
-        });
+        );
     };
 };
 
