@@ -72,7 +72,6 @@ vows.describe('stamper module interface').addBatch({
                     return Stamper.unstamp(ts);
                 },
                 'it works': function(dt) {
-                    assert.isObject(dt);
                     assert.instanceOf(dt, Date);
                 },
                 'its properties are correct': function(dt) {
