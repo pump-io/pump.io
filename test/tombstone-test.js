@@ -32,12 +32,10 @@ var suite = vows.describe('tombstone interface');
 var testSchema = {
     pkey: 'typeuuid',
     fields: ['objectType',
-             'id',
              'uuid',
              'created',
              'updated',
-             'deleted'],
-    indices: ['id']
+             'deleted']
 };
 
 var testData = {
