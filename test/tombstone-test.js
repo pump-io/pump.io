@@ -87,14 +87,12 @@ suite.addBatch({
             });
         },
         'it works': function(err, Tombstone) {
-            assert.isObject(Tombstone);
+            assert.isFunction(Tombstone);
         },
         'it has the mark() method': function(err, Tombstone) {
-            assert.include(Tombstone, 'mark');
             assert.isFunction(Tombstone.mark);
         },
         'it has the lookup() method': function(err, Tombstone) {
-            assert.include(Tombstone, 'lookup');
             assert.isFunction(Tombstone.lookup);
         },
         'and we call mark() on an ActivityObject': {
