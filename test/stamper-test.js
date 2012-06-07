@@ -53,7 +53,7 @@ vows.describe('stamper module interface').addBatch({
             },
             'and we make a timestamp with a date argument': {
                 topic: function(Stamper) {
-                    var d = Date.UTC(2000, 1, 1, 12, 34, 56);
+                    var d = Date.UTC(2000, 0, 1, 12, 34, 56);
                     return Stamper.stamp(d);
                 },
                 'it works': function(ts) {
@@ -76,7 +76,7 @@ vows.describe('stamper module interface').addBatch({
                 },
                 'its properties are correct': function(dt) {
                     assert.equal(dt.getUTCFullYear(), 1968);
-                    assert.equal(dt.getUTCMonth(), 10);
+                    assert.equal(dt.getUTCMonth(), 9);
                     assert.equal(dt.getUTCDate(), 14);
                     assert.equal(dt.getUTCHours(), 13);
                     assert.equal(dt.getUTCMinutes(), 32);
