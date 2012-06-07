@@ -117,6 +117,28 @@ suite.addBatch({
                 assert.ifError(err);
             }
         },
+        'and we call markFull() on an ActivityObject': {
+            topic: function(Tombstone) {
+                var cb = this.callback,
+                    Person = require('../lib/model/person').Person;
+
+                Step(
+                    function() {
+                        Person.create({displayName: "Abraham Lincoln"}, this);
+                    },
+                    function(err, person) {
+                        if (err) throw err;
+                        Tombstone.markFull(person, 'person', person.uuid, this);
+                    },
+                    function(err) {
+                        cb(err);
+                    }
+                );
+            },
+            'it works': function(err) {
+                assert.ifError(err);
+            }
+        },
         'and we call mark() on another kind of object': {
             topic: function(Tombstone) {
                 var cb = this.callback,
