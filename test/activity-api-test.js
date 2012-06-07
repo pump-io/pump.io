@@ -704,6 +704,62 @@ suite.addBatch({
                         assert.ifError(err);
                     }
                 }
+            },
+            'and we PUT an activity then GET it': {
+                topic: function(cred) {
+                    var cb = this.callback,
+                        act = {
+                            verb: "listen",
+                            object: {
+                                objectType: "audio",
+                                id: "http://example.net/music/jingle-bells",
+                                displayName: "Jingle Bells"
+                            }
+                        },
+                        id;
+
+                    Step(
+                        function() {
+                            httputil.postJSON("http://localhost:4815/api/user/gerold/feed", cred, act, this);
+                        },
+                        function(err, posted, resp) {
+                            var changed;
+                            if (err) throw err;
+                            id = posted.id;
+                            changed = JSON.parse(JSON.stringify(posted)); // copy it
+                            changed.mood = {
+                                displayName: "Merry"
+                            };
+                            httputil.putJSON(id, cred, changed, this);
+                        },
+                        function(err, put, resp) {
+                            if (err) throw err;
+                            httputil.getJSON(id, cred, this);
+                        },
+                        function(err, got, resp) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                cb(null, got);
+                            }
+                        }
+                    );
+                },
+                'it works': function(err, act) {
+                    assert.ifError(err);
+                },
+                'results are valid': function(err, act) {
+                    assert.ifError(err);
+                    assertValid(act);
+                },
+                'results include our changes': function(err, act) {
+                    assert.ifError(err);
+                    assert.include(act, 'mood');
+                    assert.isObject(act.mood);
+                    assert.include(act.mood, 'displayName');
+                    assert.isString(act.mood.displayName);
+                    assert.equal(act.mood.displayName, "Merry");
+                }
             }
         }
     }
