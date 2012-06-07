@@ -205,7 +205,6 @@ suite.addBatch({
             'tombstone is correct': function(err, ts, person) {
                 assert.isObject(ts);
                 assert.equal(ts.objectType, person.objectType);
-                assert.equal(ts.id, person.id);
                 assert.equal(ts.uuid, person.uuid);
                 assert.equal(ts.created, person.published);
                 assert.equal(ts.updated, person.updated);
