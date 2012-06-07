@@ -22,6 +22,7 @@ var assert = require('assert'),
     Step = require('step'),
     URLMaker = require('../lib/urlmaker').URLMaker,
     modelBatch = require('./lib/model').modelBatch,
+    schema = require('../lib/schema').schema,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
     NoSuchThingError = databank.NoSuchThingError;
