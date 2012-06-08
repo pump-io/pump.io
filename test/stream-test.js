@@ -195,6 +195,98 @@ suite.addBatch({
 });
 
 suite.addBatch({
+
+    'When we setup the env': {
+        topic: function() {
+            var cb = this.callback;
+
+            // Need this to make IDs
+
+            URLMaker.hostname = "example.net";
+
+            // Dummy databank
+
+            var params = {schema: schema};
+
+            var db = Databank.get('memory', params);
+
+            var stream = null;
+
+            db.connect({}, function(err) {
+
+                if (err) {
+                    cb(err, null);
+                    return;
+                }
+
+                DatabankObject.bank = db;
+                
+                var Stream = require('../lib/model/stream').Stream;
+                cb(null, Stream);
+            });
+        },
+        'it works': function(err, Stream) {
+            assert.ifError(err);
+        },
+        'and we create a stream': {
+            topic: function(Stream) {
+                Stream.create('test-remove', this.callback);
+            },
+            'it works': function(err, stream) {
+                assert.ifError(err);
+                assert.isObject(stream);
+            },
+            'and we add 5000 ids': {
+                topic: function(stream, Stream) {
+                    var cb = this.callback();
+                    Step(
+                        function() {
+                            var i, group = this.group();
+                            for (i = 0; i < 5000; i++) {
+                                stream.deliver('http://example.net/api/object/'+i, group());
+                            }
+                        },
+                        function(err) {
+                            if (err) {
+                                cb(err);
+                            } else {
+                                cb(null);
+                            }
+                        }
+                    );
+                },
+                'it works': function(err) {
+                    assert.ifError(err);
+                },
+                'and we remove one': {
+                    topic: function(stream, Stream) {
+                        stream.remove('http://example.net/api/object/2500', this.callback());
+                    },
+                    'it works': function(err) {
+                        assert.ifError(err);
+                    },
+                    'and we get all the IDs': {
+                        topic: function(stream, Stream) {
+                            stream.getIDs(0, 5000, this.callback);
+                        },
+                        'it works': function(err, ids) {
+                            assert.ifError(err);
+                            assert.isArray(ids);
+                        },
+                        'it is the right size': function(err, ids) {
+                            assert.equal(ids.length, 4999); // 5000 - 1
+                        },
+                        'removed ID is missing': function(err, ids) {
+                            assert.equal(ids.indexOf('http://example.net/api/object/2500'), -1);
+                        }
+                    }
+                }
+            }
+        }
+    }
+});
+
+suite.addBatch({
     'When we deliver a lot of activities to a stream': {
         topic: function() {
             var cb = this.callback,
