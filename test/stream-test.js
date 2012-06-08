@@ -230,7 +230,7 @@ suite.addBatch({
         },
         'and we create a stream': {
             topic: function(Stream) {
-                Stream.create({name: 'test-remove'}, this.callback);
+                Stream.create({name: 'test-remove-1'}, this.callback);
             },
             'it works': function(err, stream) {
                 assert.ifError(err);
@@ -281,6 +281,65 @@ suite.addBatch({
                         }
                     }
                 }
+            }
+        },
+        'and we try to remove() from an empty stream': {
+            topic: function(Stream) {
+                var cb = this.callback();
+                
+                Stream.create({name: 'test-remove-2'}, function(err, stream) {
+                    if (err) {
+                        cb(err);
+                    } else {
+                        stream.remove('http://example.net/api/object/6000', function(err) {
+                            if (err) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        });
+                    }
+                });
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        'and we remove a not-present object from a non-empty stream': {
+            topic: function(Stream) {
+                var cb = this.callback(),
+                    stream;
+
+                Step(
+                    function() {
+                        Stream.create({name: 'test-remove-3'}, this);
+                    }, 
+                    function(err, results) {
+                        var i, group = this.group();
+                        if (err) throw err;
+                        stream = results;
+                        for (i = 0; i < 5000; i++) {
+                            stream.deliver('http://example.net/api/object/'+i, group());
+                        }
+                    },
+                    function(err) {
+                        if (err) {
+                            cb(err);
+                        } else {
+                            // 6666 > 5000
+                            stream.remove('http://example.net/api/object/6666', function(err) {
+                                if (err) {
+                                    cb(null);
+                                } else {
+                                    cb(new Error("Unexpected success"));
+                                }
+                            });
+                        }
+                    }
+                );
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
             }
         }
     }
