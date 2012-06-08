@@ -799,7 +799,74 @@ suite.addBatch({
                     );
                 },
                 'it fails with a 410 Gone status code': function(err, act) {
-                    // Should this be 410 Gone?
+                    assert.ifError(err);
+                }
+            },
+            'and we try to PUT a non-existent activity': {
+                topic: function(cred) {
+                    var cb = this.callback,
+                        url = 'http://localhost:4815/api/activity/NONEXISTENT',
+                        act = {
+                            verb: "play",
+                            object: {
+                                objectType: "video",
+                                id: "http://example.net/video/autotune-the-news-4",
+                                displayName: "Autotune The News 4"
+                            }
+                        };
+
+                        httputil.putJSON(url, cred, act, function(err, got, resp) {
+                            if (err && err.statusCode && err.statusCode == 404) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                'it fails with a 404 status code': function(err, act) {
+                    assert.ifError(err);
+                }
+            },
+            'and we try to GET a non-existent activity': {
+                topic: function(cred) {
+                    var cb = this.callback,
+                        url = 'http://localhost:4815/api/activity/NONEXISTENT';
+
+                        httputil.getJSON(url, cred, function(err, got, resp) {
+                            if (err && err.statusCode && err.statusCode == 404) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                'it fails with a 404 status code': function(err, act) {
+                    assert.ifError(err);
+                }
+            },
+            'and we try to DELETE a non-existent activity': {
+                topic: function(cred) {
+                    var cb = this.callback,
+                        url = 'http://localhost:4815/api/activity/NONEXISTENT';
+
+                        httputil.delJSON(url, cred, function(err, got, resp) {
+                            if (err && err.statusCode && err.statusCode == 404) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                'it fails with a 404 status code': function(err, act) {
                     assert.ifError(err);
                 }
             }
