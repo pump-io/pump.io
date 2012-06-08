@@ -26,6 +26,7 @@ var assert = require('assert'),
     Browser = require('zombie'),
     httputil = require('./lib/http'),
     oauthutil = require('./lib/oauth'),
+    actutil = require('./lib/activity'),
     setupApp = oauthutil.setupApp,
     newCredentials = oauthutil.newCredentials,
     newClient = oauthutil.newClient,
@@ -54,7 +55,8 @@ suite.addBatch({
         'and we get new credentials': {
             topic: function() {
                 var cb = this.callback,
-                    cl;
+                    cl,
+                    users = {larry: {}, moe: {}, curly: {}};
 
                 Step(
                     function() {
@@ -69,25 +71,57 @@ suite.addBatch({
                     },
                     function(err, user1, user2, user3) {
                         if (err) throw err;
+                        users.larry.profile = user1.profile;
+                        users.moe.profile   = user2.profile;
+                        users.curly.profile = user3.profile;
                         accessToken(cl, {nickname: "larry", password: "wiry1"}, this.parallel());
                         accessToken(cl, {nickname: "moe", password: "bowlcut"}, this.parallel());
                         accessToken(cl, {nickname: "curly", password: "nyuknyuk"}, this.parallel());
                     },
                     function(err, pair1, pair2, pair3) {
                         if (err) {
-                            cb(err, null, null, null, null);
+                            cb(err, null);
                         } else {
-                            cb(err, cl, pair3, pair2, pair1);
+                            users.larry.pair = pair1;
+                            users.moe.pair   = pair2;
+                            users.curly.pair = pair3;
+                            cb(err, cl, users);
                         }
                     }
                 );
             },
-            'it works': function(err, cl, pair3, pair2, pair1) {
+            'it works': function(err, cl, users) {
                 assert.ifError(err);
                 assert.isObject(cl);
-                assert.isObject(pair3);
-                assert.isObject(pair2);
-                assert.isObject(pair1);
+            },
+            'and one user follows another': {
+                topic: function(users, cl) {
+                    var cb = this.callback,
+                        act = {
+                            verb: "follow",
+                            object: {
+                                objectType: "person",
+                                id: users.moe.profile.id
+                            }
+                        },
+                        url = 'http://localhost:4815/api/user/larry/feed',
+                        cred = makeCred(cl, users.larry.pair);
+
+                    httputil.postJSON(url, cred, act, function(err, act, result) {
+                        cb(err, act);
+                    });
+                },
+                'it works': function(err, act) {
+                    assert.ifError(err);
+                },
+                'results are valid': function(err, act) {
+                    assert.ifError(err);
+                    actutil.validActivity(act);
+                },
+                'results are correct': function(err, act) {
+                    assert.ifError(err);
+                    assert.equal(act.verb, "follow");
+                }
             }
         }
     }
