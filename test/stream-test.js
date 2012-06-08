@@ -238,7 +238,7 @@ suite.addBatch({
             },
             'and we add 5000 ids': {
                 topic: function(stream, Stream) {
-                    var cb = this.callback();
+                    var cb = this.callback;
                     Step(
                         function() {
                             var i, group = this.group();
