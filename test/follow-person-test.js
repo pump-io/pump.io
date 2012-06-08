@@ -107,8 +107,8 @@ suite.addBatch({
                         url = 'http://localhost:4815/api/user/larry/feed',
                         cred = makeCred(cl, users.larry.pair);
 
-                    httputil.postJSON(url, cred, act, function(err, act, result) {
-                        cb(err, act);
+                    httputil.postJSON(url, cred, act, function(err, posted, result) {
+                        cb(err, posted);
                     });
                 },
                 'it works': function(err, act) {
