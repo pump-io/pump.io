@@ -1,6 +1,6 @@
-// user-stream-api.js
+// activity-api-test.js
 //
-// Test user streams
+// Test activity REST API
 //
 // Copyright 2012, StatusNet Inc.
 //
