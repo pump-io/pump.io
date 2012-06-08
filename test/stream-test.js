@@ -230,7 +230,7 @@ suite.addBatch({
         },
         'and we create a stream': {
             topic: function(Stream) {
-                Stream.create('test-remove', this.callback);
+                Stream.create({name: 'test-remove'}, this.callback);
             },
             'it works': function(err, stream) {
                 assert.ifError(err);
