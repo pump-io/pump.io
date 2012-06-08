@@ -126,8 +126,8 @@ suite.addBatch({
         'it has a deliver() method': function(err, stream) {
             assert.isFunction(stream.deliver);
         },
-        'it has a getActivities() method': function(err, stream) {
-            assert.isFunction(stream.getActivities);
+        'it has a getIDs() method': function(err, stream) {
+            assert.isFunction(stream.getIDs);
         },
         'it has a count() method': function(err, stream) {
             assert.isFunction(stream.count);
@@ -158,14 +158,14 @@ suite.addBatch({
             'and we deliver it to the stream': {
                 topic: function(activity, stream) {
                     act1 = activity;
-                    stream.deliver(activity, this.callback);
+                    stream.deliver(activity.id, this.callback);
                 },
                 'it works': function(err) {
                     assert.ifError(err);
                 },
                 "and we get the stream's activities": {
                     topic: function(activity, stream) {
-                        stream.getActivities(0, 100, this.callback);
+                        stream.getIDs(0, 100, this.callback);
                     },
                     'it works': function(err, activities) {
                         assert.ifError(err);
@@ -174,7 +174,7 @@ suite.addBatch({
                     },
                     'our activity is in there': function(err, activities) {
                         assert.isTrue(activities.some(function(item) {
-                            return item.id == act1.id;
+                            return item === act1.id;
                         }));
                     }
                 },
@@ -239,7 +239,7 @@ suite.addBatch({
                             if (err) {
                                 callback(err, null);
                             } else {
-                                stream.deliver(results, function(err) {
+                                stream.deliver(results.id, function(err) {
                                     if (err) {
                                         callback(err, null);
                                     } else {
@@ -291,7 +291,7 @@ suite.addBatch({
                     function() {
                         var i, group = this.group();
                         for (i = 0; i < 500; i++) { 
-                            stream.getActivities(i * 20, (i+1)*20, group());
+                            stream.getIDs(i * 20, (i+1)*20, group());
                         }
                     },
                     function(err, chunks) {
@@ -317,8 +317,8 @@ suite.addBatch({
                 var i, j, seen = {};
                 for (i = 0; i < chunks.length; i++) {
                     for (j = 0; j < chunks[i].length; j++) {
-                        assert.isUndefined(seen[chunks[i][j].id]);
-                        seen[chunks[i][j].id] = true;
+                        assert.isUndefined(seen[chunks[i][j]]);
+                        seen[chunks[i][j]] = true;
                     }
                 }
             }
@@ -330,7 +330,7 @@ suite.addBatch({
                     function() {
                         var i, group = this.group();
                         for (i = 0; i < 20; i++) { 
-                            stream.getActivities(i * 500, (i+1)*500, group());
+                            stream.getIDs(i * 500, (i+1)*500, group());
                         }
                     },
                     function(err, chunks) {
@@ -356,8 +356,8 @@ suite.addBatch({
                 var i, j, seen = {};
                 for (i = 0; i < chunks.length; i++) {
                     for (j = 0; j < chunks[i].length; j++) {
-                        assert.isUndefined(seen[chunks[i][j].id]);
-                        seen[chunks[i][j].id] = true;
+                        assert.isUndefined(seen[chunks[i][j]]);
+                        seen[chunks[i][j]] = true;
                     }
                 }
             }
@@ -369,7 +369,7 @@ suite.addBatch({
                     function() {
                         var i, group = this.group();
                         for (i = 0; i < 10000; i++) { 
-                            stream.getActivities(i, i+1, group());
+                            stream.getIDs(i, i+1, group());
                         }
                     },
                     function(err, chunks) {
@@ -395,8 +395,8 @@ suite.addBatch({
                 var i, j, seen = {};
                 for (i = 0; i < chunks.length; i++) {
                     for (j = 0; j < chunks[i].length; j++) {
-                        assert.isUndefined(seen[chunks[i][j].id]);
-                        seen[chunks[i][j].id] = true;
+                        assert.isUndefined(seen[chunks[i][j]]);
+                        seen[chunks[i][j]] = true;
                     }
                 }
             }
@@ -404,7 +404,7 @@ suite.addBatch({
         "and we get all the activities at once": {
             topic: function(stream) {
                 var cb = this.callback;
-                stream.getActivities(0, 10000, cb);
+                stream.getIDs(0, 10000, cb);
             },
             "it works": function(err, chunk) {
                 assert.ifError(err);
@@ -415,15 +415,15 @@ suite.addBatch({
             "there are no duplicates": function(err, chunk) {
                 var i, seen = {};
                 for (i = 0; i < chunk.length; i++) {
-                    assert.isUndefined(seen[chunk[i].id]);
-                    seen[chunk[i].id] = true;
+                    assert.isUndefined(seen[chunk[i]]);
+                    seen[chunk[i]] = true;
                 }
             }
         },
         "and we try to get activities starting at a negative number": {
             topic: function(stream) {
                 var cb = this.callback;
-                stream.getActivities(-10, 20, function(err, activities) {
+                stream.getIDs(-10, 20, function(err, activities) {
                     if (err) {
                         cb(null);
                     } else {
@@ -438,7 +438,7 @@ suite.addBatch({
         "and we try to get activities ending at a negative number": {
             topic: function(stream) {
                 var cb = this.callback;
-                stream.getActivities(10, -20, function(err, activities) {
+                stream.getIDs(10, -20, function(err, activities) {
                     if (err) {
                         cb(null);
                     } else {
@@ -453,7 +453,7 @@ suite.addBatch({
         "and we try to get activities with start after the end": {
             topic: function(stream) {
                 var cb = this.callback;
-                stream.getActivities(110, 100, function(err, activities) {
+                stream.getIDs(110, 100, function(err, activities) {
                     if (err) {
                         cb(null);
                     } else {
@@ -468,7 +468,7 @@ suite.addBatch({
         "and we try to get activities start and end equal": {
             topic: function(stream) {
                 var cb = this.callback;
-                stream.getActivities(50, 50, cb);
+                stream.getIDs(50, 50, cb);
             },
             'it works': function(err, results) {
                 assert.ifError(err);
