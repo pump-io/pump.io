@@ -481,13 +481,13 @@ suite.addBatch({
                     topic: function(users) {
                         users.yarnell.getFollowers(0, 20, this.callback);
                     },
-                    'it works': function(err, following) {
+                    'it works': function(err, followers) {
                         assert.ifError(err);
-                        assert.isArray(following);
+                        assert.isArray(followers);
                     },
-                    'it is the right size': function(err, following) {
+                    'it is the right size': function(err, followers) {
                         assert.ifError(err);
-                        assert.lengthOf(following, 1);
+                        assert.lengthOf(followers, 1);
                     }
                 }
             }
