@@ -24,36 +24,11 @@ var assert = require('assert'),
     urlparse = require('url').parse,
     httputil = require('./lib/http'),
     oauthutil = require('./lib/oauth'),
+    actutil = require('./lib/activity'),
     setupApp = oauthutil.setupApp,
     register = oauthutil.register,
     accessToken = oauthutil.accessToken,
     newCredentials = oauthutil.newCredentials;
-
-var assertValid = function(act) {
-    assert.isObject(act);
-    assert.include(act, 'id');
-    assert.isString(act.id);
-    assert.include(act, 'actor');
-    assert.isObject(act.actor);
-    assert.include(act.actor, 'id');
-    assert.isString(act.actor.id);
-    assert.include(act.actor, 'objectType');
-    assert.isString(act.actor.objectType);
-    assert.include(act.actor, 'displayName');
-    assert.isString(act.actor.displayName);
-    assert.include(act, 'verb');
-    assert.isString(act.verb);
-    assert.include(act, 'object');
-    assert.isObject(act.object);
-    assert.include(act.object, 'id');
-    assert.isString(act.object.id);
-    assert.include(act.object, 'objectType');
-    assert.isString(act.object.objectType);
-    assert.include(act, 'published');
-    assert.isString(act.published);
-    assert.include(act, 'updated');
-    assert.isString(act.updated);
-};
 
 var suite = vows.describe('Activity API test');
 
@@ -134,7 +109,7 @@ suite.addBatch({
                     },
                     'results look right': function(err, res) {
                         var got = res.got;
-                        assertValid(got);
+                        actutil.validActivity(got);
                     },
                     'it has the correct data': function(err, res) {
                         var got = res.got, posted = res.posted;
@@ -171,7 +146,7 @@ suite.addBatch({
                         },
                         'results look right': function(err, res) {
                             var newact = res.newact, act = res.act;
-                            assertValid(newact);
+                            actutil.validActivity(newact);
                             assert.include(newact, 'mood');
                             assert.isObject(newact.mood);
                             assert.include(newact.mood, 'displayName');
@@ -248,7 +223,7 @@ suite.addBatch({
                     },
                     'it works': function(err, doc, act) {
                         assert.ifError(err);
-                        assertValid(doc);
+                        actutil.validActivity(doc);
                     }
                 },
                 'and we GET the activity with no credentials': {
@@ -750,7 +725,7 @@ suite.addBatch({
                 },
                 'results are valid': function(err, act) {
                     assert.ifError(err);
-                    assertValid(act);
+                    actutil.validActivity(act);
                 },
                 'results include our changes': function(err, act) {
                     assert.ifError(err);
