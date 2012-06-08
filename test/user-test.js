@@ -126,6 +126,18 @@ suite.addBatch({
             'it has the addToInbox() method': function(user) {
                 assert.isFunction(user.addToInbox);
             },
+            'it has the getFollowers() method': function(user) {
+                assert.isFunction(user.getFollowers);
+            },
+            'it has the getFollowing() method': function(user) {
+                assert.isFunction(user.getFollowing);
+            },
+            'it has the follow() method': function(user) {
+                assert.isFunction(user.follow);
+            },
+            'it has the stopFollowing() method': function(user) {
+                assert.isFunction(user.stopFollowing);
+            },
             'and we check the credentials with the right password': {
                 topic: function(user, User) {
                     User.checkCredentials('tom', '123456', this.callback);
