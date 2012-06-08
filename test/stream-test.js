@@ -260,7 +260,7 @@ suite.addBatch({
                 },
                 'and we remove one': {
                     topic: function(stream, Stream) {
-                        stream.remove('http://example.net/api/object/2500', this.callback());
+                        stream.remove('http://example.net/api/object/2500', this.callback);
                     },
                     'it works': function(err) {
                         assert.ifError(err);
