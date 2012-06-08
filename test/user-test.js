@@ -436,6 +436,61 @@ suite.addBatch({
                     }
                 }
             }
+        },
+        'and we create a pair of users': {
+            topic: function(User) {
+                var cb = this.callback;
+                Step(
+                    function() {
+                        User.create({nickname: "shields", password: "wind"}, this.parallel());
+                        User.create({nickname: "yarnell", password: "rope"}, this.parallel());
+                    },
+                    function(err, shields, yarnell) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, {shields: shields, yarnell: yarnell});
+                        }
+                    }
+                );
+            },
+            'it works': function(err, users) {
+                assert.ifError(err);
+            },
+            'and we make one follow the other': {
+                topic: function(users) {
+                    users.shields.follow(users.yarnell.profile.id, this.callback);
+                },
+                'it works': function(err) {
+                    assert.ifError(err);
+                },
+                'and we check the first user\'s following list': {
+                    topic: function(users) {
+                        users.shields.getFollowing(0, 20, this.callback);
+                    },
+                    'it works': function(err, following) {
+                        assert.ifError(err);
+                        assert.isArray(following);
+                    },
+                    'it is the right size': function(err, following) {
+                        assert.ifError(err);
+                        assert.lengthOf(following, 1);
+                    }
+                },
+                'and we check the second user\'s followers list': {
+                    topic: function(users) {
+                        users.yarnell.getFollowers(0, 20, this.callback);
+                    },
+                    'it works': function(err, following) {
+                        assert.ifError(err);
+                        assert.isArray(following);
+                    },
+                    'it is the right size': function(err, following) {
+                        assert.ifError(err);
+                        assert.lengthOf(following, 1);
+                    }
+                }
+            }
         }
     }
 });
