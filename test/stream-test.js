@@ -126,6 +126,9 @@ suite.addBatch({
         'it has a deliver() method': function(err, stream) {
             assert.isFunction(stream.deliver);
         },
+        'it has a remove() method': function(err, stream) {
+            assert.isFunction(stream.remove);
+        },
         'it has a getIDs() method': function(err, stream) {
             assert.isFunction(stream.getIDs);
         },
