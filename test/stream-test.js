@@ -285,7 +285,7 @@ suite.addBatch({
         },
         'and we try to remove() from an empty stream': {
             topic: function(Stream) {
-                var cb = this.callback();
+                var cb = this.callback;
                 
                 Stream.create({name: 'test-remove-2'}, function(err, stream) {
                     if (err) {
@@ -307,7 +307,7 @@ suite.addBatch({
         },
         'and we remove a not-present object from a non-empty stream': {
             topic: function(Stream) {
-                var cb = this.callback(),
+                var cb = this.callback,
                     stream;
 
                 Step(
