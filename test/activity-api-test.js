@@ -802,7 +802,7 @@ suite.addBatch({
                     assert.ifError(err);
                 }
             },
-            'and we try to PUT a non-existent activity': {
+            'and we PUT a non-existent activity': {
                 topic: function(cred) {
                     var cb = this.callback,
                         url = 'http://localhost:4815/api/activity/NONEXISTENT',
@@ -830,7 +830,7 @@ suite.addBatch({
                     assert.ifError(err);
                 }
             },
-            'and we try to GET a non-existent activity': {
+            'and we GET a non-existent activity': {
                 topic: function(cred) {
                     var cb = this.callback,
                         url = 'http://localhost:4815/api/activity/NONEXISTENT';
@@ -850,7 +850,7 @@ suite.addBatch({
                     assert.ifError(err);
                 }
             },
-            'and we try to DELETE a non-existent activity': {
+            'and we DELETE a non-existent activity': {
                 topic: function(cred) {
                     var cb = this.callback,
                         url = 'http://localhost:4815/api/activity/NONEXISTENT';
