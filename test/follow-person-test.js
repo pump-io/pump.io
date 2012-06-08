@@ -34,6 +34,14 @@ var assert = require('assert'),
     accessToken = oauthutil.accessToken;
 
 var ignore = function(err) {};
+var makeCred = function(cl, pair) {
+    return {
+        consumer_key: cl.client_id,
+        consumer_secret: cl.client_secret,
+        token: pair.token,
+        token_secret: pair.token_secret
+    };
+};
 
 var suite = vows.describe('follow person activity test');
 
@@ -95,7 +103,7 @@ suite.addBatch({
                 assert.isObject(cl);
             },
             'and one user follows another': {
-                topic: function(users, cl) {
+                topic: function(cl, users) {
                     var cb = this.callback,
                         act = {
                             verb: "follow",
