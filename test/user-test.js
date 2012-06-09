@@ -618,7 +618,7 @@ suite.addBatch({
                     'it works': function(err, followers) {
                         assert.ifError(err);
                         assert.isArray(followers);
-                        assert.lengthOf(followers, 499);
+                        assert.lengthOf(followers, 49);
                     }
                 },
                 'and we check the following user\'s following list': {
