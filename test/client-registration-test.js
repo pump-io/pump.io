@@ -20,7 +20,9 @@ var assert = require('assert'),
     vows = require('vows'),
     Step = require('step'),
     _ = require('underscore'),
-    httputil = require('./lib/http');
+    httputil = require('./lib/http'),
+    oauthutil = require('./lib/oauth'),
+    setupApp = oauthutil.setupApp;
 
 var ignore = function(err) {};
 
@@ -129,30 +131,7 @@ var assocSucceed = function(params) {
 suite.addBatch({
     'When we set up the app': {
         topic: function() {
-            var cb = this.callback,
-                config = {port: 4815,
-                          hostname: 'localhost',
-                          driver: 'memory',
-                          params: {},
-                          nologger: true
-                         },
-                makeApp = require('../lib/app').makeApp;
-
-            process.env.NODE_ENV = 'test';
-
-            makeApp(config, function(err, app) {
-                if (err) {
-                    cb(err, null);
-                } else {
-                    app.run(function(err) {
-                        if (err) {
-                            cb(err, null);
-                        } else {
-                            cb(null, app);
-                        }
-                    });
-                }
-            });
+            setupApp(this.callback);
         },
         teardown: function(app) {
             app.close();
