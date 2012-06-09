@@ -612,7 +612,7 @@ suite.addBatch({
             },
             'and we check the other users\' following lists': {
                 topic: function(users) {
-                    var cb = this.callback();
+                    var cb = this.callback;
                     Step(
                         function() {
                             var i, group = this.group();
