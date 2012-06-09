@@ -564,6 +564,27 @@ suite.addBatch({
                     assert.lengthOf(followers, 0);
                 }
             }
+        },
+        'and we create a bunch of users': {
+            topic: function(User) {
+                var cb = this.callback,
+                    MAX_USERS = 50;
+
+                Step(
+                    function() {
+                        var i, group = this.group();
+                        for (i = 0; i < MAX_USERS; i++) {
+                            User.create({nickname: "clown"+i, password: "hahaha"}, group());
+                        }
+                    },
+                    cb
+                );
+            },
+            'it works': function(err, users) {
+                assert.ifError(err);
+                assert.isArray(users);
+                assert.lengthOf(users, 50);
+            }
         }
     }
 });
