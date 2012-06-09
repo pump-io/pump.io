@@ -440,11 +440,11 @@ suite.addBatch({
                         },
                         'following list is correct': function(err, res) {
                             assert.isArray(res.following);
-                            assert.lengthOf(res.following, 1);
+                            assert.lengthOf(res.following, 0);
                         },
                         'followers list is correct': function(err, res) {
                             assert.isArray(res.followers);
-                            assert.lengthOf(res.followers, 1);
+                            assert.lengthOf(res.followers, 0);
                         }
                     }
                 }
