@@ -466,28 +466,42 @@ suite.addBatch({
                 },
                 'and we check the first user\'s following list': {
                     topic: function(users) {
-                        users.shields.getFollowing(0, 20, this.callback);
+                        var cb = this.callback;
+                        users.shields.getFollowing(0, 20, function(err, following) {
+                            cb(err, following, users.yarnell);
+                        });
                     },
-                    'it works': function(err, following) {
+                    'it works': function(err, following, other) {
                         assert.ifError(err);
                         assert.isArray(following);
                     },
-                    'it is the right size': function(err, following) {
+                    'it is the right size': function(err, following, other) {
                         assert.ifError(err);
                         assert.lengthOf(following, 1);
+                    },
+                    'it has the right data': function(err, following, other) {
+                        assert.ifError(err);
+                        assert.equal(following[0].id, other.profile.id);
                     }
                 },
                 'and we check the second user\'s followers list': {
                     topic: function(users) {
-                        users.yarnell.getFollowers(0, 20, this.callback);
+                        var cb = this.callback;
+                        users.yarnell.getFollowers(0, 20, function(err, following) {
+                            cb(err, following, users.shields);
+                        });
                     },
-                    'it works': function(err, followers) {
+                    'it works': function(err, followers, other) {
                         assert.ifError(err);
                         assert.isArray(followers);
                     },
-                    'it is the right size': function(err, followers) {
+                    'it is the right size': function(err, followers, other) {
                         assert.ifError(err);
                         assert.lengthOf(followers, 1);
+                    },
+                    'it has the right data': function(err, followers, other) {
+                        assert.ifError(err);
+                        assert.equal(followers[0].id, other.profile.id);
                     }
                 }
             }
