@@ -573,7 +573,7 @@ suite.addBatch({
                 Step(
                     function() {
                         var i, group = this.group();
-                        for (i = 0; i < 5000; i++) {
+                        for (i = 0; i < 50; i++) {
                             User.create({nickname: "keystonekop"+i, password: "password"+i}, group());
                         }
                     },
@@ -607,7 +607,7 @@ suite.addBatch({
                 },
                 'it is the right size': function(err, following, other) {
                     assert.ifError(err);
-                    assert.lengthOf(following, 4999);
+                    assert.lengthOf(following, 49);
                 }
             },
             'and we check the other users\' following lists': {
@@ -640,7 +640,7 @@ suite.addBatch({
                 'it is the right size': function(err, lists) {
                     var i;
                     assert.ifError(err);
-                    assert.lengthOf(lists, 4999);
+                    assert.lengthOf(lists, 49);
                     for (i = 0; i < lists.length; i++) {
                         assert.lengthOf(lists[i], 1);
                     }
