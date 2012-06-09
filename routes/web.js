@@ -66,7 +66,7 @@ var handleLogin = function(req, res, next) {
                 if (err instanceof NoSuchThingError) {
                     next(new HTTPError("Not authorized", 403));
                 } else {
-                    throw err;
+                    next(err);
                 }
             } else if (!user) {
                 // done here
@@ -103,10 +103,10 @@ var showActivity = function(req, res, next) {
         function(err, activities) {
             if (err) throw err;
             if (activities.length === 0) {
-                throw new NoSuchThingError('activity', uuid);
+                next(new NoSuchThingError('activity', uuid));
             }
             if (activities.length > 1) {
-                throw new Error("Too many activities with ID = " + req.params.uuid);
+                next(new Error("Too many activities with ID = " + req.params.uuid));
             }
             activities[0].expand(this);
         },
@@ -160,17 +160,17 @@ var showStream = function(req, res, next) {
     );
 };
 
-var authenticate = function(req, res) {
+var authenticate = function(req, res, next) {
     // XXX: I think there's an easier way to get this, but leave it for now.
     var parsedUrl = url.parse(req.originalUrl, true),
         token = parsedUrl.query.oauth_token;
 
     if (!token) {
-        throw new HTTPError("Must provide an oauth_token", 400);
+        next(new HTTPError("Must provide an oauth_token", 400));
     } else {
         RequestToken.get(token, function(err, rt) {
             if (err) {
-                throw new HTTPError(err.toString(), 400);
+                next(new HTTPError(err.toString(), 400));
             } else {
                 res.render('authentication', {title: "Authentication", token: token, nologin: true, error: false});
             }
