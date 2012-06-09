@@ -622,7 +622,7 @@ suite.addBatch({
                             function() {
                                 var i, group = this.group();
                                 for (i = 1; i < users.length; i++) {
-                                    users[i].getFollowing(users[0].profile.id, group());
+                                    users[i].getFollowing(0, 20, group());
                                 }
                             },
                             cb
