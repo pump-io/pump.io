@@ -160,17 +160,17 @@ var showStream = function(req, res, next) {
     );
 };
 
-var authenticate = function(req, res, next) {
+var authenticate = function(req, res) {
     // XXX: I think there's an easier way to get this, but leave it for now.
     var parsedUrl = url.parse(req.originalUrl, true),
         token = parsedUrl.query.oauth_token;
 
     if (!token) {
-        next(new HTTPError("Must provide an oauth_token", 400));
+        res.render('error', {status: 400, error: new HTTPError("Must provide an oauth_token", 400), title: "Error"});
     } else {
         RequestToken.get(token, function(err, rt) {
             if (err) {
-                next(new HTTPError(err.toString(), 400));
+                res.render('error', {status: 400, error: err, title: "Error"});
             } else {
                 res.render('authentication', {title: "Authentication", token: token, nologin: true, error: false});
             }
