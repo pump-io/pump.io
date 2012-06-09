@@ -366,7 +366,7 @@ suite.addBatch({
                 assert.isObject(users.alice);
                 assert.isObject(users.bob);
             },
-            'and we check the following list': {
+            'and we check the follow lists': {
                 topic: function(users) {
                     var cb = this.callback,
                         following, followers;
@@ -407,8 +407,8 @@ suite.addBatch({
                     'it works': function(err) {
                         assert.ifError(err);
                     },
-                    'and we check for the following list again': {
-                        topic: function(users) {
+                    'and we check for the follow lists again': {
+                        topic: function(res, users) {
                             var cb = this.callback,
                                 following, followers;
 
