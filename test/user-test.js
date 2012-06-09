@@ -603,7 +603,9 @@ suite.addBatch({
                                 users[i].follow(users[0].profile.id, group());
                             }
                         },
-                        cb
+                        function(err) {
+                            cb(err);
+                        }
                     );
                 },
                 'it works': function(err) {
