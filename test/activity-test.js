@@ -366,20 +366,39 @@ suite.addBatch({
                 assert.isObject(users.alice);
                 assert.isObject(users.bob);
             },
-            'and we search for a resulting edge': {
+            'and we check the following list': {
                 topic: function(users) {
-                    var Edge = require('../lib/model/edge').Edge;
-                    Edge.search({"from.id": users.alice.profile.id,
-                                 "to.id": users.bob.profile.id},
-                                this.callback);
+                    var cb = this.callback,
+                        following, followers;
+
+                    Step(
+                        function() {
+                            users.alice.getFollowing(0, 20, this);
+                        },
+                        function(err, results) {
+                            if (err) throw err;
+                            following = results;
+                            users.bob.getFollowers(0, 20, this);
+                        },
+                        function(err, results) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                followers = results;
+                                cb(err, {users: users, following: following, followers: followers});
+                            }
+                        }
+                    );
                 },
-                'it exists': function(err, edges) {
+                'it exists': function(err, res) {
                     assert.ifError(err);
-                    assert.isArray(edges);
-                    assert.lengthOf(edges, 1);
+                    assert.isArray(res.following);
+                    assert.lengthOf(res.following, 1);
+                    assert.isArray(res.followers);
+                    assert.lengthOf(res.followers, 1);
                 },
                 'and we apply() a stop-following activity': {
-                    topic: function(edges, users, Activity) {
+                    topic: function(res, users, Activity) {
                         var act = new Activity({actor: users.alice.profile,
                                                 verb: "stop-following",
                                                 object: users.bob.profile});
@@ -388,17 +407,36 @@ suite.addBatch({
                     'it works': function(err) {
                         assert.ifError(err);
                     },
-                    'and we check for the resulting edge again': {
-                        topic: function(edges, users, Activity) {
-                            var Edge = require('../lib/model/edge').Edge;
-                            Edge.search({"from.id": users.alice.profile.id,
-                                         "to.id": users.bob.profile.id},
-                                        this.callback);
+                    'and we check for the following list again': {
+                        topic: function(users) {
+                            var cb = this.callback,
+                                following, followers;
+
+                            Step(
+                                function() {
+                                    users.alice.getFollowing(0, 20, this);
+                                },
+                                function(err, results) {
+                                    if (err) throw err;
+                                    following = results;
+                                    users.bob.getFollowers(0, 20, this);
+                                },
+                                function(err, results) {
+                                    if (err) {
+                                        cb(err, null);
+                                    } else {
+                                        followers = results;
+                                        cb(err, {users: users, following: following, followers: followers});
+                                    }
+                                }
+                            );
                         },
-                        'it does not exist': function(err, edges) {
+                        'it exists': function(err, res) {
                             assert.ifError(err);
-                            assert.isArray(edges);
-                            assert.lengthOf(edges, 0);
+                            assert.isArray(res.following);
+                            assert.lengthOf(res.following, 0);
+                            assert.isArray(res.followers);
+                            assert.lengthOf(res.followers, 0);
                         }
                     }
                 }
