@@ -28,13 +28,17 @@ var ignore = function(err) {};
 
 var suite = vows.describe('client registration API');
 
+var rp = function(params, callback) {
+    httputil.post('localhost',
+                  4815,
+                  '/api/client/register',
+                  params,
+                  callback);
+};
+
 var assoc = function(params) {
     return function() {
-        httputil.post('localhost',
-                      4815,
-                      '/api/client/register',
-                      params,
-                      this.callback);
+        rp(params, this.callback);
     };
 };
 
@@ -43,11 +47,7 @@ var update = function(initial, params) {
         var cb = this.callback;
         Step(
             function() {
-                httputil.post('localhost',
-                              4815,
-                              '/api/client/register',
-                              initial,
-                              this);
+                rp(initial, this);
             },
             function(err, res, body) {
                 if (err) throw err;
@@ -55,11 +55,7 @@ var update = function(initial, params) {
                 var reg = JSON.parse(body);
                 params = _.extend(params, {client_id: reg.client_id,
                                            client_secret: reg.client_secret});
-                httputil.post('localhost',
-                              4815,
-                              '/api/client/register',
-                              params,
-                              this);
+                rp(params, this);
             },
             function(err, res, body) {
                 if (err) {
@@ -222,14 +218,11 @@ suite.addBatch({
                       redirect_uris: "http://example.org/redirect http://example.org/redirect2 http://example.org/redirect3"}),
         'and we try to update without associating first': {
             topic: function() {
-                httputil.post('localhost',
-                              4815,
-                              '/api/client/register',
-                              {application_name: "Not Yet Associated",
-                               type: 'client_update',
-                               client_id: "IMADETHISUP",
-                               client_secret: "MADEUPTHISTOO"},
-                              this.callback);
+                rp({application_name: "Not Yet Associated",
+                    type: 'client_update',
+                    client_id: "IMADETHISUP",
+                    client_secret: "MADEUPTHISTOO"},
+                   this.callback);
             },
             'it fails correctly': function(err, res, body) {
                 assert.ifError(err);
@@ -240,29 +233,18 @@ suite.addBatch({
                 var cb = this.callback;
                 Step(
                     function() {
-                        httputil.post('localhost',
-                                      4815,
-                                      '/api/client/register',
-                                      {
-                                          application_name: 'No Secret',
-                                          type: 'client_associate'
-                                      },
-                                      this);
+                        rp({application_name: 'No Secret',
+                            type: 'client_associate'},
+                           this);
                     },
                     function(err, res, body) {
                         if (err) throw err;
                         if (res.statusCode != 200) throw new Error("Bad assoc");
                         var reg = JSON.parse(body);
-                        httputil.post('localhost',
-                                      4815,
-                                      '/api/client/register',
-                                      {
-                                          application_name: 'No Secret',
-                                          logo_url: 'http://example.com/my-logo-url.jpg',
-                                          type: 'client_update',
-                                          client_id: reg.client_id
-                                      },
-                                      this);
+                        rp({application_name: 'No Secret',
+                            logo_url: 'http://example.com/my-logo-url.jpg',
+                            type: 'client_update',
+                            client_id: reg.client_id}, this);
                     },
                     function(err, res, body) {
                         if (err) {
@@ -282,30 +264,21 @@ suite.addBatch({
                 var cb = this.callback;
                 Step(
                     function() {
-                        httputil.post('localhost',
-                                      4815,
-                                      '/api/client/register',
-                                      {
-                                          application_name: 'Wrong Secret',
-                                          type: 'client_associate'
-                                      },
-                                      this);
+                        rp({application_name: 'Wrong Secret',
+                            type: 'client_associate'},
+                           this);
                     },
                     function(err, res, body) {
                         if (err) throw err;
                         if (res.statusCode != 200) throw new Error("Bad assoc");
                         var reg = JSON.parse(body);
-                        httputil.post('localhost',
-                                      4815,
-                                      '/api/client/register',
-                                      {
-                                          application_name: 'Wrong Secret',
-                                          logo_url: 'http://example.com/my-logo-url.jpg',
-                                          type: 'client_update',
-                                          client_id: reg.client_id,
-                                          client_secret: 'SOMECRAP'
-                                      },
-                                      this);
+                        rp({application_name: 'Wrong Secret',
+                            logo_url: 'http://example.com/my-logo-url.jpg',
+                            type: 'client_update',
+                            client_id: reg.client_id,
+                            client_secret: 'SOMECRAP'
+                           },
+                           this);
                     },
                     function(err, res, body) {
                         if (err) {
