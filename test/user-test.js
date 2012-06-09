@@ -599,15 +599,15 @@ suite.addBatch({
             },
             'and we check the first user\'s followers list': {
                 topic: function(users) {
-                    users[0].getFollowing(0, 20, this.callback);
+                    users[0].getFollowers(0, 50, this.callback);
                 },
-                'it works': function(err, following, other) {
+                'it works': function(err, followers, other) {
                     assert.ifError(err);
-                    assert.isArray(following);
+                    assert.isArray(followers);
                 },
-                'it is the right size': function(err, following, other) {
+                'it is the right size': function(err, followers, other) {
                     assert.ifError(err);
-                    assert.lengthOf(following, 49);
+                    assert.lengthOf(followers, 49);
                 }
             },
             'and we check the other users\' following lists': {
