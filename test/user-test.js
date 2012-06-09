@@ -640,7 +640,7 @@ suite.addBatch({
                         var i;
                         assert.ifError(err);
                         assert.isArray(lists);
-                        assert.lengthOf(lists, 499);
+                        assert.lengthOf(lists, 49);
                         for (i = 0; i < lists.length; i++) {
                             assert.isArray(lists[i]);
                             assert.lengthOf(lists[i], 1);
