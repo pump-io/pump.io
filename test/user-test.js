@@ -584,6 +584,61 @@ suite.addBatch({
                 assert.ifError(err);
                 assert.isArray(users);
                 assert.lengthOf(users, 500);
+            },
+            'and they all follow someone': {
+                topic: function(users) {
+                    var cb = this.callback,
+                        MAX_USERS = 500;
+
+                    Step(
+                        function() {
+                            var i, group = this.group();
+                            for (i = 1; i < users.length; i++) {
+                                users[i].follow(users[0].profile.id, group());
+                            }
+                        },
+                        cb
+                    );
+                },
+                'it works': function(err) {
+                    assert.ifError(err);
+                },
+                'and we check the followed user\'s followers list': {
+                    topic: function(users) {
+                        users[0].getFollowers(0, users.length + 1, this.callback);
+                    },
+                    'it works': function(err, followers) {
+                        assert.ifError(err);
+                        assert.isArray(followers);
+                        assert.lengthOf(followers, 499);
+                    }
+                },
+                'and we check the following user\'s following list': {
+                    topic: function(users) {
+                        var cb = this.callback,
+                            MAX_USERS = 500;
+
+                        Step(
+                            function() {
+                                var i, group = this.group();
+                                for (i = 1; i < users.length; i++) {
+                                    users[i].getFollowing(users[0].profile.id, group());
+                                }
+                            },
+                            cb
+                        );
+                    },
+                    'it works': function(err, lists) {
+                        var i;
+                        assert.ifError(err);
+                        assert.isArray(lists);
+                        assert.lengthOf(lists, 499);
+                        for (i = 0; i < lists.length; i++) {
+                            assert.isArray(lists[i]);
+                            assert.lengthOf(lists[i], 1);
+                        }
+                    }
+                }
             }
         }
     }
