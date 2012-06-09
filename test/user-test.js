@@ -568,7 +568,7 @@ suite.addBatch({
         'and we create a bunch of users': {
             topic: function(User) {
                 var cb = this.callback,
-                    MAX_USERS = 50;
+                    MAX_USERS = 500;
 
                 Step(
                     function() {
@@ -583,7 +583,7 @@ suite.addBatch({
             'it works': function(err, users) {
                 assert.ifError(err);
                 assert.isArray(users);
-                assert.lengthOf(users, 50);
+                assert.lengthOf(users, 500);
             }
         }
     }
