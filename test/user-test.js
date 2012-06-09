@@ -573,7 +573,7 @@ suite.addBatch({
                 Step(
                     function() {
                         var i, group = this.group();
-                        for (i = 0; i < 50; i++) {
+                        for (i = 0; i < 5000; i++) {
                             User.create({nickname: "keystonekop"+i, password: "password"+i}, group());
                         }
                     },
@@ -599,7 +599,7 @@ suite.addBatch({
             },
             'and we check the first user\'s followers list': {
                 topic: function(users) {
-                    users[0].getFollowers(0, 50, this.callback);
+                    users[0].getFollowers(0, 5000, this.callback);
                 },
                 'it works': function(err, followers, other) {
                     assert.ifError(err);
@@ -607,7 +607,7 @@ suite.addBatch({
                 },
                 'it is the right size': function(err, followers, other) {
                     assert.ifError(err);
-                    assert.lengthOf(followers, 49);
+                    assert.lengthOf(followers, 4999);
                 }
             },
             'and we check the other users\' following lists': {
@@ -640,7 +640,7 @@ suite.addBatch({
                 'it is the right size': function(err, lists) {
                     var i;
                     assert.ifError(err);
-                    assert.lengthOf(lists, 49);
+                    assert.lengthOf(lists, 4999);
                     for (i = 0; i < lists.length; i++) {
                         assert.lengthOf(lists[i], 1);
                     }
