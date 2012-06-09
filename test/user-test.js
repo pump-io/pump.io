@@ -568,7 +568,7 @@ suite.addBatch({
         'and we create a bunch of users': {
             topic: function(User) {
                 var cb = this.callback,
-                    MAX_USERS = 500;
+                    MAX_USERS = 50;
 
                 Step(
                     function() {
@@ -577,18 +577,24 @@ suite.addBatch({
                             User.create({nickname: "clown"+i, password: "hahaha"}, group());
                         }
                     },
-                    cb
+                    function(err, users) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, users);
+                        }
+                    }
                 );
             },
             'it works': function(err, users) {
                 assert.ifError(err);
                 assert.isArray(users);
-                assert.lengthOf(users, 500);
+                assert.lengthOf(users, 50);
             },
             'and they all follow someone': {
                 topic: function(users) {
                     var cb = this.callback,
-                        MAX_USERS = 500;
+                        MAX_USERS = 50;
 
                     Step(
                         function() {
@@ -616,7 +622,7 @@ suite.addBatch({
                 'and we check the following user\'s following list': {
                     topic: function(users) {
                         var cb = this.callback,
-                            MAX_USERS = 500;
+                            MAX_USERS = 50;
 
                         Step(
                             function() {
