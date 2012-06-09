@@ -505,6 +505,70 @@ suite.addBatch({
                     }
                 }
             }
+        },
+        'and we create another pair of users following': {
+            topic: function(User) {
+                var cb = this.callback,
+                    users = {};
+                Step(
+                    function() {
+                        User.create({nickname: "captain", password: "beachboy"}, this.parallel());
+                        User.create({nickname: "tenille", password: "muskrat"}, this.parallel());
+                    },
+                    function(err, captain, tenille) {
+                        if (err) throw err;
+                        users.captain = captain;
+                        users.tenille = tenille;
+                        captain.follow(tenille.profile.id, this);
+                    },
+                    function(err) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, users);
+                        }
+                    }
+                );
+            },
+            'it works': function(err, users) {
+                assert.ifError(err);
+            },
+            'and then they stop following': {
+                topic: function(users) {
+                    // :(
+                    users.captain.stopFollowing(users.tenille.profile.id, this.callback);
+                },
+                'it works': function(err) {
+                    assert.ifError(err);
+                },
+                'and we check the first user\'s following list': {
+                    topic: function(users) {
+                        var cb = this.callback;
+                        users.captain.getFollowing(0, 20, this.callback);
+                    },
+                    'it works': function(err, following, other) {
+                        assert.ifError(err);
+                        assert.isArray(following);
+                    },
+                    'it is the right size': function(err, following, other) {
+                        assert.ifError(err);
+                        assert.lengthOf(following, 0);
+                    }
+                },
+                'and we check the second user\'s followers list': {
+                    topic: function(users) {
+                        users.tenille.getFollowers(0, 20, this.callback);
+                    },
+                    'it works': function(err, followers, other) {
+                        assert.ifError(err);
+                        assert.isArray(followers);
+                    },
+                    'it is the right size': function(err, followers, other) {
+                        assert.ifError(err);
+                        assert.lengthOf(followers, 0);
+                    }
+                }
+            }
         }
     }
 });
