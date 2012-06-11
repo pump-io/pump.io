@@ -8,7 +8,7 @@
         "node-mocks-http": "0.0.x",
         "zombie": "0.12.x"
     },
-    "dependencies": { "connect": "1.x",
+    "dependencies": { "connect": "1.8.x",
 		      "connect-auth": "0.5.2",
                       "express": "2.5.x",
                       "utml": "0.2.x",
