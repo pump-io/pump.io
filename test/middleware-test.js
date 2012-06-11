@@ -93,6 +93,7 @@ vows.describe('middleware module interface').addBatch({
                 
                 mw.reqUser(req, res, function(err) {
                     if (err && err.code && err.code === 404) {
+                        cb(null);
                     } else if (err) {
                         cb(err);
                     } else {
@@ -115,6 +116,7 @@ vows.describe('middleware module interface').addBatch({
                 
                 mw.reqUser(req, res, function(err) {
                     if (err && err.code && err.code === 404) {
+                        cb(null);
                     } else if (err) {
                         cb(err);
                     } else {
@@ -137,6 +139,7 @@ vows.describe('middleware module interface').addBatch({
                 
                 mw.reqUser(req, res, function(err) {
                     if (err && err.code && err.code === 404) {
+                        cb(null);
                     } else if (err) {
                         cb(err);
                     } else {
