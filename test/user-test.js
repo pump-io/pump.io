@@ -619,6 +619,66 @@ suite.addBatch({
                 }
             }
         },
+        'and one user follows another twice': {
+            topic: function(User) {
+                var cb = this.callback,
+                    users = {};
+                Step(
+                    function() {
+                        User.create({nickname: "boris", password: "squirrel"}, this.parallel());
+                        User.create({nickname: "natasha", password: "moose"}, this.parallel());
+                    },
+                    function(err, boris, natasha) {
+                        if (err) throw err;
+                        users.boris = boris;
+                        users.natasha = natasha;
+                        users.boris.follow(users.natasha.profile.id, this);
+                    },
+                    function(err) {
+                        if (err) throw err;
+                        users.boris.follow(users.natasha.profile.id, this);
+                    },
+                    function(err) {
+                        if (err) {
+                            cb(null);
+                        } else {
+                            cb(new Error("Unexpected success"));
+                        }
+                    }
+                );
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        'and one user stops following a user they never followed': {
+            topic: function(User) {
+                var cb = this.callback,
+                    users = {};
+                Step(
+                    function() {
+                        User.create({nickname: "rocky", password: "flying"}, this.parallel());
+                        User.create({nickname: "bullwinkle", password: "rabbit"}, this.parallel());
+                    },
+                    function(err, rocky, bullwinkle) {
+                        if (err) throw err;
+                        users.rocky = rocky;
+                        users.bullwinkle = bullwinkle;
+                        users.rocky.stopFollowing(users.bullwinkle.profile.id, this);
+                    },
+                    function(err) {
+                        if (err) {
+                            cb(null);
+                        } else {
+                            cb(new Error("Unexpected success"));
+                        }
+                    }
+                );
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
         'and we create a bunch of users': {
             topic: function(User) {
                 var cb = this.callback,
