@@ -68,4 +68,28 @@ mb['When we require the edge module']
 
 suite.addBatch(mb);
 
+suite.addBatch({
+    'When we get the Edge class': {
+        topic: function() {
+            return require('../lib/model/edge').Edge;
+        },
+        'it exists': function(Edge) {
+            assert.isFunction(Edge);
+        },
+        'it has an id() method': function(Edge) {
+            assert.isFunction(Edge.id);
+        },
+        'and we get a new id': {
+            topic: function(Edge) {
+                var from = "http://example.com/user/1",
+                    to = "http://example.net/company/35";
+                return Edge.id(from, to);
+            },
+            'it is a string': function(id) {
+                assert.isString(id);
+            }
+        }
+    }
+});
+
 suite['export'](module);
