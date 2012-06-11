@@ -60,64 +60,61 @@ suite.addBatch({
         'it works': function(err, app) {
             assert.ifError(err);
         },
-        'and we get new credentials': {
+        'and we register a client': {
             topic: function() {
-                var cb = this.callback,
-                    cl,
-                    users = {larry: {}, moe: {}, curly: {}};
-
-                Step(
-                    function() {
-                        newClient(this);
-                    },
-                    function(err, results) {
-                        if (err) throw err;
-                        cl = results;
-                        register(cl, "larry", "wiry1", this.parallel());
-                        register(cl, "moe", "bowlcut", this.parallel());
-                        register(cl, "curly", "nyuknyuk", this.parallel());
-                    },
-                    function(err, user1, user2, user3) {
-                        if (err) throw err;
-                        users.larry.profile = user1.profile;
-                        users.moe.profile   = user2.profile;
-                        users.curly.profile = user3.profile;
-                        accessToken(cl, {nickname: "larry", password: "wiry1"}, this.parallel());
-                        accessToken(cl, {nickname: "moe", password: "bowlcut"}, this.parallel());
-                        accessToken(cl, {nickname: "curly", password: "nyuknyuk"}, this.parallel());
-                    },
-                    function(err, pair1, pair2, pair3) {
-                        if (err) {
-                            cb(err, null);
-                        } else {
-                            users.larry.pair = pair1;
-                            users.moe.pair   = pair2;
-                            users.curly.pair = pair3;
-                            cb(err, cl, users);
-                        }
-                    }
-                );
+                newClient(this.callback);
             },
-            'it works': function(err, cl, users) {
+            'it works': function(err, cl) {
                 assert.ifError(err);
                 assert.isObject(cl);
             },
             'and one user follows another': {
-                topic: function(cl, users) {
+                topic: function(cl) {
                     var cb = this.callback,
-                        act = {
-                            verb: "follow",
-                            object: {
-                                objectType: "person",
-                                id: users.moe.profile.id
-                            }
-                        },
-                        url = 'http://localhost:4815/api/user/larry/feed',
-                        cred = makeCred(cl, users.larry.pair);
+                        users = {larry: {}, moe: {}, curly: {}};
 
-                    httputil.postJSON(url, cred, act, function(err, posted, result) {
-                        cb(err, posted);
-                    });
+                    Step(
+                        function(err, results) {
+                            if (err) throw err;
+                            cl = results;
+                            register(cl, "larry", "wiry1", this.parallel());
+                            register(cl, "moe", "bowlcut", this.parallel());
+                            register(cl, "curly", "nyuknyuk", this.parallel());
+                        },
+                        function(err, user1, user2, user3) {
+                            if (err) throw err;
+                            users.larry.profile = user1.profile;
+                            users.moe.profile   = user2.profile;
+                            users.curly.profile = user3.profile;
+                            accessToken(cl, {nickname: "larry", password: "wiry1"}, this.parallel());
+                            accessToken(cl, {nickname: "moe", password: "bowlcut"}, this.parallel());
+                            accessToken(cl, {nickname: "curly", password: "nyuknyuk"}, this.parallel());
+                        },
+                        function(err, pair1, pair2, pair3) {
+                            if (err) throw err;
+                            users.larry.pair = pair1;
+                            users.moe.pair   = pair2;
+                            users.curly.pair = pair3;
+                            var act = {
+                                verb: "follow",
+                                object: {
+                                    objectType: "person",
+                                    id: users.moe.profile.id
+                                }
+                            },
+                                url = 'http://localhost:4815/api/user/larry/feed',
+                                cred = makeCred(cl, users.larry.pair);
+
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, posted, result) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                cb(null, posted);
+                            };
+                        }
+                    );
                 },
                 'it works': function(err, act) {
                     assert.ifError(err);
@@ -129,6 +126,70 @@ suite.addBatch({
                 'results are correct': function(err, act) {
                     assert.ifError(err);
                     assert.equal(act.verb, "follow");
+                }
+            },
+            'and one user double-follows another': {
+                topic: function(cl) {
+                    var cb = this.callback,
+                        users = {},
+                        hpair;
+
+                    Step(
+                        function() {
+                            newClient(this);
+                        },
+                        function(err, results) {
+                            if (err) throw err;
+                            cl = results;
+                            register(cl, "heckle", "cigar", this.parallel());
+                            register(cl, "jeckle", "hijinks", this.parallel());
+                        },
+                        function(err, heckle, jeckle) {
+                            if (err) throw err;
+                            users.heckle = heckle;
+                            users.jeckle  = jeckle;
+                            accessToken(cl, {nickname: "heckle", password: "cigar"}, this);
+                        },
+                        function(err, pair) {
+                            if (err) throw err;
+                            hpair = pair;
+                            var act = {
+                                verb: "follow",
+                                object: {
+                                    objectType: "person",
+                                    id: users.jeckle.profile.id
+                                }
+                            },
+                                url = 'http://localhost:4815/api/user/heckle/feed',
+                                cred = makeCred(cl, users.heckle.pair);
+
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, posted, result) {
+                            if (err) throw err;
+                            var act = {
+                                verb: "follow",
+                                object: {
+                                    objectType: "person",
+                                    id: users.jeckle.profile.id
+                                }
+                            },
+                                url = 'http://localhost:4815/api/user/heckle/feed',
+                                cred = makeCred(cl, users.heckle.pair);
+
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, posted, result) {
+                            if (err) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            };
+                        }
+                    );
+                },
+                'it fails correctly': function(err) {
+                    assert.ifError(err);
                 }
             }
         }
