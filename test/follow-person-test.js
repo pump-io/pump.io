@@ -74,9 +74,7 @@ suite.addBatch({
                         users = {larry: {}, moe: {}, curly: {}};
 
                     Step(
-                        function(err, results) {
-                            if (err) throw err;
-                            cl = results;
+                        function() {
                             register(cl, "larry", "wiry1", this.parallel());
                             register(cl, "moe", "bowlcut", this.parallel());
                             register(cl, "curly", "nyuknyuk", this.parallel());
@@ -136,11 +134,6 @@ suite.addBatch({
 
                     Step(
                         function() {
-                            newClient(this);
-                        },
-                        function(err, results) {
-                            if (err) throw err;
-                            cl = results;
                             register(cl, "heckle", "cigar", this.parallel());
                             register(cl, "jeckle", "hijinks", this.parallel());
                         },
