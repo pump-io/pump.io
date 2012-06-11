@@ -58,6 +58,9 @@ var addRoutes = function(app) {
     app.get('/api/user/:nickname/inbox', userAuth, reqUser, sameUser, userInbox);
     app.post('/api/user/:nickname/inbox', notYetImplemented);
 
+    app.get('/api/user/:nickname/followers', clientAuth, reqUser, userFollowers);
+    app.get('/api/user/:nickname/following', clientAuth, reqUser, userFollowing);
+
     for (i = 0; i < ActivityObject.objectTypes.length; i++) {
 
         type = ActivityObject.objectTypes[i];
@@ -624,6 +627,90 @@ var userInbox = function(req, res, next) {
                 next(err);
             } else {
                 collection.items = activities;
+                res.json(collection);
+            }
+        }
+    );
+};
+
+var userFollowers = function(req, res, next) {
+    var collection = {
+        author: req.user.profile,
+        displayName: "Followers for " + (req.user.profile.displayName || req.user.nickname),
+        id: URLMaker.makeURL("api/user/" + req.user.nickname + "/followers"),
+        objectTypes: ["person"],
+        items: []
+    };
+    var start, cnt, end;
+
+    start = (req.query.offset) ? parseInt(req.query.offset, 10) : 0;
+    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_ACTIVITIES;
+    end = start + cnt;
+
+    Step(
+        function() {
+            req.user.followerCount(this);
+        },
+        function(err, count) {
+            if (err) {
+                if (err instanceof NoSuchThingError) {
+                    collection.totalCount = 0;
+                    res.json(collection);
+                } else {
+                    throw err;
+                }
+            } else {
+                collection.totalCount = count;
+                req.user.getFollowers(start, end, this);
+            }
+        },
+        function(err, people) {
+            if (err) {
+                next(err);
+            } else {
+                collection.items = people;
+                res.json(collection);
+            }
+        }
+    );
+};
+
+var userFollowing = function(req, res, next) {
+    var collection = {
+        author: req.user.profile,
+        displayName: "People that " + (req.user.profile.displayName || req.user.nickname) + " is following",
+        id: URLMaker.makeURL("api/user/" + req.user.nickname + "/following"),
+        objectTypes: ["person"],
+        items: []
+    };
+    var start, cnt, end;
+
+    start = (req.query.offset) ? parseInt(req.query.offset, 10) : 0;
+    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_ACTIVITIES;
+    end = start + cnt;
+
+    Step(
+        function() {
+            req.user.followingCount(this);
+        },
+        function(err, count) {
+            if (err) {
+                if (err instanceof NoSuchThingError) {
+                    collection.totalCount = 0;
+                    res.json(collection);
+                } else {
+                    throw err;
+                }
+            } else {
+                collection.totalCount = count;
+                req.user.getFollowing(start, end, this);
+            }
+        },
+        function(err, people) {
+            if (err) {
+                next(err);
+            } else {
+                collection.items = people;
                 res.json(collection);
             }
         }
