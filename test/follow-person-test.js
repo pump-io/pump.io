@@ -1,6 +1,6 @@
 // follow-person-test.js
 //
-// Test posting a notice to follow a person
+// Test posting an activity to follow a person
 //
 // Copyright 2012, StatusNet Inc.
 //
