@@ -187,7 +187,7 @@ suite.addBatch({
             },
             'and one user follows a remote person': {
                 topic: function(cl) {
-                    var cb = this.callback,
+                    var cb = this.callback;
 
                     Step(
                         function() {
