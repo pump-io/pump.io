@@ -132,6 +132,12 @@ suite.addBatch({
             'it has the getFollowing() method': function(user) {
                 assert.isFunction(user.getFollowing);
             },
+            'it has the followerCount() method': function(user) {
+                assert.isFunction(user.followerCount);
+            },
+            'it has the followingCount() method': function(user) {
+                assert.isFunction(user.followingCount);
+            },
             'it has the follow() method': function(user) {
                 assert.isFunction(user.follow);
             },
@@ -484,6 +490,18 @@ suite.addBatch({
                         assert.equal(following[0].id, other.profile.id);
                     }
                 },
+                'and we check the first user\'s following count': {
+                    topic: function(users) {
+                        users.shields.followingCount(this.callback);
+                    },
+                    'it works': function(err, fc) {
+                        assert.ifError(err);
+                    },
+                    'it is correct': function(err, fc) {
+                        assert.ifError(err);
+                        assert.equal(fc, 1);
+                    }
+                },
                 'and we check the second user\'s followers list': {
                     topic: function(users) {
                         var cb = this.callback;
@@ -502,6 +520,18 @@ suite.addBatch({
                     'it has the right data': function(err, followers, other) {
                         assert.ifError(err);
                         assert.equal(followers[0].id, other.profile.id);
+                    }
+                },
+                'and we check the second user\'s followers count': {
+                    topic: function(users) {
+                        users.yarnell.followersCount(this.callback);
+                    },
+                    'it works': function(err, fc) {
+                        assert.ifError(err);
+                    },
+                    'it is correct': function(err, fc) {
+                        assert.ifError(err);
+                        assert.equal(fc, 1);
                     }
                 }
             }
@@ -551,6 +581,18 @@ suite.addBatch({
                     assert.lengthOf(following, 0);
                 }
             },
+            'and we check the first user\'s following count': {
+                topic: function(users) {
+                    users.captain.followingCount(this.callback);
+                },
+                'it works': function(err, fc) {
+                    assert.ifError(err);
+                },
+                'it is correct': function(err, fc) {
+                    assert.ifError(err);
+                    assert.equal(fc, 0);
+                }
+            },
             'and we check the second user\'s followers list': {
                 topic: function(users) {
                     users.tenille.getFollowers(0, 20, this.callback);
@@ -562,6 +604,18 @@ suite.addBatch({
                 'it is the right size': function(err, followers, other) {
                     assert.ifError(err);
                     assert.lengthOf(followers, 0);
+                }
+            },
+            'and we check the second user\'s followers count': {
+                topic: function(users) {
+                    users.tenille.followersCount(this.callback);
+                },
+                'it works': function(err, fc) {
+                    assert.ifError(err);
+                },
+                'it is correct': function(err, fc) {
+                    assert.ifError(err);
+                    assert.equal(fc, 0);
                 }
             }
         },
@@ -621,7 +675,19 @@ suite.addBatch({
                         assert.lengthOf(followers, 49);
                     }
                 },
-                'and we check the following user\'s following list': {
+                'and we check the followed user\'s followers count': {
+                    topic: function(users) {
+                        users[0].followersCount(this.callback);
+                    },
+                    'it works': function(err, fc) {
+                        assert.ifError(err);
+                    },
+                    'it is correct': function(err, fc) {
+                        assert.ifError(err);
+                        assert.equal(fc, 49);
+                    }
+                },
+                'and we check the following users\' following lists': {
                     topic: function(users) {
                         var cb = this.callback,
                             MAX_USERS = 50;
@@ -644,6 +710,31 @@ suite.addBatch({
                         for (i = 0; i < lists.length; i++) {
                             assert.isArray(lists[i]);
                             assert.lengthOf(lists[i], 1);
+                        }
+                    }
+                },
+                'and we check the following users\' following counts': {
+                    topic: function(users) {
+                        var cb = this.callback,
+                            MAX_USERS = 50;
+
+                        Step(
+                            function() {
+                                var i, group = this.group();
+                                for (i = 1; i < users.length; i++) {
+                                    users[i].followingCount(group());
+                                }
+                            },
+                            cb
+                        );
+                    },
+                    'it works': function(err, counts) {
+                        var i;
+                        assert.ifError(err);
+                        assert.isArray(counts);
+                        assert.lengthOf(counts, 49);
+                        for (i = 0; i < counts.length; i++) {
+                            assert.equal(counts[i], 1);
                         }
                     }
                 }
