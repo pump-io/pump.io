@@ -92,8 +92,9 @@ vows.describe('middleware module interface').addBatch({
                     res = httpMocks.createResponse();
                 
                 mw.reqUser(req, res, function(err) {
-                    if (err) {
-                        cb(null);
+                    if (err && err.code && err.code === 404) {
+                    } else if (err) {
+                        cb(err);
                     } else {
                         cb(new Error("Unexpected success!"));
                     }
@@ -113,8 +114,9 @@ vows.describe('middleware module interface').addBatch({
                     res = httpMocks.createResponse();
                 
                 mw.reqUser(req, res, function(err) {
-                    if (err) {
-                        cb(null);
+                    if (err && err.code && err.code === 404) {
+                    } else if (err) {
+                        cb(err);
                     } else {
                         cb(new Error("Unexpected success!"));
                     }
@@ -134,8 +136,9 @@ vows.describe('middleware module interface').addBatch({
                     res = httpMocks.createResponse();
                 
                 mw.reqUser(req, res, function(err) {
-                    if (err) {
-                        cb(null);
+                    if (err && err.code && err.code === 404) {
+                    } else if (err) {
+                        cb(err);
                     } else {
                         cb(new Error("Unexpected success!"));
                     }
