@@ -455,7 +455,7 @@ suite.addBatch({
                 topic: function(users, pairs, cl) {
                     var cb = this.callback,
                         cred = makeCred(cl, pairs.greatjon),
-                        url = 'http://localhost/4814/api/user/greatjon/following';
+                        url = 'http://localhost:4815/api/user/greatjon/following';
                     httputil.getJSON(url, cred, function(err, doc, results) {
                         cb(err, doc, users.robb.profile);
                     });
@@ -476,7 +476,7 @@ suite.addBatch({
                 topic: function(users, pairs, cl) {
                     var cb = this.callback,
                         cred = makeCred(cl, pairs.greatjon),
-                        url = 'http://localhost/4814/api/user/greatjon/followers';
+                        url = 'http://localhost:4815/api/user/greatjon/followers';
                     httputil.getJSON(url, cred, function(err, doc, results) {
                         cb(err, doc);
                     });
@@ -493,7 +493,7 @@ suite.addBatch({
                 topic: function(users, pairs, cl) {
                     var cb = this.callback,
                         cred = makeCred(cl, pairs.robb),
-                        url = 'http://localhost/4814/api/user/robb/followers';
+                        url = 'http://localhost:4815/api/user/robb/followers';
                     httputil.getJSON(url, cred, function(err, doc, results) {
                         cb(err, doc, users.greatjon.profile);
                     });
@@ -514,7 +514,7 @@ suite.addBatch({
                 topic: function(users, pairs, cl) {
                     var cb = this.callback,
                         cred = makeCred(cl, pairs.robb),
-                        url = 'http://localhost/4814/api/user/robb/following';
+                        url = 'http://localhost:4815/api/user/robb/following';
                     httputil.getJSON(url, cred, function(err, doc, results) {
                         cb(err, doc);
                     });
