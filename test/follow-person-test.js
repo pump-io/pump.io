@@ -45,7 +45,7 @@ var makeCred = function(cl, pair) {
 
 var suite = vows.describe('follow person activity test');
 
-// A batch to test lots of parallel access token requests
+// A batch to test following/unfollowing users
 
 suite.addBatch({
     'When we set up the app': {
@@ -183,6 +183,54 @@ suite.addBatch({
                 },
                 'it fails correctly': function(err) {
                     assert.ifError(err);
+                }
+            },
+            'and one user follows a remote person': {
+                topic: function(cl) {
+                    var cb = this.callback,
+
+                    Step(
+                        function() {
+                            register(cl, "tom", "cat", this);
+                        },
+                        function(err, tom) {
+                            if (err) throw err;
+                            accessToken(cl, {nickname: "tom", password: "cat"}, this);
+                        },
+                        function(err, pair) {
+                            if (err) throw err;
+                            var act = {
+                                verb: "follow",
+                                object: {
+                                    objectType: "person",
+                                    id: "urn:uuid:6e621028-cdbc-4550-a593-4268e0f729f5",
+                                    displayName: "Jerry"
+                                }
+                            },
+                                url = 'http://localhost:4815/api/user/tom/feed',
+                                cred = makeCred(cl, pair);
+
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, posted, result) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                cb(null, posted);
+                            };
+                        }
+                    );
+                },
+                'it works': function(err, act) {
+                    assert.ifError(err);
+                },
+                'results are valid': function(err, act) {
+                    assert.ifError(err);
+                    actutil.validActivity(act);
+                },
+                'results are correct': function(err, act) {
+                    assert.ifError(err);
+                    assert.equal(act.verb, "follow");
                 }
             }
         }
