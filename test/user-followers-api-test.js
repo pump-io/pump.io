@@ -205,34 +205,64 @@ suite.addBatch({
                     assert.ifError(err);
                 }
             },
-            'and we GET the followers list with client credentials and the same user\'s access token': {
+            'and we get an access token': {
                 topic: function(user, cl) {
-                    var cb = this.callback;
-                    Step(
-                        function() {
-                            accessToken(cl, {nickname: "tyrion", password: "payURdebts"}, this);
-                        },
-                        function(err, pair) {
-                            if (err) throw err;
-                            httputil.getJSON('http://localhost:4815/api/user/tyrion/followers',
-                                             {consumer_key: cl.client_id,
-                                              consumer_secret: cl.client_secret,
-                                              token: pair.token,
-                                              token_secret: pair.token_secret},
-                                              this);
-                        },
-                        function(err, results) {
-                            if (err) {
-                                cb(err, null);
-                            } else {
-                                cb(null, results);
-                            }
-                        }
-                    );
+                    accessToken(cl, {nickname: "tyrion", password: "payURdebts"}, this.callback);
                 },
-                'it works': function(err, doc) {
+                'it works': function(err, pair) {
                     assert.ifError(err);
-                    assertValidList(doc, 0);
+                },
+                'and we GET the following list with client credentials and the same user\'s access token': {
+                    topic: function(pair, user, cl) {
+                        var cb = this.callback;
+                        Step(
+                            function() {
+                                httputil.getJSON('http://localhost:4815/api/user/tyrion/following',
+                                                 {consumer_key: cl.client_id,
+                                                  consumer_secret: cl.client_secret,
+                                                  token: pair.token,
+                                                  token_secret: pair.token_secret},
+                                                 this);
+                            },
+                            function(err, results) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    cb(null, results);
+                                }
+                            }
+                        );
+                    },
+                    'it works': function(err, doc) {
+                        assert.ifError(err);
+                        assertValidList(doc, 0);
+                    }
+                },
+                'and we GET the followers list with client credentials and the same user\'s access token': {
+                    topic: function(pair, user, cl) {
+                        var cb = this.callback;
+                        Step(
+                            function() {
+                                httputil.getJSON('http://localhost:4815/api/user/tyrion/followers',
+                                                 {consumer_key: cl.client_id,
+                                                  consumer_secret: cl.client_secret,
+                                                  token: pair.token,
+                                                  token_secret: pair.token_secret},
+                                                 this);
+                            },
+                            function(err, results) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    cb(null, results);
+                                }
+                            }
+                        );
+                    },
+                    'it works': function(err, doc) {
+                        assert.ifError(err);
+                        assertValidList(doc, 0);
+                    }
                 }
             },
             'and we GET the followers list with client credentials and a different user\'s access token': {
@@ -322,36 +352,6 @@ suite.addBatch({
                 },
                 'it fails correctly': function(err) {
                     assert.ifError(err);
-                }
-            },
-            'and we GET the following list with client credentials and the same user\'s access token': {
-                topic: function(user, cl) {
-                    var cb = this.callback;
-                    Step(
-                        function() {
-                            accessToken(cl, {nickname: "zardoz", password: "m3rl1n"}, this);
-                        },
-                        function(err, pair) {
-                            if (err) throw err;
-                            httputil.getJSON('http://localhost:4815/api/user/tyrion/following',
-                                             {consumer_key: cl.client_id,
-                                              consumer_secret: cl.client_secret,
-                                              token: pair.token,
-                                              token_secret: pair.token_secret},
-                                              this);
-                        },
-                        function(err, results) {
-                            if (err) {
-                                cb(err, null);
-                            } else {
-                                cb(null, results);
-                            }
-                        }
-                    );
-                },
-                'it works': function(err, doc) {
-                    assert.ifError(err);
-                    assertValidList(doc, 0);
                 }
             },
             'and we GET the following list with client credentials and a different user\'s access token': {
