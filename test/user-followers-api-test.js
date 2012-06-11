@@ -1,6 +1,6 @@
-// user-rest-test.js
+// user-followers-api-test.js
 //
-// Test the client registration API
+// Test the user followers/following endpoints for the API
 //
 // Copyright 2012, StatusNet Inc.
 //
