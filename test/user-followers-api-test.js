@@ -188,8 +188,9 @@ suite.addBatch({
                                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
                                      this.callback);
                 },
-                'it fails correctly': function(err) {
+                'it works': function(err, doc) {
                     assert.ifError(err);
+                    assertValidList(doc, 0);
                 }
             },
             'and we GET the followers list with client credentials and an invalid access token': {
@@ -337,8 +338,9 @@ suite.addBatch({
                                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
                                      this.callback);
                 },
-                'it fails correctly': function(err) {
+                'it works': function(err, doc) {
                     assert.ifError(err);
+                    assertValidList(doc, 0);
                 }
             },
             'and we GET the following list with client credentials and an invalid access token': {
