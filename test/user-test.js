@@ -524,7 +524,7 @@ suite.addBatch({
                 },
                 'and we check the second user\'s followers count': {
                     topic: function(users) {
-                        users.yarnell.followersCount(this.callback);
+                        users.yarnell.followerCount(this.callback);
                     },
                     'it works': function(err, fc) {
                         assert.ifError(err);
@@ -608,7 +608,7 @@ suite.addBatch({
             },
             'and we check the second user\'s followers count': {
                 topic: function(users) {
-                    users.tenille.followersCount(this.callback);
+                    users.tenille.followerCount(this.callback);
                 },
                 'it works': function(err, fc) {
                     assert.ifError(err);
@@ -677,7 +677,7 @@ suite.addBatch({
                 },
                 'and we check the followed user\'s followers count': {
                     topic: function(users) {
-                        users[0].followersCount(this.callback);
+                        users[0].followerCount(this.callback);
                     },
                     'it works': function(err, fc) {
                         assert.ifError(err);
