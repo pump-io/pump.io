@@ -1,6 +1,6 @@
-// user-api-test.js
+// user-list-test.js
 //
-// Test the client registration API
+// Test the API for the global list of registered users
 //
 // Copyright 2012, StatusNet Inc.
 //
