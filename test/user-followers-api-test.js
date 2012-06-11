@@ -62,8 +62,8 @@ var assertValidList = function(doc, count) {
     assert.include(doc, 'objectTypes');
     assert.include(doc.objectTypes, 'person');
     if (_(count).isNumber()) {
-        assert.equal(doc.totalCount, 0);
-        assert.isEmpty(doc.items);
+        assert.equal(doc.totalCount, count);
+        assert.lengthOf(doc.items, count);
     }
 };
 
