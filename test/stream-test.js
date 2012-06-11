@@ -191,6 +191,18 @@ suite.addBatch({
                     'it has the right value (1)': function(err, cnt) {
                         assert.equal(cnt, 1);
                     }
+                },
+                "and we count the stream's activities with Stream.count()": {
+                    topic: function(activity, stream) {
+                        var Stream = require('../lib/model/stream').Stream;
+                        Stream.count(stream.name, this.callback);
+                    },
+                    'it works': function(err, cnt) {
+                        assert.ifError(err);
+                    },
+                    'it has the right value (1)': function(err, cnt) {
+                        assert.equal(cnt, 1);
+                    }
                 }
             }
         }
