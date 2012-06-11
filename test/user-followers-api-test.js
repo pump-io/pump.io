@@ -469,7 +469,8 @@ suite.addBatch({
                 },
                 'it contains the second person': function(err, doc, person) {
                     assert.ifError(err);
-                    assert.deepEqual(doc.items[0], person);
+                    assert.equal(doc.items[0].id, person.id);
+                    assert.equal(doc.items[0].objectType, person.objectType);
                 }
             },
             'and we check the first user\'s followers list': {
@@ -507,7 +508,8 @@ suite.addBatch({
                 },
                 'it contains the first person': function(err, doc, person) {
                     assert.ifError(err);
-                    assert.deepEqual(doc.items[0], person);
+                    assert.equal(doc.items[0].id, person.id);
+                    assert.equal(doc.items[0].objectType, person.objectType);
                 }
             },
             'and we check the second user\'s following list': {
