@@ -41,6 +41,15 @@ var invert = function(callback) {
     };
 };
 
+var makeCred = function(cl, pair) {
+    return {
+        consumer_key: cl.client_id,
+        consumer_secret: cl.client_secret,
+        token: pair.token,
+        token_secret: pair.token_secret
+    };
+};
+
 var assertValidList = function(doc, count) {
     assert.include(doc, 'author');
     assert.include(doc.author, 'id');
@@ -390,9 +399,136 @@ suite.addBatch({
                     assertValidList(doc, 0);
                 }
             }
+        },
+        'and one user follows another': {
+
+            topic: function(cl) {
+                var cb = this.callback,
+                    users,
+                    pairs;
+
+                Step(
+                    function() {
+                        register(cl, "robb", "gr3yw1nd", this.parallel());
+                        register(cl, "greatjon", "bl00dyt0ugh", this.parallel());
+                    },
+                    function(err, robb, greatjon) {
+                        if (err) throw err;
+                        users = {
+                            robb: robb,
+                            greatjon: greatjon
+                        };
+                        accessToken(cl, {nickname: "robb", password: "gr3yw1nd"}, this.parallel());
+                        accessToken(cl, {nickname: "greatjon", password: "bl00dyt0ugh"}, this.parallel());
+                    },
+                    function(err, robbPair, greatjonPair) {
+                        var act, url, cred;
+                        if (err) throw err;
+                        pairs = {robb: robbPair, greatjon: greatjonPair};
+                        act = {
+                            verb: "follow",
+                            object: {
+                                objectType: "person",
+                                id: users.robb.profile.id
+                            },
+                            mood: {
+                                displayName: "Raucous"
+                            }
+                        };
+                        url = 'http://localhost:4815/api/user/greatjon/feed',
+                        cred = makeCred(cl, pairs.greatjon);
+
+                        httputil.postJSON(url, cred, act, function(err, posted, result) {
+                            if (err) {
+                                cb(err, null, null);
+                            } else {
+                                cb(null, users, pairs);
+                            }
+                        });
+                    }
+                );
+            },
+            'it works': function(err, users, pairs) {
+                assert.ifError(err);
+            },
+            'and we check the first user\'s following list': {
+                topic: function(users, pairs, cl) {
+                    var cb = this.callback,
+                        cred = makeCred(cl, pairs.greatjon),
+                        url = 'http://localhost/4814/api/user/greatjon/following';
+                    httputil.getJSON(url, cred, function(err, doc, results) {
+                        cb(err, doc, users.robb.profile);
+                    });
+                },
+                'it works': function(err, doc, person) {
+                    assert.ifError(err);
+                },
+                'it is valid': function(err, doc, person) {
+                    assert.ifError(err);
+                    assertValidList(doc, 1);
+                },
+                'it contains the second person': function(err, doc, person) {
+                    assert.ifError(err);
+                    assert.deepEqual(doc.items[0], person);
+                }
+            },
+            'and we check the first user\'s followers list': {
+                topic: function(users, pairs, cl) {
+                    var cb = this.callback,
+                        cred = makeCred(cl, pairs.greatjon),
+                        url = 'http://localhost/4814/api/user/greatjon/followers';
+                    httputil.getJSON(url, cred, function(err, doc, results) {
+                        cb(err, doc);
+                    });
+                },
+                'it works': function(err, doc) {
+                    assert.ifError(err);
+                },
+                'it is valid': function(err, doc) {
+                    assert.ifError(err);
+                    assertValidList(doc, 0);
+                }
+            },
+            'and we check the second user\'s followers list': {
+                topic: function(users, pairs, cl) {
+                    var cb = this.callback,
+                        cred = makeCred(cl, pairs.robb),
+                        url = 'http://localhost/4814/api/user/robb/followers';
+                    httputil.getJSON(url, cred, function(err, doc, results) {
+                        cb(err, doc, users.greatjon.profile);
+                    });
+                },
+                'it works': function(err, doc, person) {
+                    assert.ifError(err);
+                },
+                'it is valid': function(err, doc, person) {
+                    assert.ifError(err);
+                    assertValidList(doc, 1);
+                },
+                'it contains the first person': function(err, doc, person) {
+                    assert.ifError(err);
+                    assert.deepEqual(doc.items[0], person);
+                }
+            },
+            'and we check the second user\'s following list': {
+                topic: function(users, pairs, cl) {
+                    var cb = this.callback,
+                        cred = makeCred(cl, pairs.robb),
+                        url = 'http://localhost/4814/api/user/robb/following';
+                    httputil.getJSON(url, cred, function(err, doc, results) {
+                        cb(err, doc);
+                    });
+                },
+                'it works': function(err, doc) {
+                    assert.ifError(err);
+                },
+                'it is valid': function(err, doc) {
+                    assert.ifError(err);
+                    assertValidList(doc, 0);
+                }
+            }
         }
     }
 });
-
 
 suite['export'](module);
