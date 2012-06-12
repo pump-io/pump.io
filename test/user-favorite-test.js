@@ -26,7 +26,17 @@ var assert = require('assert'),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('user module interface');
+var a2m = function(arr, prop) {
+    var i, map = {}, key, value;
+    for (i = 0; i < arr.length; i++) {
+        value = arr[i];
+        key   = value[prop];
+        map[key] = value;
+    }
+    return map;
+};
+
+var suite = vows.describe('user favorite interface');
 
 suite.addBatch({
     'When we get the User class': {
@@ -296,6 +306,121 @@ suite.addBatch({
                 'it has the right data': function(err, favers, user) {
                     assert.ifError(err);
                     assert.equal(favers[0].id, user.profile.id);
+                }
+            }
+        },
+        'and a new user favors a lot of objects': {
+            topic: function(User) {
+
+                var cb = this.callback,
+                    user,
+                    images;
+
+                Step(
+                    function() {
+                        User.create({nickname: "count", password: "123456"}, this);
+                    },
+                    function(err, results) {
+                        var Image = require('../lib/model/image').Image,
+                            i = 0,
+                            group = this.group();
+                        if (err) throw err;
+                        user = results;
+                        for (i = 0; i < 5000; i++) {
+                            Image.create({displayName: "Image for #" + i,
+                                          increment: i,
+                                          url: "http://"+i+".jpg.to"},
+                                         group());
+                        }
+                    },
+                    function(err, results) {
+                        var i = 0,
+                            group = this.group();
+                        if (err) throw err;
+                        images = results;
+                        for (i = 0; i < images.length; i++) {
+                            user.favorite(images[i].id, "image", group());
+                        }
+                    },
+                    function(err) {
+                        if (err) {
+                            cb(err, null, null);
+                        } else {
+                            cb(null, user, images);
+                        }
+                    }
+                );
+            },
+            'it works': function(err, user, images) {
+                assert.ifError(err);
+                assert.isObject(user);
+                assert.isArray(images);
+                assert.lengthOf(images, 5000);
+                for (var i = 0; i < images.length; i++) {
+                    assert.isObject(images[i]);
+                }
+            },
+            'and we check the user favorites list': {
+                topic: function(user, images) {
+                    var cb = this.callback;
+                    user.getFavorites(0, 5001, function(err, faves) {
+                        cb(err, faves, images);
+                    });
+                },
+                'it works': function(err, faves, images) {
+                    assert.ifError(err);
+                },
+                'it is the right size': function(err, faves, images) {
+                    assert.ifError(err);
+                    assert.lengthOf(faves, 5000);
+                },
+                'it has the right data': function(err, faves, images) {
+                    var fm, im, id;
+                    assert.ifError(err);
+                    fm = a2m(faves, 'id');
+                    im = a2m(images, 'id');
+                    for (id in im) {
+                        assert.include(fm, id);
+                    }
+                    for (id in fm) {
+                        assert.include(im, id);
+                    }
+                }
+            },
+            'and we check the images favoriters list': {
+                topic: function(user, images) {
+                    var cb = this.callback;
+                    Step(
+                        function() {
+                            var i, group = this.group();
+                            for (i = 0; i < images.length; i++) {
+                                images.getFavoriters(0, 20, group());
+                            }
+                        },
+                        function(err, faverses) {
+                            if (err) {
+                                cb(err, null, null);
+                            } else {
+                                cb(null, faverses, user);
+                            }
+                        }
+                    );
+                },
+                'it works': function(err, faverses, user) {
+                    assert.ifError(err);
+                },
+                'it is the right size': function(err, faverses, user) {
+                    assert.ifError(err);
+                    assert.lengthOf(faverses, 5000);
+                    for (var i = 0; i < faverses.length; i++) {
+                        assert.lengthOf(faverses[i], 1);
+                    }
+                },
+                'it has the right data': function(err, faverses, user) {
+                    assert.ifError(err);
+                    for (var i = 0; i < faverses.length; i++) {
+                        assert.equal(faverses[i][0].id, user.profile.id);
+                    }
                 }
             }
         }
