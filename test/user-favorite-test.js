@@ -222,6 +222,80 @@ suite.addBatch({
                 assert.isArray(faves);
                 assert.lengthOf(faves, 0);
             }
+        },
+        'and a new user favors an object': {
+            topic: function(User) {
+                var cb = this.callback,
+                    user,
+                    image;
+
+                Step(
+                    function() {
+                        User.create({nickname: "ernie", password: "rubberduckie"}, this);
+                    },
+                    function(err, results) {
+                        var Image = require('../lib/model/image').Image;
+                        if (err) throw err;
+                        user = results;
+                        Image.create({displayName: "Evan's avatar",
+                                      url: "https://c778552.ssl.cf2.rackcdn.com/evan/1-96-20120103014637.jpeg"},
+                                     this);
+                    },
+                    function(err, results) {
+                        if (err) throw err;
+                        image = results;
+                        user.favorite(image.id, image.objectType, this);
+                    },
+                    function(err) {
+                        if (err) {
+                            cb(err, null, null);
+                        } else {
+                            cb(null, user, image);
+                        }
+                    }
+                );
+            },
+            'it works': function(err) {
+                assert.ifError(err);
+            },
+            'and we check the user favorites list': {
+                topic: function(user, image) {
+                    var cb = this.callback;
+                    user.getFavorites(0, 20, function(err, faves) {
+                        cb(err, faves, image);
+                    });
+                },
+                'it works': function(err, faves, image) {
+                    assert.ifError(err);
+                },
+                'it is the right size': function(err, faves, image) {
+                    assert.ifError(err);
+                    assert.lengthOf(faves, 1);
+                },
+                'it has the right data': function(err, faves, image) {
+                    assert.ifError(err);
+                    assert.equal(faves[0].id, image.id);
+                }
+            },
+            'and we check the image favoriters list': {
+                topic: function(user, image) {
+                    var cb = this.callback;
+                    image.getFavoriters(0, 20, function(err, favers) {
+                        cb(err, favers, user);
+                    });
+                },
+                'it works': function(err, favers, user) {
+                    assert.ifError(err);
+                },
+                'it is the right size': function(err, favers, user) {
+                    assert.ifError(err);
+                    assert.lengthOf(favers, 1);
+                },
+                'it has the right data': function(err, favers, user) {
+                    assert.ifError(err);
+                    assert.equal(favers[0].id, user.profile.id);
+                }
+            }
         }
     }
 });
