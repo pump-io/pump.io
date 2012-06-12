@@ -255,8 +255,10 @@ suite.addBatch({
                     }
                 );
             },
-            'it works': function(err) {
+            'it works': function(err, user, image) {
                 assert.ifError(err);
+                assert.isObject(user);
+                assert.isObject(image);
             },
             'and we check the user favorites list': {
                 topic: function(user, image) {
