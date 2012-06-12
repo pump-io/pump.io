@@ -158,6 +158,25 @@ var newCredentials = function(nickname, password, cb) {
         function(err, res) {
             if (err) throw err;
             cl = res;
+            newPair(cl, nickname, password, this);
+        },
+        function(err, res) {
+            if (err) {
+                cb(err, null);
+            } else {
+                _.extend(res, {consumer_key: cl.client_id,
+                               consumer_secret: cl.client_secret});
+                cb(err, res);
+            }
+        }
+    );
+};
+
+var newPair = function(cl, nickname, password, cb) {
+    var user;
+
+    Step(
+        function() {
             register(cl, nickname, password, this);
         },
         function(err, res) {
@@ -167,11 +186,9 @@ var newCredentials = function(nickname, password, cb) {
         },
         function(err, res) {
             if (err) {
-                cb(err);
+                cb(err, null);
             } else {
-                _.extend(res, {consumer_key: cl.client_id,
-                               consumer_secret: cl.client_secret});
-                cb(err, res);
+                cb(null, res);
             }
         }
     );
@@ -214,5 +231,6 @@ exports.requestToken = requestToken;
 exports.newClient = newClient;
 exports.register = register;
 exports.newCredentials = newCredentials;
+exports.newPair = newPair;
 exports.accessToken = accessToken;
 exports.setupApp = setupApp;
