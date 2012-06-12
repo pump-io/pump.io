@@ -59,7 +59,7 @@ var mb = modelBatch('favorite', 'Favorite', testSchema, testData);
 
 mb['When we require the favorite module']
 ['and we get its Favorite class export']
-['and we create an favorite instance']
+['and we create a favorite instance']
 ['auto-generated fields are there'] = function(err, created) {
     assert.isString(created.id);
     assert.isString(created.published);
