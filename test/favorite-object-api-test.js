@@ -425,7 +425,7 @@ suite.addBatch({
                                     }
                                 };
 
-                            var cred = makeCred(cl, pairs.peter);
+                            var cred = makeCred(cl, pairs.mike);
                             
                             httputil.postJSON(url, cred, act, this);
                         },
