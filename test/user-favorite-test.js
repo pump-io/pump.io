@@ -394,7 +394,7 @@ suite.addBatch({
                         function() {
                             var i, group = this.group();
                             for (i = 0; i < images.length; i++) {
-                                images.getFavoriters(0, 20, group());
+                                images[i].getFavoriters(0, 20, group());
                             }
                         },
                         function(err, faverses) {
