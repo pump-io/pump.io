@@ -950,6 +950,39 @@ suite.addBatch({
                     assert.ifError(err);
                 }
             }
+        },
+        'and we get the list of favorites for a new user': {
+            topic: function(User) {
+                var cb = this.callback,
+                    props = {
+                        nickname: 'carroway',
+                        password: 'feldspar'
+                    };
+                Step(
+                    function() {
+                        User.create(props, this);
+                    },
+                    function(err, user) {
+                        if (err) throw err;
+                        user.getFavorites(0, 20, this);
+                    },
+                    function(err, faves) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, faves);
+                        }
+                    }
+                );
+            },
+            'it works': function(err, faves) {
+                assert.ifError(err);
+            },
+            'it looks right': function(err, faves) {
+                assert.ifError(err);
+                assert.isArray(faves);
+                assert.lengthOf(faves, 0);
+            }
         }
     }
 });
