@@ -48,7 +48,7 @@ suite.addBatch({
 
                 DatabankObject.bank = db;
                 
-                User = require('../../lib/model/user').User || null;
+                User = require('../lib/model/user').User || null;
 
                 cb(null, User);
             });
