@@ -144,6 +144,12 @@ suite.addBatch({
             'it has the stopFollowing() method': function(user) {
                 assert.isFunction(user.stopFollowing);
             },
+            'it has the favorite() method': function(user) {
+                assert.isFunction(user.favorite);
+            },
+            'it has the unfavorite() method': function(user) {
+                assert.isFunction(user.unfavorite);
+            },
             'and we check the credentials with the right password': {
                 topic: function(user, User) {
                     User.checkCredentials('tom', '123456', this.callback);
@@ -797,6 +803,151 @@ suite.addBatch({
                             assert.equal(counts[i], 1);
                         }
                     }
+                }
+            }
+        }
+    }
+});
+
+suite.addBatch({
+    'When we get the User class': {
+        topic: function() {
+            return require('../lib/model/user').User;
+        },
+        'it exists': function(User) {
+            assert.isFunction(User);
+        },
+        'and we create a user': {
+            topic: function(User) {
+                var props = {
+                    nickname: 'bert',
+                    password: 'pidgeons'
+                };
+                User.create(props, this.callback);
+            },
+            teardown: function(user) {
+                if (user && user.del) {
+                    user.del(function(err) {});
+                }
+            },
+            'it works': function(user) {
+                assert.isObject(user);
+            },
+            'and it favorites a known object': {
+                topic: function(user) {
+                    var cb = this.callback,
+                        Image = require('../lib/model/image').Image,
+                        obj;
+                    
+                    Step(
+                        function() {
+                            Image.create({displayName: "Courage Wolf",
+                                          url: "http://i0.kym-cdn.com/photos/images/newsfeed/000/159/986/Couragewolf1.jpg"}, this);
+                        },
+                        function(err, image) {
+                            if (err) throw err;
+                            obj = image;
+                            user.favorite(image.id, image.objectType, this);
+                        },
+                        function(err) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                cb(err, obj);
+                            }
+                        }
+                    );
+                },
+                'it works': function(err, image) {
+                    assert.ifError(err);
+                },
+                'and it unfavorites that object': {
+                    topic: function(image, user) {
+                        user.unfavorite(image.id, image.objectType, this.callback);
+                    },
+                    'it works': function(err) {
+                        assert.ifError(err);
+                    }
+                }
+            },
+            'and it favorites an unknown object': {
+                topic: function(user) {
+                    var cb = this.callback;
+                    
+                    user.favorite("urn:uuid:5be685ef-f50b-458b-bfd3-3ca004eb0e89", "image", this.callback);
+                },
+                'it works': function(err) {
+                    assert.ifError(err);
+                },
+                'and it unfavorites that object': {
+                    topic: function(user) {
+                        user.unfavorite("urn:uuid:5be685ef-f50b-458b-bfd3-3ca004eb0e89", "image", this.callback);
+                    },
+                    'it works': function(err) {
+                        assert.ifError(err);
+                    }
+                }
+            },
+            'and it double-favorites an object': {
+                topic: function(user) {
+                    var cb = this.callback,
+                        Video = require('../lib/model/video').Video,
+                        obj;
+                    
+                    Step(
+                        function() {
+                            Video.create({displayName: "Winning",
+                                          url: "http://www.youtube.com/watch?v=9QS0q3mGPGg"}, this);
+                        },
+                        function(err, video) {
+                            if (err) throw err;
+                            obj = video;
+                            user.favorite(obj.id, obj.objectType, this);
+                        },
+                        function(err) {
+                            if (err) throw err;
+                            user.favorite(obj.id, obj.objectType, this);
+                        },
+                        function(err) {
+                            if (err) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                'it fails correctly': function(err) {
+                    assert.ifError(err);
+                }
+            },
+            'and it unfavorites an object it never favorited': {
+                topic: function(user) {
+                    var cb = this.callback,
+                        Audio = require('../lib/model/audio').Audio,
+                        obj;
+                    
+                    Step(
+                        function() {
+                            Audio.create({displayName: "Spock",
+                                          url: "http://musicbrainz.org/recording/c1038685-49f3-45d7-bb26-1372f1052126"}, this);
+                        },
+                        function(err, video) {
+                            if (err) throw err;
+                            obj = video;
+                            user.unfavorite(obj.id, obj.objectType, this);
+                        },
+                        function(err) {
+                            if (err) {
+                                cb(null);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                'it fails correctly': function(err) {
+                    assert.ifError(err);
                 }
             }
         }
