@@ -317,13 +317,13 @@ var likes = function(type) {
             function(err, count) {
                 if (err) {
                     if (err instanceof NoSuchThingError) {
-                        collection.totalCount = 0;
+                        collection.totalItems = 0;
                         res.json(collection);
                     } else {
                         throw err;
                     }
                 }
-                collection.totalCount = count;
+                collection.totalItems = count;
                 obj.getFavoriters(start, end, this);
             },
             function(err, likers) {
@@ -486,13 +486,13 @@ var listUsers = function(req, res, next) {
         },
         function(err, totalUsers) {
             if (err) throw err;
-            collection.totalCount = totalUsers;
+            collection.totalItems = totalUsers;
             bank.slice('userlist', 0, start, end, this);
         },
         function(err, userIds) {
             if (err) {
                 if (err instanceof NoSuchThingError) { // may catch err in prev func
-                    collection.totalCount = 0;
+                    collection.totalItems = 0;
                     collection.items = [];
                     res.json(collection);
                 } else {
@@ -607,13 +607,13 @@ var userStream = function(req, res, next) {
         function(err, totalOutbox) {
             if (err) {
                 if (err instanceof NoSuchThingError) {
-                    collection.totalCount = 0;
+                    collection.totalItems = 0;
                     res.json(collection);
                 } else {
                     throw err;
                 }
             } else {
-                collection.totalCount = totalOutbox;
+                collection.totalItems = totalOutbox;
                 req.user.getStream(start, end, this);
             }
         },
@@ -664,13 +664,13 @@ var userInbox = function(req, res, next) {
         function(err, inboxCount) {
             if (err) {
                 if (err instanceof NoSuchThingError) {
-                    collection.totalCount = 0;
+                    collection.totalItems = 0;
                     res.json(collection);
                 } else {
                     throw err;
                 }
             } else {
-                collection.totalCount = inboxCount;
+                collection.totalItems = inboxCount;
                 req.user.getInbox(start, end, this);
             }
         },
@@ -706,13 +706,13 @@ var userFollowers = function(req, res, next) {
         function(err, count) {
             if (err) {
                 if (err instanceof NoSuchThingError) {
-                    collection.totalCount = 0;
+                    collection.totalItems = 0;
                     res.json(collection);
                 } else {
                     throw err;
                 }
             } else {
-                collection.totalCount = count;
+                collection.totalItems = count;
                 req.user.getFollowers(start, end, this);
             }
         },
@@ -748,13 +748,13 @@ var userFollowing = function(req, res, next) {
         function(err, count) {
             if (err) {
                 if (err instanceof NoSuchThingError) {
-                    collection.totalCount = 0;
+                    collection.totalItems = 0;
                     res.json(collection);
                 } else {
                     throw err;
                 }
             } else {
-                collection.totalCount = count;
+                collection.totalItems = count;
                 req.user.getFollowing(start, end, this);
             }
         },
@@ -789,13 +789,13 @@ var userFavorites = function(req, res, next) {
         function(err, count) {
             if (err) {
                 if (err instanceof NoSuchThingError) {
-                    collection.totalCount = 0;
+                    collection.totalItems = 0;
                     res.json(collection);
                 } else {
                     throw err;
                 }
             } else {
-                collection.totalCount = count;
+                collection.totalItems = count;
                 req.user.getFavorites(start, end, this);
             }
         },
