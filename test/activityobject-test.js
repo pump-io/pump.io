@@ -676,6 +676,30 @@ vows.describe('activityobject class interface').addBatch({
                     assert.isArray(objects);
                     assert.lengthOf(objects, 0);
                 }
+            },
+            'and we get an empty object stream': {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Stream = require('../lib/model/stream').Stream;
+
+                    Step(
+                        function() {
+                            Stream.create({name: "activityobject-test-1"}, this);
+                        },
+                        function(err, stream) {
+                            if (err) throw err;
+                            ActivityObject.getObjectStream('person', "activityobject-test-1", 0, 20, cb);
+                        }
+                    );
+                },
+                'it works': function(err, objects) {
+                    assert.ifError(err);
+                },
+                'it returns an empty array': function(err, objects) {
+                    assert.ifError(err);
+                    assert.isArray(objects);
+                    assert.lengthOf(objects, 0);
+                }
             }
         }
     }
