@@ -331,6 +331,15 @@ suite.addBatch({
                     assert.isString(activity.actor.displayName);
                     assert.isString(activity.object.content);
                 },
+                'its object property has a likes property': function(err, activity) {
+                    assert.ifError(err);
+                    assert.includes(activity.object, 'likes');
+                    assert.isObject(activity.object.likes);
+                    assert.includes(activity.object.likes, 'totalItems');
+                    assert.isNumber(activity.object.likes.totalItems);
+                    assert.includes(activity.object.likes, 'url');
+                    assert.isString(activity.object.likes.url);
+                },
                 'and we get the stored activity': {
                     topic: function(saved, activity, Activity) {
                         Activity.get(activity.id, this.callback);
@@ -348,6 +357,15 @@ suite.addBatch({
                         assert.instanceOf(activity.actor, require('../lib/model/person').Person);
                         assert.isObject(activity.object);
                         assert.instanceOf(activity.object, require('../lib/model/note').Note);
+                    },
+                    'its object property has a likes property': function(err, activity) {
+                        assert.ifError(err);
+                        assert.includes(activity.object, 'likes');
+                        assert.isObject(activity.object.likes);
+                        assert.includes(activity.object.likes, 'totalItems');
+                        assert.isNumber(activity.object.likes.totalItems);
+                        assert.includes(activity.object.likes, 'url');
+                        assert.isString(activity.object.likes.url);
                     }
                 }
             }
