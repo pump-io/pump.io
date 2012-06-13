@@ -700,6 +700,55 @@ vows.describe('activityobject class interface').addBatch({
                     assert.isArray(objects);
                     assert.lengthOf(objects, 0);
                 }
+            },
+            'and we get an object stream with stuff in it': {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Stream = require('../lib/model/stream').Stream,
+                        Service = require('../lib/model/service').Service,
+                        stream;
+
+                    Step(
+                        function() {
+                            Stream.create({name: "activityobject-test-2"}, this);
+                        },
+                        function(err, results) {
+                            var i, group = this.group();
+                            if (err) throw err;
+                            stream = results;
+                            for (i = 0; i < 100; i++) {
+                                Service.create({displayName: "Service #" + i}, group());
+                            }
+                        },
+                        function(err, services) {
+                            var i, group = this.group();
+                            if (err) throw err;
+                            for (i = 0; i < 100; i++) {
+                                stream.deliver(services[i].id, group());
+                            }
+                        },
+                        function(err) {
+                            if (err) throw err;
+                            ActivityObject.getObjectStream("service", "activityobject-test-2", 0, 20, cb);
+                        }
+                    );
+                },
+                'it works': function(err, objects) {
+                    assert.ifError(err);
+                },
+                'it returns a non-empty array': function(err, objects) {
+                    assert.ifError(err);
+                    assert.isArray(objects);
+                    assert.lengthOf(objects, 20);
+                },
+                'members are the correct type': function(err, objects) {
+                    var Service = require('../lib/model/service').Service;
+                    assert.ifError(err);
+                    for (var i = 0; i < objects.length; i++) {
+                        assert.isObject(objects[i]);
+                        assert.instanceOf(objects[i], Service);
+                    }
+                }
             }
         }
     }
