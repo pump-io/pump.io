@@ -330,7 +330,8 @@ var likes = function(type) {
                 if (err) {
                     next(err);
                 } else {
-                    res.json(likers);
+                    collection.items = likers;
+                    res.json(collection);
                 }
             }
         );
