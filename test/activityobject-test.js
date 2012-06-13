@@ -749,6 +749,71 @@ vows.describe('activityobject class interface').addBatch({
                         assert.instanceOf(objects[i], Service);
                     }
                 }
+            },
+            'and we get the favoriters of a brand-new object': {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Place = require('../lib/model/place').Place;
+
+                    Step(
+                        function() {
+                            Place.create({displayName: "Mount Everest",
+                                          "position": "+27.5916+086.5640+8850/"},
+                                         this);
+                        },
+                        function(err, place) {
+                            if (err) throw err;
+                            place.getFavoriters(0, 20, this);
+                        },
+                        function(err, favers) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                cb(null, favers);
+                            }
+                        }
+                    );
+                },
+                'it works': function(err, objects) {
+                    assert.ifError(err);
+                },
+                'it returns an empty array': function(err, objects) {
+                    assert.ifError(err);
+                    assert.isArray(objects);
+                    assert.lengthOf(objects, 0);
+                }
+            },
+            'and we get the favoriters count of a brand-new object': {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Place = require('../lib/model/place').Place;
+
+                    Step(
+                        function() {
+                            Place.create({displayName: "South Pole",
+                                          "position": "-90.0000+0.0000/"},
+                                         this);
+                        },
+                        function(err, place) {
+                            if (err) throw err;
+                            place.getFavoritersCount(this);
+                        },
+                        function(err, count) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                cb(null, count);
+                            }
+                        }
+                    );
+                },
+                'it works': function(err, count) {
+                    assert.ifError(err);
+                },
+                'it returns zero': function(err, count) {
+                    assert.ifError(err);
+                    assert.equal(count, 0);
+                }
             }
         }
     }
