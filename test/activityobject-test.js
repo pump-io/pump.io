@@ -796,7 +796,7 @@ vows.describe('activityobject class interface').addBatch({
                         },
                         function(err, place) {
                             if (err) throw err;
-                            place.getFavoritersCount(this);
+                            place.favoritersCount(this);
                         },
                         function(err, count) {
                             if (err) {
