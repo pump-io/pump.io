@@ -43,12 +43,12 @@ var assertValidList = function(doc, count) {
     assert.include(doc.author, 'id');
     assert.include(doc.author, 'displayName');
     assert.include(doc.author, 'objectType');
-    assert.include(doc, 'totalCount');
+    assert.include(doc, 'totalItems');
     assert.include(doc, 'items');
     assert.include(doc, 'displayName');
     assert.include(doc, 'id');
     if (_(count).isNumber()) {
-        assert.equal(doc.totalCount, count);
+        assert.equal(doc.totalItems, count);
         assert.lengthOf(doc.items, count);
     }
 };

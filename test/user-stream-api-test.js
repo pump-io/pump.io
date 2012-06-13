@@ -81,7 +81,7 @@ suite.addBatch({
                     assert.include(feed.author, 'id');
                     assert.include(feed.author, 'displayName');
                     assert.include(feed.author, 'objectType');
-                    assert.include(feed, 'totalCount');
+                    assert.include(feed, 'totalItems');
                     assert.include(feed, 'items');
                     assert.include(feed, 'displayName');
                     assert.include(feed, 'id');
@@ -89,7 +89,7 @@ suite.addBatch({
                     assert.include(feed.objectTypes, 'activity');
                 },
                 'it is empty': function(err, feed) {
-                    assert.equal(feed.totalCount, 0);
+                    assert.equal(feed.totalItems, 0);
                     assert.isEmpty(feed.items);
                 },
                 'and we get the inbox of a new user': {
@@ -107,7 +107,7 @@ suite.addBatch({
                         assert.include(inbox.author, 'id');
                         assert.include(inbox.author, 'displayName');
                         assert.include(inbox.author, 'objectType');
-                        assert.include(inbox, 'totalCount');
+                        assert.include(inbox, 'totalItems');
                         assert.include(inbox, 'items');
                         assert.include(inbox, 'displayName');
                         assert.include(inbox, 'id');
@@ -115,7 +115,7 @@ suite.addBatch({
                         assert.include(inbox.objectTypes, 'activity');
                     },
                     'it is empty': function(err, inbox) {
-                        assert.equal(inbox.totalCount, 0);
+                        assert.equal(inbox.totalItems, 0);
                         assert.isEmpty(inbox.items);
                     },
                     'and we post a new activity': {
@@ -177,7 +177,7 @@ suite.addBatch({
                                 assert.include(feed.author, 'id');
                                 assert.include(feed.author, 'displayName');
                                 assert.include(feed.author, 'objectType');
-                                assert.include(feed, 'totalCount');
+                                assert.include(feed, 'totalItems');
                                 assert.include(feed, 'items');
                                 assert.include(feed, 'displayName');
                                 assert.include(feed, 'id');
@@ -188,7 +188,7 @@ suite.addBatch({
                                 assert.isObject(res);
                                 assert.include(res, 'feed');
                                 var feed = res.feed;
-                                assert.equal(feed.totalCount, 1);
+                                assert.equal(feed.totalItems, 1);
                                 assert.lengthOf(feed.items, 1);
                             },
                             'it has our activity': function(err, res) {
@@ -221,7 +221,7 @@ suite.addBatch({
                                 assert.include(inbox.author, 'id');
                                 assert.include(inbox.author, 'displayName');
                                 assert.include(inbox.author, 'objectType');
-                                assert.include(inbox, 'totalCount');
+                                assert.include(inbox, 'totalItems');
                                 assert.include(inbox, 'items');
                                 assert.include(inbox, 'displayName');
                                 assert.include(inbox, 'id');
@@ -232,7 +232,7 @@ suite.addBatch({
                                 assert.isObject(res);
                                 assert.include(res, 'inbox');
                                 var inbox = res.inbox;
-                                assert.equal(inbox.totalCount, 1);
+                                assert.equal(inbox.totalItems, 1);
                                 assert.lengthOf(inbox.items, 1);
                             },
                             'it has our activity': function(err, res) {

@@ -373,13 +373,13 @@ suite.addBatch({
                     assert.isArray(collection.objectTypes);
                     assert.lengthOf(collection.objectTypes, 1);
                     assert.include(collection.objectTypes, 'user');
-                    assert.include(collection, 'totalCount');
-                    assert.isNumber(collection.totalCount);
+                    assert.include(collection, 'totalItems');
+                    assert.isNumber(collection.totalItems);
                     assert.include(collection, 'items');
                     assert.isArray(collection.items);
                 },
                 'it is empty': function(err, collection) {
-                    assert.equal(collection.totalCount, 0);
+                    assert.equal(collection.totalItems, 0);
                     assert.isEmpty(collection.items);
                 },
                 'and we add a user': {
@@ -410,13 +410,13 @@ suite.addBatch({
                         assert.isArray(collection.objectTypes);
                         assert.lengthOf(collection.objectTypes, 1);
                         assert.include(collection.objectTypes, 'user');
-                        assert.include(collection, 'totalCount');
-                        assert.isNumber(collection.totalCount);
+                        assert.include(collection, 'totalItems');
+                        assert.isNumber(collection.totalItems);
                         assert.include(collection, 'items');
                         assert.isArray(collection.items);
                     },
                     'it has one element': function(err, collection) {
-                        assert.equal(collection.totalCount, 1);
+                        assert.equal(collection.totalItems, 1);
                         assert.lengthOf(collection.items, 1);
                     },
                     'it has a valid user': function(err, collection) {
@@ -473,13 +473,13 @@ suite.addBatch({
                             assert.isArray(collection.objectTypes);
                             assert.lengthOf(collection.objectTypes, 1);
                             assert.include(collection.objectTypes, 'user');
-                            assert.include(collection, 'totalCount');
-                            assert.isNumber(collection.totalCount);
+                            assert.include(collection, 'totalItems');
+                            assert.isNumber(collection.totalItems);
                             assert.include(collection, 'items');
                             assert.isArray(collection.items);
                         },
                         'it has the right number of elements': function(err, collection) {
-                            assert.equal(collection.totalCount, 50);
+                            assert.equal(collection.totalItems, 50);
                             assert.lengthOf(collection.items, 20);
                         },
                         'there are no duplicates': function(err, collection) {
@@ -509,13 +509,13 @@ suite.addBatch({
                                 assert.isArray(collection.objectTypes);
                                 assert.lengthOf(collection.objectTypes, 1);
                                 assert.include(collection.objectTypes, 'user');
-                                assert.include(collection, 'totalCount');
-                                assert.isNumber(collection.totalCount);
+                                assert.include(collection, 'totalItems');
+                                assert.isNumber(collection.totalItems);
                                 assert.include(collection, 'items');
                                 assert.isArray(collection.items);
                             },
                             'it has the right number of elements': function(err, collection) {
-                                assert.equal(collection.totalCount, 50);
+                                assert.equal(collection.totalItems, 50);
                                 assert.lengthOf(collection.items, 50);
                             },
                             'there are no duplicates': function(err, collection) {
