@@ -308,10 +308,11 @@ vows.describe('activityobject class interface').addBatch({
                         Image = require('../lib/model/image').Image,
                         Person = require('../lib/model/person').Person,
                         image = new Image({
-                            author: new Person({
+                            author: {
                                 id: "urn:uuid:8a9d0e92-3210-4ea3-920f-3950ca8d5306",
-                                displayName: "Barney Miller"
-                            }),
+                                displayName: "Barney Miller",
+                                objectType: "person"
+                            },
                             url: "http://example.net/images/1.jpg"
                         });
                     ActivityObject.compressProperty(image, "author", function(err) {
