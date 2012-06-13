@@ -53,7 +53,7 @@ var assertValidList = function(doc, count) {
     }
 };
 
-var suite = vows.describe('follow person activity test');
+var suite = vows.describe('favorite object activity api test');
 
 // A batch to test following/unfollowing users
 
