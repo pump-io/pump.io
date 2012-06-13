@@ -33,6 +33,7 @@ var databank = require('databank'),
     reqUser = mw.reqUser,
     sameUser = mw.sameUser,
     NoSuchThingError = databank.NoSuchThingError,
+    AlreadyExistsError = databank.AlreadyExistsError,
     DEFAULT_ITEMS = 20,
     DEFAULT_ACTIVITIES = DEFAULT_ITEMS,
     DEFAULT_FAVORITES = DEFAULT_ITEMS,
@@ -559,7 +560,15 @@ var postActivity = function(req, res, next) {
             activity.apply(req.user.profile, this);
         },
         function(err) {
-            if (err) throw err;
+            if (err) {
+                if (err instanceof NoSuchThingError) {
+                    throw new HTTPError(err.message, 400);
+                } else if (err instanceof AlreadyExistsError) {
+                    throw new HTTPError(err.message, 400);
+                } else {
+                    throw err;
+                }
+            }
             // ...then persist...
             activity.save(this);
         },
