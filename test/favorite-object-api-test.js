@@ -143,11 +143,11 @@ suite.addBatch({
                 },
                 'it is empty': function(err, faves) {
                     assert.ifError(err);
-                    assert.include(faves, 'totalCount');
+                    assert.include(faves, 'totalItems');
                     assert.include(faves, 'items');
                     assert.include(faves, 'displayName');
                     assert.include(faves, 'id');
-                    assert.equal(faves.totalCount, 0);
+                    assert.equal(faves.totalItems, 0);
                     assert.lengthOf(faves.items, 0);
                 }
             },
@@ -232,11 +232,11 @@ suite.addBatch({
                     },
                     'it works': function(err, doc, act) {
                         assert.ifError(err);
-                        assert.include(doc, 'totalCount');
+                        assert.include(doc, 'totalItems');
                         assert.include(doc, 'items');
                         assert.include(doc, 'displayName');
                         assert.include(doc, 'id');
-                        assert.equal(doc.totalCount, 1);
+                        assert.equal(doc.totalItems, 1);
                         assert.lengthOf(doc.items, 1);
                     },
                     'it includes the actor': function(err, doc, act) {
@@ -407,11 +407,11 @@ suite.addBatch({
                     },
                     'it works': function(err, doc) {
                         assert.ifError(err);
-                        assert.include(doc, 'totalCount');
+                        assert.include(doc, 'totalItems');
                         assert.include(doc, 'items');
                         assert.include(doc, 'displayName');
                         assert.include(doc, 'id');
-                        assert.equal(doc.totalCount, 0);
+                        assert.equal(doc.totalItems, 0);
                         assert.lengthOf(doc.items, 0);
                     }
                 }
