@@ -233,6 +233,38 @@ suite.addBatch({
                 assert.lengthOf(faves, 0);
             }
         },
+        'and we get the count of favorites for a new user': {
+            topic: function(User) {
+                var cb = this.callback,
+                    props = {
+                        nickname: 'cookie',
+                        password: 'cookie'
+                    };
+                Step(
+                    function() {
+                        User.create(props, this);
+                    },
+                    function(err, user) {
+                        if (err) throw err;
+                        user.favoritesCount(this);
+                    },
+                    function(err, count) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, count);
+                        }
+                    }
+                );
+            },
+            'it works': function(err, count) {
+                assert.ifError(err);
+            },
+            'it looks right': function(err, count) {
+                assert.ifError(err);
+                assert.equal(count, 0);
+            }
+        },
         'and a new user favors an object': {
             topic: function(User) {
                 var cb = this.callback,
@@ -289,6 +321,19 @@ suite.addBatch({
                     assert.equal(faves[0].id, image.id);
                 }
             },
+            'and we check the user favorites count': {
+                topic: function(user, image) {
+                    var cb = this.callback;
+                    user.favoritesCount(cb);
+                },
+                'it works': function(err, count) {
+                    assert.ifError(err);
+                },
+                'it is correct': function(err, count) {
+                    assert.ifError(err);
+                    assert.equal(count, 1);
+                }
+            },
             'and we check the image favoriters list': {
                 topic: function(user, image) {
                     var cb = this.callback;
@@ -306,6 +351,19 @@ suite.addBatch({
                 'it has the right data': function(err, favers, user) {
                     assert.ifError(err);
                     assert.equal(favers[0].id, user.profile.id);
+                }
+            },
+            'and we check the image favoriters count': {
+                topic: function(user, image) {
+                    var cb = this.callback;
+                    image.favoritersCount(cb);
+                },
+                'it works': function(err, count) {
+                    assert.ifError(err);
+                },
+                'it is correct': function(err, count) {
+                    assert.ifError(err);
+                    assert.equal(count, 1);
                 }
             }
         },
@@ -385,6 +443,19 @@ suite.addBatch({
                     for (id in fm) {
                         assert.include(im, id);
                     }
+                }
+            },
+            'and we check the user favorites count': {
+                topic: function(user, image) {
+                    var cb = this.callback;
+                    user.favoritesCount(cb);
+                },
+                'it works': function(err, count) {
+                    assert.ifError(err);
+                },
+                'it is correct': function(err, count) {
+                    assert.ifError(err);
+                    assert.equal(count, 5000);
                 }
             },
             'and we check the images favoriters list': {
