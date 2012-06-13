@@ -150,6 +150,21 @@ vows.describe('activityobject class interface').addBatch({
                     assert.equal(review.objectType, 'review');
                     assert.equal(review.id, 'http://example.org/reviews/1');
                     assert.equal(review.content, "I hate your blog.");
+                },
+                'it has an expand() method': function(review) {
+                    assert.isFunction(review.expand);
+                },
+                'it has a favoritedBy() method': function(review) {
+                    assert.isFunction(review.favoritedBy);
+                },
+                'it has an unfavoritedBy() method': function(review) {
+                    assert.isFunction(review.unfavoritedBy);
+                },
+                'it has a getFavoriters() method': function(review) {
+                    assert.isFunction(review.getFavoriters);
+                },
+                'it has a favoritersCount() method': function(review) {
+                    assert.isFunction(review.favoritersCount);
                 }
             },
             'and we get a non-activityobject model object by its properties': {
