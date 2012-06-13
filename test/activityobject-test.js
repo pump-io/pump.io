@@ -814,6 +814,137 @@ vows.describe('activityobject class interface').addBatch({
                     assert.ifError(err);
                     assert.equal(count, 0);
                 }
+            },
+            'and we add a favoriter for an object': {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Place = require('../lib/model/place').Place,
+                        Person = require('../lib/model/person').Person,
+                        place = null,
+                        person = null;
+                    
+                    Step(
+                        function() {
+                            Place.create({displayName: "North Pole",
+                                          "position": "+90.0000+0.0000/"},
+                                         this.parallel());
+                            Person.create({displayName: "Robert Peary"},
+                                          this.parallel());
+                        },
+                        function(err, results1, results2) {
+                            if (err) throw err;
+                            place = results1;
+                            person = results2;
+                            place.favoritedBy(person.id, this);
+                        },
+                        function(err) {
+                            if (err) {
+                                cb(err, null, null);
+                            } else {
+                                cb(null, place, person);
+                            }
+                        }
+                    );
+                },
+                'it worked': function(err, place, person) {
+                    assert.ifError(err);
+                },
+                'and we get its favoriters list': {
+                    topic: function(place, person) {
+                        var cb = this.callback;
+                        place.getFavoriters(0, 20, function(err, favers) {
+                            cb(err, favers, person);
+                        });
+                    },
+                    'it worked': function(err, favers, person) {
+                        assert.ifError(err);
+                    } ,
+                    'it is the right size': function(err, favers, person) {
+                        assert.ifError(err);
+                        assert.isArray(favers);
+                        assert.lengthOf(favers, 1);
+                    },
+                    'it contains our data': function(err, favers, person) {
+                        assert.ifError(err);
+                        assert.equal(favers[0].id, person.id);
+                    }
+                },
+                'and we get its favoriters count': {
+                    topic: function(place, person) {
+                        place.favoritersCount(this.callback);
+                    },
+                    'it works': function(err, count) {
+                        assert.ifError(err);
+                    },
+                    'it returns one': function(err, count) {
+                        assert.ifError(err);
+                        assert.equal(count, 1);
+                    }
+                }
+            },
+            'and we add then remove a favoriter for an object': {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Place = require('../lib/model/place').Place,
+                        Person = require('../lib/model/person').Person,
+                        place = null,
+                        person = null;
+                    
+                    Step(
+                        function() {
+                            Place.create({displayName: "Montreal",
+                                          "position": "+45.5124-73.5547/"},
+                                         this.parallel());
+                            Person.create({displayName: "Evan Prodromou"},
+                                          this.parallel());
+                        },
+                        function(err, results1, results2) {
+                            if (err) throw err;
+                            place = results1;
+                            person = results2;
+                            place.favoritedBy(person.id, this);
+                        },
+                        function(err) {
+                            if (err) throw err;
+                            place.unfavoritedBy(person.id, this);
+                        },
+                        function(err) {
+                            if (err) {
+                                cb(err, null, null);
+                            } else {
+                                cb(null, place, person);
+                            }
+                        }
+                    );
+                },
+                'and we get its favoriters list': {
+                    topic: function(place, person) {
+                        var cb = this.callback;
+                        place.getFavoriters(0, 20, function(err, favers) {
+                            cb(err, favers, person);
+                        });
+                    },
+                    'it worked': function(err, favers, person) {
+                        assert.ifError(err);
+                    } ,
+                    'it is the right size': function(err, favers, person) {
+                        assert.ifError(err);
+                        assert.isArray(favers);
+                        assert.lengthOf(favers, 0);
+                    }
+                },
+                'and we get its favoriters count': {
+                    topic: function(place, person) {
+                        place.favoritersCount(this.callback);
+                    },
+                    'it works': function(err, count) {
+                        assert.ifError(err);
+                    },
+                    'it returns zero': function(err, count) {
+                        assert.ifError(err);
+                        assert.equal(count, 0);
+                    }
+                }
             }
         }
     }
