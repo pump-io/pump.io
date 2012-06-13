@@ -20,6 +20,7 @@ var assert = require('assert'),
     vows = require('vows'),
     databank = require('databank'),
     Step = require('step'),
+    _ = require('underscore'),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
     schema = require('../lib/schema').schema,
@@ -84,6 +85,12 @@ vows.describe('activityobject class interface').addBatch({
             },
             'it has an ensureObject member': function(ActivityObject) {
                 assert.isFunction(ActivityObject.ensureObject);
+            },
+            'it has a compressProperty member': function(ActivityObject) {
+                assert.isFunction(ActivityObject.compressProperty);
+            },
+            'it has an expandProperty member': function(ActivityObject) {
+                assert.isFunction(ActivityObject.expandProperty);
             },
             'it has an objectTypes member': function(ActivityObject) {
                 assert.isArray(ActivityObject.objectTypes);
@@ -293,6 +300,186 @@ vows.describe('activityobject class interface').addBatch({
                     assert.isString(comment.id);
                     assert.isString(comment.published);
                     assert.isString(comment.updated);
+                }
+            },
+            'and we compress an existing object property of an object': {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Image = require('../lib/model/image').Image,
+                        Person = require('../lib/model/person').Person,
+                        image = new Image({
+                            author: new Person({
+                                id: "urn:uuid:8a9d0e92-3210-4ea3-920f-3950ca8d5306",
+                                displayName: "Barney Miller"
+                            }),
+                            url: "http://example.net/images/1.jpg"
+                        });
+                    ActivityObject.compressProperty(image, "author", function(err) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, image);
+                        }
+                    });
+                },
+                'it works': function(err, image) {
+                    assert.ifError(err);
+                },
+                'the property is compressed': function(err, image) {
+                    assert.ifError(err);
+                    assert.include(image, 'author');
+                    assert.isObject(image.author);
+                    assert.instanceOf(image.author, require('../lib/model/person').Person);
+                    assert.include(image.author, 'id');
+                    assert.isString(image.author.id);
+                    assert.equal(image.author.id, "urn:uuid:8a9d0e92-3210-4ea3-920f-3950ca8d5306");
+                    assert.include(image.author, 'objectType');
+                    assert.isString(image.author.objectType);
+                    assert.equal(image.author.objectType, "person");
+                    assert.isFalse(_(image.author).has('displayName'));
+                }
+            },
+            'and we compress a non-existent object property of an object': {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Image = require('../lib/model/image').Image,
+                        image = new Image({
+                            url: "http://example.net/images/2.jpg"
+                        });
+                    ActivityObject.compressProperty(image, "author", function(err) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, image);
+                        }
+                    });
+                },
+                'it works': function(err, image) {
+                    assert.ifError(err);
+                },
+                'the property remains non-existent': function(err, image) {
+                    assert.ifError(err);
+                    assert.isFalse(_(image).has('author'));
+                }
+            },
+            'and we expand an existing object property of an object': {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Image = require('../lib/model/image').Image,
+                        Person = require('../lib/model/person').Person,
+                        image;
+
+                    Step(
+                        function() {
+                            Person.create({id: "urn:uuid:bbd313d1-6f8d-4d72-bc05-bde69ba795d7",
+                                           displayName: "Theo Kojak"},
+                                          this);
+                        },
+                        function(err, person) {
+                            if (err) throw err;
+                            image = new Image({
+                                url: "http://example.net/images/1.jpg",
+                                author: {id: person.id, objectType: "person"}
+                            });
+                            ActivityObject.expandProperty(image, "author", this);
+                        },
+                        function(err) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                cb(null, image);
+                            }
+                        }
+                    );
+                },
+                'it works': function(err, image) {
+                    assert.ifError(err);
+                },
+                'the property is expanded': function(err, image) {
+                    assert.ifError(err);
+                    assert.include(image, 'author');
+                    assert.isObject(image.author);
+                    assert.instanceOf(image.author, require('../lib/model/person').Person);
+                    assert.include(image.author, 'id');
+                    assert.isString(image.author.id);
+                    assert.equal(image.author.id, "urn:uuid:bbd313d1-6f8d-4d72-bc05-bde69ba795d7");
+                    assert.include(image.author, 'objectType');
+                    assert.isString(image.author.objectType);
+                    assert.equal(image.author.objectType, "person");
+                    assert.include(image.author, 'displayName');
+                    assert.isString(image.author.displayName);
+                    assert.equal(image.author.displayName, "Theo Kojak");
+                }
+            },
+            'and we expand a non-existent object property of an object': {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Image = require('../lib/model/image').Image,
+                        image = new Image({
+                            url: "http://example.net/images/4.jpg"
+                        });
+                    ActivityObject.expandProperty(image, "author", function(err) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, image);
+                        }
+                    });
+                },
+                'it works': function(err, image) {
+                    assert.ifError(err);
+                },
+                'the property remains non-existent': function(err, image) {
+                    assert.ifError(err);
+                    assert.isFalse(_(image).has('author'));
+                }
+            },
+            'and we compress a scalar property of an object': {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Image = require('../lib/model/image').Image,
+                        image = new Image({
+                            url: "http://example.net/images/5.jpg"
+                        });
+                    ActivityObject.compressProperty(image, "url", function(err) {
+                        if (err) {
+                            cb(null, image);
+                        } else {
+                            cb(new Error("Unexpected success"), null);
+                        }
+                    });
+                },
+                'it fails correctly': function(err, image) {
+                    assert.ifError(err);
+                },
+                'the property remains non-existent': function(err, image) {
+                    assert.ifError(err);
+                    assert.isString(image.url);
+                    assert.equal(image.url, "http://example.net/images/5.jpg");
+                }
+            },
+            'and we expand a scalar property of an object': {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Image = require('../lib/model/image').Image,
+                        image = new Image({
+                            url: "http://example.net/images/6.jpg"
+                        });
+                    ActivityObject.expandProperty(image, "url", function(err) {
+                        if (err) {
+                            cb(null, image);
+                        } else {
+                            cb(new Error("Unexpected success"), null);
+                        }
+                    });
+                },
+                'it fails correctly': function(err, image) {
+                    assert.ifError(err);
+                },
+                'the property remains non-existent': function(err, image) {
+                    assert.ifError(err);
+                    assert.isString(image.url);
+                    assert.equal(image.url, "http://example.net/images/6.jpg");
                 }
             },
             'and we create an activityobject with an author': {
