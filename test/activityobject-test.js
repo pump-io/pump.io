@@ -168,6 +168,9 @@ vows.describe('activityobject class interface').addBatch({
                 },
                 'it has a favoritersCount() method': function(review) {
                     assert.isFunction(review.favoritersCount);
+                },
+                'it has an expandFeeds() method': function(review) {
+                    assert.isFunction(review.expandFeeds);
                 }
             },
             'and we get a non-activityobject model object by its properties': {
@@ -944,6 +947,45 @@ vows.describe('activityobject class interface').addBatch({
                         assert.ifError(err);
                         assert.equal(count, 0);
                     }
+                }
+            },
+            'and we expand the feeds for an object': {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Place = require('../lib/model/place').Place,
+                        place = null;
+                    
+                    Step(
+                        function() {
+                            Place.create({displayName: "San Francisco",
+                                          "position": "+37.7771-122.4196/"},
+                                         this);
+                        },
+                        function(err, results) {
+                            if (err) throw err;
+                            place = results;
+                            place.expandFeeds(this);
+                        },
+                        function(err) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                cb(null, place);
+                            }
+                        }
+                    );
+                },
+                'it works': function(err, place) {
+                    assert.ifError(err);
+                },
+                'it adds the "likes" property': function(err, place) {
+                    assert.ifError(err);
+                    assert.includes(place, 'likes');
+                    assert.isObject(place.likes);
+                    assert.includes(place.likes, 'totalItems');
+                    assert.equal(place.likes.totalItems, 0);
+                    assert.includes(place.likes, 'url');
+                    assert.isString(place.likes.url);
                 }
             }
         }
