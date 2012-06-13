@@ -373,7 +373,7 @@ suite.addBatch({
                             httputil.postJSON(url, cred, act, this);
                         },
                         function(err, doc, response) {
-                            cb(err, doc);
+                            cb(err, doc, pairs);
                         }
                     );
                 },
