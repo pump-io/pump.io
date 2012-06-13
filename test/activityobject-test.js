@@ -92,6 +92,9 @@ vows.describe('activityobject class interface').addBatch({
             'it has an expandProperty member': function(ActivityObject) {
                 assert.isFunction(ActivityObject.expandProperty);
             },
+            'it has a getObjectStream member': function(ActivityObject) {
+                assert.isFunction(ActivityObject.getObjectStream);
+            },
             'it has an objectTypes member': function(ActivityObject) {
                 assert.isArray(ActivityObject.objectTypes);
             },
