@@ -309,6 +309,31 @@ var likes = function(type) {
         start = (req.query.offset) ? parseInt(req.query.offset, 10) : 0;
         cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_LIKES;
         end = start + cnt;
+
+        Step(
+            function() {
+                obj.favoritersCount(this);
+            },
+            function(err, count) {
+                if (err) {
+                    if (err instanceof NoSuchThingError) {
+                        collection.totalCount = 0;
+                        res.json(collection);
+                    } else {
+                        throw err;
+                    }
+                }
+                collection.totalCount = count;
+                obj.getFavoriters(start, end, this);
+            },
+            function(err, likers) {
+                if (err) {
+                    next(err);
+                } else {
+                    res.json(likers);
+                }
+            }
+        );
     };
 };
 
