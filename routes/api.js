@@ -33,8 +33,13 @@ var databank = require('databank'),
     reqUser = mw.reqUser,
     sameUser = mw.sameUser,
     NoSuchThingError = databank.NoSuchThingError,
-    DEFAULT_ACTIVITIES = 20,
-    DEFAULT_USERS = 20;
+    DEFAULT_ITEMS = 20,
+    DEFAULT_ACTIVITIES = DEFAULT_ITEMS,
+    DEFAULT_FAVORITES = DEFAULT_ITEMS,
+    DEFAULT_LIKES = DEFAULT_ITEMS,
+    DEFAULT_FOLLOWERS = DEFAULT_ITEMS,
+    DEFAULT_FOLLOWING = DEFAULT_ITEMS,
+    DEFAULT_USERS = DEFAULT_ITEMS;
 
 // Initialize the app controller
 
@@ -61,6 +66,8 @@ var addRoutes = function(app) {
     app.get('/api/user/:nickname/followers', clientAuth, reqUser, userFollowers);
     app.get('/api/user/:nickname/following', clientAuth, reqUser, userFollowing);
 
+    app.get('/api/user/:nickname/favorites', clientAuth, reqUser, userFavorites);
+
     for (i = 0; i < ActivityObject.objectTypes.length; i++) {
 
         type = ActivityObject.objectTypes[i];
@@ -78,6 +85,8 @@ var addRoutes = function(app) {
         app.get(url, clientAuth, requester(type), getter(type));
         app.put(url, userAuth, requester(type), authz, putter(type));
         app.del(url, userAuth, requester(type), authz, deleter(type));
+
+        app.get('/api/' + type + '/' + ':uuid/likes', clientAuth, requester(type), likes(type));
     }
     
     // Activities
@@ -282,6 +291,24 @@ var deleter = function(type) {
                 }
             }
         );
+    };
+};
+
+var likes = function(type) {
+    return function(req, res, next) {
+        var obj = req[type];
+
+        var collection = {
+            displayName: "People who like " + obj.displayName,
+            id: URLMaker.makeURL("api/" + type + "/" + obj.uuid + "/likes"),
+            items: []
+        };
+
+        var start, cnt, end;
+
+        start = (req.query.offset) ? parseInt(req.query.offset, 10) : 0;
+        cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_LIKES;
+        end = start + cnt;
     };
 };
 
@@ -644,7 +671,7 @@ var userFollowers = function(req, res, next) {
     var start, cnt, end;
 
     start = (req.query.offset) ? parseInt(req.query.offset, 10) : 0;
-    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_ACTIVITIES;
+    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_FOLLOWERS;
     end = start + cnt;
 
     Step(
@@ -686,7 +713,7 @@ var userFollowing = function(req, res, next) {
     var start, cnt, end;
 
     start = (req.query.offset) ? parseInt(req.query.offset, 10) : 0;
-    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_ACTIVITIES;
+    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_FOLLOWING;
     end = start + cnt;
 
     Step(
@@ -711,6 +738,47 @@ var userFollowing = function(req, res, next) {
                 next(err);
             } else {
                 collection.items = people;
+                res.json(collection);
+            }
+        }
+    );
+};
+
+var userFavorites = function(req, res, next) {
+    var collection = {
+        author: req.user.profile,
+        displayName: "Things that " + (req.user.profile.displayName || req.user.nickname) + " has favorited",
+        id: URLMaker.makeURL("api/user/" + req.user.nickname + "/favorites"),
+        items: []
+    };
+    var start, cnt, end;
+
+    start = (req.query.offset) ? parseInt(req.query.offset, 10) : 0;
+    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_FAVORITES;
+    end = start + cnt;
+
+    Step(
+        function() {
+            req.user.favoritesCount(this);
+        },
+        function(err, count) {
+            if (err) {
+                if (err instanceof NoSuchThingError) {
+                    collection.totalCount = 0;
+                    res.json(collection);
+                } else {
+                    throw err;
+                }
+            } else {
+                collection.totalCount = count;
+                req.user.getFavorites(start, end, this);
+            }
+        },
+        function(err, objects) {
+            if (err) {
+                next(err);
+            } else {
+                collection.items = objects;
                 res.json(collection);
             }
         }
