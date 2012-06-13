@@ -663,6 +663,19 @@ vows.describe('activityobject class interface').addBatch({
                     assert.equal(object.author.displayName, author.displayName);
                     assert.equal(object.author.preferredUsername, author.preferredUsername);
                 }
+            },
+            'and we get a non-existent stream of objects': {
+                topic: function(ActivityObject) {
+                    ActivityObject.getObjectStream('person', 'nonexistent', 0, 20, this.callback);
+                },
+                'it works': function(err, objects) {
+                    assert.ifError(err);
+                },
+                'it returns an empty array': function(err, objects) {
+                    assert.ifError(err);
+                    assert.isArray(objects);
+                    assert.lengthOf(objects, 0);
+                }
             }
         }
     }
