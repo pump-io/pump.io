@@ -20,7 +20,8 @@
                       "step": "0.0.x",
                       "oauth": "0.9.x",
                       "optimist": "0.3.x",
-                      "validator": "0.4.x"
+                      "validator": "0.4.x",
+                      "express-validator": "0.2.x"
 		    },
     "scripts": {
         "test": "vows test/*-test.js",
