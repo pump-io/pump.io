@@ -132,6 +132,12 @@ suite.addBatch({
         'it has a getIDs() method': function(err, stream) {
             assert.isFunction(stream.getIDs);
         },
+        'it has a getIDsGreaterThan() method': function(err, stream) {
+            assert.isFunction(stream.getIDsGreaterThan);
+        },
+        'it has a getIDsLessThan() method': function(err, stream) {
+            assert.isFunction(stream.getIDsLessThan);
+        },
         'it has a count() method': function(err, stream) {
             assert.isFunction(stream.count);
         },
@@ -583,6 +589,48 @@ suite.addBatch({
                 for (i = 0; i < chunk.length; i++) {
                     assert.isUndefined(seen[chunk[i]]);
                     seen[chunk[i]] = true;
+                }
+            },
+            "and we get IDs greater than some ID": {
+                topic: function(all, stream) {
+                    var cb = this.callback,
+                        target = all[4216];
+                    
+                    stream.getIDsGreaterThan(target, 20, function(err, results) {
+                        cb(err, results, all);
+                    });
+                },
+                'it works': function(err, ids, all) {
+                    assert.ifError(err);
+                    assert.isArray(ids);
+                    assert.isArray(all);
+                },
+                'it is the right size': function(err, ids, all) {
+                    assert.lengthOf(ids, 20);
+                },
+                'it has the right values': function(err, ids, all) {
+                    assert.deepEqual(ids, all.slice(4217, 4237));
+                }
+            },
+            "and we get IDs less than some ID": {
+                topic: function(all, stream) {
+                    var cb = this.callback,
+                        target = all[8423];
+                    
+                    stream.getIDsLessThan(target, 20, function(err, results) {
+                        cb(err, results, all);
+                    });
+                },
+                'it works': function(err, ids, all) {
+                    assert.ifError(err);
+                    assert.isArray(ids);
+                    assert.isArray(all);
+                },
+                'it is the right size': function(err, ids, all) {
+                    assert.lengthOf(ids, 20);
+                },
+                'it has the right values': function(err, ids, all) {
+                    assert.deepEqual(ids, all.slice(8403, 8423));
                 }
             }
         },
