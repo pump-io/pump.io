@@ -632,6 +632,48 @@ suite.addBatch({
                 'it has the right values': function(err, ids, all) {
                     assert.deepEqual(ids, all.slice(8403, 8423));
                 }
+            },
+            "and we get too many IDs greater than some ID at the end": {
+                topic: function(all, stream) {
+                    var cb = this.callback,
+                        target = all[9979];
+                    
+                    stream.getIDsGreaterThan(target, 40, function(err, results) {
+                        cb(err, results, all);
+                    });
+                },
+                'it works': function(err, ids, all) {
+                    assert.ifError(err);
+                    assert.isArray(ids);
+                    assert.isArray(all);
+                },
+                'it is the right size': function(err, ids, all) {
+                    assert.lengthOf(ids, 20);
+                },
+                'it has the right values': function(err, ids, all) {
+                    assert.deepEqual(ids, all.slice(9980, 10000));
+                }
+            },
+            "and we too many get IDs less than some ID toward the beginning": {
+                topic: function(all, stream) {
+                    var cb = this.callback,
+                        target = all[40];
+                    
+                    stream.getIDsLessThan(target, 60, function(err, results) {
+                        cb(err, results, all);
+                    });
+                },
+                'it works': function(err, ids, all) {
+                    assert.ifError(err);
+                    assert.isArray(ids);
+                    assert.isArray(all);
+                },
+                'it is the right size': function(err, ids, all) {
+                    assert.lengthOf(ids, 40);
+                },
+                'it has the right values': function(err, ids, all) {
+                    assert.deepEqual(ids, all.slice(0, 40));
+                }
             }
         },
         "and we try to get activities starting at a negative number": {
