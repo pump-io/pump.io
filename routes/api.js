@@ -1028,7 +1028,7 @@ var streamArgs = function(req, defaultCount, maxCount) {
 
     var args = {};
 
-    if (_(maxCount).empty()) {
+    if (_(maxCount).isUndefined()) {
         maxCount = 10 * defaultCount;
     }
 
