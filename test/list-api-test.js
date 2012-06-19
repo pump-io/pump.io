@@ -20,6 +20,8 @@ var assert = require('assert'),
     vows = require('vows'),
     Step = require('step'),
     _ = require('underscore'),
+    http = require('http'),
+    urlparse = require('url').parse,
     OAuth = require('oauth').OAuth,
     httputil = require('./lib/http'),
     oauthutil = require('./lib/oauth'),
@@ -169,6 +171,8 @@ suite.addBatch({
                 assert.include(act.object, 'totalItems');
                 assert.equal(act.object.totalItems, 0);
                 assert.include(act.object, 'items');
+                assert.include(act.object, 'links');
+                assert.include(act.object.links, 'self');
             },
             'and we get the list of lists owned by the user': {
                 topic: function(act, pair, cl) {
@@ -646,6 +650,333 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.lengthOf(list.items, 1);
                     assert.equal(list.items[0].id, person.id);
+                }
+            }
+        },
+        'and a user removes another person from a list they\'re not in': {
+            topic: function(cl) {
+                var cb = this.callback,
+                    pair = null,
+                    cred = null,
+                    url = 'http://localhost:4815/api/user/bunny/feed',
+                    list;
+
+                Step(
+                    function() {
+                        newPair(cl, "bunny", "number3", this);
+                    },
+                    function(err, results) {
+                        if (err) throw err;
+                        pair = results;
+                        cred = makeCred(cl, pair);
+                        var act = {
+                            verb: "post",
+                            object: {
+                                objectType: "collection",
+                                displayName: "Wailers"
+                            }
+                        };
+                        httputil.postJSON(url, cred, act, this);
+                    },
+                    function(err, doc, response) {
+                        if (err) throw err;
+                        list = doc;
+                        var act = {
+                            verb: "remove",
+                            object: {
+                                id: "urn:uuid:88b33906-b9c9-11e1-98f5-70f1a154e1aa",
+                                objectType: "person",
+                                displayName: "Rita Marley"
+                            },
+                            target: list
+                        };
+                        httputil.postJSON(url, cred, act, this);
+                    },
+                    function(err, doc, response) {
+                        if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                            cb(null);
+                        } else if (err) {
+                            cb(err);
+                        } else {
+                            cb(new Error("Unexpected success"));
+                        }
+                    }
+                );
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        'and a user adds another user to a list they don\'t own': {
+            topic: function(cl) {
+                var cb = this.callback,
+                    pair1 = null,
+                    pair2 = null,
+                    cred1 = null,
+                    cred2 = null,
+                    url1 = 'http://localhost:4815/api/user/burningspear/feed',
+                    url2 = 'http://localhost:4815/api/user/sugar/feed',
+                    list;
+
+                Step(
+                    function() {
+                        newPair(cl, "burningspear", "m4rcus", this.parallel());
+                        newPair(cl, "sugar", "minott", this.parallel());
+                    },
+                    function(err, results1, results2) {
+                        if (err) throw err;
+                        pair1 = results1;
+                        pair2 = results2;
+                        cred1 = makeCred(cl, pair1);
+                        cred2 = makeCred(cl, pair2);
+                        var act = {
+                            verb: "post",
+                            object: {
+                                objectType: "collection",
+                                displayName: "Rastafarians"
+                            }
+                        };
+                        httputil.postJSON(url1, cred1, act, this);
+                    },
+                    function(err, doc, response) {
+                        if (err) throw err;
+                        list = doc;
+                        var act = {
+                            verb: "add",
+                            object: {
+                                id: "urn:uuid:3db214bc-ba10-11e1-b5ac-70f1a154e1aa",
+                                objectType: "person",
+                                displayName: "Hillary Clinton"
+                            },
+                            target: list
+                        };
+                        httputil.postJSON(url2, cred2, act, this);
+                    },
+                    function(err, doc, response) {
+                        if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                            cb(null);
+                        } else if (err) {
+                            cb(err);
+                        } else {
+                            cb(new Error("Unexpected success"));
+                        }
+                    }
+                );
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        'and a user removes another user from a list they don\'t own': {
+            topic: function(cl) {
+                var cb = this.callback,
+                    pair1 = null,
+                    pair2 = null,
+                    cred1 = null,
+                    cred2 = null,
+                    url1 = 'http://localhost:4815/api/user/junior/feed',
+                    url2 = 'http://localhost:4815/api/user/marcia/feed',
+                    list;
+
+                Step(
+                    function() {
+                        newPair(cl, "junior", "murvin", this.parallel());
+                        newPair(cl, "marcia", "griffiths", this.parallel());
+                    },
+                    function(err, results1, results2) {
+                        if (err) throw err;
+                        pair1 = results1;
+                        pair2 = results2;
+                        cred1 = makeCred(cl, pair1);
+                        cred2 = makeCred(cl, pair2);
+                        var act = {
+                            verb: "post",
+                            object: {
+                                objectType: "collection",
+                                displayName: "Police"
+                            }
+                        };
+                        httputil.postJSON(url1, cred1, act, this);
+                    },
+                    function(err, doc, response) {
+                        if (err) throw err;
+                        list = doc;
+                        var act = {
+                            verb: "add",
+                            object: {
+                                id: "urn:uuid:acfadb0a-ba16-11e1-bcbc-70f1a154e1aa",
+                                objectType: "person",
+                                displayName: "J. Edgar Hoover"
+                            },
+                            target: list
+                        };
+                        httputil.postJSON(url1, cred1, act, this);
+                    },
+                    function(err, doc, response) {
+                        if (err) {
+                            // Got an error up to here; it's an error
+                            cb(err);
+                            return;
+                        }
+                        var act = {
+                            verb: "remove",
+                            object: doc.object,
+                            target: list
+                        };
+                        httputil.postJSON(url2, cred2, act, this);
+                    },
+                    function(err, doc, response) {
+                        if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                            cb(null);
+                        } else if (err) {
+                            cb(err);
+                        } else {
+                            cb(new Error("Unexpected success"));
+                        }
+                    }
+                );
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        'and a user creates a list': {
+            topic: function(cl) {
+                var cb = this.callback,
+                    pair = null,
+                    cred = null,
+                    url = 'http://localhost:4815/api/user/jimmy/feed';
+
+                Step(
+                    function() {
+                        newPair(cl, "jimmy", "cliff", this);
+                    },
+                    function(err, results) {
+                        if (err) throw err;
+                        pair = results;
+                        cred = makeCred(cl, pair);
+                        var act = {
+                            verb: "post",
+                            object: {
+                                objectType: "collection",
+                                displayName: "Beautiful People"
+                            }
+                        };
+                        httputil.postJSON(url, cred, act, this);
+                    },
+                    function(err, doc, response) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, cred, doc.object);
+                        }
+                    }
+                );
+            },
+            'it works': function(err, cred, list) {
+                assert.ifError(err);
+            },
+            'and we try to read it with no credentials': {
+                topic: function(cred, list, cl) {
+                    var cb = this.callback,
+                        parsed = urlparse(list.links.self),
+                        options = {
+                            host: 'localhost',
+                            port: 4815,
+                            path: parsed.path
+                        };
+                    http.get(options, function(res) {
+                        if (res.statusCode >= 400 && res.statusCode < 500) {
+                            cb(null);
+                        } else {
+                            cb(new Error("Unexpected status code"));
+                        }
+                    }).on('error', function(err) {
+                        cb(err);
+                    });
+                },
+                'it fails correctly': function(err) {
+                    assert.ifError(err);
+                }
+            },
+            'and we read it with another user\'s credentials': {
+                topic: function(cred, list, cl) {
+                    var cb = this.callback,
+                        other = null;
+
+                    Step(
+                        function() {
+                            newPair(cl, "ziggy", "blahblah", this);
+                        },
+                        function(err, results) {
+                            if (err) throw err;
+                            other = makeCred(cl, results);
+                            httputil.getJSON(list.links.self, cred, this);
+                        },
+                        function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                'it fails correctly': function(err) {
+                    assert.ifError(err);
+                }
+            },
+            'and we read it with only client credentials': {
+                topic: function(cred, list, cl) {
+                    var cb = this.callback;
+
+                    Step(
+                        function() {
+                            var justcl = makeCred(cl, {});
+                            httputil.getJSON(list.links.self, justcl, this);
+                        },
+                        function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                'it fails correctly': function(err) {
+                    assert.ifError(err);
+                }
+            },
+            'and we read it with the creator credentials': {
+                topic: function(cred, list, cl) {
+                    var cb = this.callback;
+
+                    Step(
+                        function() {
+                            httputil.getJSON(list.links.self, cred, this);
+                        },
+                        function(err, doc, response) {
+                            cb(err, doc);
+                        }
+                    );
+                },
+                'it works': function(err, doc) {
+                    assert.ifError(err);
+                },
+                'it looks right': function(err, doc) {
+                    assert.equal(doc.objectType, 'collection');
+                    assert.equal(doc.displayName, 'Beautiful People');
+                    assert.include(doc, 'url');
+                    assert.include(doc, 'totalItems');
+                    assert.equal(doc.totalItems, 0);
+                    assert.include(doc, 'items');
+                    assert.include(doc, 'links');
+                    assert.include(doc.links, 'self');
                 }
             }
         }
