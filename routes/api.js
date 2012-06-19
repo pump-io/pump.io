@@ -19,7 +19,9 @@
 var databank = require('databank'),
     _ = require('underscore'),
     Step = require('step'),
-    check = require('validator').check,
+    validator = require('validator'),
+    check = validator.check,
+    sanitize = validator.sanitize,
     HTTPError = require('../lib/httperror').HTTPError,
     Activity = require('../lib/model/activity').Activity,
     ActivityObject = require('../lib/model/activityobject').ActivityObject,
@@ -40,7 +42,14 @@ var databank = require('databank'),
     DEFAULT_LIKES = DEFAULT_ITEMS,
     DEFAULT_FOLLOWERS = DEFAULT_ITEMS,
     DEFAULT_FOLLOWING = DEFAULT_ITEMS,
-    DEFAULT_USERS = DEFAULT_ITEMS;
+    DEFAULT_USERS = DEFAULT_ITEMS,
+    MAX_ITEMS = DEFAULT_ITEMS * 10,
+    MAX_ACTIVITIES = MAX_ITEMS,
+    MAX_FAVORITES = MAX_ITEMS,
+    MAX_LIKES = MAX_ITEMS,
+    MAX_FOLLOWERS = MAX_ITEMS,
+    MAX_FOLLOWING = MAX_ITEMS,
+    MAX_USERS = MAX_ITEMS;
 
 // Initialize the app controller
 
@@ -305,11 +314,14 @@ var likes = function(type) {
             items: []
         };
 
-        var start, cnt, end;
+        var args;
 
-        start = (req.query.offset) ? parseInt(req.query.offset, 10) : 0;
-        cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_LIKES;
-        end = start + cnt;
+        try {
+            args = streamArgs(req, DEFAULT_LIKES, MAX_LIKES);
+        } catch (e) {
+            next(e);
+            return;
+        }
 
         Step(
             function() {
@@ -325,7 +337,7 @@ var likes = function(type) {
                     }
                 }
                 collection.totalItems = count;
-                obj.getFavoriters(start, end, this);
+                obj.getFavoriters(args.start, args.end, this);
             },
             function(err, likers) {
                 if (err) {
@@ -470,7 +482,6 @@ var createUser = function (req, res, next) {
 };
 
 var listUsers = function(req, res, next) {
-    var start, cnt, end;
 
     var collection = {
         displayName: "Users of this service",
@@ -478,9 +489,14 @@ var listUsers = function(req, res, next) {
         objectTypes: ["user"]
     };
 
-    start = (req.query.offset) ? parseInt(req.query.offset, 10) : 0;
-    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_USERS;
-    end = start + cnt;
+    var args;
+
+    try {
+        args = streamArgs(req, DEFAULT_USERS, MAX_USERS);
+    } catch (e) {
+        next(e);
+        return;
+    }
 
     Step(
         function () {
@@ -489,7 +505,7 @@ var listUsers = function(req, res, next) {
         function(err, totalUsers) {
             if (err) throw err;
             collection.totalItems = totalUsers;
-            bank.slice('userlist', 0, start, end, this);
+            bank.slice('userlist', 0, args.start, args.end, this);
         },
         function(err, userIds) {
             if (err) {
@@ -603,11 +619,14 @@ var userStream = function(req, res, next) {
         items: []
     };
 
-    var start, cnt, end;
+    var args;
 
-    start = (req.query.offset) ? parseInt(req.query.offset, 10) : 0;
-    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_ACTIVITIES;
-    end = start + cnt;
+    try {
+        args = streamArgs(req, DEFAULT_ACTIVITIES, MAX_ACTIVITIES);
+    } catch (e) {
+        next(e);
+        return;
+    }
 
     Step(
         function() {
@@ -624,7 +643,7 @@ var userStream = function(req, res, next) {
                 }
             } else {
                 collection.totalItems = totalOutbox;
-                req.user.getStream(start, end, this);
+                req.user.getStream(args.start, args.end, this);
             }
         },
         function(err, activities) {
@@ -660,11 +679,15 @@ var userInbox = function(req, res, next) {
         objectTypes: ["activity"],
         items: []
     };
-    var start, cnt, end;
 
-    start = (req.query.offset) ? parseInt(req.query.offset, 10) : 0;
-    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_ACTIVITIES;
-    end = start + cnt;
+    var args;
+
+    try {
+        args = streamArgs(req, DEFAULT_ACTIVITIES, MAX_ACTIVITIES);
+    } catch (e) {
+        next(e);
+        return;
+    }
 
     Step(
         function() {
@@ -681,7 +704,7 @@ var userInbox = function(req, res, next) {
                 }
             } else {
                 collection.totalItems = inboxCount;
-                req.user.getInbox(start, end, this);
+                req.user.getInbox(args.start, args.end, this);
             }
         },
         function(err, activities) {
@@ -703,11 +726,15 @@ var userFollowers = function(req, res, next) {
         objectTypes: ["person"],
         items: []
     };
-    var start, cnt, end;
 
-    start = (req.query.offset) ? parseInt(req.query.offset, 10) : 0;
-    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_FOLLOWERS;
-    end = start + cnt;
+    var args;
+
+    try {
+        args = streamArgs(req, DEFAULT_FOLLOWERS, MAX_FOLLOWERS);
+    } catch (e) {
+        next(e);
+        return;
+    }
 
     Step(
         function() {
@@ -723,7 +750,7 @@ var userFollowers = function(req, res, next) {
                 }
             } else {
                 collection.totalItems = count;
-                req.user.getFollowers(start, end, this);
+                req.user.getFollowers(args.start, args.end, this);
             }
         },
         function(err, people) {
@@ -745,11 +772,15 @@ var userFollowing = function(req, res, next) {
         objectTypes: ["person"],
         items: []
     };
-    var start, cnt, end;
 
-    start = (req.query.offset) ? parseInt(req.query.offset, 10) : 0;
-    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_FOLLOWING;
-    end = start + cnt;
+    var args;
+
+    try {
+        args = streamArgs(req, DEFAULT_FOLLOWING, MAX_FOLLOWING);
+    } catch (e) {
+        next(e);
+        return;
+    }
 
     Step(
         function() {
@@ -765,7 +796,7 @@ var userFollowing = function(req, res, next) {
                 }
             } else {
                 collection.totalItems = count;
-                req.user.getFollowing(start, end, this);
+                req.user.getFollowing(args.start, args.end, this);
             }
         },
         function(err, people) {
@@ -786,11 +817,15 @@ var userFavorites = function(req, res, next) {
         id: URLMaker.makeURL("api/user/" + req.user.nickname + "/favorites"),
         items: []
     };
-    var start, cnt, end;
 
-    start = (req.query.offset) ? parseInt(req.query.offset, 10) : 0;
-    cnt = (req.query.cnt) ? parseInt(req.query.cnt, 10) : DEFAULT_FAVORITES;
-    end = start + cnt;
+    var args;
+
+    try {
+        args = streamArgs(req, DEFAULT_FAVORITES, MAX_FAVORITES);
+    } catch (e) {
+        next(e);
+        return;
+    }
 
     Step(
         function() {
@@ -806,7 +841,7 @@ var userFavorites = function(req, res, next) {
                 }
             } else {
                 collection.totalItems = count;
-                req.user.getFavorites(start, end, this);
+                req.user.getFavorites(args.start, args.end, this);
             }
         },
         function(err, objects) {
@@ -983,5 +1018,65 @@ var clientReg = function (req, res, next) {
     } else {
         next(new HTTPError("Invalid registration type", 400));
         return;
+    }
+};
+
+// Since most stream endpoints take the same arguments,
+// consolidate validation and parsing here
+
+var streamArgs = function(req, defaultCount, maxCount) {
+
+    var args = {};
+
+    try {
+        if (_(maxCount).isUndefined()) {
+            maxCount = 10 * defaultCount;
+        }
+
+        if (_(req.query).has('count')) {
+            check(req.query.count, "Count must be between 0 and " + maxCount).isInt().min(0).max(maxCount);
+            args.count = sanitize(req.query.count).toInt();
+        } else {
+            args.count = defaultCount;
+        }
+
+        // XXX: Check 'before' and 'since' for injection...?
+        // XXX: Check 'before' and 'since' for URI...?
+
+        if (_(req.query).has('before')) {
+            check(req.query.before).notEmpty();
+            args.before = sanitize(req.query.before).trim();
+        }
+
+        if (_(req.query).has('since')) {
+            if (_(args).has('before')) {
+                throw new Error("Can't have both 'before' and 'since' parameters");
+            }
+            check(req.query.since).notEmpty();
+            args.since = sanitize(req.query.since).trim();
+        }
+
+        if (_(req.query).has('offset')) {
+            if (_(args).has('before')) {
+                throw new Error("Can't have both 'before' and 'offset' parameters");
+            }
+            if (_(args).has('since')) {
+                throw new Error("Can't have both 'since' and 'offset' parameters");
+            }
+            check(req.query.offset, "Offset must be an integer greater than or equal to zero").isInt().min(0);
+            args.start = sanitize(req.query.offset).toInt();
+        }
+
+        if (!_(req.query).has('offset') && !_(req.query).has('since') && !_(req.query).has('before')) {
+            args.start = 0;
+        }
+
+        if (_(args).has('start')) {
+            args.end = args.start + args.count;
+        }
+
+        return args;
+    } catch (e) {
+        throw new HTTPError(e.message, 400);
     }
 };

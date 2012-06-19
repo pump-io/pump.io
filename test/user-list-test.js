@@ -492,7 +492,7 @@ suite.addBatch({
                         'and we fetch all users': {
                             topic: function(ignore1, ignore2, ignore3, cl) {
                                 var cb = this.callback;
-                                httputil.getJSON('http://localhost:4815/api/users?cnt=50',
+                                httputil.getJSON('http://localhost:4815/api/users?count=50',
                                                  {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
                                                  cb);
                             },
@@ -534,7 +534,7 @@ suite.addBatch({
                                     function() {
                                         var i, group = this.group();
                                         for (i = 0; i < 50; i += 10) {
-                                            httputil.getJSON('http://localhost:4815/api/users?offset='+i+'&cnt=10',
+                                            httputil.getJSON('http://localhost:4815/api/users?offset='+i+'&count=10',
                                                              {consumer_key: cl.client_id, 
                                                               consumer_secret: cl.client_secret},
                                                              group());

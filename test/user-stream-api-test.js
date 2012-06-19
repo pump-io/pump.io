@@ -399,4 +399,307 @@ suite.addBatch({
     }
 });
 
+// Test arguments to the feed
+
+var BASE = "http://localhost:4815/api/user/alicia/feed";
+var INBOX = "http://localhost:4815/api/user/alicia/inbox";
+
+var justDoc = function(callback) {
+    return function(err, doc, resp) {
+        callback(err, doc);
+    };
+};
+
+var docPlus = function(callback, plus) {
+    return function(err, doc, resp) {
+        callback(err, doc, plus);
+    };
+};
+
+var getDoc = function(url) {
+    return function(cred) {
+        httputil.getJSON(url,
+                         cred,
+                         justDoc(this.callback));
+    };
+};
+
+var failDoc = function(url) {
+    return function(cred) { 
+        var cb = this.callback;
+        httputil.getJSON(url, cred, function(err, doc, resp) {
+            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                cb(null);
+            } else if (err) {
+                cb(err);
+            } else {
+                cb(new Error("Unexpected success"));
+            }
+        });
+    };
+};
+
+var cmpDoc = function(url) {
+    return function(full, cred) {
+        httputil.getJSON(url,
+                         cred,
+                         docPlus(this.callback, full));
+    };
+};
+
+var itWorks = function(err, doc) {
+    assert.ifError(err, doc);
+};
+
+var itFails = function(err) {
+    assert.ifError(err);
+};
+
+var validForm = function(count, total) {
+    return function(err, doc) {
+        assert.include(doc, 'author');
+        assert.include(doc.author, 'id');
+        assert.include(doc.author, 'displayName');
+        assert.include(doc.author, 'objectType');
+        assert.include(doc, 'totalItems');
+        assert.include(doc, 'items');
+        assert.include(doc, 'displayName');
+        assert.include(doc, 'id');
+        if (_(count).isNumber()) {
+            assert.lengthOf(doc.items, count);
+        }
+        if (_(total).isNumber()) {
+            assert.equal(doc.totalItems, total);
+        }
+    };
+};
+
+var validData = function(start, end) {
+    return function(err, doc, full) {
+        assert.deepEqual(doc.items, full.items.slice(start, end));
+    };
+};
+
+suite.addBatch({
+    'When we set up the app': {
+        topic: function() {
+            setupApp(this.callback);
+        },
+        teardown: function(app) {
+            if (app && app.close) {
+                app.close();
+            }
+        },
+        'it works': function(err, app) {
+            assert.ifError(err);
+        },
+        'and we get new credentials': {
+            topic: function(app) {
+                newCredentials("alicia", "base*station", this.callback);
+            },
+            'it works': function(err, cred) {
+                assert.ifError(err);
+                assert.isObject(cred);
+                assert.isString(cred.consumer_key);
+                assert.isString(cred.consumer_secret);
+                assert.isString(cred.token);
+                assert.isString(cred.token_secret);
+            },
+            'and we post a bunch of activities': {
+                topic: function(cred) {
+                    var cb = this.callback;
+
+                    Step(
+                        function() {
+                            var group = this.group(),
+                                i,
+                                act = {
+                                    verb: "post",
+                                    object: {
+                                        objectType: "note",
+                                        content: "Hello, World!"
+                                    }
+                                },
+                                newAct,
+                                url = BASE;
+
+                            for (i = 0; i < 100; i++) {
+                                newAct = JSON.parse(JSON.stringify(act));
+                                newAct.object.content = "Hello, World #" + i + "!";
+                                httputil.postJSON(url, cred, newAct, group());
+                            }
+                        },
+                        function(err) {
+                            cb(err);
+                        }
+                    );
+                },
+                'it works': function(err) {
+                    assert.ifError(err);
+                },
+                'and we get the default feed': {
+                    topic: getDoc(BASE),
+                    'it works': itWorks,
+                    'it looks right': validForm(20, 100)
+                },
+                'and we get the full feed': {
+                    topic: getDoc(BASE + "?count=100"),
+                    'it works': itWorks,
+                    'it looks right': validForm(100, 100),
+                    'and we get the feed with a non-zero offset': {
+                        topic: cmpDoc(BASE + "?offset=50"),
+                        'it works': itWorks,
+                        'it looks right': validForm(20, 100),
+                        'it has the right data': validData(50, 70)
+                    },
+                    'and we get the feed with a zero offset': {
+                        topic: cmpDoc(BASE + "?offset=0"),
+                        'it works': itWorks,
+                        'it looks right': validForm(20, 100),
+                        'it has the right data': validData(0, 20)
+                    },
+                    'and we get the feed with a non-zero offset and count': {
+                        topic: cmpDoc(BASE + "?offset=20&count=20"),
+                        'it works': itWorks,
+                        'it looks right': validForm(20, 100),
+                        'it has the right data': validData(20, 40)
+                    },
+                    'and we get the feed with a zero offset and count': {
+                        topic: cmpDoc(BASE + "?offset=0"),
+                        'it works': itWorks,
+                        'it looks right': validForm(20, 100),
+                        'it has the right data': validData(0, 20)
+                    },
+                    'and we get the feed with a non-zero count': {
+                        topic: cmpDoc(BASE + "?count=50"),
+                        'it works': itWorks,
+                        'it looks right': validForm(50, 100),
+                        'it has the right data': validData(0, 50)
+                    }
+                },
+                'and we get the feed with a negative count': {
+                    topic: failDoc(BASE + "?count=-30"),
+                    'it fails correctly': itFails
+                },
+                'and we get the feed with a negative offset': {
+                    topic: failDoc(BASE + "?offset=-50"),
+                    'it fails correctly': itFails
+                },
+                'and we get the feed with a zero offset and zero count': {
+                    topic: getDoc(BASE + "?offset=0&count=0"),
+                    'it works': itWorks,
+                    'it looks right': validForm(0, 100)
+                },
+                'and we get the feed with a non-zero offset and zero count': {
+                    topic: getDoc(BASE + "?offset=30&count=0"),
+                    'it works': itWorks,
+                    'it looks right': validForm(0, 100)
+                },
+                'and we get the feed with a non-integer count': {
+                    topic: failDoc(BASE + "?count=foo"),
+                    'it fails correctly': itFails
+                },
+                'and we get the feed with a non-integer offset': {
+                    topic: failDoc(BASE + "?offset=bar"),
+                    'it fails correctly': itFails
+                },
+                'and we get the feed with a too-large offset': {
+                    topic: getDoc(BASE + "?offset=200"),
+                    'it works': itWorks,
+                    'it looks right': validForm(0, 100)
+                },
+                'and we get the feed with a too-large count': {
+                    topic: getDoc(BASE + "?count=150"),
+                    'it works': itWorks,
+                    'it looks right': validForm(100, 100)
+                },
+                'and we get the feed with a disallowed count': {
+                    topic: failDoc(BASE + "?count=1000"),
+                    'it fails correctly': itFails
+                },
+                'and we get the default inbox': {
+                    topic: getDoc(INBOX),
+                    'it works': itWorks,
+                    'it looks right': validForm(20, 100)
+                },
+                'and we get the full inbox': {
+                    topic: getDoc(INBOX + "?count=100"),
+                    'it works': itWorks,
+                    'it looks right': validForm(100, 100),
+                    'and we get the inbox with a non-zero offset': {
+                        topic: cmpDoc(INBOX + "?offset=50"),
+                        'it works': itWorks,
+                        'it looks right': validForm(20, 100),
+                        'it has the right data': validData(50, 70)
+                    },
+                    'and we get the inbox with a zero offset': {
+                        topic: cmpDoc(INBOX + "?offset=0"),
+                        'it works': itWorks,
+                        'it looks right': validForm(20, 100),
+                        'it has the right data': validData(0, 20)
+                    },
+                    'and we get the inbox with a non-zero offset and count': {
+                        topic: cmpDoc(INBOX + "?offset=20&count=20"),
+                        'it works': itWorks,
+                        'it looks right': validForm(20, 100),
+                        'it has the right data': validData(20, 40)
+                    },
+                    'and we get the inbox with a zero offset and count': {
+                        topic: cmpDoc(INBOX + "?offset=0"),
+                        'it works': itWorks,
+                        'it looks right': validForm(20, 100),
+                        'it has the right data': validData(0, 20)
+                    },
+                    'and we get the inbox with a non-zero count': {
+                        topic: cmpDoc(INBOX + "?count=50"),
+                        'it works': itWorks,
+                        'it looks right': validForm(50, 100),
+                        'it has the right data': validData(0, 50)
+                    }
+                },
+                'and we get the inbox with a negative count': {
+                    topic: failDoc(INBOX + "?count=-30"),
+                    'it fails correctly': itFails
+                },
+                'and we get the inbox with a negative offset': {
+                    topic: failDoc(INBOX + "?offset=-50"),
+                    'it fails correctly': itFails
+                },
+                'and we get the inbox with a zero offset and zero count': {
+                    topic: getDoc(INBOX + "?offset=0&count=0"),
+                    'it works': itWorks,
+                    'it looks right': validForm(0, 100)
+                },
+                'and we get the inbox with a non-zero offset and zero count': {
+                    topic: getDoc(INBOX + "?offset=30&count=0"),
+                    'it works': itWorks,
+                    'it looks right': validForm(0, 100)
+                },
+                'and we get the inbox with a non-integer count': {
+                    topic: failDoc(INBOX + "?count=foo"),
+                    'it fails correctly': itFails
+                },
+                'and we get the inbox with a non-integer offset': {
+                    topic: failDoc(INBOX + "?offset=bar"),
+                    'it fails correctly': itFails
+                },
+                'and we get the inbox with a too-large offset': {
+                    topic: getDoc(INBOX + "?offset=200"),
+                    'it works': itWorks,
+                    'it looks right': validForm(0, 100)
+                },
+                'and we get the inbox with a too-large count': {
+                    topic: getDoc(INBOX + "?count=150"),
+                    'it works': itWorks,
+                    'it looks right': validForm(100, 100)
+                },
+                'and we get the inbox with a disallowed count': {
+                    topic: failDoc(INBOX + "?count=1000"),
+                    'it fails correctly': itFails
+                }
+            }
+        }
+    }
+});
+
 suite['export'](module);

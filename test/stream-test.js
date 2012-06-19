@@ -132,6 +132,12 @@ suite.addBatch({
         'it has a getIDs() method': function(err, stream) {
             assert.isFunction(stream.getIDs);
         },
+        'it has a getIDsGreaterThan() method': function(err, stream) {
+            assert.isFunction(stream.getIDsGreaterThan);
+        },
+        'it has a getIDsLessThan() method': function(err, stream) {
+            assert.isFunction(stream.getIDsLessThan);
+        },
         'it has a count() method': function(err, stream) {
             assert.isFunction(stream.count);
         },
@@ -584,6 +590,146 @@ suite.addBatch({
                     assert.isUndefined(seen[chunk[i]]);
                     seen[chunk[i]] = true;
                 }
+            },
+            "and we get IDs greater than some ID": {
+                topic: function(all, stream) {
+                    var cb = this.callback,
+                        target = all[4216];
+                    
+                    stream.getIDsGreaterThan(target, 20, function(err, results) {
+                        cb(err, results, all);
+                    });
+                },
+                'it works': function(err, ids, all) {
+                    assert.ifError(err);
+                    assert.isArray(ids);
+                    assert.isArray(all);
+                },
+                'it is the right size': function(err, ids, all) {
+                    assert.lengthOf(ids, 20);
+                },
+                'it has the right values': function(err, ids, all) {
+                    assert.deepEqual(ids, all.slice(4217, 4237));
+                }
+            },
+            "and we get IDs less than some ID": {
+                topic: function(all, stream) {
+                    var cb = this.callback,
+                        target = all[8423];
+                    
+                    stream.getIDsLessThan(target, 20, function(err, results) {
+                        cb(err, results, all);
+                    });
+                },
+                'it works': function(err, ids, all) {
+                    assert.ifError(err);
+                    assert.isArray(ids);
+                    assert.isArray(all);
+                },
+                'it is the right size': function(err, ids, all) {
+                    assert.lengthOf(ids, 20);
+                },
+                'it has the right values': function(err, ids, all) {
+                    assert.deepEqual(ids, all.slice(8403, 8423));
+                }
+            },
+            "and we get too many IDs greater than some ID at the end": {
+                topic: function(all, stream) {
+                    var cb = this.callback,
+                        target = all[9979];
+                    
+                    stream.getIDsGreaterThan(target, 40, function(err, results) {
+                        cb(err, results, all);
+                    });
+                },
+                'it works': function(err, ids, all) {
+                    assert.ifError(err);
+                    assert.isArray(ids);
+                    assert.isArray(all);
+                },
+                'it is the right size': function(err, ids, all) {
+                    assert.lengthOf(ids, 20);
+                },
+                'it has the right values': function(err, ids, all) {
+                    assert.deepEqual(ids, all.slice(9980, 10000));
+                }
+            },
+            "and we too many get IDs less than some ID toward the beginning": {
+                topic: function(all, stream) {
+                    var cb = this.callback,
+                        target = all[40];
+                    
+                    stream.getIDsLessThan(target, 60, function(err, results) {
+                        cb(err, results, all);
+                    });
+                },
+                'it works': function(err, ids, all) {
+                    assert.ifError(err);
+                    assert.isArray(ids);
+                    assert.isArray(all);
+                },
+                'it is the right size': function(err, ids, all) {
+                    assert.lengthOf(ids, 40);
+                },
+                'it has the right values': function(err, ids, all) {
+                    assert.deepEqual(ids, all.slice(0, 40));
+                }
+            },
+            "and we get a negative number of IDs less than an ID": {
+                topic: function(all, stream) {
+                    var cb = this.callback;
+                    stream.getIDsLessThan(all[100], -50, function(err, ids) {
+                        if (err) {
+                            cb(null);
+                        } else {
+                            cb(new Error("Unexpected success"));
+                        }
+                    });
+                },
+                'it fails correctly': function(err) {
+                    assert.ifError(err);
+                }
+            },
+            "and we get zero IDs less than an ID": {
+                topic: function(all, stream) {
+                    var cb = this.callback;
+                    stream.getIDsLessThan(all[100], 0, cb);
+                },
+                'it works': function(err, ids) {
+                    assert.ifError(err);
+                    assert.isArray(ids);
+                },
+                'it returns the right value': function(err, ids) {
+                    assert.lengthOf(ids, 0);
+                }
+            },
+            "and we get a negative number of IDs greater than an ID": {
+                topic: function(all, stream) {
+                    var cb = this.callback;
+                    stream.getIDsGreaterThan(all[100], -50, function(err, ids) {
+                        if (err) {
+                            cb(null);
+                        } else {
+                            cb(new Error("Unexpected success"));
+                        }
+                    });
+                },
+                'it fails correctly': function(err) {
+                    assert.ifError(err);
+                }
+            },
+            "and we get zero IDs greater than an ID": {
+                topic: function(all, stream) {
+                    var cb = this.callback;
+                    stream.getIDsGreaterThan(all[100], 0, cb);
+                },
+                'it works': function(err, ids) {
+                    assert.ifError(err);
+                    assert.isArray(ids);
+                },
+                'it returns the right value': function(err, ids) {
+                    assert.lengthOf(ids, 0);
+                }
             }
         },
         "and we try to get activities starting at a negative number": {
@@ -641,6 +787,66 @@ suite.addBatch({
             },
             'results are empty': function(err, results) {
                 assert.isEmpty(results);
+            }
+        },
+        "and we get IDs greater than an ID not in the stream": {
+            topic: function(stream) {
+                var cb = this.callback;
+                stream.getIDsGreaterThan('http://example.org/nonexistent', 20, function(err, ids) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success!"));
+                    }
+                });
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        "and we get IDs less than an ID not in the stream": {
+            topic: function(stream) {
+                var cb = this.callback;
+                stream.getIDsLessThan('http://example.org/nonexistent', 20, function(err, ids) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success!"));
+                    }
+                });
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        "and we get zero IDs greater than an ID not in the stream": {
+            topic: function(stream) {
+                var cb = this.callback;
+                stream.getIDsGreaterThan('http://example.org/nonexistent', 0, function(err, ids) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success!"));
+                    }
+                });
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
+            }
+        },
+        "and we get zero IDs less than an ID not in the stream": {
+            topic: function(stream) {
+                var cb = this.callback;
+                stream.getIDsLessThan('http://example.org/nonexistent', 0, function(err, ids) {
+                    if (err) {
+                        cb(null);
+                    } else {
+                        cb(new Error("Unexpected success!"));
+                    }
+                });
+            },
+            'it fails correctly': function(err) {
+                assert.ifError(err);
             }
         }
     }
