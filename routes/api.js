@@ -771,11 +771,11 @@ var userInbox = function(req, res, next) {
                 if (activities.length > 0) {
                     if ((_(args).has('start') && args.start > 0) ||
                         (_(args).has('before')) ||
-                        (_(args).has('since'))) {
+                        (_(args).has('since') && activities.length >= args.count)) {
                         collection.links.prev = collection.url + "?since=" + encodeURIComponent(activities[0].id);
                     }
                     if ((_(args).has('start') && args.start + activities.length < collection.totalItems) ||
-                        (_(args).has('before')) ||
+                        (_(args).has('before') && activities.length >= args.count) ||
                         (_(args).has('since'))) {
                         collection.links.next = collection.url + "?before=" + encodeURIComponent(activities[activities.length-1].id);
                     }
