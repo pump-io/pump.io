@@ -21,6 +21,7 @@ var assert = require('assert'),
     databank = require('databank'),
     _ = require('underscore'),
     Step = require('step'),
+    Activity = require('../lib/model/activity').Activity,
     modelBatch = require('./lib/model').modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
@@ -111,11 +112,11 @@ suite.addBatch({
             'it has the getProfile() method': function(user) {
                 assert.isFunction(user.getProfile);
             },
-            'it has the getStream() method': function(user) {
-                assert.isFunction(user.getStream);
+            'it has the getOutboxStream() method': function(user) {
+                assert.isFunction(user.getOutboxStream);
             },
-            'it has the getInbox() method': function(user) {
-                assert.isFunction(user.getInbox);
+            'it has the getInboxStream() method': function(user) {
+                assert.isFunction(user.getInboxStream);
             },
             'it has the expand() method': function(user) {
                 assert.isFunction(user.expand);
@@ -238,7 +239,15 @@ suite.addBatch({
                     function(err, results) {
                         if (err) throw err;
                         user = results;
-                        user.getStream(0, 20, this);
+                        user.getOutboxStream(this);
+                    },
+                    function(err, outbox) {
+                        if (err) throw err;
+                        outbox.getIDs(0, 20, this);
+                    },
+                    function(err, ids) {
+                        if (err) throw err;
+                        Activity.readArray(ids, this);
                     },
                     function(err, activities) {
                         if (err) {
@@ -316,15 +325,28 @@ suite.addBatch({
                             user = results.user,
                             activity = results.activity;
 
-                        user.getStream(0, 20, function(err, activities) {
-                            if (err) {
-                                cb(err, null);
-                            } else {
-                                cb(null, {user: user,
-                                          activity: activity,
-                                          activities: activities});
+                        Step(
+                            function() {
+                                user.getOutboxStream(this);
+                            },
+                            function(err, outbox) {
+                                if (err) throw err;
+                                outbox.getIDs(0, 20, this);
+                            },
+                            function(err, ids) {
+                                if (err) throw err;
+                                Activity.readArray(ids, this);
+                            },
+                            function(err, activities) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    cb(null, {user: user,
+                                              activity: activity,
+                                              activities: activities});
+                                }
                             }
-                        });
+                        );
                     },
                     'it works': function(err, results) {
                         assert.ifError(err);
@@ -353,7 +375,15 @@ suite.addBatch({
                     function(err, results) {
                         if (err) throw err;
                         user = results;
-                        user.getInbox(0, 20, this);
+                        user.getInboxStream(this);
+                    },
+                    function(err, inbox) {
+                        if (err) throw err;
+                        inbox.getIDs(0, 20, this);
+                    },
+                    function(err, ids) {
+                        if (err) throw err;
+                        Activity.readArray(ids, this);
                     },
                     function(err, activities) {
                         if (err) {
@@ -428,15 +458,28 @@ suite.addBatch({
                             user = results.user,
                             activity = results.activity;
 
-                        user.getInbox(0, 20, function(err, activities) {
-                            if (err) {
-                                cb(err, null);
-                            } else {
-                                cb(null, {user: user,
-                                          activity: activity,
-                                          activities: activities});
+                        Step(
+                            function() {
+                                user.getInboxStream(this);
+                            },
+                            function(err, inbox) {
+                                if (err) throw err;
+                                inbox.getIDs(0, 20, this);
+                            },
+                            function(err, ids) {
+                                if (err) throw err;
+                                Activity.readArray(ids, this);
+                            },
+                            function(err, activities) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    cb(null, {user: user,
+                                              activity: activity,
+                                              activities: activities});
+                                }
                             }
-                        });
+                        );
                     },
                     'it works': function(err, results) {
                         assert.ifError(err);
