@@ -451,7 +451,7 @@ var cmpBefore = function(base, idx, count) {
     return function(full, cred) {
         var id = full[idx];
         var url = base + "?before=" + id;
-        if (!_.(count).isUndefined()) {
+        if (!_(count).isUndefined()) {
             url = url + "&count=" + count;
         }
         httputil.getJSON(url,
