@@ -619,7 +619,7 @@ var userStream = function(req, res, next) {
         items: []
     };
 
-    var args;
+    var args, str, ids;
 
     try {
         args = streamArgs(req, DEFAULT_ACTIVITIES, MAX_ACTIVITIES);
@@ -631,9 +631,9 @@ var userStream = function(req, res, next) {
     Step(
         function() {
             // XXX: stuff this into User
-            bank.read('streamcount', req.user.nickname + "-outbox", this);
+            req.user.getOutboxStream(this);
         },
-        function(err, totalOutbox) {
+        function(err, outbox) {
             if (err) {
                 if (err instanceof NoSuchThingError) {
                     collection.totalItems = 0;
@@ -642,28 +642,35 @@ var userStream = function(req, res, next) {
                     throw err;
                 }
             } else {
-                collection.totalItems = totalOutbox;
-                req.user.getStream(args.start, args.end, this);
+                str = outbox;
+                str.count(this);
             }
+        },
+        function(err, totalItems) {
+            if (err) throw err;
+            collection.totalItems = totalItems;
+            if (totalItems === 0) {
+                res.json(collection);
+                return;
+            }
+            if (_(args).has('before')) {
+                str.getIDsGreaterThan(args.before, args.count, this);
+            } else if (_(args).has('since')) {
+                str.getIDsLessThan(args.since, args.count, this);
+            } else {
+                str.getIDs(args.start, args.end, this);
+            }
+        },
+        function(err, results) {
+            if (err) throw err;
+            ids = results;
+            Activity.readArray(ids, this);
         },
         function(err, activities) {
             if (err) {
                 next(err);
             } else {
-                activities.forEach(function(el, i, arr) {
-                    if (_(el).isObject()) {
-                        // remove internal uuid info, if any
-                        if (_(el).has('actor')) {
-                            delete el.actor;
-                        }
-                        if (_(el).has('uuid')) {
-                            delete el.uuid;
-                        }
-                    }
-                });
-
                 collection.items = activities;
-
                 res.json(collection);
             }
         }
@@ -680,7 +687,7 @@ var userInbox = function(req, res, next) {
         items: []
     };
 
-    var args;
+    var args, str;
 
     try {
         args = streamArgs(req, DEFAULT_ACTIVITIES, MAX_ACTIVITIES);
@@ -692,9 +699,9 @@ var userInbox = function(req, res, next) {
     Step(
         function() {
             // XXX: stuff this into User
-            bank.read('streamcount', req.user.nickname + "-inbox", this);
+            req.user.getInboxStream(this);
         },
-        function(err, inboxCount) {
+        function(err, inbox) {
             if (err) {
                 if (err instanceof NoSuchThingError) {
                     collection.totalItems = 0;
@@ -703,9 +710,28 @@ var userInbox = function(req, res, next) {
                     throw err;
                 }
             } else {
-                collection.totalItems = inboxCount;
-                req.user.getInbox(args.start, args.end, this);
+                str = inbox;
+                str.count(this);
             }
+        },
+        function(err, totalItems) {
+            if (err) throw err;
+            collection.totalItems = totalItems;
+            if (totalItems === 0) {
+                res.json(collection);
+                return;
+            }
+            if (_(args).has('before')) {
+                str.getIDsGreaterThan(args.before, args.count, this);
+            } else if (_(args).has('since')) {
+                str.getIDsLessThan(args.since, args.count, this);
+            } else {
+                str.getIDs(args.start, args.end, this);
+            }
+        },
+        function(err, ids) {
+            if (err) throw err;
+            Activity.readArray(ids, this);
         },
         function(err, activities) {
             if (err) {
