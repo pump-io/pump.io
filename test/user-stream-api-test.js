@@ -833,11 +833,11 @@ suite.addBatch({
                     topic: failDoc(INBOX + "?count=1000"),
                     'it fails correctly': itFails
                 },
-                'and we get the feed before a nonexistent id': {
+                'and we get the inbox before a nonexistent id': {
                     topic: failDoc(INBOX + "?before="+encodeURIComponent('http://example.net/nonexistent')),
                     'it fails correctly': itFails
                 },
-                'and we get the feed since a nonexistent id': {
+                'and we get the inbox since a nonexistent id': {
                     topic: failDoc(INBOX + "?since="+encodeURIComponent('http://example.net/nonexistent')),
                     'it fails correctly': itFails
                 }
