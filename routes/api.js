@@ -611,13 +611,18 @@ var postActivity = function(req, res, next) {
 
 var userStream = function(req, res, next) {
 
-    var collection = {
-        author: req.user.profile,
-        displayName: "Activities by " + (req.user.profile.displayName || req.user.nickname),
-        id: URLMaker.makeURL("api/user/" + req.user.nickname + "/feed"),
-        objectTypes: ["activity"],
-        items: []
-    };
+    var url = URLMaker.makeURL("api/user/" + req.user.nickname + "/feed"),
+        collection = {
+            author: req.user.profile,
+            displayName: "Activities by " + (req.user.profile.displayName || req.user.nickname),
+            id: url,
+            objectTypes: ["activity"],
+            url: url,
+            links: {
+                self: url
+            },
+            items: []
+        };
 
     var args, str, ids;
 
@@ -675,6 +680,18 @@ var userStream = function(req, res, next) {
                     delete el.uuid;
                 });
                 collection.items = activities;
+                if (activities.length > 0) {
+                    if ((_(args).has('start') && args.start > 0) ||
+                        (_(args).has('before')) ||
+                        (_(args).has('since'))) {
+                        collection.links.prev = collection.url + "?since=" + encodeURIComponent(activities[0].id);
+                    }
+                    if ((_(args).has('start') && args.start + activities.length < collection.totalItems) ||
+                        (_(args).has('before')) ||
+                        (_(args).has('since'))) {
+                        collection.links.next = collection.url + "?before=" + encodeURIComponent(activities[activities.length].id);
+                    }
+                }
                 res.json(collection);
             }
         }
@@ -683,13 +700,17 @@ var userStream = function(req, res, next) {
 
 var userInbox = function(req, res, next) {
 
-    var collection = {
-        author: req.user.profile,
-        displayName: "Activities for " + (req.user.profile.displayName || req.user.nickname),
-        id: URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox"),
-        objectTypes: ["activity"],
-        items: []
-    };
+    var url = URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox"),
+        collection = {
+            author: req.user.profile,
+            displayName: "Activities for " + (req.user.profile.displayName || req.user.nickname),
+            id: url,
+            objectTypes: ["activity"],
+            links: {
+                self: url
+            },
+            items: []
+        };
 
     var args, str;
 
@@ -745,6 +766,18 @@ var userInbox = function(req, res, next) {
                     delete el.uuid;
                 });
                 collection.items = activities;
+                if (activities.length > 0) {
+                    if ((_(args).has('start') && args.start > 0) ||
+                        (_(args).has('before')) ||
+                        (_(args).has('since'))) {
+                        collection.links.prev = collection.url + "?since=" + encodeURIComponent(activities[0].id);
+                    }
+                    if ((_(args).has('start') && args.start + activities.length < collection.totalItems) ||
+                        (_(args).has('before')) ||
+                        (_(args).has('since'))) {
+                        collection.links.next = collection.url + "?before=" + encodeURIComponent(activities[activities.length].id);
+                    }
+                }
                 res.json(collection);
             }
         }
