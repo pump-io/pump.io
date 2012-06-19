@@ -229,12 +229,10 @@ suite.addBatch({
                             for (var i = 0; i < 100; i++) {
                                 acti = _(act).clone();
                                 acti.object.displayName = "Israelites #" + i;
-                                httputil.postJSON(url, cred, acti, function(err, doc, response) {
-                                    group()(err, doc);
-                                });
+                                httputil.postJSON(url, cred, acti, group());
                             }
                         },
-                        function(err, docs, response) {
+                        function(err, docs, responses) {
                             cb(err, docs, pair);
                         }
                     );
