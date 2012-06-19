@@ -578,11 +578,11 @@ suite.addBatch({
                     }
                 },
                 'and we get the feed with a negative count': {
-                    topic: getDoc(BASE + "?count=-30"),
+                    topic: failDoc(BASE + "?count=-30"),
                     'it fails correctly': itFails
                 },
                 'and we get the feed with a negative offset': {
-                    topic: getDoc(BASE + "?offset=-50"),
+                    topic: failDoc(BASE + "?offset=-50"),
                     'it fails correctly': itFails
                 },
                 'and we get the feed with a zero offset and zero count': {
@@ -596,11 +596,11 @@ suite.addBatch({
                     'it looks right': validForm(0, 100)
                 },
                 'and we get the feed with a non-integer count': {
-                    topic: getDoc(BASE + "?count=foo"),
+                    topic: failDoc(BASE + "?count=foo"),
                     'it fails correctly': itFails
                 },
                 'and we get the feed with a non-integer offset': {
-                    topic: getDoc(BASE + "?offset=bar"),
+                    topic: failDoc(BASE + "?offset=bar"),
                     'it fails correctly': itFails
                 },
                 'and we get the feed with a too-large offset': {
@@ -614,7 +614,7 @@ suite.addBatch({
                     'it looks right': validForm(100, 100)
                 },
                 'and we get the feed with a disallowed count': {
-                    topic: getDoc(BASE + "?count=1000"),
+                    topic: failDoc(BASE + "?count=1000"),
                     'it fails correctly': itFails
                 },
                 'and we get the default inbox': {
@@ -658,11 +658,11 @@ suite.addBatch({
                     }
                 },
                 'and we get the inbox with a negative count': {
-                    topic: getDoc(INBOX + "?count=-30"),
+                    topic: failDoc(INBOX + "?count=-30"),
                     'it fails correctly': itFails
                 },
                 'and we get the inbox with a negative offset': {
-                    topic: getDoc(INBOX + "?offset=-50"),
+                    topic: failDoc(INBOX + "?offset=-50"),
                     'it fails correctly': itFails
                 },
                 'and we get the inbox with a zero offset and zero count': {
@@ -676,11 +676,11 @@ suite.addBatch({
                     'it looks right': validForm(0, 100)
                 },
                 'and we get the inbox with a non-integer count': {
-                    topic: getDoc(INBOX + "?count=foo"),
+                    topic: failDoc(INBOX + "?count=foo"),
                     'it fails correctly': itFails
                 },
                 'and we get the inbox with a non-integer offset': {
-                    topic: getDoc(INBOX + "?offset=bar"),
+                    topic: failDoc(INBOX + "?offset=bar"),
                     'it fails correctly': itFails
                 },
                 'and we get the inbox with a too-large offset': {
@@ -694,7 +694,7 @@ suite.addBatch({
                     'it looks right': validForm(100, 100)
                 },
                 'and we get the inbox with a disallowed count': {
-                    topic: getDoc(INBOX + "?count=1000"),
+                    topic: failDoc(INBOX + "?count=1000"),
                     'it fails correctly': itFails
                 }
             }
