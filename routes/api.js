@@ -27,7 +27,9 @@ var databank = require('databank'),
     ActivityObject = require('../lib/model/activityobject').ActivityObject,
     User = require('../lib/model/user').User,
     Edge = require('../lib/model/edge').Edge,
-    Stream = require('../lib/model/stream').Stream,
+    stream = require('../lib/model/stream'),
+    Stream = stream.Stream,
+    NotInStreamError = stream.NotInStreamError,
     Client = require('../lib/model/client').Client,
     Tombstone = require('../lib/model/tombstone').Tombstone,
     mw = require('../lib/middleware'),
@@ -668,7 +670,13 @@ var userStream = function(req, res, next) {
             }
         },
         function(err, results) {
-            if (err) throw err;
+            if (err) {
+                if (err instanceof NotInStreamError) {
+                    throw new HTTPError(err.message, 400);
+                } else {
+                    throw err;
+                }
+            }
             ids = results;
             Activity.readArray(ids, this);
         },
