@@ -1032,11 +1032,11 @@ var streamArgs = function(req, defaultCount, maxCount) {
         maxCount = 10 * defaultCount;
     }
 
-    if (_(req.query).has('cnt')) {
-        check(req.query.cnt, "Count must be between 0 and " + maxCount).isInt().min(0).max(maxCount);
-        args.cnt = sanitize(req.query.cnt).toInt();
+    if (_(req.query).has('count')) {
+        check(req.query.count, "Count must be between 0 and " + maxCount).isInt().min(0).max(maxCount);
+        args.count = sanitize(req.query.count).toInt();
     } else {
-        args.cnt = defaultCount;
+        args.count = defaultCount;
     }
 
     // XXX: Check 'before' and 'since' for injection...?
@@ -1071,7 +1071,7 @@ var streamArgs = function(req, defaultCount, maxCount) {
     }
 
     if (_(args).has('start')) {
-        args.end = args.start + args.cnt;
+        args.end = args.start + args.count;
     }
 
     return args;
