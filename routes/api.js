@@ -670,6 +670,10 @@ var userStream = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
+                activities.forEach(function(el) {
+                    delete el.actor;
+                    delete el.uuid;
+                });
                 collection.items = activities;
                 res.json(collection);
             }
@@ -737,6 +741,9 @@ var userInbox = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
+                activities.forEach(function(el) {
+                    delete el.uuid;
+                });
                 collection.items = activities;
                 res.json(collection);
             }
