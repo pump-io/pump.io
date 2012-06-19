@@ -699,6 +699,14 @@ suite.addBatch({
                     topic: failDoc(BASE + "?count=1000"),
                     'it fails correctly': itFails
                 },
+                'and we get the feed before a nonexistent id': {
+                    topic: failDoc(BASE + "?before="+encodeURIComponent('http://example.net/nonexistent')),
+                    'it fails correctly': itFails
+                },
+                'and we get the feed since a nonexistent id': {
+                    topic: failDoc(BASE + "?since="+encodeURIComponent('http://example.net/nonexistent')),
+                    'it fails correctly': itFails
+                },
                 'and we get the default inbox': {
                     topic: getDoc(INBOX),
                     'it works': itWorks,
@@ -737,6 +745,52 @@ suite.addBatch({
                         'it works': itWorks,
                         'it looks right': validForm(50, 100),
                         'it has the right data': validData(0, 50)
+                    },
+                    'and we get the inbox since a value': {
+                        topic: cmpSince(INBOX, 25),
+                        'it works': itWorks,
+                        'it looks right': validForm(20, 100),
+                        'it has the right data': validData(5, 25)
+                    },
+                    'and we get the inbox before a value': {
+                        topic: cmpBefore(INBOX, 25),
+                        'it works': itWorks,
+                        'it looks right': validForm(20, 100),
+                        'it has the right data': validData(26, 46)
+                    },
+                    'and we get the inbox since a small value': {
+                        topic: cmpSince(INBOX, 5),
+                        'it works': itWorks,
+                        'it looks right': validForm(5, 100),
+                        'it has the right data': validData(0, 5)
+                    },
+                    'and we get the inbox before a big value': {
+                        topic: cmpBefore(INBOX, 94),
+                        'it works': itWorks,
+                        'it looks right': validForm(5, 100),
+                        'it has the right data': validData(95, 100)
+                    },
+                    'and we get the inbox since a value with a count': {
+                        topic: cmpSince(INBOX, 75, 50),
+                        'it works': itWorks,
+                        'it looks right': validForm(50, 100),
+                        'it has the right data': validData(25, 75)
+                    },
+                    'and we get the inbox before a value with a count': {
+                        topic: cmpBefore(INBOX, 35, 50),
+                        'it works': itWorks,
+                        'it looks right': validForm(50, 100),
+                        'it has the right data': validData(36, 86)
+                    },
+                    'and we get the inbox since a value with a zero count': {
+                        topic: cmpSince(INBOX, 30, 0),
+                        'it works': itWorks,
+                        'it looks right': validForm(0, 100)
+                    },
+                    'and we get the inbox before a value with a zero count': {
+                        topic: cmpBefore(INBOX, 60, 0),
+                        'it works': itWorks,
+                        'it looks right': validForm(0, 100)
                     }
                 },
                 'and we get the inbox with a negative count': {
