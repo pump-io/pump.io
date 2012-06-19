@@ -637,6 +637,16 @@ suite.addBatch({
                         'it works': itWorks,
                         'it looks right': validForm(50, 100),
                         'it has the right data': validData(36, 86)
+                    },
+                    'and we get the feed since a value with a zero count': {
+                        topic: cmpSince(BASE, 30, 0),
+                        'it works': itWorks,
+                        'it looks right': validForm(0, 100)
+                    },
+                    'and we get the feed before a value with a zero count': {
+                        topic: cmpBefore(BASE, 60, 0),
+                        'it works': itWorks,
+                        'it looks right': validForm(0, 100)
                     }
                 },
                 'and we get the feed with a negative count': {
