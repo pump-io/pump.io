@@ -668,7 +668,7 @@ suite.addBatch({
                                             cb(err, null, null);
                                         } else {
                                             if (doc.items.length > 0) {
-                                                items = items.append(doc.items);
+                                                items = items.concat(doc.items);
                                                 if (doc.links.next) {
                                                     addResultsOf(doc.links.next);
                                                 } else {
