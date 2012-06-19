@@ -497,6 +497,10 @@ var validForm = function(count, total) {
         if (_(total).isNumber()) {
             assert.equal(doc.totalItems, total);
         }
+        assert.include(doc, 'links');
+        assert.isObject(doc.links);
+        assert.include(doc.links, 'self');
+        assert.isString(doc.links.self);
     };
 };
 
