@@ -1028,51 +1028,55 @@ var streamArgs = function(req, defaultCount, maxCount) {
 
     var args = {};
 
-    if (_(maxCount).isUndefined()) {
-        maxCount = 10 * defaultCount;
-    }
-
-    if (_(req.query).has('count')) {
-        check(req.query.count, "Count must be between 0 and " + maxCount).isInt().min(0).max(maxCount);
-        args.count = sanitize(req.query.count).toInt();
-    } else {
-        args.count = defaultCount;
-    }
-
-    // XXX: Check 'before' and 'since' for injection...?
-    // XXX: Check 'before' and 'since' for URI...?
-
-    if (_(req.query).has('before')) {
-        check(req.query.before).notEmpty();
-        args.before = sanitize(req.query.before).trim();
-    }
-
-    if (_(req.query).has('since')) {
-        if (_(args).has('before')) {
-            throw new Error("Can't have both 'before' and 'since' parameters");
+    try {
+        if (_(maxCount).isUndefined()) {
+            maxCount = 10 * defaultCount;
         }
-        check(req.query.since).notEmpty();
-        args.since = sanitize(req.query.since).trim();
-    }
 
-    if (_(req.query).has('offset')) {
-        if (_(args).has('before')) {
-            throw new Error("Can't have both 'before' and 'offset' parameters");
+        if (_(req.query).has('count')) {
+            check(req.query.count, "Count must be between 0 and " + maxCount).isInt().min(0).max(maxCount);
+            args.count = sanitize(req.query.count).toInt();
+        } else {
+            args.count = defaultCount;
         }
-        if (_(args).has('since')) {
-            throw new Error("Can't have both 'since' and 'offset' parameters");
+
+        // XXX: Check 'before' and 'since' for injection...?
+        // XXX: Check 'before' and 'since' for URI...?
+
+        if (_(req.query).has('before')) {
+            check(req.query.before).notEmpty();
+            args.before = sanitize(req.query.before).trim();
         }
-        check(req.query.offset, "Offset must be an integer greater than or equal to zero").isInt().min(0);
-        args.start = sanitize(req.query.offset).toInt();
-    }
 
-    if (!_(req.query).has('offset') && !_(req.query).has('since') && !_(req.query).has('before')) {
-        args.start = 0;
-    }
+        if (_(req.query).has('since')) {
+            if (_(args).has('before')) {
+                throw new Error("Can't have both 'before' and 'since' parameters");
+            }
+            check(req.query.since).notEmpty();
+            args.since = sanitize(req.query.since).trim();
+        }
 
-    if (_(args).has('start')) {
-        args.end = args.start + args.count;
-    }
+        if (_(req.query).has('offset')) {
+            if (_(args).has('before')) {
+                throw new Error("Can't have both 'before' and 'offset' parameters");
+            }
+            if (_(args).has('since')) {
+                throw new Error("Can't have both 'since' and 'offset' parameters");
+            }
+            check(req.query.offset, "Offset must be an integer greater than or equal to zero").isInt().min(0);
+            args.start = sanitize(req.query.offset).toInt();
+        }
 
-    return args;
+        if (!_(req.query).has('offset') && !_(req.query).has('since') && !_(req.query).has('before')) {
+            args.start = 0;
+        }
+
+        if (_(args).has('start')) {
+            args.end = args.start + args.count;
+        }
+
+        return args;
+    } catch (e) {
+        throw new HTTPError(e.message, 400);
+    }
 };
