@@ -832,6 +832,14 @@ suite.addBatch({
                 'and we get the inbox with a disallowed count': {
                     topic: failDoc(INBOX + "?count=1000"),
                     'it fails correctly': itFails
+                },
+                'and we get the feed before a nonexistent id': {
+                    topic: failDoc(INBOX + "?before="+encodeURIComponent('http://example.net/nonexistent')),
+                    'it fails correctly': itFails
+                },
+                'and we get the feed since a nonexistent id': {
+                    topic: failDoc(INBOX + "?since="+encodeURIComponent('http://example.net/nonexistent')),
+                    'it fails correctly': itFails
                 }
             }
         }
