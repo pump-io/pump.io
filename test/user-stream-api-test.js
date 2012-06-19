@@ -491,6 +491,7 @@ var validForm = function(count, total) {
         assert.include(doc, 'items');
         assert.include(doc, 'displayName');
         assert.include(doc, 'id');
+        assert.include(doc, 'url');
         if (_(count).isNumber()) {
             assert.lengthOf(doc.items, count);
         }
@@ -501,6 +502,11 @@ var validForm = function(count, total) {
         assert.isObject(doc.links);
         assert.include(doc.links, 'self');
         assert.isString(doc.links.self);
+        assert.include(doc.links, 'first');
+        assert.isString(doc.links.first);
+        if (_(count).isNumber() && count !== 0) {
+            assert.include(doc.links, 'prev');
+        }
     };
 };
 
