@@ -619,6 +619,7 @@ var userStream = function(req, res, next) {
             objectTypes: ["activity"],
             url: url,
             links: {
+                first: url,
                 self: url
             },
             items: []
@@ -707,6 +708,7 @@ var userInbox = function(req, res, next) {
             id: url,
             objectTypes: ["activity"],
             links: {
+                first: url,
                 self: url
             },
             items: []
