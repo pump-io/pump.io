@@ -449,7 +449,7 @@ var cmpDoc = function(url) {
 
 var cmpBefore = function(base, idx, count) {
     return function(full, cred) {
-        var id = full[idx];
+        var id = full.items[idx];
         var url = base + "?before=" + id;
         if (!_(count).isUndefined()) {
             url = url + "&count=" + count;
@@ -462,7 +462,7 @@ var cmpBefore = function(base, idx, count) {
 
 var cmpSince = function(base, idx, count) {
     return function(full, cred) {
-        var id = full[idx];
+        var id = full.items[idx];
         var url = base + "?since=" + id;
         if (!_(count).isUndefined()) {
             url = url + "&count=" + count;
