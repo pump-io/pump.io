@@ -621,7 +621,7 @@ suite.addBatch({
                         'it has the right data': validData(0, 5)
                     },
                     'and we get the feed before a big value': {
-                        topic: cmpSince(BASE, 94),
+                        topic: cmpBefore(BASE, 94),
                         'it works': itWorks,
                         'it looks right': validForm(5, 100),
                         'it has the right data': validData(95, 100)
