@@ -651,52 +651,16 @@ var userStream = function(req, res, next) {
                 }
             } else {
                 str = outbox;
-                str.count(this);
+                getStream(str, args, collection, this);
             }
         },
-        function(err, totalItems) {
-            if (err) throw err;
-            collection.totalItems = totalItems;
-            if (totalItems === 0) {
-                res.json(collection);
-                return;
-            }
-            if (_(args).has('before')) {
-                str.getIDsGreaterThan(args.before, args.count, this);
-            } else if (_(args).has('since')) {
-                str.getIDsLessThan(args.since, args.count, this);
-            } else {
-                str.getIDs(args.start, args.end, this);
-            }
-        },
-        function(err, results) {
-            if (err) {
-                if (err instanceof NotInStreamError) {
-                    throw new HTTPError(err.message, 400);
-                } else {
-                    throw err;
-                }
-            }
-            ids = results;
-            Activity.readArray(ids, this);
-        },
-        function(err, activities) {
+        function(err) {
             if (err) {
                 next(err);
             } else {
-                activities.forEach(function(el) {
+                collection.items.forEach(function(el) {
                     delete el.actor;
-                    delete el.uuid;
                 });
-                collection.items = activities;
-                if (activities.length > 0) {
-                    collection.links.prev = collection.url + "?since=" + encodeURIComponent(activities[0].id);
-                    if ((_(args).has('start') && args.start + activities.length < collection.totalItems) ||
-                        (_(args).has('before') && activities.length >= args.count) ||
-                        (_(args).has('since'))) {
-                        collection.links.next = collection.url + "?before=" + encodeURIComponent(activities[activities.length-1].id);
-                    }
-                }
                 res.json(collection);
             }
         }
@@ -742,15 +706,30 @@ var userInbox = function(req, res, next) {
                     throw err;
                 }
             } else {
-                str = inbox;
-                str.count(this);
+                getStream(inbox, args, collection, this);
             }
+        },
+        function(err) {
+            if (err) {
+                next(err);
+            } else {
+                res.json(collection);
+            }
+        }
+    );
+};
+
+var getStream = function(str, args, collection, callback) {
+
+    Step(
+        function() {
+            str.count(this);
         },
         function(err, totalItems) {
             if (err) throw err;
             collection.totalItems = totalItems;
             if (totalItems === 0) {
-                res.json(collection);
+                callback(null);
                 return;
             }
             if (_(args).has('before')) {
@@ -762,12 +741,18 @@ var userInbox = function(req, res, next) {
             }
         },
         function(err, ids) {
-            if (err) throw err;
+            if (err) {
+                if (err instanceof NotInStreamError) {
+                    throw new HTTPError(err.message, 400);
+                } else {
+                    throw err;
+                }
+            }
             Activity.readArray(ids, this);
         },
         function(err, activities) {
             if (err) {
-                next(err);
+                callback(err);
             } else {
                 activities.forEach(function(el) {
                     delete el.uuid;
@@ -781,7 +766,7 @@ var userInbox = function(req, res, next) {
                         collection.links.next = collection.url + "?before=" + encodeURIComponent(activities[activities.length-1].id);
                     }
                 }
-                res.json(collection);
+                callback(null);
             }
         }
     );
