@@ -657,6 +657,37 @@ suite.addBatch({
                         topic: cmpBefore(BASE, 60, 0),
                         'it works': itWorks,
                         'it looks right': validForm(0, 100)
+                    },
+                    'and we get the full feed by following "next" links': {
+                        topic: function(full, cred) {
+                            var cb = this.callback,
+                                items = [],
+                                addResultsOf = function(url) {
+                                    httputil.getJSON(url, cred, function(err, doc, resp) {
+                                        if (err) {
+                                            cb(err, null, null);
+                                        } else {
+                                            if (doc.items.length > 0) {
+                                                items = items.append(doc.items);
+                                                if (doc.links.next) {
+                                                    addResultsOf(doc.links.next);
+                                                } else {
+                                                    cb(null, items, full);
+                                                }
+                                            } else {
+                                                cb(null, items, full);
+                                            }
+                                        }
+                                    });
+                                };
+                            addResultsOf(BASE);
+                        },
+                        'it works': itWorks,
+                        'it looks correct': function(err, items, full) {
+                            assert.isArray(items);
+                            assert.lengthOf(items, full.items.length);
+                            assert.deepEqual(items, full.items);
+                        }
                     }
                 },
                 'and we get the feed with a negative count': {
