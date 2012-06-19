@@ -690,7 +690,7 @@ var userStream = function(req, res, next) {
                     if ((_(args).has('start') && args.start + activities.length < collection.totalItems) ||
                         (_(args).has('before')) ||
                         (_(args).has('since'))) {
-                        collection.links.next = collection.url + "?before=" + encodeURIComponent(activities[activities.length].id);
+                        collection.links.next = collection.url + "?before=" + encodeURIComponent(activities[activities.length-1].id);
                     }
                 }
                 res.json(collection);
