@@ -682,13 +682,9 @@ var userStream = function(req, res, next) {
                 });
                 collection.items = activities;
                 if (activities.length > 0) {
-                    if ((_(args).has('start') && args.start > 0) ||
-                        (_(args).has('before')) ||
-                        (_(args).has('since'))) {
-                        collection.links.prev = collection.url + "?since=" + encodeURIComponent(activities[0].id);
-                    }
+                    collection.links.prev = collection.url + "?since=" + encodeURIComponent(activities[0].id);
                     if ((_(args).has('start') && args.start + activities.length < collection.totalItems) ||
-                        (_(args).has('before')) ||
+                        (_(args).has('before') && activities.length >= args.count) ||
                         (_(args).has('since'))) {
                         collection.links.next = collection.url + "?before=" + encodeURIComponent(activities[activities.length-1].id);
                     }
@@ -707,6 +703,7 @@ var userInbox = function(req, res, next) {
             displayName: "Activities for " + (req.user.profile.displayName || req.user.nickname),
             id: url,
             objectTypes: ["activity"],
+            url: url,
             links: {
                 first: url,
                 self: url
@@ -769,11 +766,7 @@ var userInbox = function(req, res, next) {
                 });
                 collection.items = activities;
                 if (activities.length > 0) {
-                    if ((_(args).has('start') && args.start > 0) ||
-                        (_(args).has('before')) ||
-                        (_(args).has('since') && activities.length >= args.count)) {
-                        collection.links.prev = collection.url + "?since=" + encodeURIComponent(activities[0].id);
-                    }
+                    collection.links.prev = collection.url + "?since=" + encodeURIComponent(activities[0].id);
                     if ((_(args).has('start') && args.start + activities.length < collection.totalItems) ||
                         (_(args).has('before') && activities.length >= args.count) ||
                         (_(args).has('since'))) {
