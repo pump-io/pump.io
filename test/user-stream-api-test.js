@@ -447,6 +447,32 @@ var cmpDoc = function(url) {
     };
 };
 
+var cmpBefore = function(base, idx, count) {
+    return function(full, cred) {
+        var id = full[idx];
+        var url = base + "?before=" + id;
+        if (!_.(count).isUndefined()) {
+            url = url + "&count=" + count;
+        }
+        httputil.getJSON(url,
+                         cred,
+                         docPlus(this.callback, full));
+    };
+};
+
+var cmpSince = function(base, idx, count) {
+    return function(full, cred) {
+        var id = full[idx];
+        var url = base + "?since=" + id;
+        if (!_.(count).isUndefined()) {
+            url = url + "&count=" + count;
+        }
+        httputil.getJSON(url,
+                         cred,
+                         docPlus(this.callback, full));
+    };
+};
+
 var itWorks = function(err, doc) {
     assert.ifError(err, doc);
 };
@@ -575,6 +601,42 @@ suite.addBatch({
                         'it works': itWorks,
                         'it looks right': validForm(50, 100),
                         'it has the right data': validData(0, 50)
+                    },
+                    'and we get the feed since a value': {
+                        topic: cmpSince(BASE, 25),
+                        'it works': itWorks,
+                        'it looks right': validForm(20, 100),
+                        'it has the right data': validData(5, 25)
+                    },
+                    'and we get the feed before a value': {
+                        topic: cmpBefore(BASE, 25),
+                        'it works': itWorks,
+                        'it looks right': validForm(20, 100),
+                        'it has the right data': validData(26, 46)
+                    },
+                    'and we get the feed since a small value': {
+                        topic: cmpSince(BASE, 5),
+                        'it works': itWorks,
+                        'it looks right': validForm(5, 100),
+                        'it has the right data': validData(0, 5)
+                    },
+                    'and we get the feed before a big value': {
+                        topic: cmpSince(BASE, 94),
+                        'it works': itWorks,
+                        'it looks right': validForm(5, 100),
+                        'it has the right data': validData(95, 100)
+                    },
+                    'and we get the feed since a value with a count': {
+                        topic: cmpSince(BASE, 75, 50),
+                        'it works': itWorks,
+                        'it looks right': validForm(50, 100),
+                        'it has the right data': validData(25, 75)
+                    },
+                    'and we get the feed before a value with a count': {
+                        topic: cmpBefore(BASE, 35, 50),
+                        'it works': itWorks,
+                        'it looks right': validForm(50, 100),
+                        'it has the right data': validData(36, 86)
                     }
                 },
                 'and we get the feed with a negative count': {
