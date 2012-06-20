@@ -39,7 +39,7 @@ var testSchema = {
 
 var testData = {
     "create": {
-        displayName: "What"s the greatest programming editor?",
+        displayName: "What's the greatest programming editor?",
         content: "What do you think is the greatest programming editor?",
         url: "http://example.com/questions/greatest-programming-editor"
     },
