@@ -167,7 +167,7 @@ suite.addBatch({
                     assert.ifError(err);
                 }
             },
-            "and we GET the user data with client credentials and the same user\"s access token": {
+            "and we GET the user data with client credentials and the same user's access token": {
                 topic: function(user, cl) {
                     var cb = this.callback;
                     Step(
@@ -204,7 +204,7 @@ suite.addBatch({
                     assert.equal(doc.profile.objectType, "person");
                 }
             },
-            "and we GET the user data with client credentials and a different user\"s access token": {
+            "and we GET the user data with client credentials and a different user's access token": {
                 topic: function(user, cl) {
                     var cb = this.callback;
                     Step(
@@ -370,7 +370,7 @@ suite.addBatch({
                     assert.ifError(err);
                 }
             },
-            "and we PUT new user data with client credentials and a different user\"s access token": {
+            "and we PUT new user data with client credentials and a different user's access token": {
                 topic: function(user, cl) {
                     var cb = this.callback;
                     
@@ -399,7 +399,7 @@ suite.addBatch({
                     assert.ifError(err);
                 }
             },
-            "and we PUT new user data with client credentials and the same user\"s access token": {
+            "and we PUT new user data with client credentials and the same user's access token": {
                 topic: function(user, cl) {
                     var cb = this.callback;
                     
@@ -739,7 +739,7 @@ suite.addBatch({
                     assert.ifError(err);
                 }
             },
-            "and we DELETE the user with client credentials and a different user\"s access token": {
+            "and we DELETE the user with client credentials and a different user's access token": {
                 topic: function(user, cl) {
                     var cb = this.callback;
                     Step(
@@ -766,7 +766,7 @@ suite.addBatch({
                     assert.ifError(err);
                 }
             },
-            "and we DELETE the user with client credentials and the same user\"s access token": {
+            "and we DELETE the user with client credentials and the same user's access token": {
                 topic: function(user, cl) {
                     var cb = this.callback;
                     Step(
