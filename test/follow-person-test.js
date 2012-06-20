@@ -110,7 +110,7 @@ suite.addBatch({
                                 cb(err, null);
                             } else {
                                 cb(null, posted);
-                            };
+                            }
                         }
                     );
                 },
@@ -177,7 +177,7 @@ suite.addBatch({
                                 cb(null);
                             } else {
                                 cb(new Error("Unexpected success"));
-                            };
+                            }
                         }
                     );
                 },
@@ -217,7 +217,7 @@ suite.addBatch({
                                 cb(err, null);
                             } else {
                                 cb(null, posted);
-                            };
+                            }
                         }
                     );
                 },
