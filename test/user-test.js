@@ -519,7 +519,7 @@ suite.addBatch({
                 "it works": function(err) {
                     assert.ifError(err);
                 },
-                "and we check the first user\"s following list": {
+                "and we check the first user's following list": {
                     topic: function(users) {
                         var cb = this.callback;
                         users.shields.getFollowing(0, 20, function(err, following) {
@@ -539,7 +539,7 @@ suite.addBatch({
                         assert.equal(following[0].id, other.profile.id);
                     }
                 },
-                "and we check the first user\"s following count": {
+                "and we check the first user's following count": {
                     topic: function(users) {
                         users.shields.followingCount(this.callback);
                     },
@@ -551,7 +551,7 @@ suite.addBatch({
                         assert.equal(fc, 1);
                     }
                 },
-                "and we check the second user\"s followers list": {
+                "and we check the second user's followers list": {
                     topic: function(users) {
                         var cb = this.callback;
                         users.yarnell.getFollowers(0, 20, function(err, following) {
@@ -571,7 +571,7 @@ suite.addBatch({
                         assert.equal(followers[0].id, other.profile.id);
                     }
                 },
-                "and we check the second user\"s followers count": {
+                "and we check the second user's followers count": {
                     topic: function(users) {
                         users.yarnell.followerCount(this.callback);
                     },
@@ -616,7 +616,7 @@ suite.addBatch({
             "it works": function(err, users) {
                 assert.ifError(err);
             },
-            "and we check the first user\"s following list": {
+            "and we check the first user's following list": {
                 topic: function(users) {
                     var cb = this.callback;
                     users.captain.getFollowing(0, 20, this.callback);
@@ -630,7 +630,7 @@ suite.addBatch({
                     assert.lengthOf(following, 0);
                 }
             },
-            "and we check the first user\"s following count": {
+            "and we check the first user's following count": {
                 topic: function(users) {
                     users.captain.followingCount(this.callback);
                 },
@@ -642,7 +642,7 @@ suite.addBatch({
                     assert.equal(fc, 0);
                 }
             },
-            "and we check the second user\"s followers list": {
+            "and we check the second user's followers list": {
                 topic: function(users) {
                     users.tenille.getFollowers(0, 20, this.callback);
                 },
@@ -655,7 +655,7 @@ suite.addBatch({
                     assert.lengthOf(followers, 0);
                 }
             },
-            "and we check the second user\"s followers count": {
+            "and we check the second user's followers count": {
                 topic: function(users) {
                     users.tenille.followerCount(this.callback);
                 },
@@ -774,7 +774,7 @@ suite.addBatch({
                 "it works": function(err) {
                     assert.ifError(err);
                 },
-                "and we check the followed user\"s followers list": {
+                "and we check the followed user's followers list": {
                     topic: function(users) {
                         users[0].getFollowers(0, users.length + 1, this.callback);
                     },
@@ -784,7 +784,7 @@ suite.addBatch({
                         assert.lengthOf(followers, 49);
                     }
                 },
-                "and we check the followed user\"s followers count": {
+                "and we check the followed user's followers count": {
                     topic: function(users) {
                         users[0].followerCount(this.callback);
                     },
@@ -796,7 +796,7 @@ suite.addBatch({
                         assert.equal(fc, 49);
                     }
                 },
-                "and we check the following users\" following lists": {
+                "and we check the following users' following lists": {
                     topic: function(users) {
                         var cb = this.callback,
                             MAX_USERS = 50;
@@ -822,7 +822,7 @@ suite.addBatch({
                         }
                     }
                 },
-                "and we check the following users\" following counts": {
+                "and we check the following users' following counts": {
                     topic: function(users) {
                         var cb = this.callback,
                             MAX_USERS = 50;
