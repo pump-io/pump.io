@@ -250,7 +250,7 @@ suite.addBatch({
                     topic: function(acts, pair, cl) {
                         var cb = this.callback,
                             cred = makeCred(cl, pair),
-                            url = 'http://localhost:4815/api/user/yellowman/lists';
+                            url = 'http://localhost:4815/api/user/dekker/lists';
 
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc);
