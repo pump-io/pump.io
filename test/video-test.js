@@ -43,8 +43,8 @@ var testData = {
         displayName: "Watch me dunk a basketball",
         summary: "I can dunk!",
         embedCode: "<video>"+
-            "<source type="video/ogg" "+
-            "src="http://example.com/videos/watch-me-dunk-a-basketball.ogv" >"+
+            "<source type='video/ogg' "+
+            "src='http://example.com/videos/watch-me-dunk-a-basketball.ogv' >"+
             "</video>",
         stream: {
             url: "http://example.com/videos/watch-me-dunk-a-basketball.ogv",
