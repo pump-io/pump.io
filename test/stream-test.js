@@ -172,7 +172,7 @@ suite.addBatch({
                 "it works": function(err) {
                     assert.ifError(err);
                 },
-                "and we get the stream"s activities": {
+                "and we get the stream's activities": {
                     topic: function(activity, stream) {
                         stream.getIDs(0, 100, this.callback);
                     },
@@ -187,7 +187,7 @@ suite.addBatch({
                         }));
                     }
                 },
-                "and we count the stream"s activities": {
+                "and we count the stream's activities": {
                     topic: function(activity, stream) {
                         stream.count(this.callback);
                     },
@@ -198,7 +198,7 @@ suite.addBatch({
                         assert.equal(cnt, 1);
                     }
                 },
-                "and we count the stream"s activities with Stream.count()": {
+                "and we count the stream's activities with Stream.count()": {
                     topic: function(activity, stream) {
                         var Stream = require("../lib/model/stream").Stream;
                         Stream.count(stream.name, this.callback);
