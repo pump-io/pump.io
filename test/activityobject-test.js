@@ -1,6 +1,6 @@
 // activityobject-test.js
 //
-// Test the activityobject module"s class methods
+// Test the activityobject module's class methods
 //
 // Copyright 2012, StatusNet Inc.
 //
