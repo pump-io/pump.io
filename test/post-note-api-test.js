@@ -91,7 +91,7 @@ suite.addBatch({
                                     verb: "post",
                                     object: {
                                         objectType: "note",
-                                        content: "I"m so scared!"
+                                        content: "I'm so scared!"
                                     }
                                 },
                                 cred = {
@@ -129,7 +129,7 @@ suite.addBatch({
                         },
                         "results are what we posted": function(err, act) {
                             assert.equal(act.verb, "post");
-                            assert.equal(act.object.content, "I"m so scared!");
+                            assert.equal(act.object.content, "I'm so scared!");
                             assert.equal(act.object.objectType, "note");
                         },
                         "and we check the actor": {
@@ -178,7 +178,7 @@ suite.addBatch({
                                 assert.isString(note.author.objectType);
                             },
                             "results are what we posted": function(err, note, act) {
-                                assert.equal(note.content, "I"m so scared!");
+                                assert.equal(note.content, "I'm so scared!");
                                 assert.equal(note.objectType, "note");
                                 assert.equal(note.id, act.object.id);
                                 assert.equal(note.published, act.object.published);
