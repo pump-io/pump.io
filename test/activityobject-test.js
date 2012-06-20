@@ -978,7 +978,7 @@ vows.describe("activityobject class interface").addBatch({
                 "it works": function(err, place) {
                     assert.ifError(err);
                 },
-                "it adds the "likes" property": function(err, place) {
+                "it adds the 'likes' property": function(err, place) {
                     assert.ifError(err);
                     assert.includes(place, "likes");
                     assert.isObject(place.likes);
