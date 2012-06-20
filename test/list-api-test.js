@@ -16,16 +16,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    Step = require('step'),
-    _ = require('underscore'),
-    http = require('http'),
-    urlparse = require('url').parse,
-    OAuth = require('oauth').OAuth,
-    httputil = require('./lib/http'),
-    oauthutil = require('./lib/oauth'),
-    actutil = require('./lib/activity'),
+var assert = require("assert"),
+    vows = require("vows"),
+    Step = require("step"),
+    _ = require("underscore"),
+    http = require("http"),
+    urlparse = require("url").parse,
+    OAuth = require("oauth").OAuth,
+    httputil = require("./lib/http"),
+    oauthutil = require("./lib/oauth"),
+    actutil = require("./lib/activity"),
     setupApp = oauthutil.setupApp,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair,
@@ -41,14 +41,14 @@ var makeCred = function(cl, pair) {
 };
 
 var assertValidList = function(doc, count) {
-    assert.include(doc, 'author');
-    assert.include(doc.author, 'id');
-    assert.include(doc.author, 'displayName');
-    assert.include(doc.author, 'objectType');
-    assert.include(doc, 'totalItems');
-    assert.include(doc, 'items');
-    assert.include(doc, 'displayName');
-    assert.include(doc, 'id');
+    assert.include(doc, "author");
+    assert.include(doc.author, "id");
+    assert.include(doc.author, "displayName");
+    assert.include(doc.author, "objectType");
+    assert.include(doc, "totalItems");
+    assert.include(doc, "items");
+    assert.include(doc, "displayName");
+    assert.include(doc, "id");
     if (_(count).isNumber()) {
         assert.equal(doc.totalItems, count);
         assert.lengthOf(doc.items, count);
@@ -57,28 +57,28 @@ var assertValidList = function(doc, count) {
 
 var assertValidActivity = function(act) {
     assert.isString(act.id);
-    assert.include(act, 'actor');
+    assert.include(act, "actor");
     assert.isObject(act.actor);
-    assert.include(act.actor, 'id');
+    assert.include(act.actor, "id");
     assert.isString(act.actor.id);
-    assert.include(act, 'verb');
+    assert.include(act, "verb");
     assert.isString(act.verb);
-    assert.include(act, 'object');
+    assert.include(act, "object");
     assert.isObject(act.object);
-    assert.include(act.object, 'id');
+    assert.include(act.object, "id");
     assert.isString(act.object.id);
-    assert.include(act, 'published');
+    assert.include(act, "published");
     assert.isString(act.published);
-    assert.include(act, 'updated');
+    assert.include(act, "updated");
     assert.isString(act.updated);
 };
 
-var suite = vows.describe('list api test');
+var suite = vows.describe("list api test");
 
 // A batch to test following/unfollowing users
 
 suite.addBatch({
-    'When we set up the app': {
+    "When we set up the app": {
         topic: function() {
             setupApp(this.callback);
         },
@@ -87,18 +87,18 @@ suite.addBatch({
                 app.close();
             }
         },
-        'it works': function(err, app) {
+        "it works": function(err, app) {
             assert.ifError(err);
         },
-        'and we register a client': {
+        "and we register a client": {
             topic: function() {
                 newClient(this.callback);
             },
-            'it works': function(err, cl) {
+            "it works": function(err, cl) {
                 assert.ifError(err);
                 assert.isObject(cl);
             },
-            'and we get the list of lists owned by a new user': {
+            "and we get the list of lists owned by a new user": {
                 topic: function(cl) {
                     var cb = this.callback;
                     Step(
@@ -108,7 +108,7 @@ suite.addBatch({
                         function(err, pair) {
                             if (err) throw err;
                             var cred = makeCred(cl, pair),
-                                url = 'http://localhost:4815/api/user/eekamouse/lists';
+                                url = "http://localhost:4815/api/user/eekamouse/lists";
 
                             httputil.getJSON(url, cred, this);
                         },
@@ -117,15 +117,15 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err, lists) {
+                "it works": function(err, lists) {
                     assert.ifError(err);
                 },
-                'it is valid': function(err, lists) {
+                "it is valid": function(err, lists) {
                     assert.ifError(err);
                     assertValidList(lists, 0);
                 }
             },
-            'and a user creates a list': {
+            "and a user creates a list": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pair = null;
@@ -138,7 +138,7 @@ suite.addBatch({
                             if (err) throw err;
                             pair = results;
                             var cred = makeCred(cl, pair),
-                                url = 'http://localhost:4815/api/user/yellowman/feed',
+                                url = "http://localhost:4815/api/user/yellowman/feed",
                                 act = {
                                     verb: "post",
                                     object: {
@@ -154,56 +154,56 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err, act, pair) {
+                "it works": function(err, act, pair) {
                     assert.ifError(err);
                     assert.isObject(act);
                 },
-                'results look correct': function(err, act, pair) {
-                    assert.include(act, 'id');
+                "results look correct": function(err, act, pair) {
+                    assert.include(act, "id");
                     assertValidActivity(act);
                 },
-                'object has correct data': function(err, act) {
+                "object has correct data": function(err, act) {
                     assert.ifError(err);
-                    assert.equal(act.object.objectType, 'collection');
-                    assert.equal(act.object.displayName, 'Bad Boys');
-                    assert.include(act.object, 'url');
-                    assert.include(act.object, 'totalItems');
+                    assert.equal(act.object.objectType, "collection");
+                    assert.equal(act.object.displayName, "Bad Boys");
+                    assert.include(act.object, "url");
+                    assert.include(act.object, "totalItems");
                     assert.equal(act.object.totalItems, 0);
-                    assert.include(act.object, 'items');
-                    assert.include(act.object, 'links');
-                    assert.include(act.object.links, 'self');
+                    assert.include(act.object, "items");
+                    assert.include(act.object, "links");
+                    assert.include(act.object.links, "self");
                 },
-                'and we get the list of lists owned by the user': {
+                "and we get the list of lists owned by the user": {
                     topic: function(act, pair, cl) {
                         var cb = this.callback,
                             cred = makeCred(cl, pair),
-                            url = 'http://localhost:4815/api/user/yellowman/lists';
+                            url = "http://localhost:4815/api/user/yellowman/lists";
 
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc, act.object);
                         });
                     },
-                    'it works': function(err, lists, collection) {
+                    "it works": function(err, lists, collection) {
                         assert.ifError(err);
                         assert.isObject(lists);
                     },
-                    'it looks correct': function(err, lists, collection) {
+                    "it looks correct": function(err, lists, collection) {
                         assert.ifError(err);
                         assertValidList(lists, 1);
-                        assert.include(lists, 'objectTypes');
+                        assert.include(lists, "objectTypes");
                         assert.isArray(lists.objectTypes);
                         assert.include(lists.objectTypes, "collection");
                     },
-                    'it contains the new list': function(err, lists, collection) {
+                    "it contains the new list": function(err, lists, collection) {
                         assert.ifError(err);
-                        assert.include(lists, 'items');
+                        assert.include(lists, "items");
                         assert.isArray(lists.items);
                         assert.lengthOf(lists.items, 1);
                         assert.equal(lists.items[0].id, collection.id);
                     }
                 }
             },
-            'and a user creates a lot of lists': {
+            "and a user creates a lot of lists": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pair = null;
@@ -216,7 +216,7 @@ suite.addBatch({
                             if (err) throw err;
                             pair = results;
                             var cred = makeCred(cl, pair),
-                                url = 'http://localhost:4815/api/user/dekker/feed',
+                                url = "http://localhost:4815/api/user/dekker/feed",
                                 act = {
                                     verb: "post",
                                     object: {
@@ -237,7 +237,7 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err, lists) {
+                "it works": function(err, lists) {
                     assert.ifError(err);
                     assert.isArray(lists);
                     assert.lengthOf(lists, 100);
@@ -246,35 +246,35 @@ suite.addBatch({
                         assertValidActivity(lists[i]);
                     }
                 },
-                'and we get the list of lists owned by the user': {
+                "and we get the list of lists owned by the user": {
                     topic: function(acts, pair, cl) {
                         var cb = this.callback,
                             cred = makeCred(cl, pair),
-                            url = 'http://localhost:4815/api/user/dekker/lists';
+                            url = "http://localhost:4815/api/user/dekker/lists";
 
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc);
                         });
                     },
-                    'it works': function(err, lists, acts) {
+                    "it works": function(err, lists, acts) {
                         assert.ifError(err);
                         assert.isObject(lists);
                     },
-                    'it looks correct': function(err, lists, acts) {
+                    "it looks correct": function(err, lists, acts) {
                         assert.ifError(err);
                         assertValidList(lists, 20);
-                        assert.include(lists, 'objectTypes');
+                        assert.include(lists, "objectTypes");
                         assert.isArray(lists.objectTypes);
                         assert.include(lists.objectTypes, "collection");
                     }
                 }
             },
-            'and a user deletes a list': {
+            "and a user deletes a list": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pair = null,
                         cred = null,
-                        url = 'http://localhost:4815/api/user/maxromeo/feed',
+                        url = "http://localhost:4815/api/user/maxromeo/feed",
                         list = null;
 
                     Step(
@@ -308,39 +308,39 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err, act) {
+                "it works": function(err, act) {
                     assert.ifError(err);
                     assertValidActivity(act);
                 },
-                'and we get the list of lists owned by the user': {
+                "and we get the list of lists owned by the user": {
                     topic: function(act, pair, cl) {
                         var cb = this.callback,
                             cred = makeCred(cl, pair),
-                            url = 'http://localhost:4815/api/user/maxromeo/lists';
+                            url = "http://localhost:4815/api/user/maxromeo/lists";
 
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc);
                         });
                     },
-                    'it works': function(err, lists, acts) {
+                    "it works": function(err, lists, acts) {
                         assert.ifError(err);
                         assert.isObject(lists);
                     },
-                    'it looks correct': function(err, lists, acts) {
+                    "it looks correct": function(err, lists, acts) {
                         assert.ifError(err);
                         assertValidList(lists, 0);
-                        assert.include(lists, 'objectTypes');
+                        assert.include(lists, "objectTypes");
                         assert.isArray(lists.objectTypes);
                         assert.include(lists.objectTypes, "collection");
                     }
                 }
             },
-            'and a user deletes a non-existent list': {
+            "and a user deletes a non-existent list": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pair = null,
                         cred = null,
-                        url = 'http://localhost:4815/api/user/scratch/feed',
+                        url = "http://localhost:4815/api/user/scratch/feed",
                         list = null;
 
                     Step(
@@ -371,16 +371,16 @@ suite.addBatch({
                         }
                     );
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
-            'and a user creates a list that already exists': {
+            "and a user creates a list that already exists": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pair = null,
                         cred = null,
-                        url = 'http://localhost:4815/api/user/petertosh/feed';
+                        url = "http://localhost:4815/api/user/petertosh/feed";
 
                     Step(
                         function() {
@@ -421,16 +421,16 @@ suite.addBatch({
                         }
                     );
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
-            'and a user adds another user to a created list': {
+            "and a user adds another user to a created list": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pair = null,
                         cred = null,
-                        url = 'http://localhost:4815/api/user/patobanton/feed',
+                        url = "http://localhost:4815/api/user/patobanton/feed",
                         list;
 
                     Step(
@@ -468,14 +468,14 @@ suite.addBatch({
                             httputil.postJSON(url, cred, act, this);
                         },
                         function(err, doc, response) {
-                            cb(err, doc, pair); 
+                            cb(err, doc, pair);
                         }
                     );
                 },
-                'it works': function(err, act, pair) {
+                "it works": function(err, act, pair) {
                     assert.ifError(err);
                 },
-                'and we get the collection of users in that list': {
+                "and we get the collection of users in that list": {
                     topic: function(act, pair, cl) {
                         var cb = this.callback,
                             cred = makeCred(cl, pair),
@@ -485,22 +485,22 @@ suite.addBatch({
                             cb(err, doc, act.object);
                         });
                     },
-                    'it works': function(err, list, person) {
+                    "it works": function(err, list, person) {
                         assert.ifError(err);
                         assert.isObject(list);
                         assert.isObject(person);
                         assertValidList(list, 1);
                     },
-                    'it includes that user': function(err, list, person) {
+                    "it includes that user": function(err, list, person) {
                         assert.ifError(err);
                         assert.lengthOf(list.items, 1);
                         assert.equal(list.items[0].id, person.id);
                     },
-                    'and the user removes the other user from the list': {
+                    "and the user removes the other user from the list": {
                         topic: function(list, person, act, pair, cl) {
                             var cb = this.callback,
                                 cred = makeCred(cl, pair),
-                                url = 'http://localhost:4815/api/user/patobanton/feed',
+                                url = "http://localhost:4815/api/user/patobanton/feed",
                                 ract = {
                                     verb: "remove",
                                     object: person,
@@ -508,19 +508,19 @@ suite.addBatch({
                                 };
                             httputil.postJSON(url, cred, ract, cb);
                         },
-                        'it works': function(err, doc, response) {
+                        "it works": function(err, doc, response) {
                             assert.ifError(err);
                             assertValidActivity(doc);
                         }
                     }
                 }
             },
-            'and a user adds another user to a not-yet-created list': {
+            "and a user adds another user to a not-yet-created list": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pair = null,
                         cred = null,
-                        url = 'http://localhost:4815/api/user/sly/feed';
+                        url = "http://localhost:4815/api/user/sly/feed";
 
                     Step(
                         function() {
@@ -548,15 +548,15 @@ suite.addBatch({
                             httputil.postJSON(url, cred, act, this);
                         },
                         function(err, doc, response) {
-                            cb(err, doc, pair); 
+                            cb(err, doc, pair);
                         }
                     );
                 },
-                'it works': function(err, doc, pair) {
+                "it works": function(err, doc, pair) {
                     assert.ifError(err);
                     assertValidActivity(doc);
                 },
-                'and we get the collection of users in that list': {
+                "and we get the collection of users in that list": {
                     topic: function(act, pair, cl) {
                         var cb = this.callback,
                             cred = makeCred(cl, pair),
@@ -566,25 +566,25 @@ suite.addBatch({
                             cb(err, doc, act.object);
                         });
                     },
-                    'it works': function(err, list, person) {
+                    "it works": function(err, list, person) {
                         assert.ifError(err);
                         assert.isObject(list);
                         assert.isObject(person);
                         assertValidList(list, 1);
                     },
-                    'it includes that user': function(err, list, person) {
+                    "it includes that user": function(err, list, person) {
                         assert.ifError(err);
                         assert.lengthOf(list.items, 1);
                         assert.equal(list.items[0].id, person.id);
                     }
                 }
             },
-            'and a user adds an arbitrary person to a list': {
+            "and a user adds an arbitrary person to a list": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pair = null,
                         cred = null,
-                        url = 'http://localhost:4815/api/user/toots/feed',
+                        url = "http://localhost:4815/api/user/toots/feed",
                         list;
 
                     Step(
@@ -619,15 +619,15 @@ suite.addBatch({
                             httputil.postJSON(url, cred, act, this);
                         },
                         function(err, doc, response) {
-                            cb(err, doc, pair); 
+                            cb(err, doc, pair);
                         }
                     );
                 },
-                'it works': function(err, doc, pair) {
+                "it works": function(err, doc, pair) {
                     assert.ifError(err);
                     assertValidActivity(doc);
                 },
-                'and we get the collection of users in that list': {
+                "and we get the collection of users in that list": {
                     topic: function(act, pair, cl) {
                         var cb = this.callback,
                             cred = makeCred(cl, pair),
@@ -637,25 +637,25 @@ suite.addBatch({
                             cb(err, doc, act.object);
                         });
                     },
-                    'it works': function(err, list, person) {
+                    "it works": function(err, list, person) {
                         assert.ifError(err);
                         assert.isObject(list);
                         assert.isObject(person);
                         assertValidList(list, 1);
                     },
-                    'it includes that user': function(err, list, person) {
+                    "it includes that user": function(err, list, person) {
                         assert.ifError(err);
                         assert.lengthOf(list.items, 1);
                         assert.equal(list.items[0].id, person.id);
                     }
                 }
             },
-            'and a user removes another person from a list they\'re not in': {
+            "and a user removes another person from a list they're not in": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pair = null,
                         cred = null,
-                        url = 'http://localhost:4815/api/user/bunny/feed',
+                        url = "http://localhost:4815/api/user/bunny/feed",
                         list;
 
                     Step(
@@ -700,19 +700,19 @@ suite.addBatch({
                         }
                     );
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
-            'and a user adds another user to a list they don\'t own': {
+            "and a user adds another user to a list they don't own": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pair1 = null,
                         pair2 = null,
                         cred1 = null,
                         cred2 = null,
-                        url1 = 'http://localhost:4815/api/user/burningspear/feed',
-                        url2 = 'http://localhost:4815/api/user/sugar/feed',
+                        url1 = "http://localhost:4815/api/user/burningspear/feed",
+                        url2 = "http://localhost:4815/api/user/sugar/feed",
                         list;
 
                     Step(
@@ -760,19 +760,19 @@ suite.addBatch({
                         }
                     );
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
-            'and a user removes another user from a list they don\'t own': {
+            "and a user removes another user from a list they don't own": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pair1 = null,
                         pair2 = null,
                         cred1 = null,
                         cred2 = null,
-                        url1 = 'http://localhost:4815/api/user/junior/feed',
-                        url2 = 'http://localhost:4815/api/user/marcia/feed',
+                        url1 = "http://localhost:4815/api/user/junior/feed",
+                        url2 = "http://localhost:4815/api/user/marcia/feed",
                         list;
 
                     Step(
@@ -811,7 +811,7 @@ suite.addBatch({
                         },
                         function(err, doc, response) {
                             if (err) {
-                                // Got an error up to here; it's an error
+                                // Got an error up to here; it"s an error
                                 cb(err);
                                 return;
                             }
@@ -833,16 +833,16 @@ suite.addBatch({
                         }
                     );
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
-            'and a user creates a list': {
+            "and a user creates a list": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pair = null,
                         cred = null,
-                        url = 'http://localhost:4815/api/user/jimmy/feed';
+                        url = "http://localhost:4815/api/user/jimmy/feed";
 
                     Step(
                         function() {
@@ -870,15 +870,15 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err, cred, list) {
+                "it works": function(err, cred, list) {
                     assert.ifError(err);
                 },
-                'and we try to read it with no credentials': {
+                "and we try to read it with no credentials": {
                     topic: function(cred, list, cl) {
                         var cb = this.callback,
                             parsed = urlparse(list.links.self),
                             options = {
-                                host: 'localhost',
+                                host: "localhost",
                                 port: 4815,
                                 path: parsed.path
                             };
@@ -888,15 +888,15 @@ suite.addBatch({
                             } else {
                                 cb(new Error("Unexpected status code"));
                             }
-                        }).on('error', function(err) {
+                        }).on("error", function(err) {
                             cb(err);
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we read it with another user\'s credentials': {
+                "and we read it with another user's credentials": {
                     topic: function(cred, list, cl) {
                         var cb = this.callback,
                             other = null;
@@ -921,11 +921,11 @@ suite.addBatch({
                             }
                         );
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we read it with only client credentials': {
+                "and we read it with only client credentials": {
                     topic: function(cred, list, cl) {
                         var cb = this.callback;
 
@@ -945,11 +945,11 @@ suite.addBatch({
                             }
                         );
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we read it with the creator credentials': {
+                "and we read it with the creator credentials": {
                     topic: function(cred, list, cl) {
                         var cb = this.callback;
 
@@ -962,18 +962,18 @@ suite.addBatch({
                             }
                         );
                     },
-                    'it works': function(err, doc) {
+                    "it works": function(err, doc) {
                         assert.ifError(err);
                     },
-                    'it looks right': function(err, doc) {
-                        assert.equal(doc.objectType, 'collection');
-                        assert.equal(doc.displayName, 'Beautiful People');
-                        assert.include(doc, 'url');
-                        assert.include(doc, 'totalItems');
+                    "it looks right": function(err, doc) {
+                        assert.equal(doc.objectType, "collection");
+                        assert.equal(doc.displayName, "Beautiful People");
+                        assert.include(doc, "url");
+                        assert.include(doc, "totalItems");
                         assert.equal(doc.totalItems, 0);
-                        assert.include(doc, 'items');
-                        assert.include(doc, 'links');
-                        assert.include(doc.links, 'self');
+                        assert.include(doc, "items");
+                        assert.include(doc, "links");
+                        assert.include(doc.links, "self");
                     }
                 }
             }
@@ -981,6 +981,6 @@ suite.addBatch({
     }
 });
 
-               suite['export'](module);
+suite["export"](module);
 
-               
+
