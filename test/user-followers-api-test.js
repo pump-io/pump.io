@@ -222,7 +222,7 @@ suite.addBatch({
                 "it works": function(err, pair) {
                     assert.ifError(err);
                 },
-                "and we GET the following list with client credentials and the same user\"s access token": {
+                "and we GET the following list with client credentials and the same user's access token": {
                     topic: function(pair, user, cl) {
                         var cb = this.callback;
                         Step(
@@ -248,7 +248,7 @@ suite.addBatch({
                         assertValidList(doc, 0);
                     }
                 },
-                "and we GET the followers list with client credentials and the same user\"s access token": {
+                "and we GET the followers list with client credentials and the same user's access token": {
                     topic: function(pair, user, cl) {
                         var cb = this.callback;
                         Step(
@@ -275,7 +275,7 @@ suite.addBatch({
                     }
                 }
             },
-            "and we GET the followers list with client credentials and a different user\"s access token": {
+            "and we GET the followers list with client credentials and a different user's access token": {
                 topic: function(user, cl) {
                     var cb = this.callback;
                     Step(
@@ -365,7 +365,7 @@ suite.addBatch({
                     assert.ifError(err);
                 }
             },
-            "and we GET the following list with client credentials and a different user\"s access token": {
+            "and we GET the following list with client credentials and a different user's access token": {
                 topic: function(user, cl) {
                     var cb = this.callback;
                     Step(
@@ -451,7 +451,7 @@ suite.addBatch({
             "it works": function(err, users, pairs) {
                 assert.ifError(err);
             },
-            "and we check the first user\"s following list": {
+            "and we check the first user's following list": {
                 topic: function(users, pairs, cl) {
                     var cb = this.callback,
                         cred = makeCred(cl, pairs.greatjon),
@@ -473,7 +473,7 @@ suite.addBatch({
                     assert.equal(doc.items[0].objectType, person.objectType);
                 }
             },
-            "and we check the first user\"s followers list": {
+            "and we check the first user's followers list": {
                 topic: function(users, pairs, cl) {
                     var cb = this.callback,
                         cred = makeCred(cl, pairs.greatjon),
@@ -490,7 +490,7 @@ suite.addBatch({
                     assertValidList(doc, 0);
                 }
             },
-            "and we check the second user\"s followers list": {
+            "and we check the second user's followers list": {
                 topic: function(users, pairs, cl) {
                     var cb = this.callback,
                         cred = makeCred(cl, pairs.robb),
@@ -512,7 +512,7 @@ suite.addBatch({
                     assert.equal(doc.items[0].objectType, person.objectType);
                 }
             },
-            "and we check the second user\"s following list": {
+            "and we check the second user's following list": {
                 topic: function(users, pairs, cl) {
                     var cb = this.callback,
                         cred = makeCred(cl, pairs.robb),
