@@ -279,7 +279,7 @@ suite.addBatch({
                         var Image = require("../lib/model/image").Image;
                         if (err) throw err;
                         user = results;
-                        Image.create({displayName: "Evan"s avatar",
+                        Image.create({displayName: "Evan's avatar",
                                       url: "https://c778552.ssl.cf2.rackcdn.com/evan/1-96-20120103014637.jpeg"},
                                      this);
                     },
