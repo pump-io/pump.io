@@ -161,7 +161,7 @@ var showStream = function(req, res, next) {
 };
 
 var authenticate = function(req, res) {
-    // XXX: I think there"s an easier way to get this, but leave it for now.
+    // XXX: I think there's an easier way to get this, but leave it for now.
     var parsedUrl = url.parse(req.originalUrl, true),
         token = parsedUrl.query.oauth_token;
 
