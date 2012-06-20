@@ -151,7 +151,7 @@ suite.addBatch({
                     assert.lengthOf(faves.items, 0);
                 }
             },
-            "and one user favorites another user\"s object": {
+            "and one user favorites another user's object": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pairs = {};
@@ -201,7 +201,7 @@ suite.addBatch({
                 "it works": function(err, act, pairs) {
                     assert.ifError(err);
                 },
-                "and we get the user\"s list of favorites": {
+                "and we get the user's list of favorites": {
                     topic: function(act, pairs, cl) {
                         var cred = makeCred(cl, pairs.bobby),
                             url = "http://localhost:4815/api/user/bobby/favorites",
@@ -245,7 +245,7 @@ suite.addBatch({
                     }
                 }
             },
-            "and one user double-favorites another user\"s object": {
+            "and one user double-favorites another user's object": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pairs = {};
@@ -316,7 +316,7 @@ suite.addBatch({
                     assert.ifError(err);
                 }
             },
-            "and one user favorites then unfavorites another user\"s object": {
+            "and one user favorites then unfavorites another user's object": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pairs = {};
@@ -380,7 +380,7 @@ suite.addBatch({
                 "it works": function(err, act) {
                     assert.ifError(err);
                 },
-                "and we get the user\"s list of favorites": {
+                "and we get the user's list of favorites": {
                     topic: function(act, pairs, cl) {
                         var cred = makeCred(cl, pairs.greg),
                             url = "http://localhost:4815/api/user/greg/favorites",
@@ -416,7 +416,7 @@ suite.addBatch({
                     }
                 }
             },
-            "and one user unfavorites another user\"s object they hadn\"t faved before": {
+            "and one user unfavorites another user's object they hadn't faved before": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pairs = {};
@@ -507,7 +507,7 @@ suite.addBatch({
                 "it works": function(err, act) {
                     assert.ifError(err);
                 },
-                "and we get the user\"s list of favorites": {
+                "and we get the user's list of favorites": {
                     topic: function(act, pairs, cl) {
                         var cred = makeCred(cl, pairs.tiger),
                             url = "http://localhost:4815/api/user/tiger/favorites",
