@@ -265,7 +265,7 @@ suite.addBatch({
                         assertValidList(lists, 20);
                         assert.include(lists, 'objectTypes');
                         assert.isArray(lists.objectTypes);
-                        assert.include(lists.objectTypes, "collections");
+                        assert.include(lists.objectTypes, "collection");
                     }
                 }
             },
@@ -331,7 +331,7 @@ suite.addBatch({
                         assertValidList(lists, 0);
                         assert.include(lists, 'objectTypes');
                         assert.isArray(lists.objectTypes);
-                        assert.include(lists.objectTypes, "collections");
+                        assert.include(lists.objectTypes, "collection");
                     }
                 }
             },
