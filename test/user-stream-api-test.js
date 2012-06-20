@@ -658,7 +658,7 @@ suite.addBatch({
                         "it works": itWorks,
                         "it looks right": validForm(0, 100)
                     },
-                    "and we get the full feed by following "next" links": {
+                    "and we get the full feed by following 'next' links": {
                         topic: function(full, cred) {
                             var cb = this.callback,
                                 items = [],
