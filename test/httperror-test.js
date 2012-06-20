@@ -16,34 +16,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows');
+var assert = require("assert"),
+    vows = require("vows");
 
-vows.describe('httperror module interface').addBatch({
-    'When we require the http error module': {
+vows.describe("httperror module interface").addBatch({
+    "When we require the http error module": {
         topic: function() { 
-            return require('../lib/httperror');
+            return require("../lib/httperror");
         },
-        'we get an object': function(httperror) {
+        "we get an object": function(httperror) {
             assert.isObject(httperror);
         },
-        'which includes HTTPError': function(httperror) {
-            assert.includes(httperror, 'HTTPError');
+        "which includes HTTPError": function(httperror) {
+            assert.includes(httperror, "HTTPError");
         },
-        'and we get its HTTPError export': {
+        "and we get its HTTPError export": {
             topic: function(httperror) {
                 return httperror.HTTPError;
             },
-            'it exists': function(HTTPError) {
+            "it exists": function(HTTPError) {
                 assert.isFunction(HTTPError);
             },
-            'and we create an HTTPError': {
+            "and we create an HTTPError": {
                 topic: function(HTTPError) {
                     return new HTTPError("Message", 404);
                 },
-                'it looks about right': function(err) {
-                    assert.includes(err, 'message');
-                    assert.includes(err, 'code');
+                "it looks about right": function(err) {
+                    assert.includes(err, "message");
+                    assert.includes(err, "code");
                     assert.isString(err.message);
                     assert.isNumber(err.code);
                     assert.equal(err.message, "Message");
@@ -53,5 +53,5 @@ vows.describe('httperror module interface').addBatch({
             
         }
     }
-})['export'](module);
+})["export"](module);
 

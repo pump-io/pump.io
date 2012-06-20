@@ -16,39 +16,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows');
+var assert = require("assert"),
+    vows = require("vows");
 
-vows.describe('randomstring module interface').addBatch({
-    'When we require the randomstring module': {
+vows.describe("randomstring module interface").addBatch({
+    "When we require the randomstring module": {
         topic: function() { 
-            return require('../lib/randomstring');
+            return require("../lib/randomstring");
         },
-        'we get a module back': function(rs) {
+        "we get a module back": function(rs) {
             assert.ok(rs);
         },
-        'we can get the randomString function': {
+        "we can get the randomString function": {
             topic: function(rs) {
                 return rs.randomString;
             },
-            'which is a function': function (randomString) {
+            "which is a function": function (randomString) {
                 assert.isFunction(randomString);
             },
-            'we can get a random string': {
+            "we can get a random string": {
                 topic: function(randomString) {
                     randomString(16, this.callback);
                 },
-                'without an error': function(err, value) {
+                "without an error": function(err, value) {
                     assert.ifError(err);
                 },
-                'with a string return value': function(err, value) {
+                "with a string return value": function(err, value) {
                     assert.isString(value);
                 },
-                'with only URL-safe characters': function(err, value) {
+                "with only URL-safe characters": function(err, value) {
                     assert.match(value, /^[A-Za-z0-9\-_]+$/);
                 }
             }
         }
     }
-})['export'](module);
+})["export"](module);
 

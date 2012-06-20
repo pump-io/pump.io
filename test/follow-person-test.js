@@ -16,17 +16,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    Step = require('step'),
-    _ = require('underscore'),
-    querystring = require('querystring'),
-    http = require('http'),
-    OAuth = require('oauth').OAuth,
-    Browser = require('zombie'),
-    httputil = require('./lib/http'),
-    oauthutil = require('./lib/oauth'),
-    actutil = require('./lib/activity'),
+var assert = require("assert"),
+    vows = require("vows"),
+    Step = require("step"),
+    _ = require("underscore"),
+    querystring = require("querystring"),
+    http = require("http"),
+    OAuth = require("oauth").OAuth,
+    Browser = require("zombie"),
+    httputil = require("./lib/http"),
+    oauthutil = require("./lib/oauth"),
+    actutil = require("./lib/activity"),
     setupApp = oauthutil.setupApp,
     newCredentials = oauthutil.newCredentials,
     newClient = oauthutil.newClient,
@@ -43,12 +43,12 @@ var makeCred = function(cl, pair) {
     };
 };
 
-var suite = vows.describe('follow person activity test');
+var suite = vows.describe("follow person activity test");
 
 // A batch to test following/unfollowing users
 
 suite.addBatch({
-    'When we set up the app': {
+    "When we set up the app": {
         topic: function() {
             setupApp(this.callback);
         },
@@ -57,18 +57,18 @@ suite.addBatch({
                 app.close();
             }
         },
-        'it works': function(err, app) {
+        "it works": function(err, app) {
             assert.ifError(err);
         },
-        'and we register a client': {
+        "and we register a client": {
             topic: function() {
                 newClient(this.callback);
             },
-            'it works': function(err, cl) {
+            "it works": function(err, cl) {
                 assert.ifError(err);
                 assert.isObject(cl);
             },
-            'and one user follows another': {
+            "and one user follows another": {
                 topic: function(cl) {
                     var cb = this.callback,
                         users = {larry: {}, moe: {}, curly: {}};
@@ -100,7 +100,7 @@ suite.addBatch({
                                     id: users.moe.profile.id
                                 }
                             },
-                                url = 'http://localhost:4815/api/user/larry/feed',
+                                url = "http://localhost:4815/api/user/larry/feed",
                                 cred = makeCred(cl, users.larry.pair);
 
                             httputil.postJSON(url, cred, act, this);
@@ -110,23 +110,23 @@ suite.addBatch({
                                 cb(err, null);
                             } else {
                                 cb(null, posted);
-                            };
+                            }
                         }
                     );
                 },
-                'it works': function(err, act) {
+                "it works": function(err, act) {
                     assert.ifError(err);
                 },
-                'results are valid': function(err, act) {
+                "results are valid": function(err, act) {
                     assert.ifError(err);
                     actutil.validActivity(act);
                 },
-                'results are correct': function(err, act) {
+                "results are correct": function(err, act) {
                     assert.ifError(err);
                     assert.equal(act.verb, "follow");
                 }
             },
-            'and one user double-follows another': {
+            "and one user double-follows another": {
                 topic: function(cl) {
                     var cb = this.callback,
                         users = {},
@@ -153,7 +153,7 @@ suite.addBatch({
                                     id: users.jeckle.profile.id
                                 }
                             },
-                                url = 'http://localhost:4815/api/user/heckle/feed',
+                                url = "http://localhost:4815/api/user/heckle/feed",
                                 cred = makeCred(cl, users.heckle.pair);
 
                             httputil.postJSON(url, cred, act, this);
@@ -167,7 +167,7 @@ suite.addBatch({
                                     id: users.jeckle.profile.id
                                 }
                             },
-                                url = 'http://localhost:4815/api/user/heckle/feed',
+                                url = "http://localhost:4815/api/user/heckle/feed",
                                 cred = makeCred(cl, users.heckle.pair);
 
                             httputil.postJSON(url, cred, act, this);
@@ -177,15 +177,15 @@ suite.addBatch({
                                 cb(null);
                             } else {
                                 cb(new Error("Unexpected success"));
-                            };
+                            }
                         }
                     );
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
-            'and one user follows a remote person': {
+            "and one user follows a remote person": {
                 topic: function(cl) {
                     var cb = this.callback;
 
@@ -207,7 +207,7 @@ suite.addBatch({
                                     displayName: "Jerry"
                                 }
                             },
-                                url = 'http://localhost:4815/api/user/tom/feed',
+                                url = "http://localhost:4815/api/user/tom/feed",
                                 cred = makeCred(cl, pair);
 
                             httputil.postJSON(url, cred, act, this);
@@ -217,18 +217,18 @@ suite.addBatch({
                                 cb(err, null);
                             } else {
                                 cb(null, posted);
-                            };
+                            }
                         }
                     );
                 },
-                'it works': function(err, act) {
+                "it works": function(err, act) {
                     assert.ifError(err);
                 },
-                'results are valid': function(err, act) {
+                "results are valid": function(err, act) {
                     assert.ifError(err);
                     actutil.validActivity(act);
                 },
-                'results are correct': function(err, act) {
+                "results are correct": function(err, act) {
                     assert.ifError(err);
                     assert.equal(act.verb, "follow");
                 }
@@ -237,4 +237,4 @@ suite.addBatch({
     }
 });
 
-suite['export'](module);
+suite["export"](module);

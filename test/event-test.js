@@ -16,34 +16,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('event module interface');
+var suite = vows.describe("event module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ['attending',
-             'author',
-             'displayName',
-             'endTime',
-             'location',
-             'maybeAttending',
-             'notAttending',
-             'published',
-             'startTime',
-             'summary',
-             'updated',
-             'url']
+    fields: ["attending",
+             "author",
+             "displayName",
+             "endTime",
+             "location",
+             "maybeAttending",
+             "notAttending",
+             "published",
+             "startTime",
+             "summary",
+             "updated",
+             "url"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         displayName: "Federation Hackfest 2012",
         url: "http://example.com/event/federation-hackfest-2012",
         summary: "Come hack with us!",
@@ -66,11 +66,11 @@ var testData = {
             }
         ]
     },
-    'update': {
+    "update": {
         summary: "Come <strong>hack</strong> with us!"
     }
 };
 
-suite.addBatch(modelBatch('event', 'Event', testSchema, testData));
+suite.addBatch(modelBatch("event", "Event", testSchema, testData));
 
-suite['export'](module);
+suite["export"](module);

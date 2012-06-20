@@ -16,29 +16,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('audio module interface');
+var suite = vows.describe("audio module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ['author',
-             'displayName',
-             'embedCode',
-             'published',
-             'stream',
-             'summary',
-             'updated']
+    fields: ["author",
+             "displayName",
+             "embedCode",
+             "published",
+             "stream",
+             "summary",
+             "updated"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         displayName: "Shake Your Rump",
         url: "http://example.com/beastie-boys/pauls-boutique/2",
         stream: {
@@ -46,12 +46,12 @@ var testData = {
             duration: 388
         }
     },
-    'update': {
+    "update": {
         displayName: "Shake Your Rump (Extended Mix)"
     }
 };
 
-suite.addBatch(modelBatch('audio', 'Audio', testSchema, testData));
+suite.addBatch(modelBatch("audio", "Audio", testSchema, testData));
 
-suite['export'](module);
+suite["export"](module);
 

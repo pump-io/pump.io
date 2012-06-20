@@ -16,11 +16,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var http = require('http'),
-    assert = require('assert'),
-    querystring = require('querystring'),
-    _ = require('underscore'),
-    OAuth = require('oauth').OAuth;
+var http = require("http"),
+    assert = require("assert"),
+    querystring = require("querystring"),
+    _ = require("underscore"),
+    OAuth = require("oauth").OAuth;
 
 var OAuthJSONError = function(obj) {
     Error.captureStackTrace(this, OAuthJSONError);
@@ -38,9 +38,9 @@ OAuthJSONError.prototype.toString = function() {
 var endpoint = function(url, methods) {
     var context = {
         topic: function() {
-            options('localhost', 4815, url, this.callback);
+            options("localhost", 4815, url, this.callback);
         },
-        'it exists': function(err, allow, res, body) {
+        "it exists": function(err, allow, res, body) {
             assert.ifError(err);
             assert.equal(res.statusCode, 200);
         }
@@ -54,7 +54,7 @@ var endpoint = function(url, methods) {
     var i;
 
     for (i = 0; i < methods.length; i++) {
-        context['it supports '+methods[i]] = checkMethod(methods[i]);
+        context["it supports "+methods[i]] = checkMethod(methods[i]);
     }
 
     return context;
@@ -66,31 +66,31 @@ var options = function(host, port, path, callback) {
         host: host,
         port: port,
         path: path,
-        method: 'OPTIONS',
+        method: "OPTIONS",
         headers: {
-            'User-Agent': 'activitypump-test/0.1.0dev'
+            "User-Agent": "activitypump-test/0.1.0dev"
         }
     };
 
     var req = http.request(reqOpts, function(res) {
-        var body = '';
-        res.setEncoding('utf8');
-        res.on('data', function(chunk) {
+        var body = "";
+        res.setEncoding("utf8");
+        res.on("data", function(chunk) {
             body = body + chunk;
         });
-        res.on('error', function(err) {
+        res.on("error", function(err) {
             callback(err, null, null, null);
         });
-        res.on('end', function() {
+        res.on("end", function() {
             var allow = [];
-            if (_(res.headers).has('allow')) {
-                allow = res.headers.allow.split(',').map(function(s) { return s.trim(); });
+            if (_(res.headers).has("allow")) {
+                allow = res.headers.allow.split(",").map(function(s) { return s.trim(); });
             }
             callback(null, allow, res, body);
         });
     });
 
-    req.on('error', function(err) {
+    req.on("error", function(err) {
         callback(err, null, null, null);
     });
 
@@ -105,29 +105,29 @@ var post = function(host, port, path, params, callback) {
         host: host,
         port: port,
         path: path,
-        method: 'POST',
+        method: "POST",
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Content-Length': requestBody.length,
-            'User-Agent': 'activitypump-test/0.1.0dev'
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Length": requestBody.length,
+            "User-Agent": "activitypump-test/0.1.0dev"
         }
     };
 
     var req = http.request(reqOpts, function(res) {
-        var body = '';
-        res.setEncoding('utf8');
-        res.on('data', function(chunk) {
+        var body = "";
+        res.setEncoding("utf8");
+        res.on("data", function(chunk) {
             body = body + chunk;
         });
-        res.on('error', function(err) {
+        res.on("error", function(err) {
             callback(err, null, null);
         });
-        res.on('end', function() {
+        res.on("end", function() {
             callback(null, res, body);
         });
     });
 
-    req.on('error', function(err) {
+    req.on("error", function(err) {
         callback(err, null, null);
     });
 
@@ -156,8 +156,8 @@ var postJSON = function(serverUrl, cred, payload, callback) {
 
     var oa, toSend;
 
-    oa = new OAuth('http://localhost:4815/oauth/request_token',
-                   'http://localhost:4815/oauth/access_token',
+    oa = new OAuth("http://localhost:4815/oauth/request_token",
+                   "http://localhost:4815/oauth/access_token",
                    cred.consumer_key,
                    cred.consumer_secret,
                    "1.0",
@@ -168,15 +168,15 @@ var postJSON = function(serverUrl, cred, payload, callback) {
     
     toSend = JSON.stringify(payload);
 
-    oa.post(serverUrl, cred.token, cred.token_secret, toSend, 'application/json', jsonHandler(callback));
+    oa.post(serverUrl, cred.token, cred.token_secret, toSend, "application/json", jsonHandler(callback));
 };
 
 var putJSON = function(serverUrl, cred, payload, callback) {
 
     var oa, toSend;
 
-    oa = new OAuth('http://localhost:4815/oauth/request_token',
-                   'http://localhost:4815/oauth/access_token',
+    oa = new OAuth("http://localhost:4815/oauth/request_token",
+                   "http://localhost:4815/oauth/access_token",
                    cred.consumer_key,
                    cred.consumer_secret,
                    "1.0",
@@ -187,15 +187,15 @@ var putJSON = function(serverUrl, cred, payload, callback) {
     
     toSend = JSON.stringify(payload);
 
-    oa.put(serverUrl, cred.token, cred.token_secret, toSend, 'application/json', jsonHandler(callback));
+    oa.put(serverUrl, cred.token, cred.token_secret, toSend, "application/json", jsonHandler(callback));
 };
 
 var getJSON = function(serverUrl, cred, callback) {
 
     var oa, toSend;
 
-    oa = new OAuth('http://localhost:4815/oauth/request_token',
-                   'http://localhost:4815/oauth/access_token',
+    oa = new OAuth("http://localhost:4815/oauth/request_token",
+                   "http://localhost:4815/oauth/access_token",
                    cred.consumer_key,
                    cred.consumer_secret,
                    "1.0",
@@ -211,8 +211,8 @@ var delJSON = function(serverUrl, cred, callback) {
 
     var oa, toSend;
 
-    oa = new OAuth('http://localhost:4815/oauth/request_token',
-                   'http://localhost:4815/oauth/access_token',
+    oa = new OAuth("http://localhost:4815/oauth/request_token",
+                   "http://localhost:4815/oauth/access_token",
                    cred.consumer_key,
                    cred.consumer_secret,
                    "1.0",
@@ -221,7 +221,7 @@ var delJSON = function(serverUrl, cred, callback) {
                    null, // nonce size; use default
                    {"User-Agent": "activitypump-test/0.1.0"});
     
-    oa['delete'](serverUrl, cred.token, cred.token_secret, jsonHandler(callback));
+    oa["delete"](serverUrl, cred.token, cred.token_secret, jsonHandler(callback));
 };
 
 exports.options = options;

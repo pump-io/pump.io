@@ -16,32 +16,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows');
+var assert = require("assert"),
+    vows = require("vows");
 
 var validActivity = function(act) {
     assert.isObject(act);
-    assert.include(act, 'id');
+    assert.include(act, "id");
     assert.isString(act.id);
-    assert.include(act, 'actor');
+    assert.include(act, "actor");
     assert.isObject(act.actor);
-    assert.include(act.actor, 'id');
+    assert.include(act.actor, "id");
     assert.isString(act.actor.id);
-    assert.include(act.actor, 'objectType');
+    assert.include(act.actor, "objectType");
     assert.isString(act.actor.objectType);
-    assert.include(act.actor, 'displayName');
+    assert.include(act.actor, "displayName");
     assert.isString(act.actor.displayName);
-    assert.include(act, 'verb');
+    assert.include(act, "verb");
     assert.isString(act.verb);
-    assert.include(act, 'object');
+    assert.include(act, "object");
     assert.isObject(act.object);
-    assert.include(act.object, 'id');
+    assert.include(act.object, "id");
     assert.isString(act.object.id);
-    assert.include(act.object, 'objectType');
+    assert.include(act.object, "objectType");
     assert.isString(act.object.objectType);
-    assert.include(act, 'published');
+    assert.include(act, "published");
     assert.isString(act.published);
-    assert.include(act, 'updated');
+    assert.include(act, "updated");
     assert.isString(act.updated);
 };
 

@@ -16,12 +16,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var Step = require('step'),
-    _ = require('underscore'),
-    http = require('http'),
-    OAuth = require('oauth').OAuth,
-    Browser = require('zombie'),
-    httputil = require('./http');
+var Step = require("step"),
+    _ = require("underscore"),
+    http = require("http"),
+    OAuth = require("oauth").OAuth,
+    Browser = require("zombie"),
+    httputil = require("./http");
 
 var OAuthError = function(obj) {
     Error.captureStackTrace(this, OAuthError);
@@ -38,8 +38,8 @@ OAuthError.prototype.toString = function() {
 
 var requestToken = function(cl, cb) {
     var oa;
-    oa = new OAuth('http://localhost:4815/oauth/request_token',
-                   'http://localhost:4815/oauth/access_token',
+    oa = new OAuth("http://localhost:4815/oauth/request_token",
+                   "http://localhost:4815/oauth/access_token",
                    cl.client_id,
                    cl.client_secret,
                    "1.0",
@@ -58,7 +58,7 @@ var requestToken = function(cl, cb) {
 };
 
 var newClient = function(cb) {
-    httputil.post('localhost', 4815, '/api/client/register', {type: 'client_associate'}, function(err, res, body) {
+    httputil.post("localhost", 4815, "/api/client/register", {type: "client_associate"}, function(err, res, body) {
         var cl;
         if (err) {
             cb(err, null);
@@ -110,8 +110,8 @@ var accessToken = function(cl, user, cb) {
             if (err) throw err;
             if (!br.success) throw new OAuthError({statusCode: br.statusCode, data: br.error || br.text("#error")});
             verifier = br.text("#verifier");
-            oa = new OAuth('http://localhost:4815/oauth/request_token',
-                           'http://localhost:4815/oauth/access_token',
+            oa = new OAuth("http://localhost:4815/oauth/request_token",
+                           "http://localhost:4815/oauth/access_token",
                            cl.client_id,
                            cl.client_secret,
                            "1.0",
@@ -140,7 +140,7 @@ var accessToken = function(cl, user, cb) {
 
 var register = function(cl, nickname, password, callback) {
 
-    httputil.postJSON('http://localhost:4815/api/users', 
+    httputil.postJSON("http://localhost:4815/api/users", 
                       {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
                       {nickname: nickname, password: password},
                       function(err, body, res) {
@@ -198,15 +198,15 @@ var setupApp = function(callback) {
 
     var cb = callback,
         config = {port: 4815,
-                  hostname: 'localhost',
-                  driver: 'memory',
+                  hostname: "localhost",
+                  driver: "memory",
                   params: {},
                   nologger: true
                  },
         app = null,
-        makeApp = require('../../lib/app').makeApp;
+        makeApp = require("../../lib/app").makeApp;
 
-    process.env.NODE_ENV = 'test';
+    process.env.NODE_ENV = "test";
 
     Step(
         function() {

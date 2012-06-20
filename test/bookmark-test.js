@@ -16,30 +16,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('bookmark module interface');
+var suite = vows.describe("bookmark module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ['author',
-             'content',
-             'displayName',
-             'image',
-             'published',
-             'targetUrl',
-             'updated',
-             'url']
+    fields: ["author",
+             "content",
+             "displayName",
+             "image",
+             "published",
+             "targetUrl",
+             "updated",
+             "url"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         displayName: "Google Home Page",
         url: "http://example.com/bookmark/google-home-page",
         content: "Main search page for Google",
@@ -50,11 +50,11 @@ var testData = {
         },
         targetUrl: "http://www.google.com/"
     },
-    'update': {
+    "update": {
         content: "Main search page for Google in the US"
     }
 };
 
-suite.addBatch(modelBatch('bookmark', 'Bookmark', testSchema, testData));
+suite.addBatch(modelBatch("bookmark", "Bookmark", testSchema, testData));
 
-suite['export'](module);
+suite["export"](module);

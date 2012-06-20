@@ -16,36 +16,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
-    AccessToken = require('../lib/model/accesstoken').AccessToken,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
+    AccessToken = require("../lib/model/accesstoken").AccessToken,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('access token interface');
+var suite = vows.describe("access token interface");
 
 var testSchema = {
-    pkey: 'access_token',
-    fields: ['token_secret',
-             'consumer_key',
-             'request_token',
-             'username',
-             'created',
-             'updated'],
-    indices: ['username', 'consumer_key', 'request_token']
+    pkey: "access_token",
+    fields: ["token_secret",
+             "consumer_key",
+             "request_token",
+             "username",
+             "created",
+             "updated"],
+    indices: ["username", "consumer_key", "request_token"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         consumer_key: "AAAAAAAAAAAAAAAAAAAAAA",
         request_token: "BBBBBBBBBBBBBBBBBBBBBB",
         username: "jordan",
         callback: "http://example.com/callback"
     },
-    'update': {
+    "update": {
         username: "evan"
     }
 };
@@ -53,12 +53,12 @@ var testData = {
 // XXX: hack hack hack
 // modelBatch hard-codes ActivityObject-style
 
-var mb = modelBatch('accesstoken', 'AccessToken', testSchema, testData);
+var mb = modelBatch("accesstoken", "AccessToken", testSchema, testData);
 
-mb['When we require the accesstoken module']
-  ['and we get its AccessToken class export']
-  ['and we create an accesstoken instance']
-  ['auto-generated fields are there'] = function(err, created) {
+mb["When we require the accesstoken module"]
+  ["and we get its AccessToken class export"]
+  ["and we create an accesstoken instance"]
+  ["auto-generated fields are there"] = function(err, created) {
       assert.isString(created.access_token);
       assert.isString(created.token_secret);
       assert.isString(created.created);
@@ -67,4 +67,4 @@ mb['When we require the accesstoken module']
 
 suite.addBatch(mb);
 
-suite['export'](module);
+suite["export"](module);

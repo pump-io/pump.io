@@ -16,30 +16,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('collection module interface');
+var suite = vows.describe("collection module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ['author',
-             'displayName',
-             'image',
-             'objectTypes',
-             'published',
-             'summary',
-             'updated',
-             'url']
+    fields: ["author",
+             "displayName",
+             "image",
+             "objectTypes",
+             "published",
+             "summary",
+             "updated",
+             "url"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         displayName: "Vacation 2011",
         url: "http://example.com/collection/photos/vacation-2011",
         image: {
@@ -49,11 +49,11 @@ var testData = {
         },
         objectTypes: ["image", "video"]
     },
-    'update': {
+    "update": {
         displayName: "Vacation Summer 2011"
     }
 };
 
-suite.addBatch(modelBatch('collection', 'Collection', testSchema, testData));
+suite.addBatch(modelBatch("collection", "Collection", testSchema, testData));
 
-suite['export'](module);
+suite["export"](module);

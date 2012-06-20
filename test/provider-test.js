@@ -16,28 +16,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    Step = require('step'),
-    _ = require('underscore'),
-    schema = require('../lib/schema'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    randomString = require('../lib/randomstring').randomString,
-    Client = require('../lib/model/client').Client,
-    RequestToken = require('../lib/model/requesttoken').RequestToken,
-    AccessToken = require('../lib/model/accesstoken').AccessToken,
-    User = require('../lib/model/user').User,
-    methodContext = require('./lib/methods').methodContext,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    Step = require("step"),
+    _ = require("underscore"),
+    schema = require("../lib/schema"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    randomString = require("../lib/randomstring").randomString,
+    Client = require("../lib/model/client").Client,
+    RequestToken = require("../lib/model/requesttoken").RequestToken,
+    AccessToken = require("../lib/model/accesstoken").AccessToken,
+    User = require("../lib/model/user").User,
+    methodContext = require("./lib/methods").methodContext,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
 var testClient = null;
 var ignore = function(err) {};
 
-vows.describe('provider module interface').addBatch({
+vows.describe("provider module interface").addBatch({
 
-    'When we get the provider module': {
+    "When we get the provider module": {
 
         topic: function() { 
             var cb = this.callback;
@@ -49,7 +49,7 @@ vows.describe('provider module interface').addBatch({
 
             var params = {schema: schema};
 
-            var db = Databank.get('memory', params);
+            var db = Databank.get("memory", params);
 
             db.connect({}, function(err) {
                 var mod;
@@ -61,57 +61,57 @@ vows.describe('provider module interface').addBatch({
                         cb(err, null);
                     } else {
                         testClient = client;
-                        mod = require('../lib/provider');
+                        mod = require("../lib/provider");
                         cb(null, mod);
                     }
                 });
             });
         },
-        'there is one': function(err, mod) {
+        "there is one": function(err, mod) {
             assert.isObject(mod);
         },
-        'and we get its Provider export': {
+        "and we get its Provider export": {
             topic: function(mod) {
                 return mod.Provider;
             },
-            'it exists': function(Provider) {
+            "it exists": function(Provider) {
                 assert.isFunction(Provider);
             },
-            'and we create a new Provider': {
+            "and we create a new Provider": {
                 topic: function(Provider) {
                     return new Provider();
                 },
-                'it exists': function(provider) {
+                "it exists": function(provider) {
                     assert.isObject(provider);
                 },
-                'and we check its methods': methodContext(['previousRequestToken',
-                                                           'tokenByConsumer',
-                                                           'applicationByConsumerKey',
-                                                           'fetchAuthorizationInformation',
-                                                           'validToken',
-                                                           'tokenByTokenAndVerifier',
-                                                           'validateNotReplayClient',
-                                                           'userIdByToken',
-                                                           'authenticateUser',
-                                                           'associateTokenToUser',
-                                                           'generateRequestToken',
-                                                           'generateAccessToken',
-                                                           'cleanRequestTokens']),
-                'and we use previousRequestToken() on a previously unseen token': {
+                "and we check its methods": methodContext(["previousRequestToken",
+                                                           "tokenByConsumer",
+                                                           "applicationByConsumerKey",
+                                                           "fetchAuthorizationInformation",
+                                                           "validToken",
+                                                           "tokenByTokenAndVerifier",
+                                                           "validateNotReplayClient",
+                                                           "userIdByToken",
+                                                           "authenticateUser",
+                                                           "associateTokenToUser",
+                                                           "generateRequestToken",
+                                                           "generateAccessToken",
+                                                           "cleanRequestTokens"]),
+                "and we use previousRequestToken() on a previously unseen token": {
                     topic: function(provider) {
                         provider.previousRequestToken("ZZZZZZZZZZZZZZZZZZZZZ", this.callback);
                     },
-                    'it returns correct value': function(err, token) {
+                    "it returns correct value": function(err, token) {
                         assert.ifError(err);
                         assert.isString(token);
                         assert.equal(token, "ZZZZZZZZZZZZZZZZZZZZZ");
                     }
                 },
-                'and we use previousRequestToken() on an existing but unused token': {
+                "and we use previousRequestToken() on an existing but unused token": {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/12345/'};
+                                     callback: "http://example.com/callback/12345/"};
 
                         RequestToken.create(props, function(err, rt) {
                             if (err) {
@@ -127,7 +127,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err, rt) {
+                    "it fails correctly": function(err, rt) {
                         assert.ifError(err);
                         assert.isObject(rt);
                     },
@@ -137,11 +137,11 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we use previousRequestToken() on a used token': {
+                "and we use previousRequestToken() on a used token": {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'},
+                                     callback: "http://example.com/callback/abc123/"},
                             user, rt, at;
 
                         Step(
@@ -178,7 +178,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it fails correctly': function(err, results) {
+                    "it fails correctly": function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(results) {
@@ -193,7 +193,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we use tokenByConsumer() on an unknown consumer key': {
+                "and we use tokenByConsumer() on an unknown consumer key": {
                     topic: function(provider) {
                         var cb = this.callback;
                         provider.tokenByConsumer("BOGUSCONSUMERKEY", function(err, rt) {
@@ -204,11 +204,11 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we use tokenByConsumer() on a consumer key with no request tokens': {
+                "and we use tokenByConsumer() on a consumer key with no request tokens": {
                     topic: function(provider) {
                         var cb = this.callback;
 
@@ -226,7 +226,7 @@ vows.describe('provider module interface').addBatch({
                             });
                         });
                     },
-                    'it fails correctly': function(err, results) {
+                    "it fails correctly": function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(results) {
@@ -235,7 +235,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we use tokenByConsumer() on a consumer key with a single request token': {
+                "and we use tokenByConsumer() on a consumer key with a single request token": {
                     topic: function(provider) {
                         var cb = this.callback;
 
@@ -245,7 +245,7 @@ vows.describe('provider module interface').addBatch({
                                 return;
                             }
                             var props = {consumer_key: client.consumer_key, 
-                                         callback: 'http://example.com/madeup/endpoint'};
+                                         callback: "http://example.com/madeup/endpoint"};
                             RequestToken.create(props, function(err, rt) {
                                 if (err) {
                                     cb(err, null);
@@ -263,10 +263,10 @@ vows.describe('provider module interface').addBatch({
                             });
                         });
                     },
-                    'it works': function(err, results) {
+                    "it works": function(err, results) {
                         assert.ifError(err);
                     },
-                    'results are correct': function(err, results) {
+                    "results are correct": function(err, results) {
                         assert.isObject(results.token);
                         assert.equal(results.token.token, results.requestToken.token);
                     },
@@ -279,7 +279,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we use applicationByConsumerKey() on an invalid key': {
+                "and we use applicationByConsumerKey() on an invalid key": {
                     topic: function(provider) {
                         var cb = this.callback;
                         provider.applicationByConsumerKey("BOGUSCONSUMERKEY", function(err, result) {
@@ -290,29 +290,29 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we use applicationByConsumerKey() on a valid key': {
+                "and we use applicationByConsumerKey() on a valid key": {
                     topic: function(provider) {
                         provider.applicationByConsumerKey(testClient.consumer_key, this.callback);
                     },
-                    'it works': function(err, client) {
+                    "it works": function(err, client) {
                         assert.ifError(err);
                         assert.isObject(client);
                         assert.instanceOf(client, Client);
                     },
-                    'it has the right fields': function(err, client) {
+                    "it has the right fields": function(err, client) {
                         assert.isString(client.consumer_key);
                         assert.isString(client.secret);
                     }
                 },
-                'and we use fetchAuthorizationInformation() with a nonexistent username and existent token': {
+                "and we use fetchAuthorizationInformation() with a nonexistent username and existent token": {
                     topic: function(provider) {
                         var cb = this.callback,
                             username = "nonexistent",
-                            props = {consumer_key: testClient.consumer_key, callback: 'http://example.com/madeup/endpoint'};
+                            props = {consumer_key: testClient.consumer_key, callback: "http://example.com/madeup/endpoint"};
 
                         RequestToken.create(props, function(err, rt) {
                             if (err) {
@@ -328,7 +328,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err, rt) {
+                    "it fails correctly": function(err, rt) {
                         assert.ifError(err);
                         assert.isObject(rt);
                         assert.instanceOf(rt, RequestToken);
@@ -339,7 +339,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we use fetchAuthorizationInformation() with a existent username and unassociated token': {
+                "and we use fetchAuthorizationInformation() with a existent username and unassociated token": {
                     topic: function(provider) {
                         var cb = this.callback;
 
@@ -347,7 +347,7 @@ vows.describe('provider module interface').addBatch({
                             if (err) {
                                 cb(err, null);
                             } else {
-                                var props = {consumer_key: testClient.consumer_key, callback: 'http://example.com/madeup/endpoint'};
+                                var props = {consumer_key: testClient.consumer_key, callback: "http://example.com/madeup/endpoint"};
 
                                 RequestToken.create(props, function(err, rt) {
                                     if (err) {
@@ -365,7 +365,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err, results) {
+                    "it fails correctly": function(err, results) {
                         assert.ifError(err);
                         assert.isObject(results);
                         assert.isObject(results.rt);
@@ -382,7 +382,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we use fetchAuthorizationInformation() with a existent username and non-existent token': {
+                "and we use fetchAuthorizationInformation() with a existent username and non-existent token": {
                     topic: function(provider) {
                         var cb = this.callback;
 
@@ -400,7 +400,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err, user) {
+                    "it fails correctly": function(err, user) {
                         assert.ifError(err);
                         assert.isObject(user);
                         assert.instanceOf(user, User);
@@ -411,7 +411,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we use fetchAuthorizationInformation() with a existent username and associated token': {
+                "and we use fetchAuthorizationInformation() with a existent username and associated token": {
                     topic: function(provider) {
                         var cb = this.callback;
 
@@ -419,7 +419,7 @@ vows.describe('provider module interface').addBatch({
                             if (err) {
                                 cb(err, null);
                             } else {
-                                var props = {consumer_key: testClient.consumer_key, callback: 'http://example.com/madeup/endpoint'};
+                                var props = {consumer_key: testClient.consumer_key, callback: "http://example.com/madeup/endpoint"};
 
                                 RequestToken.create(props, function(err, rt) {
                                     if (err) {
@@ -443,7 +443,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it works': function(err, results) {
+                    "it works": function(err, results) {
                         assert.ifError(err);
                         assert.isObject(results);
                         assert.isObject(results.rt);
@@ -457,7 +457,7 @@ vows.describe('provider module interface').addBatch({
                         assert.equal(results.rt.token, results.found.token);
                         assert.equal(results.rt.token_secret, results.found.token_secret);
                     },
-                    'results have right properties': function(err, results) {
+                    "results have right properties": function(err, results) {
                         assert.isString(results.app.title);
                         assert.isString(results.app.description);
                         assert.isString(results.found.token);
@@ -472,7 +472,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we use fetchAuthorizationInformation() with a client without a title': {
+                "and we use fetchAuthorizationInformation() with a client without a title": {
                     topic: function(provider) {
                         var cb = this.callback,
                             user, rt, client;
@@ -490,7 +490,7 @@ vows.describe('provider module interface').addBatch({
                                 if (err) throw err;
                                 user = u;
                                 var props = {consumer_key: testClient.consumer_key,
-                                             callback: 'http://example.com/madeup/endpoint'};
+                                             callback: "http://example.com/madeup/endpoint"};
                                 RequestToken.create(props, this);
                             },
                             function(err, requesttoken) {
@@ -511,7 +511,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it works': function(err, results) {
+                    "it works": function(err, results) {
                         assert.ifError(err);
                         assert.isObject(results);
                         assert.isObject(results.rt);
@@ -525,7 +525,7 @@ vows.describe('provider module interface').addBatch({
                         assert.equal(results.rt.token, results.found.token);
                         assert.equal(results.rt.token_secret, results.found.token_secret);
                     },
-                    'results have right properties': function(err, results) {
+                    "results have right properties": function(err, results) {
                         assert.isString(results.app.title);
                         assert.isString(results.app.description);
                         assert.isString(results.found.token);
@@ -543,7 +543,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call validToken() with an invalid token': {
+                "and we call validToken() with an invalid token": {
                     topic: function(provider) {
                         var cb = this.callback;
                         provider.validToken("NOT A VALID TOKEN", function(err, token) {
@@ -554,15 +554,15 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we call validToken() with a request token': {
+                "and we call validToken() with a request token": {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'};
+                                     callback: "http://example.com/callback/abc123/"};
 
                         RequestToken.create(props, function(err, rt) {
                             if (err) {
@@ -578,7 +578,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err, rt) {
+                    "it fails correctly": function(err, rt) {
                         assert.ifError(err);
                     },
                     teardown: function(rt) {
@@ -587,11 +587,11 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call validToken() with a valid access token': {
+                "and we call validToken() with a valid access token": {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'},
+                                     callback: "http://example.com/callback/abc123/"},
                             user, rt, at;
 
                         Step(
@@ -628,7 +628,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it works': function(err, results) {
+                    "it works": function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(results) {
@@ -643,7 +643,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call tokenByTokenAndVerifier() with bad token and bad verifier': {
+                "and we call tokenByTokenAndVerifier() with bad token and bad verifier": {
                     topic: function(provider) {
                         var cb = this.callback;
                         provider.tokenByTokenAndVerifier("NOT A TOKEN", "NOT A VERIFIER", function(err, token) {
@@ -654,15 +654,15 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we call tokenByTokenAndVerifier() with bad token and good verifier': {
+                "and we call tokenByTokenAndVerifier() with bad token and good verifier": {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'};
+                                     callback: "http://example.com/callback/abc123/"};
 
                         RequestToken.create(props, function(err, rt) {
                             if (err) {
@@ -678,7 +678,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err, results) {
+                    "it fails correctly": function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(rt) {
@@ -687,11 +687,11 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call tokenByTokenAndVerifier() with good token and bad verifier': {
+                "and we call tokenByTokenAndVerifier() with good token and bad verifier": {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'};
+                                     callback: "http://example.com/callback/abc123/"};
 
                         RequestToken.create(props, function(err, rt) {
                             if (err) {
@@ -707,7 +707,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err, results) {
+                    "it fails correctly": function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(rt) {
@@ -716,11 +716,11 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call tokenByTokenAndVerifier() with good token and wrong verifier': {
+                "and we call tokenByTokenAndVerifier() with good token and wrong verifier": {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'};
+                                     callback: "http://example.com/callback/abc123/"};
 
                         RequestToken.create(props, function(err, rt1) {
                             if (err) {
@@ -742,7 +742,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err, results) {
+                    "it fails correctly": function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(results) {
@@ -754,11 +754,11 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call tokenByTokenAndVerifier() with good token and good verifier': {
+                "and we call tokenByTokenAndVerifier() with good token and good verifier": {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'};
+                                     callback: "http://example.com/callback/abc123/"};
 
                         RequestToken.create(props, function(err, rt) {
                             if (err) {
@@ -774,7 +774,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it works': function(err, results) {
+                    "it works": function(err, results) {
                         assert.ifError(err);
                         assert.isObject(results.newt);
                         assert.instanceOf(results.newt, RequestToken);
@@ -787,7 +787,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call validateNotReplayClient() with an invalid consumer key and invalid access token': {
+                "and we call validateNotReplayClient() with an invalid consumer key and invalid access token": {
                     topic: function(provider) {
                         var cb = this.callback,
                             ts = Number(Date.now()/1000).toString(10);
@@ -802,16 +802,16 @@ vows.describe('provider module interface').addBatch({
                             });
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we call validateNotReplayClient() with an invalid consumer key and valid access token and a good timestamp and an unused nonce': {
+                "and we call validateNotReplayClient() with an invalid consumer key and valid access token and a good timestamp and an unused nonce": {
                     topic: function(provider) {
                         var cb = this.callback,
                             ts = Number((Date.now()/1000)).toString(10),
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'},
+                                     callback: "http://example.com/callback/abc123/"},
                             user, rt, at;
 
                         Step(
@@ -852,7 +852,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it works': function(err, results) {
+                    "it works": function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(results) {
@@ -867,7 +867,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call validateNotReplayClient() with a valid consumer key and invalid access token': {
+                "and we call validateNotReplayClient() with a valid consumer key and invalid access token": {
                     topic: function(provider) {
                         var cb = this.callback,
                             ts = Number(Date.now()/1000).toString(10);
@@ -882,16 +882,16 @@ vows.describe('provider module interface').addBatch({
                             });
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we call validateNotReplayClient() with a valid consumer key and access token and a long-expired timestamp': {
+                "and we call validateNotReplayClient() with a valid consumer key and access token and a long-expired timestamp": {
                     topic: function(provider) {
                         var cb = this.callback,
                             ts = Number((Date.now()/1000) - (24*60*60*365)).toString(10),
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'},
+                                     callback: "http://example.com/callback/abc123/"},
                             user, rt, at;
 
                         Step(
@@ -934,7 +934,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it fails correctly': function(err, results) {
+                    "it fails correctly": function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(results) {
@@ -949,12 +949,12 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call validateNotReplayClient() with a valid access token and a far-future timestamp': {
+                "and we call validateNotReplayClient() with a valid access token and a far-future timestamp": {
                     topic: function(provider) {
                         var cb = this.callback,
                             ts = Number((Date.now()/1000) + (24*60*60*365)).toString(10),
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'},
+                                     callback: "http://example.com/callback/abc123/"},
                             user, rt, at;
 
                         Step(
@@ -997,7 +997,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it fails correctly': function(err, results) {
+                    "it fails correctly": function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(results) {
@@ -1012,12 +1012,12 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call validateNotReplayClient() with a valid access token and a good timestamp and a used nonce': {
+                "and we call validateNotReplayClient() with a valid access token and a good timestamp and a used nonce": {
                     topic: function(provider) {
                         var cb = this.callback,
                             ts = Number((Date.now()/1000)).toString(10),
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'},
+                                     callback: "http://example.com/callback/abc123/"},
                             user, rt, at, nonce;
 
                         Step(
@@ -1067,7 +1067,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it fails correctly': function(err, results) {
+                    "it fails correctly": function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(results) {
@@ -1082,12 +1082,12 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call validateNotReplayClient() with a valid access token and a good timestamp and an unused nonce': {
+                "and we call validateNotReplayClient() with a valid access token and a good timestamp and an unused nonce": {
                     topic: function(provider) {
                         var cb = this.callback,
                             ts = Number((Date.now()/1000)).toString(10),
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'},
+                                     callback: "http://example.com/callback/abc123/"},
                             user, rt, at;
 
                         Step(
@@ -1130,7 +1130,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it works': function(err, results) {
+                    "it works": function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(results) {
@@ -1145,7 +1145,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call userIdByToken() with an invalid access token': {
+                "and we call userIdByToken() with an invalid access token": {
                     topic: function(provider) {
                         var cb = this.callback;
                         provider.userIdByToken("NOT AN ACCESS TOKEN", function(err, userId) {
@@ -1156,15 +1156,15 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we call userIdByToken() with a valid request token': {
+                "and we call userIdByToken() with a valid request token": {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'},
+                                     callback: "http://example.com/callback/abc123/"},
                             user, rt;
 
                         Step(
@@ -1196,7 +1196,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it fails correctly': function(err, results) {
+                    "it fails correctly": function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(results) {
@@ -1208,11 +1208,11 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call userIdByToken() with a valid access token': {
+                "and we call userIdByToken() with a valid access token": {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'},
+                                     callback: "http://example.com/callback/abc123/"},
                             user, rt, at;
 
                         Step(
@@ -1249,10 +1249,10 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it works': function(err, results) {
+                    "it works": function(err, results) {
                         assert.ifError(err);
                     },
-                    'it has the right properties': function(err, results) {
+                    "it has the right properties": function(err, results) {
                         assert.isString(results.id.id);
                         assert.equal(results.user.nickname, results.id.id);
                     },
@@ -1268,7 +1268,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call authenticateUser with a non-existent username': {
+                "and we call authenticateUser with a non-existent username": {
                     topic: function(provider) {
                         var cb = this.callback;
                         provider.authenticateUser("nonexistentuser", "badpassword", "badtoken", function(err, rt) {
@@ -1279,11 +1279,11 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we call authenticateUser with a good username and non-matching password': {
+                "and we call authenticateUser with a good username and non-matching password": {
                     topic: function(provider) {
                         var cb = this.callback,
                             user;
@@ -1308,7 +1308,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it fails correctly': function(err, user) {
+                    "it fails correctly": function(err, user) {
                         assert.ifError(err);
                     },
                     teardown: function(user) {
@@ -1317,7 +1317,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call authenticateUser with a good username and good password and non-existent token': {
+                "and we call authenticateUser with a good username and good password and non-existent token": {
                     topic: function(provider) {
                         var cb = this.callback,
                             user;
@@ -1342,7 +1342,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it fails correctly': function(err, user) {
+                    "it fails correctly": function(err, user) {
                         assert.ifError(err);
                     },
                     teardown: function(user) {
@@ -1351,11 +1351,11 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call authenticateUser with a good username and good password and already-assigned token': {
+                "and we call authenticateUser with a good username and good password and already-assigned token": {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'},
+                                     callback: "http://example.com/callback/abc123/"},
                             user1, user2, rt;
                         
                         Step(
@@ -1386,7 +1386,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it fails correctly': function(err, results) {
+                    "it fails correctly": function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(results) {
@@ -1401,11 +1401,11 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call authenticateUser with a good username and good password and an unused request token': {
+                "and we call authenticateUser with a good username and good password and an unused request token": {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'},
+                                     callback: "http://example.com/callback/abc123/"},
                             user,rt;
                         
                         Step(
@@ -1430,7 +1430,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it works correctly': function(err, results) {
+                    "it works correctly": function(err, results) {
                         assert.ifError(err);
                         assert.equal(results.newt.token, results.rt.token);
                     },
@@ -1443,7 +1443,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call associateTokenToUser with an invalid username and an invalid token': {
+                "and we call associateTokenToUser with an invalid username and an invalid token": {
                     topic: function(provider) {
                         var cb = this.callback;
                         provider.associateTokenToUser("nonexistentuser", "badtoken", function(err, rt) {
@@ -1454,11 +1454,11 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we call associateTokenToUser with a valid username and an invalid token': {
+                "and we call associateTokenToUser with a valid username and an invalid token": {
                     topic: function(provider) {
                         var cb = this.callback;
                         
@@ -1476,7 +1476,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it works correctly': function(err, results) {
+                    "it works correctly": function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(user) {
@@ -1485,11 +1485,11 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call associateTokenToUser with a invalid username and a valid token': {
+                "and we call associateTokenToUser with a invalid username and a valid token": {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'};
+                                     callback: "http://example.com/callback/abc123/"};
                         
                         RequestToken.create(props, function(err, rt) {
                             if (err) {
@@ -1505,7 +1505,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err, rt) {
+                    "it fails correctly": function(err, rt) {
                         assert.ifError(err);
                     },
                     teardown: function(rt) {
@@ -1514,11 +1514,11 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call associateTokenToUser with a valid username and a used token': {
+                "and we call associateTokenToUser with a valid username and a used token": {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'},
+                                     callback: "http://example.com/callback/abc123/"},
                             user1, user2, rt;
                         
                         Step(
@@ -1549,7 +1549,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it fails correctly': function(err, results) {
+                    "it fails correctly": function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(results) {
@@ -1564,11 +1564,11 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call associateTokenToUser with a valid username and an unused token': {
+                "and we call associateTokenToUser with a valid username and an unused token": {
                     topic: function(provider) {
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'},
+                                     callback: "http://example.com/callback/abc123/"},
                             user,rt;
                         
                         Step(
@@ -1593,7 +1593,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it works correctly': function(err, results) {
+                    "it works correctly": function(err, results) {
                         assert.ifError(err);
                         assert.equal(results.newt.token, results.rt.token);
                     },
@@ -1606,7 +1606,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call generateRequestToken with an invalid consumer key': {
+                "and we call generateRequestToken with an invalid consumer key": {
                     topic: function(provider) {
                         var cb = this.callback;
                         provider.generateRequestToken("NOT A KEY", "http://example.com/callback", function(err, rt) {
@@ -1617,11 +1617,11 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we call generateRequestToken with a valid consumer key and an invalid callback url': {
+                "and we call generateRequestToken with a valid consumer key and an invalid callback url": {
                     topic: function(provider) {
                         var cb = this.callback;
                         provider.generateRequestToken(testClient.consumer_key, "NOT A VALID URL", function(err, rt) {
@@ -1632,11 +1632,11 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we call generateRequestToken with a valid consumer key and a valid callback url': {
+                "and we call generateRequestToken with a valid consumer key and a valid callback url": {
                     topic: function(provider) {
                         var cb = this.callback;
                         provider.generateRequestToken(testClient.consumer_key, "http://example.com/callback", function(err, rt) {
@@ -1647,12 +1647,12 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it works': function(err, rt) {
+                    "it works": function(err, rt) {
                         assert.ifError(err);
                         assert.isObject(rt);
                         assert.instanceOf(rt, RequestToken);
                     },
-                    'it has the right attributes': function(err, rt) {
+                    "it has the right attributes": function(err, rt) {
                         assert.isString(rt.token);
                         assert.isString(rt.token_secret);
                     },
@@ -1662,7 +1662,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call generateAccessToken() with an invalid request token': {
+                "and we call generateAccessToken() with an invalid request token": {
                     topic: function(provider) {
                         var cb = this.callback;
                         provider.generateAccessToken("NOT A TOKEN", function(err, at) {
@@ -1673,11 +1673,11 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we call generateAccessToken() with an unassociated request token': {
+                "and we call generateAccessToken() with an unassociated request token": {
                     topic: function(provider) {
                         var cb = this.callback;
                         provider.generateRequestToken(testClient.consumer_key, "http://example.com/callback", function(err, rt) {
@@ -1694,7 +1694,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err, rt) {
+                    "it fails correctly": function(err, rt) {
                         assert.ifError(err);
                     },
                     teardown: function(rt) {
@@ -1703,7 +1703,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call generateAccessToken() with an already-used request token': {
+                "and we call generateAccessToken() with an already-used request token": {
                     topic: function(provider) {
                         var cb = this.callback;
 
@@ -1740,7 +1740,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err, results) {
+                    "it fails correctly": function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(results) {
@@ -1755,7 +1755,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we call generateAccessToken() with an associated request token': {
+                "and we call generateAccessToken() with an associated request token": {
                     topic: function(provider) {
                         var cb = this.callback;
 
@@ -1785,12 +1785,12 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it works': function(err, results) {
+                    "it works": function(err, results) {
                         assert.ifError(err);
                         assert.isObject(results.at);
                         assert.instanceOf(results.at, AccessToken);
                     },
-                    'it has the right properties': function(err, results) {
+                    "it has the right properties": function(err, results) {
                         assert.isString(results.at.access_token);
                         assert.isString(results.at.token_secret);
                     },
@@ -1806,7 +1806,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we use tokenByTokenAndConsumer() on an invalid token and invalid consumer key': {
+                "and we use tokenByTokenAndConsumer() on an invalid token and invalid consumer key": {
                     topic: function(provider) {
                         var cb = this.callback;
                         provider.tokenByTokenAndConsumer("BADTOKEN", "BADCONSUMER", function(err, rt) {
@@ -1817,11 +1817,11 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we use tokenByTokenAndConsumer() on an invalid token and valid consumer key': {
+                "and we use tokenByTokenAndConsumer() on an invalid token and valid consumer key": {
                     topic: function(provider) {
                         var cb = this.callback;
                         provider.tokenByTokenAndConsumer("BADTOKEN", testClient.consumer_key, function(err, rt) {
@@ -1832,15 +1832,15 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we use tokenByTokenAndConsumer() on a valid token and invalid consumer key': {
+                "and we use tokenByTokenAndConsumer() on a valid token and invalid consumer key": {
                     topic: function(provider) {
                         var cb = this.callback;
                         var props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'};
+                                     callback: "http://example.com/callback/abc123/"};
                         Step(
                             function() {
                                 RequestToken.create(props, this);
@@ -1860,7 +1860,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it fails correctly': function(err, rt) {
+                    "it fails correctly": function(err, rt) {
                         assert.ifError(err);
                     },
                     teardown: function(rt) {
@@ -1869,11 +1869,11 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we use tokenByTokenAndConsumer() on a valid token and mismatched consumer key': {
+                "and we use tokenByTokenAndConsumer() on a valid token and mismatched consumer key": {
                     topic: function(provider) {
                         var cb = this.callback;
                         var props = {consumer_key: testClient.consumer_key,
-                                     callback: 'http://example.com/callback/abc123/'};
+                                     callback: "http://example.com/callback/abc123/"};
                         Step(
                             function() {
                                 RequestToken.create(props, this.parallel());
@@ -1894,7 +1894,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it fails correctly': function(err, results) {
+                    "it fails correctly": function(err, results) {
                         assert.ifError(err);
                     },
                     teardown: function(results) {
@@ -1906,7 +1906,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we use tokenByTokenAndConsumer() on a valid token and matching consumer key': {
+                "and we use tokenByTokenAndConsumer() on a valid token and matching consumer key": {
                     topic: function(provider) {
                         var cb = this.callback, rt, client;
 
@@ -1918,7 +1918,7 @@ vows.describe('provider module interface').addBatch({
                                 if (err) throw err;
                                 client = results;
                                 var props = {consumer_key: client.consumer_key,
-                                             callback: 'http://example.com/callback/abc123/'};
+                                             callback: "http://example.com/callback/abc123/"};
                                 RequestToken.create(props, this);
                             },
                             function(err, results) {
@@ -1937,10 +1937,10 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it works': function(err, results) {
+                    "it works": function(err, results) {
                         assert.ifError(err);
                     },
-                    'it returns the correct token': function(err, results) {
+                    "it returns the correct token": function(err, results) {
                         assert.equal(results.client.consumer_key, results.newt.consumer_key);
                         assert.equal(results.rt.token, results.newt.token);
                     },
@@ -1953,7 +1953,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we use tokenByTokenAndConsumer() on a valid token and matching consumer key with multiple tokens': {
+                "and we use tokenByTokenAndConsumer() on a valid token and matching consumer key with multiple tokens": {
                     topic: function(provider) {
                         var cb = this.callback, rt1, rt2, client;
 
@@ -1965,7 +1965,7 @@ vows.describe('provider module interface').addBatch({
                                 if (err) throw err;
                                 client = results;
                                 var props = {consumer_key: client.consumer_key,
-                                             callback: 'http://example.com/callback/abc123/'};
+                                             callback: "http://example.com/callback/abc123/"};
                                 RequestToken.create(props, this.parallel());
                                 RequestToken.create(props, this.parallel());
                             },
@@ -1986,10 +1986,10 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it works': function(err, results) {
+                    "it works": function(err, results) {
                         assert.ifError(err);
                     },
-                    'it returns the correct token': function(err, results) {
+                    "it returns the correct token": function(err, results) {
                         assert.equal(results.client.consumer_key, results.newt.consumer_key);
                         assert.equal(results.rt1.token, results.newt.token);
                     },
@@ -2005,7 +2005,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we use cleanRequestTokens() on an invalid consumer key': {
+                "and we use cleanRequestTokens() on an invalid consumer key": {
                     topic: function(provider) {
                         var cb = this.callback;
                         provider.cleanRequestTokens("NOTACONSUMERKEY", function(err) {
@@ -2016,11 +2016,11 @@ vows.describe('provider module interface').addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we use cleanRequestTokens() on a consumer key with no request tokens': {
+                "and we use cleanRequestTokens() on a consumer key with no request tokens": {
                     topic: function(provider) {
                         var cb = this.callback,
                             client;
@@ -2043,7 +2043,7 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it works': function(err, client) {
+                    "it works": function(err, client) {
                         assert.ifError(err);
                         assert.isObject(client);
                     },
@@ -2053,7 +2053,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we use cleanRequestTokens() on a consumer key with no out-of-date tokens': {
+                "and we use cleanRequestTokens() on a consumer key with no out-of-date tokens": {
                     topic: function(provider) {
                         var cb = this.callback,
                             client,
@@ -2093,14 +2093,14 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it works': function(err, res) {
+                    "it works": function(err, res) {
                         assert.ifError(err);
                         assert.isObject(res);
-                        assert.include(res, 'client');
-                        assert.include(res, 'before');
-                        assert.include(res, 'after');
+                        assert.include(res, "client");
+                        assert.include(res, "before");
+                        assert.include(res, "after");
                     },
-                    'nothing was deleted': function(err, res) {
+                    "nothing was deleted": function(err, res) {
                         var b = res.before,
                             a = res.after,
                             i,
@@ -2125,7 +2125,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we use cleanRequestTokens() on a consumer key with mixed out-of-date tokens': {
+                "and we use cleanRequestTokens() on a consumer key with mixed out-of-date tokens": {
                     topic: function(provider) {
                         var cb = this.callback,
                             client,
@@ -2157,7 +2157,7 @@ vows.describe('provider module interface').addBatch({
                                 outdated = {};
                                 for (i = 0; i < 5; i++) {
                                     outdated[before[i].token] = true;
-                                    bank.update('requesttoken', before[i].token, {updated: touched}, group());
+                                    bank.update("requesttoken", before[i].token, {updated: touched}, group());
                                 }
                             },
                             function(err, tks) {
@@ -2178,15 +2178,15 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it works': function(err, res) {
+                    "it works": function(err, res) {
                         assert.ifError(err);
                         assert.isObject(res);
-                        assert.include(res, 'client');
-                        assert.include(res, 'before');
-                        assert.include(res, 'after');
-                        assert.include(res, 'outdated');
+                        assert.include(res, "client");
+                        assert.include(res, "before");
+                        assert.include(res, "after");
+                        assert.include(res, "outdated");
                     },
-                    'some were deleted': function(err, res) {
+                    "some were deleted": function(err, res) {
                         var b = res.before,
                             a = res.after,
                             o = res.outdated,
@@ -2217,7 +2217,7 @@ vows.describe('provider module interface').addBatch({
                         }
                     }
                 },
-                'and we use cleanRequestTokens() on a consumer key with only out-of-date tokens': {
+                "and we use cleanRequestTokens() on a consumer key with only out-of-date tokens": {
                     topic: function(provider) {
                         var cb = this.callback,
                             client,
@@ -2246,7 +2246,7 @@ vows.describe('provider module interface').addBatch({
                                 if (err) throw err;
                                 before = rts;
                                 for (i = 0; i < 10; i++) {
-                                    bank.update('requesttoken', before[i].token, {updated: touched}, group());
+                                    bank.update("requesttoken", before[i].token, {updated: touched}, group());
                                 }
                             },
                             function(err, tks) {
@@ -2267,14 +2267,14 @@ vows.describe('provider module interface').addBatch({
                             }
                         );
                     },
-                    'it works': function(err, res) {
+                    "it works": function(err, res) {
                         assert.ifError(err);
                         assert.isObject(res);
-                        assert.include(res, 'client');
-                        assert.include(res, 'before');
-                        assert.include(res, 'after');
+                        assert.include(res, "client");
+                        assert.include(res, "before");
+                        assert.include(res, "after");
                     },
-                    'all were deleted': function(err, res) {
+                    "all were deleted": function(err, res) {
                         assert.isEmpty(res.after);
                     },
                     teardown: function(res) {
@@ -2287,4 +2287,4 @@ vows.describe('provider module interface').addBatch({
             }
         }
     }
-})['export'](module);
+})["export"](module);

@@ -16,7 +16,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var common = require('./common'),
+var common = require("./common"),
     postActivity = common.postActivity;
 
 var nickname = process.argv[2],
@@ -24,13 +24,13 @@ var nickname = process.argv[2],
     note = process.argv[4];
 
 var activity,
-    opts = {auth: nickname + ':' + password},
-    url = 'http://localhost:8001/api/user/'+nickname+'/feed';
+    opts = {auth: nickname + ":" + password},
+    url = "http://localhost:8001/api/user/"+nickname+"/feed";
 
-activity = {'verb': 'post',
-	    'object': {
-		'objectType': 'note',
-		'content': note
+activity = {"verb": "post",
+	    "object": {
+		"objectType": "note",
+		"content": note
 	    }
 	   };
 

@@ -16,14 +16,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    Step = require('step'),
-    _ = require('underscore'),
-    OAuth = require('oauth').OAuth,
-    httputil = require('./lib/http'),
-    oauthutil = require('./lib/oauth'),
-    actutil = require('./lib/activity'),
+var assert = require("assert"),
+    vows = require("vows"),
+    Step = require("step"),
+    _ = require("underscore"),
+    OAuth = require("oauth").OAuth,
+    httputil = require("./lib/http"),
+    oauthutil = require("./lib/oauth"),
+    actutil = require("./lib/activity"),
     setupApp = oauthutil.setupApp,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair;
@@ -39,26 +39,26 @@ var makeCred = function(cl, pair) {
 };
 
 var assertValidList = function(doc, count) {
-    assert.include(doc, 'author');
-    assert.include(doc.author, 'id');
-    assert.include(doc.author, 'displayName');
-    assert.include(doc.author, 'objectType');
-    assert.include(doc, 'totalItems');
-    assert.include(doc, 'items');
-    assert.include(doc, 'displayName');
-    assert.include(doc, 'id');
+    assert.include(doc, "author");
+    assert.include(doc.author, "id");
+    assert.include(doc.author, "displayName");
+    assert.include(doc.author, "objectType");
+    assert.include(doc, "totalItems");
+    assert.include(doc, "items");
+    assert.include(doc, "displayName");
+    assert.include(doc, "id");
     if (_(count).isNumber()) {
         assert.equal(doc.totalItems, count);
         assert.lengthOf(doc.items, count);
     }
 };
 
-var suite = vows.describe('favorite object activity api test');
+var suite = vows.describe("favorite object activity api test");
 
 // A batch to test following/unfollowing users
 
 suite.addBatch({
-    'When we set up the app': {
+    "When we set up the app": {
         topic: function() {
             setupApp(this.callback);
         },
@@ -67,18 +67,18 @@ suite.addBatch({
                 app.close();
             }
         },
-        'it works': function(err, app) {
+        "it works": function(err, app) {
             assert.ifError(err);
         },
-        'and we register a client': {
+        "and we register a client": {
             topic: function() {
                 newClient(this.callback);
             },
-            'it works': function(err, cl) {
+            "it works": function(err, cl) {
                 assert.ifError(err);
                 assert.isObject(cl);
             },
-            'and we get the list of favorites for a new user': {
+            "and we get the list of favorites for a new user": {
                 topic: function(cl) {
                     var cb = this.callback;
                     Step(
@@ -88,7 +88,7 @@ suite.addBatch({
                         function(err, pair) {
                             if (err) throw err;
                             var cred = makeCred(cl, pair),
-                                url = 'http://localhost:4815/api/user/marsha/favorites';
+                                url = "http://localhost:4815/api/user/marsha/favorites";
 
                             httputil.getJSON(url, cred, this);
                         },
@@ -97,15 +97,15 @@ suite.addBatch({
                         }
                     );
                 },
-                'it exists': function(err, doc) {
+                "it exists": function(err, doc) {
                     assert.ifError(err);
                 },
-                'it looks correct': function(err, doc) {
+                "it looks correct": function(err, doc) {
                     assert.ifError(err);
                     assertValidList(doc, 0);
                 }
             },
-            'and we get the list of favorites for a brand-new object': {
+            "and we get the list of favorites for a brand-new object": {
                 topic: function(cl) {
                     var cb = this.callback,
                         cred;
@@ -115,7 +115,7 @@ suite.addBatch({
                         },
                         function(err, pair) {
                             if (err) throw err;
-                            var url = 'http://localhost:4815/api/user/jan/feed',
+                            var url = "http://localhost:4815/api/user/jan/feed",
                                 act = {
                                     verb: "post",
                                     object: {
@@ -138,20 +138,20 @@ suite.addBatch({
                         }
                     );
                 },
-                'it exists': function(err, faves) {
+                "it exists": function(err, faves) {
                     assert.ifError(err);
                 },
-                'it is empty': function(err, faves) {
+                "it is empty": function(err, faves) {
                     assert.ifError(err);
-                    assert.include(faves, 'totalItems');
-                    assert.include(faves, 'items');
-                    assert.include(faves, 'displayName');
-                    assert.include(faves, 'id');
+                    assert.include(faves, "totalItems");
+                    assert.include(faves, "items");
+                    assert.include(faves, "displayName");
+                    assert.include(faves, "id");
                     assert.equal(faves.totalItems, 0);
                     assert.lengthOf(faves.items, 0);
                 }
             },
-            'and one user favorites another user\'s object': {
+            "and one user favorites another user's object": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pairs = {};
@@ -166,7 +166,7 @@ suite.addBatch({
                             pairs.cindy = cpair;
                             pairs.bobby = bpair;
 
-                            var url = 'http://localhost:4815/api/user/cindy/feed',
+                            var url = "http://localhost:4815/api/user/cindy/feed",
                                 act = {
                                     verb: "post",
                                     object: {
@@ -181,7 +181,7 @@ suite.addBatch({
                         },
                         function(err, doc, response) {
                             if (err) throw err;
-                            var url = 'http://localhost:4815/api/user/bobby/feed',
+                            var url = "http://localhost:4815/api/user/bobby/feed",
                                 act = {
                                     verb: "favorite",
                                     object: {
@@ -198,29 +198,29 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err, act, pairs) {
+                "it works": function(err, act, pairs) {
                     assert.ifError(err);
                 },
-                'and we get the user\'s list of favorites': {
+                "and we get the user's list of favorites": {
                     topic: function(act, pairs, cl) {
                         var cred = makeCred(cl, pairs.bobby),
-                            url = 'http://localhost:4815/api/user/bobby/favorites',
+                            url = "http://localhost:4815/api/user/bobby/favorites",
                             cb = this.callback;
 
                             httputil.getJSON(url, cred, function(err, doc, response) {
                                 cb(err, doc, act);
                             });
                     },
-                    'it works': function(err, doc, act) {
+                    "it works": function(err, doc, act) {
                         assert.ifError(err);
                         assertValidList(doc, 1);
                     },
-                    'it includes the object': function(err, doc, act) {
+                    "it includes the object": function(err, doc, act) {
                         assert.ifError(err);
                         assert.equal(doc.items[0].id, act.object.id);
                     }
                 },
-                'and we get the list of likes of the object': {
+                "and we get the list of likes of the object": {
                     topic: function(act, pairs, cl) {
                         var cred = makeCred(cl, pairs.cindy),
                             url = act.object.likes.url,
@@ -230,22 +230,22 @@ suite.addBatch({
                                 cb(err, doc, act);
                             });
                     },
-                    'it works': function(err, doc, act) {
+                    "it works": function(err, doc, act) {
                         assert.ifError(err);
-                        assert.include(doc, 'totalItems');
-                        assert.include(doc, 'items');
-                        assert.include(doc, 'displayName');
-                        assert.include(doc, 'id');
+                        assert.include(doc, "totalItems");
+                        assert.include(doc, "items");
+                        assert.include(doc, "displayName");
+                        assert.include(doc, "id");
                         assert.equal(doc.totalItems, 1);
                         assert.lengthOf(doc.items, 1);
                     },
-                    'it includes the actor': function(err, doc, act) {
+                    "it includes the actor": function(err, doc, act) {
                         assert.ifError(err);
                         assert.equal(doc.items[0].id, act.actor.id);
                     }
                 }
             },
-            'and one user double-favorites another user\'s object': {
+            "and one user double-favorites another user's object": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pairs = {};
@@ -260,7 +260,7 @@ suite.addBatch({
                             pairs.alice = apair;
                             pairs.sam = spair;
 
-                            var url = 'http://localhost:4815/api/user/alice/feed',
+                            var url = "http://localhost:4815/api/user/alice/feed",
                                 act = {
                                     verb: "post",
                                     object: {
@@ -275,7 +275,7 @@ suite.addBatch({
                         },
                         function(err, doc, response) {
                             if (err) throw err;
-                            var url = 'http://localhost:4815/api/user/sam/feed',
+                            var url = "http://localhost:4815/api/user/sam/feed",
                                 act = {
                                     verb: "favorite",
                                     object: {
@@ -289,7 +289,7 @@ suite.addBatch({
                         },
                         function(err, doc, response) {
                             if (err) throw err;
-                            var url = 'http://localhost:4815/api/user/sam/feed',
+                            var url = "http://localhost:4815/api/user/sam/feed",
                                 act = {
                                     verb: "favorite",
                                     object: {
@@ -312,11 +312,11 @@ suite.addBatch({
                         }
                     );
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
-            'and one user favorites then unfavorites another user\'s object': {
+            "and one user favorites then unfavorites another user's object": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pairs = {};
@@ -331,7 +331,7 @@ suite.addBatch({
                             pairs.greg = gpair;
                             pairs.peter = ppair;
 
-                            var url = 'http://localhost:4815/api/user/peter/feed',
+                            var url = "http://localhost:4815/api/user/peter/feed",
                                 act = {
                                     verb: "post",
                                     object: {
@@ -346,7 +346,7 @@ suite.addBatch({
                         },
                         function(err, doc, response) {
                             if (err) throw err;
-                            var url = 'http://localhost:4815/api/user/greg/feed',
+                            var url = "http://localhost:4815/api/user/greg/feed",
                                 act = {
                                     verb: "favorite",
                                     object: {
@@ -360,7 +360,7 @@ suite.addBatch({
                         },
                         function(err, doc, response) {
                             if (err) throw err;
-                            var url = 'http://localhost:4815/api/user/greg/feed',
+                            var url = "http://localhost:4815/api/user/greg/feed",
                                 act = {
                                     verb: "unfavorite",
                                     object: {
@@ -377,25 +377,25 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err, act) {
+                "it works": function(err, act) {
                     assert.ifError(err);
                 },
-                'and we get the user\'s list of favorites': {
+                "and we get the user's list of favorites": {
                     topic: function(act, pairs, cl) {
                         var cred = makeCred(cl, pairs.greg),
-                            url = 'http://localhost:4815/api/user/greg/favorites',
+                            url = "http://localhost:4815/api/user/greg/favorites",
                             cb = this.callback;
 
                             httputil.getJSON(url, cred, function(err, doc, response) {
                                 cb(err, doc, act);
                             });
                     },
-                    'it works': function(err, doc, act) {
+                    "it works": function(err, doc, act) {
                         assert.ifError(err);
                         assertValidList(doc, 0);
                     }
                 },
-                'and we get the list of favorites of the object': {
+                "and we get the list of favorites of the object": {
                     topic: function(act, pairs, cl) {
                         var cred = makeCred(cl, pairs.peter),
                             url = act.object.likes.url,
@@ -405,18 +405,18 @@ suite.addBatch({
                                 cb(err, doc);
                             });
                     },
-                    'it works': function(err, doc) {
+                    "it works": function(err, doc) {
                         assert.ifError(err);
-                        assert.include(doc, 'totalItems');
-                        assert.include(doc, 'items');
-                        assert.include(doc, 'displayName');
-                        assert.include(doc, 'id');
+                        assert.include(doc, "totalItems");
+                        assert.include(doc, "items");
+                        assert.include(doc, "displayName");
+                        assert.include(doc, "id");
                         assert.equal(doc.totalItems, 0);
                         assert.lengthOf(doc.items, 0);
                     }
                 }
             },
-            'and one user unfavorites another user\'s object they hadn\'t faved before': {
+            "and one user unfavorites another user's object they hadn't faved before": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pairs = {};
@@ -431,7 +431,7 @@ suite.addBatch({
                             pairs.mike = mpair;
                             pairs.carol = cpair;
 
-                            var url = 'http://localhost:4815/api/user/mike/feed',
+                            var url = "http://localhost:4815/api/user/mike/feed",
                                 act = {
                                     verb: "post",
                                     object: {
@@ -446,7 +446,7 @@ suite.addBatch({
                         },
                         function(err, doc, response) {
                             if (err) throw err;
-                            var url = 'http://localhost:4815/api/user/carol/feed',
+                            var url = "http://localhost:4815/api/user/carol/feed",
                                 act = {
                                     verb: "unfavorite",
                                     object: {
@@ -469,11 +469,11 @@ suite.addBatch({
                         }
                     );
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
-            'and one user favorites an unknown or arbitrary object': {
+            "and one user favorites an unknown or arbitrary object": {
                 topic: function(cl) {
                     var cb = this.callback,
                         pairs = {};
@@ -486,7 +486,7 @@ suite.addBatch({
                             if (err) throw err;
                             pairs.tiger = pair;
 
-                            var url = 'http://localhost:4815/api/user/tiger/feed',
+                            var url = "http://localhost:4815/api/user/tiger/feed",
                                 act = {
                                     verb: "favorite",
                                     object: {
@@ -504,24 +504,24 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err, act) {
+                "it works": function(err, act) {
                     assert.ifError(err);
                 },
-                'and we get the user\'s list of favorites': {
+                "and we get the user's list of favorites": {
                     topic: function(act, pairs, cl) {
                         var cred = makeCred(cl, pairs.tiger),
-                            url = 'http://localhost:4815/api/user/tiger/favorites',
+                            url = "http://localhost:4815/api/user/tiger/favorites",
                             cb = this.callback;
 
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc, act);
                         });
                     },
-                    'it works': function(err, doc, act) {
+                    "it works": function(err, doc, act) {
                         assert.ifError(err);
                         assertValidList(doc, 1);
                     },
-                    'it includes our object': function(err, doc, act) {
+                    "it includes our object": function(err, doc, act) {
                         assert.ifError(err);
                         assert.equal(doc.items[0].id, act.object.id);
                     }
@@ -531,4 +531,4 @@ suite.addBatch({
     }
 });
 
-suite['export'](module);
+suite["export"](module);

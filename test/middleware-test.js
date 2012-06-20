@@ -16,23 +16,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    Step = require('step'),
-    httpMocks = require('node-mocks-http'),
-    schema = require('../lib/schema'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    User = require('../lib/model/user').User,
-    methodContext = require('./lib/methods').methodContext,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    Step = require("step"),
+    httpMocks = require("node-mocks-http"),
+    schema = require("../lib/schema"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    User = require("../lib/model/user").User,
+    methodContext = require("./lib/methods").methodContext,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
 var robby, maya;
 
-vows.describe('middleware module interface').addBatch({
+vows.describe("middleware module interface").addBatch({
 
-    'When we load the module': {
+    "When we load the module": {
 
         topic: function() { 
 
@@ -45,7 +45,7 @@ vows.describe('middleware module interface').addBatch({
 
             var params = {schema: schema};
 
-            var db = Databank.get('memory', params);
+            var db = Databank.get("memory", params);
 
             Step(
                 function() {
@@ -64,29 +64,29 @@ vows.describe('middleware module interface').addBatch({
                     } else {
                         robby = user1;
                         maya = user2;
-                        mw = require('../lib/middleware');
+                        mw = require("../lib/middleware");
                         cb(null, mw);
                     }
                 }
             );
         },
-        'there is one': function(err, mw) {
+        "there is one": function(err, mw) {
             assert.ifError(err);
             assert.isObject(mw);
         },
-        'and we check its methods': methodContext(['maybeAuth',
-                                                   'reqUser',
-                                                   'mustAuth',
-                                                   'sameUser',
-                                                   'noUser',
-                                                   'checkCredentials',
-                                                   'getCurrentUser',
-                                                   'getSessionUser']),
-        'and we use reqUser with no nickname param': {
+        "and we check its methods": methodContext(["maybeAuth",
+                                                   "reqUser",
+                                                   "mustAuth",
+                                                   "sameUser",
+                                                   "noUser",
+                                                   "checkCredentials",
+                                                   "getCurrentUser",
+                                                   "getSessionUser"]),
+        "and we use reqUser with no nickname param": {
             topic: function(mw) {
                 var cb = this.callback,
-                    req = httpMocks.createRequest({method: 'get',
-                                                   url: '/api/user/',
+                    req = httpMocks.createRequest({method: "get",
+                                                   url: "/api/user/",
                                                    params: {}
                                                   }),
                     res = httpMocks.createResponse();
@@ -101,15 +101,15 @@ vows.describe('middleware module interface').addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
-        'and we use reqUser with an invalid nickname param': {
+        "and we use reqUser with an invalid nickname param": {
             topic: function(mw) {
                 var cb = this.callback,
-                    req = httpMocks.createRequest({method: 'get',
-                                                   url: '/api/user/notanickname',
+                    req = httpMocks.createRequest({method: "get",
+                                                   url: "/api/user/notanickname",
                                                    params: {nickname: "notanickname"}
                                                   }),
                     res = httpMocks.createResponse();
@@ -124,15 +124,15 @@ vows.describe('middleware module interface').addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
-        'and we use reqUser with a nickname param only off by case': {
+        "and we use reqUser with a nickname param only off by case": {
             topic: function(mw) {
                 var cb = this.callback,
-                    req = httpMocks.createRequest({method: 'get',
-                                                   url: '/api/user/Robby',
+                    req = httpMocks.createRequest({method: "get",
+                                                   url: "/api/user/Robby",
                                                    params: {nickname: "Robby"}
                                                   }),
                     res = httpMocks.createResponse();
@@ -147,15 +147,15 @@ vows.describe('middleware module interface').addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
-        'and we use reqUser with a valid nickname param': {
+        "and we use reqUser with a valid nickname param": {
             topic: function(mw) {
                 var cb = this.callback,
-                    req = httpMocks.createRequest({method: 'get',
-                                                   url: '/api/user/robby',
+                    req = httpMocks.createRequest({method: "get",
+                                                   url: "/api/user/robby",
                                                    params: {nickname: "robby"}
                                                   }),
                     res = httpMocks.createResponse();
@@ -168,15 +168,15 @@ vows.describe('middleware module interface').addBatch({
                     }
                 });
             },
-            'it works': function(err) {
+            "it works": function(err) {
                 assert.ifError(err);
             }
         },
-        'and we use sameUser() with remoteUser but no user': {
+        "and we use sameUser() with remoteUser but no user": {
             topic: function(mw) {
                 var cb = this.callback,
-                    req = httpMocks.createRequest({method: 'get',
-                                                   url: '/api/user/',
+                    req = httpMocks.createRequest({method: "get",
+                                                   url: "/api/user/",
                                                    params: {},
                                                    remoteUser: maya
                                                   }),
@@ -190,15 +190,15 @@ vows.describe('middleware module interface').addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
-        'and we use sameUser() with user but no remoteUser': {
+        "and we use sameUser() with user but no remoteUser": {
             topic: function(mw) {
                 var cb = this.callback,
-                    req = httpMocks.createRequest({method: 'get',
-                                                   url: '/api/user/robby',
+                    req = httpMocks.createRequest({method: "get",
+                                                   url: "/api/user/robby",
                                                    params: {nickname: "robby"},
                                                    user: robby
                                                   }),
@@ -212,15 +212,15 @@ vows.describe('middleware module interface').addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
-        'and we use sameUser() with user not matching remoteUser': {
+        "and we use sameUser() with user not matching remoteUser": {
             topic: function(mw) {
                 var cb = this.callback,
-                    req = httpMocks.createRequest({method: 'get',
-                                                   url: '/api/user/robby',
+                    req = httpMocks.createRequest({method: "get",
+                                                   url: "/api/user/robby",
                                                    params: {nickname: "robby"},
                                                    user: robby,
                                                    remoteUser: maya
@@ -235,15 +235,15 @@ vows.describe('middleware module interface').addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
-        'and we use sameUser() with user matching remoteUser': {
+        "and we use sameUser() with user matching remoteUser": {
             topic: function(mw) {
                 var cb = this.callback,
-                    req = httpMocks.createRequest({method: 'get',
-                                                   url: '/api/user/robby',
+                    req = httpMocks.createRequest({method: "get",
+                                                   url: "/api/user/robby",
                                                    params: {nickname: "robby"},
                                                    user: robby,
                                                    remoteUser: robby
@@ -258,10 +258,10 @@ vows.describe('middleware module interface').addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         }
     }
-})['export'](module);
+})["export"](module);
 

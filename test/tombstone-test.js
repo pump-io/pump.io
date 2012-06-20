@@ -16,44 +16,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    Step = require('step'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
-    schema = require('../lib/schema').schema,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    Step = require("step"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
+    schema = require("../lib/schema").schema,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
     NoSuchThingError = databank.NoSuchThingError;
 
-var suite = vows.describe('tombstone interface');
+var suite = vows.describe("tombstone interface");
 
 var testSchema = {
-    pkey: 'typeuuid',
-    fields: ['objectType',
-             'uuid',
-             'created',
-             'updated',
-             'deleted']
+    pkey: "typeuuid",
+    fields: ["objectType",
+             "uuid",
+             "created",
+             "updated",
+             "deleted"]
 };
 
 var testData = {
-    'create': {
-        objectType: 'person',
-        id: 'http://example.net/api/person/QpL57jiXQt2WzMW4GKfp9A',
-        uuid: 'QpL57jiXQt2WzMW4GKfp9A',
-        created: '2012-06-07T12:00:00',
-        updated: '2012-06-07T12:05:00'
+    "create": {
+        objectType: "person",
+        id: "http://example.net/api/person/QpL57jiXQt2WzMW4GKfp9A",
+        uuid: "QpL57jiXQt2WzMW4GKfp9A",
+        created: "2012-06-07T12:00:00",
+        updated: "2012-06-07T12:05:00"
     }
 };
 
-var mb = modelBatch('tombstone', 'Tombstone', testSchema, testData);
+var mb = modelBatch("tombstone", "Tombstone", testSchema, testData);
 
-mb['When we require the tombstone module']
-['and we get its Tombstone class export']
-['and we create a tombstone instance']
-['auto-generated fields are there'] = function(err, created) {
+mb["When we require the tombstone module"]
+["and we get its Tombstone class export"]
+["and we create a tombstone instance"]
+["auto-generated fields are there"] = function(err, created) {
     assert.isString(created.typeuuid);
     assert.isString(created.deleted);
 };
@@ -61,7 +61,7 @@ mb['When we require the tombstone module']
 suite.addBatch(mb);
 
 suite.addBatch({
-    'When we get the Tombstone class again': {
+    "When we get the Tombstone class again": {
         topic: function() {
             var cb = this.callback;
             // Need this to make IDs
@@ -72,31 +72,31 @@ suite.addBatch({
 
             var params = {schema: schema};
 
-            var db = Databank.get('memory', params);
+            var db = Databank.get("memory", params);
 
             db.connect({}, function(err) {
                 var mod;
 
                 DatabankObject.bank = db;
                 
-                mod = require('../lib/model/tombstone').Tombstone;
+                mod = require("../lib/model/tombstone").Tombstone;
 
                 cb(null, mod);
             });
         },
-        'it works': function(err, Tombstone) {
+        "it works": function(err, Tombstone) {
             assert.isFunction(Tombstone);
         },
-        'it has the mark() method': function(err, Tombstone) {
+        "it has the mark() method": function(err, Tombstone) {
             assert.isFunction(Tombstone.mark);
         },
-        'it has the lookup() method': function(err, Tombstone) {
+        "it has the lookup() method": function(err, Tombstone) {
             assert.isFunction(Tombstone.lookup);
         },
-        'and we call mark() on an ActivityObject': {
+        "and we call mark() on an ActivityObject": {
             topic: function(Tombstone) {
                 var cb = this.callback,
-                    Person = require('../lib/model/person').Person;
+                    Person = require("../lib/model/person").Person;
 
                 Step(
                     function() {
@@ -111,14 +111,14 @@ suite.addBatch({
                     }
                 );
             },
-            'it works': function(err) {
+            "it works": function(err) {
                 assert.ifError(err);
             }
         },
-        'and we call markFull() on an ActivityObject': {
+        "and we call markFull() on an ActivityObject": {
             topic: function(Tombstone) {
                 var cb = this.callback,
-                    Person = require('../lib/model/person').Person;
+                    Person = require("../lib/model/person").Person;
 
                 Step(
                     function() {
@@ -126,18 +126,18 @@ suite.addBatch({
                     },
                     function(err, person) {
                         if (err) throw err;
-                        Tombstone.markFull(person, 'person', person.uuid, this);
+                        Tombstone.markFull(person, "person", person.uuid, this);
                     },
                     function(err) {
                         cb(err);
                     }
                 );
             },
-            'it works': function(err) {
+            "it works": function(err) {
                 assert.ifError(err);
             }
         },
-        'and we call mark() on another kind of object': {
+        "and we call mark() on another kind of object": {
             topic: function(Tombstone) {
                 var cb = this.callback,
                     Cls = function() {},
@@ -147,15 +147,15 @@ suite.addBatch({
                     if (err) {
                         cb(null);
                     } else {
-                        cb(new Error('Unexpected success'));
+                        cb(new Error("Unexpected success"));
                     }
                 });
             },
-            'it works': function(err) {
+            "it works": function(err) {
                 assert.ifError(err);
             }
         },
-        'and we call mark() on null': {
+        "and we call mark() on null": {
             topic: function(Tombstone) {
                 var cb = this.callback;
                 
@@ -163,18 +163,18 @@ suite.addBatch({
                     if (err) {
                         cb(null);
                     } else {
-                        cb(new Error('Unexpected success'));
+                        cb(new Error("Unexpected success"));
                     }
                 });
             },
-            'it works': function(err) {
+            "it works": function(err) {
                 assert.ifError(err);
             }
         },
-        'and we call lookup() on a valid type/uuid pair': {
+        "and we call lookup() on a valid type/uuid pair": {
             topic: function(Tombstone) {
                 var cb = this.callback,
-                    Person = require('../lib/model/person').Person,
+                    Person = require("../lib/model/person").Person,
                     person;
 
                 Step(
@@ -199,10 +199,10 @@ suite.addBatch({
                     }
                 );
             },
-            'it works': function(err, ts, person) {
+            "it works": function(err, ts, person) {
                 assert.ifError(err);
             },
-            'tombstone is correct': function(err, ts, person) {
+            "tombstone is correct": function(err, ts, person) {
                 assert.isObject(ts);
                 assert.equal(ts.objectType, person.objectType);
                 assert.equal(ts.uuid, person.uuid);
@@ -212,10 +212,10 @@ suite.addBatch({
                 assert.match(ts.deleted, /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
             }
         },
-        'and we call lookup() on a valid type but invalid uuid': {
+        "and we call lookup() on a valid type but invalid uuid": {
             topic: function(Tombstone) {
                 var cb = this.callback;
-                Tombstone.lookup('person', 'NOTAUUID', function(err, ts) {
+                Tombstone.lookup("person", "NOTAUUID", function(err, ts) {
                     if (err && err instanceof NoSuchThingError) {
                         cb(null);
                     } else if (err) {
@@ -225,14 +225,14 @@ suite.addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
-        'and we call lookup() on a valid uuid but mismatched type': {
+        "and we call lookup() on a valid uuid but mismatched type": {
             topic: function(Tombstone) {
                 var cb = this.callback,
-                    Person = require('../lib/model/person').Person,
+                    Person = require("../lib/model/person").Person,
                     person;
 
                 Step(
@@ -246,7 +246,7 @@ suite.addBatch({
                     },
                     function(err) {
                         if (err) throw err;
-                        Tombstone.lookup('audio', person.uuid, this);
+                        Tombstone.lookup("audio", person.uuid, this);
                     },
                     function(err, ts) {
                         if (err && err instanceof NoSuchThingError) {
@@ -259,11 +259,11 @@ suite.addBatch({
                     }
                 );
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         }
     }
 });
 
-suite['export'](module);
+suite["export"](module);

@@ -16,16 +16,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    Step = require('step'),
-    _ = require('underscore'),
-    querystring = require('querystring'),
-    http = require('http'),
-    OAuth = require('oauth').OAuth,
-    Browser = require('zombie'),
-    httputil = require('./lib/http'),
-    oauthutil = require('./lib/oauth'),
+var assert = require("assert"),
+    vows = require("vows"),
+    Step = require("step"),
+    _ = require("underscore"),
+    querystring = require("querystring"),
+    http = require("http"),
+    OAuth = require("oauth").OAuth,
+    Browser = require("zombie"),
+    httputil = require("./lib/http"),
+    oauthutil = require("./lib/oauth"),
     setupApp = oauthutil.setupApp,
     register = oauthutil.register,
     accessToken = oauthutil.accessToken,
@@ -33,12 +33,12 @@ var assert = require('assert'),
 
 var ignore = function(err) {};
 
-var suite = vows.describe('User stream API test');
+var suite = vows.describe("User stream API test");
 
 // A batch for testing the read access to the API
 
 suite.addBatch({
-    'When we set up the app': {
+    "When we set up the app": {
         topic: function() {
             setupApp(this.callback);
         },
@@ -47,14 +47,14 @@ suite.addBatch({
                 app.close();
             }
         },
-        'it works': function(err, app) {
+        "it works": function(err, app) {
             assert.ifError(err);
         },
-        'and we get new credentials': {
+        "and we get new credentials": {
             topic: function() {
                 newCredentials("dora", "v4m0nos", this.callback);
             },
-            'it works': function(err, cred) {
+            "it works": function(err, cred) {
                 assert.ifError(err);
                 assert.isObject(cred);
                 assert.isString(cred.consumer_key);
@@ -62,103 +62,103 @@ suite.addBatch({
                 assert.isString(cred.token);
                 assert.isString(cred.token_secret);
             },
-            'and we check the feed endpoint': 
-            httputil.endpoint('/api/user/dora/feed', ['GET', 'POST']),
-            'and we check the inbox endpoint': 
-            httputil.endpoint('/api/user/dora/inbox', ['GET', 'POST']),
-            'and we get the feed of a new user': {
+            "and we check the feed endpoint": 
+            httputil.endpoint("/api/user/dora/feed", ["GET", "POST"]),
+            "and we check the inbox endpoint": 
+            httputil.endpoint("/api/user/dora/inbox", ["GET", "POST"]),
+            "and we get the feed of a new user": {
                 topic: function(cred) {
                     var cb = this.callback;
-                    httputil.getJSON('http://localhost:4815/api/user/dora/feed', cred, function(err, feed, result) {
+                    httputil.getJSON("http://localhost:4815/api/user/dora/feed", cred, function(err, feed, result) {
                         cb(err, feed);
                     });
                 },
-                'it works': function(err, feed) {
+                "it works": function(err, feed) {
                     assert.ifError(err);
                 },
-                'it has the right members': function(err, feed) {
-                    assert.include(feed, 'author');
-                    assert.include(feed.author, 'id');
-                    assert.include(feed.author, 'displayName');
-                    assert.include(feed.author, 'objectType');
-                    assert.include(feed, 'totalItems');
-                    assert.include(feed, 'items');
-                    assert.include(feed, 'displayName');
-                    assert.include(feed, 'id');
-                    assert.include(feed, 'objectTypes');
-                    assert.include(feed.objectTypes, 'activity');
+                "it has the right members": function(err, feed) {
+                    assert.include(feed, "author");
+                    assert.include(feed.author, "id");
+                    assert.include(feed.author, "displayName");
+                    assert.include(feed.author, "objectType");
+                    assert.include(feed, "totalItems");
+                    assert.include(feed, "items");
+                    assert.include(feed, "displayName");
+                    assert.include(feed, "id");
+                    assert.include(feed, "objectTypes");
+                    assert.include(feed.objectTypes, "activity");
                 },
-                'it is empty': function(err, feed) {
+                "it is empty": function(err, feed) {
                     assert.equal(feed.totalItems, 0);
                     assert.isEmpty(feed.items);
                 },
-                'and we get the inbox of a new user': {
+                "and we get the inbox of a new user": {
                     topic: function(feed, cred) {
                         var cb = this.callback;
-                        httputil.getJSON('http://localhost:4815/api/user/dora/inbox', cred, function(err, feed, result) {
+                        httputil.getJSON("http://localhost:4815/api/user/dora/inbox", cred, function(err, feed, result) {
                             cb(err, feed);
                         });
                     },
-                    'it works': function(err, inbox) {
+                    "it works": function(err, inbox) {
                         assert.ifError(err);
                     },
-                    'it has the right members': function(err, inbox) {
-                        assert.include(inbox, 'author');
-                        assert.include(inbox.author, 'id');
-                        assert.include(inbox.author, 'displayName');
-                        assert.include(inbox.author, 'objectType');
-                        assert.include(inbox, 'totalItems');
-                        assert.include(inbox, 'items');
-                        assert.include(inbox, 'displayName');
-                        assert.include(inbox, 'id');
-                        assert.include(inbox, 'objectTypes');
-                        assert.include(inbox.objectTypes, 'activity');
+                    "it has the right members": function(err, inbox) {
+                        assert.include(inbox, "author");
+                        assert.include(inbox.author, "id");
+                        assert.include(inbox.author, "displayName");
+                        assert.include(inbox.author, "objectType");
+                        assert.include(inbox, "totalItems");
+                        assert.include(inbox, "items");
+                        assert.include(inbox, "displayName");
+                        assert.include(inbox, "id");
+                        assert.include(inbox, "objectTypes");
+                        assert.include(inbox.objectTypes, "activity");
                     },
-                    'it is empty': function(err, inbox) {
+                    "it is empty": function(err, inbox) {
                         assert.equal(inbox.totalItems, 0);
                         assert.isEmpty(inbox.items);
                     },
-                    'and we post a new activity': {
+                    "and we post a new activity": {
                         topic: function(inbox, feed, cred) {
                             var cb = this.callback,
                                 act = {
-                                    verb: 'post',
+                                    verb: "post",
                                     object: {
-                                        objectType: 'note',
-                                        content: 'Hello, world!'
+                                        objectType: "note",
+                                        content: "Hello, world!"
                                     }
                                 };
-                            httputil.postJSON('http://localhost:4815/api/user/dora/feed', cred, act, function(err, feed, result) {
+                            httputil.postJSON("http://localhost:4815/api/user/dora/feed", cred, act, function(err, feed, result) {
                                 cb(err, feed);
                             });
                         },
-                        'it works': function(err, act) {
+                        "it works": function(err, act) {
                             assert.ifError(err);
                         },
-                        'results look right': function(err, act) {
+                        "results look right": function(err, act) {
                             assert.isObject(act);
-                            assert.include(act, 'id');
+                            assert.include(act, "id");
                             assert.isString(act.id);
-                            assert.include(act, 'actor');
+                            assert.include(act, "actor");
                             assert.isObject(act.actor);
-                            assert.include(act.actor, 'id');
+                            assert.include(act.actor, "id");
                             assert.isString(act.actor.id);
-                            assert.include(act, 'verb');
+                            assert.include(act, "verb");
                             assert.isString(act.verb);
-                            assert.include(act, 'object');
+                            assert.include(act, "object");
                             assert.isObject(act.object);
-                            assert.include(act.object, 'id');
+                            assert.include(act.object, "id");
                             assert.isString(act.object.id);
-                            assert.include(act, 'published');
+                            assert.include(act, "published");
                             assert.isString(act.published);
-                            assert.include(act, 'updated');
+                            assert.include(act, "updated");
                             assert.isString(act.updated);
                         },
-                        'and we read the feed': {
+                        "and we read the feed": {
                             topic: function(act, inbox, feed, cred) {
                                 var cb = this.callback;
 
-                                httputil.getJSON('http://localhost:4815/api/user/dora/feed', cred, function(err, newf) {
+                                httputil.getJSON("http://localhost:4815/api/user/dora/feed", cred, function(err, newf) {
                                     if (err) {
                                         cb(err);
                                     } else {
@@ -166,43 +166,43 @@ suite.addBatch({
                                     }
                                 });
                             },
-                            'it works': function(err, res) {
+                            "it works": function(err, res) {
                                 assert.ifError(err);
                             },
-                            'it has the right members': function(err, res) {
+                            "it has the right members": function(err, res) {
                                 assert.isObject(res);
-                                assert.include(res, 'feed');
+                                assert.include(res, "feed");
                                 var feed = res.feed;
-                                assert.include(feed, 'author');
-                                assert.include(feed.author, 'id');
-                                assert.include(feed.author, 'displayName');
-                                assert.include(feed.author, 'objectType');
-                                assert.include(feed, 'totalItems');
-                                assert.include(feed, 'items');
-                                assert.include(feed, 'displayName');
-                                assert.include(feed, 'id');
-                                assert.include(feed, 'objectTypes');
-                                assert.include(feed.objectTypes, 'activity');
+                                assert.include(feed, "author");
+                                assert.include(feed.author, "id");
+                                assert.include(feed.author, "displayName");
+                                assert.include(feed.author, "objectType");
+                                assert.include(feed, "totalItems");
+                                assert.include(feed, "items");
+                                assert.include(feed, "displayName");
+                                assert.include(feed, "id");
+                                assert.include(feed, "objectTypes");
+                                assert.include(feed.objectTypes, "activity");
                             },
-                            'it has one object': function(err, res) {
+                            "it has one object": function(err, res) {
                                 assert.isObject(res);
-                                assert.include(res, 'feed');
+                                assert.include(res, "feed");
                                 var feed = res.feed;
                                 assert.equal(feed.totalItems, 1);
                                 assert.lengthOf(feed.items, 1);
                             },
-                            'it has our activity': function(err, res) {
+                            "it has our activity": function(err, res) {
                                 assert.isObject(res);
-                                assert.include(res, 'feed');
-                                assert.include(res, 'act');
+                                assert.include(res, "feed");
+                                assert.include(res, "act");
                                 var feed = res.feed, act = res.act;
                                 assert.equal(feed.items[0].id, act.id);
                             }
                         },
-                        'and we read the inbox': {
+                        "and we read the inbox": {
                             topic: function(act, inbox, feed, cred) {
                                 var cb = this.callback;
-                                httputil.getJSON('http://localhost:4815/api/user/dora/inbox', cred, function(err, newb) {
+                                httputil.getJSON("http://localhost:4815/api/user/dora/inbox", cred, function(err, newb) {
                                     if (err) {
                                         cb(err);
                                     } else {
@@ -210,35 +210,35 @@ suite.addBatch({
                                     }
                                 });
                             },
-                            'it works': function(err, res) {
+                            "it works": function(err, res) {
                                 assert.ifError(err);
                             },
-                            'it has the right members': function(err, res) {
+                            "it has the right members": function(err, res) {
                                 assert.isObject(res);
-                                assert.include(res, 'inbox');
+                                assert.include(res, "inbox");
                                 var inbox = res.inbox;
-                                assert.include(inbox, 'author');
-                                assert.include(inbox.author, 'id');
-                                assert.include(inbox.author, 'displayName');
-                                assert.include(inbox.author, 'objectType');
-                                assert.include(inbox, 'totalItems');
-                                assert.include(inbox, 'items');
-                                assert.include(inbox, 'displayName');
-                                assert.include(inbox, 'id');
-                                assert.include(inbox, 'objectTypes');
-                                assert.include(inbox.objectTypes, 'activity');
+                                assert.include(inbox, "author");
+                                assert.include(inbox.author, "id");
+                                assert.include(inbox.author, "displayName");
+                                assert.include(inbox.author, "objectType");
+                                assert.include(inbox, "totalItems");
+                                assert.include(inbox, "items");
+                                assert.include(inbox, "displayName");
+                                assert.include(inbox, "id");
+                                assert.include(inbox, "objectTypes");
+                                assert.include(inbox.objectTypes, "activity");
                             },
-                            'it has one item': function(err, res) {
+                            "it has one item": function(err, res) {
                                 assert.isObject(res);
-                                assert.include(res, 'inbox');
+                                assert.include(res, "inbox");
                                 var inbox = res.inbox;
                                 assert.equal(inbox.totalItems, 1);
                                 assert.lengthOf(inbox.items, 1);
                             },
-                            'it has our activity': function(err, res) {
+                            "it has our activity": function(err, res) {
                                 assert.isObject(res);
-                                assert.include(res, 'inbox');
-                                assert.include(res, 'act');
+                                assert.include(res, "inbox");
+                                assert.include(res, "act");
                                 var inbox = res.inbox, act = res.act;
                                 assert.equal(inbox.items[0].id, act.id);
                             }
@@ -253,7 +253,7 @@ suite.addBatch({
 // Test some "bad" kinds of activity
 
 suite.addBatch({
-    'When we set up the app': {
+    "When we set up the app": {
         topic: function() {
             setupApp(this.callback);
         },
@@ -262,14 +262,14 @@ suite.addBatch({
                 app.close();
             }
         },
-        'it works': function(err, app) {
+        "it works": function(err, app) {
             assert.ifError(err);
         },
-        'and we get new credentials': {
+        "and we get new credentials": {
             topic: function(app) {
                 newCredentials("diego", "rescue", this.callback);
             },
-            'it works': function(err, cred) {
+            "it works": function(err, cred) {
                 assert.ifError(err);
                 assert.isObject(cred);
                 assert.isString(cred.consumer_key);
@@ -286,13 +286,13 @@ suite.addBatch({
                                 objectType: "person",
                                 displayName: "Not Diego"
                             },
-                            verb: 'post',
+                            verb: "post",
                             object: {
-                                objectType: 'note',
-                                content: 'To the rescue!'
+                                objectType: "note",
+                                content: "To the rescue!"
                             }
                         };
-                    httputil.postJSON('http://localhost:4815/api/user/diego/feed', cred, act, function(err, feed, result) {
+                    httputil.postJSON("http://localhost:4815/api/user/diego/feed", cred, act, function(err, feed, result) {
                         if (err) {
                             cb(null);
                         } else if (result.statusCode < 400 || result.statusCode >= 500) {
@@ -302,7 +302,7 @@ suite.addBatch({
                         }
                     });
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
@@ -310,9 +310,9 @@ suite.addBatch({
                 topic: function(cred, app) {
                     var cb = this.callback,
                         act = {
-                            verb: 'noop'
+                            verb: "noop"
                         };
-                    httputil.postJSON('http://localhost:4815/api/user/diego/feed', cred, act, function(err, feed, result) {
+                    httputil.postJSON("http://localhost:4815/api/user/diego/feed", cred, act, function(err, feed, result) {
                         if (err) {
                             cb(null);
                         } else if (result.statusCode < 400 || result.statusCode >= 500) {
@@ -322,7 +322,7 @@ suite.addBatch({
                         }
                     });
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
@@ -332,10 +332,10 @@ suite.addBatch({
                         cl = {client_id: cred.consumer_key,
                               client_secret: cred.consumer_secret},
                         act = {
-                            verb: 'post',
+                            verb: "post",
                             object: {
-                                objectType: 'note',
-                                content: 'To the rescue!'
+                                objectType: "note",
+                                content: "To the rescue!"
                             }
                         };
                     Step(
@@ -354,7 +354,7 @@ suite.addBatch({
                                 nuke = _(cred).clone();
                                 _(nuke).extend(pair);
 
-                                httputil.postJSON('http://localhost:4815/api/user/diego/feed', nuke, act, function(err, feed, result) {
+                                httputil.postJSON("http://localhost:4815/api/user/diego/feed", nuke, act, function(err, feed, result) {
                                     if (err) {
                                         cb(null);
                                     } else if (result.statusCode < 400 || result.statusCode >= 500) {
@@ -367,7 +367,7 @@ suite.addBatch({
                         }
                     );
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
@@ -376,11 +376,11 @@ suite.addBatch({
                     var cb = this.callback,
                         act = {
                             object: {
-                                objectType: 'note',
-                                content: 'Hello, llama!'
+                                objectType: "note",
+                                content: "Hello, llama!"
                             }
                         };
-                    httputil.postJSON('http://localhost:4815/api/user/diego/feed', cred, act, function(err, posted, result) {
+                    httputil.postJSON("http://localhost:4815/api/user/diego/feed", cred, act, function(err, posted, result) {
                         if (err) {
                             cb(err, null);
                         } else {
@@ -388,11 +388,11 @@ suite.addBatch({
                         }
                     });
                 },
-                'it works': function(err, act) {
+                "it works": function(err, act) {
                     assert.ifError(err);
                 },
-                'it has the right verb': function(err, act) {
-                    assert.equal(act.verb, 'post');
+                "it has the right verb": function(err, act) {
+                    assert.equal(act.verb, "post");
                 }
             }
         }
@@ -483,29 +483,29 @@ var itFails = function(err) {
 
 var validForm = function(count, total) {
     return function(err, doc) {
-        assert.include(doc, 'author');
-        assert.include(doc.author, 'id');
-        assert.include(doc.author, 'displayName');
-        assert.include(doc.author, 'objectType');
-        assert.include(doc, 'totalItems');
-        assert.include(doc, 'items');
-        assert.include(doc, 'displayName');
-        assert.include(doc, 'id');
-        assert.include(doc, 'url');
+        assert.include(doc, "author");
+        assert.include(doc.author, "id");
+        assert.include(doc.author, "displayName");
+        assert.include(doc.author, "objectType");
+        assert.include(doc, "totalItems");
+        assert.include(doc, "items");
+        assert.include(doc, "displayName");
+        assert.include(doc, "id");
+        assert.include(doc, "url");
         if (_(count).isNumber()) {
             assert.lengthOf(doc.items, count);
         }
         if (_(total).isNumber()) {
             assert.equal(doc.totalItems, total);
         }
-        assert.include(doc, 'links');
+        assert.include(doc, "links");
         assert.isObject(doc.links);
-        assert.include(doc.links, 'self');
+        assert.include(doc.links, "self");
         assert.isString(doc.links.self);
-        assert.include(doc.links, 'first');
+        assert.include(doc.links, "first");
         assert.isString(doc.links.first);
         if (_(count).isNumber() && count !== 0) {
-            assert.include(doc.links, 'prev');
+            assert.include(doc.links, "prev");
         }
     };
 };
@@ -517,7 +517,7 @@ var validData = function(start, end) {
 };
 
 suite.addBatch({
-    'When we set up the app': {
+    "When we set up the app": {
         topic: function() {
             setupApp(this.callback);
         },
@@ -526,14 +526,14 @@ suite.addBatch({
                 app.close();
             }
         },
-        'it works': function(err, app) {
+        "it works": function(err, app) {
             assert.ifError(err);
         },
-        'and we get new credentials': {
+        "and we get new credentials": {
             topic: function(app) {
                 newCredentials("alicia", "base*station", this.callback);
             },
-            'it works': function(err, cred) {
+            "it works": function(err, cred) {
                 assert.ifError(err);
                 assert.isObject(cred);
                 assert.isString(cred.consumer_key);
@@ -541,7 +541,7 @@ suite.addBatch({
                 assert.isString(cred.token);
                 assert.isString(cred.token_secret);
             },
-            'and we post a bunch of activities': {
+            "and we post a bunch of activities": {
                 topic: function(cred) {
                     var cb = this.callback;
 
@@ -570,95 +570,95 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err) {
+                "it works": function(err) {
                     assert.ifError(err);
                 },
-                'and we get the default feed': {
+                "and we get the default feed": {
                     topic: getDoc(BASE),
-                    'it works': itWorks,
-                    'it looks right': validForm(20, 100)
+                    "it works": itWorks,
+                    "it looks right": validForm(20, 100)
                 },
-                'and we get the full feed': {
+                "and we get the full feed": {
                     topic: getDoc(BASE + "?count=100"),
-                    'it works': itWorks,
-                    'it looks right': validForm(100, 100),
-                    'and we get the feed with a non-zero offset': {
+                    "it works": itWorks,
+                    "it looks right": validForm(100, 100),
+                    "and we get the feed with a non-zero offset": {
                         topic: cmpDoc(BASE + "?offset=50"),
-                        'it works': itWorks,
-                        'it looks right': validForm(20, 100),
-                        'it has the right data': validData(50, 70)
+                        "it works": itWorks,
+                        "it looks right": validForm(20, 100),
+                        "it has the right data": validData(50, 70)
                     },
-                    'and we get the feed with a zero offset': {
+                    "and we get the feed with a zero offset": {
                         topic: cmpDoc(BASE + "?offset=0"),
-                        'it works': itWorks,
-                        'it looks right': validForm(20, 100),
-                        'it has the right data': validData(0, 20)
+                        "it works": itWorks,
+                        "it looks right": validForm(20, 100),
+                        "it has the right data": validData(0, 20)
                     },
-                    'and we get the feed with a non-zero offset and count': {
+                    "and we get the feed with a non-zero offset and count": {
                         topic: cmpDoc(BASE + "?offset=20&count=20"),
-                        'it works': itWorks,
-                        'it looks right': validForm(20, 100),
-                        'it has the right data': validData(20, 40)
+                        "it works": itWorks,
+                        "it looks right": validForm(20, 100),
+                        "it has the right data": validData(20, 40)
                     },
-                    'and we get the feed with a zero offset and count': {
+                    "and we get the feed with a zero offset and count": {
                         topic: cmpDoc(BASE + "?offset=0"),
-                        'it works': itWorks,
-                        'it looks right': validForm(20, 100),
-                        'it has the right data': validData(0, 20)
+                        "it works": itWorks,
+                        "it looks right": validForm(20, 100),
+                        "it has the right data": validData(0, 20)
                     },
-                    'and we get the feed with a non-zero count': {
+                    "and we get the feed with a non-zero count": {
                         topic: cmpDoc(BASE + "?count=50"),
-                        'it works': itWorks,
-                        'it looks right': validForm(50, 100),
-                        'it has the right data': validData(0, 50)
+                        "it works": itWorks,
+                        "it looks right": validForm(50, 100),
+                        "it has the right data": validData(0, 50)
                     },
-                    'and we get the feed since a value': {
+                    "and we get the feed since a value": {
                         topic: cmpSince(BASE, 25),
-                        'it works': itWorks,
-                        'it looks right': validForm(20, 100),
-                        'it has the right data': validData(5, 25)
+                        "it works": itWorks,
+                        "it looks right": validForm(20, 100),
+                        "it has the right data": validData(5, 25)
                     },
-                    'and we get the feed before a value': {
+                    "and we get the feed before a value": {
                         topic: cmpBefore(BASE, 25),
-                        'it works': itWorks,
-                        'it looks right': validForm(20, 100),
-                        'it has the right data': validData(26, 46)
+                        "it works": itWorks,
+                        "it looks right": validForm(20, 100),
+                        "it has the right data": validData(26, 46)
                     },
-                    'and we get the feed since a small value': {
+                    "and we get the feed since a small value": {
                         topic: cmpSince(BASE, 5),
-                        'it works': itWorks,
-                        'it looks right': validForm(5, 100),
-                        'it has the right data': validData(0, 5)
+                        "it works": itWorks,
+                        "it looks right": validForm(5, 100),
+                        "it has the right data": validData(0, 5)
                     },
-                    'and we get the feed before a big value': {
+                    "and we get the feed before a big value": {
                         topic: cmpBefore(BASE, 94),
-                        'it works': itWorks,
-                        'it looks right': validForm(5, 100),
-                        'it has the right data': validData(95, 100)
+                        "it works": itWorks,
+                        "it looks right": validForm(5, 100),
+                        "it has the right data": validData(95, 100)
                     },
-                    'and we get the feed since a value with a count': {
+                    "and we get the feed since a value with a count": {
                         topic: cmpSince(BASE, 75, 50),
-                        'it works': itWorks,
-                        'it looks right': validForm(50, 100),
-                        'it has the right data': validData(25, 75)
+                        "it works": itWorks,
+                        "it looks right": validForm(50, 100),
+                        "it has the right data": validData(25, 75)
                     },
-                    'and we get the feed before a value with a count': {
+                    "and we get the feed before a value with a count": {
                         topic: cmpBefore(BASE, 35, 50),
-                        'it works': itWorks,
-                        'it looks right': validForm(50, 100),
-                        'it has the right data': validData(36, 86)
+                        "it works": itWorks,
+                        "it looks right": validForm(50, 100),
+                        "it has the right data": validData(36, 86)
                     },
-                    'and we get the feed since a value with a zero count': {
+                    "and we get the feed since a value with a zero count": {
                         topic: cmpSince(BASE, 30, 0),
-                        'it works': itWorks,
-                        'it looks right': validForm(0, 100)
+                        "it works": itWorks,
+                        "it looks right": validForm(0, 100)
                     },
-                    'and we get the feed before a value with a zero count': {
+                    "and we get the feed before a value with a zero count": {
                         topic: cmpBefore(BASE, 60, 0),
-                        'it works': itWorks,
-                        'it looks right': validForm(0, 100)
+                        "it works": itWorks,
+                        "it looks right": validForm(0, 100)
                     },
-                    'and we get the full feed by following "next" links': {
+                    "and we get the full feed by following 'next' links": {
                         topic: function(full, cred) {
                             var cb = this.callback,
                                 items = [],
@@ -682,199 +682,199 @@ suite.addBatch({
                                 };
                             addResultsOf(BASE);
                         },
-                        'it works': itWorks,
-                        'it looks correct': function(err, items, full) {
+                        "it works": itWorks,
+                        "it looks correct": function(err, items, full) {
                             assert.isArray(items);
                             assert.lengthOf(items, full.items.length);
                             assert.deepEqual(items, full.items);
                         }
                     }
                 },
-                'and we get the feed with a negative count': {
+                "and we get the feed with a negative count": {
                     topic: failDoc(BASE + "?count=-30"),
-                    'it fails correctly': itFails
+                    "it fails correctly": itFails
                 },
-                'and we get the feed with a negative offset': {
+                "and we get the feed with a negative offset": {
                     topic: failDoc(BASE + "?offset=-50"),
-                    'it fails correctly': itFails
+                    "it fails correctly": itFails
                 },
-                'and we get the feed with a zero offset and zero count': {
+                "and we get the feed with a zero offset and zero count": {
                     topic: getDoc(BASE + "?offset=0&count=0"),
-                    'it works': itWorks,
-                    'it looks right': validForm(0, 100)
+                    "it works": itWorks,
+                    "it looks right": validForm(0, 100)
                 },
-                'and we get the feed with a non-zero offset and zero count': {
+                "and we get the feed with a non-zero offset and zero count": {
                     topic: getDoc(BASE + "?offset=30&count=0"),
-                    'it works': itWorks,
-                    'it looks right': validForm(0, 100)
+                    "it works": itWorks,
+                    "it looks right": validForm(0, 100)
                 },
-                'and we get the feed with a non-integer count': {
+                "and we get the feed with a non-integer count": {
                     topic: failDoc(BASE + "?count=foo"),
-                    'it fails correctly': itFails
+                    "it fails correctly": itFails
                 },
-                'and we get the feed with a non-integer offset': {
+                "and we get the feed with a non-integer offset": {
                     topic: failDoc(BASE + "?offset=bar"),
-                    'it fails correctly': itFails
+                    "it fails correctly": itFails
                 },
-                'and we get the feed with a too-large offset': {
+                "and we get the feed with a too-large offset": {
                     topic: getDoc(BASE + "?offset=200"),
-                    'it works': itWorks,
-                    'it looks right': validForm(0, 100)
+                    "it works": itWorks,
+                    "it looks right": validForm(0, 100)
                 },
-                'and we get the feed with a too-large count': {
+                "and we get the feed with a too-large count": {
                     topic: getDoc(BASE + "?count=150"),
-                    'it works': itWorks,
-                    'it looks right': validForm(100, 100)
+                    "it works": itWorks,
+                    "it looks right": validForm(100, 100)
                 },
-                'and we get the feed with a disallowed count': {
+                "and we get the feed with a disallowed count": {
                     topic: failDoc(BASE + "?count=1000"),
-                    'it fails correctly': itFails
+                    "it fails correctly": itFails
                 },
-                'and we get the feed before a nonexistent id': {
-                    topic: failDoc(BASE + "?before="+encodeURIComponent('http://example.net/nonexistent')),
-                    'it fails correctly': itFails
+                "and we get the feed before a nonexistent id": {
+                    topic: failDoc(BASE + "?before="+encodeURIComponent("http://example.net/nonexistent")),
+                    "it fails correctly": itFails
                 },
-                'and we get the feed since a nonexistent id': {
-                    topic: failDoc(BASE + "?since="+encodeURIComponent('http://example.net/nonexistent')),
-                    'it fails correctly': itFails
+                "and we get the feed since a nonexistent id": {
+                    topic: failDoc(BASE + "?since="+encodeURIComponent("http://example.net/nonexistent")),
+                    "it fails correctly": itFails
                 },
-                'and we get the default inbox': {
+                "and we get the default inbox": {
                     topic: getDoc(INBOX),
-                    'it works': itWorks,
-                    'it looks right': validForm(20, 100)
+                    "it works": itWorks,
+                    "it looks right": validForm(20, 100)
                 },
-                'and we get the full inbox': {
+                "and we get the full inbox": {
                     topic: getDoc(INBOX + "?count=100"),
-                    'it works': itWorks,
-                    'it looks right': validForm(100, 100),
-                    'and we get the inbox with a non-zero offset': {
+                    "it works": itWorks,
+                    "it looks right": validForm(100, 100),
+                    "and we get the inbox with a non-zero offset": {
                         topic: cmpDoc(INBOX + "?offset=50"),
-                        'it works': itWorks,
-                        'it looks right': validForm(20, 100),
-                        'it has the right data': validData(50, 70)
+                        "it works": itWorks,
+                        "it looks right": validForm(20, 100),
+                        "it has the right data": validData(50, 70)
                     },
-                    'and we get the inbox with a zero offset': {
+                    "and we get the inbox with a zero offset": {
                         topic: cmpDoc(INBOX + "?offset=0"),
-                        'it works': itWorks,
-                        'it looks right': validForm(20, 100),
-                        'it has the right data': validData(0, 20)
+                        "it works": itWorks,
+                        "it looks right": validForm(20, 100),
+                        "it has the right data": validData(0, 20)
                     },
-                    'and we get the inbox with a non-zero offset and count': {
+                    "and we get the inbox with a non-zero offset and count": {
                         topic: cmpDoc(INBOX + "?offset=20&count=20"),
-                        'it works': itWorks,
-                        'it looks right': validForm(20, 100),
-                        'it has the right data': validData(20, 40)
+                        "it works": itWorks,
+                        "it looks right": validForm(20, 100),
+                        "it has the right data": validData(20, 40)
                     },
-                    'and we get the inbox with a zero offset and count': {
+                    "and we get the inbox with a zero offset and count": {
                         topic: cmpDoc(INBOX + "?offset=0"),
-                        'it works': itWorks,
-                        'it looks right': validForm(20, 100),
-                        'it has the right data': validData(0, 20)
+                        "it works": itWorks,
+                        "it looks right": validForm(20, 100),
+                        "it has the right data": validData(0, 20)
                     },
-                    'and we get the inbox with a non-zero count': {
+                    "and we get the inbox with a non-zero count": {
                         topic: cmpDoc(INBOX + "?count=50"),
-                        'it works': itWorks,
-                        'it looks right': validForm(50, 100),
-                        'it has the right data': validData(0, 50)
+                        "it works": itWorks,
+                        "it looks right": validForm(50, 100),
+                        "it has the right data": validData(0, 50)
                     },
-                    'and we get the inbox since a value': {
+                    "and we get the inbox since a value": {
                         topic: cmpSince(INBOX, 25),
-                        'it works': itWorks,
-                        'it looks right': validForm(20, 100),
-                        'it has the right data': validData(5, 25)
+                        "it works": itWorks,
+                        "it looks right": validForm(20, 100),
+                        "it has the right data": validData(5, 25)
                     },
-                    'and we get the inbox before a value': {
+                    "and we get the inbox before a value": {
                         topic: cmpBefore(INBOX, 25),
-                        'it works': itWorks,
-                        'it looks right': validForm(20, 100),
-                        'it has the right data': validData(26, 46)
+                        "it works": itWorks,
+                        "it looks right": validForm(20, 100),
+                        "it has the right data": validData(26, 46)
                     },
-                    'and we get the inbox since a small value': {
+                    "and we get the inbox since a small value": {
                         topic: cmpSince(INBOX, 5),
-                        'it works': itWorks,
-                        'it looks right': validForm(5, 100),
-                        'it has the right data': validData(0, 5)
+                        "it works": itWorks,
+                        "it looks right": validForm(5, 100),
+                        "it has the right data": validData(0, 5)
                     },
-                    'and we get the inbox before a big value': {
+                    "and we get the inbox before a big value": {
                         topic: cmpBefore(INBOX, 94),
-                        'it works': itWorks,
-                        'it looks right': validForm(5, 100),
-                        'it has the right data': validData(95, 100)
+                        "it works": itWorks,
+                        "it looks right": validForm(5, 100),
+                        "it has the right data": validData(95, 100)
                     },
-                    'and we get the inbox since a value with a count': {
+                    "and we get the inbox since a value with a count": {
                         topic: cmpSince(INBOX, 75, 50),
-                        'it works': itWorks,
-                        'it looks right': validForm(50, 100),
-                        'it has the right data': validData(25, 75)
+                        "it works": itWorks,
+                        "it looks right": validForm(50, 100),
+                        "it has the right data": validData(25, 75)
                     },
-                    'and we get the inbox before a value with a count': {
+                    "and we get the inbox before a value with a count": {
                         topic: cmpBefore(INBOX, 35, 50),
-                        'it works': itWorks,
-                        'it looks right': validForm(50, 100),
-                        'it has the right data': validData(36, 86)
+                        "it works": itWorks,
+                        "it looks right": validForm(50, 100),
+                        "it has the right data": validData(36, 86)
                     },
-                    'and we get the inbox since a value with a zero count': {
+                    "and we get the inbox since a value with a zero count": {
                         topic: cmpSince(INBOX, 30, 0),
-                        'it works': itWorks,
-                        'it looks right': validForm(0, 100)
+                        "it works": itWorks,
+                        "it looks right": validForm(0, 100)
                     },
-                    'and we get the inbox before a value with a zero count': {
+                    "and we get the inbox before a value with a zero count": {
                         topic: cmpBefore(INBOX, 60, 0),
-                        'it works': itWorks,
-                        'it looks right': validForm(0, 100)
+                        "it works": itWorks,
+                        "it looks right": validForm(0, 100)
                     }
                 },
-                'and we get the inbox with a negative count': {
+                "and we get the inbox with a negative count": {
                     topic: failDoc(INBOX + "?count=-30"),
-                    'it fails correctly': itFails
+                    "it fails correctly": itFails
                 },
-                'and we get the inbox with a negative offset': {
+                "and we get the inbox with a negative offset": {
                     topic: failDoc(INBOX + "?offset=-50"),
-                    'it fails correctly': itFails
+                    "it fails correctly": itFails
                 },
-                'and we get the inbox with a zero offset and zero count': {
+                "and we get the inbox with a zero offset and zero count": {
                     topic: getDoc(INBOX + "?offset=0&count=0"),
-                    'it works': itWorks,
-                    'it looks right': validForm(0, 100)
+                    "it works": itWorks,
+                    "it looks right": validForm(0, 100)
                 },
-                'and we get the inbox with a non-zero offset and zero count': {
+                "and we get the inbox with a non-zero offset and zero count": {
                     topic: getDoc(INBOX + "?offset=30&count=0"),
-                    'it works': itWorks,
-                    'it looks right': validForm(0, 100)
+                    "it works": itWorks,
+                    "it looks right": validForm(0, 100)
                 },
-                'and we get the inbox with a non-integer count': {
+                "and we get the inbox with a non-integer count": {
                     topic: failDoc(INBOX + "?count=foo"),
-                    'it fails correctly': itFails
+                    "it fails correctly": itFails
                 },
-                'and we get the inbox with a non-integer offset': {
+                "and we get the inbox with a non-integer offset": {
                     topic: failDoc(INBOX + "?offset=bar"),
-                    'it fails correctly': itFails
+                    "it fails correctly": itFails
                 },
-                'and we get the inbox with a too-large offset': {
+                "and we get the inbox with a too-large offset": {
                     topic: getDoc(INBOX + "?offset=200"),
-                    'it works': itWorks,
-                    'it looks right': validForm(0, 100)
+                    "it works": itWorks,
+                    "it looks right": validForm(0, 100)
                 },
-                'and we get the inbox with a too-large count': {
+                "and we get the inbox with a too-large count": {
                     topic: getDoc(INBOX + "?count=150"),
-                    'it works': itWorks,
-                    'it looks right': validForm(100, 100)
+                    "it works": itWorks,
+                    "it looks right": validForm(100, 100)
                 },
-                'and we get the inbox with a disallowed count': {
+                "and we get the inbox with a disallowed count": {
                     topic: failDoc(INBOX + "?count=1000"),
-                    'it fails correctly': itFails
+                    "it fails correctly": itFails
                 },
-                'and we get the inbox before a nonexistent id': {
-                    topic: failDoc(INBOX + "?before="+encodeURIComponent('http://example.net/nonexistent')),
-                    'it fails correctly': itFails
+                "and we get the inbox before a nonexistent id": {
+                    topic: failDoc(INBOX + "?before="+encodeURIComponent("http://example.net/nonexistent")),
+                    "it fails correctly": itFails
                 },
-                'and we get the inbox since a nonexistent id': {
-                    topic: failDoc(INBOX + "?since="+encodeURIComponent('http://example.net/nonexistent')),
-                    'it fails correctly': itFails
+                "and we get the inbox since a nonexistent id": {
+                    topic: failDoc(INBOX + "?since="+encodeURIComponent("http://example.net/nonexistent")),
+                    "it fails correctly": itFails
                 }
             }
         }
     }
 });
 
-suite['export'](module);
+suite["export"](module);

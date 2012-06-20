@@ -16,41 +16,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('review module interface');
+var suite = vows.describe("review module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ['author',
-             'content',
-             'displayName',
-             'published',
-             'rating',
-             'updated',
-             'url']
+    fields: ["author",
+             "content",
+             "displayName",
+             "published",
+             "rating",
+             "updated",
+             "url"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         displayName: "My review of your blog",
         content: "I hate your blog. It's incredibly terrible and bad.",
         url: "http://example.com/reviews/i-hate-your-blog",
         rating: 0.5
     },
-    'update': {
+    "update": {
         rating: 0.0
     }
 };
 
-suite.addBatch(modelBatch('review', 'Review', testSchema, testData));
+suite.addBatch(modelBatch("review", "Review", testSchema, testData));
 
-suite['export'](module);
+suite["export"](module);
 
 

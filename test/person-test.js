@@ -16,29 +16,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('person module interface');
+var suite = vows.describe("person module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ['displayName',
-             'image',
-             'published',
-             'updated',
-             'url',
-             'uuid'],
-    indices: ['uuid']
+    fields: ["displayName",
+             "image",
+             "published",
+             "updated",
+             "url",
+             "uuid"],
+    indices: ["uuid"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         displayName: "George Washington",
         image: {
             url: "http://www.georgewashington.si.edu/portrait/images/face.jpg",
@@ -46,12 +46,12 @@ var testData = {
             height: 120
         }
     },
-    'update': {
+    "update": {
         displayName: "President George Washington"
     }
 };
 
-suite.addBatch(modelBatch('person', 'Person', testSchema, testData));
+suite.addBatch(modelBatch("person", "Person", testSchema, testData));
 
-suite['export'](module);
+suite["export"](module);
 

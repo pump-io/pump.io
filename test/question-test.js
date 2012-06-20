@@ -16,38 +16,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('question module interface');
+var suite = vows.describe("question module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ['author',
-             'content',
-             'displayName',
-             'options',
-             'published',
-             'updated',
-             'url']
+    fields: ["author",
+             "content",
+             "displayName",
+             "options",
+             "published",
+             "updated",
+             "url"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         displayName: "What's the greatest programming editor?",
         content: "What do you think is the greatest programming editor?",
         url: "http://example.com/questions/greatest-programming-editor"
     },
-    'update': {
+    "update": {
         displayName: "What is the greatest programming editor?"
     }
 };
 
-suite.addBatch(modelBatch('question', 'Question', testSchema, testData));
+suite.addBatch(modelBatch("question", "Question", testSchema, testData));
 
-suite['export'](module);
+suite["export"](module);

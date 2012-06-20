@@ -16,30 +16,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('image module interface');
+var suite = vows.describe("image module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ['author',
-             'displayName',
-             'image',
-             'fullImage',
-             'published',
-             'summary',
-             'updated',
-             'url']
+    fields: ["author",
+             "displayName",
+             "image",
+             "fullImage",
+             "published",
+             "summary",
+             "updated",
+             "url"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         displayName: "At the Beach",
         summary: "Us at the beach last year.",
         image: {
@@ -53,11 +53,11 @@ var testData = {
             width: 1500
         }
     },
-    'update': {
+    "update": {
         displayName: "Us at the Beach"
     }
 };
 
-suite.addBatch(modelBatch('image', 'Image', testSchema, testData));
+suite.addBatch(modelBatch("image", "Image", testSchema, testData));
 
-suite['export'](module);
+suite["export"](module);

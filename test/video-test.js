@@ -16,30 +16,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('video module interface');
+var suite = vows.describe("video module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ['author',
-             'displayName',
-             'embedCode',
-             'published',
-             'stream',
-             'summary',
-             'updated',
-             'url']
+    fields: ["author",
+             "displayName",
+             "embedCode",
+             "published",
+             "stream",
+             "summary",
+             "updated",
+             "url"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         displayName: "Watch me dunk a basketball",
         summary: "I can dunk!",
         embedCode: "<video>"+
@@ -54,12 +54,12 @@ var testData = {
         },
         url: "http://example.com/videos/watch-me-dunk-a-basketball.html"
     },
-    'update': {
+    "update": {
         displayName: "Watch me almost dunk a basketball",
         summary: "So close!"
     }
 };
 
-suite.addBatch(modelBatch('video', 'Video', testSchema, testData));
+suite.addBatch(modelBatch("video", "Video", testSchema, testData));
 
-suite['export'](module);
+suite["export"](module);

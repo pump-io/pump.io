@@ -16,39 +16,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('file module interface');
+var suite = vows.describe("file module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ['author',
-             'displayName',
-             'fileUrl',
-             'published',
-             'mimeType',
-             'updated',
-             'url']
+    fields: ["author",
+             "displayName",
+             "fileUrl",
+             "published",
+             "mimeType",
+             "updated",
+             "url"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         displayName: "2012 Q1 Sales",
         fileUrl: "http://example.com/files/2012-q1-sales.xls",
         mimeType: "application/vnd.ms-excel",
         url: "http://example.com/pages/2012-q1-sales"
     },
-    'update': {
+    "update": {
         displayName: "2012 Q1 Sales (Revised)"
     }
 };
 
-suite.addBatch(modelBatch('file', 'File', testSchema, testData));
+suite.addBatch(modelBatch("file", "File", testSchema, testData));
 
-suite['export'](module);
+suite["export"](module);

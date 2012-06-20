@@ -16,15 +16,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    Step = require('step'),
-    _ = require('underscore'),
-    querystring = require('querystring'),
-    http = require('http'),
-    OAuth = require('oauth').OAuth,
-    httputil = require('./lib/http'),
-    oauthutil = require('./lib/oauth'),
+var assert = require("assert"),
+    vows = require("vows"),
+    Step = require("step"),
+    _ = require("underscore"),
+    querystring = require("querystring"),
+    http = require("http"),
+    OAuth = require("oauth").OAuth,
+    httputil = require("./lib/http"),
+    oauthutil = require("./lib/oauth"),
     accessToken = oauthutil.accessToken,
     requestToken = oauthutil.requestToken,
     register = oauthutil.register,
@@ -32,10 +32,10 @@ var assert = require('assert'),
     newClient = oauthutil.newClient,
     newCredentials = oauthutil.newCredentials;
 
-var suite = vows.describe('user API');
+var suite = vows.describe("user API");
 
 suite.addBatch({
-    'When we set up the app': {
+    "When we set up the app": {
         topic: function() {
             setupApp(this.callback);
         },
@@ -44,13 +44,13 @@ suite.addBatch({
                 app.close();
             }
         },
-        'it works': function(err, app) {
+        "it works": function(err, app) {
             assert.ifError(err);
         },
-        'and we request a token with no Authorization': {
+        "and we request a token with no Authorization": {
             topic: function() {
                 var cb = this.callback;
-                httputil.post('localhost', 4815, '/oauth/request_token', {}, function(err, res, body) {
+                httputil.post("localhost", 4815, "/oauth/request_token", {}, function(err, res, body) {
                     if (err) {
                         cb(err);
                     } else if (res.statusCode === 400) {
@@ -60,11 +60,11 @@ suite.addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err, cred) {
+            "it fails correctly": function(err, cred) {
                 assert.ifError(err);
             }
         },
-        'and we request a token with an invalid client_id': {
+        "and we request a token with an invalid client_id": {
             topic: function() {
                 var cb = this.callback,
                     badcl = {client_id: "NOTACLIENTID",
@@ -78,21 +78,21 @@ suite.addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err, cred) {
+            "it fails correctly": function(err, cred) {
                 assert.ifError(err);
             }
         },
-        'and we create a client using the api': {
+        "and we create a client using the api": {
             topic: function() {
                 newClient(this.callback);
             },
-            'it works': function(err, cl) {
+            "it works": function(err, cl) {
                 assert.ifError(err);
                 assert.isObject(cl);
                 assert.isString(cl.client_id);
                 assert.isString(cl.client_secret);
             },
-            'and we request a token with a valid client_id and invalid client_secret': {
+            "and we request a token with a valid client_id and invalid client_secret": {
                 topic: function(cl) {
                     var cb = this.callback,
                         badcl = {client_id: cl.client_id,
@@ -106,22 +106,22 @@ suite.addBatch({
                         }
                     });
                 },
-                'it fails correctly': function(err, cred) {
+                "it fails correctly": function(err, cred) {
                     assert.ifError(err);
                 }
             },
-            'and we request a request token with valid client_id and client_secret': {
+            "and we request a request token with valid client_id and client_secret": {
                 topic: function(cl) {
                     requestToken(cl, this.callback);
                 },
-                'it works': function(err, cred) {
+                "it works": function(err, cred) {
                     assert.ifError(err);
                     assert.isObject(cred);
                 },
-                'it has the right results': function(err, cred) {
-                    assert.include(cred, 'token');
+                "it has the right results": function(err, cred) {
+                    assert.include(cred, "token");
                     assert.isString(cred.token);
-                    assert.include(cred, 'token_secret');
+                    assert.include(cred, "token_secret");
                     assert.isString(cred.token_secret);
                 }
             }
@@ -132,7 +132,7 @@ suite.addBatch({
 // A batch to test parallel requests
 
 suite.addBatch({
-    'When we set up the app': {
+    "When we set up the app": {
         topic: function() {
             setupApp(this.callback);
         },
@@ -141,17 +141,17 @@ suite.addBatch({
                 app.close();
             }
         },
-        'it works': function(err, app) {
+        "it works": function(err, app) {
             assert.ifError(err);
         },
-        'and we create a client using the api': {
+        "and we create a client using the api": {
             topic: function() {
                 newClient(this.callback);
             },
-            'it works': function(err, cl) {
+            "it works": function(err, cl) {
                 assert.ifError(err);
             },
-            'and we get two request tokens in series': {
+            "and we get two request tokens in series": {
                 topic: function(cl) {
                     var cb = this.callback;
                     Step(
@@ -167,7 +167,7 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err) {
+                "it works": function(err) {
                     assert.ifError(err);
                 }
             }
@@ -178,7 +178,7 @@ suite.addBatch({
 // A batch to test parallel requests
 
 suite.addBatch({
-    'When we set up the app': {
+    "When we set up the app": {
         topic: function() {
             setupApp(this.callback);
         },
@@ -187,17 +187,17 @@ suite.addBatch({
                 app.close();
             }
         },
-        'it works': function(err, app) {
+        "it works": function(err, app) {
             assert.ifError(err);
         },
-        'and we create a client using the api': {
+        "and we create a client using the api": {
             topic: function() {
                 newClient(this.callback);
             },
-            'it works': function(err, cl) {
+            "it works": function(err, cl) {
                 assert.ifError(err);
             },
-            'and we get many request tokens in parallel': {
+            "and we get many request tokens in parallel": {
                 topic: function(cl) {
                     var cb = this.callback;
                     Step(
@@ -212,7 +212,7 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err) {
+                "it works": function(err) {
                     assert.ifError(err);
                 }
             }
@@ -223,7 +223,7 @@ suite.addBatch({
 // A batch to test request token after access token
 
 suite.addBatch({
-    'When we set up the app': {
+    "When we set up the app": {
         topic: function() {
             setupApp(this.callback);
         },
@@ -232,10 +232,10 @@ suite.addBatch({
                 app.close();
             }
         },
-        'it works': function(err, app) {
+        "it works": function(err, app) {
             assert.ifError(err);
         },
-        'and we get a request token after getting an access token': {
+        "and we get a request token after getting an access token": {
             topic: function() {
                 var cb = this.callback,
                     cl;
@@ -265,7 +265,7 @@ suite.addBatch({
                     }
                 );
             },
-            'it works': function(err, rt) {
+            "it works": function(err, rt) {
                 assert.ifError(err);
                 assert.isObject(rt);
             }
@@ -273,4 +273,4 @@ suite.addBatch({
     }
 });
 
-suite['export'](module);
+suite["export"](module);

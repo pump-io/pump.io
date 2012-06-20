@@ -16,15 +16,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    Step = require('step'),
-    _ = require('underscore'),
-    querystring = require('querystring'),
-    OAuth = require('oauth').OAuth,
-    httputil = require('./lib/http');
+var assert = require("assert"),
+    vows = require("vows"),
+    Step = require("step"),
+    _ = require("underscore"),
+    querystring = require("querystring"),
+    OAuth = require("oauth").OAuth,
+    httputil = require("./lib/http");
 
-var suite = vows.describe('user API');
+var suite = vows.describe("user API");
 
 var invert = function(callback) {
     return function(err) {
@@ -37,7 +37,7 @@ var invert = function(callback) {
 };
 
 var register = function(cl, params, callback) {
-    httputil.postJSON('http://localhost:4815/api/users', 
+    httputil.postJSON("http://localhost:4815/api/users", 
                       {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
                       params,
                       callback);
@@ -48,19 +48,19 @@ var registerSucceed = function(params) {
         topic: function(cl) {
             register(cl, params, this.callback);
         },
-        'it works': function(err, user, resp) {
+        "it works": function(err, user, resp) {
             assert.ifError(err);
             assert.isObject(user);
         },
-        'results are correct': function(err, user, resp) {
-            assert.include(user, 'nickname');
-            assert.include(user, 'published');
-            assert.include(user, 'updated');
-            assert.include(user, 'profile');
+        "results are correct": function(err, user, resp) {
+            assert.include(user, "nickname");
+            assert.include(user, "published");
+            assert.include(user, "updated");
+            assert.include(user, "profile");
             assert.isObject(user.profile);
-            assert.include(user.profile, 'id');
-            assert.include(user.profile, 'objectType');
-            assert.equal(user.profile.objectType, 'person');
+            assert.include(user.profile, "id");
+            assert.include(user.profile, "objectType");
+            assert.equal(user.profile.objectType, "person");
         }
     };
 };
@@ -70,7 +70,7 @@ var registerFail = function(params) {
         topic: function(cl) {
             register(cl, params, invert(this.callback));
         },
-        'it fails correctly': function(err) {
+        "it fails correctly": function(err) {
             assert.ifError(err);
         }
     };
@@ -104,28 +104,28 @@ var doubleRegisterSucceed = function(first, second) {
                 }
             );
         },
-        'it works': function(err, user1, user2) {
+        "it works": function(err, user1, user2) {
             assert.ifError(err);
         },
-        'user1 is correct': function(err, user1, user2) {
-            assert.include(user1, 'nickname');
-            assert.include(user1, 'published');
-            assert.include(user1, 'updated');
-            assert.include(user1, 'profile');
+        "user1 is correct": function(err, user1, user2) {
+            assert.include(user1, "nickname");
+            assert.include(user1, "published");
+            assert.include(user1, "updated");
+            assert.include(user1, "profile");
             assert.isObject(user1.profile);
-            assert.include(user1.profile, 'id');
-            assert.include(user1.profile, 'objectType');
-            assert.equal(user1.profile.objectType, 'person');
+            assert.include(user1.profile, "id");
+            assert.include(user1.profile, "objectType");
+            assert.equal(user1.profile.objectType, "person");
         },
-        'user2 is correct': function(err, user1, user2) {
-            assert.include(user2, 'nickname');
-            assert.include(user2, 'published');
-            assert.include(user2, 'updated');
-            assert.include(user2, 'profile');
+        "user2 is correct": function(err, user1, user2) {
+            assert.include(user2, "nickname");
+            assert.include(user2, "published");
+            assert.include(user2, "updated");
+            assert.include(user2, "profile");
             assert.isObject(user2.profile);
-            assert.include(user2.profile, 'id');
-            assert.include(user2.profile, 'objectType');
-            assert.equal(user2.profile.objectType, 'person');
+            assert.include(user2.profile, "id");
+            assert.include(user2.profile, "objectType");
+            assert.equal(user2.profile.objectType, "person");
         }
     };
 };
@@ -155,25 +155,25 @@ var doubleRegisterFail = function(first, second) {
                 }
             );
         },
-        'it fails correctly': function(err) {
+        "it fails correctly": function(err) {
             assert.ifError(err);
         }
     };
 };
 
 suite.addBatch({
-    'When we set up the app': {
+    "When we set up the app": {
         topic: function() {
             var cb = this.callback,
                 config = {port: 4815,
-                          hostname: 'localhost',
-                          driver: 'memory',
+                          hostname: "localhost",
+                          driver: "memory",
                           params: {},
                           nologger: true
                          },
-                makeApp = require('../lib/app').makeApp;
+                makeApp = require("../lib/app").makeApp;
 
-            process.env.NODE_ENV = 'test';
+            process.env.NODE_ENV = "test";
 
             makeApp(config, function(err, app) {
                 if (err) {
@@ -192,28 +192,28 @@ suite.addBatch({
         teardown: function(app) {
             app.close();
         },
-        'it works': function(err, app) {
+        "it works": function(err, app) {
             assert.ifError(err);
         },
-        'and we check the user list endpoint': {
+        "and we check the user list endpoint": {
             topic: function() {
-                httputil.options('localhost', 4815, '/api/users', this.callback);
+                httputil.options("localhost", 4815, "/api/users", this.callback);
             },
-            'it exists': function(err, allow, res, body) {
+            "it exists": function(err, allow, res, body) {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 200);
             },
-            'it supports GET': function(err, allow, res, body) {
-                assert.include(allow, 'GET');
+            "it supports GET": function(err, allow, res, body) {
+                assert.include(allow, "GET");
             },
-            'it supports POST': function(err, allow, res, body) {
-                assert.include(allow, 'POST');
+            "it supports POST": function(err, allow, res, body) {
+                assert.include(allow, "POST");
             }
         },
-        'and we try to register a user with no OAuth credentials': {
+        "and we try to register a user with no OAuth credentials": {
             topic: function() {
                 var cb = this.callback;
-                httputil.postJSON('http://localhost:4815/api/users', {}, {nickname: 'nocred', password: 'nobadge'}, function(err, body, res) {
+                httputil.postJSON("http://localhost:4815/api/users", {}, {nickname: "nocred", password: "nobadge"}, function(err, body, res) {
                     if (err && err.statusCode === 401) {
                         cb(null);
                     } else if (err) {
@@ -223,14 +223,14 @@ suite.addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
-        'and we create a client using the api': {
+        "and we create a client using the api": {
             topic: function() {
                 var cb = this.callback;
-                httputil.post('localhost', 4815, '/api/client/register', {type: 'client_associate'}, function(err, res, body) {
+                httputil.post("localhost", 4815, "/api/client/register", {type: "client_associate"}, function(err, res, body) {
                     var cl;
                     if (err) {
                         cb(err, null);
@@ -244,27 +244,27 @@ suite.addBatch({
                     }
                 });
             },
-            'it works': function(err, cl) {
+            "it works": function(err, cl) {
                 assert.ifError(err);
                 assert.isObject(cl);
                 assert.isString(cl.client_id);
                 assert.isString(cl.client_secret);
             },
-            'and we register a user with nickname and password': 
-            registerSucceed({nickname: 'withcred', password: 'verysecret'}),
-            'and we register a user with nickname and no password': 
-            registerFail({nickname: 'nopass'}),
-            'and we register a user with password and no nickname': 
-            registerFail({password: 'toosecret'}),
-            'and we register a user with no data': 
+            "and we register a user with nickname and password": 
+            registerSucceed({nickname: "withcred", password: "verysecret"}),
+            "and we register a user with nickname and no password": 
+            registerFail({nickname: "nopass"}),
+            "and we register a user with password and no nickname": 
+            registerFail({password: "toosecret"}),
+            "and we register a user with no data": 
             registerFail({}),
-            'and we register two unrelated users':
+            "and we register two unrelated users":
             doubleRegisterSucceed({nickname: "able", password: "isuream"},
                                   {nickname: "baker", password: "flour"}),
-            'and we register two users with the same nickname':
+            "and we register two users with the same nickname":
             doubleRegisterFail({nickname: "charlie", password: "parker"},
                                {nickname: "charlie", password: "mccarthy"}),
-            'and we try to register with URL-encoded params': {
+            "and we try to register with URL-encoded params": {
                 topic: function(cl) {
                     var oa, toSend, cb = this.callback;
 
@@ -280,7 +280,7 @@ suite.addBatch({
                     
                     toSend = querystring.stringify({nickname: "delta", password: "dawn"});
 
-                    oa.post('http://localhost:4815/api/users', null, null, toSend, 'application/x-www-form-urlencoded', function(err, data, response) {
+                    oa.post("http://localhost:4815/api/users", null, null, toSend, "application/x-www-form-urlencoded", function(err, data, response) {
                         if (err) {
                             cb(null);
                         } else {
@@ -288,7 +288,7 @@ suite.addBatch({
                         }
                     });
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             }
@@ -297,16 +297,16 @@ suite.addBatch({
 });
 
 suite.addBatch({
-    'When we set up the app': {
+    "When we set up the app": {
         topic: function() {
             var cb = this.callback,
                 config = {port: 4815,
-                          hostname: 'localhost',
-                          driver: 'memory',
+                          hostname: "localhost",
+                          driver: "memory",
                           params: {},
                           nologger: true
                          },
-                makeApp = require('../lib/app').makeApp;
+                makeApp = require("../lib/app").makeApp;
 
             makeApp(config, function(err, app) {
                 if (err) {
@@ -325,13 +325,13 @@ suite.addBatch({
         teardown: function(app) {
             app.close();
         },
-        'it works': function(err, app) {
+        "it works": function(err, app) {
             assert.ifError(err);
         },
-        'and we create a client using the api': {
+        "and we create a client using the api": {
             topic: function() {
                 var cb = this.callback;
-                httputil.post('localhost', 4815, '/api/client/register', {type: 'client_associate'}, function(err, res, body) {
+                httputil.post("localhost", 4815, "/api/client/register", {type: "client_associate"}, function(err, res, body) {
                     var cl;
                     if (err) {
                         cb(err, null);
@@ -345,51 +345,51 @@ suite.addBatch({
                     }
                 });
             },
-            'it works': function(err, cl) {
+            "it works": function(err, cl) {
                 assert.ifError(err);
                 assert.isObject(cl);
                 assert.isString(cl.client_id);
                 assert.isString(cl.client_secret);
             },
-            'and we get an empty user list': {
+            "and we get an empty user list": {
                 topic: function(cl) {
                     var cb = this.callback;
-                    httputil.getJSON('http://localhost:4815/api/users',
+                    httputil.getJSON("http://localhost:4815/api/users",
                                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
                                      function(err, coll, resp) {
                                          cb(err, coll);
                                      });
                 },
-                'it works': function(err, collection) {
+                "it works": function(err, collection) {
                     assert.ifError(err);
                 },
-                'it has the right top-level properties': function(err, collection) {
+                "it has the right top-level properties": function(err, collection) {
                     assert.isObject(collection);
-                    assert.include(collection, 'displayName');
+                    assert.include(collection, "displayName");
                     assert.isString(collection.displayName);
-                    assert.include(collection, 'id');
+                    assert.include(collection, "id");
                     assert.isString(collection.id);
-                    assert.include(collection, 'objectTypes');
+                    assert.include(collection, "objectTypes");
                     assert.isArray(collection.objectTypes);
                     assert.lengthOf(collection.objectTypes, 1);
-                    assert.include(collection.objectTypes, 'user');
-                    assert.include(collection, 'totalItems');
+                    assert.include(collection.objectTypes, "user");
+                    assert.include(collection, "totalItems");
                     assert.isNumber(collection.totalItems);
-                    assert.include(collection, 'items');
+                    assert.include(collection, "items");
                     assert.isArray(collection.items);
                 },
-                'it is empty': function(err, collection) {
+                "it is empty": function(err, collection) {
                     assert.equal(collection.totalItems, 0);
                     assert.isEmpty(collection.items);
                 },
-                'and we add a user': {
+                "and we add a user": {
                     topic: function(ignore, cl) {
                         var cb = this.callback;
                         register(cl, {nickname: "echo", password: "echoooooooo"}, function(err, body, res) {
                             if (err) {
                                 cb(err, null);
                             } else {
-                                httputil.getJSON('http://localhost:4815/api/users',
+                                httputil.getJSON("http://localhost:4815/api/users",
                                                  {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
                                                  function(err, coll, resp) {
                                                      cb(err, coll);
@@ -397,44 +397,44 @@ suite.addBatch({
                             }
                         });
                     },
-                    'it works': function(err, collection) {
+                    "it works": function(err, collection) {
                         assert.ifError(err);
                     },
-                    'it has the right top-level properties': function(err, collection) {
+                    "it has the right top-level properties": function(err, collection) {
                         assert.isObject(collection);
-                        assert.include(collection, 'displayName');
+                        assert.include(collection, "displayName");
                         assert.isString(collection.displayName);
-                        assert.include(collection, 'id');
+                        assert.include(collection, "id");
                         assert.isString(collection.id);
-                        assert.include(collection, 'objectTypes');
+                        assert.include(collection, "objectTypes");
                         assert.isArray(collection.objectTypes);
                         assert.lengthOf(collection.objectTypes, 1);
-                        assert.include(collection.objectTypes, 'user');
-                        assert.include(collection, 'totalItems');
+                        assert.include(collection.objectTypes, "user");
+                        assert.include(collection, "totalItems");
                         assert.isNumber(collection.totalItems);
-                        assert.include(collection, 'items');
+                        assert.include(collection, "items");
                         assert.isArray(collection.items);
                     },
-                    'it has one element': function(err, collection) {
+                    "it has one element": function(err, collection) {
                         assert.equal(collection.totalItems, 1);
                         assert.lengthOf(collection.items, 1);
                     },
-                    'it has a valid user': function(err, collection) {
+                    "it has a valid user": function(err, collection) {
                         var user = collection.items[0];
-                        assert.include(user, 'nickname');
-                        assert.include(user, 'published');
-                        assert.include(user, 'updated');
-                        assert.include(user, 'profile');
+                        assert.include(user, "nickname");
+                        assert.include(user, "published");
+                        assert.include(user, "updated");
+                        assert.include(user, "profile");
                         assert.isObject(user.profile);
-                        assert.include(user.profile, 'id');
-                        assert.include(user.profile, 'objectType');
-                        assert.equal(user.profile.objectType, 'person');
+                        assert.include(user.profile, "id");
+                        assert.include(user.profile, "objectType");
+                        assert.equal(user.profile.objectType, "person");
                     },
-                    'it has our valid user': function(err, collection) {
+                    "it has our valid user": function(err, collection) {
                         var user = collection.items[0];
                         assert.equal(user.nickname, "echo");
                     },
-                    'and we add a few more users': {
+                    "and we add a few more users": {
                         topic: function(ignore1, ignore2, cl) {
                             var cb = this.callback;
 
@@ -447,7 +447,7 @@ suite.addBatch({
                                 },
                                 function(err) {
                                     if (err) throw err;
-                                    httputil.getJSON('http://localhost:4815/api/users',
+                                    httputil.getJSON("http://localhost:4815/api/users",
                                                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
                                                      this);
                                 },
@@ -460,65 +460,65 @@ suite.addBatch({
                                 }
                             );
                         },
-                        'it works': function(err, collection) {
+                        "it works": function(err, collection) {
                             assert.ifError(err);
                         },
-                        'it has the right top-level properties': function(err, collection) {
+                        "it has the right top-level properties": function(err, collection) {
                             assert.isObject(collection);
-                            assert.include(collection, 'displayName');
+                            assert.include(collection, "displayName");
                             assert.isString(collection.displayName);
-                            assert.include(collection, 'id');
+                            assert.include(collection, "id");
                             assert.isString(collection.id);
-                            assert.include(collection, 'objectTypes');
+                            assert.include(collection, "objectTypes");
                             assert.isArray(collection.objectTypes);
                             assert.lengthOf(collection.objectTypes, 1);
-                            assert.include(collection.objectTypes, 'user');
-                            assert.include(collection, 'totalItems');
+                            assert.include(collection.objectTypes, "user");
+                            assert.include(collection, "totalItems");
                             assert.isNumber(collection.totalItems);
-                            assert.include(collection, 'items');
+                            assert.include(collection, "items");
                             assert.isArray(collection.items);
                         },
-                        'it has the right number of elements': function(err, collection) {
+                        "it has the right number of elements": function(err, collection) {
                             assert.equal(collection.totalItems, 50);
                             assert.lengthOf(collection.items, 20);
                         },
-                        'there are no duplicates': function(err, collection) {
+                        "there are no duplicates": function(err, collection) {
                             var i, seen = {}, items = collection.items;
                             for (i = 0; i < items.length; i++) {
                                 assert.isUndefined(seen[items[i].nickname]);
                                 seen[items[i].nickname] = true;
                             }
                         },
-                        'and we fetch all users': {
+                        "and we fetch all users": {
                             topic: function(ignore1, ignore2, ignore3, cl) {
                                 var cb = this.callback;
-                                httputil.getJSON('http://localhost:4815/api/users?count=50',
+                                httputil.getJSON("http://localhost:4815/api/users?count=50",
                                                  {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
                                                  cb);
                             },
-                            'it works': function(err, collection) {
+                            "it works": function(err, collection) {
                                 assert.ifError(err);
                             },
-                            'it has the right top-level properties': function(err, collection) {
+                            "it has the right top-level properties": function(err, collection) {
                                 assert.isObject(collection);
-                                assert.include(collection, 'displayName');
+                                assert.include(collection, "displayName");
                                 assert.isString(collection.displayName);
-                                assert.include(collection, 'id');
+                                assert.include(collection, "id");
                                 assert.isString(collection.id);
-                                assert.include(collection, 'objectTypes');
+                                assert.include(collection, "objectTypes");
                                 assert.isArray(collection.objectTypes);
                                 assert.lengthOf(collection.objectTypes, 1);
-                                assert.include(collection.objectTypes, 'user');
-                                assert.include(collection, 'totalItems');
+                                assert.include(collection.objectTypes, "user");
+                                assert.include(collection, "totalItems");
                                 assert.isNumber(collection.totalItems);
-                                assert.include(collection, 'items');
+                                assert.include(collection, "items");
                                 assert.isArray(collection.items);
                             },
-                            'it has the right number of elements': function(err, collection) {
+                            "it has the right number of elements": function(err, collection) {
                                 assert.equal(collection.totalItems, 50);
                                 assert.lengthOf(collection.items, 50);
                             },
-                            'there are no duplicates': function(err, collection) {
+                            "there are no duplicates": function(err, collection) {
                                 var i, seen = {}, items = collection.items;
                                 for (i = 0; i < items.length; i++) {
                                     assert.isUndefined(seen[items[i].nickname]);
@@ -526,7 +526,7 @@ suite.addBatch({
                                 }
                             }
                         },
-                        'and we fetch all users in groups of 10': {
+                        "and we fetch all users in groups of 10": {
                             topic: function(ignore1, ignore2, ignore3, cl) {
 
                                 var cb = this.callback;
@@ -534,7 +534,7 @@ suite.addBatch({
                                     function() {
                                         var i, group = this.group();
                                         for (i = 0; i < 50; i += 10) {
-                                            httputil.getJSON('http://localhost:4815/api/users?offset='+i+'&count=10',
+                                            httputil.getJSON("http://localhost:4815/api/users?offset="+i+"&count=10",
                                                              {consumer_key: cl.client_id, 
                                                               consumer_secret: cl.client_secret},
                                                              group());
@@ -553,17 +553,17 @@ suite.addBatch({
                                     }
                                 );
                             },
-                            'it works': function(err, chunks) {
+                            "it works": function(err, chunks) {
                                 assert.ifError(err);
                             },
-                            'it has the right number of elements': function(err, chunks) {
+                            "it has the right number of elements": function(err, chunks) {
                                 var i;
                                 assert.lengthOf(chunks, 5);
                                 for (i = 0; i < chunks.length; i++) {
                                     assert.lengthOf(chunks[i], 10);
                                 }
                             },
-                            'there are no duplicates': function(err, chunks) {
+                            "there are no duplicates": function(err, chunks) {
                                 var i, j, seen = {};
                                 for (i = 0; i < chunks.length; i++) {
                                     for (j = 0; j < chunks[i].length; j++) {
@@ -580,4 +580,4 @@ suite.addBatch({
     }
 });
 
-suite['export'](module);
+suite["export"](module);

@@ -1,6 +1,6 @@
 // routes/api.js
 //
-// The beating heart of a pumpin' good time
+// The beating heart of a pumpin" good time
 //
 // Copyright 2011-2012, StatusNet Inc.
 //
@@ -16,24 +16,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var databank = require('databank'),
-    _ = require('underscore'),
-    Step = require('step'),
-    validator = require('validator'),
+var databank = require("databank"),
+    _ = require("underscore"),
+    Step = require("step"),
+    validator = require("validator"),
     check = validator.check,
     sanitize = validator.sanitize,
-    HTTPError = require('../lib/httperror').HTTPError,
-    Activity = require('../lib/model/activity').Activity,
-    ActivityObject = require('../lib/model/activityobject').ActivityObject,
-    User = require('../lib/model/user').User,
-    Edge = require('../lib/model/edge').Edge,
-    stream = require('../lib/model/stream'),
+    HTTPError = require("../lib/httperror").HTTPError,
+    Activity = require("../lib/model/activity").Activity,
+    ActivityObject = require("../lib/model/activityobject").ActivityObject,
+    User = require("../lib/model/user").User,
+    Edge = require("../lib/model/edge").Edge,
+    stream = require("../lib/model/stream"),
     Stream = stream.Stream,
     NotInStreamError = stream.NotInStreamError,
-    Client = require('../lib/model/client').Client,
-    Tombstone = require('../lib/model/tombstone').Tombstone,
-    mw = require('../lib/middleware'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
+    Client = require("../lib/model/client").Client,
+    Tombstone = require("../lib/model/tombstone").Tombstone,
+    mw = require("../lib/middleware"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
     reqUser = mw.reqUser,
     sameUser = mw.sameUser,
     NoSuchThingError = databank.NoSuchThingError,
@@ -60,35 +60,35 @@ var addRoutes = function(app) {
     var i = 0, url, type, authz;
 
     // Users
-    app.get('/api/user/:nickname', clientAuth, reqUser, getUser);
-    app.put('/api/user/:nickname', userAuth, reqUser, sameUser, putUser);
-    app.del('/api/user/:nickname', userAuth, reqUser, sameUser, delUser);
+    app.get("/api/user/:nickname", clientAuth, reqUser, getUser);
+    app.put("/api/user/:nickname", userAuth, reqUser, sameUser, putUser);
+    app.del("/api/user/:nickname", userAuth, reqUser, sameUser, delUser);
 
     // Feeds
 
-    app.post('/api/user/:nickname/feed', userAuth, reqUser, sameUser, postActivity);
+    app.post("/api/user/:nickname/feed", userAuth, reqUser, sameUser, postActivity);
     // XXX: privileged access when authenticated
-    app.get('/api/user/:nickname/feed', clientAuth, reqUser, userStream);
+    app.get("/api/user/:nickname/feed", clientAuth, reqUser, userStream);
 
     // Inboxen
 
-    app.get('/api/user/:nickname/inbox', userAuth, reqUser, sameUser, userInbox);
-    app.post('/api/user/:nickname/inbox', notYetImplemented);
+    app.get("/api/user/:nickname/inbox", userAuth, reqUser, sameUser, userInbox);
+    app.post("/api/user/:nickname/inbox", notYetImplemented);
 
-    app.get('/api/user/:nickname/followers', clientAuth, reqUser, userFollowers);
-    app.get('/api/user/:nickname/following', clientAuth, reqUser, userFollowing);
+    app.get("/api/user/:nickname/followers", clientAuth, reqUser, userFollowers);
+    app.get("/api/user/:nickname/following", clientAuth, reqUser, userFollowing);
 
-    app.get('/api/user/:nickname/favorites', clientAuth, reqUser, userFavorites);
+    app.get("/api/user/:nickname/favorites", clientAuth, reqUser, userFavorites);
 
     for (i = 0; i < ActivityObject.objectTypes.length; i++) {
 
         type = ActivityObject.objectTypes[i];
 
-        url = '/api/' + type + '/' + ':uuid';
+        url = "/api/" + type + "/" + ":uuid";
 
         // person
 
-        if (type === 'person') {
+        if (type === "person") {
             authz = userOnly;
         } else {
             authz = authorOnly(type);
@@ -98,23 +98,23 @@ var addRoutes = function(app) {
         app.put(url, userAuth, requester(type), authz, putter(type));
         app.del(url, userAuth, requester(type), authz, deleter(type));
 
-        app.get('/api/' + type + '/' + ':uuid/likes', clientAuth, requester(type), likes(type));
+        app.get("/api/" + type + "/" + ":uuid/likes", clientAuth, requester(type), likes(type));
     }
     
     // Activities
 
-    app.get('/api/activity/:uuid', clientAuth, reqActivity, getActivity);
-    app.put('/api/activity/:uuid', userAuth, reqActivity, actorOnly, putActivity);
-    app.del('/api/activity/:uuid', userAuth, reqActivity, actorOnly, delActivity);
+    app.get("/api/activity/:uuid", clientAuth, reqActivity, getActivity);
+    app.put("/api/activity/:uuid", userAuth, reqActivity, actorOnly, putActivity);
+    app.del("/api/activity/:uuid", userAuth, reqActivity, actorOnly, delActivity);
 
     // Global user list
 
-    app.get('/api/users', clientAuth, listUsers);
-    app.post('/api/users', clientAuth, createUser);
+    app.get("/api/users", clientAuth, listUsers);
+    app.post("/api/users", clientAuth, createUser);
 
     // Client registration
 
-    app.post('/api/client/register', clientReg);
+    app.post("/api/client/register", clientReg);
 };
 
 exports.addRoutes = addRoutes;
@@ -132,14 +132,14 @@ exports.setBank = setBank;
 var clientAuth = function(req, res, next) {
 
     req.client = null;
-    res.local('client', null); // init to null
+    res.local("client", null); // init to null
 
     if (hasToken(req)) {
         userAuth(req, res, next);
         return;
     }
 
-    req.authenticate(['client'], function(error, authenticated) { 
+    req.authenticate(["client"], function(error, authenticated) { 
 
         if (error) {
             next(error);
@@ -151,7 +151,7 @@ var clientAuth = function(req, res, next) {
         }
         
         req.client = req.getAuthDetails().user.client;
-        res.local('client', req.client); // init to null
+        res.local("client", req.client); // init to null
 
         next();
     });
@@ -159,9 +159,9 @@ var clientAuth = function(req, res, next) {
 
 var hasToken = function(req) {
     return (req &&
-            (_(req.headers).has('authorization') && req.headers.authorization.match(/oauth_token/)) ||
+            (_(req.headers).has("authorization") && req.headers.authorization.match(/oauth_token/)) ||
             (req.query && req.query.oauth_token) ||
-            (req.body && req.headers['content-type'] === 'application/x-www-form-urlencoded' && req.body.oauth_token));
+            (req.body && req.headers["content-type"] === "application/x-www-form-urlencoded" && req.body.oauth_token));
 };
 
 // Accept only 3-legged OAuth
@@ -170,11 +170,11 @@ var hasToken = function(req) {
 var userAuth = function(req, res, next) {
 
     req.remoteUser = null;
-    res.local('remoteUser', null); // init to null
+    res.local("remoteUser", null); // init to null
     req.client = null;
-    res.local('client', null); // init to null
+    res.local("client", null); // init to null
 
-    req.authenticate(['user'], function(error, authenticated) { 
+    req.authenticate(["user"], function(error, authenticated) { 
 
         if (error) {
             next(error);
@@ -186,10 +186,10 @@ var userAuth = function(req, res, next) {
         }
 
         req.remoteUser = req.getAuthDetails().user.user;
-        res.local('remoteUser', req.remoteUser);
+        res.local("remoteUser", req.remoteUser);
 
         req.client = req.getAuthDetails().user.client;
-        res.local('client', req.client);
+        res.local("client", req.client);
 
         next();
     });
@@ -203,7 +203,7 @@ var requester = function(type) {
         var uuid = req.params.uuid,
             obj = null;
 
-        Cls.search({'uuid': uuid}, function(err, results) {
+        Cls.search({"uuid": uuid}, function(err, results) {
             if (err) {
                 next(err);
             } else if (results.length === 0) {
@@ -235,7 +235,7 @@ var userOnly = function(req, res, next) {
     var person = req.person,
         user = req.remoteUser;
 
-    if (person && user && user.profile && person.id === user.profile.id && user.profile.objectType === 'person') { 
+    if (person && user && user.profile && person.id === user.profile.id && user.profile.objectType === "person") { 
         next();
     } else {
         next(new HTTPError("Only the user can modify this profile.", 403));
@@ -378,7 +378,7 @@ var delUser = function(req, res, next) {
         } else if (err) {
             next(err);
         } else {
-            bank.decr('usercount', 0, function(err, value) {
+            bank.decr("usercount", 0, function(err, value) {
                 if (err) {
                     next(err);
                 } else {
@@ -392,11 +392,11 @@ var delUser = function(req, res, next) {
 var reqActivity = function(req, res, next) {
     var act = null,
         uuid = req.params.uuid;
-    Activity.search({'uuid': uuid}, function(err, results) {
+    Activity.search({"uuid": uuid}, function(err, results) {
         if (err) {
             next(err);
         } else if (results.length === 0) { // not found
-            Tombstone.lookup('activity', uuid, function(err, ts) {
+            Tombstone.lookup("activity", uuid, function(err, ts) {
                 if (err instanceof NoSuchThingError) {
                     next(new HTTPError("Can't find an activity with id " + uuid, 404));
                 } else {
@@ -442,7 +442,7 @@ var delActivity = function(req, res, next) {
         },
         function(err) {
             if (err) throw err;
-            Tombstone.markFull(act, 'activity', act.uuid, this);
+            Tombstone.markFull(act, "activity", act.uuid, this);
         },
         function(err) {
             if (err) {
@@ -465,11 +465,11 @@ var createUser = function (req, res, next) {
         function (err, value) {
             if (err) throw err;
             user = value;
-            bank.prepend('userlist', 0, user.nickname, this);
+            bank.prepend("userlist", 0, user.nickname, this);
         },
         function (err, userList) {
             if (err) throw err;
-            bank.incr('usercount', 0, this);
+            bank.incr("usercount", 0, this);
         },
         function (err, userCount) {
             if (err) {
@@ -502,12 +502,12 @@ var listUsers = function(req, res, next) {
 
     Step(
         function () {
-            bank.read('usercount', 0, this);
+            bank.read("usercount", 0, this);
         },
         function(err, totalUsers) {
             if (err) throw err;
             collection.totalItems = totalUsers;
-            bank.slice('userlist', 0, args.start, args.end, this);
+            bank.slice("userlist", 0, args.start, args.end, this);
         },
         function(err, userIds) {
             if (err) {
@@ -522,7 +522,7 @@ var listUsers = function(req, res, next) {
                 collection.items = [];
                 res.json(collection);
             } else {
-                bank.readAll('user', userIds, this);
+                bank.readAll("user", userIds, this);
             }
         },
         function(err, userMap) {
@@ -555,7 +555,7 @@ var postActivity = function(req, res, next) {
 
     // Add a default actor
 
-    if (!_(activity).has('actor')) {
+    if (!_(activity).has("actor")) {
         activity.actor = req.user.profile;
     }
 
@@ -568,7 +568,7 @@ var postActivity = function(req, res, next) {
 
     // Default verb
 
-    if (!_(activity).has('verb') || _(activity.verb).isNull()) {
+    if (!_(activity).has("verb") || _(activity.verb).isNull()) {
         activity.verb = "post";
     }
 
@@ -732,9 +732,9 @@ var getStream = function(str, args, collection, callback) {
                 callback(null);
                 return;
             }
-            if (_(args).has('before')) {
+            if (_(args).has("before")) {
                 str.getIDsGreaterThan(args.before, args.count, this);
-            } else if (_(args).has('since')) {
+            } else if (_(args).has("since")) {
                 str.getIDsLessThan(args.since, args.count, this);
             } else {
                 str.getIDs(args.start, args.end, this);
@@ -760,9 +760,9 @@ var getStream = function(str, args, collection, callback) {
                 collection.items = activities;
                 if (activities.length > 0) {
                     collection.links.prev = collection.url + "?since=" + encodeURIComponent(activities[0].id);
-                    if ((_(args).has('start') && args.start + activities.length < collection.totalItems) ||
-                        (_(args).has('before') && activities.length >= args.count) ||
-                        (_(args).has('since'))) {
+                    if ((_(args).has("start") && args.start + activities.length < collection.totalItems) ||
+                        (_(args).has("before") && activities.length >= args.count) ||
+                        (_(args).has("since"))) {
                         collection.links.next = collection.url + "?before=" + encodeURIComponent(activities[activities.length-1].id);
                     }
                 }
@@ -917,7 +917,7 @@ var distribute = function(activity, callback) {
 
     Step(
         function() {
-            Edge.search({'to.id': activity.actor.id}, this);
+            Edge.search({"to.id": activity.actor.id}, this);
         },
         function(err, follows) {
             if (err) throw err;
@@ -956,15 +956,15 @@ var clientReg = function (req, res, next) {
         props = {},
         type;
 
-    if (!_(params).has('type')) {
+    if (!_(params).has("type")) {
         next(new HTTPError("No registration type provided", 400));
         return;
     }
 
     type = params.type;
     
-    if (_(params).has('client_id')) {
-        if (type !== 'client_update') {
+    if (_(params).has("client_id")) {
+        if (type !== "client_update") {
             // XXX: log this
             next(new HTTPError("Only set client_id for update.", 400));
             return;
@@ -972,13 +972,13 @@ var clientReg = function (req, res, next) {
         props.consumer_key = params.client_id;
     }
 
-    if (_(params).has('access_token')) {
+    if (_(params).has("access_token")) {
         next(new HTTPError("access_token not needed for registration.", 400));
         return;
     }
 
-    if (_(params).has('client_secret')) {
-        if (type !== 'client_update') {
+    if (_(params).has("client_secret")) {
+        if (type !== "client_update") {
             // XXX: log this
             next(new HTTPError("Only set client_secret for update.", 400));
             return;
@@ -986,7 +986,7 @@ var clientReg = function (req, res, next) {
         props.secret = params.client_secret;
     }
 
-    if (_(params).has('contacts')) {
+    if (_(params).has("contacts")) {
         props.contacts = params.contacts.split(" ");
         if (!props.contacts.every(function(contact) {
                 try {
@@ -1001,8 +1001,8 @@ var clientReg = function (req, res, next) {
         }
     }
 
-    if (_(params).has('application_type')) {
-        if (params.application_type !== 'web' && params.application_type !== 'native') {
+    if (_(params).has("application_type")) {
+        if (params.application_type !== "web" && params.application_type !== "native") {
             next(new HTTPError("Unknown application_type.", 400));
             return;
         }
@@ -1011,11 +1011,11 @@ var clientReg = function (req, res, next) {
         props.type = null;
     }
 
-    if (_(params).has('application_name')) {
+    if (_(params).has("application_name")) {
         props.title = params.application_name;
     }
 
-    if (_(params).has('logo_url')) {
+    if (_(params).has("logo_url")) {
         try {
             check(params.logo_url).isUrl();
             props.logo_url = params.logo_url;
@@ -1025,7 +1025,7 @@ var clientReg = function (req, res, next) {
         }
     }
 
-    if (_(params).has('redirect_uris')) {
+    if (_(params).has("redirect_uris")) {
         props.redirect_uris = params.redirect_uris.split(" ");
         if (!props.redirect_uris.every(function(uri) {
                 try {
@@ -1040,7 +1040,7 @@ var clientReg = function (req, res, next) {
         }
     }
 
-    if (type === 'client_associate') {
+    if (type === "client_associate") {
         Client.create(props, function(err, client) {
             if (err) {
                 next(err);
@@ -1050,7 +1050,7 @@ var clientReg = function (req, res, next) {
                           expires_at: 0});
             }
         });
-    } else if (type === 'client_update') {
+    } else if (type === "client_update") {
         Client.get(props.consumer_key, function(err, client) {
             if (err) {
                 next(err);
@@ -1087,45 +1087,45 @@ var streamArgs = function(req, defaultCount, maxCount) {
             maxCount = 10 * defaultCount;
         }
 
-        if (_(req.query).has('count')) {
+        if (_(req.query).has("count")) {
             check(req.query.count, "Count must be between 0 and " + maxCount).isInt().min(0).max(maxCount);
             args.count = sanitize(req.query.count).toInt();
         } else {
             args.count = defaultCount;
         }
 
-        // XXX: Check 'before' and 'since' for injection...?
-        // XXX: Check 'before' and 'since' for URI...?
+        // XXX: Check "before" and "since" for injection...?
+        // XXX: Check "before" and "since" for URI...?
 
-        if (_(req.query).has('before')) {
+        if (_(req.query).has("before")) {
             check(req.query.before).notEmpty();
             args.before = sanitize(req.query.before).trim();
         }
 
-        if (_(req.query).has('since')) {
-            if (_(args).has('before')) {
+        if (_(req.query).has("since")) {
+            if (_(args).has("before")) {
                 throw new Error("Can't have both 'before' and 'since' parameters");
             }
             check(req.query.since).notEmpty();
             args.since = sanitize(req.query.since).trim();
         }
 
-        if (_(req.query).has('offset')) {
-            if (_(args).has('before')) {
+        if (_(req.query).has("offset")) {
+            if (_(args).has("before")) {
                 throw new Error("Can't have both 'before' and 'offset' parameters");
             }
-            if (_(args).has('since')) {
+            if (_(args).has("since")) {
                 throw new Error("Can't have both 'since' and 'offset' parameters");
             }
             check(req.query.offset, "Offset must be an integer greater than or equal to zero").isInt().min(0);
             args.start = sanitize(req.query.offset).toInt();
         }
 
-        if (!_(req.query).has('offset') && !_(req.query).has('since') && !_(req.query).has('before')) {
+        if (!_(req.query).has("offset") && !_(req.query).has("since") && !_(req.query).has("before")) {
             args.start = 0;
         }
 
-        if (_(args).has('start')) {
+        if (_(args).has("start")) {
             args.end = args.start + args.count;
         }
 

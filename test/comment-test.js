@@ -16,30 +16,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('comment module interface');
+var suite = vows.describe("comment module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ['author',
-             'content',
-             'displayName',
-             'inReplyTo',
-             'published',
-             'summary',
-             'updated',
-             'url']
+    fields: ["author",
+             "content",
+             "displayName",
+             "inReplyTo",
+             "published",
+             "summary",
+             "updated",
+             "url"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         author: {
             id: "acct:evan@example.net",
             displayName: "Evan Prodromou",
@@ -56,11 +56,11 @@ var testData = {
             }
         ]
     },
-    'update': {
+    "update": {
         content: "<strong>Nice job</strong> on the spec!"
     }
 };
 
-suite.addBatch(modelBatch('comment', 'Comment', testSchema, testData));
+suite.addBatch(modelBatch("comment", "Comment", testSchema, testData));
 
-suite['export'](module);
+suite["export"](module);
