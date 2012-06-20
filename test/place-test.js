@@ -38,7 +38,7 @@ var testSchema = {
 
 var testData = {
     "create": {
-        displayName: "Torchy"s Tacos",
+        displayName: "Torchy's Tacos",
         position: "+30.2516492-97.7540501/",
         address: {
             streetAddress: "South 1st Street",
@@ -50,7 +50,7 @@ var testData = {
         url: "http://nominatim.openstreetmap.org/details.php?place_id=9576945"
     },
     "update": {
-        displayName: "Torchy"s Tacos on South 1st"
+        displayName: "Torchy's Tacos on South 1st"
     }
 };
 
