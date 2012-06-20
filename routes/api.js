@@ -209,7 +209,7 @@ var requester = function(type) {
             } else if (results.length === 0) {
                 Tombstone.lookup(type, uuid, function(err, ts) {
                     if (err instanceof NoSuchThingError) {
-                        next(new HTTPError("Can"t find a " + type + " with ID = " + uuid, 404));
+                        next(new HTTPError("Can't find a " + type + " with ID = " + uuid, 404));
                     } else {
                         next(new HTTPError("The " + type + " with ID = " + uuid + " was deleted", 410));
                     }
@@ -398,7 +398,7 @@ var reqActivity = function(req, res, next) {
         } else if (results.length === 0) { // not found
             Tombstone.lookup("activity", uuid, function(err, ts) {
                 if (err instanceof NoSuchThingError) {
-                    next(new HTTPError("Can"t find an activity with id " + uuid, 404));
+                    next(new HTTPError("Can't find an activity with id " + uuid, 404));
                 } else {
                     // Last-Modified?
                     next(new HTTPError("That activity was deleted.", 410));
@@ -1104,7 +1104,7 @@ var streamArgs = function(req, defaultCount, maxCount) {
 
         if (_(req.query).has("since")) {
             if (_(args).has("before")) {
-                throw new Error("Can"t have both "before" and "since" parameters");
+                throw new Error("Can't have both 'before' and 'since' parameters");
             }
             check(req.query.since).notEmpty();
             args.since = sanitize(req.query.since).trim();
@@ -1112,10 +1112,10 @@ var streamArgs = function(req, defaultCount, maxCount) {
 
         if (_(req.query).has("offset")) {
             if (_(args).has("before")) {
-                throw new Error("Can"t have both "before" and "offset" parameters");
+                throw new Error("Can't have both 'before' and 'offset' parameters");
             }
             if (_(args).has("since")) {
-                throw new Error("Can"t have both "since" and "offset" parameters");
+                throw new Error("Can't have both 'since' and 'offset' parameters");
             }
             check(req.query.offset, "Offset must be an integer greater than or equal to zero").isInt().min(0);
             args.start = sanitize(req.query.offset).toInt();
