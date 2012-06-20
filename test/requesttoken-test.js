@@ -16,48 +16,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('request token interface');
+var suite = vows.describe("request token interface");
 
 var testSchema = {
-    pkey: 'token',
-    fields: ['consumer_key',
-             'callback',
-             'used',
-             'token_secret',
-             'verifier',
-             'authenticated',
-             'username',
-             'access_token',
-             'created',
-             'updated'],
-    indices: ['access_token']
+    pkey: "token",
+    fields: ["consumer_key",
+             "callback",
+             "used",
+             "token_secret",
+             "verifier",
+             "authenticated",
+             "username",
+             "access_token",
+             "created",
+             "updated"],
+    indices: ["access_token"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         consumer_key: "AAAAAAAAAAAAAAAAAAAAAA",
         callback: "http://example.com/callback"
     },
-    'update': {
+    "update": {
         access_token: "BBBBBBBBBBBBBBBBBBBB",
         used: true
     }
 };
 
-var mb = modelBatch('requesttoken', 'RequestToken', testSchema, testData);
+var mb = modelBatch("requesttoken", "RequestToken", testSchema, testData);
 
-mb['When we require the requesttoken module']
-  ['and we get its RequestToken class export']
-  ['and we create a requesttoken instance']
-  ['auto-generated fields are there'] = function(err, created) {
+mb["When we require the requesttoken module"]
+  ["and we get its RequestToken class export"]
+  ["and we create a requesttoken instance"]
+  ["auto-generated fields are there"] = function(err, created) {
       assert.isString(created.token);
       assert.isString(created.token_secret);
       assert.isString(created.verifier);
@@ -67,4 +67,4 @@ mb['When we require the requesttoken module']
 
 suite.addBatch(mb);
 
-suite['export'](module);
+suite["export"](module);

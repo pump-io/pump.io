@@ -16,62 +16,62 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    Step = require('step'),
-    schema = require('../lib/schema'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    randomString = require('../lib/randomstring').randomString,
-    Client = require('../lib/model/client').Client,
-    RequestToken = require('../lib/model/requesttoken').RequestToken,
-    AccessToken = require('../lib/model/accesstoken').AccessToken,
-    User = require('../lib/model/user').User,
-    methodContext = require('./lib/methods').methodContext,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    Step = require("step"),
+    schema = require("../lib/schema"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    randomString = require("../lib/randomstring").randomString,
+    Client = require("../lib/model/client").Client,
+    RequestToken = require("../lib/model/requesttoken").RequestToken,
+    AccessToken = require("../lib/model/accesstoken").AccessToken,
+    User = require("../lib/model/user").User,
+    methodContext = require("./lib/methods").methodContext,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
 var ignore = function(err) {};
 
-var suite = vows.describe('app module interface');
+var suite = vows.describe("app module interface");
 
 suite.addBatch({
-    'When we get the app module': {
+    "When we get the app module": {
         topic: function() { 
-            return require('../lib/app');
+            return require("../lib/app");
         },
-        'there is one': function(mod) {
+        "there is one": function(mod) {
             assert.isObject(mod);
         },
-        'it has the makeApp() export': function(mod) {
+        "it has the makeApp() export": function(mod) {
             assert.isFunction(mod.makeApp);
         }
     }
 });
 
 suite.addBatch({
-    'When we makeApp()': {
+    "When we makeApp()": {
         topic: function() {
             var config = {port: 4815,
-                          hostname: 'localhost',
-                          driver: 'memory',
+                          hostname: "localhost",
+                          driver: "memory",
                           params: {},
                           nologger: true
                          },
-                makeApp = require('../lib/app').makeApp;
+                makeApp = require("../lib/app").makeApp;
 
-            process.env.NODE_ENV = 'test';
+            process.env.NODE_ENV = "test";
 
             makeApp(config, this.callback);
         },
-        'it works': function(err, app) {
+        "it works": function(err, app) {
             assert.ifError(err);
             assert.isObject(app);
         },
-        'app has the run() method': function(err, app) {
+        "app has the run() method": function(err, app) {
             assert.isFunction(app.run);
         },
-        'and we app.run()': {
+        "and we app.run()": {
             topic: function(app) {
                 var cb = this.callback;
                 app.run(function(err) {
@@ -82,10 +82,10 @@ suite.addBatch({
                     }
                 });
             },
-            'it works': function(err, app) {
+            "it works": function(err, app) {
                 assert.ifError(err);
             },
-            'app is listening on correct port': function(err, app) {
+            "app is listening on correct port": function(err, app) {
                 var addr = app.address();
                 assert.equal(addr.port, 4815);
             },
@@ -98,4 +98,4 @@ suite.addBatch({
     }
 });
 
-suite['export'](module);
+suite["export"](module);

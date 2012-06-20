@@ -16,8 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows');
+var assert = require("assert"),
+    vows = require("vows");
 
 var methodContext = function(methods) {
     var i, m, k,
@@ -30,9 +30,9 @@ var methodContext = function(methods) {
     for (i in methods) {
         m = methods[i];
         if ("aeiouAEIOU".indexOf(m.charAt(0)) !== -1) {
-            k = 'it has an '+m+' method';
+            k = "it has an "+m+" method";
         } else {
-            k = 'it has a '+m+' method';
+            k = "it has a "+m+" method";
         }
         context[k] = function(obj) {
             assert.isFunction(obj[methods[i]]);

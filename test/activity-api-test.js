@@ -16,26 +16,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    Step = require('step'),
-    _ = require('underscore'),
-    http = require('http'),
-    urlparse = require('url').parse,
-    httputil = require('./lib/http'),
-    oauthutil = require('./lib/oauth'),
-    actutil = require('./lib/activity'),
+var assert = require("assert"),
+    vows = require("vows"),
+    Step = require("step"),
+    _ = require("underscore"),
+    http = require("http"),
+    urlparse = require("url").parse,
+    httputil = require("./lib/http"),
+    oauthutil = require("./lib/oauth"),
+    actutil = require("./lib/activity"),
     setupApp = oauthutil.setupApp,
     register = oauthutil.register,
     accessToken = oauthutil.accessToken,
     newCredentials = oauthutil.newCredentials;
 
-var suite = vows.describe('Activity API test');
+var suite = vows.describe("Activity API test");
 
 // A batch for testing the read-write access to the API
 
 suite.addBatch({
-    'When we set up the app': {
+    "When we set up the app": {
         topic: function() {
             setupApp(this.callback);
         },
@@ -44,14 +44,14 @@ suite.addBatch({
                 app.close();
             }
         },
-        'it works': function(err, app) {
+        "it works": function(err, app) {
             assert.ifError(err);
         },
-        'and we get new credentials': {
+        "and we get new credentials": {
             topic: function() {
                 newCredentials("gerold", "justaguy", this.callback);
             },
-            'it works': function(err, cred) {
+            "it works": function(err, cred) {
                 assert.ifError(err);
                 assert.isObject(cred);
                 assert.isString(cred.consumer_key);
@@ -59,7 +59,7 @@ suite.addBatch({
                 assert.isString(cred.token);
                 assert.isString(cred.token_secret);
             },
-            'and we post a new activity': {
+            "and we post a new activity": {
                 topic: function(cred) {
                     var cb = this.callback,
                         act = {
@@ -73,45 +73,45 @@ suite.addBatch({
                         cb(err, act);
                     });
                 },
-                'it works': function(err, act) {
+                "it works": function(err, act) {
                     assert.ifError(err);
                     assert.isObject(act);
                 },
-                'and we check the options on the JSON url': {
+                "and we check the options on the JSON url": {
                     topic: function(act, cred) {
                         var parts = urlparse(act.id);
-                        httputil.options('localhost', 4815, parts.path, this.callback);
+                        httputil.options("localhost", 4815, parts.path, this.callback);
                     },
-                    'it exists': function(err, allow, res, body) {
+                    "it exists": function(err, allow, res, body) {
                         assert.ifError(err);
                         assert.equal(res.statusCode, 200);
                     },
-                    'it allows GET': function(err, allow, res, body) {
-                        assert.include(allow, 'GET');
+                    "it allows GET": function(err, allow, res, body) {
+                        assert.include(allow, "GET");
                     },
-                    'it allows PUT': function(err, allow, res, body) {
-                        assert.include(allow, 'PUT');
+                    "it allows PUT": function(err, allow, res, body) {
+                        assert.include(allow, "PUT");
                     },
-                    'it allows DELETE': function(err, allow, res, body) {
-                        assert.include(allow, 'DELETE');
+                    "it allows DELETE": function(err, allow, res, body) {
+                        assert.include(allow, "DELETE");
                     }
                 },
-                'and we GET the activity': {
+                "and we GET the activity": {
                     topic: function(posted, cred) {
                         var cb = this.callback;
                         httputil.getJSON(posted.id, cred, function(err, got, result) {
                             cb(err, {got: got, posted: posted});
                         });
                     },
-                    'it works': function(err, res) {
+                    "it works": function(err, res) {
                         assert.ifError(err);
                         assert.isObject(res.got);
                     },
-                    'results look right': function(err, res) {
+                    "results look right": function(err, res) {
                         var got = res.got;
                         actutil.validActivity(got);
                     },
-                    'it has the correct data': function(err, res) {
+                    "it has the correct data": function(err, res) {
                         var got = res.got, posted = res.posted;
                         assert.equal(got.id, posted.id);
                         assert.equal(got.verb, posted.verb);
@@ -126,7 +126,7 @@ suite.addBatch({
                         assert.equal(got.object.published, posted.object.published);
                         assert.equal(got.object.updated, posted.object.updated);
                     },
-                    'and we PUT a new version of the activity': {
+                    "and we PUT a new version of the activity": {
                         topic: function(got, act, cred) {
                             var cb = this.callback,
                                 newact = JSON.parse(JSON.stringify(act));
@@ -140,19 +140,19 @@ suite.addBatch({
                                 });
                             }, 2000);
                         },
-                        'it works': function(err, res) {
+                        "it works": function(err, res) {
                             assert.ifError(err);
                             assert.isObject(res.newact);
                         },
-                        'results look right': function(err, res) {
+                        "results look right": function(err, res) {
                             var newact = res.newact, act = res.act;
                             actutil.validActivity(newact);
-                            assert.include(newact, 'mood');
+                            assert.include(newact, "mood");
                             assert.isObject(newact.mood);
-                            assert.include(newact.mood, 'displayName');
+                            assert.include(newact.mood, "displayName");
                             assert.isString(newact.mood.displayName);
                         },
-                        'it has the correct data': function(err, res) {
+                        "it has the correct data": function(err, res) {
                             var newact = res.newact, act = res.act;
                             assert.equal(newact.id, act.id);
                             assert.equal(newact.verb, act.verb);
@@ -168,7 +168,7 @@ suite.addBatch({
                             assert.equal(newact.object.updated, act.object.updated);
                             assert.equal(newact.mood.displayName, "Friendly");
                         },
-                        'and we DELETE the activity': {
+                        "and we DELETE the activity": {
                             topic: function(put, got, posted, cred) {
                                 var cb = this.callback;
 
@@ -176,7 +176,7 @@ suite.addBatch({
                                     cb(err, doc);
                                 });
                             },
-                            'it works': function(err, doc) {
+                            "it works": function(err, doc) {
                                 assert.ifError(err);
                                 assert.equal(doc, "Deleted");
                             }
@@ -184,7 +184,7 @@ suite.addBatch({
                     }
                 }
             },
-            'and we post another activity': {
+            "and we post another activity": {
                 topic: function(cred) {
                     var cb = this.callback,
                         act = {
@@ -198,10 +198,10 @@ suite.addBatch({
                         cb(err, act);
                     });
                 },
-                'it works': function(err, act) {
+                "it works": function(err, act) {
                     assert.ifError(err);
                 },
-                'and we GET the activity with different credentials than the author': {
+                "and we GET the activity with different credentials than the author": {
                     topic: function(act, cred) {
                         var cb = this.callback;
                         
@@ -221,22 +221,22 @@ suite.addBatch({
                             }
                         );
                     },
-                    'it works': function(err, doc, act) {
+                    "it works": function(err, doc, act) {
                         assert.ifError(err);
                         actutil.validActivity(doc);
                     }
                 },
-                'and we GET the activity with no credentials': {
+                "and we GET the activity with no credentials": {
                     topic: function(act, cred) {
                         var cb = this.callback,
                             parsed = urlparse(act.id),
                             options = {
-                                host: 'localhost',
+                                host: "localhost",
                                 port: 4815,
                                 path: parsed.path,
                                 headers: {
-                                    'User-Agent': 'activitypump-test/0.1.0dev',
-                                    'Content-Type': 'application/json'
+                                    "User-Agent": "activitypump-test/0.1.0dev",
+                                    "Content-Type": "application/json"
                                 }
                             };
                         
@@ -246,15 +246,15 @@ suite.addBatch({
                             } else {
                                 cb(null);
                             }
-                        }).on('error', function(err) {
+                        }).on("error", function(err) {
                             cb(err);
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we GET the activity with invalid consumer key': {
+                "and we GET the activity with invalid consumer key": {
                     topic: function(act, cred) {
                         var cb = this.callback,
                             nuke = _(cred).clone();
@@ -269,11 +269,11 @@ suite.addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we GET the activity with invalid consumer secret': {
+                "and we GET the activity with invalid consumer secret": {
                     topic: function(act, cred) {
                         var cb = this.callback,
                             nuke = _(cred).clone();
@@ -288,11 +288,11 @@ suite.addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we GET the activity with invalid token': {
+                "and we GET the activity with invalid token": {
                     topic: function(act, cred) {
                         var cb = this.callback,
                             nuke = _(cred).clone();
@@ -307,11 +307,11 @@ suite.addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we GET the activity with invalid token secret': {
+                "and we GET the activity with invalid token secret": {
                     topic: function(act, cred) {
                         var cb = this.callback,
                             nuke = _(cred).clone();
@@ -326,12 +326,12 @@ suite.addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 }
             },
-            'and we post yet another activity': {
+            "and we post yet another activity": {
                 topic: function(cred) {
                     var cb = this.callback,
                         act = {
@@ -345,10 +345,10 @@ suite.addBatch({
                         cb(err, act);
                     });
                 },
-                'it works': function(err, act) {
+                "it works": function(err, act) {
                     assert.ifError(err);
                 },
-                'and we PUT the activity with different credentials than the author': {
+                "and we PUT the activity with different credentials than the author": {
                     topic: function(act, cred) {
                         var cb = this.callback,
                             newact = JSON.parse(JSON.stringify(act));
@@ -379,22 +379,22 @@ suite.addBatch({
                             }
                         );
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we PUT the activity with no credentials': {
+                "and we PUT the activity with no credentials": {
                     topic: function(act, cred) {
                         var cb = this.callback,
                             parsed = urlparse(act.id),
                             options = {
-                                host: 'localhost',
+                                host: "localhost",
                                 port: 4815,
                                 path: parsed.path,
                                 method: "PUT",
                                 headers: {
-                                    'User-Agent': 'activitypump-test/0.1.0dev',
-                                    'Content-Type': 'application/json'
+                                    "User-Agent": "activitypump-test/0.1.0dev",
+                                    "Content-Type": "application/json"
                                 }
                             },
                             newact = JSON.parse(JSON.stringify(act));
@@ -409,17 +409,17 @@ suite.addBatch({
                             } else {
                                 cb(new Error("Unexpected status code: " + res.statusCode));
                             }
-                        }).on('error', function(err) {
+                        }).on("error", function(err) {
                             cb(err);
                         });
                         req.write(JSON.stringify(newact));
                         req.end();
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we PUT the activity with invalid consumer key': {
+                "and we PUT the activity with invalid consumer key": {
                     topic: function(act, cred) {
                         var cb = this.callback,
                             nuke = _(cred).clone(),
@@ -440,11 +440,11 @@ suite.addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we PUT the activity with invalid consumer secret': {
+                "and we PUT the activity with invalid consumer secret": {
                     topic: function(act, cred) {
                         var cb = this.callback,
                             nuke = _(cred).clone(),
@@ -465,11 +465,11 @@ suite.addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we PUT the activity with invalid token': {
+                "and we PUT the activity with invalid token": {
                     topic: function(act, cred) {
                         var cb = this.callback,
                             nuke = _(cred).clone(),
@@ -490,11 +490,11 @@ suite.addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we PUT the activity with invalid token secret': {
+                "and we PUT the activity with invalid token secret": {
                     topic: function(act, cred) {
                         var cb = this.callback,
                             nuke = _(cred).clone(),
@@ -515,12 +515,12 @@ suite.addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 }
             },
-            'and we post still another activity': {
+            "and we post still another activity": {
                 topic: function(cred) {
                     var cb = this.callback,
                         act = {
@@ -534,10 +534,10 @@ suite.addBatch({
                         cb(err, act);
                     });
                 },
-                'it works': function(err, act) {
+                "it works": function(err, act) {
                     assert.ifError(err);
                 },
-                'and we DELETE the activity with different credentials than the author': {
+                "and we DELETE the activity with different credentials than the author": {
                     topic: function(act, cred) {
                         var cb = this.callback;
                         
@@ -563,21 +563,21 @@ suite.addBatch({
                             }
                         );
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we DELETE the activity with no credentials': {
+                "and we DELETE the activity with no credentials": {
                     topic: function(act, cred) {
                         var cb = this.callback,
                             parsed = urlparse(act.id),
                             options = {
-                                host: 'localhost',
+                                host: "localhost",
                                 port: 4815,
                                 path: parsed.path,
                                 method: "DELETE",
                                 headers: {
-                                    'User-Agent': 'activitypump-test/0.1.0dev'
+                                    "User-Agent": "activitypump-test/0.1.0dev"
                                 }
                             };
                         var req = http.request(options, function(res) {
@@ -586,16 +586,16 @@ suite.addBatch({
                             } else {
                                 cb(new Error("Unexpected status code: " + res.statusCode));
                             }
-                        }).on('error', function(err) {
+                        }).on("error", function(err) {
                             cb(err);
                         });
                         req.end();
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we DELETE the activity with invalid consumer key': {
+                "and we DELETE the activity with invalid consumer key": {
                     topic: function(act, cred) {
                         var cb = this.callback,
                             nuke = _(cred).clone();
@@ -612,11 +612,11 @@ suite.addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we DELETE the activity with invalid consumer secret': {
+                "and we DELETE the activity with invalid consumer secret": {
                     topic: function(act, cred) {
                         var cb = this.callback,
                             nuke = _(cred).clone();
@@ -633,11 +633,11 @@ suite.addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we DELETE the activity with invalid token': {
+                "and we DELETE the activity with invalid token": {
                     topic: function(act, cred) {
                         var cb = this.callback,
                             nuke = _(cred).clone();
@@ -654,11 +654,11 @@ suite.addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 },
-                'and we DELETE the activity with invalid token secret': {
+                "and we DELETE the activity with invalid token secret": {
                     topic: function(act, cred) {
                         var cb = this.callback,
                             nuke = _(cred).clone();
@@ -675,12 +675,12 @@ suite.addBatch({
                             }
                         });
                     },
-                    'it fails correctly': function(err) {
+                    "it fails correctly": function(err) {
                         assert.ifError(err);
                     }
                 }
             },
-            'and we PUT an activity then GET it': {
+            "and we PUT an activity then GET it": {
                 topic: function(cred) {
                     var cb = this.callback,
                         act = {
@@ -720,23 +720,23 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err, act) {
+                "it works": function(err, act) {
                     assert.ifError(err);
                 },
-                'results are valid': function(err, act) {
+                "results are valid": function(err, act) {
                     assert.ifError(err);
                     actutil.validActivity(act);
                 },
-                'results include our changes': function(err, act) {
+                "results include our changes": function(err, act) {
                     assert.ifError(err);
-                    assert.include(act, 'mood');
+                    assert.include(act, "mood");
                     assert.isObject(act.mood);
-                    assert.include(act.mood, 'displayName');
+                    assert.include(act.mood, "displayName");
                     assert.isString(act.mood.displayName);
                     assert.equal(act.mood.displayName, "Merry");
                 }
             },
-            'and we DELETE an activity then GET it': {
+            "and we DELETE an activity then GET it": {
                 topic: function(cred) {
                     var cb = this.callback,
                         act = {
@@ -773,14 +773,14 @@ suite.addBatch({
                         }
                     );
                 },
-                'it fails with a 410 Gone status code': function(err, act) {
+                "it fails with a 410 Gone status code": function(err, act) {
                     assert.ifError(err);
                 }
             },
-            'and we PUT a non-existent activity': {
+            "and we PUT a non-existent activity": {
                 topic: function(cred) {
                     var cb = this.callback,
-                        url = 'http://localhost:4815/api/activity/NONEXISTENT',
+                        url = "http://localhost:4815/api/activity/NONEXISTENT",
                         act = {
                             verb: "play",
                             object: {
@@ -801,14 +801,14 @@ suite.addBatch({
                         }
                     );
                 },
-                'it fails with a 404 status code': function(err, act) {
+                "it fails with a 404 status code": function(err, act) {
                     assert.ifError(err);
                 }
             },
-            'and we GET a non-existent activity': {
+            "and we GET a non-existent activity": {
                 topic: function(cred) {
                     var cb = this.callback,
-                        url = 'http://localhost:4815/api/activity/NONEXISTENT';
+                        url = "http://localhost:4815/api/activity/NONEXISTENT";
 
                         httputil.getJSON(url, cred, function(err, got, resp) {
                             if (err && err.statusCode && err.statusCode == 404) {
@@ -821,14 +821,14 @@ suite.addBatch({
                         }
                     );
                 },
-                'it fails with a 404 status code': function(err, act) {
+                "it fails with a 404 status code": function(err, act) {
                     assert.ifError(err);
                 }
             },
-            'and we DELETE a non-existent activity': {
+            "and we DELETE a non-existent activity": {
                 topic: function(cred) {
                     var cb = this.callback,
-                        url = 'http://localhost:4815/api/activity/NONEXISTENT';
+                        url = "http://localhost:4815/api/activity/NONEXISTENT";
 
                         httputil.delJSON(url, cred, function(err, got, resp) {
                             if (err && err.statusCode && err.statusCode == 404) {
@@ -841,7 +841,7 @@ suite.addBatch({
                         }
                     );
                 },
-                'it fails with a 404 status code': function(err, act) {
+                "it fails with a 404 status code": function(err, act) {
                     assert.ifError(err);
                 }
             }
@@ -849,4 +849,4 @@ suite.addBatch({
     }
 });
 
-suite['export'](module);
+suite["export"](module);

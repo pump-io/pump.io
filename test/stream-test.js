@@ -16,17 +16,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    Step = require('step'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
-    schema = require('../lib/schema').schema,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    Step = require("step"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
+    schema = require("../lib/schema").schema,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('stream interface');
+var suite = vows.describe("stream interface");
 
 // XXX: check other types
 
@@ -46,30 +46,30 @@ var testData = {
 // XXX: hack hack hack
 // modelBatch hard-codes ActivityObject-style
 
-var mb = modelBatch('stream', 'Stream', testSchema, testData);
+var mb = modelBatch("stream", "Stream", testSchema, testData);
 
 // This class has a weird schema format
 
-mb['When we require the stream module']
-['and we get its Stream class export']
-['and we get its schema']
-['topic'] = function(Stream) {
+mb["When we require the stream module"]
+["and we get its Stream class export"]
+["and we get its schema"]
+["topic"] = function(Stream) {
     return Stream.schema.stream || null;
 };
 
-mb['When we require the stream module']
-['and we get its Stream class export']
-['and we create a stream instance']
-['auto-generated fields are there'] = function(err, created) {
+mb["When we require the stream module"]
+["and we get its Stream class export"]
+["and we create a stream instance"]
+["auto-generated fields are there"] = function(err, created) {
     // No auto-gen fields, so...
     assert.isTrue(true);
 };
 
-mb['When we require the stream module']
-['and we get its Stream class export']
-['and we create a stream instance']
-['and we modify it']
-['it is modified'] = function(err, updated) {
+mb["When we require the stream module"]
+["and we get its Stream class export"]
+["and we create a stream instance"]
+["and we modify it"]
+["it is modified"] = function(err, updated) {
     assert.ifError(err);
 };
 
@@ -78,7 +78,7 @@ suite.addBatch(mb);
 var act1 = null;
 
 suite.addBatch({
-    'When we create a new stream': {
+    "When we create a new stream": {
         topic: function() {
             var cb = this.callback;
             // Need this to make IDs
@@ -89,7 +89,7 @@ suite.addBatch({
 
             var params = {schema: schema};
 
-            var db = Databank.get('memory', params);
+            var db = Databank.get("memory", params);
 
             db.connect({}, function(err) {
 
@@ -102,7 +102,7 @@ suite.addBatch({
 
                 DatabankObject.bank = db;
                 
-                mod = require('../lib/model/stream');
+                mod = require("../lib/model/stream");
 
                 if (!mod) {
                     cb(new Error("No module"), null);
@@ -116,34 +116,34 @@ suite.addBatch({
                     return;
                 }
 
-                Stream.create({name: 'test'}, cb);
+                Stream.create({name: "test"}, cb);
             });
         },
-        'it works': function(err, stream) {
+        "it works": function(err, stream) {
             assert.ifError(err);
             assert.isObject(stream);
         },
-        'it has a deliver() method': function(err, stream) {
+        "it has a deliver() method": function(err, stream) {
             assert.isFunction(stream.deliver);
         },
-        'it has a remove() method': function(err, stream) {
+        "it has a remove() method": function(err, stream) {
             assert.isFunction(stream.remove);
         },
-        'it has a getIDs() method': function(err, stream) {
+        "it has a getIDs() method": function(err, stream) {
             assert.isFunction(stream.getIDs);
         },
-        'it has a getIDsGreaterThan() method': function(err, stream) {
+        "it has a getIDsGreaterThan() method": function(err, stream) {
             assert.isFunction(stream.getIDsGreaterThan);
         },
-        'it has a getIDsLessThan() method': function(err, stream) {
+        "it has a getIDsLessThan() method": function(err, stream) {
             assert.isFunction(stream.getIDsLessThan);
         },
-        'it has a count() method': function(err, stream) {
+        "it has a count() method": function(err, stream) {
             assert.isFunction(stream.count);
         },
-        'and we create a single activity': {
+        "and we create a single activity": {
             topic: function(stream) {
-                var Activity = require('../lib/model/activity').Activity,
+                var Activity = require("../lib/model/activity").Activity,
                     props = {
                         actor: {
                             id: "urn:uuid:8f64087d-fffc-4fe0-9848-c18ae611cafd",
@@ -160,53 +160,53 @@ suite.addBatch({
 
                 Activity.create(props, this.callback);
             },
-            'it works': function(err, activity) {
+            "it works": function(err, activity) {
                 assert.ifError(err);
                 assert.isObject(activity);
             },
-            'and we deliver it to the stream': {
+            "and we deliver it to the stream": {
                 topic: function(activity, stream) {
                     act1 = activity;
                     stream.deliver(activity.id, this.callback);
                 },
-                'it works': function(err) {
+                "it works": function(err) {
                     assert.ifError(err);
                 },
-                "and we get the stream's activities": {
+                "and we get the stream"s activities": {
                     topic: function(activity, stream) {
                         stream.getIDs(0, 100, this.callback);
                     },
-                    'it works': function(err, activities) {
+                    "it works": function(err, activities) {
                         assert.ifError(err);
                         assert.isArray(activities);
                         assert.isTrue(activities.length > 0);
                     },
-                    'our activity is in there': function(err, activities) {
+                    "our activity is in there": function(err, activities) {
                         assert.isTrue(activities.some(function(item) {
                             return item === act1.id;
                         }));
                     }
                 },
-                "and we count the stream's activities": {
+                "and we count the stream"s activities": {
                     topic: function(activity, stream) {
                         stream.count(this.callback);
                     },
-                    'it works': function(err, cnt) {
+                    "it works": function(err, cnt) {
                         assert.ifError(err);
                     },
-                    'it has the right value (1)': function(err, cnt) {
+                    "it has the right value (1)": function(err, cnt) {
                         assert.equal(cnt, 1);
                     }
                 },
-                "and we count the stream's activities with Stream.count()": {
+                "and we count the stream"s activities with Stream.count()": {
                     topic: function(activity, stream) {
-                        var Stream = require('../lib/model/stream').Stream;
+                        var Stream = require("../lib/model/stream").Stream;
                         Stream.count(stream.name, this.callback);
                     },
-                    'it works': function(err, cnt) {
+                    "it works": function(err, cnt) {
                         assert.ifError(err);
                     },
-                    'it has the right value (1)': function(err, cnt) {
+                    "it has the right value (1)": function(err, cnt) {
                         assert.equal(cnt, 1);
                     }
                 }
@@ -217,7 +217,7 @@ suite.addBatch({
 
 suite.addBatch({
 
-    'When we setup the env': {
+    "When we setup the env": {
         topic: function() {
             var cb = this.callback;
 
@@ -229,7 +229,7 @@ suite.addBatch({
 
             var params = {schema: schema};
 
-            var db = Databank.get('memory', params);
+            var db = Databank.get("memory", params);
 
             var stream = null;
 
@@ -242,29 +242,29 @@ suite.addBatch({
 
                 DatabankObject.bank = db;
                 
-                var Stream = require('../lib/model/stream').Stream;
+                var Stream = require("../lib/model/stream").Stream;
                 cb(null, Stream);
             });
         },
-        'it works': function(err, Stream) {
+        "it works": function(err, Stream) {
             assert.ifError(err);
         },
-        'and we create a stream': {
+        "and we create a stream": {
             topic: function(Stream) {
-                Stream.create({name: 'test-remove-1'}, this.callback);
+                Stream.create({name: "test-remove-1"}, this.callback);
             },
-            'it works': function(err, stream) {
+            "it works": function(err, stream) {
                 assert.ifError(err);
                 assert.isObject(stream);
             },
-            'and we add 5000 ids': {
+            "and we add 5000 ids": {
                 topic: function(stream, Stream) {
                     var cb = this.callback;
                     Step(
                         function() {
                             var i, group = this.group();
                             for (i = 0; i < 5000; i++) {
-                                stream.deliver('http://example.net/api/object/'+i, group());
+                                stream.deliver("http://example.net/api/object/"+i, group());
                             }
                         },
                         function(err) {
@@ -276,43 +276,43 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err) {
+                "it works": function(err) {
                     assert.ifError(err);
                 },
-                'and we remove one': {
+                "and we remove one": {
                     topic: function(stream, Stream) {
-                        stream.remove('http://example.net/api/object/2500', this.callback);
+                        stream.remove("http://example.net/api/object/2500", this.callback);
                     },
-                    'it works': function(err) {
+                    "it works": function(err) {
                         assert.ifError(err);
                     },
-                    'and we get all the IDs': {
+                    "and we get all the IDs": {
                         topic: function(stream, Stream) {
                             stream.getIDs(0, 5000, this.callback);
                         },
-                        'it works': function(err, ids) {
+                        "it works": function(err, ids) {
                             assert.ifError(err);
                             assert.isArray(ids);
                         },
-                        'it is the right size': function(err, ids) {
+                        "it is the right size": function(err, ids) {
                             assert.equal(ids.length, 4999); // 5000 - 1
                         },
-                        'removed ID is missing': function(err, ids) {
-                            assert.equal(ids.indexOf('http://example.net/api/object/2500'), -1);
+                        "removed ID is missing": function(err, ids) {
+                            assert.equal(ids.indexOf("http://example.net/api/object/2500"), -1);
                         }
                     }
                 }
             }
         },
-        'and we try to remove() from an empty stream': {
+        "and we try to remove() from an empty stream": {
             topic: function(Stream) {
                 var cb = this.callback;
                 
-                Stream.create({name: 'test-remove-2'}, function(err, stream) {
+                Stream.create({name: "test-remove-2"}, function(err, stream) {
                     if (err) {
                         cb(err);
                     } else {
-                        stream.remove('http://example.net/api/object/6000', function(err) {
+                        stream.remove("http://example.net/api/object/6000", function(err) {
                             if (err) {
                                 cb(null);
                             } else {
@@ -322,25 +322,25 @@ suite.addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
-        'and we remove a not-present object from a non-empty stream': {
+        "and we remove a not-present object from a non-empty stream": {
             topic: function(Stream) {
                 var cb = this.callback,
                     stream;
 
                 Step(
                     function() {
-                        Stream.create({name: 'test-remove-3'}, this);
+                        Stream.create({name: "test-remove-3"}, this);
                     }, 
                     function(err, results) {
                         var i, group = this.group();
                         if (err) throw err;
                         stream = results;
                         for (i = 0; i < 5000; i++) {
-                            stream.deliver('http://example.net/api/object/'+i, group());
+                            stream.deliver("http://example.net/api/object/"+i, group());
                         }
                     },
                     function(err) {
@@ -348,7 +348,7 @@ suite.addBatch({
                             cb(err);
                         } else {
                             // 6666 > 5000
-                            stream.remove('http://example.net/api/object/6666', function(err) {
+                            stream.remove("http://example.net/api/object/6666", function(err) {
                                 if (err) {
                                     cb(null);
                                 } else {
@@ -359,7 +359,7 @@ suite.addBatch({
                     }
                 );
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         }
@@ -367,10 +367,10 @@ suite.addBatch({
 });
 
 suite.addBatch({
-    'When we deliver a lot of activities to a stream': {
+    "When we deliver a lot of activities to a stream": {
         topic: function() {
             var cb = this.callback,
-                Activity = require('../lib/model/activity').Activity,
+                Activity = require("../lib/model/activity").Activity,
                 actor = {
                     id: "urn:uuid:c484d84e-6afa-4c51-ac9a-f8738d48569c",
                     displayName: "Counter",
@@ -385,7 +385,7 @@ suite.addBatch({
 
             var params = {schema: schema};
 
-            var db = Databank.get('memory', params);
+            var db = Databank.get("memory", params);
 
             var stream = null;
 
@@ -398,9 +398,9 @@ suite.addBatch({
 
                     DatabankObject.bank = db;
                 
-                    var Stream = require('../lib/model/stream').Stream;
+                    var Stream = require("../lib/model/stream").Stream;
 
-                    Stream.create({name: 'scale-test'}, this);
+                    Stream.create({name: "scale-test"}, this);
                 },
                 function(err, results) {
                     var i, act, group = this.group();
@@ -441,7 +441,7 @@ suite.addBatch({
                 }
             );
         },
-        'it works': function(err, stream) {
+        "it works": function(err, stream) {
             assert.ifError(err);
             assert.isObject(stream);
         },
@@ -600,15 +600,15 @@ suite.addBatch({
                         cb(err, results, all);
                     });
                 },
-                'it works': function(err, ids, all) {
+                "it works": function(err, ids, all) {
                     assert.ifError(err);
                     assert.isArray(ids);
                     assert.isArray(all);
                 },
-                'it is the right size': function(err, ids, all) {
+                "it is the right size": function(err, ids, all) {
                     assert.lengthOf(ids, 20);
                 },
-                'it has the right values': function(err, ids, all) {
+                "it has the right values": function(err, ids, all) {
                     assert.deepEqual(ids, all.slice(4217, 4237));
                 }
             },
@@ -621,15 +621,15 @@ suite.addBatch({
                         cb(err, results, all);
                     });
                 },
-                'it works': function(err, ids, all) {
+                "it works": function(err, ids, all) {
                     assert.ifError(err);
                     assert.isArray(ids);
                     assert.isArray(all);
                 },
-                'it is the right size': function(err, ids, all) {
+                "it is the right size": function(err, ids, all) {
                     assert.lengthOf(ids, 20);
                 },
-                'it has the right values': function(err, ids, all) {
+                "it has the right values": function(err, ids, all) {
                     assert.deepEqual(ids, all.slice(8403, 8423));
                 }
             },
@@ -642,15 +642,15 @@ suite.addBatch({
                         cb(err, results, all);
                     });
                 },
-                'it works': function(err, ids, all) {
+                "it works": function(err, ids, all) {
                     assert.ifError(err);
                     assert.isArray(ids);
                     assert.isArray(all);
                 },
-                'it is the right size': function(err, ids, all) {
+                "it is the right size": function(err, ids, all) {
                     assert.lengthOf(ids, 20);
                 },
-                'it has the right values': function(err, ids, all) {
+                "it has the right values": function(err, ids, all) {
                     assert.deepEqual(ids, all.slice(9980, 10000));
                 }
             },
@@ -663,15 +663,15 @@ suite.addBatch({
                         cb(err, results, all);
                     });
                 },
-                'it works': function(err, ids, all) {
+                "it works": function(err, ids, all) {
                     assert.ifError(err);
                     assert.isArray(ids);
                     assert.isArray(all);
                 },
-                'it is the right size': function(err, ids, all) {
+                "it is the right size": function(err, ids, all) {
                     assert.lengthOf(ids, 40);
                 },
-                'it has the right values': function(err, ids, all) {
+                "it has the right values": function(err, ids, all) {
                     assert.deepEqual(ids, all.slice(0, 40));
                 }
             },
@@ -686,7 +686,7 @@ suite.addBatch({
                         }
                     });
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
@@ -695,11 +695,11 @@ suite.addBatch({
                     var cb = this.callback;
                     stream.getIDsLessThan(all[100], 0, cb);
                 },
-                'it works': function(err, ids) {
+                "it works": function(err, ids) {
                     assert.ifError(err);
                     assert.isArray(ids);
                 },
-                'it returns the right value': function(err, ids) {
+                "it returns the right value": function(err, ids) {
                     assert.lengthOf(ids, 0);
                 }
             },
@@ -714,7 +714,7 @@ suite.addBatch({
                         }
                     });
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
@@ -723,11 +723,11 @@ suite.addBatch({
                     var cb = this.callback;
                     stream.getIDsGreaterThan(all[100], 0, cb);
                 },
-                'it works': function(err, ids) {
+                "it works": function(err, ids) {
                     assert.ifError(err);
                     assert.isArray(ids);
                 },
-                'it returns the right value': function(err, ids) {
+                "it returns the right value": function(err, ids) {
                     assert.lengthOf(ids, 0);
                 }
             }
@@ -743,7 +743,7 @@ suite.addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
@@ -758,7 +758,7 @@ suite.addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
@@ -773,7 +773,7 @@ suite.addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
@@ -782,17 +782,17 @@ suite.addBatch({
                 var cb = this.callback;
                 stream.getIDs(50, 50, cb);
             },
-            'it works': function(err, results) {
+            "it works": function(err, results) {
                 assert.ifError(err);
             },
-            'results are empty': function(err, results) {
+            "results are empty": function(err, results) {
                 assert.isEmpty(results);
             }
         },
         "and we get IDs greater than an ID not in the stream": {
             topic: function(stream) {
                 var cb = this.callback;
-                stream.getIDsGreaterThan('http://example.org/nonexistent', 20, function(err, ids) {
+                stream.getIDsGreaterThan("http://example.org/nonexistent", 20, function(err, ids) {
                     if (err) {
                         cb(null);
                     } else {
@@ -800,14 +800,14 @@ suite.addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
         "and we get IDs less than an ID not in the stream": {
             topic: function(stream) {
                 var cb = this.callback;
-                stream.getIDsLessThan('http://example.org/nonexistent', 20, function(err, ids) {
+                stream.getIDsLessThan("http://example.org/nonexistent", 20, function(err, ids) {
                     if (err) {
                         cb(null);
                     } else {
@@ -815,14 +815,14 @@ suite.addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
         "and we get zero IDs greater than an ID not in the stream": {
             topic: function(stream) {
                 var cb = this.callback;
-                stream.getIDsGreaterThan('http://example.org/nonexistent', 0, function(err, ids) {
+                stream.getIDsGreaterThan("http://example.org/nonexistent", 0, function(err, ids) {
                     if (err) {
                         cb(null);
                     } else {
@@ -830,14 +830,14 @@ suite.addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
         "and we get zero IDs less than an ID not in the stream": {
             topic: function(stream) {
                 var cb = this.callback;
-                stream.getIDsLessThan('http://example.org/nonexistent', 0, function(err, ids) {
+                stream.getIDsLessThan("http://example.org/nonexistent", 0, function(err, ids) {
                     if (err) {
                         cb(null);
                     } else {
@@ -845,11 +845,11 @@ suite.addBatch({
                     }
                 });
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         }
     }
 });
 
-suite['export'](module);
+suite["export"](module);

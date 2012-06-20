@@ -16,35 +16,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('group module interface');
+var suite = vows.describe("group module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ['author',
-             'displayName',
-             'published',
-             'updated',
-             'url']
+    fields: ["author",
+             "displayName",
+             "published",
+             "updated",
+             "url"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         displayName: "ActivityPump Developers",
         url: "http://example.com/group/activitypump-dev"
     },
-    'update': {
+    "update": {
         displayName: "ActivityPump Hackers"
     }
 };
 
-suite.addBatch(modelBatch('group', 'Group', testSchema, testData));
+suite.addBatch(modelBatch("group", "Group", testSchema, testData));
 
-suite['export'](module);
+suite["export"](module);

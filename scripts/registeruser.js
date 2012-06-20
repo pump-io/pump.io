@@ -16,30 +16,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var _ = require('underscore'),
-    postJSON = require('./common').postJSON,
-    argv = require('optimist')
-        .usage('Usage: $0 -u <nickname> -p <num>')
-        .demand(['u','p'])
-        .alias('u', 'username')
-        .alias('p', 'password')
-        .alias('s', 'server')
-        .alias('P', 'port')
-        .describe('u', "Username to register")
-        .describe('p', "Password for user")
-        .describe('s', "Server name (default 'localhost')")
-        .describe('P', "Port (default 8001)")
-        .default('P', 8001)
-        .default('s', 'localhost')
+var _ = require("underscore"),
+    postJSON = require("./common").postJSON,
+    argv = require("optimist")
+        .usage("Usage: $0 -u <nickname> -p <num>")
+        .demand(["u","p"])
+        .alias("u", "username")
+        .alias("p", "password")
+        .alias("s", "server")
+        .alias("P", "port")
+        .describe("u", "Username to register")
+        .describe("p", "Password for user")
+        .describe("s", "Server name (default "localhost")")
+        .describe("P", "Port (default 8001)")
+        .default("P", 8001)
+        .default("s", "localhost")
         .argv;
 
-var user = {'nickname': argv.u,
-            'password': argv.p};
+var user = {"nickname": argv.u,
+            "password": argv.p};
 
 var server = argv.s;
 var port = argv.P;
 
-postJSON('http://'+server+':'+port+'/api/users', user, function(err, result, body) {
+postJSON("http://"+server+":"+port+"/api/users", user, function(err, result, body) {
     if (err) {
         console.error(err);
     } else {

@@ -16,26 +16,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    Step = require('step'),
-    URLMaker = require('../../lib/urlmaker').URLMaker,
-    schema = require('../../lib/schema').schema,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    Step = require("step"),
+    URLMaker = require("../../lib/urlmaker").URLMaker,
+    schema = require("../../lib/schema").schema,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
 var modelBatch = function(typeName, className, testSchema, testData) {
     
     var batch = {};
-    var typeKey = 'When we require the '+typeName+' module';
-    var classKey = 'and we get its '+className+' class export';
+    var typeKey = "When we require the "+typeName+" module";
+    var classKey = "and we get its "+className+" class export";
     var instKey;
 
     if ("aeiouAEIOU".indexOf(typeName.charAt(0)) !== -1) {
-        instKey = 'and we create an '+typeName+' instance';
+        instKey = "and we create an "+typeName+" instance";
     } else {
-        instKey = 'and we create a '+typeName+' instance';
+        instKey = "and we create a "+typeName+" instance";
     }
 
     batch[typeKey] = {
@@ -50,22 +50,22 @@ var modelBatch = function(typeName, className, testSchema, testData) {
 
             var params = {schema: schema};
 
-            var db = Databank.get('memory', params);
+            var db = Databank.get("memory", params);
 
             db.connect({}, function(err) {
                 var mod;
 
                 DatabankObject.bank = db;
                 
-                mod = require('../../lib/model/'+typeName) || null;
+                mod = require("../../lib/model/"+typeName) || null;
 
                 cb(null, mod);
             });
         },
-        'there is one': function(err, mod) {
+        "there is one": function(err, mod) {
             assert.isObject(mod);
         },
-        'it has a class export': function(err, mod) {
+        "it has a class export": function(err, mod) {
             assert.includes(mod, className);
         }
     };
@@ -74,51 +74,51 @@ var modelBatch = function(typeName, className, testSchema, testData) {
         topic: function(mod) {
             return mod[className] || null;
         },
-        'it is a function': function(Cls) {
+        "it is a function": function(Cls) {
             assert.isFunction(Cls);
         },
-        'it has an init method': function(Cls) {
+        "it has an init method": function(Cls) {
             assert.isFunction(Cls.init);
         },
-        'it has a bank method': function(Cls) {
+        "it has a bank method": function(Cls) {
             assert.isFunction(Cls.bank);
         },
-        'it has a get method': function(Cls) {
+        "it has a get method": function(Cls) {
             assert.isFunction(Cls.get);
         },
-        'it has a search method': function(Cls) {
+        "it has a search method": function(Cls) {
             assert.isFunction(Cls.search);
         },
-        'it has a pkey method': function(Cls) {
+        "it has a pkey method": function(Cls) {
             assert.isFunction(Cls.pkey);
         },
-        'it has a create method': function(Cls) {
+        "it has a create method": function(Cls) {
             assert.isFunction(Cls.create);
         },
-        'it has a readAll method': function(Cls) {
+        "it has a readAll method": function(Cls) {
             assert.isFunction(Cls.readAll);
         },
-        'its type is correct': function(Cls) {
+        "its type is correct": function(Cls) {
             assert.isString(Cls.type);
             assert.equal(Cls.type, typeName);
         },
-        'and we get its schema': {
+        "and we get its schema": {
             topic: function(Cls) {
                 return Cls.schema || null;
             },
-            'it exists': function(schema) {
+            "it exists": function(schema) {
                 assert.isObject(schema);
             },
-            'it has the right pkey': function(schema) {
-                assert.includes(schema, 'pkey');
+            "it has the right pkey": function(schema) {
+                assert.includes(schema, "pkey");
                 assert.equal(schema.pkey, testSchema.pkey);
             },
-            'it has the right fields': function(schema) {
+            "it has the right fields": function(schema) {
                 var fields = testSchema.fields,
                     i, field;
 
                 if (fields) {
-                    assert.includes(schema, 'fields');
+                    assert.includes(schema, "fields");
                     for (i = 0; i < fields.length; i++) {
                         assert.includes(schema.fields, fields[i]);
                     }
@@ -127,12 +127,12 @@ var modelBatch = function(typeName, className, testSchema, testData) {
                     }
                 }
             },
-            'it has the right indices': function(schema) {
+            "it has the right indices": function(schema) {
                 var indices = testSchema.indices,
                     i, field;
 
                 if (indices) {
-                    assert.includes(schema, 'indices');
+                    assert.includes(schema, "indices");
                     for (i = 0; i < indices.length; i++) {
                         assert.includes(schema.indices, indices[i]);
                     }
@@ -148,22 +148,22 @@ var modelBatch = function(typeName, className, testSchema, testData) {
         topic: function(Cls) {
             Cls.create(testData.create, this.callback);
         },
-        'it works correctly': function(err, created) {
+        "it works correctly": function(err, created) {
             assert.ifError(err);
             assert.isObject(created);
         },
-        'auto-generated fields are there': function(err, created) {
+        "auto-generated fields are there": function(err, created) {
             assert.isString(created.objectType);
             assert.equal(created.objectType, typeName);
             assert.isString(created.id);
             assert.isString(created.published);
             assert.isString(created.updated); // required for new object?
         },
-        'passed-in fields are there': function(err, created) {
+        "passed-in fields are there": function(err, created) {
             var prop, aprop;
             for (prop in testData.create) {
                 // Author may have auto-created properties
-                if (prop === 'author') {
+                if (prop === "author") {
                     for (aprop in testData.create.author) {
                         assert.deepEqual(created.author[aprop], testData.create.author[aprop]);
                     }
@@ -172,25 +172,25 @@ var modelBatch = function(typeName, className, testSchema, testData) {
                 }
             }
         },
-        'and we modify it': {
+        "and we modify it": {
             topic: function(created) {
                 created.update(testData.update, this.callback);
             },
-            'it is modified': function(err, updated) {
+            "it is modified": function(err, updated) {
                 assert.ifError(err);
                 assert.isString(updated.updated);
             },
-            'modified fields are modified': function(err, updated) {
+            "modified fields are modified": function(err, updated) {
                 var prop;
                 for (prop in testData.update) {
                     assert.deepEqual(updated[prop], testData.update[prop]); 
                 }
             },
-            'and we delete it': {
+            "and we delete it": {
                 topic: function(updated) {
                     updated.del(this.callback);
                 },
-                'it works': function(err, updated) {
+                "it works": function(err, updated) {
                     assert.ifError(err);
                 }
             }

@@ -16,29 +16,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('badge module interface');
+var suite = vows.describe("badge module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ['author',
-             'displayName',
-             'image',
-             'published',
-             'summary',
-             'updated',
-             'url']
+    fields: ["author",
+             "displayName",
+             "image",
+             "published",
+             "summary",
+             "updated",
+             "url"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         displayName: "Unit TestX0r",
         url: "http://example.com/badge/unit-testx0r",
         summary: "Ran 3 or more unit tests, automatically!",
@@ -48,11 +48,11 @@ var testData = {
             width: 350
         }
     },
-    'update': {
+    "update": {
         summary: "Ran 5 or more unit tests, automatically!"
     }
 };
 
-suite.addBatch(modelBatch('badge', 'Badge', testSchema, testData));
+suite.addBatch(modelBatch("badge", "Badge", testSchema, testData));
 
-suite['export'](module);
+suite["export"](module);

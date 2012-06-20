@@ -1,6 +1,6 @@
 // activityobject-test.js
 //
-// Test the activityobject module's class methods
+// Test the activityobject module"s class methods
 //
 // Copyright 2012, StatusNet Inc.
 //
@@ -16,18 +16,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    Step = require('step'),
-    _ = require('underscore'),
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    Step = require("step"),
+    _ = require("underscore"),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
-    schema = require('../lib/schema').schema,
-    URLMaker = require('../lib/urlmaker').URLMaker;
+    schema = require("../lib/schema").schema,
+    URLMaker = require("../lib/urlmaker").URLMaker;
 
-vows.describe('activityobject class interface').addBatch({
-    'When we require the activityobject module': {
+vows.describe("activityobject class interface").addBatch({
+    "When we require the activityobject module": {
         topic: function() { 
             var cb = this.callback;
             // Need this to make IDs
@@ -38,154 +38,154 @@ vows.describe('activityobject class interface').addBatch({
 
             var params = {schema: schema};
 
-            var db = Databank.get('memory', params);
+            var db = Databank.get("memory", params);
 
             db.connect({}, function(err) {
                 var mod;
 
                 DatabankObject.bank = db;
                 
-                mod = require('../lib/model/activityobject') || null;
+                mod = require("../lib/model/activityobject") || null;
 
                 cb(null, mod);
             });
         },
-        'we get a module': function(mod) {
+        "we get a module": function(mod) {
             assert.isObject(mod);
         },
-        'and we get its UnknownTypeError member': {
+        "and we get its UnknownTypeError member": {
             topic: function(mod) {
                 return mod.UnknownTypeError;
             },
-            'it exists': function(ActivityObject) {
+            "it exists": function(ActivityObject) {
                 assert.isFunction(ActivityObject);
             }
         },
-        'and we get its ActivityObject member': {
+        "and we get its ActivityObject member": {
             topic: function(mod) {
                 return mod.ActivityObject;
             },
-            'it exists': function(ActivityObject) {
+            "it exists": function(ActivityObject) {
                 assert.isFunction(ActivityObject);
             },
-            'it has a makeURI member': function(ActivityObject) {
+            "it has a makeURI member": function(ActivityObject) {
                 assert.isFunction(ActivityObject.makeURI);
             },
-            'it has a toClass member': function(ActivityObject) {
+            "it has a toClass member": function(ActivityObject) {
                 assert.isFunction(ActivityObject.toClass);
             },
-            'it has a toObject member': function(ActivityObject) {
+            "it has a toObject member": function(ActivityObject) {
                 assert.isFunction(ActivityObject.toObject);
             },
-            'it has a getObject member': function(ActivityObject) {
+            "it has a getObject member": function(ActivityObject) {
                 assert.isFunction(ActivityObject.getObject);
             },
-            'it has a createObject member': function(ActivityObject) {
+            "it has a createObject member": function(ActivityObject) {
                 assert.isFunction(ActivityObject.createObject);
             },
-            'it has an ensureObject member': function(ActivityObject) {
+            "it has an ensureObject member": function(ActivityObject) {
                 assert.isFunction(ActivityObject.ensureObject);
             },
-            'it has a compressProperty member': function(ActivityObject) {
+            "it has a compressProperty member": function(ActivityObject) {
                 assert.isFunction(ActivityObject.compressProperty);
             },
-            'it has an expandProperty member': function(ActivityObject) {
+            "it has an expandProperty member": function(ActivityObject) {
                 assert.isFunction(ActivityObject.expandProperty);
             },
-            'it has a getObjectStream member': function(ActivityObject) {
+            "it has a getObjectStream member": function(ActivityObject) {
                 assert.isFunction(ActivityObject.getObjectStream);
             },
-            'it has an objectTypes member': function(ActivityObject) {
+            "it has an objectTypes member": function(ActivityObject) {
                 assert.isArray(ActivityObject.objectTypes);
             },
-            'it has constant-ish members for known types': function(ActivityObject) {
-                assert.equal(ActivityObject.ARTICLE, 'article');
-                assert.equal(ActivityObject.AUDIO, 'audio');
-                assert.equal(ActivityObject.BADGE, 'badge');
-                assert.equal(ActivityObject.BOOKMARK, 'bookmark');
-                assert.equal(ActivityObject.COLLECTION, 'collection');
-                assert.equal(ActivityObject.COMMENT, 'comment');
-                assert.equal(ActivityObject.EVENT, 'event');
-                assert.equal(ActivityObject.FILE, 'file');
-                assert.equal(ActivityObject.GROUP, 'group');
-                assert.equal(ActivityObject.IMAGE, 'image');
-                assert.equal(ActivityObject.NOTE, 'note');
-                assert.equal(ActivityObject.PERSON, 'person');
-                assert.equal(ActivityObject.PLACE, 'place');
-                assert.equal(ActivityObject.PRODUCT, 'product');
-                assert.equal(ActivityObject.QUESTION, 'question');
-                assert.equal(ActivityObject.REVIEW, 'review');
-                assert.equal(ActivityObject.SERVICE, 'service');
-                assert.equal(ActivityObject.VIDEO, 'video');
+            "it has constant-ish members for known types": function(ActivityObject) {
+                assert.equal(ActivityObject.ARTICLE, "article");
+                assert.equal(ActivityObject.AUDIO, "audio");
+                assert.equal(ActivityObject.BADGE, "badge");
+                assert.equal(ActivityObject.BOOKMARK, "bookmark");
+                assert.equal(ActivityObject.COLLECTION, "collection");
+                assert.equal(ActivityObject.COMMENT, "comment");
+                assert.equal(ActivityObject.EVENT, "event");
+                assert.equal(ActivityObject.FILE, "file");
+                assert.equal(ActivityObject.GROUP, "group");
+                assert.equal(ActivityObject.IMAGE, "image");
+                assert.equal(ActivityObject.NOTE, "note");
+                assert.equal(ActivityObject.PERSON, "person");
+                assert.equal(ActivityObject.PLACE, "place");
+                assert.equal(ActivityObject.PRODUCT, "product");
+                assert.equal(ActivityObject.QUESTION, "question");
+                assert.equal(ActivityObject.REVIEW, "review");
+                assert.equal(ActivityObject.SERVICE, "service");
+                assert.equal(ActivityObject.VIDEO, "video");
             },
-            'and we make a new URI': {
+            "and we make a new URI": {
                 topic: function(ActivityObject) {
-                    return ActivityObject.makeURI(ActivityObject.AUDIO, 'AAAAAAAAAAAAAAAAAAAAAAA');
+                    return ActivityObject.makeURI(ActivityObject.AUDIO, "AAAAAAAAAAAAAAAAAAAAAAA");
                 },
-                'it returns a string': function(uri) {
+                "it returns a string": function(uri) {
                     assert.isString(uri);
                 }
             },
-            'and we get a class by typename': {
+            "and we get a class by typename": {
                 topic: function(ActivityObject) {
                     return ActivityObject.toClass(ActivityObject.VIDEO);
                 },
-                'it returns the right one': function(Video) {
-                    assert.equal(Video, require('../lib/model/video').Video);
+                "it returns the right one": function(Video) {
+                    assert.equal(Video, require("../lib/model/video").Video);
                 }
             },
-            'and we get an object by properties': {
+            "and we get an object by properties": {
                 topic: function(ActivityObject) {
                     var props = {
                         objectType: ActivityObject.REVIEW,
-                        id: 'http://example.org/reviews/1',
+                        id: "http://example.org/reviews/1",
                         content: "I hate your blog."
                     };
                     return ActivityObject.toObject(props);
                 },
-                'it exists': function(review) {
+                "it exists": function(review) {
                     assert.isObject(review);
                 },
-                'it is the right type': function(review) {
-                    assert.instanceOf(review, require('../lib/model/review').Review);
+                "it is the right type": function(review) {
+                    assert.instanceOf(review, require("../lib/model/review").Review);
                 },
-                'it has the right properties': function(review) {
-                    assert.equal(review.objectType, 'review');
-                    assert.equal(review.id, 'http://example.org/reviews/1');
+                "it has the right properties": function(review) {
+                    assert.equal(review.objectType, "review");
+                    assert.equal(review.id, "http://example.org/reviews/1");
                     assert.equal(review.content, "I hate your blog.");
                 },
-                'it has an expand() method': function(review) {
+                "it has an expand() method": function(review) {
                     assert.isFunction(review.expand);
                 },
-                'it has a favoritedBy() method': function(review) {
+                "it has a favoritedBy() method": function(review) {
                     assert.isFunction(review.favoritedBy);
                 },
-                'it has an unfavoritedBy() method': function(review) {
+                "it has an unfavoritedBy() method": function(review) {
                     assert.isFunction(review.unfavoritedBy);
                 },
-                'it has a getFavoriters() method': function(review) {
+                "it has a getFavoriters() method": function(review) {
                     assert.isFunction(review.getFavoriters);
                 },
-                'it has a favoritersCount() method': function(review) {
+                "it has a favoritersCount() method": function(review) {
                     assert.isFunction(review.favoritersCount);
                 },
-                'it has an expandFeeds() method': function(review) {
+                "it has an expandFeeds() method": function(review) {
                     assert.isFunction(review.expandFeeds);
                 }
             },
-            'and we get a non-activityobject model object by its properties': {
+            "and we get a non-activityobject model object by its properties": {
                 topic: function(ActivityObject) {
                     var props = {
-                        objectType: 'user',
-                        nickname: 'evan'
+                        objectType: "user",
+                        nickname: "evan"
                     };
                     return ActivityObject.toObject(props);
                 },
-                'it fails': function(client) {
+                "it fails": function(client) {
                     assert.isObject(client);
                 }
             },
-            'and we create an activityobject object': {
+            "and we create an activityobject object": {
                 topic: function(ActivityObject) {
                     var props = {
                         objectType: ActivityObject.ARTICLE,
@@ -198,52 +198,52 @@ vows.describe('activityobject class interface').addBatch({
                         article.del(function(err) {});
                     }
                 },
-                'it works': function(err, article) {
+                "it works": function(err, article) {
                     assert.ifError(err);
                 },
-                'it exists': function(err, article) {
+                "it exists": function(err, article) {
                     assert.isObject(article);
                 },
-                'it has the right class': function(err, article) {
-                    assert.instanceOf(article, require('../lib/model/article').Article);
+                "it has the right class": function(err, article) {
+                    assert.instanceOf(article, require("../lib/model/article").Article);
                 },
-                'it has the right passed-in attributes': function(err, article) {
-                    assert.equal(article.objectType, 'article');
+                "it has the right passed-in attributes": function(err, article) {
+                    assert.equal(article.objectType, "article");
                     assert.equal(article.content, "Blah blah blah.");
                 },
-                'it has the right auto-created attributes': function(err, article) {
+                "it has the right auto-created attributes": function(err, article) {
                     assert.isString(article.id);
                     assert.isString(article.published);
                     assert.isString(article.updated);
                 },
-                'and we get the same object': {
+                "and we get the same object": {
                     topic: function(article, ActivityObject) {
                         ActivityObject.getObject(ActivityObject.ARTICLE, article.id, this.callback);
                     },
-                    'it works': function(err, article) {
+                    "it works": function(err, article) {
                         assert.ifError(err);
                     },
-                    'it exists': function(err, article) {
+                    "it exists": function(err, article) {
                         assert.isObject(article);
                     },
-                    'it has the right class': function(err, article) {
-                        assert.instanceOf(article, require('../lib/model/article').Article);
+                    "it has the right class": function(err, article) {
+                        assert.instanceOf(article, require("../lib/model/article").Article);
                     },
-                    'it has the right passed-in attributes': function(err, article) {
-                        assert.equal(article.objectType, 'article');
+                    "it has the right passed-in attributes": function(err, article) {
+                        assert.equal(article.objectType, "article");
                         assert.equal(article.content, "Blah blah blah.");
                     },
-                    'it has the right auto-created attributes': function(err, article) {
+                    "it has the right auto-created attributes": function(err, article) {
                         assert.isString(article.id);
                         assert.isString(article.published);
                         assert.isString(article.updated);
                     }
                 }
             },
-            'and we ensure a new activityobject object': {
+            "and we ensure a new activityobject object": {
                 topic: function(ActivityObject) {
                     var props = {
-                        id: 'urn:uuid:2b7cc63f-dd9a-438f-b6d3-846fee2634bf',
+                        id: "urn:uuid:2b7cc63f-dd9a-438f-b6d3-846fee2634bf",
                         objectType: ActivityObject.GROUP,
                         displayName: "ActivityPump Devs"
                     };
@@ -254,29 +254,29 @@ vows.describe('activityobject class interface').addBatch({
                         group.del(function(err) {});
                     }
                 },
-                'it works': function(err, article) {
+                "it works": function(err, article) {
                     assert.ifError(err);
                 },
-                'it exists': function(err, group) {
+                "it exists": function(err, group) {
                     assert.isObject(group);
                 },
-                'it has the right class': function(err, group) {
-                    assert.instanceOf(group, require('../lib/model/group').Group);
+                "it has the right class": function(err, group) {
+                    assert.instanceOf(group, require("../lib/model/group").Group);
                 },
-                'it has the right passed-in attributes': function(err, group) {
-                    assert.equal(group.objectType, 'group');
+                "it has the right passed-in attributes": function(err, group) {
+                    assert.equal(group.objectType, "group");
                     assert.equal(group.displayName, "ActivityPump Devs");
                 },
-                'it has the right auto-created attributes': function(err, group) {
+                "it has the right auto-created attributes": function(err, group) {
                     assert.isString(group.id);
                     assert.isString(group.published);
                     assert.isString(group.updated);
                 }
             },
-            'and we ensure an existing activityobject object': {
+            "and we ensure an existing activityobject object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Comment = require('../lib/model/comment').Comment,
+                        Comment = require("../lib/model/comment").Comment,
                         props = {
                             objectType: ActivityObject.COMMENT,
                             content: "FIRST POST",
@@ -301,33 +301,33 @@ vows.describe('activityobject class interface').addBatch({
                         comment.del(function(err) {});
                     }
                 },
-                'it works': function(err, comment) {
+                "it works": function(err, comment) {
                     assert.ifError(err);
                 },
-                'it exists': function(err, comment) {
+                "it exists": function(err, comment) {
                     assert.isObject(comment);
                 },
-                'it has the right class': function(err, comment) {
-                    assert.instanceOf(comment, require('../lib/model/comment').Comment);
+                "it has the right class": function(err, comment) {
+                    assert.instanceOf(comment, require("../lib/model/comment").Comment);
                 },
-                'it has the right passed-in attributes': function(err, comment) {
-                    assert.equal(comment.objectType, 'comment');
+                "it has the right passed-in attributes": function(err, comment) {
+                    assert.equal(comment.objectType, "comment");
                     assert.equal(comment.content, "FIRST POST");
                     assert.equal(comment.inReplyTo.url, "http://example.net/articles/3");
                     assert.equal(comment.inReplyTo.objectType, "article");
 
                 },
-                'it has the right auto-created attributes': function(err, comment) {
+                "it has the right auto-created attributes": function(err, comment) {
                     assert.isString(comment.id);
                     assert.isString(comment.published);
                     assert.isString(comment.updated);
                 }
             },
-            'and we compress an existing object property of an object': {
+            "and we compress an existing object property of an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Image = require('../lib/model/image').Image,
-                        Person = require('../lib/model/person').Person,
+                        Image = require("../lib/model/image").Image,
+                        Person = require("../lib/model/person").Person,
                         image = new Image({
                             author: {
                                 id: "urn:uuid:8a9d0e92-3210-4ea3-920f-3950ca8d5306",
@@ -344,27 +344,27 @@ vows.describe('activityobject class interface').addBatch({
                         }
                     });
                 },
-                'it works': function(err, image) {
+                "it works": function(err, image) {
                     assert.ifError(err);
                 },
-                'the property is compressed': function(err, image) {
+                "the property is compressed": function(err, image) {
                     assert.ifError(err);
-                    assert.include(image, 'author');
+                    assert.include(image, "author");
                     assert.isObject(image.author);
-                    assert.instanceOf(image.author, require('../lib/model/person').Person);
-                    assert.include(image.author, 'id');
+                    assert.instanceOf(image.author, require("../lib/model/person").Person);
+                    assert.include(image.author, "id");
                     assert.isString(image.author.id);
                     assert.equal(image.author.id, "urn:uuid:8a9d0e92-3210-4ea3-920f-3950ca8d5306");
-                    assert.include(image.author, 'objectType');
+                    assert.include(image.author, "objectType");
                     assert.isString(image.author.objectType);
                     assert.equal(image.author.objectType, "person");
-                    assert.isFalse(_(image.author).has('displayName'));
+                    assert.isFalse(_(image.author).has("displayName"));
                 }
             },
-            'and we compress a non-existent object property of an object': {
+            "and we compress a non-existent object property of an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Image = require('../lib/model/image').Image,
+                        Image = require("../lib/model/image").Image,
                         image = new Image({
                             url: "http://example.net/images/2.jpg"
                         });
@@ -376,19 +376,19 @@ vows.describe('activityobject class interface').addBatch({
                         }
                     });
                 },
-                'it works': function(err, image) {
+                "it works": function(err, image) {
                     assert.ifError(err);
                 },
-                'the property remains non-existent': function(err, image) {
+                "the property remains non-existent": function(err, image) {
                     assert.ifError(err);
-                    assert.isFalse(_(image).has('author'));
+                    assert.isFalse(_(image).has("author"));
                 }
             },
-            'and we expand an existing object property of an object': {
+            "and we expand an existing object property of an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Image = require('../lib/model/image').Image,
-                        Person = require('../lib/model/person').Person,
+                        Image = require("../lib/model/image").Image,
+                        Person = require("../lib/model/person").Person,
                         image;
 
                     Step(
@@ -414,29 +414,29 @@ vows.describe('activityobject class interface').addBatch({
                         }
                     );
                 },
-                'it works': function(err, image) {
+                "it works": function(err, image) {
                     assert.ifError(err);
                 },
-                'the property is expanded': function(err, image) {
+                "the property is expanded": function(err, image) {
                     assert.ifError(err);
-                    assert.include(image, 'author');
+                    assert.include(image, "author");
                     assert.isObject(image.author);
-                    assert.instanceOf(image.author, require('../lib/model/person').Person);
-                    assert.include(image.author, 'id');
+                    assert.instanceOf(image.author, require("../lib/model/person").Person);
+                    assert.include(image.author, "id");
                     assert.isString(image.author.id);
                     assert.equal(image.author.id, "urn:uuid:bbd313d1-6f8d-4d72-bc05-bde69ba795d7");
-                    assert.include(image.author, 'objectType');
+                    assert.include(image.author, "objectType");
                     assert.isString(image.author.objectType);
                     assert.equal(image.author.objectType, "person");
-                    assert.include(image.author, 'displayName');
+                    assert.include(image.author, "displayName");
                     assert.isString(image.author.displayName);
                     assert.equal(image.author.displayName, "Theo Kojak");
                 }
             },
-            'and we expand a non-existent object property of an object': {
+            "and we expand a non-existent object property of an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Image = require('../lib/model/image').Image,
+                        Image = require("../lib/model/image").Image,
                         image = new Image({
                             url: "http://example.net/images/4.jpg"
                         });
@@ -448,18 +448,18 @@ vows.describe('activityobject class interface').addBatch({
                         }
                     });
                 },
-                'it works': function(err, image) {
+                "it works": function(err, image) {
                     assert.ifError(err);
                 },
-                'the property remains non-existent': function(err, image) {
+                "the property remains non-existent": function(err, image) {
                     assert.ifError(err);
-                    assert.isFalse(_(image).has('author'));
+                    assert.isFalse(_(image).has("author"));
                 }
             },
-            'and we compress a scalar property of an object': {
+            "and we compress a scalar property of an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Image = require('../lib/model/image').Image,
+                        Image = require("../lib/model/image").Image,
                         image = new Image({
                             url: "http://example.net/images/5.jpg"
                         });
@@ -471,19 +471,19 @@ vows.describe('activityobject class interface').addBatch({
                         }
                     });
                 },
-                'it fails correctly': function(err, image) {
+                "it fails correctly": function(err, image) {
                     assert.ifError(err);
                 },
-                'the property remains non-existent': function(err, image) {
+                "the property remains non-existent": function(err, image) {
                     assert.ifError(err);
                     assert.isString(image.url);
                     assert.equal(image.url, "http://example.net/images/5.jpg");
                 }
             },
-            'and we expand a scalar property of an object': {
+            "and we expand a scalar property of an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Image = require('../lib/model/image').Image,
+                        Image = require("../lib/model/image").Image,
                         image = new Image({
                             url: "http://example.net/images/6.jpg"
                         });
@@ -495,20 +495,20 @@ vows.describe('activityobject class interface').addBatch({
                         }
                     });
                 },
-                'it fails correctly': function(err, image) {
+                "it fails correctly": function(err, image) {
                     assert.ifError(err);
                 },
-                'the property remains non-existent': function(err, image) {
+                "the property remains non-existent": function(err, image) {
                     assert.ifError(err);
                     assert.isString(image.url);
                     assert.equal(image.url, "http://example.net/images/6.jpg");
                 }
             },
-            'and we create an activityobject with an author': {
+            "and we create an activityobject with an author": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Note = require('../lib/model/note').Note,
-                        Person = require('../lib/model/person').Person,
+                        Note = require("../lib/model/note").Note,
+                        Person = require("../lib/model/person").Person,
                         props = {
                             objectType: ActivityObject.NOTE,
                             content: "HELLO WORLD"
@@ -517,7 +517,7 @@ vows.describe('activityobject class interface').addBatch({
 
                     Step(
                         function() {
-                            Person.create({displayName: 'peter', preferredUsername: 'p65'}, this);
+                            Person.create({displayName: "peter", preferredUsername: "p65"}, this);
                         },
                         function(err, person) {
                             if (err) throw err;
@@ -529,11 +529,11 @@ vows.describe('activityobject class interface').addBatch({
                         }
                     );
                 },
-                'it works': function(err, object, author) {
+                "it works": function(err, object, author) {
                     assert.ifError(err);
                     assert.isObject(object);
                 },
-                'results contain the author information': function(err, object, author) {
+                "results contain the author information": function(err, object, author) {
                     assert.ifError(err);
                     assert.isObject(object.author);
                     assert.equal(object.author.id, author.id);
@@ -542,11 +542,11 @@ vows.describe('activityobject class interface').addBatch({
                     assert.equal(object.author.preferredUsername, author.preferredUsername);
                 }
             },
-            'and we create an activityobject with an author reference': {
+            "and we create an activityobject with an author reference": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Note = require('../lib/model/note').Note,
-                        Person = require('../lib/model/person').Person,
+                        Note = require("../lib/model/note").Note,
+                        Person = require("../lib/model/person").Person,
                         props = {
                             objectType: ActivityObject.NOTE,
                             content: "HELLO WORLD"
@@ -555,7 +555,7 @@ vows.describe('activityobject class interface').addBatch({
 
                     Step(
                         function() {
-                            Person.create({displayName: 'quincy', preferredUsername: 'qbert'}, this);
+                            Person.create({displayName: "quincy", preferredUsername: "qbert"}, this);
                         },
                         function(err, person) {
                             if (err) throw err;
@@ -568,11 +568,11 @@ vows.describe('activityobject class interface').addBatch({
                         }
                     );
                 },
-                'it works': function(err, object, author) {
+                "it works": function(err, object, author) {
                     assert.ifError(err);
                     assert.isObject(object);
                 },
-                'results contain the author information': function(err, object, author) {
+                "results contain the author information": function(err, object, author) {
                     assert.ifError(err);
                     assert.isObject(object.author);
                     assert.equal(object.author.id, author.id);
@@ -581,11 +581,11 @@ vows.describe('activityobject class interface').addBatch({
                     assert.equal(object.author.preferredUsername, author.preferredUsername);
                 }
             },
-            'and we update an activityobject with an author': {
+            "and we update an activityobject with an author": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Note = require('../lib/model/note').Note,
-                        Person = require('../lib/model/person').Person,
+                        Note = require("../lib/model/note").Note,
+                        Person = require("../lib/model/person").Person,
                         props = {
                             objectType: ActivityObject.NOTE,
                             content: "HELLO WORLD"
@@ -593,7 +593,7 @@ vows.describe('activityobject class interface').addBatch({
                         author;
                     Step(
                         function() {
-                            Person.create({displayName: 'randy', preferredUsername: 'rman99'}, this);
+                            Person.create({displayName: "randy", preferredUsername: "rman99"}, this);
                         },
                         function(err, person) {
                             if (err) throw err;
@@ -610,11 +610,11 @@ vows.describe('activityobject class interface').addBatch({
                         }
                     );
                 },
-                'it works': function(err, object, author) {
+                "it works": function(err, object, author) {
                     assert.ifError(err);
                     assert.isObject(object);
                 },
-                'results contain the author information': function(err, object, author) {
+                "results contain the author information": function(err, object, author) {
                     assert.ifError(err);
                     assert.isObject(object.author);
                     assert.equal(object.author.id, author.id);
@@ -623,11 +623,11 @@ vows.describe('activityobject class interface').addBatch({
                     assert.equal(object.author.preferredUsername, author.preferredUsername);
                 }
             },
-            'and we update an activityobject with an author reference': {
+            "and we update an activityobject with an author reference": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Note = require('../lib/model/note').Note,
-                        Person = require('../lib/model/person').Person,
+                        Note = require("../lib/model/note").Note,
+                        Person = require("../lib/model/person").Person,
                         props = {
                             objectType: ActivityObject.NOTE,
                             content: "HELLO WORLD"
@@ -636,7 +636,7 @@ vows.describe('activityobject class interface').addBatch({
 
                     Step(
                         function() {
-                            Person.create({displayName: 'steven', preferredUsername: 'billabong'}, this);
+                            Person.create({displayName: "steven", preferredUsername: "billabong"}, this);
                         },
                         function(err, person) {
                             if (err) throw err;
@@ -654,11 +654,11 @@ vows.describe('activityobject class interface').addBatch({
                         }
                     );
                 },
-                'it works': function(err, object, author) {
+                "it works": function(err, object, author) {
                     assert.ifError(err);
                     assert.isObject(object);
                 },
-                'results contain the author information': function(err, object, author) {
+                "results contain the author information": function(err, object, author) {
                     assert.ifError(err);
                     assert.isObject(object.author);
                     assert.equal(object.author.id, author.id);
@@ -667,23 +667,23 @@ vows.describe('activityobject class interface').addBatch({
                     assert.equal(object.author.preferredUsername, author.preferredUsername);
                 }
             },
-            'and we get a non-existent stream of objects': {
+            "and we get a non-existent stream of objects": {
                 topic: function(ActivityObject) {
-                    ActivityObject.getObjectStream('person', 'nonexistent', 0, 20, this.callback);
+                    ActivityObject.getObjectStream("person", "nonexistent", 0, 20, this.callback);
                 },
-                'it works': function(err, objects) {
+                "it works": function(err, objects) {
                     assert.ifError(err);
                 },
-                'it returns an empty array': function(err, objects) {
+                "it returns an empty array": function(err, objects) {
                     assert.ifError(err);
                     assert.isArray(objects);
                     assert.lengthOf(objects, 0);
                 }
             },
-            'and we get an empty object stream': {
+            "and we get an empty object stream": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Stream = require('../lib/model/stream').Stream;
+                        Stream = require("../lib/model/stream").Stream;
 
                     Step(
                         function() {
@@ -691,24 +691,24 @@ vows.describe('activityobject class interface').addBatch({
                         },
                         function(err, stream) {
                             if (err) throw err;
-                            ActivityObject.getObjectStream('person', "activityobject-test-1", 0, 20, cb);
+                            ActivityObject.getObjectStream("person", "activityobject-test-1", 0, 20, cb);
                         }
                     );
                 },
-                'it works': function(err, objects) {
+                "it works": function(err, objects) {
                     assert.ifError(err);
                 },
-                'it returns an empty array': function(err, objects) {
+                "it returns an empty array": function(err, objects) {
                     assert.ifError(err);
                     assert.isArray(objects);
                     assert.lengthOf(objects, 0);
                 }
             },
-            'and we get an object stream with stuff in it': {
+            "and we get an object stream with stuff in it": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Stream = require('../lib/model/stream').Stream,
-                        Service = require('../lib/model/service').Service,
+                        Stream = require("../lib/model/stream").Stream,
+                        Service = require("../lib/model/service").Service,
                         stream;
 
                     Step(
@@ -736,16 +736,16 @@ vows.describe('activityobject class interface').addBatch({
                         }
                     );
                 },
-                'it works': function(err, objects) {
+                "it works": function(err, objects) {
                     assert.ifError(err);
                 },
-                'it returns a non-empty array': function(err, objects) {
+                "it returns a non-empty array": function(err, objects) {
                     assert.ifError(err);
                     assert.isArray(objects);
                     assert.lengthOf(objects, 20);
                 },
-                'members are the correct type': function(err, objects) {
-                    var Service = require('../lib/model/service').Service;
+                "members are the correct type": function(err, objects) {
+                    var Service = require("../lib/model/service").Service;
                     assert.ifError(err);
                     for (var i = 0; i < objects.length; i++) {
                         assert.isObject(objects[i]);
@@ -753,10 +753,10 @@ vows.describe('activityobject class interface').addBatch({
                     }
                 }
             },
-            'and we get the favoriters of a brand-new object': {
+            "and we get the favoriters of a brand-new object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Place = require('../lib/model/place').Place;
+                        Place = require("../lib/model/place").Place;
 
                     Step(
                         function() {
@@ -777,19 +777,19 @@ vows.describe('activityobject class interface').addBatch({
                         }
                     );
                 },
-                'it works': function(err, objects) {
+                "it works": function(err, objects) {
                     assert.ifError(err);
                 },
-                'it returns an empty array': function(err, objects) {
+                "it returns an empty array": function(err, objects) {
                     assert.ifError(err);
                     assert.isArray(objects);
                     assert.lengthOf(objects, 0);
                 }
             },
-            'and we get the favoriters count of a brand-new object': {
+            "and we get the favoriters count of a brand-new object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Place = require('../lib/model/place').Place;
+                        Place = require("../lib/model/place").Place;
 
                     Step(
                         function() {
@@ -810,19 +810,19 @@ vows.describe('activityobject class interface').addBatch({
                         }
                     );
                 },
-                'it works': function(err, count) {
+                "it works": function(err, count) {
                     assert.ifError(err);
                 },
-                'it returns zero': function(err, count) {
+                "it returns zero": function(err, count) {
                     assert.ifError(err);
                     assert.equal(count, 0);
                 }
             },
-            'and we add a favoriter for an object': {
+            "and we add a favoriter for an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Place = require('../lib/model/place').Place,
-                        Person = require('../lib/model/person').Person,
+                        Place = require("../lib/model/place").Place,
+                        Person = require("../lib/model/person").Person,
                         place = null,
                         person = null;
                     
@@ -849,47 +849,47 @@ vows.describe('activityobject class interface').addBatch({
                         }
                     );
                 },
-                'it worked': function(err, place, person) {
+                "it worked": function(err, place, person) {
                     assert.ifError(err);
                 },
-                'and we get its favoriters list': {
+                "and we get its favoriters list": {
                     topic: function(place, person) {
                         var cb = this.callback;
                         place.getFavoriters(0, 20, function(err, favers) {
                             cb(err, favers, person);
                         });
                     },
-                    'it worked': function(err, favers, person) {
+                    "it worked": function(err, favers, person) {
                         assert.ifError(err);
                     } ,
-                    'it is the right size': function(err, favers, person) {
+                    "it is the right size": function(err, favers, person) {
                         assert.ifError(err);
                         assert.isArray(favers);
                         assert.lengthOf(favers, 1);
                     },
-                    'it contains our data': function(err, favers, person) {
+                    "it contains our data": function(err, favers, person) {
                         assert.ifError(err);
                         assert.equal(favers[0].id, person.id);
                     }
                 },
-                'and we get its favoriters count': {
+                "and we get its favoriters count": {
                     topic: function(place, person) {
                         place.favoritersCount(this.callback);
                     },
-                    'it works': function(err, count) {
+                    "it works": function(err, count) {
                         assert.ifError(err);
                     },
-                    'it returns one': function(err, count) {
+                    "it returns one": function(err, count) {
                         assert.ifError(err);
                         assert.equal(count, 1);
                     }
                 }
             },
-            'and we add then remove a favoriter for an object': {
+            "and we add then remove a favoriter for an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Place = require('../lib/model/place').Place,
-                        Person = require('../lib/model/person').Person,
+                        Place = require("../lib/model/place").Place,
+                        Person = require("../lib/model/person").Person,
                         place = null,
                         person = null;
                     
@@ -920,39 +920,39 @@ vows.describe('activityobject class interface').addBatch({
                         }
                     );
                 },
-                'and we get its favoriters list': {
+                "and we get its favoriters list": {
                     topic: function(place, person) {
                         var cb = this.callback;
                         place.getFavoriters(0, 20, function(err, favers) {
                             cb(err, favers, person);
                         });
                     },
-                    'it worked': function(err, favers, person) {
+                    "it worked": function(err, favers, person) {
                         assert.ifError(err);
                     } ,
-                    'it is the right size': function(err, favers, person) {
+                    "it is the right size": function(err, favers, person) {
                         assert.ifError(err);
                         assert.isArray(favers);
                         assert.lengthOf(favers, 0);
                     }
                 },
-                'and we get its favoriters count': {
+                "and we get its favoriters count": {
                     topic: function(place, person) {
                         place.favoritersCount(this.callback);
                     },
-                    'it works': function(err, count) {
+                    "it works": function(err, count) {
                         assert.ifError(err);
                     },
-                    'it returns zero': function(err, count) {
+                    "it returns zero": function(err, count) {
                         assert.ifError(err);
                         assert.equal(count, 0);
                     }
                 }
             },
-            'and we expand the feeds for an object': {
+            "and we expand the feeds for an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Place = require('../lib/model/place').Place,
+                        Place = require("../lib/model/place").Place,
                         place = null;
                     
                     Step(
@@ -975,20 +975,20 @@ vows.describe('activityobject class interface').addBatch({
                         }
                     );
                 },
-                'it works': function(err, place) {
+                "it works": function(err, place) {
                     assert.ifError(err);
                 },
-                'it adds the "likes" property': function(err, place) {
+                "it adds the "likes" property": function(err, place) {
                     assert.ifError(err);
-                    assert.includes(place, 'likes');
+                    assert.includes(place, "likes");
                     assert.isObject(place.likes);
-                    assert.includes(place.likes, 'totalItems');
+                    assert.includes(place.likes, "totalItems");
                     assert.equal(place.likes.totalItems, 0);
-                    assert.includes(place.likes, 'url');
+                    assert.includes(place.likes, "url");
                     assert.isString(place.likes.url);
                 }
             }
         }
     }
-})['export'](module);
+})["export"](module);
 

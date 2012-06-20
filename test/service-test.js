@@ -16,37 +16,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('service module interface');
+var suite = vows.describe("service module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ['displayName',
-             'image',
-             'published',
-             'summary',
-             'updated',
-             'url']
+    fields: ["displayName",
+             "image",
+             "published",
+             "summary",
+             "updated",
+             "url"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         displayName: "Gmail",
         url: "http://mail.google.com/",
         summary: "Web-based email."
     },
-    'update': {
+    "update": {
         summary: "Web-based email with unique tagging and sorting features."
     }
 };
 
-suite.addBatch(modelBatch('service', 'Service', testSchema, testData));
+suite.addBatch(modelBatch("service", "Service", testSchema, testData));
 
-suite['export'](module);
+suite["export"](module);

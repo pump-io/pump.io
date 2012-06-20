@@ -16,34 +16,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('note module interface');
+var suite = vows.describe("note module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ['author',
-             'content',
-             'published',
-             'updated',
-             'url']
+    fields: ["author",
+             "content",
+             "published",
+             "updated",
+             "url"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         content: "Now is the time for all good men to come to the aid of the party."
     },
-    'update': {
+    "update": {
         content: "Now is the time for all good people to come to the aid of the party."
     }
 };
 
-suite.addBatch(modelBatch('note', 'Note', testSchema, testData));
+suite.addBatch(modelBatch("note", "Note", testSchema, testData));
 
-suite['export'](module);
+suite["export"](module);

@@ -16,51 +16,51 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('nonce module interface');
+var suite = vows.describe("nonce module interface");
 
 var testSchema = {
-    pkey: 'token_nonce',
-    fields: ['nonce',
-             'consumer_key',
-             'access_token',
-             'timestamp'],
-    indices: ['consumer_key']
+    pkey: "token_nonce",
+    fields: ["nonce",
+             "consumer_key",
+             "access_token",
+             "timestamp"],
+    indices: ["consumer_key"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         consumer_key: "ZZZZZZZZZZZZZZZZZZZZZZZ",
         access_token: "AAAAAAAAAAAAAAAAAAAAAAA",
         nonce: "BBBBBB",
         timestamp: 1337801665
     },
-    'update': {
+    "update": {
         timestamp: 1337801765
     }
 };
 
-var mb = modelBatch('nonce', 'Nonce', testSchema, testData);
+var mb = modelBatch("nonce", "Nonce", testSchema, testData);
 
-mb['When we require the nonce module']
-  ['and we get its Nonce class export']
-  ['and we create a nonce instance']
-  ['auto-generated fields are there'] = function(err, created) {
+mb["When we require the nonce module"]
+  ["and we get its Nonce class export"]
+  ["and we create a nonce instance"]
+  ["auto-generated fields are there"] = function(err, created) {
       assert.isString(created.token_nonce);
 };
 
-mb['When we require the nonce module']
-['and we get its Nonce class export']
-['and we create a nonce instance']
-['and we modify it']
-['it is modified'] = function(err, updated) {
+mb["When we require the nonce module"]
+["and we get its Nonce class export"]
+["and we create a nonce instance"]
+["and we modify it"]
+["it is modified"] = function(err, updated) {
     assert.ifError(err);
 };
 
@@ -185,4 +185,4 @@ suite.addBatch({
     }
 });
 
-suite['export'](module);
+suite["export"](module);

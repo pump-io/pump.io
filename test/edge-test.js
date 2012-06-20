@@ -16,26 +16,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('edge module interface');
+var suite = vows.describe("edge module interface");
 
 var testSchema = {
-    pkey: 'id', 
-    fields: ['from',
-             'to',
-             'published',
-             'updated'],
-    indices: ['from.id', 'to.id']
+    pkey: "id", 
+    fields: ["from",
+             "to",
+             "published",
+             "updated"],
+    indices: ["from.id", "to.id"]
 };
 
 var testData = {
-    'create': {
+    "create": {
         from: {
             id: "http://example.org/people/evan",
             displayName: "Evan Prodromou",
@@ -47,7 +47,7 @@ var testData = {
             objectType: "person"
         }
     },
-    'update': {
+    "update": {
         type: "friend" // XXX: is there a real reason to update...?
     }
 };
@@ -55,12 +55,12 @@ var testData = {
 // XXX: hack hack hack
 // modelBatch hard-codes ActivityObject-style
 
-var mb = modelBatch('edge', 'Edge', testSchema, testData);
+var mb = modelBatch("edge", "Edge", testSchema, testData);
 
-mb['When we require the edge module']
-['and we get its Edge class export']
-['and we create an edge instance']
-['auto-generated fields are there'] = function(err, created) {
+mb["When we require the edge module"]
+["and we get its Edge class export"]
+["and we create an edge instance"]
+["auto-generated fields are there"] = function(err, created) {
     assert.isString(created.id);
     assert.isString(created.published);
     assert.isString(created.updated);
@@ -69,27 +69,27 @@ mb['When we require the edge module']
 suite.addBatch(mb);
 
 suite.addBatch({
-    'When we get the Edge class': {
+    "When we get the Edge class": {
         topic: function() {
-            return require('../lib/model/edge').Edge;
+            return require("../lib/model/edge").Edge;
         },
-        'it exists': function(Edge) {
+        "it exists": function(Edge) {
             assert.isFunction(Edge);
         },
-        'it has an id() method': function(Edge) {
+        "it has an id() method": function(Edge) {
             assert.isFunction(Edge.id);
         },
-        'and we get a new id': {
+        "and we get a new id": {
             topic: function(Edge) {
                 var from = "http://example.com/user/1",
                     to = "http://example.net/company/35";
                 return Edge.id(from, to);
             },
-            'it is a string': function(id) {
+            "it is a string": function(id) {
                 assert.isString(id);
             }
         }
     }
 });
 
-suite['export'](module);
+suite["export"](module);

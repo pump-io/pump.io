@@ -16,35 +16,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    _ = require('underscore'),
-    Step = require('step'),
-    Activity = require('../lib/model/activity').Activity,
-    modelBatch = require('./lib/model').modelBatch,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    _ = require("underscore"),
+    Step = require("step"),
+    Activity = require("../lib/model/activity").Activity,
+    modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe('user module interface');
+var suite = vows.describe("user module interface");
 
 var testSchema = {
-    'pkey': 'nickname',
-    'fields': ['passwordHash',
-               'published',
-               'updated',
-               'profile'],
-    'indices': ['profile.id']};
+    "pkey": "nickname",
+    "fields": ["passwordHash",
+               "published",
+               "updated",
+               "profile"],
+    "indices": ["profile.id"]};
 
 var testData = {
-    'create': {
+    "create": {
         nickname: "evan",
         password: "trustno1",
         profile: {
             displayName: "Evan Prodromou"
         }
     },
-    'update': {
+    "update": {
         nickname: "evan",
         password: "correct horse battery staple" // the most secure password! see http://xkcd.com/936/
     }
@@ -53,12 +53,12 @@ var testData = {
 // XXX: hack hack hack
 // modelBatch hard-codes ActivityObject-style
 
-var mb = modelBatch('user', 'User', testSchema, testData);
+var mb = modelBatch("user", "User", testSchema, testData);
 
-mb['When we require the user module']
-['and we get its User class export']
-['and we create an user instance']
-['auto-generated fields are there'] = function(err, created) {
+mb["When we require the user module"]
+["and we get its User class export"]
+["and we create an user instance"]
+["auto-generated fields are there"] = function(err, created) {
     assert.isString(created.passwordHash);
     assert.isString(created.published);
     assert.isString(created.updated);
@@ -67,34 +67,34 @@ mb['When we require the user module']
 suite.addBatch(mb);
 
 suite.addBatch({
-    'When we get the User class': {
+    "When we get the User class": {
         topic: function() {
-            return require('../lib/model/user').User;
+            return require("../lib/model/user").User;
         },
-        'it exists': function(User) {
+        "it exists": function(User) {
             assert.isFunction(User);
         },
-        'it has a fromPerson() method': function(User) {
+        "it has a fromPerson() method": function(User) {
             assert.isFunction(User.fromPerson);
         },
-        'it has a checkCredentials() method': function(User) {
+        "it has a checkCredentials() method": function(User) {
             assert.isFunction(User.checkCredentials);
         },
-        'and we check the credentials for a non-existent user': {
+        "and we check the credentials for a non-existent user": {
             topic: function(User) {
                 var cb = this.callback;
-                User.checkCredentials('nosuchuser', 'passw0rd', this.callback);
+                User.checkCredentials("nosuchuser", "passw0rd", this.callback);
             },
-            'it returns null': function(err, found) {
+            "it returns null": function(err, found) {
                 assert.ifError(err);
                 assert.isNull(found);
             }
         },
-        'and we create a user': {
+        "and we create a user": {
             topic: function(User) {
                 var props = {
-                    nickname: 'tom',
-                    password: '123456'
+                    nickname: "tom",
+                    password: "123456"
                 };
                 User.create(props, this.callback);
             },
@@ -103,101 +103,101 @@ suite.addBatch({
                     user.del(function(err) {});
                 }
             },
-            'it works': function(user) {
+            "it works": function(user) {
                 assert.isObject(user);
             },
-            'it has the sanitize() method': function(user) {
+            "it has the sanitize() method": function(user) {
                 assert.isFunction(user.sanitize);
             },
-            'it has the getProfile() method': function(user) {
+            "it has the getProfile() method": function(user) {
                 assert.isFunction(user.getProfile);
             },
-            'it has the getOutboxStream() method': function(user) {
+            "it has the getOutboxStream() method": function(user) {
                 assert.isFunction(user.getOutboxStream);
             },
-            'it has the getInboxStream() method': function(user) {
+            "it has the getInboxStream() method": function(user) {
                 assert.isFunction(user.getInboxStream);
             },
-            'it has the expand() method': function(user) {
+            "it has the expand() method": function(user) {
                 assert.isFunction(user.expand);
             },
-            'it has the addToOutbox() method': function(user) {
+            "it has the addToOutbox() method": function(user) {
                 assert.isFunction(user.addToOutbox);
             },
-            'it has the addToInbox() method': function(user) {
+            "it has the addToInbox() method": function(user) {
                 assert.isFunction(user.addToInbox);
             },
-            'it has the getFollowers() method': function(user) {
+            "it has the getFollowers() method": function(user) {
                 assert.isFunction(user.getFollowers);
             },
-            'it has the getFollowing() method': function(user) {
+            "it has the getFollowing() method": function(user) {
                 assert.isFunction(user.getFollowing);
             },
-            'it has the followerCount() method': function(user) {
+            "it has the followerCount() method": function(user) {
                 assert.isFunction(user.followerCount);
             },
-            'it has the followingCount() method': function(user) {
+            "it has the followingCount() method": function(user) {
                 assert.isFunction(user.followingCount);
             },
-            'it has the follow() method': function(user) {
+            "it has the follow() method": function(user) {
                 assert.isFunction(user.follow);
             },
-            'it has the stopFollowing() method': function(user) {
+            "it has the stopFollowing() method": function(user) {
                 assert.isFunction(user.stopFollowing);
             },
-            'it has the favorite() method': function(user) {
+            "it has the favorite() method": function(user) {
                 assert.isFunction(user.favorite);
             },
-            'it has the unfavorite() method': function(user) {
+            "it has the unfavorite() method": function(user) {
                 assert.isFunction(user.unfavorite);
             },
-            'and we check the credentials with the right password': {
+            "and we check the credentials with the right password": {
                 topic: function(user, User) {
-                    User.checkCredentials('tom', '123456', this.callback);
+                    User.checkCredentials("tom", "123456", this.callback);
                 },
-                'it works': function(err, user) {
+                "it works": function(err, user) {
                     assert.ifError(err);
                     assert.isObject(user);
                 }
             },
-            'and we check the credentials with the wrong password': {
+            "and we check the credentials with the wrong password": {
                 topic: function(user, User) {
                     var cb = this.callback;
-                    User.checkCredentials('tom', '654321', this.callback);
+                    User.checkCredentials("tom", "654321", this.callback);
                 },
-                'it returns null': function(err, found) {
+                "it returns null": function(err, found) {
                     assert.ifError(err);
                     assert.isNull(found);
                 }
             },
-            'and we try to retrieve it from the person id': {
+            "and we try to retrieve it from the person id": {
                 topic: function(user, User) {
                     User.fromPerson(user.profile.id, this.callback);
                 },
-                'it works': function(err, found) {
+                "it works": function(err, found) {
                     assert.ifError(err);
                     assert.isObject(found);
-                    assert.equal(found.nickname, 'tom');
+                    assert.equal(found.nickname, "tom");
                 }
             },
-            'and we try to get its profile': {
+            "and we try to get its profile": {
                 topic: function(user) {
                     user.getProfile(this.callback);
                 },
-                'it works': function(err, profile) {
+                "it works": function(err, profile) {
                     assert.ifError(err);
                     assert.isObject(profile);
                     assert.instanceOf(profile,
-                                      require('../lib/model/person').Person);
+                                      require("../lib/model/person").Person);
                 }
             }
         },
-        'and we create a user and sanitize it': {
+        "and we create a user and sanitize it": {
             topic: function(User) {
                 var cb = this.callback,
                     props = {
-                        nickname: 'dick',
-                        password: 'foobar'
+                        nickname: "dick",
+                        password: "foobar"
                     };
                     
                 User.create(props, function(err, user) {
@@ -214,22 +214,22 @@ suite.addBatch({
                     user.del(function(err) {});
                 }
             },
-            'it works': function(err, user) {
+            "it works": function(err, user) {
                 assert.ifError(err);
                 assert.isObject(user);
             },
-            'it is sanitized': function(err, user) {
-                assert.isFalse(_(user).has('password'));
-                assert.isFalse(_(user).has('passwordHash'));
+            "it is sanitized": function(err, user) {
+                assert.isFalse(_(user).has("password"));
+                assert.isFalse(_(user).has("passwordHash"));
             }
         },
-        'and we create a new user and get its stream': {
+        "and we create a new user and get its stream": {
             topic: function(User) {
                 var cb = this.callback,
                     user = null,
                     props = {
-                        nickname: 'harry',
-                        password: 'un1c0rn'
+                        nickname: "harry",
+                        password: "un1c0rn"
                     };
 
                 Step(
@@ -264,15 +264,15 @@ suite.addBatch({
                     results.user.del(function(err) {});
                 }
             },
-            'it works': function(err, results) {
+            "it works": function(err, results) {
                 assert.ifError(err);
                 assert.isObject(results.user);
                 assert.isArray(results.activities);
             },
-            'it is empty': function(err, results) {
+            "it is empty": function(err, results) {
                 assert.lengthOf(results.activities, 0);
             },
-            'and we add an activity to its stream': {
+            "and we add an activity to its stream": {
                 topic: function(results) {
                     var cb = this.callback,
                         user = results.user,
@@ -291,7 +291,7 @@ suite.addBatch({
                                 }
                             }
                         },
-                        Activity = require('../lib/model/activity').Activity,
+                        Activity = require("../lib/model/activity").Activity,
                         act = new Activity(props);
                     
                     Step(
@@ -316,10 +316,10 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err, results) {
+                "it works": function(err, results) {
                     assert.ifError(err);
                 },
-                'and we get the user stream': {
+                "and we get the user stream": {
                     topic: function(results) {
                         var cb = this.callback,
                             user = results.user,
@@ -348,24 +348,24 @@ suite.addBatch({
                             }
                         );
                     },
-                    'it works': function(err, results) {
+                    "it works": function(err, results) {
                         assert.ifError(err);
                         assert.isArray(results.activities);
                     },
-                    'it includes the added activity': function(err, results) {
+                    "it includes the added activity": function(err, results) {
                         assert.lengthOf(results.activities, 1);
                         assert.equal(results.activities[0].id, results.activity.id);
                     }
                 }
             }
         },
-        'and we create a new user and get its inbox': {
+        "and we create a new user and get its inbox": {
             topic: function(User) {
                 var cb = this.callback,
                     user = null,
                     props = {
-                        nickname: 'maurice',
-                        password: 'cappadoccia'
+                        nickname: "maurice",
+                        password: "cappadoccia"
                     };
 
                 Step(
@@ -400,15 +400,15 @@ suite.addBatch({
                     results.user.del(function(err) {});
                 }
             },
-            'it works': function(err, results) {
+            "it works": function(err, results) {
                 assert.ifError(err);
                 assert.isObject(results.user);
                 assert.isArray(results.activities);
             },
-            'it is empty': function(err, results) {
+            "it is empty": function(err, results) {
                 assert.lengthOf(results.activities, 0);
             },
-            'and we add an activity to its inbox': {
+            "and we add an activity to its inbox": {
                 topic: function(results) {
                     var cb = this.callback,
                         user = results.user,
@@ -424,7 +424,7 @@ suite.addBatch({
                                 content: "Remember to get eggs, bread, and milk."
                             }
                         },
-                        Activity = require('../lib/model/activity').Activity,
+                        Activity = require("../lib/model/activity").Activity,
                         act = new Activity(props);
                     
                     Step(
@@ -449,10 +449,10 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err, results) {
+                "it works": function(err, results) {
                     assert.ifError(err);
                 },
-                'and we get the user inbox': {
+                "and we get the user inbox": {
                     topic: function(results) {
                         var cb = this.callback,
                             user = results.user,
@@ -481,18 +481,18 @@ suite.addBatch({
                             }
                         );
                     },
-                    'it works': function(err, results) {
+                    "it works": function(err, results) {
                         assert.ifError(err);
                         assert.isArray(results.activities);
                     },
-                    'it includes the added activity': function(err, results) {
+                    "it includes the added activity": function(err, results) {
                         assert.lengthOf(results.activities, 1);
                         assert.equal(results.activities[0].id, results.activity.id);
                     }
                 }
             }
         },
-        'and we create a pair of users': {
+        "and we create a pair of users": {
             topic: function(User) {
                 var cb = this.callback;
                 Step(
@@ -509,83 +509,83 @@ suite.addBatch({
                     }
                 );
             },
-            'it works': function(err, users) {
+            "it works": function(err, users) {
                 assert.ifError(err);
             },
-            'and we make one follow the other': {
+            "and we make one follow the other": {
                 topic: function(users) {
                     users.shields.follow(users.yarnell.profile.id, this.callback);
                 },
-                'it works': function(err) {
+                "it works": function(err) {
                     assert.ifError(err);
                 },
-                'and we check the first user\'s following list': {
+                "and we check the first user\"s following list": {
                     topic: function(users) {
                         var cb = this.callback;
                         users.shields.getFollowing(0, 20, function(err, following) {
                             cb(err, following, users.yarnell);
                         });
                     },
-                    'it works': function(err, following, other) {
+                    "it works": function(err, following, other) {
                         assert.ifError(err);
                         assert.isArray(following);
                     },
-                    'it is the right size': function(err, following, other) {
+                    "it is the right size": function(err, following, other) {
                         assert.ifError(err);
                         assert.lengthOf(following, 1);
                     },
-                    'it has the right data': function(err, following, other) {
+                    "it has the right data": function(err, following, other) {
                         assert.ifError(err);
                         assert.equal(following[0].id, other.profile.id);
                     }
                 },
-                'and we check the first user\'s following count': {
+                "and we check the first user\"s following count": {
                     topic: function(users) {
                         users.shields.followingCount(this.callback);
                     },
-                    'it works': function(err, fc) {
+                    "it works": function(err, fc) {
                         assert.ifError(err);
                     },
-                    'it is correct': function(err, fc) {
+                    "it is correct": function(err, fc) {
                         assert.ifError(err);
                         assert.equal(fc, 1);
                     }
                 },
-                'and we check the second user\'s followers list': {
+                "and we check the second user\"s followers list": {
                     topic: function(users) {
                         var cb = this.callback;
                         users.yarnell.getFollowers(0, 20, function(err, following) {
                             cb(err, following, users.shields);
                         });
                     },
-                    'it works': function(err, followers, other) {
+                    "it works": function(err, followers, other) {
                         assert.ifError(err);
                         assert.isArray(followers);
                     },
-                    'it is the right size': function(err, followers, other) {
+                    "it is the right size": function(err, followers, other) {
                         assert.ifError(err);
                         assert.lengthOf(followers, 1);
                     },
-                    'it has the right data': function(err, followers, other) {
+                    "it has the right data": function(err, followers, other) {
                         assert.ifError(err);
                         assert.equal(followers[0].id, other.profile.id);
                     }
                 },
-                'and we check the second user\'s followers count': {
+                "and we check the second user\"s followers count": {
                     topic: function(users) {
                         users.yarnell.followerCount(this.callback);
                     },
-                    'it works': function(err, fc) {
+                    "it works": function(err, fc) {
                         assert.ifError(err);
                     },
-                    'it is correct': function(err, fc) {
+                    "it is correct": function(err, fc) {
                         assert.ifError(err);
                         assert.equal(fc, 1);
                     }
                 }
             }
         },
-        'and we create another pair of users following': {
+        "and we create another pair of users following": {
             topic: function(User) {
                 var cb = this.callback,
                     users = {};
@@ -613,62 +613,62 @@ suite.addBatch({
                     }
                 );
             },
-            'it works': function(err, users) {
+            "it works": function(err, users) {
                 assert.ifError(err);
             },
-            'and we check the first user\'s following list': {
+            "and we check the first user\"s following list": {
                 topic: function(users) {
                     var cb = this.callback;
                     users.captain.getFollowing(0, 20, this.callback);
                 },
-                'it works': function(err, following, other) {
+                "it works": function(err, following, other) {
                     assert.ifError(err);
                     assert.isArray(following);
                 },
-                'it is the right size': function(err, following, other) {
+                "it is the right size": function(err, following, other) {
                     assert.ifError(err);
                     assert.lengthOf(following, 0);
                 }
             },
-            'and we check the first user\'s following count': {
+            "and we check the first user\"s following count": {
                 topic: function(users) {
                     users.captain.followingCount(this.callback);
                 },
-                'it works': function(err, fc) {
+                "it works": function(err, fc) {
                     assert.ifError(err);
                 },
-                'it is correct': function(err, fc) {
+                "it is correct": function(err, fc) {
                     assert.ifError(err);
                     assert.equal(fc, 0);
                 }
             },
-            'and we check the second user\'s followers list': {
+            "and we check the second user\"s followers list": {
                 topic: function(users) {
                     users.tenille.getFollowers(0, 20, this.callback);
                 },
-                'it works': function(err, followers, other) {
+                "it works": function(err, followers, other) {
                     assert.ifError(err);
                     assert.isArray(followers);
                 },
-                'it is the right size': function(err, followers, other) {
+                "it is the right size": function(err, followers, other) {
                     assert.ifError(err);
                     assert.lengthOf(followers, 0);
                 }
             },
-            'and we check the second user\'s followers count': {
+            "and we check the second user\"s followers count": {
                 topic: function(users) {
                     users.tenille.followerCount(this.callback);
                 },
-                'it works': function(err, fc) {
+                "it works": function(err, fc) {
                     assert.ifError(err);
                 },
-                'it is correct': function(err, fc) {
+                "it is correct": function(err, fc) {
                     assert.ifError(err);
                     assert.equal(fc, 0);
                 }
             }
         },
-        'and one user follows another twice': {
+        "and one user follows another twice": {
             topic: function(User) {
                 var cb = this.callback,
                     users = {};
@@ -696,11 +696,11 @@ suite.addBatch({
                     }
                 );
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
-        'and one user stops following a user they never followed': {
+        "and one user stops following a user they never followed": {
             topic: function(User) {
                 var cb = this.callback,
                     users = {};
@@ -724,11 +724,11 @@ suite.addBatch({
                     }
                 );
             },
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
-        'and we create a bunch of users': {
+        "and we create a bunch of users": {
             topic: function(User) {
                 var cb = this.callback,
                     MAX_USERS = 50;
@@ -749,12 +749,12 @@ suite.addBatch({
                     }
                 );
             },
-            'it works': function(err, users) {
+            "it works": function(err, users) {
                 assert.ifError(err);
                 assert.isArray(users);
                 assert.lengthOf(users, 50);
             },
-            'and they all follow someone': {
+            "and they all follow someone": {
                 topic: function(users) {
                     var cb = this.callback,
                         MAX_USERS = 50;
@@ -771,32 +771,32 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err) {
+                "it works": function(err) {
                     assert.ifError(err);
                 },
-                'and we check the followed user\'s followers list': {
+                "and we check the followed user\"s followers list": {
                     topic: function(users) {
                         users[0].getFollowers(0, users.length + 1, this.callback);
                     },
-                    'it works': function(err, followers) {
+                    "it works": function(err, followers) {
                         assert.ifError(err);
                         assert.isArray(followers);
                         assert.lengthOf(followers, 49);
                     }
                 },
-                'and we check the followed user\'s followers count': {
+                "and we check the followed user\"s followers count": {
                     topic: function(users) {
                         users[0].followerCount(this.callback);
                     },
-                    'it works': function(err, fc) {
+                    "it works": function(err, fc) {
                         assert.ifError(err);
                     },
-                    'it is correct': function(err, fc) {
+                    "it is correct": function(err, fc) {
                         assert.ifError(err);
                         assert.equal(fc, 49);
                     }
                 },
-                'and we check the following users\' following lists': {
+                "and we check the following users\" following lists": {
                     topic: function(users) {
                         var cb = this.callback,
                             MAX_USERS = 50;
@@ -811,7 +811,7 @@ suite.addBatch({
                             cb
                         );
                     },
-                    'it works': function(err, lists) {
+                    "it works": function(err, lists) {
                         var i;
                         assert.ifError(err);
                         assert.isArray(lists);
@@ -822,7 +822,7 @@ suite.addBatch({
                         }
                     }
                 },
-                'and we check the following users\' following counts': {
+                "and we check the following users\" following counts": {
                     topic: function(users) {
                         var cb = this.callback,
                             MAX_USERS = 50;
@@ -837,7 +837,7 @@ suite.addBatch({
                             cb
                         );
                     },
-                    'it works': function(err, counts) {
+                    "it works": function(err, counts) {
                         var i;
                         assert.ifError(err);
                         assert.isArray(counts);
@@ -853,4 +853,4 @@ suite.addBatch({
 });
 
 
-suite['export'](module);
+suite["export"](module);

@@ -16,13 +16,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    vows = require('vows'),
-    databank = require('databank'),
-    _ = require('underscore'),
-    Step = require('step'),
-    schema = require('../lib/schema').schema,
-    URLMaker = require('../lib/urlmaker').URLMaker,
+var assert = require("assert"),
+    vows = require("vows"),
+    databank = require("databank"),
+    _ = require("underscore"),
+    Step = require("step"),
+    schema = require("../lib/schema").schema,
+    URLMaker = require("../lib/urlmaker").URLMaker,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
@@ -36,10 +36,10 @@ var a2m = function(arr, prop) {
     return map;
 };
 
-var suite = vows.describe('user favorite interface');
+var suite = vows.describe("user favorite interface");
 
 suite.addBatch({
-    'When we get the User class': {
+    "When we get the User class": {
         topic: function() { 
 
             var cb = this.callback;
@@ -51,26 +51,26 @@ suite.addBatch({
 
             var params = {schema: schema};
 
-            var db = Databank.get('memory', params);
+            var db = Databank.get("memory", params);
 
             db.connect({}, function(err) {
                 var User;
 
                 DatabankObject.bank = db;
                 
-                User = require('../lib/model/user').User || null;
+                User = require("../lib/model/user").User || null;
 
                 cb(null, User);
             });
         },
-        'it exists': function(User) {
+        "it exists": function(User) {
             assert.isFunction(User);
         },
-        'and we create a user': {
+        "and we create a user": {
             topic: function(User) {
                 var props = {
-                    nickname: 'bert',
-                    password: 'pidgeons'
+                    nickname: "bert",
+                    password: "pidgeons"
                 };
                 User.create(props, this.callback);
             },
@@ -79,13 +79,13 @@ suite.addBatch({
                     user.del(function(err) {});
                 }
             },
-            'it works': function(user) {
+            "it works": function(user) {
                 assert.isObject(user);
             },
-            'and it favorites a known object': {
+            "and it favorites a known object": {
                 topic: function(user) {
                     var cb = this.callback,
-                        Image = require('../lib/model/image').Image,
+                        Image = require("../lib/model/image").Image,
                         obj;
                     
                     Step(
@@ -107,40 +107,40 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err, image) {
+                "it works": function(err, image) {
                     assert.ifError(err);
                 },
-                'and it unfavorites that object': {
+                "and it unfavorites that object": {
                     topic: function(image, user) {
                         user.unfavorite(image.id, image.objectType, this.callback);
                     },
-                    'it works': function(err) {
+                    "it works": function(err) {
                         assert.ifError(err);
                     }
                 }
             },
-            'and it favorites an unknown object': {
+            "and it favorites an unknown object": {
                 topic: function(user) {
                     var cb = this.callback;
                     
                     user.favorite("urn:uuid:5be685ef-f50b-458b-bfd3-3ca004eb0e89", "image", this.callback);
                 },
-                'it works': function(err) {
+                "it works": function(err) {
                     assert.ifError(err);
                 },
-                'and it unfavorites that object': {
+                "and it unfavorites that object": {
                     topic: function(user) {
                         user.unfavorite("urn:uuid:5be685ef-f50b-458b-bfd3-3ca004eb0e89", "image", this.callback);
                     },
-                    'it works': function(err) {
+                    "it works": function(err) {
                         assert.ifError(err);
                     }
                 }
             },
-            'and it double-favorites an object': {
+            "and it double-favorites an object": {
                 topic: function(user) {
                     var cb = this.callback,
-                        Video = require('../lib/model/video').Video,
+                        Video = require("../lib/model/video").Video,
                         obj;
                     
                     Step(
@@ -166,14 +166,14 @@ suite.addBatch({
                         }
                     );
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
-            'and it unfavorites an object it never favorited': {
+            "and it unfavorites an object it never favorited": {
                 topic: function(user) {
                     var cb = this.callback,
-                        Audio = require('../lib/model/audio').Audio,
+                        Audio = require("../lib/model/audio").Audio,
                         obj;
                     
                     Step(
@@ -195,17 +195,17 @@ suite.addBatch({
                         }
                     );
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             }
         },
-        'and we get the list of favorites for a new user': {
+        "and we get the list of favorites for a new user": {
             topic: function(User) {
                 var cb = this.callback,
                     props = {
-                        nickname: 'carroway',
-                        password: 'feldspar'
+                        nickname: "carroway",
+                        password: "feldspar"
                     };
                 Step(
                     function() {
@@ -224,21 +224,21 @@ suite.addBatch({
                     }
                 );
             },
-            'it works': function(err, faves) {
+            "it works": function(err, faves) {
                 assert.ifError(err);
             },
-            'it looks right': function(err, faves) {
+            "it looks right": function(err, faves) {
                 assert.ifError(err);
                 assert.isArray(faves);
                 assert.lengthOf(faves, 0);
             }
         },
-        'and we get the count of favorites for a new user': {
+        "and we get the count of favorites for a new user": {
             topic: function(User) {
                 var cb = this.callback,
                     props = {
-                        nickname: 'cookie',
-                        password: 'cookie'
+                        nickname: "cookie",
+                        password: "cookie"
                     };
                 Step(
                     function() {
@@ -257,15 +257,15 @@ suite.addBatch({
                     }
                 );
             },
-            'it works': function(err, count) {
+            "it works": function(err, count) {
                 assert.ifError(err);
             },
-            'it looks right': function(err, count) {
+            "it looks right": function(err, count) {
                 assert.ifError(err);
                 assert.equal(count, 0);
             }
         },
-        'and a new user favors an object': {
+        "and a new user favors an object": {
             topic: function(User) {
                 var cb = this.callback,
                     user,
@@ -276,10 +276,10 @@ suite.addBatch({
                         User.create({nickname: "ernie", password: "rubberduckie"}, this);
                     },
                     function(err, results) {
-                        var Image = require('../lib/model/image').Image;
+                        var Image = require("../lib/model/image").Image;
                         if (err) throw err;
                         user = results;
-                        Image.create({displayName: "Evan's avatar",
+                        Image.create({displayName: "Evan"s avatar",
                                       url: "https://c778552.ssl.cf2.rackcdn.com/evan/1-96-20120103014637.jpeg"},
                                      this);
                     },
@@ -297,77 +297,77 @@ suite.addBatch({
                     }
                 );
             },
-            'it works': function(err, user, image) {
+            "it works": function(err, user, image) {
                 assert.ifError(err);
                 assert.isObject(user);
                 assert.isObject(image);
             },
-            'and we check the user favorites list': {
+            "and we check the user favorites list": {
                 topic: function(user, image) {
                     var cb = this.callback;
                     user.getFavorites(0, 20, function(err, faves) {
                         cb(err, faves, image);
                     });
                 },
-                'it works': function(err, faves, image) {
+                "it works": function(err, faves, image) {
                     assert.ifError(err);
                 },
-                'it is the right size': function(err, faves, image) {
+                "it is the right size": function(err, faves, image) {
                     assert.ifError(err);
                     assert.lengthOf(faves, 1);
                 },
-                'it has the right data': function(err, faves, image) {
+                "it has the right data": function(err, faves, image) {
                     assert.ifError(err);
                     assert.equal(faves[0].id, image.id);
                 }
             },
-            'and we check the user favorites count': {
+            "and we check the user favorites count": {
                 topic: function(user, image) {
                     var cb = this.callback;
                     user.favoritesCount(cb);
                 },
-                'it works': function(err, count) {
+                "it works": function(err, count) {
                     assert.ifError(err);
                 },
-                'it is correct': function(err, count) {
+                "it is correct": function(err, count) {
                     assert.ifError(err);
                     assert.equal(count, 1);
                 }
             },
-            'and we check the image favoriters list': {
+            "and we check the image favoriters list": {
                 topic: function(user, image) {
                     var cb = this.callback;
                     image.getFavoriters(0, 20, function(err, favers) {
                         cb(err, favers, user);
                     });
                 },
-                'it works': function(err, favers, user) {
+                "it works": function(err, favers, user) {
                     assert.ifError(err);
                 },
-                'it is the right size': function(err, favers, user) {
+                "it is the right size": function(err, favers, user) {
                     assert.ifError(err);
                     assert.lengthOf(favers, 1);
                 },
-                'it has the right data': function(err, favers, user) {
+                "it has the right data": function(err, favers, user) {
                     assert.ifError(err);
                     assert.equal(favers[0].id, user.profile.id);
                 }
             },
-            'and we check the image favoriters count': {
+            "and we check the image favoriters count": {
                 topic: function(user, image) {
                     var cb = this.callback;
                     image.favoritersCount(cb);
                 },
-                'it works': function(err, count) {
+                "it works": function(err, count) {
                     assert.ifError(err);
                 },
-                'it is correct': function(err, count) {
+                "it is correct": function(err, count) {
                     assert.ifError(err);
                     assert.equal(count, 1);
                 }
             }
         },
-        'and a new user favors a lot of objects': {
+        "and a new user favors a lot of objects": {
             topic: function(User) {
 
                 var cb = this.callback,
@@ -379,7 +379,7 @@ suite.addBatch({
                         User.create({nickname: "count", password: "123456"}, this);
                     },
                     function(err, results) {
-                        var Image = require('../lib/model/image').Image,
+                        var Image = require("../lib/model/image").Image,
                             i = 0,
                             group = this.group();
                         if (err) throw err;
@@ -409,7 +409,7 @@ suite.addBatch({
                     }
                 );
             },
-            'it works': function(err, user, images) {
+            "it works": function(err, user, images) {
                 assert.ifError(err);
                 assert.isObject(user);
                 assert.isArray(images);
@@ -418,25 +418,25 @@ suite.addBatch({
                     assert.isObject(images[i]);
                 }
             },
-            'and we check the user favorites list': {
+            "and we check the user favorites list": {
                 topic: function(user, images) {
                     var cb = this.callback;
                     user.getFavorites(0, 5001, function(err, faves) {
                         cb(err, faves, images);
                     });
                 },
-                'it works': function(err, faves, images) {
+                "it works": function(err, faves, images) {
                     assert.ifError(err);
                 },
-                'it is the right size': function(err, faves, images) {
+                "it is the right size": function(err, faves, images) {
                     assert.ifError(err);
                     assert.lengthOf(faves, 5000);
                 },
-                'it has the right data': function(err, faves, images) {
+                "it has the right data": function(err, faves, images) {
                     var fm, im, id;
                     assert.ifError(err);
-                    fm = a2m(faves, 'id');
-                    im = a2m(images, 'id');
+                    fm = a2m(faves, "id");
+                    im = a2m(images, "id");
                     for (id in im) {
                         assert.include(fm, id);
                     }
@@ -445,20 +445,20 @@ suite.addBatch({
                     }
                 }
             },
-            'and we check the user favorites count': {
+            "and we check the user favorites count": {
                 topic: function(user, image) {
                     var cb = this.callback;
                     user.favoritesCount(cb);
                 },
-                'it works': function(err, count) {
+                "it works": function(err, count) {
                     assert.ifError(err);
                 },
-                'it is correct': function(err, count) {
+                "it is correct": function(err, count) {
                     assert.ifError(err);
                     assert.equal(count, 5000);
                 }
             },
-            'and we check the images favoriters list': {
+            "and we check the images favoriters list": {
                 topic: function(user, images) {
                     var cb = this.callback;
                     Step(
@@ -477,17 +477,17 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err, faverses, user) {
+                "it works": function(err, faverses, user) {
                     assert.ifError(err);
                 },
-                'it is the right size': function(err, faverses, user) {
+                "it is the right size": function(err, faverses, user) {
                     assert.ifError(err);
                     assert.lengthOf(faverses, 5000);
                     for (var i = 0; i < faverses.length; i++) {
                         assert.lengthOf(faverses[i], 1);
                     }
                 },
-                'it has the right data': function(err, faverses, user) {
+                "it has the right data": function(err, faverses, user) {
                     assert.ifError(err);
                     for (var i = 0; i < faverses.length; i++) {
                         assert.equal(faverses[i][0].id, user.profile.id);
@@ -498,4 +498,4 @@ suite.addBatch({
     }
 });
 
-suite['export'](module);
+suite["export"](module);

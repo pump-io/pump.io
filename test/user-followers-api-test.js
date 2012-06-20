@@ -16,20 +16,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require('assert'),
-    http = require('http'),
-    vows = require('vows'),
-    Step = require('step'),
-    _ = require('underscore'),
-    OAuth = require('oauth').OAuth,
-    httputil = require('./lib/http'),
-    oauthutil = require('./lib/oauth'),
+var assert = require("assert"),
+    http = require("http"),
+    vows = require("vows"),
+    Step = require("step"),
+    _ = require("underscore"),
+    OAuth = require("oauth").OAuth,
+    httputil = require("./lib/http"),
+    oauthutil = require("./lib/oauth"),
     setupApp = oauthutil.setupApp,
     newClient = oauthutil.newClient,
     register = oauthutil.register,
     accessToken = oauthutil.accessToken;
 
-var suite = vows.describe('user followers API');
+var suite = vows.describe("user followers API");
 
 var invert = function(callback) {
     return function(err) {
@@ -51,16 +51,16 @@ var makeCred = function(cl, pair) {
 };
 
 var assertValidList = function(doc, count) {
-    assert.include(doc, 'author');
-    assert.include(doc.author, 'id');
-    assert.include(doc.author, 'displayName');
-    assert.include(doc.author, 'objectType');
-    assert.include(doc, 'totalItems');
-    assert.include(doc, 'items');
-    assert.include(doc, 'displayName');
-    assert.include(doc, 'id');
-    assert.include(doc, 'objectTypes');
-    assert.include(doc.objectTypes, 'person');
+    assert.include(doc, "author");
+    assert.include(doc.author, "id");
+    assert.include(doc.author, "displayName");
+    assert.include(doc.author, "objectType");
+    assert.include(doc, "totalItems");
+    assert.include(doc, "items");
+    assert.include(doc, "displayName");
+    assert.include(doc, "id");
+    assert.include(doc, "objectTypes");
+    assert.include(doc.objectTypes, "person");
     if (_(count).isNumber()) {
         assert.equal(doc.totalItems, count);
         assert.lengthOf(doc.items, count);
@@ -69,7 +69,7 @@ var assertValidList = function(doc, count) {
 
 suite.addBatch({
 
-    'When we set up the app': {
+    "When we set up the app": {
 
         topic: function() {
             var cb = this.callback;
@@ -90,7 +90,7 @@ suite.addBatch({
             });
         },
 
-        'it works': function(err, cl) {
+        "it works": function(err, cl) {
             assert.ifError(err);
             assert.isObject(cl);
         },
@@ -101,10 +101,10 @@ suite.addBatch({
             }
         },
 
-        'and we try to get followers for a non-existent user': {
+        "and we try to get followers for a non-existent user": {
             topic: function(cl) {
                 var cb = this.callback;
-                httputil.getJSON('http://localhost:4815/api/user/nonexistent/followers',
+                httputil.getJSON("http://localhost:4815/api/user/nonexistent/followers",
                                  {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
                                  function(err, followers, result) {
                                      if (err && err.statusCode && err.statusCode === 404) {
@@ -117,15 +117,15 @@ suite.addBatch({
                                  });
             },
 
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
 
-        'and we try to get following for a non-existent user': {
+        "and we try to get following for a non-existent user": {
             topic: function(cl) {
                 var cb = this.callback;
-                httputil.getJSON('http://localhost:4815/api/user/nonexistent/following',
+                httputil.getJSON("http://localhost:4815/api/user/nonexistent/following",
                                  {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
                                  function(err, followers, result) {
                                      if (err && err.statusCode && err.statusCode === 404) {
@@ -138,32 +138,32 @@ suite.addBatch({
                                  });
             },
 
-            'it fails correctly': function(err) {
+            "it fails correctly": function(err) {
                 assert.ifError(err);
             }
         },
 
-        'and we register a user': {
+        "and we register a user": {
 
             topic: function(cl) {
                 register(cl, "tyrion", "payURdebts", this.callback);
             },
 
-            'it works': function(err, user) {
+            "it works": function(err, user) {
                 assert.ifError(err);
             },
 
-            'and we get the options on the user followers endpoint': 
-            httputil.endpoint('/api/user/tyrion/followers', ['GET']),
+            "and we get the options on the user followers endpoint": 
+            httputil.endpoint("/api/user/tyrion/followers", ["GET"]),
 
-            'and we get the options on the user following endpoint': 
-            httputil.endpoint('/api/user/tyrion/followers', ['GET']),
+            "and we get the options on the user following endpoint": 
+            httputil.endpoint("/api/user/tyrion/followers", ["GET"]),
 
-            'and we GET the followers list without OAuth credentials': {
+            "and we GET the followers list without OAuth credentials": {
                 topic: function() {
                     var cb = this.callback,
                         options = {
-                            host: 'localhost',
+                            host: "localhost",
                             port: 4815,
                             path: "/api/user/tyrion/followers"
                         };
@@ -173,61 +173,61 @@ suite.addBatch({
                         } else {
                             cb(new Error("Unexpected status code"));
                         }
-                    }).on('error', function(err) {
+                    }).on("error", function(err) {
                         cb(err);
                     });
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
-            'and we GET the followers list with invalid client credentials': {
+            "and we GET the followers list with invalid client credentials": {
                 topic: function(user, cl) {
-                    httputil.getJSON('http://localhost:4815/api/user/tyrion/followers',
+                    httputil.getJSON("http://localhost:4815/api/user/tyrion/followers",
                                      {consumer_key: "NOTACLIENT", consumer_secret: "NOTASECRET"},
                                      invert(this.callback));
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
-            'and we GET the followers list with client credentials and no access token': {
+            "and we GET the followers list with client credentials and no access token": {
                 topic: function(user, cl) {
-                    httputil.getJSON('http://localhost:4815/api/user/tyrion/followers',
+                    httputil.getJSON("http://localhost:4815/api/user/tyrion/followers",
                                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
                                      this.callback);
                 },
-                'it works': function(err, doc) {
+                "it works": function(err, doc) {
                     assert.ifError(err);
                     assertValidList(doc, 0);
                 }
             },
-            'and we GET the followers list with client credentials and an invalid access token': {
+            "and we GET the followers list with client credentials and an invalid access token": {
                 topic: function(user, cl) {
-                    httputil.getJSON('http://localhost:4815/api/user/tyrion/followers',
+                    httputil.getJSON("http://localhost:4815/api/user/tyrion/followers",
                                      {consumer_key: cl.client_id,
                                       consumer_secret: cl.client_secret,
                                       token: "NOTATOKEN",
                                       token_secret: "NOTASECRET"},
                                      invert(this.callback));
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
-            'and we get an access token': {
+            "and we get an access token": {
                 topic: function(user, cl) {
                     accessToken(cl, {nickname: "tyrion", password: "payURdebts"}, this.callback);
                 },
-                'it works': function(err, pair) {
+                "it works": function(err, pair) {
                     assert.ifError(err);
                 },
-                'and we GET the following list with client credentials and the same user\'s access token': {
+                "and we GET the following list with client credentials and the same user\"s access token": {
                     topic: function(pair, user, cl) {
                         var cb = this.callback;
                         Step(
                             function() {
-                                httputil.getJSON('http://localhost:4815/api/user/tyrion/following',
+                                httputil.getJSON("http://localhost:4815/api/user/tyrion/following",
                                                  {consumer_key: cl.client_id,
                                                   consumer_secret: cl.client_secret,
                                                   token: pair.token,
@@ -243,17 +243,17 @@ suite.addBatch({
                             }
                         );
                     },
-                    'it works': function(err, doc) {
+                    "it works": function(err, doc) {
                         assert.ifError(err);
                         assertValidList(doc, 0);
                     }
                 },
-                'and we GET the followers list with client credentials and the same user\'s access token': {
+                "and we GET the followers list with client credentials and the same user\"s access token": {
                     topic: function(pair, user, cl) {
                         var cb = this.callback;
                         Step(
                             function() {
-                                httputil.getJSON('http://localhost:4815/api/user/tyrion/followers',
+                                httputil.getJSON("http://localhost:4815/api/user/tyrion/followers",
                                                  {consumer_key: cl.client_id,
                                                   consumer_secret: cl.client_secret,
                                                   token: pair.token,
@@ -269,13 +269,13 @@ suite.addBatch({
                             }
                         );
                     },
-                    'it works': function(err, doc) {
+                    "it works": function(err, doc) {
                         assert.ifError(err);
                         assertValidList(doc, 0);
                     }
                 }
             },
-            'and we GET the followers list with client credentials and a different user\'s access token': {
+            "and we GET the followers list with client credentials and a different user\"s access token": {
                 topic: function(user, cl) {
                     var cb = this.callback;
                     Step(
@@ -288,7 +288,7 @@ suite.addBatch({
                         },
                         function(err, pair) {
                             if (err) throw err;
-                            httputil.getJSON('http://localhost:4815/api/user/tyrion/followers',
+                            httputil.getJSON("http://localhost:4815/api/user/tyrion/followers",
                                              {consumer_key: cl.client_id,
                                               consumer_secret: cl.client_secret,
                                               token: pair.token,
@@ -304,16 +304,16 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err, doc) {
+                "it works": function(err, doc) {
                     assert.ifError(err);
                     assertValidList(doc, 0);
                 }
             },
-            'and we GET the following list without OAuth credentials': {
+            "and we GET the following list without OAuth credentials": {
                 topic: function() {
                     var cb = this.callback,
                         options = {
-                            host: 'localhost',
+                            host: "localhost",
                             port: 4815,
                             path: "/api/user/tyrion/following"
                         };
@@ -323,49 +323,49 @@ suite.addBatch({
                         } else {
                             cb(new Error("Unexpected status code"));
                         }
-                    }).on('error', function(err) {
+                    }).on("error", function(err) {
                         cb(err);
                     });
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
-            'and we GET the following list with invalid client credentials': {
+            "and we GET the following list with invalid client credentials": {
                 topic: function(user, cl) {
-                    httputil.getJSON('http://localhost:4815/api/user/tyrion/following',
+                    httputil.getJSON("http://localhost:4815/api/user/tyrion/following",
                                      {consumer_key: "NOTACLIENT", consumer_secret: "NOTASECRET"},
                                      invert(this.callback));
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
-            'and we GET the following list with client credentials and no access token': {
+            "and we GET the following list with client credentials and no access token": {
                 topic: function(user, cl) {
-                    httputil.getJSON('http://localhost:4815/api/user/tyrion/following',
+                    httputil.getJSON("http://localhost:4815/api/user/tyrion/following",
                                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
                                      this.callback);
                 },
-                'it works': function(err, doc) {
+                "it works": function(err, doc) {
                     assert.ifError(err);
                     assertValidList(doc, 0);
                 }
             },
-            'and we GET the following list with client credentials and an invalid access token': {
+            "and we GET the following list with client credentials and an invalid access token": {
                 topic: function(user, cl) {
-                    httputil.getJSON('http://localhost:4815/api/user/tyrion/following',
+                    httputil.getJSON("http://localhost:4815/api/user/tyrion/following",
                                      {consumer_key: cl.client_id,
                                       consumer_secret: cl.client_secret,
                                       token: "NOTATOKEN",
                                       token_secret: "NOTASECRET"},
                                      invert(this.callback));
                 },
-                'it fails correctly': function(err) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
             },
-            'and we GET the following list with client credentials and a different user\'s access token': {
+            "and we GET the following list with client credentials and a different user\"s access token": {
                 topic: function(user, cl) {
                     var cb = this.callback;
                     Step(
@@ -378,7 +378,7 @@ suite.addBatch({
                         },
                         function(err, pair) {
                             if (err) throw err;
-                            httputil.getJSON('http://localhost:4815/api/user/tyrion/following',
+                            httputil.getJSON("http://localhost:4815/api/user/tyrion/following",
                                              {consumer_key: cl.client_id,
                                               consumer_secret: cl.client_secret,
                                               token: pair.token,
@@ -394,13 +394,13 @@ suite.addBatch({
                         }
                     );
                 },
-                'it works': function(err, doc) {
+                "it works": function(err, doc) {
                     assert.ifError(err);
                     assertValidList(doc, 0);
                 }
             }
         },
-        'and one user follows another': {
+        "and one user follows another": {
 
             topic: function(cl) {
                 var cb = this.callback,
@@ -435,7 +435,7 @@ suite.addBatch({
                                 displayName: "Raucous"
                             }
                         };
-                        url = 'http://localhost:4815/api/user/greatjon/feed',
+                        url = "http://localhost:4815/api/user/greatjon/feed",
                         cred = makeCred(cl, pairs.greatjon);
 
                         httputil.postJSON(url, cred, act, function(err, posted, result) {
@@ -448,83 +448,83 @@ suite.addBatch({
                     }
                 );
             },
-            'it works': function(err, users, pairs) {
+            "it works": function(err, users, pairs) {
                 assert.ifError(err);
             },
-            'and we check the first user\'s following list': {
+            "and we check the first user\"s following list": {
                 topic: function(users, pairs, cl) {
                     var cb = this.callback,
                         cred = makeCred(cl, pairs.greatjon),
-                        url = 'http://localhost:4815/api/user/greatjon/following';
+                        url = "http://localhost:4815/api/user/greatjon/following";
                     httputil.getJSON(url, cred, function(err, doc, results) {
                         cb(err, doc, users.robb.profile);
                     });
                 },
-                'it works': function(err, doc, person) {
+                "it works": function(err, doc, person) {
                     assert.ifError(err);
                 },
-                'it is valid': function(err, doc, person) {
+                "it is valid": function(err, doc, person) {
                     assert.ifError(err);
                     assertValidList(doc, 1);
                 },
-                'it contains the second person': function(err, doc, person) {
+                "it contains the second person": function(err, doc, person) {
                     assert.ifError(err);
                     assert.equal(doc.items[0].id, person.id);
                     assert.equal(doc.items[0].objectType, person.objectType);
                 }
             },
-            'and we check the first user\'s followers list': {
+            "and we check the first user\"s followers list": {
                 topic: function(users, pairs, cl) {
                     var cb = this.callback,
                         cred = makeCred(cl, pairs.greatjon),
-                        url = 'http://localhost:4815/api/user/greatjon/followers';
+                        url = "http://localhost:4815/api/user/greatjon/followers";
                     httputil.getJSON(url, cred, function(err, doc, results) {
                         cb(err, doc);
                     });
                 },
-                'it works': function(err, doc) {
+                "it works": function(err, doc) {
                     assert.ifError(err);
                 },
-                'it is valid': function(err, doc) {
+                "it is valid": function(err, doc) {
                     assert.ifError(err);
                     assertValidList(doc, 0);
                 }
             },
-            'and we check the second user\'s followers list': {
+            "and we check the second user\"s followers list": {
                 topic: function(users, pairs, cl) {
                     var cb = this.callback,
                         cred = makeCred(cl, pairs.robb),
-                        url = 'http://localhost:4815/api/user/robb/followers';
+                        url = "http://localhost:4815/api/user/robb/followers";
                     httputil.getJSON(url, cred, function(err, doc, results) {
                         cb(err, doc, users.greatjon.profile);
                     });
                 },
-                'it works': function(err, doc, person) {
+                "it works": function(err, doc, person) {
                     assert.ifError(err);
                 },
-                'it is valid': function(err, doc, person) {
+                "it is valid": function(err, doc, person) {
                     assert.ifError(err);
                     assertValidList(doc, 1);
                 },
-                'it contains the first person': function(err, doc, person) {
+                "it contains the first person": function(err, doc, person) {
                     assert.ifError(err);
                     assert.equal(doc.items[0].id, person.id);
                     assert.equal(doc.items[0].objectType, person.objectType);
                 }
             },
-            'and we check the second user\'s following list': {
+            "and we check the second user\"s following list": {
                 topic: function(users, pairs, cl) {
                     var cb = this.callback,
                         cred = makeCred(cl, pairs.robb),
-                        url = 'http://localhost:4815/api/user/robb/following';
+                        url = "http://localhost:4815/api/user/robb/following";
                     httputil.getJSON(url, cred, function(err, doc, results) {
                         cb(err, doc);
                     });
                 },
-                'it works': function(err, doc) {
+                "it works": function(err, doc) {
                     assert.ifError(err);
                 },
-                'it is valid': function(err, doc) {
+                "it is valid": function(err, doc) {
                     assert.ifError(err);
                     assertValidList(doc, 0);
                 }
@@ -533,4 +533,4 @@ suite.addBatch({
     }
 });
 
-suite['export'](module);
+suite["export"](module);
