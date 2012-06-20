@@ -171,7 +171,7 @@ suite.addBatch({
                                     verb: "post",
                                     object: {
                                         objectType: "note",
-                                        content: "Let"s play dress-up."
+                                        content: "Let's play dress-up."
                                     }
                                 };
 
@@ -336,7 +336,7 @@ suite.addBatch({
                                     verb: "post",
                                     object: {
                                         objectType: "note",
-                                        content: "I"m going to build a fort."
+                                        content: "I'm going to build a fort."
                                     }
                                 };
 
@@ -436,7 +436,7 @@ suite.addBatch({
                                     verb: "post",
                                     object: {
                                         objectType: "note",
-                                        content: "We"re going to Hawaii!"
+                                        content: "We're going to Hawaii!"
                                     }
                                 };
 
