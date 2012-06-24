@@ -81,6 +81,49 @@ suite.addBatch({
             }
         },
         "and we create a new object and post a reply": {
+            topic: function() {
+                var Note = require("../lib/model/note").Note,
+                    note = null,
+                    Comment = require("../lib/model/comment").Comment,
+                    cb = this.callback;
+                
+                Step(
+                    function() {
+                        Note.create({content: "Testing testing 123."}, this);
+                    },
+                    function(err, result) {
+                        if (err) throw err;
+                        note = result;
+                        Comment.create({content: "Whatever.", inReplyTo: note.id}, this);
+                    },
+                    function(err, comment) {
+                        if (err) {
+                            cb(err, null, null);
+                        } else {
+                            cb(null, comment, note);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, comment, note) {
+                assert.ifError(err);
+            },
+            "and we check the replies of the first object": {
+                topic: function(comment, note) {
+                    var cb = this.callback;
+                    note.getReplies(0, 20, function(err, list) {
+                        cb(err, list, comment);
+                    });
+                },
+                "it works": function(err, list, comment) {
+                    assert.ifError(err);
+                },
+                "it looks correct": function(err, list, comment) {
+                    assert.isArray(list);
+                    assert.lengthOf(list, 1);
+                    assert.deepEqual(list[0], comment);
+                }
+            }
         },
         "and we create a new object and post a reply and remove the reply": {
         },
