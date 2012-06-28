@@ -126,8 +126,107 @@ suite.addBatch({
             }
         },
         "and we create a new object and post a reply and remove the reply": {
+            topic: function() {
+                var Note = require("../lib/model/note").Note,
+                    note = null,
+                    Comment = require("../lib/model/comment").Comment,
+                    cb = this.callback;
+                
+                Step(
+                    function() {
+                        Note.create({content: "Another test note."}, this);
+                    },
+                    function(err, result) {
+                        if (err) throw err;
+                        note = result;
+                        Comment.create({content: "Still bad.", inReplyTo: note.id}, this);
+                    },
+                    function(err, comment) {
+                        if (err) throw err;
+                        comment.del(this);
+                    },
+                    function(err) {
+                        if (err) {
+                            cb(err, null, null);
+                        } else {
+                            cb(null, note);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, comment, note) {
+                assert.ifError(err);
+            },
+            "and we check the replies of the first object": {
+                topic: function(comment, note) {
+                    var cb = this.callback;
+                    note.getReplies(0, 20, function(err, list) {
+                        cb(err, list, comment);
+                    });
+                },
+                "it works": function(err, list, comment) {
+                    assert.ifError(err);
+                },
+                "it looks correct": function(err, list, comment) {
+                    assert.isArray(list);
+                    assert.lengthOf(list, 0);
+                }
+            }
         },
         "and we create a new object and post a reply and post a reply to that": {
+            topic: function() {
+                var Note = require("../lib/model/note").Note,
+                    note = null,
+                    Comment = require("../lib/model/comment").Comment,
+                    cb = this.callback,
+                    comment1 = null;
+                
+                Step(
+                    function() {
+                        Note.create({content: "Test again."}, this);
+                    },
+                    function(err, result) {
+                        if (err) throw err;
+                        note = result;
+                        Comment.create({content: "PLBBBBTTTTBBTT.", inReplyTo: note.id}, this);
+                    },
+                    function(err, comment) {
+                        if (err) throw err;
+                        comment1 = comment;
+                        Comment.create({content: "Uncalled for!", inReplyTo: comment.id}, this);
+                    },
+                    function(err, comment2) {
+                        if (err) {
+                            cb(err, null, null, null);
+                        } else {
+                            cb(null, comment2, comment1, note);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, comment2, comment1, note) {
+                assert.ifError(err);
+            },
+            "and we check the replies of the first object": {
+                topic: function(comment2, comment1, note) {
+                    var cb = this.callback;
+                    note.getReplies(0, 20, function(err, list) {
+                        cb(err, list, comment1, comment2);
+                    });
+                },
+                "it works": function(err, list, comment1, comment2) {
+                    assert.ifError(err);
+                },
+                "it looks correct": function(err, list, comment1, comment2) {
+                    assert.isArray(list);
+                    assert.lengthOf(list, 1);
+                    assert.equal(list[0].id, comment1.id);
+                    assert.include(list[0], 'replies');
+                    assert.include(list[0].replies, 'items');
+                    assert.lengthOf(list[0].replies.items, 1);
+                    assert.equal(list[0].replies.items[0].id, comment2.id);
+                }
+            }
         },
         "and we create a new object and post a reply and favour the reply": {
         },
