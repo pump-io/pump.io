@@ -229,10 +229,201 @@ suite.addBatch({
             }
         },
         "and we create a new object and post a reply and favour the reply": {
+            topic: function() {
+                var Note = require("../lib/model/note").Note,
+                    note = null,
+                    Comment = require("../lib/model/comment").Comment,
+                    cb = this.callback,
+                    comment1 = null;
+                
+                Step(
+                    function() {
+                        Note.create({content: "Test again."}, this);
+                    },
+                    function(err, result) {
+                        if (err) throw err;
+                        note = result;
+                        Comment.create({content: "PLBBBBTTTTBBTT.", inReplyTo: note.id}, this);
+                    },
+                    function(err, comment) {
+                        if (err) throw err;
+                        comment1 = comment;
+                    },
+                    function(err, comment2) {
+                        if (err) {
+                            cb(err, null, null, null);
+                        } else {
+                            cb(null, comment2, comment1, note);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, comment2, comment1, note) {
+                assert.ifError(err);
+            },
+            "and we check the replies of the first object": {
+                topic: function(comment2, comment1, note) {
+                    var cb = this.callback;
+                    note.getReplies(0, 20, function(err, list) {
+                        cb(err, list, comment1, comment2);
+                    });
+                },
+                "it works": function(err, list, comment1, comment2) {
+                    assert.ifError(err);
+                },
+                "it looks correct": function(err, list, comment1, comment2) {
+                    assert.isArray(list);
+                    assert.lengthOf(list, 1);
+                    assert.equal(list[0].id, comment1.id);
+                    assert.include(list[0], 'replies');
+                    assert.include(list[0].replies, 'items');
+                    assert.lengthOf(list[0].replies.items, 1);
+                    assert.equal(list[0].replies.items[0].id, comment2.id);
+                }
+            }
         },
         "and we create a new object and post a lot of replies": {
+            topic: function() {
+                var Note = require("../lib/model/note").Note,
+                    note = null,
+                    Comment = require("../lib/model/comment").Comment,
+                    cb = this.callback,
+                    comments = null;
+                
+                Step(
+                    function() {
+                        Note.create({content: "More testing."}, this);
+                    },
+                    function(err, result) {
+                        var i, group = this.group();
+                        if (err) throw err;
+                        note = result;
+                        for (var i = 0; i < 100; i++) {
+                            Comment.create({content: "YOU LIE.", inReplyTo: note.id}, group());
+                        }
+                    },
+                    function(err, comments) {
+                        if (err) {
+                            cb(err, null, null);
+                        } else {
+                            cb(null, comments, note);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, comments, note) {
+                assert.ifError(err);
+            },
+            "and we check the replies of the first object": {
+                topic: function(comments, note) {
+                    var cb = this.callback;
+                    note.getReplies(0, 200, function(err, list) {
+                        cb(err, list, comments, note);
+                    });
+                },
+                "it works": function(err, list, comments, note) {
+                    assert.ifError(err);
+                },
+                "it looks correct": function(err, list, comments, note) {
+                    var i, listIDs = new Array(100), commentIDs = new Array(100);
+                    assert.isArray(list);
+                    assert.lengthOf(list, 100);
+                    for (i = 0; i < 100; i++) {
+                        listIDs[i] = list.items[i].id;
+                        commentIDs[i] = comments[i].id;
+                    }
+                    for (i = 0; i < 100; i++) {
+                        assert.include(listIDs, comments[i].id);
+                        assert.include(commentIDs, list.items[i].id);
+                    }
+                }
+            }
+        },
+        "and we create a new object and expand it": {
+            topic: function() {
+                var Note = require("../lib/model/note").Note,
+                    note = null,
+                    cb = this.callback;
+                
+                Step(
+                    function() {
+                        Note.create({content: "Blow face."}, this);
+                    },
+                    function(err, result) {
+                        if (err) throw err;
+                        note = result;
+                        note.expand(this);
+                    },
+                    function(err) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, note);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, note) {
+                assert.ifError(err);
+            },
+            "its replies element looks right": function(err, comment, note) {
+                assert.include(note, "replies");
+                assert.isObject(note.replies);
+                assert.include(note.replies, "totalItems");
+                assert.equal(note.replies.totalItems, 0);
+                assert.include(note.replies, "url");
+                assert.isString(note.replies.url);
+                assert.include(note.replies, "items");
+                assert.isArray(note.replies.items);
+                assert.lengthOf(note.replies.items, 0);
+            }
         },
         "and we create a new object and post a reply and expand the object": {
+            topic: function() {
+                var Note = require("../lib/model/note").Note,
+                    note = null,
+                    Comment = require("../lib/model/comment").Comment,
+                    cb = this.callback,
+                    comment = null;
+                
+                Step(
+                    function() {
+                        Note.create({content: "Test your face."}, this);
+                    },
+                    function(err, result) {
+                        if (err) throw err;
+                        note = result;
+                        Comment.create({content: "UR FACE", inReplyTo: note.id}, this);
+                    },
+                    function(err, result) {
+                        if (err) throw err;
+                        comment = result;
+                        note.expand(this);
+                    },
+                    function(err) {
+                        if (err) {
+                            cb(err, null, null);
+                        } else {
+                            cb(null, comment, note);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, comment, note) {
+                assert.ifError(err);
+            },
+            "its replies element looks right": function(err, comment, note) {
+                assert.include(note, "replies");
+                assert.isObject(note.replies);
+                assert.include(note.replies, "totalItems");
+                assert.equal(note.replies.totalItems, 1);
+                assert.include(note.replies, "url");
+                assert.isString(note.replies.url);
+                assert.include(note.replies, "items");
+                assert.isArray(note.replies.items);
+                assert.lengthOf(note.replies.items, 1);
+                assert.equal(note.replies.items[0].id, comment.id);
+            }
         }
     }
 });
