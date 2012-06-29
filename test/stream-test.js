@@ -913,6 +913,14 @@ suite.addBatch({
         "it has a getObjectsLessThan() method": function(err, stream) {
             assert.ifError(err);
             assert.isFunction(stream.getObjectsLessThan);
+        },
+        "it has a deliverObject() method": function(err, stream) {
+            assert.ifError(err);
+            assert.isFunction(stream.deliverObject);
+        },
+        "it has a removeObject() method": function(err, stream) {
+            assert.ifError(err);
+            assert.isFunction(stream.removeObject);
         }
     }
 });
