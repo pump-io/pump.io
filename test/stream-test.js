@@ -852,4 +852,69 @@ suite.addBatch({
     }
 });
 
+// Test the object methods
+
+suite.addBatch({
+
+    "When we create a new stream": {
+
+        topic: function() {
+            var cb = this.callback;
+            // Need this to make IDs
+
+            URLMaker.hostname = "example.net";
+
+            // Dummy databank
+
+            var params = {schema: schema};
+
+            var db = Databank.get("memory", params);
+
+            db.connect({}, function(err) {
+
+                var Stream, mod;
+
+                if (err) {
+                    cb(err, null);
+                    return;
+                }
+
+                DatabankObject.bank = db;
+                
+                mod = require("../lib/model/stream");
+
+                if (!mod) {
+                    cb(new Error("No module"), null);
+                    return;
+                }
+
+                Stream = mod.Stream;
+
+                if (!Stream) {
+                    cb(new Error("No class"), null);
+                    return;
+                }
+
+                Stream.create({name: "test-objects"}, cb);
+            });
+        },
+        "it works": function(err, stream) {
+            assert.ifError(err);
+            assert.isObject(stream);
+        },
+        "it has a getObjects() method": function(err, stream) {
+            assert.ifError(err);
+            assert.isFunction(stream.getObjects);
+        },
+        "it has a getObjectsGreaterThan() method": function(err, stream) {
+            assert.ifError(err);
+            assert.isFunction(stream.getObjectsGreaterThan);
+        },
+        "it has a getObjectsLessThan() method": function(err, stream) {
+            assert.ifError(err);
+            assert.isFunction(stream.getObjectsLessThan);
+        }
+    }
+});
+
 suite["export"](module);
