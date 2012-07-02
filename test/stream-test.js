@@ -397,7 +397,7 @@ suite.addBatch({
                     if (err) throw err;
 
                     DatabankObject.bank = db;
-                
+                    
                     var Stream = require("../lib/model/stream").Stream;
 
                     Stream.create({name: "scale-test"}, this);
@@ -856,7 +856,7 @@ suite.addBatch({
 
 suite.addBatch({
 
-    "When we create a new stream": {
+    "When we get the Stream class": {
 
         topic: function() {
             var cb = this.callback;
@@ -895,7 +895,7 @@ suite.addBatch({
                     return;
                 }
 
-                Stream.create({name: "test-objects"}, cb);
+                cb(null, Stream);
             });
         },
         "it works": function(err, stream) {
@@ -921,6 +921,56 @@ suite.addBatch({
         "it has a removeObject() method": function(err, stream) {
             assert.ifError(err);
             assert.isFunction(stream.removeObject);
+        },
+        "and we get some objects": {
+            topic: function(stream) {
+                stream.getObjects(0, 20, this.callback);
+            },
+            "it works": function(err, objects) {
+                assert.ifError(err);
+            },
+            "it is an empty array": function(err, objects) {
+                assert.isArray(objects);
+                assert.lengthOf(objects, 0);
+            }
+        },
+        "and we get objects with indexes greater than some object": {
+            topic: function(stream) {
+                var cb = this.callback,
+                    NotInStreamError = require('../lib/model/stream').NotInStreamError;
+
+                stream.getObjectsGreaterThan({a: "b"}, 10, function(err, objects) {
+                    if (err && err instanceof NotInStreamError) {
+                        cb(null);
+                    } else if (err) {
+                        cb(err);
+                    } else {
+                        cb(new Error("Unexpected success"));
+                    }
+                });
+            },
+            "it fails correctly": function(err) {
+                assert.ifError(err);
+            }
+        },
+        "and we get objects with indexes less than some object": {
+            topic: function(stream) {
+                var cb = this.callback,
+                    NotInStreamError = require('../lib/model/stream').NotInStreamError;
+
+                stream.getObjectsLessThan({a: "b"}, 10, function(err, objects) {
+                    if (err && err instanceof NotInStreamError) {
+                        cb(null);
+                    } else if (err) {
+                        cb(err);
+                    } else {
+                        cb(new Error("Unexpected success"));
+                    }
+                });
+            },
+            "it fails correctly": function(err) {
+                assert.ifError(err);
+            }
         }
     }
 });
