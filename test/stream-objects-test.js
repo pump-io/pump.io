@@ -156,7 +156,7 @@ suite.addBatch({
                     var cb = this.callback,
                         NotInStreamError = require('../lib/model/stream').NotInStreamError;
 
-                    stream.removeObject({a: "b"}, 10, function(err, objects) {
+                    stream.removeObject({a: "b"}, function(err) {
                         if (err && err instanceof NotInStreamError) {
                             cb(null);
                         } else if (err) {
