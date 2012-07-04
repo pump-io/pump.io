@@ -898,78 +898,83 @@ suite.addBatch({
                 cb(null, Stream);
             });
         },
-        "it works": function(err, stream) {
+        "it works": function(err, Stream) {
             assert.ifError(err);
-            assert.isObject(stream);
+            assert.isFunction(Stream);
         },
-        "it has a getObjects() method": function(err, stream) {
-            assert.ifError(err);
-            assert.isFunction(stream.getObjects);
-        },
-        "it has a getObjectsGreaterThan() method": function(err, stream) {
-            assert.ifError(err);
-            assert.isFunction(stream.getObjectsGreaterThan);
-        },
-        "it has a getObjectsLessThan() method": function(err, stream) {
-            assert.ifError(err);
-            assert.isFunction(stream.getObjectsLessThan);
-        },
-        "it has a deliverObject() method": function(err, stream) {
-            assert.ifError(err);
-            assert.isFunction(stream.deliverObject);
-        },
-        "it has a removeObject() method": function(err, stream) {
-            assert.ifError(err);
-            assert.isFunction(stream.removeObject);
-        },
-        "and we get some objects": {
-            topic: function(stream) {
-                stream.getObjects(0, 20, this.callback);
+        "and we create a stream object": {
+            topic: function(Stream) { 
+                Stream.create({name: "object-test-1"}, this.callback);
             },
-            "it works": function(err, objects) {
+            "it has a getObjects() method": function(err, stream) {
                 assert.ifError(err);
+                assert.isFunction(stream.getObjects);
             },
-            "it is an empty array": function(err, objects) {
-                assert.isArray(objects);
-                assert.lengthOf(objects, 0);
-            }
-        },
-        "and we get objects with indexes greater than some object": {
-            topic: function(stream) {
-                var cb = this.callback,
-                    NotInStreamError = require('../lib/model/stream').NotInStreamError;
+            "it has a getObjectsGreaterThan() method": function(err, stream) {
+                assert.ifError(err);
+                assert.isFunction(stream.getObjectsGreaterThan);
+            },
+            "it has a getObjectsLessThan() method": function(err, stream) {
+                assert.ifError(err);
+                assert.isFunction(stream.getObjectsLessThan);
+            },
+            "it has a deliverObject() method": function(err, stream) {
+                assert.ifError(err);
+                assert.isFunction(stream.deliverObject);
+            },
+            "it has a removeObject() method": function(err, stream) {
+                assert.ifError(err);
+                assert.isFunction(stream.removeObject);
+            },
+            "and we get some objects": {
+                topic: function(stream) {
+                    stream.getObjects(0, 20, this.callback);
+                },
+                "it works": function(err, objects) {
+                    assert.ifError(err);
+                },
+                "it is an empty array": function(err, objects) {
+                    assert.isArray(objects);
+                    assert.lengthOf(objects, 0);
+                }
+            },
+            "and we get objects with indexes greater than some object": {
+                topic: function(stream) {
+                    var cb = this.callback,
+                        NotInStreamError = require('../lib/model/stream').NotInStreamError;
 
-                stream.getObjectsGreaterThan({a: "b"}, 10, function(err, objects) {
-                    if (err && err instanceof NotInStreamError) {
-                        cb(null);
-                    } else if (err) {
-                        cb(err);
-                    } else {
-                        cb(new Error("Unexpected success"));
-                    }
-                });
+                    stream.getObjectsGreaterThan({a: "b"}, 10, function(err, objects) {
+                        if (err && err instanceof NotInStreamError) {
+                            cb(null);
+                        } else if (err) {
+                            cb(err);
+                        } else {
+                            cb(new Error("Unexpected success"));
+                        }
+                    });
+                },
+                "it fails correctly": function(err) {
+                    assert.ifError(err);
+                }
             },
-            "it fails correctly": function(err) {
-                assert.ifError(err);
-            }
-        },
-        "and we get objects with indexes less than some object": {
-            topic: function(stream) {
-                var cb = this.callback,
-                    NotInStreamError = require('../lib/model/stream').NotInStreamError;
+            "and we get objects with indexes less than some object": {
+                topic: function(stream) {
+                    var cb = this.callback,
+                        NotInStreamError = require('../lib/model/stream').NotInStreamError;
 
-                stream.getObjectsLessThan({a: "b"}, 10, function(err, objects) {
-                    if (err && err instanceof NotInStreamError) {
-                        cb(null);
-                    } else if (err) {
-                        cb(err);
-                    } else {
-                        cb(new Error("Unexpected success"));
-                    }
-                });
-            },
-            "it fails correctly": function(err) {
-                assert.ifError(err);
+                    stream.getObjectsLessThan({a: "b"}, 10, function(err, objects) {
+                        if (err && err instanceof NotInStreamError) {
+                            cb(null);
+                        } else if (err) {
+                            cb(err);
+                        } else {
+                            cb(new Error("Unexpected success"));
+                        }
+                    });
+                },
+                "it fails correctly": function(err) {
+                    assert.ifError(err);
+                }
             }
         }
     }
