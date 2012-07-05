@@ -1,0 +1,1 @@
+<h1><%- (obj.title || (actor.displayName + " " + verb + "ed a " + object.objectType)) %> </h1>
