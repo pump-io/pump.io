@@ -254,7 +254,7 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.isArray(objects);
                     assert.lengthOf(objects, 50);
-                    for (i = 0; i < objects.length, i++) {
+                    for (i = 0; i < objects.length; i++) {
                         obj = objects[i];
                         assert.isObject(obj);
                         assert.include(obj, "objectType");
