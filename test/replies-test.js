@@ -244,7 +244,7 @@ suite.addBatch({
                         var i, group = this.group();
                         if (err) throw err;
                         note = result;
-                        for (var i = 0; i < 100; i++) {
+                        for (i = 0; i < 100; i++) {
                             Comment.create({content: "YOU LIE.", inReplyTo: note}, group());
                         }
                     },
