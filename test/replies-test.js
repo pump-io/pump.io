@@ -94,7 +94,7 @@ suite.addBatch({
                     function(err, result) {
                         if (err) throw err;
                         note = result;
-                        Comment.create({content: "Whatever.", inReplyTo: {objectType: "note", id: note.id}}, this);
+                        Comment.create({content: "Whatever.", inReplyTo: note}, this);
                     },
                     function(err, comment) {
                         if (err) {
@@ -139,7 +139,7 @@ suite.addBatch({
                     function(err, result) {
                         if (err) throw err;
                         note = result;
-                        Comment.create({content: "Still bad.", inReplyTo: {objectType: "note", id: note.id}}, this);
+                        Comment.create({content: "Still bad.", inReplyTo: note}, this);
                     },
                     function(err, comment) {
                         if (err) throw err;
@@ -188,12 +188,12 @@ suite.addBatch({
                     function(err, result) {
                         if (err) throw err;
                         note = result;
-                        Comment.create({content: "PLBBBBTTTTBBTT.", inReplyTo: note.id}, this);
+                        Comment.create({content: "PLBBBBTTTTBBTT.", inReplyTo: note}, this);
                     },
                     function(err, comment) {
                         if (err) throw err;
                         comment1 = comment;
-                        Comment.create({content: "Uncalled for!", inReplyTo: comment.id}, this);
+                        Comment.create({content: "Uncalled for!", inReplyTo: comment}, this);
                     },
                     function(err, comment2) {
                         if (err) {
@@ -243,7 +243,7 @@ suite.addBatch({
                     function(err, result) {
                         if (err) throw err;
                         note = result;
-                        Comment.create({content: "PLBBBBTTTTBBTT.", inReplyTo: note.id}, this);
+                        Comment.create({content: "PLBBBBTTTTBBTT.", inReplyTo: note}, this);
                     },
                     function(err, comment) {
                         if (err) throw err;
@@ -299,7 +299,7 @@ suite.addBatch({
                         if (err) throw err;
                         note = result;
                         for (var i = 0; i < 100; i++) {
-                            Comment.create({content: "YOU LIE.", inReplyTo: note.id}, group());
+                            Comment.create({content: "YOU LIE.", inReplyTo: note}, group());
                         }
                     },
                     function(err, comments) {
@@ -393,7 +393,7 @@ suite.addBatch({
                     function(err, result) {
                         if (err) throw err;
                         note = result;
-                        Comment.create({content: "UR FACE", inReplyTo: note.id}, this);
+                        Comment.create({content: "UR FACE", inReplyTo: note}, this);
                     },
                     function(err, result) {
                         if (err) throw err;
