@@ -264,6 +264,58 @@ suite.addBatch({
                         assert.isUndefined(seen[obj.id]);
                         seen[obj.id] = obj;
                     }
+                },
+                "and we get objects less than some object": {
+                    topic: function(objects, stream) {
+                        var cb = this.callback;
+                        stream.getObjectsLessThan(objects[30], 20, function(err, results) {
+                            cb(err, results, objects);
+                        });
+                    },
+                    "it works": function(err, objects, total) {
+                        assert.ifError(err);
+                    },
+                    "results look right": function(err, objects, total) {
+                        var i, obj;
+                        assert.ifError(err);
+                        assert.isArray(objects);
+                        assert.lengthOf(objects, 20);
+                        for (i = 0; i < objects.length; i++) {
+                            obj = objects[i];
+                            assert.isObject(obj);
+                            assert.include(obj, "objectType");
+                            assert.equal(obj.objectType, "person");
+                            assert.include(obj, "id");
+                            assert.match(obj.id, /http:\/\/example.com\/person[0-9]+/);
+                            assert.deepEqual(objects[i], total[i+10]);
+                        }
+                    }
+                },
+                "and we get objects greater than some object": {
+                    topic: function(objects, stream) {
+                        var cb = this.callback;
+                        stream.getObjectsGreaterThan(objects[9], 20, function(err, results) {
+                            cb(err, results, objects);
+                        });
+                    },
+                    "it works": function(err, objects, total) {
+                        assert.ifError(err);
+                    },
+                    "results look right": function(err, objects, total) {
+                        var i, obj;
+                        assert.ifError(err);
+                        assert.isArray(objects);
+                        assert.lengthOf(objects, 20);
+                        for (i = 0; i < objects.length; i++) {
+                            obj = objects[i];
+                            assert.isObject(obj);
+                            assert.include(obj, "objectType");
+                            assert.equal(obj.objectType, "person");
+                            assert.include(obj, "id");
+                            assert.match(obj.id, /http:\/\/example.com\/person[0-9]+/);
+                            assert.deepEqual(objects[i], total[i+10]);
+                        }
+                    }
                 }
             }
         }
