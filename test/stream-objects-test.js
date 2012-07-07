@@ -170,6 +170,48 @@ suite.addBatch({
                     assert.ifError(err);
                 }
             }
+        },
+        "and we create another stream": {
+            topic: function(Stream) { 
+                Stream.create({name: "object-test-2"}, this.callback);
+            },
+            "it works": function(err, stream, Stream) {
+                assert.ifError(err);
+                assert.isObject(stream);
+                assert.instanceOf(stream, Stream);
+            },
+            "and we deliver an object to it": {
+                topic: function(stream) {
+                    var cb = this.callback,
+                        obj = {
+                            objectType: "person",
+                            id: "acct:evan@status.net"
+                        };
+
+                    stream.deliverObject(obj, cb);
+                },
+                "it works": function(err) {
+                    assert.ifError(err);
+                },
+                "and we get the stream's objects": {
+                    topic: function(stream) {
+                        stream.getObjects(0, 20, this.callback);
+                    },
+                    "it works": function(err, objects) {
+                        assert.ifError(err);
+                    },
+                    "results look right": function(err, objects) {
+                        assert.ifError(err);
+                        assert.isArray(objects);
+                        assert.lengthOf(objects, 1);
+                        assert.isObject(objects[0]);
+                        assert.include(objects[0], "objectType");
+                        assert.equal(objects[0].objectType, "person");
+                        assert.include(objects[0], "id");
+                        assert.equal(objects[0].id, "acct:evan@status.net");
+                    }
+                }
+            }
         }
     }
 });
