@@ -312,9 +312,8 @@ suite.addBatch({
             "it works": function(err, note) {
                 assert.ifError(err);
             },
-            "its replies element looks right": function(err, comment, note) {
+            "its replies element looks right": function(err, note) {
                 assert.ifError(err);
-                assert.isObject(comment);
                 assert.isObject(note);
                 assert.include(note, "replies");
                 assert.isObject(note.replies);
