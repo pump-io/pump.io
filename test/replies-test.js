@@ -94,7 +94,7 @@ suite.addBatch({
                     function(err, result) {
                         if (err) throw err;
                         note = result;
-                        Comment.create({content: "Whatever.", inReplyTo: note.id}, this);
+                        Comment.create({content: "Whatever.", inReplyTo: {objectType: "note", id: note.id}}, this);
                     },
                     function(err, comment) {
                         if (err) {
