@@ -178,7 +178,6 @@ suite.addBatch({
             "it works": function(err, stream, Stream) {
                 assert.ifError(err);
                 assert.isObject(stream);
-                assert.instanceOf(stream, Stream);
             },
             "and we deliver an object to it": {
                 topic: function(stream) {
