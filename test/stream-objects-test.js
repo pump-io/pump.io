@@ -318,6 +318,66 @@ suite.addBatch({
                     }
                 }
             }
+        },
+        "and we create a stream and deliver an object then remove it": {
+            topic: function(Stream) {
+                var cb = this.callback,
+                    stream;
+
+                Step(
+                    function() {
+                        Stream.create({name: "object-test-4"}, this);
+                    },
+                    function(err, results) {
+                        var i, group = this.group();
+                        if (err) throw err;
+                        stream = results;
+                        for (i = 0; i < 50; i++) {
+                            stream.deliverObject({id: "http://example.com/person" + i, objectType: "person"}, group());
+                        }
+                    },
+                    function(err) {
+                        if (err) throw err;
+                        stream.removeObject({id: "http://example.com/person23", objectType: "person"}, this);
+                    },
+                    function(err) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, stream);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, stream) {
+                assert.ifError(err);
+                assert.isObject(stream);
+            },
+            "and we get its objects": {
+                topic: function(stream) {
+                    stream.getObjects(0, 100, this.callback);
+                },
+                "it works": function(err, objects) {
+                    assert.ifError(err);
+                },
+                "results look right": function(err, objects) {
+                    var i, obj, seen = {};
+                    assert.ifError(err);
+                    assert.isArray(objects);
+                    assert.lengthOf(objects, 49);
+                    for (i = 0; i < objects.length; i++) {
+                        obj = objects[i];
+                        assert.isObject(obj);
+                        assert.include(obj, "objectType");
+                        assert.equal(obj.objectType, "person");
+                        assert.include(obj, "id");
+                        assert.notEqual(obj.id, "http://example.com/person23");
+                        assert.match(obj.id, /http:\/\/example.com\/person[0-9]+/);
+                        assert.isUndefined(seen[obj.id]);
+                        seen[obj.id] = obj;
+                    }
+                }
+            }
         }
     }
 });
