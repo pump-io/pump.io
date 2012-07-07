@@ -260,7 +260,7 @@ suite.addBatch({
                         assert.include(obj, "objectType");
                         assert.equal(obj.objectType, "person");
                         assert.include(obj, "id");
-                        assert.match(obj.id, /http:\/\/example.com\/[0-9]+/);
+                        assert.match(obj.id, /http:\/\/example.com\/person[0-9]+/);
                         assert.isUndefined(seen[obj.id]);
                         seen[obj.id] = obj;
                     }
