@@ -263,6 +263,8 @@ suite.addBatch({
             },
             "it works": function(err, comments, note) {
                 assert.ifError(err);
+                assert.isArray(comments);
+                assert.isObject(note);
             },
             "and we check the replies of the first object": {
                 topic: function(comments, note) {
@@ -279,12 +281,12 @@ suite.addBatch({
                     assert.isArray(list);
                     assert.lengthOf(list, 100);
                     for (i = 0; i < 100; i++) {
-                        listIDs[i] = list.items[i].id;
+                        listIDs[i] = list[i].id;
                         commentIDs[i] = comments[i].id;
                     }
                     for (i = 0; i < 100; i++) {
                         assert.include(listIDs, comments[i].id);
-                        assert.include(commentIDs, list.items[i].id);
+                        assert.include(commentIDs, list[i].id);
                     }
                 }
             }
