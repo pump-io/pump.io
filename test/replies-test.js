@@ -123,7 +123,9 @@ suite.addBatch({
                 "it looks correct": function(err, list, comment) {
                     assert.isArray(list);
                     assert.lengthOf(list, 1);
-                    assert.deepEqual(list[0], comment);
+                    assert.isObject(list[0]);
+                    assert.include(list[0], "id");
+                    assert.equal(list[0].id, comment.id);
                 }
             }
         },
