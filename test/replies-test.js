@@ -107,6 +107,8 @@ suite.addBatch({
             },
             "it works": function(err, comment, note) {
                 assert.ifError(err);
+                assert.isObject(comment);
+                assert.isObject(note);
             },
             "and we check the replies of the first object": {
                 topic: function(comment, note) {
@@ -154,14 +156,14 @@ suite.addBatch({
                     }
                 );
             },
-            "it works": function(err, comment, note) {
+            "it works": function(err, note) {
                 assert.ifError(err);
             },
             "and we check the replies of the first object": {
-                topic: function(comment, note) {
+                topic: function(note) {
                     var cb = this.callback;
                     note.getReplies(0, 20, function(err, list) {
-                        cb(err, list, comment);
+                        cb(err, list);
                     });
                 },
                 "it works": function(err, list, comment) {
