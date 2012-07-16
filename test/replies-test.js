@@ -323,9 +323,6 @@ suite.addBatch({
                 assert.equal(note.replies.totalItems, 0);
                 assert.include(note.replies, "url");
                 assert.isString(note.replies.url);
-                assert.include(note.replies, "items");
-                assert.isArray(note.replies.items);
-                assert.lengthOf(note.replies.items, 0);
             }
         },
         "and we create a new object and post a reply and expand the object's feeds": {
