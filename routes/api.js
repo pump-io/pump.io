@@ -24,6 +24,7 @@ var databank = require("databank"),
     sanitize = validator.sanitize,
     HTTPError = require("../lib/httperror").HTTPError,
     Activity = require("../lib/model/activity").Activity,
+    Collection = require("../lib/model/collection").Collection,
     ActivityObject = require("../lib/model/activityobject").ActivityObject,
     User = require("../lib/model/user").User,
     Edge = require("../lib/model/edge").Edge,
@@ -45,13 +46,15 @@ var databank = require("databank"),
     DEFAULT_FOLLOWERS = DEFAULT_ITEMS,
     DEFAULT_FOLLOWING = DEFAULT_ITEMS,
     DEFAULT_USERS = DEFAULT_ITEMS,
+    DEFAULT_LISTS = DEFAULT_ITEMS,
     MAX_ITEMS = DEFAULT_ITEMS * 10,
     MAX_ACTIVITIES = MAX_ITEMS,
     MAX_FAVORITES = MAX_ITEMS,
     MAX_LIKES = MAX_ITEMS,
     MAX_FOLLOWERS = MAX_ITEMS,
     MAX_FOLLOWING = MAX_ITEMS,
-    MAX_USERS = MAX_ITEMS;
+    MAX_USERS = MAX_ITEMS,
+    MAX_LISTS = MAX_ITEMS;
 
 // Initialize the app controller
 
@@ -79,6 +82,8 @@ var addRoutes = function(app) {
     app.get("/api/user/:nickname/following", clientAuth, reqUser, userFollowing);
 
     app.get("/api/user/:nickname/favorites", clientAuth, reqUser, userFavorites);
+
+    app.get("/api/user/:nickname/lists", userAuth, reqUser, sameUser, userLists);
 
     for (i = 0; i < ActivityObject.objectTypes.length; i++) {
 
@@ -903,6 +908,84 @@ var userFavorites = function(req, res, next) {
                 next(err);
             } else {
                 collection.items = objects;
+                res.json(collection);
+            }
+        }
+    );
+};
+
+var userLists = function(req, res, next) {
+    var url = URLMaker.makeURL("api/user/" + req.user.nickname + "/lists"),
+        collection = {
+            author: req.user.profile,
+            displayName: "Lists for " + (req.user.profile.displayName || req.user.nickname),
+            id: url,
+            objectTypes: ["collection"],
+            url: url,
+            links: {
+                first: url,
+                self: url
+            },
+            items: []
+        };
+
+    var args, lists;
+
+    try {
+        args = streamArgs(req, DEFAULT_LISTS, MAX_LISTS);
+    } catch (e) {
+        next(e);
+        return;
+    }
+
+    Step(
+        function() {
+            req.user.getLists(this);
+        },
+        function(err, stream) {
+            if (err) throw err;
+            lists = stream;
+            lists.count(this);
+        },
+        function(err, totalItems) {
+            if (err) throw err;
+            collection.totalItems = totalItems;
+            if (totalItems === 0) {
+                res.json(collection);
+                return;
+            }
+            if (_(args).has("before")) {
+                lists.getIDsGreaterThan(args.before, args.count, this);
+            } else if (_(args).has("since")) {
+                lists.getIDsLessThan(args.since, args.count, this);
+            } else {
+                lists.getIDs(args.start, args.end, this);
+            }
+        },
+        function(err, ids) {
+            if (err) {
+                if (err instanceof NotInStreamError) {
+                    throw new HTTPError(err.message, 400);
+                } else {
+                    throw err;
+                }
+            }
+            Collection.readArray(ids, this);
+        },
+        function(err, collections) {
+            if (err) {
+                next(err);
+            } else {
+                collection.items = collections;
+                if (collections.length > 0) {
+                    collection.links.prev = collection.url + "?since=" + encodeURIComponent(collections[0].id);
+                    if ((_(args).has("start") && args.start + collections.length < collection.totalItems) ||
+                        (_(args).has("before") && collections.length >= args.count) ||
+                        (_(args).has("since"))) {
+                        collection.links.next = collection.url + "?before=" + 
+                            encodeURIComponent(collections[collections.length-1].id);
+                    }
+                }
                 res.json(collection);
             }
         }
