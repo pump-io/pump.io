@@ -287,7 +287,7 @@ suite.addBatch({
                 }
             }
         },
-        "and we create a new object and expand it": {
+        "and we create a new object and expand its feeds": {
             topic: function() {
                 var Note = require("../lib/model/note").Note,
                     note = null,
@@ -300,7 +300,7 @@ suite.addBatch({
                     function(err, result) {
                         if (err) throw err;
                         note = result;
-                        note.expand(this);
+                        note.expandFeeds(this);
                     },
                     function(err) {
                         if (err) {
@@ -328,7 +328,7 @@ suite.addBatch({
                 assert.lengthOf(note.replies.items, 0);
             }
         },
-        "and we create a new object and post a reply and expand the object": {
+        "and we create a new object and post a reply and expand the object's feeds": {
             topic: function() {
                 var Note = require("../lib/model/note").Note,
                     note = null,
@@ -348,7 +348,7 @@ suite.addBatch({
                     function(err, result) {
                         if (err) throw err;
                         comment = result;
-                        note.expand(this);
+                        note.expandFeeds(this);
                     },
                     function(err) {
                         if (err) {
