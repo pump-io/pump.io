@@ -282,7 +282,7 @@ vows.describe("activityobject class interface").addBatch({
                             content: "FIRST POST",
                             inReplyTo: {
                                 objectType: ActivityObject.ARTICLE,
-                                url: "http://example.net/articles/3"
+                                id: "http://example.net/articles/3"
                             }
                         };
 
@@ -313,7 +313,7 @@ vows.describe("activityobject class interface").addBatch({
                 "it has the right passed-in attributes": function(err, comment) {
                     assert.equal(comment.objectType, "comment");
                     assert.equal(comment.content, "FIRST POST");
-                    assert.equal(comment.inReplyTo.url, "http://example.net/articles/3");
+                    assert.equal(comment.inReplyTo.id, "http://example.net/articles/3");
                     assert.equal(comment.inReplyTo.objectType, "article");
 
                 },
