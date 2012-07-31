@@ -275,7 +275,19 @@ var actorOnly = function(req, res, next) {
 
 var getter = function(type) {
     return function(req, res, next) {
-        res.json(req[type]);
+        var obj = req[type];
+        Step(
+            function() {
+                obj.expandFeeds(this);
+            },
+            function(err) {
+                if (err) {
+                    next(err);
+                } else {
+                    res.json(obj);
+                }
+            }
+        );
     };
 };
 
