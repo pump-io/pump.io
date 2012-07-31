@@ -1,6 +1,6 @@
-// activity-api-test.js
+// replies-api-test.js
 //
-// Test activity REST API
+// Test replies over the API
 //
 // Copyright 2012, StatusNet Inc.
 //
@@ -32,6 +32,14 @@ var assert = require("assert"),
 
 var suite = vows.describe("Activity API test");
 
+var assertGoodCred = function(cred) {
+    assert.isObject(cred);
+    assert.isString(cred.consumer_key);
+    assert.isString(cred.consumer_secret);
+    assert.isString(cred.token);
+    assert.isString(cred.token_secret);
+};
+
 // A batch for testing the read-write access to the API
 
 suite.addBatch({
@@ -53,11 +61,7 @@ suite.addBatch({
             },
             "it works": function(err, cred) {
                 assert.ifError(err);
-                assert.isObject(cred);
-                assert.isString(cred.consumer_key);
-                assert.isString(cred.consumer_secret);
-                assert.isString(cred.token);
-                assert.isString(cred.token_secret);
+                assertGoodCred(cred);
             },
             "and we post a new activity": {
                 topic: function(cred) {
@@ -114,6 +118,98 @@ suite.addBatch({
                         assert.includes(coll, "items");
                         assert.isArray(coll.items);
                         assert.lengthOf(coll.items, 0);
+                    }
+                }
+            }
+        },
+        "and we make two new sets of credentials": {
+            topic: function() {
+                Step(
+                    function() {
+                        newCredentials("mackenzie", "railroad", this.parallel());
+                        newCredentials("thompson", "beringsea", this.parallel());
+                    },
+                    this.callback
+                );
+            },
+            "it works": function(err, cred1, cred2) {
+                assert.ifError(err);
+                assertGoodCred(cred1);
+                assertGoodCred(cred2);
+            },
+            "and we post a photo and a comment": {
+                topic: function(cred1, cred2) {
+                    var cb = this.callback,
+                        photo;
+
+                    Step(
+                        function() {
+                            var act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "image",
+                                    url: "http://photos.example/1",
+                                    summary: "New Parliament Buildings."
+                                }
+                            };
+                            httputil.postJSON("http://localhost:4815/api/user/mackenzie/feed", cred1, act, this);
+                        },
+                        function(err, act, response) {
+                            var reply;
+                            if (err) throw err;
+                            photo = act;
+                            reply = {
+                                verb: "post",
+                                object: {
+                                    objectType: "comment",
+                                    content: "Nice one!",
+                                    inReplyTo: act.object
+                                }
+                            };
+                            httputil.postJSON("http://localhost:4815/api/user/thompson/feed", cred2, reply, this);
+                        },
+                        function(err, reply, response) {
+                            cb(err, photo, reply);
+                        }
+                    );
+                },
+                "it works": function(err, photo, reply) {
+                    assert.ifError(err);
+                    assert.isObject(photo);
+                    assert.isObject(reply);
+                    assert.include(photo, "id");
+                    assert.include(photo, "object");
+                    assert.include(photo.object, "replies");
+                    assert.include(photo.object.replies, "url");
+                    assert.isString(photo.object.replies.url);
+                    assert.include(reply, "object");
+                    assert.include(reply.object, "inReplyTo");
+                    assert.include(reply.object.inReplyTo, "id");
+                    assert.equal(reply.object.inReplyTo.id, photo.object.id); 
+                },
+                "and we check the replies feed": {
+                    topic: function(photo, reply, cred1, cred2) {
+                        var cb = this.callback,
+                            url = photo.object.replies.url;
+
+                        httputil.getJSON(url, cred1, function(err, coll, response) {
+                            cb(err, coll, reply);
+                        });
+                    },
+                    "it works": function(err, coll, reply) {
+                        assert.ifError(err);
+                        assert.isObject(coll);
+                    },
+                    "it includes our reply": function(err, coll, reply) {
+                        assert.ifError(err);
+                        assert.isObject(coll);
+                        assert.includes(coll, "totalItems");
+                        assert.isNumber(coll.totalItems);
+                        assert.equal(coll.totalItems, 1);
+                        assert.includes(coll, "items");
+                        assert.isArray(coll.items);
+                        assert.lengthOf(coll.items, 1);
+                        assert.equal(coll.items[0].id, reply.object.id);
                     }
                 }
             }
