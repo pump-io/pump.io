@@ -349,6 +349,41 @@ suite.addBatch({
                             assert.include(commentIDs, coll.items[i].id);
                         }
                     }
+                },
+                "and we get the original item": {
+                    topic: function(note, comments, cred1, cred2) {
+                        var cb = this.callback,
+                            url = note.object.id;
+
+                        httputil.getJSON(url, cred1, function(err, note, response) {
+                            cb(err, note, comments);
+                        });
+                    },
+                    "it works": function(err, note, comments) {
+                        assert.ifError(err);
+                        assert.isObject(note);
+                        assert.isArray(comments);
+                    },
+                    "it has the correct replies": function(err, note, comments) {
+                        var i, commentIDs = {};
+
+                        assert.ifError(err);
+                        assert.isObject(note);
+                        assert.include(note, "replies");
+                        assert.include(note.replies, "totalItems");
+                        assert.isNumber(note.replies.totalItems);
+                        assert.equal(note.replies.totalItems, 100);
+                        assert.include(note.replies, "items");
+                        assert.isArray(note.replies.items);
+
+                        for (i = 0; i < 100; i++) {
+                            commentIDs[comments[i].object.id] = 1;
+                        }
+
+                        for (i = 0; i < note.replies.items.length; i++) {
+                            assert.include(commentIDs, note.replies.items[i].id);
+                        }
+                    }
                 }
             }
         }
