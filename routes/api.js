@@ -43,6 +43,7 @@ var databank = require("databank"),
     DEFAULT_ACTIVITIES = DEFAULT_ITEMS,
     DEFAULT_FAVORITES = DEFAULT_ITEMS,
     DEFAULT_LIKES = DEFAULT_ITEMS,
+    DEFAULT_REPLIES = DEFAULT_ITEMS,
     DEFAULT_FOLLOWERS = DEFAULT_ITEMS,
     DEFAULT_FOLLOWING = DEFAULT_ITEMS,
     DEFAULT_USERS = DEFAULT_ITEMS,
@@ -51,6 +52,7 @@ var databank = require("databank"),
     MAX_ACTIVITIES = MAX_ITEMS,
     MAX_FAVORITES = MAX_ITEMS,
     MAX_LIKES = MAX_ITEMS,
+    MAX_REPLIES = MAX_ITEMS,
     MAX_FOLLOWERS = MAX_ITEMS,
     MAX_FOLLOWING = MAX_ITEMS,
     MAX_USERS = MAX_ITEMS,
@@ -104,6 +106,7 @@ var addRoutes = function(app) {
         app.del(url, userAuth, requester(type), authz, deleter(type));
 
         app.get("/api/" + type + "/" + ":uuid/likes", clientAuth, requester(type), likes(type));
+        app.get("/api/" + type + "/" + ":uuid/replies", clientAuth, requester(type), replies(type));
     }
     
     // Activities
@@ -351,6 +354,58 @@ var likes = function(type) {
                     next(err);
                 } else {
                     collection.items = likers;
+                    res.json(collection);
+                }
+            }
+        );
+    };
+};
+
+var replies = function(type) {
+    return function(req, res, next) {
+        var obj = req[type];
+
+        var collection = {
+            displayName: "Replies to " + obj.displayName,
+            id: URLMaker.makeURL("api/" + type + "/" + obj.uuid + "/replies"),
+            items: []
+        };
+
+        var args;
+
+        try {
+            args = streamArgs(req, DEFAULT_REPLIES, MAX_REPLIES);
+        } catch (e) {
+            next(e);
+            return;
+        }
+
+        Step(
+            function() {
+                obj.repliesCount(this);
+            },
+            function(err, count) {
+                if (err) {
+                    if (err instanceof NoSuchThingError) {
+                        collection.totalItems = 0;
+                        res.json(collection);
+                    } else {
+                        throw err;
+                    }
+                }
+                collection.totalItems = count;
+                obj.getReplies(args.start, args.end, this);
+            },
+            function(err, replies) {
+                var i = 0;
+                if (err) {
+                    next(err);
+                } else {
+                    // Trim the IRT since it's implied
+                    for (i = 0; i < replies.length; i++) {
+                        replies[i].inReplyTo = null;
+                    }
+                    collection.items = replies;
                     res.json(collection);
                 }
             }
