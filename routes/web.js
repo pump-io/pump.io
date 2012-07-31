@@ -1,6 +1,6 @@
 // routes/web.js
 //
-// Spurtin" out pumpy goodness all over your browser window
+// Spurtin' out pumpy goodness all over your browser window
 //
 // Copyright 2011-2012, StatusNet Inc.
 //
