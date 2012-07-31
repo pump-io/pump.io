@@ -248,6 +248,109 @@ suite.addBatch({
                     }
                 }
             }
+        },
+        "and we make two more new sets of credentials": {
+            topic: function() {
+                Step(
+                    function() {
+                        newCredentials("laurier", "moderation", this.parallel());
+                        newCredentials("borden", "overthere", this.parallel());
+                    },
+                    this.callback
+                );
+            },
+            "it works": function(err, cred1, cred2) {
+                assert.ifError(err);
+                assertGoodCred(cred1);
+                assertGoodCred(cred2);
+            },
+            "and we post a note and a lot of comments": {
+
+                topic: function(cred1, cred2) {
+                    var cb = this.callback,
+                        note;
+
+                    Step(
+                        function() {
+                            var act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "note",
+                                    summary: "I must get back to work."
+                                }
+                            };
+                            httputil.postJSON("http://localhost:4815/api/user/laurier/feed", cred1, act, this);
+                        },
+                        function(err, act, response) {
+                            var i, comment, group = this.group();
+                            if (err) throw err;
+                            note = act;
+                            for (i = 0; i < 100; i++) {
+                                comment = {
+                                    verb: "post",
+                                    object: {
+                                        objectType: "comment",
+                                        content: "FIRST POST",
+                                        inReplyTo: act.object
+                                    }
+                                };
+                                httputil.postJSON("http://localhost:4815/api/user/borden/feed",
+                                                  cred2,
+                                                  comment,
+                                                  group());
+                            }
+                        },
+                        function(err, comments, responses) {
+                            cb(err, note, comments);
+                        }
+                    );
+                },
+                "it works": function(err, note, comments) {
+                    assert.ifError(err);
+                    assert.isObject(note);
+                    assert.isArray(comments);
+                    assert.lengthOf(comments, 100);
+                },
+                "and we get the full replies feed": {
+                    topic: function(note, comments, cred1, cred2) {
+                        var cb = this.callback,
+                            url = note.object.replies.url + "?count=100";
+
+                        httputil.getJSON(url, cred1, function(err, coll, response) {
+                            cb(err, coll, comments);
+                        });
+                    },
+                    "it works": function(err, coll, comments) {
+                        assert.ifError(err);
+                        assert.isObject(coll);
+                        assert.isArray(comments);
+                    },
+                    "it has the right data": function(err, coll, comments) {
+                        var i,
+                            collIDs = {},
+                            commentIDs = {};
+                        assert.isObject(coll);
+                        assert.includes(coll, "id");
+                        assert.isString(coll.id);
+                        assert.includes(coll, "totalItems");
+                        assert.isNumber(coll.totalItems);
+                        assert.equal(coll.totalItems, 100);
+                        assert.includes(coll, "items");
+                        assert.isArray(coll.items);
+                        assert.lengthOf(coll.items, 100);
+
+                        for (i = 0; i < 100; i++) {
+                            collIDs[coll.items[i].id] = 1;
+                            commentIDs[comments[i].object.id] = 1;
+                        }
+
+                        for (i = 0; i < 100; i++) {
+                            assert.include(collIDs, comments[i].object.id);
+                            assert.include(commentIDs, coll.items[i].id);
+                        }
+                    }
+                }
+            }
         }
     }
 });
