@@ -210,6 +210,41 @@ suite.addBatch({
                         assert.isArray(coll.items);
                         assert.lengthOf(coll.items, 1);
                         assert.equal(coll.items[0].id, reply.object.id);
+                    },
+                    "and we delete the reply and re-check the feed": {
+                        topic: function(coll, reply, photo, replyAgain, cred1, cred2) {
+                            var cb = this.callback;
+                            
+                            Step(
+                                function() {
+                                    httputil.delJSON(reply.object.id, cred2, this);
+                                },
+                                function(err, del, response) {
+                                    if (err) throw err;
+                                    var url = photo.object.replies.url;
+                                    httputil.getJSON(url, cred1, this);
+                                },
+                                function(err, coll, response) {
+                                    cb(err, coll);
+                                }
+                            );
+                        },
+                        "it works": function(err, coll) {
+                            assert.ifError(err);
+                            assert.isObject(coll);
+                        },
+                        "it is an empty collection": function(err, coll) {
+                            assert.ifError(err);
+                            assert.isObject(coll);
+                            assert.includes(coll, "id");
+                            assert.isString(coll.id);
+                            assert.includes(coll, "totalItems");
+                            assert.isNumber(coll.totalItems);
+                            assert.equal(coll.totalItems, 0);
+                            assert.includes(coll, "items");
+                            assert.isArray(coll.items);
+                            assert.lengthOf(coll.items, 0);
+                        }
                     }
                 }
             }
