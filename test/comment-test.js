@@ -48,14 +48,11 @@ var testData = {
         displayName: "Great spec!",
         url: "http://example.com/comment/activity-stream-spec#comment1",
         content: "Nice job on the <strong>spec</strong>!",
-        inReplyTo: [
-            {
+        inReplyTo: {
                 url: "http://activitystrea.ms/specs/json/1.0/",
-                id: "http://activitystrea.ms/specs/json/1.0/",
                 objectType: "article",
                 displayName: "JSON Activity Streams 1.0"
-            }
-        ]
+        }
     },
     "update": {
         content: "<strong>Nice job</strong> on the spec!"
