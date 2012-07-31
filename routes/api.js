@@ -403,7 +403,7 @@ var replies = function(type) {
                 } else {
                     // Trim the IRT since it's implied
                     for (i = 0; i < replies.length; i++) {
-                        replies[i].inReplyTo = null;
+                        delete replies[i].inReplyTo;
                     }
                     collection.items = replies;
                     res.json(collection);
