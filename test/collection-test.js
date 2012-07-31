@@ -56,4 +56,21 @@ var testData = {
 
 suite.addBatch(modelBatch("collection", "Collection", testSchema, testData));
 
+suite.addBatch({
+    "When we get the Collection class": {
+        topic: function() {
+            return require("../lib/model/collection").Collection;
+        },
+        "it exists": function(Collection) {
+            assert.isFunction(Collection);
+        },
+        "it has an isList() method": function(Collection) {
+            assert.isFunction(Collection.isList);
+        },
+        "it has a checkList() method": function(Collection) {
+            assert.isFunction(Collection.checkList);
+        }
+    }
+});
+
 suite["export"](module);
