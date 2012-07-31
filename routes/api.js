@@ -366,7 +366,7 @@ var replies = function(type) {
         var obj = req[type];
 
         var collection = {
-            displayName: "Replies to " + obj.displayName,
+            displayName: "Replies to " + ((obj.displayName) ? obj.displayName : obj.id),
             id: URLMaker.makeURL("api/" + type + "/" + obj.uuid + "/replies"),
             items: []
         };
