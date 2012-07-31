@@ -89,6 +89,32 @@ suite.addBatch({
                     assert.includes(act.object.replies, "totalItems");
                     assert.isNumber(act.object.replies.totalItems);
                     assert.equal(act.object.replies.totalItems, 0);
+                },
+                "and we fetch the replies feed": {
+                    topic: function(act, cred) {
+                        var cb = this.callback,
+                            url = act.object.replies.url;
+
+                        httputil.getJSON(url, cred, function(err, coll, response) {
+                            cb(err, coll);
+                        });
+                    },
+                    "it works": function(err, coll) {
+                        assert.ifError(err);
+                        assert.isObject(coll);
+                    },
+                    "it is an empty collection": function(err, coll) {
+                        assert.ifError(err);
+                        assert.isObject(coll);
+                        assert.includes(coll, "id");
+                        assert.isString(coll.id);
+                        assert.includes(coll, "totalItems");
+                        assert.isNumber(coll.totalItems);
+                        assert.equal(coll.totalItems, 0);
+                        assert.includes(coll, "items");
+                        assert.isArray(coll.items);
+                        assert.lengthOf(coll.items, 0);
+                    }
                 }
             }
         }
