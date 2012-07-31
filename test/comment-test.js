@@ -51,6 +51,7 @@ var testData = {
         inReplyTo: [
             {
                 url: "http://activitystrea.ms/specs/json/1.0/",
+                id: "http://activitystrea.ms/specs/json/1.0/",
                 objectType: "article",
                 displayName: "JSON Activity Streams 1.0"
             }
