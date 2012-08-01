@@ -118,6 +118,9 @@ suite.addBatch({
             "it has the getInboxStream() method": function(user) {
                 assert.isFunction(user.getInboxStream);
             },
+            "it has the getLists() method": function(user) {
+                assert.isFunction(user.getLists);
+            },
             "it has the expand() method": function(user) {
                 assert.isFunction(user.expand);
             },
