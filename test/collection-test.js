@@ -19,6 +19,7 @@
 var assert = require("assert"),
     vows = require("vows"),
     databank = require("databank"),
+    Step = require("step"),
     URLMaker = require("../lib/urlmaker").URLMaker,
     modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
@@ -69,6 +70,35 @@ suite.addBatch({
         },
         "it has a checkList() method": function(Collection) {
             assert.isFunction(Collection.checkList);
+        },
+        "and we create a list": {
+            topic: function(Collection) {
+                var User = require("../lib/model/user").User;
+                Step(
+                    function() {
+                        var props = {
+                            nickname: "carlyle",
+                            password: "123456"
+                        };
+                        User.create(props, this);
+                    },
+                    function(err, user) {
+                        var list;
+                        if (err) throw err;
+                        list = {
+                            author: user.profile,
+                            displayName: "Friends",
+                            objectTypes: ["person"]
+                        };
+                        Collection.create(list, this);
+                    },
+                    this.callback
+                );
+            },
+            "it works": function(err, collection) {
+                assert.ifError(err);
+                assert.isObject(collection);
+            }
         }
     }
 });
