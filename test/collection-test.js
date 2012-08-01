@@ -71,7 +71,7 @@ suite.addBatch({
         "it has a checkList() method": function(Collection) {
             assert.isFunction(Collection.checkList);
         },
-        "and we create a list": {
+        "and we create a user": {
             topic: function(Collection) {
                 var User = require("../lib/model/user").User;
                 Step(
@@ -82,22 +82,73 @@ suite.addBatch({
                         };
                         User.create(props, this);
                     },
-                    function(err, user) {
-                        var list;
-                        if (err) throw err;
-                        list = {
-                            author: user.profile,
-                            displayName: "Friends",
-                            objectTypes: ["person"]
-                        };
-                        Collection.create(list, this);
-                    },
                     this.callback
                 );
             },
-            "it works": function(err, collection) {
+            "it works": function(err, user) {
                 assert.ifError(err);
-                assert.isObject(collection);
+                assert.isObject(user);
+            },
+            "and we create a list": {
+                topic: function(user, Collection) {
+                    var list = {
+                        author: user.profile,
+                        displayName: "Friends",
+                        objectTypes: ["person"]
+                    };
+                    Collection.create(list, this.callback);
+                },
+                "it works": function(err, collection) {
+                    assert.ifError(err);
+                    assert.isObject(collection);
+                },
+                "it has a getStream() method": function(err, collection) {
+                    assert.ifError(err);
+                    assert.isObject(collection);
+                    assert.isFunction(collection.getStream);
+                },
+                "and we get the collection stream": {
+                    topic: function(coll) {
+                        coll.getStream(this.callback);
+                    },
+                    "it works": function(err, stream) {
+                        assert.ifError(err);
+                        assert.isObject(stream);
+                    }
+                },
+                "and we get the user's lists": {
+                    topic: function(coll, user) {
+                        var callback = this.callback;
+                        Step(
+                            function() {
+                                user.getLists(this);
+                            },
+                            function(err, stream) {
+                                if (err) throw err;
+                                stream.getIDs(0, 20, this);
+                            },
+                            function(err, ids) {
+                                if (err) {
+                                    callback(err, null, null);
+                                } else {
+                                    callback(err, ids, coll);
+                                }
+                            }
+                        );
+                    },
+                    "it works": function(err, ids, coll) {
+                        assert.ifError(err);
+                        assert.isArray(ids);
+                        assert.isObject(coll);
+                    },
+                    "it has the right data": function(err, ids, coll) {
+                        assert.ifError(err);
+                        assert.isArray(ids);
+                        assert.isObject(coll);
+                        assert.lengthOf(ids, 1);
+                        assert.equal(ids[0], coll.id);
+                    }
+                }
             }
         }
     }
