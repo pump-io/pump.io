@@ -40,7 +40,7 @@ var makeCred = function(cl, pair) {
     };
 };
 
-var assertValidList = function(doc, count) {
+var assertValidList = function(doc, count, itemCount) {
     assert.include(doc, "author");
     assert.include(doc.author, "id");
     assert.include(doc.author, "displayName");
@@ -51,7 +51,9 @@ var assertValidList = function(doc, count) {
     assert.include(doc, "id");
     if (_(count).isNumber()) {
         assert.equal(doc.totalItems, count);
-        assert.lengthOf(doc.items, count);
+    }
+    if (_(itemCount).isNumber()) {
+        assert.lengthOf(doc.items, itemCount);
     }
 };
 
@@ -199,6 +201,73 @@ suite.addBatch({
                         assert.isArray(lists.items);
                         assert.lengthOf(lists.items, 1);
                         assert.equal(lists.items[0].id, collection.id);
+                    }
+                }
+            },
+            "and a user creates a lot of lists": {
+                topic: function(cl) {
+                    var cb = this.callback,
+                        pair = null;
+
+                    Step(
+                        function() {
+                            newPair(cl, "dekker", "sabotage", this);
+                        },
+                        function(err, results) {
+                            if (err) throw err;
+                            pair = results;
+                            var cred = makeCred(cl, pair),
+                                url = "http://localhost:4815/api/user/dekker/feed",
+                                act = {
+                                    verb: "post",
+                                    object: {
+                                        objectType: "collection",
+                                        objectTypes: ["person"]
+                                    }
+                                },
+                                acti,
+                                group = this.group();
+
+                            for (var i = 0; i < 100; i++) {
+                                acti = _(act).clone();
+                                acti.object.displayName = "Israelites #" + i;
+                                httputil.postJSON(url, cred, acti, group());
+                            }
+                        },
+                        function(err, docs, responses) {
+                            cb(err, docs, pair);
+                        }
+                    );
+                },
+                "it works": function(err, lists) {
+                    assert.ifError(err);
+                    assert.isArray(lists);
+                    assert.lengthOf(lists, 100);
+                    for (var i = 0; i < 100; i++) {
+                        assert.isObject(lists[i]);
+                        assertValidActivity(lists[i]);
+                    }
+                },
+                "and we get the list of lists owned by the user": {
+                    topic: function(acts, pair, cl) {
+                        var cb = this.callback,
+                            cred = makeCred(cl, pair),
+                            url = "http://localhost:4815/api/user/dekker/lists";
+
+                        httputil.getJSON(url, cred, function(err, doc, response) {
+                            cb(err, doc);
+                        });
+                    },
+                    "it works": function(err, lists, acts) {
+                        assert.ifError(err);
+                        assert.isObject(lists);
+                    },
+                    "it looks correct": function(err, lists, acts) {
+                        assert.ifError(err);
+                        assertValidList(lists, 100, 20);
+                        assert.include(lists, "objectTypes");
+                        assert.isArray(lists.objectTypes);
+                        assert.include(lists.objectTypes, "collection");
                     }
                 }
             }
