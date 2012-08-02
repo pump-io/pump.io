@@ -1,6 +1,6 @@
 // routes/api.js
 //
-// The beating heart of a pumpin" good time
+// The beating heart of a pumpin' good time
 //
 // Copyright 2011-2012, StatusNet Inc.
 //
