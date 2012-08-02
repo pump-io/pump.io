@@ -270,6 +270,73 @@ suite.addBatch({
                         assert.include(lists.objectTypes, "collection");
                     }
                 }
+            },
+            "and a user deletes a list": {
+                topic: function(cl) {
+                    var cb = this.callback,
+                        pair = null,
+                        cred = null,
+                        url = "http://localhost:4815/api/user/maxromeo/feed",
+                        list = null;
+
+                    Step(
+                        function() {
+                            newPair(cl, "maxromeo", "warina", this);
+                        },
+                        function(err, results) {
+                            if (err) throw err;
+                            pair = results;
+                            cred = makeCred(cl, pair);
+                            var act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "collection",
+                                    displayName: "Babylonians",
+                                    objectTypes: ["person"]
+                                }
+                            };
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, doc, response) {
+                            if (err) throw err;
+                            list = doc.object;
+                            var act = {
+                                verb: "delete",
+                                object: list
+                            };
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, doc, response) {
+                            cb(err, doc, pair);
+                        }
+                    );
+                },
+                "it works": function(err, act) {
+                    assert.ifError(err);
+                    assertValidActivity(act);
+                },
+                "and we get the list of lists owned by the user": {
+                    topic: function(act, pair, cl) {
+                        var cb = this.callback,
+                            cred = makeCred(cl, pair),
+                            url = "http://localhost:4815/api/user/maxromeo/lists";
+
+                        httputil.getJSON(url, cred, function(err, doc, response) {
+                            cb(err, doc);
+                        });
+                    },
+                    "it works": function(err, lists, acts) {
+                        assert.ifError(err);
+                        assert.isObject(lists);
+                    },
+                    "it looks correct": function(err, lists, acts) {
+                        assert.ifError(err);
+                        assertValidList(lists, 0);
+                        assert.include(lists, "objectTypes");
+                        assert.isArray(lists.objectTypes);
+                        assert.include(lists.objectTypes, "collection");
+                    }
+                }
             }
         }
     }
