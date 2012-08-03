@@ -32,7 +32,6 @@ var databank = require("databank"),
     Stream = stream.Stream,
     NotInStreamError = stream.NotInStreamError,
     Client = require("../lib/model/client").Client,
-    Tombstone = require("../lib/model/tombstone").Tombstone,
     mw = require("../lib/middleware"),
     URLMaker = require("../lib/urlmaker").URLMaker,
     reqUser = mw.reqUser,
@@ -215,25 +214,23 @@ var requester = function(type) {
             if (err) {
                 next(err);
             } else if (results.length === 0) {
-                Tombstone.lookup(type, uuid, function(err, ts) {
-                    if (err instanceof NoSuchThingError) {
-                        next(new HTTPError("Can't find a " + type + " with ID = " + uuid, 404));
-                    } else {
-                        next(new HTTPError("The " + type + " with ID = " + uuid + " was deleted", 410));
-                    }
-                });
+                next(new HTTPError("Can't find a " + type + " with ID = " + uuid, 404));
             } else if (results.length > 1) {
                 next(new HTTPError("Too many " + type + " objects with ID = " + req.params.uuid, 500));
             } else {
                 obj = results[0];
-                obj.expand(function(err) {
-                    if (err) {
-                        next(err);
-                    } else {
-                        req[type] = obj;
-                        next();
-                    }
-                });
+                if (obj.hasOwnProperty("deleted")) {
+                    next(new HTTPError("Deleted", 410));
+                } else {
+                    obj.expand(function(err) {
+                        if (err) {
+                            next(err);
+                        } else {
+                            req[type] = obj;
+                            next();
+                        }
+                    });
+                }
             }
         });
     };
@@ -309,11 +306,7 @@ var deleter = function(type) {
         var obj = req[type];
         Step(
             function() {
-                obj.del(this);
-            },
-            function(err) {
-                if (err) throw err;
-                Tombstone.mark(obj, this);
+                obj.efface(this);
             },
             function(err) {
                 if (err) {
@@ -468,26 +461,23 @@ var reqActivity = function(req, res, next) {
         if (err) {
             next(err);
         } else if (results.length === 0) { // not found
-            Tombstone.lookup("activity", uuid, function(err, ts) {
-                if (err instanceof NoSuchThingError) {
-                    next(new HTTPError("Can't find an activity with id " + uuid, 404));
-                } else {
-                    // Last-Modified?
-                    next(new HTTPError("That activity was deleted.", 410));
-                }
-            });
+            next(new HTTPError("Can't find an activity with id " + uuid, 404));
         } else if (results.length > 1) {
             next(new HTTPError("Too many activities with ID = " + req.params.uuid, 500));
         } else {
             act = results[0];
-            act.expand(function(err) {
-                if (err) {
-                    next(err);
-                } else {
-                    req.activity = act;
-                    next();
-                }
-            });
+            if (act.hasOwnProperty("deleted")) {
+                next(new HTTPError("Deleted", 410));
+            } else {
+                act.expand(function(err) {
+                    if (err) {
+                        next(err);
+                    } else {
+                        req.activity = act;
+                        next();
+                    }
+                });
+            }
         }
     });
 };
@@ -510,11 +500,7 @@ var delActivity = function(req, res, next) {
     var act = req.activity;
     Step(
         function() {
-            act.del(this);
-        },
-        function(err) {
-            if (err) throw err;
-            Tombstone.markFull(act, "activity", act.uuid, this);
+            act.efface(this);
         },
         function(err) {
             if (err) {
