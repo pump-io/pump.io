@@ -243,15 +243,17 @@ suite.addBatch({
                         var callback = this.callback,
                             url = del.object.id;
                         httputil.getJSON(url, cred, function(err, obj, res) {
-                            callback(err, obj, res);
+                            if (err && err.statusCode == 410) {
+                                callback(null);
+                            } else if (err) {
+                                callback(err);
+                            } else {
+                                callback(new Error("Unexpected success"));
+                            }
                         });
                     },
-                    "it works": function(err, obj, res) {
+                    "it is 410 Gone": function(err) {
                         assert.ifError(err);
-                    },
-                    "it is 410 Gone": function(err, obj, res) {
-                        assert.ifError(err);
-                        assert.equal(res.statusCode, 410);
                     }
                 }
             }
