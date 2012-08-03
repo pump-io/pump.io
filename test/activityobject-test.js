@@ -171,6 +171,9 @@ vows.describe("activityobject class interface").addBatch({
                 },
                 "it has an expandFeeds() method": function(review) {
                     assert.isFunction(review.expandFeeds);
+                },
+                "it has an efface() method": function(review) {
+                    assert.isFunction(review.efface);
                 }
             },
             "and we get a non-activityobject model object by its properties": {
@@ -986,6 +989,57 @@ vows.describe("activityobject class interface").addBatch({
                     assert.equal(place.likes.totalItems, 0);
                     assert.includes(place.likes, "url");
                     assert.isString(place.likes.url);
+                }
+            },
+            "and we create then efface an object": {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Comment = require("../lib/model/comment").Comment,
+                        comment;
+                    
+                    Step(
+                        function() {
+                            var props = {
+                                author: {
+                                    id: "mailto:evan@status.net",
+                                    objectType: "person"
+                                },
+                                inReplyTo: {
+                                    url: "http://scripting.com/stories/2012/07/25/anOpenTwitterlikeEcosystem.html",
+                                    objectType: "article"
+                                },
+                                content: "Right on, Dave."
+                            };
+                            Comment.create(props, this);
+
+                        },
+                        function(err, results) {
+                            if (err) throw err;
+                            comment = results;
+                            comment.efface(this);
+                        },
+                        function(err) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                cb(null, comment);
+                            }
+                        }
+                    );
+                },
+                "it works": function(err, comment) {
+                    assert.ifError(err);
+                },
+                "it looks right": function(err, comment) {
+                    assert.ifError(err);
+                    assert.ok(comment.id);
+                    assert.ok(comment.objectType);
+                    assert.ok(comment.author);
+                    assert.ok(comment.inReplyTo);
+                    assert.ok(comment.published);
+                    assert.ok(comment.updated);
+                    assert.ok(comment.deleted);
+                    assert.isUndefined(comment.content);
                 }
             }
         }
