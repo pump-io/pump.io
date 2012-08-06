@@ -29,6 +29,7 @@ var assert = require("assert"),
     actutil = require("./lib/activity"),
     setupApp = oauthutil.setupApp,
     newCredentials = oauthutil.newCredentials,
+    newPair = oauthutil.newPair,
     newClient = oauthutil.newClient,
     register = oauthutil.register,
     accessToken = oauthutil.accessToken;
@@ -231,6 +232,93 @@ suite.addBatch({
                 "results are correct": function(err, act) {
                     assert.ifError(err);
                     assert.equal(act.verb, "follow");
+                }
+            },
+            "and one user follows a person who then posts": {
+                topic: function(cl) {
+                    var cb = this.callback,
+                        users = {jack: {}, jill: {}},
+                        postnote;
+
+                    Step(
+                        function() {
+                            register(cl, "jack", "upthehill", this.parallel());
+                            register(cl, "jill", "pailofwater", this.parallel());
+                        },
+                        function(err, user1, user2) {
+                            if (err) throw err;
+                            users.jack.profile = user1.profile;
+                            users.jill.profile = user2.profile;
+                            accessToken(cl, {nickname: "jack", password: "upthehill"}, this.parallel());
+                            accessToken(cl, {nickname: "jill", password: "pailofwater"}, this.parallel());
+                        },
+                        function(err, pair1, pair2) {
+                            if (err) throw err;
+                            users.jack.pair = pair1;
+                            users.jill.pair = pair2;
+
+                            var act = {
+                                verb: "follow",
+                                object: {
+                                    objectType: "person",
+                                    id: users.jill.profile.id
+                                }
+                            },
+                                url = "http://localhost:4815/api/user/jack/feed",
+                                cred = makeCred(cl, users.jack.pair);
+
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, posted, result) {
+                            if (err) throw err;
+                            var act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "note",
+                                    content: "Hello, world."
+                                }
+                            },
+                                url = "http://localhost:4815/api/user/jill/feed",
+                                cred = makeCred(cl, users.jill.pair);
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, posted, result) {
+                            if (err) throw err;
+                            postnote = posted;
+                            var url = "http://localhost:4815/api/user/jack/inbox",
+                                cred = makeCred(cl, users.jack.pair),
+                                callback = this;
+                            
+                            setTimeout(function() {
+                                httputil.getJSON(url, cred, callback);
+                            }, 2000);
+                        },
+                        function(err, doc, result) {
+                            if (err) {
+                                cb(err, null, null);
+                            } else {
+                                cb(null, doc, postnote);
+                            }
+                        }
+                    );
+                },
+                "it works": function(err, inbox, postnote) {
+                    assert.ifError(err);
+                },
+                "posted item goes to inbox": function(err, inbox, postnote) {
+                    assert.ifError(err);
+                    assert.isObject(inbox);
+                    assert.include(inbox, "totalItems");
+                    assert.isNumber(inbox.totalItems);
+                    assert.equal(inbox.totalItems, 2);
+                    assert.include(inbox, "items");
+                    assert.isArray(inbox.items);
+                    assert.lengthOf(inbox.items, 2);
+                    assert.isObject(inbox.items[0]);
+                    assert.include(inbox.items[0], "id");
+                    assert.isObject(postnote);
+                    assert.include(postnote, "id");
+                    assert.equal(inbox.items[0].id, postnote.id);
                 }
             }
         }
