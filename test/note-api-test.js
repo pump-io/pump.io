@@ -256,6 +256,73 @@ suite.addBatch({
                         assert.ifError(err);
                     }
                 }
+            },
+            "and we post a note and then update it": {
+                topic: function(cl) {
+                    var callback = this.callback,
+                        feed = "http://localhost:4815/api/user/radagast/feed",
+                        cred;
+                    Step(
+                        function() {
+                            newPair(cl, "radagast", "abird", this);
+                        },
+                        function(err, pair) {
+                            var act;
+                            if (err) throw err;
+                            cred = makeCred(cl, pair);
+                            act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "note",
+                                    content: "I like squirrels."
+                                }
+                            };
+
+                            httputil.postJSON(feed, cred, act, this);
+                        },
+                        function(err, post, result) {
+                            if (err) throw err;
+                            var upd = {
+                                verb: "update",
+                                object: {
+                                    id: post.object.id,
+                                    objectType: "note",
+                                    content: "I like raccoons."
+                                }
+                            };
+                            httputil.postJSON(feed, cred, upd, this);
+                        },
+                        function(err, upd, result) {
+                            if (err) {
+                                callback(err, null, null);
+                            } else {
+                                callback(null, upd, cred);
+                            }
+                        }
+                    );
+                },
+                "it works": function(err, del, cred) {
+                    assert.ifError(err);
+                },
+                "and we retrieve the updated note": {
+                    topic: function(upd, cred) {
+                        var callback = this.callback,
+                            url = upd.object.id;
+                        httputil.getJSON(url, cred, function(err, obj, res) {
+                            callback(err, obj);
+                        });
+                    },
+                    "it works": function(err, obj) {
+                        assert.ifError(err);
+                    },
+                    "it has the updated content": function(err, obj) {
+                        assert.ifError(err);
+                        assert.isObject(obj);
+                        assert.include(obj, "content");
+                        assert.isString(obj.content);
+                        assert.equal(obj.content, "I like raccoons.");
+                    }
+                }
             }
         }
     }
