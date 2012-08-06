@@ -727,6 +727,70 @@ suite.addBatch({
                     assert.ifError(err);
                 }
             },
+            "and a user adds a non-person object to a person list": {
+                topic: function(cl) {
+                    var cb = this.callback,
+                        pair1 = null,
+                        cred1 = null,
+                        url1 = "http://localhost:4815/api/user/snooplion/feed",
+                        note,
+                        list;
+
+                    Step(
+                        function() {
+                            newPair(cl, "snooplion", "lalala", this);
+                        },
+                        function(err, results1) {
+                            if (err) throw err;
+                            pair1 = results1;
+                            cred1 = makeCred(cl, pair1);
+                            var act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "collection",
+                                    displayName: "Friends",
+                                    objectTypes: ["person"]
+                                }
+                            };
+                            httputil.postJSON(url1, cred1, act, this);
+                        },
+                        function(err, doc, response) {
+                            if (err) throw err;
+                            list = doc.object;
+                            var act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "note",
+                                    content: "Yo."
+                                }
+                            };
+                            httputil.postJSON(url1, cred1, act, this);
+                        },
+                        function(err, doc, response) {
+                            if (err) throw err;
+                            note = doc.object;
+                            var act = {
+                                verb: "add",
+                                object: note,
+                                target: list
+                            };
+                            httputil.postJSON(url1, cred1, act, this);
+                        },
+                        function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                "it fails correctly": function(err) {
+                    assert.ifError(err);
+                }
+            },
             "and a user removes another user from a list they don't own": {
                 topic: function(cl) {
                     var cb = this.callback,
