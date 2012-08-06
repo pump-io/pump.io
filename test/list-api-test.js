@@ -337,6 +337,98 @@ suite.addBatch({
                         assert.include(lists.objectTypes, "collection");
                     }
                 }
+            },
+            "and a user deletes a non-existent list": {
+                topic: function(cl) {
+                    var cb = this.callback,
+                        pair = null,
+                        cred = null,
+                        url = "http://localhost:4815/api/user/scratch/feed",
+                        list = null;
+
+                    Step(
+                        function() {
+                            newPair(cl, "scratch", "roastfish&cornbread", this);
+                        },
+                        function(err, results) {
+                            if (err) throw err;
+                            pair = results;
+                            cred = makeCred(cl, pair);
+                            var act = {
+                                verb: "delete",
+                                object: {
+                                    objectType: "collection",
+                                    id: "urn:uuid:88374dac-7ce7-40da-bbde-6655181d8458"
+                                }
+                            };
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                "it fails correctly": function(err) {
+                    assert.ifError(err);
+                }
+            },
+            "and a user creates a list that already exists": {
+                topic: function(cl) {
+                    var cb = this.callback,
+                        pair = null,
+                        cred = null,
+                        url = "http://localhost:4815/api/user/petertosh/feed";
+
+                    Step(
+                        function() {
+                            newPair(cl, "petertosh", "=rights", this);
+                        },
+                        function(err, results) {
+                            if (err) throw err;
+                            pair = results;
+                            cred = makeCred(cl, pair);
+                            var act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "collection",
+                                    displayName: "Wailers",
+                                    objectTypes: ["person"]
+                                }
+                            };
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, doc, response) {
+                            if (err) throw err;
+                            var act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "collection",
+                                    displayName: "Wailers",
+                                    objectTypes: ["person"]
+                                }
+                            };
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                "it fails correctly": function(err) {
+                    assert.ifError(err);
+                }
             }
         }
     }
