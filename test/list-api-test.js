@@ -610,6 +610,196 @@ suite.addBatch({
                         assert.equal(list.members.items[0].id, person.id);
                     }
                 }
+            },
+            "and a user removes another person from a list they're not in": {
+                topic: function(cl) {
+                    var cb = this.callback,
+                        pair = null,
+                        cred = null,
+                        url = "http://localhost:4815/api/user/bunny/feed",
+                        list;
+
+                    Step(
+                        function() {
+                            newPair(cl, "bunny", "number3", this);
+                        },
+                        function(err, results) {
+                            if (err) throw err;
+                            pair = results;
+                            cred = makeCred(cl, pair);
+                            var act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "collection",
+                                    displayName: "Wailers",
+                                    objectTypes: ["person"]
+                                }
+                            };
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, doc, response) {
+                            if (err) throw err;
+                            list = doc.object;
+                            var act = {
+                                verb: "remove",
+                                object: {
+                                    id: "urn:uuid:88b33906-b9c9-11e1-98f5-70f1a154e1aa",
+                                    objectType: "person",
+                                    displayName: "Rita Marley"
+                                },
+                                target: list
+                            };
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                "it fails correctly": function(err) {
+                    assert.ifError(err);
+                }
+            },
+            "and a user adds another user to a list they don't own": {
+                topic: function(cl) {
+                    var cb = this.callback,
+                        pair1 = null,
+                        pair2 = null,
+                        cred1 = null,
+                        cred2 = null,
+                        url1 = "http://localhost:4815/api/user/burningspear/feed",
+                        url2 = "http://localhost:4815/api/user/sugar/feed",
+                        list;
+
+                    Step(
+                        function() {
+                            newPair(cl, "burningspear", "m4rcus", this.parallel());
+                            newPair(cl, "sugar", "minott", this.parallel());
+                        },
+                        function(err, results1, results2) {
+                            if (err) throw err;
+                            pair1 = results1;
+                            pair2 = results2;
+                            cred1 = makeCred(cl, pair1);
+                            cred2 = makeCred(cl, pair2);
+                            var act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "collection",
+                                    displayName: "Rastafarians",
+                                    objectTypes: ["person"]
+                                }
+                            };
+                            httputil.postJSON(url1, cred1, act, this);
+                        },
+                        function(err, doc, response) {
+                            if (err) throw err;
+                            list = doc.object;
+                            var act = {
+                                verb: "add",
+                                object: {
+                                    id: "urn:uuid:3db214bc-ba10-11e1-b5ac-70f1a154e1aa",
+                                    objectType: "person",
+                                    displayName: "Hillary Clinton"
+                                },
+                                target: list
+                            };
+                            httputil.postJSON(url2, cred2, act, this);
+                        },
+                        function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                "it fails correctly": function(err) {
+                    assert.ifError(err);
+                }
+            },
+            "and a user removes another user from a list they don't own": {
+                topic: function(cl) {
+                    var cb = this.callback,
+                        pair1 = null,
+                        pair2 = null,
+                        cred1 = null,
+                        cred2 = null,
+                        url1 = "http://localhost:4815/api/user/junior/feed",
+                        url2 = "http://localhost:4815/api/user/marcia/feed",
+                        list;
+
+                    Step(
+                        function() {
+                            newPair(cl, "junior", "murvin", this.parallel());
+                            newPair(cl, "marcia", "griffiths", this.parallel());
+                        },
+                        function(err, results1, results2) {
+                            if (err) throw err;
+                            pair1 = results1;
+                            pair2 = results2;
+                            cred1 = makeCred(cl, pair1);
+                            cred2 = makeCred(cl, pair2);
+                            var act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "collection",
+                                    displayName: "Police",
+                                    objectTypes: ["person"]
+                                }
+                            };
+                            httputil.postJSON(url1, cred1, act, this);
+                        },
+                        function(err, doc, response) {
+                            if (err) throw err;
+                            list = doc.object;
+                            var act = {
+                                verb: "add",
+                                object: {
+                                    id: "urn:uuid:acfadb0a-ba16-11e1-bcbc-70f1a154e1aa",
+                                    objectType: "person",
+                                    displayName: "J. Edgar Hoover"
+                                },
+                                target: list
+                            };
+                            httputil.postJSON(url1, cred1, act, this);
+                        },
+                        function(err, doc, response) {
+                            if (err) {
+                                // Got an error up to here; it"s an error
+                                cb(err);
+                                return;
+                            }
+                            var act = {
+                                verb: "remove",
+                                object: doc.object,
+                                target: list
+                            };
+                            httputil.postJSON(url2, cred2, act, this);
+                        },
+                        function(err, doc, response) {
+                            if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                "it fails correctly": function(err) {
+                    assert.ifError(err);
+                }
             }
         }
     }
