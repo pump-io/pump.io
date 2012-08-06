@@ -429,6 +429,116 @@ suite.addBatch({
                 "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
+            },
+            "and a user adds another user to a created list": {
+                topic: function(cl) {
+                    var cb = this.callback,
+                        pair = null,
+                        cred = null,
+                        url = "http://localhost:4815/api/user/patobanton/feed",
+                        list;
+
+                    Step(
+                        function() {
+                            newPair(cl, "patobanton", "myopinion", this);
+                        },
+                        function(err, results) {
+                            if (err) throw err;
+                            pair = results;
+                            cred = makeCred(cl, pair);
+                            var act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "collection",
+                                    displayName: "Collaborators",
+                                    objectTypes: ["person"]
+                                }
+                            };
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, doc, response) {
+                            if (err) throw err;
+                            list = doc.object;
+                            register(cl, "roger", "ranking", this);
+                        },
+                        function(err, user) {
+                            if (err) {
+                                cb(err, null, null);
+                                return;
+                            }
+                            var act = {
+                                verb: "add",
+                                object: user.profile,
+                                target: list
+                            };
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, doc, response) {
+                            cb(err, doc, pair);
+                        }
+                    );
+                },
+                "it works": function(err, act, pair) {
+                    assert.ifError(err);
+                },
+                "and we get the collection of users in that list": {
+                    topic: function(act, pair, cl) {
+                        var cb = this.callback,
+                            cred = makeCred(cl, pair),
+                            url = act.target.id;
+
+                        httputil.getJSON(url, cred, function(err, doc, response) {
+                            cb(err, doc, act.object);
+                        });
+                    },
+                    "it works": function(err, list, person) {
+                        assert.ifError(err);
+                        assert.isObject(list);
+                        assert.isObject(person);
+                    },
+                    "it includes that user": function(err, list, person) {
+                        assert.ifError(err);
+                        assert.lengthOf(list.members.items, 1);
+                        assert.equal(list.members.items[0].id, person.id);
+                    },
+                    "and the user removes the other user from the list": {
+                        topic: function(list, person, act, pair, cl) {
+                            var cb = this.callback,
+                                cred = makeCred(cl, pair),
+                                url = "http://localhost:4815/api/user/patobanton/feed",
+                                ract = {
+                                    verb: "remove",
+                                    object: person,
+                                    target: list
+                                };
+                            httputil.postJSON(url, cred, ract, cb);
+                        },
+                        "it works": function(err, doc, response) {
+                            assert.ifError(err);
+                            assertValidActivity(doc);
+                        },
+                        "and we get the collection of users in that list": {
+                            topic: function(doc, response, list, person, act, pair, cl) {
+                                var cb = this.callback,
+                                    cred = makeCred(cl, pair),
+                                    url = act.target.id;
+
+                                httputil.getJSON(url, cred, function(err, doc, response) {
+                                    cb(err, doc, act.object);
+                                });
+                            },
+                            "it works": function(err, list, person) {
+                                assert.ifError(err);
+                                assert.isObject(list);
+                                assert.isObject(person);
+                            },
+                            "it does not include that user": function(err, list, person) {
+                                assert.ifError(err);
+                                assert.equal(list.members.totalItems, 0);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
