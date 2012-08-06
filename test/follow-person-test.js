@@ -288,7 +288,10 @@ suite.addBatch({
                             var url = "http://localhost:4815/api/user/jack/inbox",
                                 cred = makeCred(cl, users.jack.pair),
                                 callback = this;
-                            
+
+                            // Need non-zero time for async distribution
+                            // to work. 2s seems reasonable for unit test.
+
                             setTimeout(function() {
                                 httputil.getJSON(url, cred, callback);
                             }, 2000);
