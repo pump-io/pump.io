@@ -24,6 +24,7 @@ var databank = require("databank"),
     sanitize = validator.sanitize,
     HTTPError = require("../lib/httperror").HTTPError,
     Activity = require("../lib/model/activity").Activity,
+    AppError = require("../lib/model/activity").AppError,
     Collection = require("../lib/model/collection").Collection,
     ActivityObject = require("../lib/model/activityobject").ActivityObject,
     User = require("../lib/model/user").User,
@@ -38,6 +39,7 @@ var databank = require("databank"),
     sameUser = mw.sameUser,
     NoSuchThingError = databank.NoSuchThingError,
     AlreadyExistsError = databank.AlreadyExistsError,
+    NoSuchItemError = databank.NoSuchItemError,
     DEFAULT_ITEMS = 20,
     DEFAULT_ACTIVITIES = DEFAULT_ITEMS,
     DEFAULT_FAVORITES = DEFAULT_ITEMS,
@@ -637,9 +639,15 @@ var postActivity = function(req, res, next) {
         },
         function(err) {
             if (err) {
-                if (err instanceof NoSuchThingError) {
+                if (err instanceof AppError) {
+                    throw new HTTPError(err.message, 400);
+                } else if (err instanceof NoSuchThingError) {
                     throw new HTTPError(err.message, 400);
                 } else if (err instanceof AlreadyExistsError) {
+                    throw new HTTPError(err.message, 400);
+                } else if (err instanceof NoSuchItemError) {
+                    throw new HTTPError(err.message, 400);
+                } else if (err instanceof NotInStreamError) {
                     throw new HTTPError(err.message, 400);
                 } else {
                     throw err;
