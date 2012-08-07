@@ -124,7 +124,7 @@ suite.addBatch({
                 },
                 "it is valid": function(err, lists) {
                     assert.ifError(err);
-                    assertValidList(lists, 5);
+                    assertValidList(lists, 0);
                 }
             },
             "and a user creates a list": {
@@ -190,7 +190,7 @@ suite.addBatch({
                     },
                     "it looks correct": function(err, lists, collection) {
                         assert.ifError(err);
-                        assertValidList(lists, 6);
+                        assertValidList(lists, 1);
                         assert.include(lists, "objectTypes");
                         assert.isArray(lists.objectTypes);
                         assert.include(lists.objectTypes, "collection");
@@ -199,7 +199,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(lists, "items");
                         assert.isArray(lists.items);
-                        assert.lengthOf(lists.items, 6);
+                        assert.lengthOf(lists.items, 1);
                         assert.equal(lists.items[0].id, collection.id);
                     }
                 }
@@ -264,7 +264,7 @@ suite.addBatch({
                     },
                     "it looks correct": function(err, lists, acts) {
                         assert.ifError(err);
-                        assertValidList(lists, 105, 20);
+                        assertValidList(lists, 100, 20);
                         assert.include(lists, "objectTypes");
                         assert.isArray(lists.objectTypes);
                         assert.include(lists.objectTypes, "collection");
@@ -331,7 +331,7 @@ suite.addBatch({
                     },
                     "it looks correct": function(err, lists, acts) {
                         assert.ifError(err);
-                        assertValidList(lists, 5);
+                        assertValidList(lists, 0);
                         assert.include(lists, "objectTypes");
                         assert.isArray(lists.objectTypes);
                         assert.include(lists.objectTypes, "collection");
