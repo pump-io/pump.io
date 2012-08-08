@@ -387,19 +387,19 @@ suite.addBatch({
                 topic: function(stream) {
                     stream.count(this.callback);
                 },
-                "it is zero": function(err, count) {
+                "it is five": function(err, count) {
                     assert.ifError(err);
-                    assert.equal(count, 0);
+                    assert.equal(count, 5);
                 }
             },
             "and we get the first few lists": {
                 topic: function(stream) {
                     stream.getItems(0, 20, this.callback);
                 },
-                "it is empty": function(err, ids) {
+                "it is a five-element list": function(err, ids) {
                     assert.ifError(err);
                     assert.isArray(ids);
-                    assert.lengthOf(ids, 0);
+                    assert.lengthOf(ids, 5);
                 }
             }
         },
