@@ -93,7 +93,7 @@ suite.addBatch({
                 topic: function(user, Collection) {
                     var list = {
                         author: user.profile,
-                        displayName: "Friends",
+                        displayName: "Neighbors",
                         objectTypes: ["person"]
                     };
                     Collection.create(list, this.callback);
@@ -145,7 +145,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.isArray(ids);
                         assert.isObject(coll);
-                        assert.lengthOf(ids, 1);
+                        assert.lengthOf(ids, 6);
                         assert.equal(ids[0], coll.id);
                     }
                 }
