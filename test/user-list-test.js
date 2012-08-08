@@ -93,8 +93,8 @@ suite.addBatch({
                     "it works": function(err, count) {
                         assert.ifError(err);
                     },
-                    "it is zero": function(err, count) {
-                        assert.equal(count, 0);
+                    "it is five": function(err, count) {
+                        assert.equal(count, 5);
                     }
                 },
                 "and we get the latest lists": {
@@ -104,9 +104,9 @@ suite.addBatch({
                     "it works": function(err, ids) {
                         assert.ifError(err);
                     },
-                    "it is an empty array": function(err, ids) {
+                    "it is an array with default items": function(err, ids) {
                         assert.isArray(ids);
-                        assert.isEmpty(ids);
+                        assert.lengthOf(ids, 5);
                     }
                 }
             }
