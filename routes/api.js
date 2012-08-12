@@ -485,6 +485,18 @@ var reqActivity = function(req, res, next) {
 };
 
 var getActivity = function(req, res, next) {
+    var user = req.remoteUser,
+        act = req.activity;
+
+    if (!user || user.profile.id !== act.actor.id) {
+        if (act.bcc) {
+            delete act.bcc;
+        }
+        if (act.bto) {
+            delete act.bto;
+        }
+    }
+
     res.json(req.activity);
 };
 
