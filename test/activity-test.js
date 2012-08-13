@@ -257,6 +257,9 @@ suite.addBatch({
             },
             "it has the expand() method": function(activity) {
                 assert.isFunction(activity.expand);
+            },
+            "it has the sanitize() method": function(activity) {
+                assert.isFunction(activity.sanitize);
             }
         },
         "and we apply() a new post activity": {
@@ -503,6 +506,204 @@ suite.addBatch({
                         }
                     }
                 }
+            }
+        },
+        "and we sanitize() an activity for the actor": {
+            topic: function(Activity) {
+                var User = require("../lib/model/user").User,
+                    user,
+                    cb = this.callback;
+
+                Step(
+                    function() {
+                        User.create({nickname: "charlie", password: "123456"}, this);
+                    },
+                    function(err, result) {
+                        var act;
+                        if (err) throw err;
+                        user = result;
+                        act = {
+                            actor: user.profile,
+                            verb: "post",
+                            bto: [
+                                {
+                                    objectType: "person",
+                                    id: "b59554e4-e576-11e1-b0ff-5cff35050cf2"
+                                }
+                            ],
+                            bcc: [
+                                {
+                                    objectType: "person",
+                                    id: "c456d228-e576-11e1-89dd-5cff35050cf2"
+                                }
+                            ],
+                            object: {
+                                objectType: "note",
+                                content: "Hello, world!"
+                            }
+                        };
+                        Activity.create(act, this);
+                    },
+                    function(err, act) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            act.sanitize(user);
+                            cb(err, act);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, act) {
+                assert.ifError(err);
+                assert.isObject(act);
+            },
+            "uuid is invisible": function(err, act) {
+                assert.ifError(err);
+                assert.isObject(act);
+                assert.isFalse(act.hasOwnProperty("uuid"));
+            },
+            "bcc is visible": function(err, act) {
+                assert.ifError(err);
+                assert.isObject(act);
+                assert.isTrue(act.hasOwnProperty("bcc"));
+            },
+            "bto is visible": function(err, act) {
+                assert.ifError(err);
+                assert.isObject(act);
+                assert.isTrue(act.hasOwnProperty("bto"));
+            }
+        },
+        "and we sanitize() an activity for another user": {
+            topic: function(Activity) {
+                var User = require("../lib/model/user").User,
+                    user1, user2,
+                    cb = this.callback;
+
+                Step(
+                    function() {
+                        User.create({nickname: "david", password: "123456"}, this.parallel());
+                        User.create({nickname: "ethel", password: "123456"}, this.parallel());
+                    },
+                    function(err, result1, result2) {
+                        var act;
+                        if (err) throw err;
+                        user1 = result1;
+                        user2 = result2;
+                        act = {
+                            actor: user1.profile,
+                            verb: "post",
+                            bto: [
+                                {
+                                    objectType: "person",
+                                    id: "b59554e4-e576-11e1-b0ff-5cff35050cf2"
+                                }
+                            ],
+                            bcc: [
+                                {
+                                    objectType: "person",
+                                    id: "c456d228-e576-11e1-89dd-5cff35050cf2"
+                                }
+                            ],
+                            object: {
+                                objectType: "note",
+                                content: "Hello, world!"
+                            }
+                        };
+                        Activity.create(act, this);
+                    },
+                    function(err, act) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            act.sanitize(user2);
+                            cb(err, act);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, act) {
+                assert.ifError(err);
+                assert.isObject(act);
+            },
+            "uuid is invisible": function(err, act) {
+                assert.ifError(err);
+                assert.isObject(act);
+                assert.isFalse(act.hasOwnProperty("uuid"));
+            },
+            "bcc is invisible": function(err, act) {
+                assert.ifError(err);
+                assert.isObject(act);
+                assert.isFalse(act.hasOwnProperty("bcc"));
+            },
+            "bto is invisible": function(err, act) {
+                assert.ifError(err);
+                assert.isObject(act);
+                assert.isFalse(act.hasOwnProperty("bto"));
+            }
+        },
+        "and we sanitize() an activity for anonymous user": {
+            topic: function(Activity) {
+                var User = require("../lib/model/user").User,
+                    cb = this.callback;
+
+                Step(
+                    function() {
+                        User.create({nickname: "frank", password: "123456"}, this);
+                    },
+                    function(err, user) {
+                        var act;
+                        if (err) throw err;
+                        act = {
+                            actor: user.profile,
+                            verb: "post",
+                            bto: [
+                                {
+                                    objectType: "person",
+                                    id: "b59554e4-e576-11e1-b0ff-5cff35050cf2"
+                                }
+                            ],
+                            bcc: [
+                                {
+                                    objectType: "person",
+                                    id: "c456d228-e576-11e1-89dd-5cff35050cf2"
+                                }
+                            ],
+                            object: {
+                                objectType: "note",
+                                content: "Hello, world!"
+                            }
+                        };
+                        Activity.create(act, this);
+                    },
+                    function(err, act) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            act.sanitize();
+                            cb(err, act);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, act) {
+                assert.ifError(err);
+                assert.isObject(act);
+            },
+            "uuid is invisible": function(err, act) {
+                assert.ifError(err);
+                assert.isObject(act);
+                assert.isFalse(act.hasOwnProperty("uuid"));
+            },
+            "bcc is invisible": function(err, act) {
+                assert.ifError(err);
+                assert.isObject(act);
+                assert.isFalse(act.hasOwnProperty("bcc"));
+            },
+            "bto is invisible": function(err, act) {
+                assert.ifError(err);
+                assert.isObject(act);
+                assert.isFalse(act.hasOwnProperty("bto"));
             }
         }
     }
