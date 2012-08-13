@@ -95,10 +95,10 @@ suite.addBatch({
                             cred = makeCred(cl, pair1);
                             act = {
                                 verb: "post",
-                                bcc: {
+                                bcc: [{
                                     id: users.skipper.profile.id,
                                     objectType: "person"
-                                },
+                                }],
                                 object: {
                                     objectType: "note",
                                     content: "Sorry!"
@@ -231,10 +231,10 @@ suite.addBatch({
                             cred = makeCred(cl, pair1);
                             act = {
                                 verb: "post",
-                                bto: {
+                                bto: [{
                                     id: users.ginger.profile.id,
                                     objectType: "person"
-                                },
+                                }],
                                 object: {
                                     objectType: "note",
                                     content: "Dinner's ready!"
