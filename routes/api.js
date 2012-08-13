@@ -736,8 +736,16 @@ var userStream = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                collection.items.forEach(function(el) {
-                    delete el.actor;
+                collection.items.forEach(function(act) {
+                    delete act.actor;
+                    if (!req.remoteUser || (req.remoteUser.profile.id !== req.user.profile.id)) {
+                        if (act.bcc) {
+                            delete act.bcc;
+                        }
+                        if (act.bto) {
+                            delete act.bto;
+                        }
+                    }
                 });
                 res.json(collection);
             }

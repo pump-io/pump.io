@@ -156,6 +156,50 @@ suite.addBatch({
                         assert.isObject(act);
                         assert.isTrue(act.hasOwnProperty("bcc"));
                     }
+                },
+                "and another user views the author's timeline": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.professor.pair),
+                            callback = this.callback,
+                            url = "http://localhost:4815/api/user/gilligan/feed";
+                        
+                        httputil.getJSON(url, cred, function(err, feed, resp) {
+                            callback(err, feed);
+                        });
+                    },
+                    "it works": function(err, feed) {
+                        assert.ifError(err);
+                    },
+                    "they can't see the bcc": function(err, feed) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 1);
+                        assert.isObject(feed.items[0]);
+                        assert.isFalse(feed.items[0].hasOwnProperty("bcc"));
+                    }
+                },
+                "and the author views their own timeline": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.gilligan.pair),
+                            callback = this.callback,
+                            url = "http://localhost:4815/api/user/gilligan/feed";
+                        
+                        httputil.getJSON(url, cred, function(err, feed, resp) {
+                            callback(err, feed);
+                        });
+                    },
+                    "it works": function(err, feed) {
+                        assert.ifError(err);
+                    },
+                    "they can see the bcc": function(err, feed) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 1);
+                        assert.isObject(feed.items[0]);
+                        assert.isTrue(feed.items[0].hasOwnProperty("bcc"));
+                    }
                 }
             },
             "and a user posts an activity with bto": {
@@ -247,6 +291,50 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.isObject(act);
                         assert.isTrue(act.hasOwnProperty("bto"));
+                    }
+                },
+                "and another user views the author's timeline": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.mrhowell.pair),
+                            callback = this.callback,
+                            url = "http://localhost:4815/api/user/maryanne/feed";
+                        
+                        httputil.getJSON(url, cred, function(err, feed, resp) {
+                            callback(err, feed);
+                        });
+                    },
+                    "it works": function(err, feed) {
+                        assert.ifError(err);
+                    },
+                    "they can't see the bto": function(err, feed) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 1);
+                        assert.isObject(feed.items[0]);
+                        assert.isFalse(feed.items[0].hasOwnProperty("bto"));
+                    }
+                },
+                "and the author views their own timeline": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.maryanne.pair),
+                            callback = this.callback,
+                            url = "http://localhost:4815/api/user/maryanne/feed";
+                        
+                        httputil.getJSON(url, cred, function(err, feed, resp) {
+                            callback(err, feed);
+                        });
+                    },
+                    "it works": function(err, feed) {
+                        assert.ifError(err);
+                    },
+                    "they can see the bto": function(err, feed) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 1);
+                        assert.isObject(feed.items[0]);
+                        assert.isTrue(feed.items[0].hasOwnProperty("bto"));
                     }
                 }
             }
