@@ -488,16 +488,9 @@ var getActivity = function(req, res, next) {
     var user = req.remoteUser,
         act = req.activity;
 
-    if (!user || user.profile.id !== act.actor.id) {
-        if (act.bcc) {
-            delete act.bcc;
-        }
-        if (act.bto) {
-            delete act.bto;
-        }
-    }
+    act.sanitize(user);
 
-    res.json(req.activity);
+    res.json(act);
 };
 
 var putActivity = function(req, res, next) {
@@ -729,7 +722,7 @@ var userStream = function(req, res, next) {
                 }
             } else {
                 str = outbox;
-                getStream(str, args, collection, this);
+                getStream(str, args, collection, req.remoteUser, this);
             }
         },
         function(err) {
@@ -738,14 +731,6 @@ var userStream = function(req, res, next) {
             } else {
                 collection.items.forEach(function(act) {
                     delete act.actor;
-                    if (!req.remoteUser || (req.remoteUser.profile.id !== req.user.profile.id)) {
-                        if (act.bcc) {
-                            delete act.bcc;
-                        }
-                        if (act.bto) {
-                            delete act.bto;
-                        }
-                    }
                 });
                 res.json(collection);
             }
@@ -792,7 +777,7 @@ var userInbox = function(req, res, next) {
                     throw err;
                 }
             } else {
-                getStream(inbox, args, collection, this);
+                getStream(inbox, args, collection, req.remoteUser, this);
             }
         },
         function(err) {
@@ -805,7 +790,7 @@ var userInbox = function(req, res, next) {
     );
 };
 
-var getStream = function(str, args, collection, callback) {
+var getStream = function(str, args, collection, user, callback) {
 
     Step(
         function() {
@@ -840,8 +825,8 @@ var getStream = function(str, args, collection, callback) {
             if (err) {
                 callback(err);
             } else {
-                activities.forEach(function(el) {
-                    delete el.uuid;
+                activities.forEach(function(act) {
+                    act.sanitize(user);
                 });
                 collection.items = activities;
                 if (activities.length > 0) {
