@@ -254,6 +254,9 @@ suite.addBatch({
                 assert.equal(Activity[name], verb);
             }
         },
+        "it has a postOf() class method": function(err, Activity) {
+            assert.isFunction(Activity.postOf);
+        },
         "and we create an instance": {
             topic: function(Activity) {
                 return new Activity({});
@@ -800,6 +803,81 @@ suite.addBatch({
                 assert.ifError(err);
                 assert.isBoolean(isRecipient);
                 assert.isFalse(isRecipient);
+            }
+        },
+        "and we look for the post activity of a known object": {
+            topic: function(Activity) {
+                var Note = require("../lib/model/note").Note,
+                    cb = this.callback,
+                    p1 = {
+                        objectType: "person",
+                        id: "urn:uuid:bda39c62-e5d1-11e1-baf4-70f1a154e1aa"
+                    },
+                    act;
+
+                Step(
+                    function() {
+                        act = new Activity({
+                            actor: p1,
+                            verb: Activity.POST,
+                            object: {
+                                objectType: "note",
+                                content: "Hello, world!"
+                            }
+                        });
+                        act.apply(p1, this);
+                    },
+                    function(err) {
+                        if (err) throw err;
+                        act.save(this);
+                    },
+                    function(err, act) {
+                        if (err) throw err;
+                        Note.get(act.object.id, this);
+                    },
+                    function(err, note) {
+                        if (err) throw err;
+                        Activity.postOf(note, this);
+                    },
+                    function(err, found) {
+                        cb(err, act, found);
+                    }
+                );
+            },
+            "it works": function(err, posted, found) {
+                assert.ifError(err);
+            },
+            "it finds the right activity": function(err, posted, found) {
+                assert.ifError(err);
+                assert.isObject(posted);
+                assert.isObject(found);
+                assert.equal(posted.id, found.id);
+            }
+        },
+        "and we look for the post activity of an unposted object": {
+            topic: function(Activity) {
+                var Note = require("../lib/model/note").Note,
+                    cb = this.callback;
+
+                Step(
+                    function() {
+                        Note.create({content: "Hello, world."}, this);
+                    },
+                    function(err, note) {
+                        if (err) throw err;
+                        Activity.postOf(note, this);
+                    },
+                    function(err, found) {
+                        if (err) {
+                            cb(null);
+                        } else {
+                            cb(new Error("Unexpected success"));
+                        }
+                    }
+                );
+            },
+            "it works": function(err) {
+                assert.ifError(err);
             }
         }
     }
