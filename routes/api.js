@@ -102,7 +102,7 @@ var addRoutes = function(app) {
             authz = authorOnly(type);
         }
 
-        app.get(url, clientAuth, requester(type), getter(type));
+        app.get(url, clientAuth, requester(type), authorOrRecipient(type), getter(type));
         app.put(url, userAuth, requester(type), authz, putter(type));
         app.del(url, userAuth, requester(type), authz, deleter(type));
 
@@ -258,6 +258,36 @@ var authorOnly = function(type) {
             next();
         } else {
             next(new HTTPError("Only the author can modify this object.", 403));
+        }
+    };
+};
+
+var authorOrRecipient = function(type) {
+
+    return function(req, res, next) {
+        var obj = req[type];
+
+        if (obj && obj.author && obj.author.id == req.remoteUser.profile.id) {
+            next();
+        } else {
+            Step(
+                function() {
+                    Activity.postOf(obj, this);
+                },
+                function(err, act) {
+                    if (err) throw err;
+                    act.checkRecipient(req.remoteUser.profile, this);
+                },
+                function(err, isRecipient) {
+                    if (err) {
+                        next(err);
+                    } else if (isRecipient) {
+                        next();
+                    } else {
+                        next(new HTTPError("Only the author and recipients can view this object.", 403));
+                    }
+                }
+            );
         }
     };
 };
