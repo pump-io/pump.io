@@ -257,6 +257,9 @@ suite.addBatch({
         "it has a postOf() class method": function(err, Activity) {
             assert.isFunction(Activity.postOf);
         },
+        "it has a NotFoundError member class": function(err, Activity) {
+            assert.isFunction(Activity.NotFoundError);
+        },
         "and we create an instance": {
             topic: function(Activity) {
                 return new Activity({});
@@ -868,8 +871,10 @@ suite.addBatch({
                         Activity.postOf(note, this);
                     },
                     function(err, found) {
-                        if (err) {
+                        if (err && err instanceof Activity.NotFoundError) {
                             cb(null);
+                        } else if (err) {
+                            cb(err);
                         } else {
                             cb(new Error("Unexpected success"));
                         }
