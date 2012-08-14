@@ -43,6 +43,13 @@ var makeCred = function(cl, pair) {
     };
 };
 
+var clientCred = function(cl) {
+    return {
+        consumer_key: cl.client_id,
+        consumer_secret: cl.client_secret
+    };
+};
+
 // A batch for testing the visibility of bcc and bto addressing
 
 suite.addBatch({
@@ -378,9 +385,68 @@ suite.addBatch({
                         assert.lengthOf(inbox.items, 1);
                         assert.notEqual(inbox.items[0].id, act.id);
                     }
+                },
+                "and an anonymous user reads the activity": {
+                    topic: function(doc, users, cl) {
+                        var cred = clientCred(cl),
+                            cb = this.callback,
+                            url = doc.links.self.href;
+
+                        httputil.getJSON(url, cred, function(err, act, response) {
+                            if (err && err.statusCode && err.statusCode == 403) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        });
+                    },
+                    "it fails with a 403 Forbidden": function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                "and an anonymous user reads the note": {
+                    topic: function(doc, users, cl) {
+                        var cred = clientCred(cl),
+                            cb = this.callback,
+                            url = doc.object.id;
+
+                        httputil.getJSON(url, cred, function(err, note, response) {
+                            if (err && err.statusCode && err.statusCode == 403) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        });
+                    },
+                    "it fails with a 403 Forbidden": function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                "and an anonymous user reads the author's feed": {
+                    topic: function(doc, users, cl) {
+                        var cred = clientCred(cl),
+                            cb = this.callback,
+                            url = "http://localhost:4815/api/user/mrmoose/feed";
+
+                        httputil.getJSON(url, cred, function(err, feed, response) {
+                            cb(err, doc, feed);
+                        });
+                    },
+                    "it works": function(err, act, feed) {
+                        assert.ifError(err);
+                    },
+                    "it does not include the private post-note activity": function(err, act, feed) {
+                        assert.ifError(err);
+                        assert.include(feed, "items");
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 0);
+                    }
                 }
             }
-            
         }
     }
 });

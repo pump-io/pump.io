@@ -265,9 +265,11 @@ var authorOnly = function(type) {
 var authorOrRecipient = function(type) {
 
     return function(req, res, next) {
-        var obj = req[type];
+        var obj = req[type],
+            user = req.remoteUser,
+            person = (user) ? user.profile : null;
 
-        if (obj && obj.author && obj.author.id == req.remoteUser.profile.id) {
+        if (obj && obj.author && person && obj.author.id == person.id) {
             next();
         } else {
             Step(
@@ -276,7 +278,7 @@ var authorOrRecipient = function(type) {
                 },
                 function(err, act) {
                     if (err) throw err;
-                    act.checkRecipient(req.remoteUser.profile, this);
+                    act.checkRecipient(person, this);
                 },
                 function(err, isRecipient) {
                     if (err) {
@@ -305,9 +307,9 @@ var actorOnly = function(req, res, next) {
 var actorOrRecipient = function(req, res, next) {
 
     var act = req.activity,
-        person = req.remoteUser.profile;
+        person = (req.remoteUser) ? req.remoteUser.profile : null;
 
-    if (act && act.actor && act.actor.id == person.id) {
+    if (act && act.actor && person && act.actor.id == person.id) {
         next();
     } else {
         act.checkRecipient(person, function(err, isRecipient) {
