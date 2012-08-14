@@ -168,6 +168,9 @@ mb["When we require the activity module"]
     assert.isString(created.uuid);
     assert.isString(created.published);
     assert.isString(created.updated);
+    assert.isObject(created.links);
+    assert.isObject(created.links.self);
+    assert.isString(created.links.self.href);
 };
 
 // Since actor, object will have some auto-created stuff, we only
