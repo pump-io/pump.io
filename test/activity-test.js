@@ -263,6 +263,9 @@ suite.addBatch({
             },
             "it has the sanitize() method": function(activity) {
                 assert.isFunction(activity.sanitize);
+            },
+            "it has the checkRecipient() method": function(activity) {
+                assert.isFunction(activity.checkRecipient);
             }
         },
         "and we apply() a new post activity": {
@@ -531,13 +534,13 @@ suite.addBatch({
                             bto: [
                                 {
                                     objectType: "person",
-                                    id: "b59554e4-e576-11e1-b0ff-5cff35050cf2"
+                                    id: "urn:uuid:b59554e4-e576-11e1-b0ff-5cff35050cf2"
                                 }
                             ],
                             bcc: [
                                 {
                                     objectType: "person",
-                                    id: "c456d228-e576-11e1-89dd-5cff35050cf2"
+                                    id: "urn:uuid:c456d228-e576-11e1-89dd-5cff35050cf2"
                                 }
                             ],
                             object: {
@@ -599,13 +602,13 @@ suite.addBatch({
                             bto: [
                                 {
                                     objectType: "person",
-                                    id: "b59554e4-e576-11e1-b0ff-5cff35050cf2"
+                                    id: "urn:uuid:b59554e4-e576-11e1-b0ff-5cff35050cf2"
                                 }
                             ],
                             bcc: [
                                 {
                                     objectType: "person",
-                                    id: "c456d228-e576-11e1-89dd-5cff35050cf2"
+                                    id: "urn:uuid:c456d228-e576-11e1-89dd-5cff35050cf2"
                                 }
                             ],
                             object: {
@@ -663,13 +666,13 @@ suite.addBatch({
                             bto: [
                                 {
                                     objectType: "person",
-                                    id: "b59554e4-e576-11e1-b0ff-5cff35050cf2"
+                                    id: "urn:uuid:b59554e4-e576-11e1-b0ff-5cff35050cf2"
                                 }
                             ],
                             bcc: [
                                 {
                                     objectType: "person",
-                                    id: "c456d228-e576-11e1-89dd-5cff35050cf2"
+                                    id: "urn:uuid:c456d228-e576-11e1-89dd-5cff35050cf2"
                                 }
                             ],
                             object: {
@@ -707,6 +710,96 @@ suite.addBatch({
                 assert.ifError(err);
                 assert.isObject(act);
                 assert.isFalse(act.hasOwnProperty("bto"));
+            }
+        },
+        "and we check if a direct addressee is a recipient": {
+            topic: function(Activity) {
+                var User = require("../lib/model/user").User,
+                    cb = this.callback,
+                    p1 = {
+                        objectType: "person",
+                        id: "urn:uuid:f58c37a4-e5c9-11e1-9613-70f1a154e1aa"
+                    },
+                    p2 = {
+                        objectType: "person",
+                        id: "urn:uuid:b59554e4-e576-11e1-b0ff-5cff35050cf2"
+                    };
+
+                Step(
+                    function() {
+                        var act = {
+                            actor: p1,
+                            verb: "post",
+                            to: [p2],
+                            object: {
+                                objectType: "note",
+                                content: "Hello, world!"
+                            }
+                        };
+                        Activity.create(act, this);
+                    },
+                    function(err, act) {
+                        if (err) throw err;
+                        act.checkRecipient(p2, this);
+                    },
+                    cb
+                );
+            },
+            "it works": function(err, isRecipient) {
+                assert.ifError(err);
+                assert.isBoolean(isRecipient);
+            },
+            "it returns true": function(err, isRecipient) {
+                assert.ifError(err);
+                assert.isBoolean(isRecipient);
+                assert.isTrue(isRecipient);
+            }
+        },
+        "and we check if a random person is a recipient": {
+            topic: function(Activity) {
+                var User = require("../lib/model/user").User,
+                    cb = this.callback,
+                    p1 = {
+                        objectType: "person",
+                        id: "urn:uuid:f931e182-e5ca-11e1-af82-70f1a154e1aa"
+                    },
+                    p2 = {
+                        objectType: "person",
+                        id: "urn:uuid:f9325900-e5ca-11e1-bbc3-70f1a154e1aa"
+                    },
+                    p3 = {
+                        objectType: "person",
+                        id: "urn:uuid:f932cd0e-e5ca-11e1-8e1e-70f1a154e1aa"
+                    };
+
+                Step(
+                    function() {
+                        var act = {
+                            actor: p1,
+                            verb: "post",
+                            to: [p2],
+                            object: {
+                                objectType: "note",
+                                content: "Hello, world!"
+                            }
+                        };
+                        Activity.create(act, this);
+                    },
+                    function(err, act) {
+                        if (err) throw err;
+                        act.checkRecipient(p3, this);
+                    },
+                    cb
+                );
+            },
+            "it works": function(err, isRecipient) {
+                assert.ifError(err);
+                assert.isBoolean(isRecipient);
+            },
+            "it returns false": function(err, isRecipient) {
+                assert.ifError(err);
+                assert.isBoolean(isRecipient);
+                assert.isFalse(isRecipient);
             }
         }
     }
