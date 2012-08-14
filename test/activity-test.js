@@ -869,9 +869,11 @@ suite.addBatch({
                     },
                     function(err, found) {
                         if (err) {
-                            cb(null);
-                        } else {
+                            cb(err);
+                        } else if (found) {
                             cb(new Error("Unexpected success"));
+                        } else {
+                            cb(null);
                         }
                     }
                 );
