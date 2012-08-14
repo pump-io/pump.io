@@ -112,7 +112,7 @@ var addRoutes = function(app) {
     
     // Activities
 
-    app.get("/api/activity/:uuid", clientAuth, reqActivity, getActivity);
+    app.get("/api/activity/:uuid", clientAuth, reqActivity, actorOrRecipient, getActivity);
     app.put("/api/activity/:uuid", userAuth, reqActivity, actorOnly, putActivity);
     app.del("/api/activity/:uuid", userAuth, reqActivity, actorOnly, delActivity);
 
@@ -269,6 +269,26 @@ var actorOnly = function(req, res, next) {
         next();
     } else {
         next(new HTTPError("Only the actor can modify this object.", 403));
+    }
+};
+
+var actorOrRecipient = function(req, res, next) {
+
+    var act = req.activity,
+        person = req.remoteUser.profile;
+
+    if (act && act.actor && act.actor.id == person.id) {
+        next();
+    } else {
+        act.checkRecipient(person, function(err, isRecipient) {
+            if (err) {
+                next(err);
+            } else if (!isRecipient) {
+                next(new HTTPError("Only the actor and recipients can view this activity.", 403));
+            } else {
+                next();
+            }
+        });
     }
 };
 
