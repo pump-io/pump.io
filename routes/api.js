@@ -22,6 +22,7 @@ var databank = require("databank"),
     validator = require("validator"),
     check = validator.check,
     sanitize = validator.sanitize,
+    FilteredStream = require("../lib/filteredstream").FilteredStream,
     HTTPError = require("../lib/httperror").HTTPError,
     Activity = require("../lib/model/activity").Activity,
     AppError = require("../lib/model/activity").AppError,
@@ -734,6 +735,25 @@ var postActivity = function(req, res, next) {
     );
 };
 
+var recipientsOnly = function(person) {
+    return function(id, callback) {
+        Step(
+            function() {
+                Activity.get(id, this);
+            },
+            function(err, act) {
+                if (err) throw err;
+                act.checkRecipient(person, this);
+            },
+            callback
+        );
+    };
+};
+
+// Just do this one once
+
+var publicOnly = recipientsOnly(null);
+
 var userStream = function(req, res, next) {
 
     var url = URLMaker.makeURL("api/user/" + req.user.nickname + "/feed"),
@@ -773,7 +793,16 @@ var userStream = function(req, res, next) {
                     throw err;
                 }
             } else {
-                str = outbox;
+                // Skip filtering if remote user == author
+                if (req.remoteUser && req.remoteUser.profile.id == req.user.profile.id) {
+                    str = outbox;
+                } else if (!req.remoteUser) {
+                    // XXX: keep a separate stream instead of filtering
+                    str = new FilteredStream(outbox, publicOnly);
+                } else {
+                    str = new FilteredStream(outbox, recipientsOnly(req.remoteUser.profile));
+                }
+
                 getStream(str, args, collection, req.remoteUser, this);
             }
         },
