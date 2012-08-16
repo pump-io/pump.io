@@ -232,6 +232,76 @@ suite.addBatch({
                                     }
                                 }
                             }
+                        },
+                        "and we get the IDs less than some middle value": {
+                            topic: function(fs) {
+                                var orig,
+                                    cb = this.callback;
+
+                                Step(
+                                    function() {
+                                        fs.getIDs(100, 150, this);
+                                    },
+                                    function(err, ids) {
+                                        if (err) throw err;
+                                        orig = ids.slice(10, 30);
+                                        fs.getIDsLessThan(ids[30], 20, this);
+                                    },
+                                    function(err, ids) {
+                                        if (err) {
+                                            cb(err, ids);
+                                        } else {
+                                            cb(null, orig, ids);
+                                        }
+                                    }
+                                );
+                            },
+                            "it works": function(err, orig, ids) {
+                                assert.ifError(err);
+                                assert.isArray(orig);
+                                assert.isArray(ids);
+                            },
+                            "data looks correct": function(err, orig, ids) {
+                                assert.ifError(err);
+                                assert.isArray(orig);
+                                assert.isArray(ids);
+                                assert.deepEqual(orig, ids);
+                            }
+                        },
+                        "and we get the IDs less than some value close to the start": {
+                            topic: function(fs) {
+                                var orig,
+                                    cb = this.callback;
+
+                                Step(
+                                    function() {
+                                        fs.getIDs(0, 20, this);
+                                    },
+                                    function(err, ids) {
+                                        if (err) throw err;
+                                        orig = ids.slice(0, 5);
+                                        fs.getIDsLessThan(ids[5], 20, this);
+                                    },
+                                    function(err, ids) {
+                                        if (err) {
+                                            cb(err, ids);
+                                        } else {
+                                            cb(null, orig, ids);
+                                        }
+                                    }
+                                );
+                            },
+                            "it works": function(err, orig, ids) {
+                                assert.ifError(err);
+                                assert.isArray(orig);
+                                assert.isArray(ids);
+                            },
+                            "data looks correct": function(err, orig, ids) {
+                                assert.ifError(err);
+                                assert.isArray(orig);
+                                assert.isArray(ids);
+                                assert.deepEqual(orig, ids);
+                            }
                         }
                     }
                 }
