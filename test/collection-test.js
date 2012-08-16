@@ -71,6 +71,10 @@ suite.addBatch({
         "it has a checkList() method": function(Collection) {
             assert.isFunction(Collection.checkList);
         },
+        "it has a PUBLIC member with the correct value": function(Collection) {
+            assert.isString(Collection.PUBLIC);
+            assert.equal(Collection.PUBLIC, "http://activityschema.org/collection/public");
+        },
         "and we create a user": {
             topic: function(Collection) {
                 var User = require("../lib/model/user").User;
