@@ -183,6 +183,18 @@ suite.addBatch({
                         },
                         "it has a count() method": function(fs) {
                             assert.isFunction(fs.count);
+                        },
+                        "and we get the filtered stream's count": {
+                            topic: function(fs) {
+                                fs.count(this.callback);
+                            },
+                            "it works": function(err, cnt) {
+                                assert.ifError(err);
+                            },
+                            "it has the value of the full stream": function(err, cnt) {
+                                assert.ifError(err);
+                                assert.equal(cnt, 2310);
+                            }
                         }
                     }
                 }
