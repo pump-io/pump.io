@@ -130,7 +130,7 @@ suite.addBatch({
                                 var i, group = this.group();
                                 if (err) throw err;
                                 for (i = 0; i < acts.length; i++) {
-                                    str.deliver(acts[i], group());
+                                    str.deliver(acts[i].id, group());
                                 }
                             },
                             function(err) {
@@ -194,6 +194,43 @@ suite.addBatch({
                             "it has the value of the full stream": function(err, cnt) {
                                 assert.ifError(err);
                                 assert.equal(cnt, 2310);
+                            }
+                        },
+                        "and we get the full stream by 20-item chunks": {
+                            topic: function(fs) {
+                                Step(
+                                    function() {
+                                        var i, group = this.group();
+                                        for (i = 0; i < 17; i++) {
+                                            fs.getIDs(i * 20, (i + 1) * 20, group());
+                                        }
+                                    },
+                                    this.callback
+                                );
+                            },
+                            "it works": function(err, chunks) {
+                                assert.ifError(err);
+                                assert.isArray(chunks);
+                            },
+                            "data looks correct": function(err, chunks) {
+                                var i, j, seen = {};
+                                assert.ifError(err);
+                                assert.isArray(chunks);
+                                assert.lengthOf(chunks, 17);
+                                for (i = 0; i < chunks.length; i++) {
+                                    assert.isArray(chunks[i]);
+                                    if (i === 16) {
+                                        // total == 330, last is only 10
+                                        assert.lengthOf(chunks[i], 10);
+                                    } else {
+                                        assert.lengthOf(chunks[i], 20);
+                                    }
+                                    for (j = 0; j < chunks[i].length; j++) {
+                                        assert.isString(chunks[i][j]);
+                                        assert.isUndefined(seen[chunks[i][j]]);
+                                        seen[chunks[i][j]] = 1;
+                                    }
+                                }
                             }
                         }
                     }
