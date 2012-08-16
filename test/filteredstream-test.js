@@ -302,6 +302,76 @@ suite.addBatch({
                                 assert.isArray(ids);
                                 assert.deepEqual(orig, ids);
                             }
+                        },
+                        "and we get the IDs greater than some middle value": {
+                            topic: function(fs) {
+                                var orig,
+                                    cb = this.callback;
+
+                                Step(
+                                    function() {
+                                        fs.getIDs(200, 250, this);
+                                    },
+                                    function(err, ids) {
+                                        if (err) throw err;
+                                        orig = ids.slice(20, 40);
+                                        fs.getIDsGreaterThan(ids[19], 20, this);
+                                    },
+                                    function(err, ids) {
+                                        if (err) {
+                                            cb(err, ids);
+                                        } else {
+                                            cb(null, orig, ids);
+                                        }
+                                    }
+                                );
+                            },
+                            "it works": function(err, orig, ids) {
+                                assert.ifError(err);
+                                assert.isArray(orig);
+                                assert.isArray(ids);
+                            },
+                            "data looks correct": function(err, orig, ids) {
+                                assert.ifError(err);
+                                assert.isArray(orig);
+                                assert.isArray(ids);
+                                assert.deepEqual(orig, ids);
+                            }
+                        },
+                        "and we get the IDs greater than some value close to the end": {
+                            topic: function(fs) {
+                                var orig,
+                                    cb = this.callback;
+
+                                Step(
+                                    function() {
+                                        fs.getIDs(319, 330, this);
+                                    },
+                                    function(err, ids) {
+                                        if (err) throw err;
+                                        orig = ids.slice(1, 11);
+                                        fs.getIDsGreaterThan(ids[0], 20, this);
+                                    },
+                                    function(err, ids) {
+                                        if (err) {
+                                            cb(err, ids);
+                                        } else {
+                                            cb(null, orig, ids);
+                                        }
+                                    }
+                                );
+                            },
+                            "it works": function(err, orig, ids) {
+                                assert.ifError(err);
+                                assert.isArray(orig);
+                                assert.isArray(ids);
+                            },
+                            "data looks correct": function(err, orig, ids) {
+                                assert.ifError(err);
+                                assert.isArray(orig);
+                                assert.isArray(ids);
+                                assert.deepEqual(orig, ids);
+                            }
                         }
                     }
                 }
