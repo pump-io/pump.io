@@ -146,6 +146,44 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.isObject(str);
                         assert.instanceOf(str, Stream);
+                    },
+                    "and we add a filter by mood": {
+                        topic: function(str, FilteredStream) {
+                            var byMood = function(mood) {
+                                return function(id, callback) {
+                                    Step(
+                                        function() {
+                                            Activity.get(id, this);
+                                        },
+                                        function(err, act) {
+                                            if (err) {
+                                                callback(err, null);
+                                            } else if (act.mood.displayName == mood) {
+                                                callback(null, true);
+                                            } else {
+                                                callback(null, false);
+                                            }
+                                        }
+                                    );
+                                };
+                            };
+                            return new FilteredStream(str, byMood("happy"));
+                        },
+                        "it works": function(fs) {
+                            assert.isObject(fs);
+                        },
+                        "it has a getIDs() method": function(fs) {
+                            assert.isFunction(fs.getIDs);
+                        },
+                        "it has a getIDsGreaterThan() method": function(fs) {
+                            assert.isFunction(fs.getIDsGreaterThan);
+                        },
+                        "it has a getIDsLessThan() method": function(fs) {
+                            assert.isFunction(fs.getIDsLessThan);
+                        },
+                        "it has a count() method": function(fs) {
+                            assert.isFunction(fs.count);
+                        }
                     }
                 }
             }
