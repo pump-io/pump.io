@@ -83,8 +83,8 @@ suite.addBatch({
                             mrbunnyrabbit: {
                                 password: "carrots"
                             },
-                            dancingbear: {
-                                password: "dancing"
+                            townclown: {
+                                password: "balloons"
                             }
                                
                         };
@@ -92,13 +92,13 @@ suite.addBatch({
                         function() {
                             register(cl, "mrmoose", users.mrmoose.password, this.parallel());
                             register(cl, "mrbunnyrabbit", users.mrbunnyrabbit.password, this.parallel());
-                            register(cl, "dancingbear", users.dancingbear.password, this.parallel());
+                            register(cl, "townclown", users.townclown.password, this.parallel());
                         },
                         function(err, user1, user2, user3) {
                             if (err) throw err;
                             users.mrmoose.profile = user1.profile;
                             users.mrbunnyrabbit.profile   = user2.profile;
-                            users.dancingbear.profile = user3.profile;
+                            users.townclown.profile = user3.profile;
                             accessToken(cl, 
                                         {nickname: "mrmoose", password: users.mrmoose.password}, 
                                         this.parallel());
@@ -106,7 +106,7 @@ suite.addBatch({
                                         {nickname: "mrbunnyrabbit", password: users.mrbunnyrabbit.password}, 
                                         this.parallel());
                             accessToken(cl, 
-                                        {nickname: "dancingbear", password: users.dancingbear.password}, 
+                                        {nickname: "townclown", password: users.townclown.password}, 
                                         this.parallel());
                         },
                         function(err, pair1, pair2, pair3) {
@@ -114,7 +114,7 @@ suite.addBatch({
                             if (err) throw err;
                             users.mrmoose.pair = pair1;
                             users.mrbunnyrabbit.pair = pair2;
-                            users.dancingbear.pair = pair3;
+                            users.townclown.pair = pair3;
                             cred = makeCred(cl, pair3);
                             act = {
                                 verb: "follow",
@@ -123,7 +123,7 @@ suite.addBatch({
                                     id: users.mrmoose.profile.id
                                 }
                             };
-                            url = "http://localhost:4815/api/user/dancingbear/feed";
+                            url = "http://localhost:4815/api/user/townclown/feed";
                             httputil.postJSON(url, cred, act, this);
                         },
                         function(err, doc, resp) {
@@ -306,7 +306,7 @@ suite.addBatch({
                 },
                 "and a follower reads the activity": {
                     topic: function(doc, users, cl) {
-                        var cred = makeCred(cl, users.dancingbear.pair),
+                        var cred = makeCred(cl, users.townclown.pair),
                             cb = this.callback,
                             url = doc.links.self.href;
 
@@ -326,7 +326,7 @@ suite.addBatch({
                 },
                 "and a follower reads the note": {
                     topic: function(doc, users, cl) {
-                        var cred = makeCred(cl, users.dancingbear.pair),
+                        var cred = makeCred(cl, users.townclown.pair),
                             cb = this.callback,
                             url = doc.object.id;
 
@@ -346,7 +346,7 @@ suite.addBatch({
                 },
                 "and a follower reads the author's feed": {
                     topic: function(doc, users, cl) {
-                        var cred = makeCred(cl, users.dancingbear.pair),
+                        var cred = makeCred(cl, users.townclown.pair),
                             cb = this.callback,
                             url = "http://localhost:4815/api/user/mrmoose/feed";
 
@@ -366,9 +366,9 @@ suite.addBatch({
                 },
                 "and a follower reads their own inbox": {
                     topic: function(doc, users, cl) {
-                        var cred = makeCred(cl, users.dancingbear.pair),
+                        var cred = makeCred(cl, users.townclown.pair),
                             cb = this.callback,
-                            url = "http://localhost:4815/api/user/dancingbear/inbox";
+                            url = "http://localhost:4815/api/user/townclown/inbox";
 
                         httputil.getJSON(url, cred, function(err, inbox, response) {
                             cb(err, doc, inbox);
@@ -444,6 +444,365 @@ suite.addBatch({
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
                         assert.lengthOf(feed.items, 0);
+                    }
+                }
+            },
+            "and a user posts a public note": {
+                topic: function(cl) {
+                    var cb = this.callback,
+                        users = {
+                            captain: {
+                                password: "kangaroo"
+                            },
+                            mrgreenjeans: {
+                                password: "animals"
+                            },
+                            dancingbear: {
+                                password: "doll"
+                            }
+                               
+                        };
+                    Step(
+                        function() {
+                            register(cl, "captain", users.captain.password, this.parallel());
+                            register(cl, "mrgreenjeans", users.mrgreenjeans.password, this.parallel());
+                            register(cl, "dancingbear", users.dancingbear.password, this.parallel());
+                        },
+                        function(err, user1, user2, user3) {
+                            if (err) throw err;
+                            users.captain.profile = user1.profile;
+                            users.mrgreenjeans.profile   = user2.profile;
+                            users.dancingbear.profile = user3.profile;
+                            accessToken(cl, 
+                                        {nickname: "captain", password: users.captain.password}, 
+                                        this.parallel());
+                            accessToken(cl, 
+                                        {nickname: "mrgreenjeans", password: users.mrgreenjeans.password}, 
+                                        this.parallel());
+                            accessToken(cl, 
+                                        {nickname: "dancingbear", password: users.dancingbear.password}, 
+                                        this.parallel());
+                        },
+                        function(err, pair1, pair2, pair3) {
+                            var url, cred, act;
+                            if (err) throw err;
+                            users.captain.pair = pair1;
+                            users.mrgreenjeans.pair = pair2;
+                            users.dancingbear.pair = pair3;
+                            cred = makeCred(cl, pair3);
+                            act = {
+                                verb: "follow",
+                                object: {
+                                    objectType: "person",
+                                    id: users.captain.profile.id
+                                }
+                            };
+                            url = "http://localhost:4815/api/user/dancingbear/feed";
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, doc, resp) {
+                            var url, cred, act, Collection = require("../lib/model/collection").Collection;
+                            if (err) throw err;
+                            cred = makeCred(cl, users.captain.pair);
+                            act = {
+                                verb: "post",
+                                to: [{
+                                    id: Collection.PUBLIC,
+                                    objectType: "collection"
+                                }],
+                                object: {
+                                    objectType: "note",
+                                    content: "Good morning!"
+                                }
+                            };
+                            url = "http://localhost:4815/api/user/captain/feed";
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, doc, response) {
+                            if (err) {
+                                cb(err, null, null);
+                            } else {
+                                cb(null, doc, users);
+                            }
+                        }
+                    );
+                },
+                "it works": function(err, doc, users) {
+                    assert.ifError(err);
+                },
+                "and the author reads the activity": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.captain.pair),
+                            cb = this.callback,
+                            url = doc.links.self.href;
+
+                        httputil.getJSON(url, cred, function(err, act, response) {
+                            cb(err, doc, act);
+                        });
+                    },
+                    "it works": function(err, orig, copy) {
+                        assert.ifError(err);
+                        assert.isObject(copy);
+                        assert.equal(orig.id, copy.id);
+                    }
+                },
+                "and the author reads the note": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.captain.pair),
+                            cb = this.callback,
+                            url = doc.object.id;
+
+                        httputil.getJSON(url, cred, function(err, note, response) {
+                            cb(err, doc.object, note);
+                        });
+                    },
+                    "it works": function(err, orig, copy) {
+                        assert.ifError(err);
+                        assert.isObject(copy);
+                        assert.equal(orig.id, copy.id);
+                    }
+                },
+                "and the author reads their own feed": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.captain.pair),
+                            cb = this.callback,
+                            url = "http://localhost:4815/api/user/captain/feed";
+
+                        httputil.getJSON(url, cred, function(err, feed, response) {
+                            cb(err, doc, feed);
+                        });
+                    },
+                    "it works": function(err, act, feed) {
+                        assert.ifError(err);
+                    },
+                    "it includes the public post-note activity": function(err, act, feed) {
+                        assert.ifError(err);
+                        assert.include(feed, "items");
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 1);
+                        assert.equal(feed.items[0].id, act.id);
+                    }
+                },
+                "and the author reads their own inbox": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.captain.pair),
+                            cb = this.callback,
+                            url = "http://localhost:4815/api/user/captain/inbox";
+
+                        httputil.getJSON(url, cred, function(err, inbox, response) {
+                            cb(err, doc, inbox);
+                        });
+                    },
+                    "it works": function(err, act, inbox) {
+                        assert.ifError(err);
+                    },
+                    "it includes the public post-note activity": function(err, act, inbox) {
+                        assert.ifError(err);
+                        assert.include(inbox, "items");
+                        assert.isArray(inbox.items);
+                        assert.lengthOf(inbox.items, 1);
+                        assert.equal(inbox.items[0].id, act.id);
+                    }
+                },
+                "and an unrelated user reads the activity": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.mrgreenjeans.pair),
+                            cb = this.callback,
+                            url = doc.links.self.href;
+
+                        httputil.getJSON(url, cred, function(err, act, response) {
+                            cb(err, doc, act);
+                        });
+                    },
+                    "it works": function(err, orig, copy) {
+                        assert.ifError(err);
+                        assert.isObject(copy);
+                        assert.equal(orig.id, copy.id);
+                    }
+                },
+                "and an unrelated user reads the note": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.mrgreenjeans.pair),
+                            cb = this.callback,
+                            url = doc.object.id;
+
+                        httputil.getJSON(url, cred, function(err, note, response) {
+                            cb(err, doc.object, note);
+                        });
+                    },
+                    "it works": function(err, orig, copy) {
+                        assert.ifError(err);
+                        assert.isObject(copy);
+                        assert.equal(orig.id, copy.id);
+                    }
+                },
+                "and an unrelated user reads the author's feed": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.mrgreenjeans.pair),
+                            cb = this.callback,
+                            url = "http://localhost:4815/api/user/captain/feed";
+
+                        httputil.getJSON(url, cred, function(err, feed, response) {
+                            cb(err, doc, feed);
+                        });
+                    },
+                    "it works": function(err, act, feed) {
+                        assert.ifError(err);
+                    },
+                    "it includes the public post-note activity": function(err, act, feed) {
+                        assert.ifError(err);
+                        assert.include(feed, "items");
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 1);
+                        assert.equal(feed.items[0].id, act.id);
+                    }
+                },
+                "and an unrelated user reads their own inbox": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.mrgreenjeans.pair),
+                            cb = this.callback,
+                            url = "http://localhost:4815/api/user/mrgreenjeans/inbox";
+
+                        httputil.getJSON(url, cred, function(err, inbox, response) {
+                            cb(err, doc, inbox);
+                        });
+                    },
+                    "it works": function(err, act, inbox) {
+                        assert.ifError(err);
+                    },
+                    "it does not include the public post-note activity": function(err, act, inbox) {
+                        assert.ifError(err);
+                        assert.include(inbox, "totalItems");
+                        assert.isNumber(inbox.totalItems);
+                        assert.equal(inbox.totalItems, 0);
+                    }
+                },
+                "and a follower reads the activity": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.dancingbear.pair),
+                            cb = this.callback,
+                            url = doc.links.self.href;
+
+                        httputil.getJSON(url, cred, function(err, act, response) {
+                            cb(err, doc, act);
+                        });
+                    },
+                    "it works": function(err, orig, copy) {
+                        assert.ifError(err);
+                        assert.isObject(copy);
+                        assert.equal(orig.id, copy.id);
+                    }
+                },
+                "and a follower reads the note": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.dancingbear.pair),
+                            cb = this.callback,
+                            url = doc.object.id;
+
+                        httputil.getJSON(url, cred, function(err, note, response) {
+                            cb(err, doc.object, note);
+                        });
+                    },
+                    "it works": function(err, orig, copy) {
+                        assert.ifError(err);
+                        assert.isObject(copy);
+                        assert.equal(orig.id, copy.id);
+                    }
+                },
+                "and a follower reads the author's feed": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.dancingbear.pair),
+                            cb = this.callback,
+                            url = "http://localhost:4815/api/user/captain/feed";
+
+                        httputil.getJSON(url, cred, function(err, feed, response) {
+                            cb(err, doc, feed);
+                        });
+                    },
+                    "it works": function(err, act, feed) {
+                        assert.ifError(err);
+                    },
+                    "it includes the public post-note activity": function(err, act, feed) {
+                        assert.ifError(err);
+                        assert.include(feed, "items");
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 1);
+                        assert.equal(feed.items[0].id, act.id);
+                    }
+                },
+                "and a follower reads their own inbox": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.dancingbear.pair),
+                            cb = this.callback,
+                            url = "http://localhost:4815/api/user/dancingbear/inbox";
+
+                        httputil.getJSON(url, cred, function(err, inbox, response) {
+                            cb(err, doc, inbox);
+                        });
+                    },
+                    "it works": function(err, act, inbox) {
+                        assert.ifError(err);
+                    },
+                    "it includes the public post-note activity": function(err, act, feed) {
+                        assert.ifError(err);
+                        assert.include(feed, "items");
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 2);
+                        assert.equal(feed.items[0].id, act.id);
+                    }
+                },
+                "and an anonymous user reads the activity": {
+                    topic: function(doc, users, cl) {
+                        var cred = clientCred(cl),
+                            cb = this.callback,
+                            url = doc.links.self.href;
+
+
+                        httputil.getJSON(url, cred, function(err, act, response) {
+                            cb(err, doc, act);
+                        });
+                    },
+                    "it works": function(err, orig, copy) {
+                        assert.ifError(err);
+                        assert.isObject(copy);
+                        assert.equal(orig.id, copy.id);
+                    }
+                },
+                "and an anonymous user reads the note": {
+                    topic: function(doc, users, cl) {
+                        var cred = clientCred(cl),
+                            cb = this.callback,
+                            url = doc.object.id;
+
+                        httputil.getJSON(url, cred, function(err, note, response) {
+                            cb(err, doc.object, note);
+                        });
+                    },
+                    "it works": function(err, orig, copy) {
+                        assert.ifError(err);
+                        assert.isObject(copy);
+                        assert.equal(orig.id, copy.id);
+                    }
+                },
+                "and an anonymous user reads the author's feed": {
+                    topic: function(doc, users, cl) {
+                        var cred = clientCred(cl),
+                            cb = this.callback,
+                            url = "http://localhost:4815/api/user/captain/feed";
+
+                        httputil.getJSON(url, cred, function(err, feed, response) {
+                            cb(err, doc, feed);
+                        });
+                    },
+                    "it works": function(err, act, feed) {
+                        assert.ifError(err);
+                    },
+                    "it includes the public post-note activity": function(err, act, feed) {
+                        assert.ifError(err);
+                        assert.include(feed, "items");
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 1);
+                        assert.equal(feed.items[0].id, act.id);
                     }
                 }
             }
