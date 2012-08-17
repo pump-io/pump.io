@@ -809,15 +809,15 @@ suite.addBatch({
                     cb = this.callback,
                     p1 = {
                         objectType: "person",
-                        id: "urn:uuid:7bb4c51a-e88d-11e1-b9d8-0024beb67924"
+                        id: "urn:uuid:c123c0d0-e89a-11e1-89fa-0024beb67924"
                     },
                     p2 = {
                         objectType: "collection",
                         id: Collection.PUBLIC
                     },
-                    p1 = {
+                    p3 = {
                         objectType: "person",
-                        id: "urn:uuid:7bb4c51a-e88d-11e1-b9d8-0024beb67924"
+                        id: "urn:uuid:c48045a0-e89a-11e1-a855-0024beb67924"
                     };
 
                 Step(
@@ -835,7 +835,7 @@ suite.addBatch({
                     },
                     function(err, act) {
                         if (err) throw err;
-                        act.checkRecipient(null, this);
+                        act.checkRecipient(p3, this);
                     },
                     cb
                 );
@@ -895,6 +895,79 @@ suite.addBatch({
                 assert.ifError(err);
                 assert.isBoolean(isRecipient);
                 assert.isFalse(isRecipient);
+            }
+        },
+        "and we check if a list member is a recipient of an activity sent to a list": {
+            topic: function(Activity) {
+                var User = require("../lib/model/user").User,
+                    Collection = require("../lib/model/collection").Collection,
+                    cb = this.callback,
+                    user1,
+                    user2,
+                    list;
+                
+
+                Step(
+                    function() {
+                        var props1 = {
+                            nickname: "pat",
+                            password: "123456"
+                        },
+                            props2 = {
+                            nickname: "tap",
+                            password: "123456"
+                        };
+                        User.create(props1, this.parallel());
+                        User.create(props2, this.parallel());
+                    },
+                    function(err, result1, result2) {
+                        if (err) throw err;
+                        user1 = result1;
+                        user2 = result2;
+                        Collection.create({author: user1.profile,
+                                           displayName: "Test 1",
+                                           objectTypes: ["person"]},
+                                          this);
+                    },
+                    function(err, result) {
+                        if (err) throw err;
+                        list = result;
+                        list.getStream(this);
+                    },
+                    function(err, stream) {
+                        var val = {id: user2.profile.id,
+                                   objectType: user2.profile.objectType};
+                        if (err) throw err;
+                        stream.deliverObject(val, this);
+                    },
+                    function(err) {
+                        if (err) throw err;
+                        var act = {
+                            actor: user1.profile,
+                            verb: "post",
+                            to: [list],
+                            object: {
+                                objectType: "note",
+                                content: "Hello, world!"
+                            }
+                        };
+                        Activity.create(act, this);
+                    },
+                    function(err, act) {
+                        if (err) throw err;
+                        act.checkRecipient(user2.profile, this);
+                    },
+                    cb
+                );
+            },
+            "it works": function(err, isRecipient) {
+                assert.ifError(err);
+                assert.isBoolean(isRecipient);
+            },
+            "it returns true": function(err, isRecipient) {
+                assert.ifError(err);
+                assert.isBoolean(isRecipient);
+                assert.isTrue(isRecipient);
             }
         },
         "and we look for the post activity of a known object": {
