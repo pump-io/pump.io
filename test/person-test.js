@@ -61,6 +61,7 @@ suite.addBatch({
             // Need this to make IDs
 
             URLMaker.hostname = "example.net";
+            URLMaker.port     = 4815;
 
             // Dummy databank
 
@@ -141,7 +142,7 @@ suite.addBatch({
                 "data is correct": function(err, url) {
                     assert.ifError(err);
                     assert.isString(url);
-                    assert.equal(url, "http://example.net/api/user/evan/followers");
+                    assert.equal(url, "http://example.net:4815/api/user/evan/followers");
                 }
             }
         }
