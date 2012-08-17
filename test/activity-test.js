@@ -987,7 +987,7 @@ suite.addBatch({
                             password: "123456"
                         },
                             props2 = {
-                            nickname: "frank",
+                            nickname: "zed",
                             password: "123456"
                         };
                         User.create(props1, this.parallel());
