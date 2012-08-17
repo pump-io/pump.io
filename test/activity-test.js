@@ -758,7 +758,99 @@ suite.addBatch({
                 assert.isTrue(isRecipient);
             }
         },
-        "and we check if a random person is a recipient": {
+        "and we check if empty user is a recipient of a public activity": {
+            topic: function(Activity) {
+                var User = require("../lib/model/user").User,
+                    Collection = require("../lib/model/collection").Collection,
+                    cb = this.callback,
+                    p1 = {
+                        objectType: "person",
+                        id: "urn:uuid:7bb4c51a-e88d-11e1-b9d8-0024beb67924"
+                    },
+                    p2 = {
+                        objectType: "collection",
+                        id: Collection.PUBLIC
+                    };
+
+                Step(
+                    function() {
+                        var act = {
+                            actor: p1,
+                            verb: "post",
+                            to: [p2],
+                            object: {
+                                objectType: "note",
+                                content: "Hello, world!"
+                            }
+                        };
+                        Activity.create(act, this);
+                    },
+                    function(err, act) {
+                        if (err) throw err;
+                        act.checkRecipient(null, this);
+                    },
+                    cb
+                );
+            },
+            "it works": function(err, isRecipient) {
+                assert.ifError(err);
+                assert.isBoolean(isRecipient);
+            },
+            "it returns true": function(err, isRecipient) {
+                assert.ifError(err);
+                assert.isBoolean(isRecipient);
+                assert.isTrue(isRecipient);
+            }
+        },
+        "and we check if a random user is a recipient of a public activity": {
+            topic: function(Activity) {
+                var User = require("../lib/model/user").User,
+                    Collection = require("../lib/model/collection").Collection,
+                    cb = this.callback,
+                    p1 = {
+                        objectType: "person",
+                        id: "urn:uuid:7bb4c51a-e88d-11e1-b9d8-0024beb67924"
+                    },
+                    p2 = {
+                        objectType: "collection",
+                        id: Collection.PUBLIC
+                    },
+                    p1 = {
+                        objectType: "person",
+                        id: "urn:uuid:7bb4c51a-e88d-11e1-b9d8-0024beb67924"
+                    };
+
+                Step(
+                    function() {
+                        var act = {
+                            actor: p1,
+                            verb: "post",
+                            to: [p2],
+                            object: {
+                                objectType: "note",
+                                content: "Hello, world!"
+                            }
+                        };
+                        Activity.create(act, this);
+                    },
+                    function(err, act) {
+                        if (err) throw err;
+                        act.checkRecipient(null, this);
+                    },
+                    cb
+                );
+            },
+            "it works": function(err, isRecipient) {
+                assert.ifError(err);
+                assert.isBoolean(isRecipient);
+            },
+            "it returns true": function(err, isRecipient) {
+                assert.ifError(err);
+                assert.isBoolean(isRecipient);
+                assert.isTrue(isRecipient);
+            }
+        },
+        "and we check if a random person is a recipient of a directed activity": {
             topic: function(Activity) {
                 var User = require("../lib/model/user").User,
                     cb = this.callback,
