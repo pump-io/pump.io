@@ -154,6 +154,10 @@ suite.addBatch({
             "it has the unfavorite() method": function(user) {
                 assert.isFunction(user.unfavorite);
             },
+            "it has a profile attribute": function(user) {
+                assert.isObject(user.profile);
+                assert.instanceOf(user.profile, require("../lib/model/person").Person);
+            },
             "and we check the credentials with the right password": {
                 topic: function(user, User) {
                     User.checkCredentials("tom", "123456", this.callback);
