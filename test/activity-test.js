@@ -1033,6 +1033,195 @@ suite.addBatch({
                 assert.isFalse(isRecipient);
             }
         },
+        "and we check if a follower is a recipient of an activity sent to followers": {
+            topic: function(Activity) {
+                var User = require("../lib/model/user").User,
+                    cb = this.callback,
+                    user1,
+                    user2;
+                
+
+                Step(
+                    function() {
+                        var props1 = {
+                            nickname: "robert",
+                            password: "123456"
+                        },
+                            props2 = {
+                            nickname: "kevin",
+                            password: "123456"
+                        };
+                        User.create(props1, this.parallel());
+                        User.create(props2, this.parallel());
+                    },
+                    function(err, result1, result2) {
+                        if (err) throw err;
+                        user1 = result1;
+                        user2 = result2;
+                        user2.follow(user1.profile.id, this);
+                    },
+                    function(err) {
+                        if (err) throw err;
+                        user1.profile.followersURL(this);
+                    },
+                    function(err, url) {
+                        if (err) throw err;
+                        if (!url) throw new Error("Bad URL");
+                        var act = {
+                            actor: user1.profile,
+                            verb: "post",
+                            to: [{
+                                objectType: "collection",
+                                id: url
+                            }],
+                            object: {
+                                objectType: "note",
+                                content: "Hello, world!"
+                            }
+                        };
+                        Activity.create(act, this);
+                    },
+                    function(err, act) {
+                        if (err) throw err;
+                        act.checkRecipient(user2.profile, this);
+                    },
+                    cb
+                );
+            },
+            "it works": function(err, isRecipient) {
+                assert.ifError(err);
+                assert.isBoolean(isRecipient);
+            },
+            "it returns true": function(err, isRecipient) {
+                assert.ifError(err);
+                assert.isBoolean(isRecipient);
+                assert.isTrue(isRecipient);
+            }
+        },
+        "and we check if a non-follower is a recipient of an activity sent to followers": {
+            topic: function(Activity) {
+                var User = require("../lib/model/user").User,
+                    cb = this.callback,
+                    user1,
+                    user2;
+                
+
+                Step(
+                    function() {
+                        var props1 = {
+                            nickname: "steve",
+                            password: "123456"
+                        },
+                            props2 = {
+                            nickname: "keith",
+                            password: "123456"
+                        };
+                        User.create(props1, this.parallel());
+                        User.create(props2, this.parallel());
+                    },
+                    function(err, result1, result2) {
+                        if (err) throw err;
+                        user1 = result1;
+                        user2 = result2;
+                        user1.profile.followersURL(this);
+                    },
+                    function(err, url) {
+                        if (err) throw err;
+                        if (!url) throw new Error("Bad URL");
+                        var act = {
+                            actor: user1.profile,
+                            verb: "post",
+                            to: [{
+                                objectType: "collection",
+                                id: url
+                            }],
+                            object: {
+                                objectType: "note",
+                                content: "Hello, world!"
+                            }
+                        };
+                        Activity.create(act, this);
+                    },
+                    function(err, act) {
+                        if (err) throw err;
+                        act.checkRecipient(user2.profile, this);
+                    },
+                    cb
+                );
+            },
+            "it works": function(err, isRecipient) {
+                assert.ifError(err);
+                assert.isBoolean(isRecipient);
+            },
+            "it returns false": function(err, isRecipient) {
+                assert.ifError(err);
+                assert.isBoolean(isRecipient);
+                assert.isFalse(isRecipient);
+            }
+        },
+        "and we check if a list non-member is a recipient of an activity sent to a list": {
+            topic: function(Activity) {
+                var User = require("../lib/model/user").User,
+                    Collection = require("../lib/model/collection").Collection,
+                    cb = this.callback,
+                    user1,
+                    user2,
+                    list;
+                
+
+                Step(
+                    function() {
+                        var props1 = {
+                            nickname: "jim",
+                            password: "123456"
+                        },
+                            props2 = {
+                            nickname: "zed",
+                            password: "123456"
+                        };
+                        User.create(props1, this.parallel());
+                        User.create(props2, this.parallel());
+                    },
+                    function(err, result1, result2) {
+                        if (err) throw err;
+                        user1 = result1;
+                        user2 = result2;
+                        Collection.create({author: user1.profile,
+                                           displayName: "Test 1",
+                                           objectTypes: ["person"]},
+                                          this);
+                    },
+                    function(err, result) {
+                        if (err) throw err;
+                        list = result;
+                        var act = {
+                            actor: user1.profile,
+                            verb: "post",
+                            to: [list],
+                            object: {
+                                objectType: "note",
+                                content: "Hello, world!"
+                            }
+                        };
+                        Activity.create(act, this);
+                    },
+                    function(err, act) {
+                        if (err) throw err;
+                        act.checkRecipient(user2.profile, this);
+                    },
+                    cb
+                );
+            },
+            "it works": function(err, isRecipient) {
+                assert.ifError(err);
+                assert.isBoolean(isRecipient);
+            },
+            "it returns false": function(err, isRecipient) {
+                assert.ifError(err);
+                assert.isBoolean(isRecipient);
+                assert.isFalse(isRecipient);
+            }
+        },
         "and we look for the post activity of a known object": {
             topic: function(Activity) {
                 var Note = require("../lib/model/note").Note,
