@@ -19,6 +19,7 @@
 var assert = require("assert"),
     vows = require("vows"),
     databank = require("databank"),
+    schema = require("../lib/schema").schema,
     URLMaker = require("../lib/urlmaker").URLMaker,
     modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
@@ -52,6 +53,100 @@ var testData = {
 };
 
 suite.addBatch(modelBatch("person", "Person", testSchema, testData));
+
+suite.addBatch({
+    "When we get the Person class": {
+        topic: function() {
+            var cb = this.callback;
+            // Need this to make IDs
+
+            URLMaker.hostname = "example.net";
+
+            // Dummy databank
+
+            var params = {schema: schema};
+
+            var db = Databank.get("memory", params);
+
+            db.connect({}, function(err) {
+
+                var mod;
+
+                if (err) {
+                    cb(err, null);
+                    return;
+                }
+
+                DatabankObject.bank = db;
+                
+                mod = require("../lib/model/person");
+
+                if (!mod) {
+                    cb(new Error("No module"), null);
+                    return;
+                }
+
+                cb(null, mod.Person);
+            });
+        },
+        "it works": function(err, Person) {
+            assert.ifError(err);
+            assert.isFunction(Person);
+        },
+        "and we instantiate a non-user Person": {
+            topic: function(Person) {
+                Person.create({displayName: "Gerald"}, this.callback);
+            },
+            "it works": function(err, person) {
+                assert.ifError(err);
+                assert.isObject(person);
+                assert.instanceOf(person, require("../lib/model/person").Person);
+            },
+            "it has a followersURL() method": function(err, person) {
+                assert.ifError(err);
+                assert.isObject(person);
+                assert.isFunction(person.followersURL);
+            },
+            "and we get its followersURL": {
+                topic: function(person) {
+                    person.followersURL(this.callback);
+                },
+                "it works": function(err, url) {
+                    assert.ifError(err);
+                },
+                "it is null": function(err, url) {
+                    assert.ifError(err);
+                    assert.isNull(url);
+                }
+            }
+        },
+        "and we create a user": {
+            topic: function(Person) {
+                var User = require("../lib/model/user").User;
+
+                User.create({nickname: "evan", password: "123456"},
+                            this.callback);
+            },
+            "it works": function(err, user) {
+                assert.ifError(err);
+            },
+            "and we get the followersURL of the profile": {
+                topic: function(user) {
+                    user.profile.followersURL(this.callback);
+                },
+                "it works": function(err, url) {
+                    assert.ifError(err);
+                    assert.isString(url);
+                },
+                "data is correct": function(err, url) {
+                    assert.ifError(err);
+                    assert.isString(url);
+                    assert.equal(url, "http://example.net/api/user/evan/followers");
+                }
+            }
+        }
+    }
+});
 
 suite["export"](module);
 
