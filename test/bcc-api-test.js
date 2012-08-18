@@ -334,7 +334,7 @@ suite.addBatch({
                                     content: "Dinner's ready!"
                                 }
                             };
-                            url = "http://localhost:4815/api/user/maryanne/feed";
+                            var url = "http://localhost:4815/api/user/maryanne/feed";
                             httputil.postJSON(url, cred, act, this);
                         },
                         function(err, doc, response) {
