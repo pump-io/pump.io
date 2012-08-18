@@ -113,6 +113,10 @@ suite.addBatch({
                             cred = makeCred(cl, users.gilligan.pair);
                             act = {
                                 verb: "post",
+                                to: [{
+                                    objectType: "collection",
+                                    id: "http://activityschema.org/collection/public"
+                                }],
                                 bcc: [{
                                     id: users.skipper.profile.id,
                                     objectType: "person"
@@ -317,6 +321,10 @@ suite.addBatch({
                             cred = makeCred(cl, users.maryanne.pair);
                             act = {
                                 verb: "post",
+                                to: [{
+                                    objectType: "collection",
+                                    id: "http://activityschema.org/collection/public"
+                                }],
                                 bto: [{
                                     id: users.ginger.profile.id,
                                     objectType: "person"
