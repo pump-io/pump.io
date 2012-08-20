@@ -36,6 +36,7 @@ var databank = require("databank"),
     Client = require("../lib/model/client").Client,
     mw = require("../lib/middleware"),
     URLMaker = require("../lib/urlmaker").URLMaker,
+    Distributor = require("../lib/distributor"),
     reqUser = mw.reqUser,
     sameUser = mw.sameUser,
     NoSuchThingError = databank.NoSuchThingError,
@@ -727,9 +728,7 @@ var postActivity = function(req, res, next) {
                 // ...then show (possibly modified) results.
                 res.json(activity);
                 // ...then distribute.
-                process.nextTick(function() {
-                    distribute(activity, function(err) {});
-                });
+                Distributor.distribute(activity, function(err) {});
             }
         }
     );
@@ -1141,43 +1140,6 @@ var userLists = function(req, res, next) {
 
 var notYetImplemented = function(req, res, next) {
     next(new HTTPError("Not yet implemented", 500));
-};
-
-var distribute = function(activity, callback) {
-
-    Step(
-        function() {
-            Edge.search({"to.id": activity.actor.id}, this);
-        },
-        function(err, follows) {
-            if (err) throw err;
-            var i, id, group = this.group();
-            // Not all profiles are users, so we gotta get em
-            for (i = 0; i < follows.length; i++) {
-                id = follows[i].from.id;
-                User.fromPerson(id, group());
-            }
-        },
-        function(err, users) {
-            var i, user, group = this.group();
-
-            if (err) throw err;
-            
-            for (i = 0; i < users.length; i++) {
-                user = users[i];
-                if (user) {
-                    user.addToInbox(activity, group);
-                }
-            }
-        },
-        function(err) {
-            if (err) {
-                callback(err);
-            } else {
-                callback(null);
-            }
-        }
-    );
 };
 
 var clientReg = function (req, res, next) {
