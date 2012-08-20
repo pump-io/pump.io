@@ -189,6 +189,10 @@ suite.addBatch({
                     var cb = this.callback,
                         act = {
                             verb: "post",
+                            to: [{
+                                id: "http://activityschema.org/collection/public",
+                                objectType: "collection"
+                            }],
                             object: {
                                 objectType: "note",
                                 content: "Hello, world!"
