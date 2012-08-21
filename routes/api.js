@@ -722,13 +722,15 @@ var postActivity = function(req, res, next) {
             req.user.addToInbox(activity, this.parallel());
         },
         function(err) {
+            var d;
             if (err) {
                 next(err);
             } else {
                 // ...then show (possibly modified) results.
                 res.json(activity);
                 // ...then distribute.
-                Distributor.distribute(activity, function(err) {});
+                d = new Distributor(activity);
+                d.distribute(function(err) {});
             }
         }
     );
