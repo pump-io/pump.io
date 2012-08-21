@@ -273,6 +273,10 @@ suite.addBatch({
                             if (err) throw err;
                             var act = {
                                 verb: "post",
+                                to: [{
+                                    id: "http://localhost:4815/api/user/jill/followers",
+                                    objectType: "collection"
+                                }],
                                 object: {
                                     objectType: "note",
                                     content: "Hello, world."
