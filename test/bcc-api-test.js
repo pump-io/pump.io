@@ -264,7 +264,7 @@ suite.addBatch({
                     "it works": function(err, feed) {
                         assert.ifError(err);
                     },
-                    "they can't see the bcc": function(err, feed) {
+                    "they can see the bcc": function(err, feed) {
                         assert.ifError(err);
                         assert.isObject(feed);
                         assert.isArray(feed.items);
