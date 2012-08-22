@@ -117,6 +117,7 @@ vows.describe("activityobject class interface").addBatch({
                 assert.equal(ActivityObject.ISSUE, "issue");
                 assert.equal(ActivityObject.JOB, "job");
                 assert.equal(ActivityObject.NOTE, "note");
+                assert.equal(ActivityObject.OFFER, "offer");
                 assert.equal(ActivityObject.ORGANIZATION, "organization");
                 assert.equal(ActivityObject.PERSON, "person");
                 assert.equal(ActivityObject.PLACE, "place");
