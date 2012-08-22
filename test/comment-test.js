@@ -40,11 +40,6 @@ var testSchema = {
 
 var testData = {
     "create": {
-        author: {
-            id: "acct:evan@example.net",
-            displayName: "Evan Prodromou",
-            objectType: "person"
-        },
         displayName: "Great spec!",
         url: "http://example.com/comment/activity-stream-spec#comment1",
         content: "Nice job on the <strong>spec</strong>!",
