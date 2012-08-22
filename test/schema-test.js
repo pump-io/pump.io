@@ -54,6 +54,7 @@ var types = [
     "note",
     "offer",
     "organization",
+    "page",
     "person",
     "place",
     "process",
