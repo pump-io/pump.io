@@ -188,6 +188,36 @@ suite.addBatch({
                         assert.equal(orig.id, copy.id);
                     }
                 },
+                "and the author reads the likes stream": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.mrmoose.pair),
+                            cb = this.callback,
+                            url = doc.object.likes.url;
+
+                        httputil.getJSON(url, cred, function(err, likes, response) {
+                            cb(err, likes);
+                        });
+                    },
+                    "it works": function(err, likes) {
+                        assert.ifError(err);
+                        assert.isObject(likes);
+                    }
+                },
+                "and the author reads the replies stream": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.mrmoose.pair),
+                            cb = this.callback,
+                            url = doc.object.replies.url;
+
+                        httputil.getJSON(url, cred, function(err, replies, response) {
+                            cb(err, replies);
+                        });
+                    },
+                    "it works": function(err, replies) {
+                        assert.ifError(err);
+                        assert.isObject(replies);
+                    }
+                },
                 "and the author reads their own feed": {
                     topic: function(doc, users, cl) {
                         var cred = makeCred(cl, users.mrmoose.pair),
@@ -260,6 +290,36 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.isObject(copy);
                         assert.equal(orig.id, copy.id);
+                    }
+                },
+                "and the recipient reads the likes stream": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.mrbunnyrabbit.pair),
+                            cb = this.callback,
+                            url = doc.object.likes.url;
+
+                        httputil.getJSON(url, cred, function(err, likes, response) {
+                            cb(err, likes);
+                        });
+                    },
+                    "it works": function(err, likes) {
+                        assert.ifError(err);
+                        assert.isObject(likes);
+                    }
+                },
+                "and the recipient reads the replies stream": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.mrbunnyrabbit.pair),
+                            cb = this.callback,
+                            url = doc.object.replies.url;
+
+                        httputil.getJSON(url, cred, function(err, replies, response) {
+                            cb(err, replies);
+                        });
+                    },
+                    "it works": function(err, replies) {
+                        assert.ifError(err);
+                        assert.isObject(replies);
                     }
                 },
                 "and the recipient reads the author's feed": {
@@ -344,6 +404,46 @@ suite.addBatch({
                         assert.ifError(err);
                     }
                 },
+                "and a follower reads the likes stream": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.townclown.pair),
+                            cb = this.callback,
+                            url = doc.object.likes.url;
+
+                        httputil.getJSON(url, cred, function(err, likes, response) {
+                            if (err && err.statusCode && err.statusCode == 403) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        });
+                    },
+                    "it fails with a 403 Forbidden": function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                "and a follower reads the replies stream": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.townclown.pair),
+                            cb = this.callback,
+                            url = doc.object.replies.url;
+
+                        httputil.getJSON(url, cred, function(err, replies, response) {
+                            if (err && err.statusCode && err.statusCode == 403) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        });
+                    },
+                    "it fails with a 403 Forbidden": function(err) {
+                        assert.ifError(err);
+                    }
+                },
                 "and a follower reads the author's feed": {
                     topic: function(doc, users, cl) {
                         var cred = makeCred(cl, users.townclown.pair),
@@ -413,6 +513,46 @@ suite.addBatch({
                             url = doc.object.id;
 
                         httputil.getJSON(url, cred, function(err, note, response) {
+                            if (err && err.statusCode && err.statusCode == 403) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        });
+                    },
+                    "it fails with a 403 Forbidden": function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                "and an anonymous user reads the likes stream": {
+                    topic: function(doc, users, cl) {
+                        var cred = clientCred(cl),
+                            cb = this.callback,
+                            url = doc.object.likes.url;
+
+                        httputil.getJSON(url, cred, function(err, likes, response) {
+                            if (err && err.statusCode && err.statusCode == 403) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        });
+                    },
+                    "it fails with a 403 Forbidden": function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                "and an anonymous user reads the replies stream": {
+                    topic: function(doc, users, cl) {
+                        var cred = clientCred(cl),
+                            cb = this.callback,
+                            url = doc.object.replies.url;
+
+                        httputil.getJSON(url, cred, function(err, replies, response) {
                             if (err && err.statusCode && err.statusCode == 403) {
                                 cb(null);
                             } else if (err) {
@@ -562,6 +702,36 @@ suite.addBatch({
                         assert.equal(orig.id, copy.id);
                     }
                 },
+                "and the author reads the likes stream": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.captain.pair),
+                            cb = this.callback,
+                            url = doc.object.likes.url;
+
+                        httputil.getJSON(url, cred, function(err, likes, response) {
+                            cb(err, likes);
+                        });
+                    },
+                    "it works": function(err, likes) {
+                        assert.ifError(err);
+                        assert.isObject(likes);
+                    }
+                },
+                "and the author reads the replies stream": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.captain.pair),
+                            cb = this.callback,
+                            url = doc.object.replies.url;
+
+                        httputil.getJSON(url, cred, function(err, replies, response) {
+                            cb(err, replies);
+                        });
+                    },
+                    "it works": function(err, replies) {
+                        assert.ifError(err);
+                        assert.isObject(replies);
+                    }
+                },
                 "and the author reads their own feed": {
                     topic: function(doc, users, cl) {
                         var cred = makeCred(cl, users.captain.pair),
@@ -634,6 +804,36 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.isObject(copy);
                         assert.equal(orig.id, copy.id);
+                    }
+                },
+                "and an unrelated user reads the likes stream": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.mrgreenjeans.pair),
+                            cb = this.callback,
+                            url = doc.object.likes.url;
+
+                        httputil.getJSON(url, cred, function(err, likes, response) {
+                            cb(err, likes);
+                        });
+                    },
+                    "it works": function(err, likes) {
+                        assert.ifError(err);
+                        assert.isObject(likes);
+                    }
+                },
+                "and an unrelated user reads the replies stream": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.mrgreenjeans.pair),
+                            cb = this.callback,
+                            url = doc.object.replies.url;
+
+                        httputil.getJSON(url, cred, function(err, replies, response) {
+                            cb(err, replies);
+                        });
+                    },
+                    "it works": function(err, replies) {
+                        assert.ifError(err);
+                        assert.isObject(replies);
                     }
                 },
                 "and an unrelated user reads the author's feed": {
@@ -709,6 +909,36 @@ suite.addBatch({
                         assert.equal(orig.id, copy.id);
                     }
                 },
+                "and a follower reads the likes stream": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.dancingbear.pair),
+                            cb = this.callback,
+                            url = doc.object.likes.url;
+
+                        httputil.getJSON(url, cred, function(err, likes, response) {
+                            cb(err, likes);
+                        });
+                    },
+                    "it works": function(err, likes) {
+                        assert.ifError(err);
+                        assert.isObject(likes);
+                    }
+                },
+                "and a follower reads the replies stream": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.dancingbear.pair),
+                            cb = this.callback,
+                            url = doc.object.replies.url;
+
+                        httputil.getJSON(url, cred, function(err, replies, response) {
+                            cb(err, replies);
+                        });
+                    },
+                    "it works": function(err, replies) {
+                        assert.ifError(err);
+                        assert.isObject(replies);
+                    }
+                },
                 "and a follower reads the author's feed": {
                     topic: function(doc, users, cl) {
                         var cred = makeCred(cl, users.dancingbear.pair),
@@ -782,6 +1012,36 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.isObject(copy);
                         assert.equal(orig.id, copy.id);
+                    }
+                },
+                "and an anonymous user reads the likes stream": {
+                    topic: function(doc, users, cl) {
+                        var cred = clientCred(cl),
+                            cb = this.callback,
+                            url = doc.object.likes.url;
+
+                        httputil.getJSON(url, cred, function(err, likes, response) {
+                            cb(err, likes);
+                        });
+                    },
+                    "it works": function(err, likes) {
+                        assert.ifError(err);
+                        assert.isObject(likes);
+                    }
+                },
+                "and an anonymous user reads the replies stream": {
+                    topic: function(doc, users, cl) {
+                        var cred = makeCred(cl, users.dancingbear.pair),
+                            cb = this.callback,
+                            url = doc.object.replies.url;
+
+                        httputil.getJSON(url, cred, function(err, replies, response) {
+                            cb(err, replies);
+                        });
+                    },
+                    "it works": function(err, replies) {
+                        assert.ifError(err);
+                        assert.isObject(replies);
                     }
                 },
                 "and an anonymous user reads the author's feed": {

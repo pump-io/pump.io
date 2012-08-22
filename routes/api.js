@@ -108,8 +108,8 @@ var addRoutes = function(app) {
         app.put(url, userAuth, requester(type), authz, putter(type));
         app.del(url, userAuth, requester(type), authz, deleter(type));
 
-        app.get("/api/" + type + "/" + ":uuid/likes", clientAuth, requester(type), likes(type));
-        app.get("/api/" + type + "/" + ":uuid/replies", clientAuth, requester(type), replies(type));
+        app.get("/api/" + type + "/" + ":uuid/likes", clientAuth, requester(type), authorOrRecipient(type), likes(type));
+        app.get("/api/" + type + "/" + ":uuid/replies", clientAuth, requester(type), authorOrRecipient(type), replies(type));
     }
     
     // Activities
