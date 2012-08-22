@@ -104,6 +104,7 @@ vows.describe("activityobject class interface").addBatch({
                 assert.equal(ActivityObject.ARTICLE, "article");
                 assert.equal(ActivityObject.AUDIO, "audio");
                 assert.equal(ActivityObject.BADGE, "badge");
+                assert.equal(ActivityObject.BINARY, "binary");
                 assert.equal(ActivityObject.BOOKMARK, "bookmark");
                 assert.equal(ActivityObject.COLLECTION, "collection");
                 assert.equal(ActivityObject.COMMENT, "comment");
