@@ -111,6 +111,7 @@ vows.describe("activityobject class interface").addBatch({
                 assert.equal(ActivityObject.DEVICE, "device");
                 assert.equal(ActivityObject.EVENT, "event");
                 assert.equal(ActivityObject.FILE, "file");
+                assert.equal(ActivityObject.GAME, "game");
                 assert.equal(ActivityObject.GROUP, "group");
                 assert.equal(ActivityObject.IMAGE, "image");
                 assert.equal(ActivityObject.NOTE, "note");
