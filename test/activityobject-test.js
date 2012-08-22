@@ -100,6 +100,7 @@ vows.describe("activityobject class interface").addBatch({
             },
             "it has constant-ish members for known types": function(ActivityObject) {
                 assert.equal(ActivityObject.ALERT, "alert");
+                assert.equal(ActivityObject.APPLICATION, "application");
                 assert.equal(ActivityObject.ARTICLE, "article");
                 assert.equal(ActivityObject.AUDIO, "audio");
                 assert.equal(ActivityObject.BADGE, "badge");
