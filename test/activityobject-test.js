@@ -108,6 +108,7 @@ vows.describe("activityobject class interface").addBatch({
                 assert.equal(ActivityObject.BOOKMARK, "bookmark");
                 assert.equal(ActivityObject.COLLECTION, "collection");
                 assert.equal(ActivityObject.COMMENT, "comment");
+                assert.equal(ActivityObject.DEVICE, "device");
                 assert.equal(ActivityObject.EVENT, "event");
                 assert.equal(ActivityObject.FILE, "file");
                 assert.equal(ActivityObject.GROUP, "group");
