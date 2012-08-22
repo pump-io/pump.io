@@ -49,6 +49,7 @@ var types = [
     "game",
     "group",
     "image",
+    "issue",
     "job",
     "note",
     "organization",
