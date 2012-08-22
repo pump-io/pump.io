@@ -124,6 +124,7 @@ vows.describe("activityobject class interface").addBatch({
                 assert.equal(ActivityObject.QUESTION, "question");
                 assert.equal(ActivityObject.REVIEW, "review");
                 assert.equal(ActivityObject.SERVICE, "service");
+                assert.equal(ActivityObject.TASK, "task");
                 assert.equal(ActivityObject.VIDEO, "video");
             },
             "and we make a new URI": {
