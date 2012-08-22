@@ -112,7 +112,7 @@ suite.addBatch({
                     assert.include(act.cc[0], "objectType");
                     assert.equal(act.cc[0].objectType, "collection");
                     assert.include(act.cc[0], "id");
-                    assert.equal(act.cc[0].id, "http://example.net:4815/api/user/mrrogers/followers");
+                    assert.equal(act.cc[0].id, "http://localhost:4815/api/user/mrrogers/followers");
                     assert.isFalse(act.hasOwnProperty("to"));
                     assert.isFalse(act.hasOwnProperty("bto"));
                     assert.isFalse(act.hasOwnProperty("bcc"));
@@ -190,9 +190,9 @@ suite.addBatch({
                     assert.lengthOf(act.to, 1);
                     assert.isObject(act.to[0]);
                     assert.include(act.to[0], "objectType");
-                    assert.equal(act.to[0].objectType, "collection");
+                    assert.equal(act.to[0].objectType, "person");
                     assert.include(act.to[0], "id");
-                    assert.equal(act.to[0].id, users.xtheowl.profile.id);
+                    assert.equal(users.xtheowl.profile.id, act.to[0].id);
                     assert.include(act, "cc");
                     assert.isArray(act.cc);
                     assert.lengthOf(act.cc, 1);
@@ -200,7 +200,7 @@ suite.addBatch({
                     assert.include(act.cc[0], "objectType");
                     assert.equal(act.cc[0].objectType, "collection");
                     assert.include(act.cc[0], "id");
-                    assert.equal(act.cc[0].id, "http://example.net:4815/api/user/xtheowl/followers");
+                    assert.equal(act.cc[0].id, "http://localhost:4815/api/user/xtheowl/followers");
                     assert.isFalse(act.hasOwnProperty("bto"));
                     assert.isFalse(act.hasOwnProperty("bcc"));
                 }
@@ -263,7 +263,7 @@ suite.addBatch({
                     assert.include(act.to[0], "objectType");
                     assert.equal(act.to[0].objectType, "collection");
                     assert.include(act.to[0], "id");
-                    assert.equal(act.to[0].id, "http://example.net:4815/api/user/elaine/followers");
+                    assert.equal(act.to[0].id, "http://localhost:4815/api/user/elaine/followers");
                     assert.isFalse(act.hasOwnProperty("cc"));
                     assert.isFalse(act.hasOwnProperty("bto"));
                     assert.isFalse(act.hasOwnProperty("bcc"));
@@ -328,7 +328,7 @@ suite.addBatch({
                     assert.include(act.to[0], "objectType");
                     assert.equal(act.to[0].objectType, "collection");
                     assert.include(act.to[0], "id");
-                    assert.equal(act.to[0].id, "http://example.net:4815/api/user/tuesday/followers");
+                    assert.equal(act.to[0].id, "http://localhost:4815/api/user/tuesday/followers");
                     assert.isFalse(act.hasOwnProperty("cc"));
                     assert.isFalse(act.hasOwnProperty("bto"));
                     assert.isFalse(act.hasOwnProperty("bcc"));

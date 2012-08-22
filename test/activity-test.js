@@ -269,6 +269,9 @@ suite.addBatch({
             },
             "it has the checkRecipient() method": function(activity) {
                 assert.isFunction(activity.checkRecipient);
+            },
+            "it has the recipients() method": function(activity) {
+                assert.isFunction(activity.recipients);
             }
         },
         "and we apply() a new post activity": {

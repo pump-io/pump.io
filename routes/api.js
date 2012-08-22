@@ -693,6 +693,11 @@ var postActivity = function(req, res, next) {
 
     Step(
         function() {
+            // First, ensure recipients
+            activity.ensureRecipients(this);
+        },
+        function(err) {
+            if (err) throw err;
             // First, apply the activity
             activity.apply(req.user.profile, this);
         },
