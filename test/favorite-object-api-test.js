@@ -614,6 +614,41 @@ suite.addBatch({
                         assert.equal("urn:uuid:ab70a4c0-ed3a-11e1-965f-0024beb67924", feed.items[0].object.id);
                     }
                 }
+            },
+            "and a user tries to post to someone else's favorites stream": {
+                topic: function(cl) {
+                    var cb = this.callback;
+
+                    Step(
+                        function() {
+                            newPair(cl, "doug", "nose", this.parallel());
+                            newPair(cl, "rachel", "dare", this.parallel());
+                        },
+                        function(err, pair1, pair2) {
+                            if (err) throw err;
+                            var url = "http://localhost:4815/api/user/rachel/favorites",
+                                obj = {
+                                    objectType: "image",
+                                    id: "urn:uuid:79ba04b8-ed3e-11e1-a70b-0024beb67924"
+                                };
+
+                            var cred = makeCred(cl, pair1);
+                            httputil.postJSON(url, cred, obj, this);
+                        },
+                        function(err, doc, response) {
+                            if (err && err.statusCode == 401) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success!"));
+                            }
+                        }
+                    );
+                },
+                "it fails with a 401 Forbidden": function(err) {
+                    assert.ifError(err);
+                }
             }
         }
     }
