@@ -691,6 +691,28 @@ var postActivity = function(req, res, next) {
         activity.verb = "post";
     }
 
+    
+    Step(
+        function() {
+            newActivity(activity, req.user, this);
+        },
+        function(err) {
+            var d;
+            if (err) {
+                next(err);
+            } else {
+                // ...then show (possibly modified) results.
+                res.json(activity);
+                // ...then distribute.
+                d = new Distributor(activity);
+                d.distribute(function(err) {});
+            }
+        }
+    );
+};
+
+var newActivity = function(activity, user, callback) {
+
     Step(
         function() {
             // First, ensure recipients
@@ -699,7 +721,7 @@ var postActivity = function(req, res, next) {
         function(err) {
             if (err) throw err;
             // First, apply the activity
-            activity.apply(req.user.profile, this);
+            activity.apply(user.profile, this);
         },
         function(err) {
             if (err) {
@@ -723,21 +745,10 @@ var postActivity = function(req, res, next) {
         function(err, saved) {
             if (err) throw err;
             activity = saved;
-            req.user.addToOutbox(activity, this.parallel());
-            req.user.addToInbox(activity, this.parallel());
+            user.addToOutbox(activity, this.parallel());
+            user.addToInbox(activity, this.parallel());
         },
-        function(err) {
-            var d;
-            if (err) {
-                next(err);
-            } else {
-                // ...then show (possibly modified) results.
-                res.json(activity);
-                // ...then distribute.
-                d = new Distributor(activity);
-                d.distribute(function(err) {});
-            }
-        }
+        callback
     );
 };
 
