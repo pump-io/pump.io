@@ -391,6 +391,36 @@ suite.addBatch({
                         assert.isObject(feed.items[0]);
                         assert.equal("costello", feed.items[0].displayName);
                     }
+                },
+                "and we check the user's activity feed": {
+                    topic: function(posted, users, cl) {
+                        var cb = this.callback,
+                            url = "http://localhost:4815/api/user/abbott/feed",
+                            cred = makeCred(cl, users.abbott.pair);
+                        
+                            httputil.getJSON(url, cred, function(err, doc, resp) {
+                                cb(err, doc);
+                            });
+                    },
+                    "it works": function(err, feed) {
+                        assert.ifError(err);
+                    },
+                    "it includes the follow activity": function(err, feed) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                        assert.include(feed, "items");
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 1);
+                        assert.isObject(feed.items[0]);
+                        assert.include(feed.items[0], "verb");
+                        assert.equal("follow", feed.items[0].verb);
+                        assert.include(feed.items[0], "object");
+                        assert.isObject(feed.items[0].object);
+                        assert.include(feed.items[0].object, "displayName");
+                        assert.equal("costello", feed.items[0].object.displayName);
+                        assert.include(feed.items[0].object, "objectType");
+                        assert.equal("person", feed.items[0].object.objectType);
+                    }
                 }
             },
             "and a user posts to someone else's following stream": {
