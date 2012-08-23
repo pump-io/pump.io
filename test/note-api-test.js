@@ -409,6 +409,91 @@ suite.addBatch({
                         assert.equal(feed.items[0].object.id, feed.items[1].object.id);
                     }
                 }
+            },
+            "and we post a note and then DELETE it": {
+                topic: function(cl) {
+                    var callback = this.callback,
+                        feed = "http://localhost:4815/api/user/pippin/feed",
+                        url,
+                        cred;
+
+                    Step(
+                        function() {
+                            newPair(cl, "pippin", "2nd*breakfast", this);
+                        },
+                        function(err, pair) {
+                            var act;
+                            if (err) throw err;
+                            cred = makeCred(cl, pair);
+                            act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "note",
+                                    content: "I'm hungry."
+                                }
+                            };
+
+                            httputil.postJSON(feed, cred, act, this);
+                        },
+                        function(err, post, result) {
+                            if (err) throw err;
+                            url = post.object.links.self.href;
+                            httputil.delJSON(url, cred, this);
+                        },
+                        function(err, res, result) {
+                            if (err) {
+                                callback(err, null, null);
+                            } else {
+                                callback(null, url, cred);
+                            }
+                        }
+                    );
+                },
+                "it works": function(err, url, cred) {
+                    assert.ifError(err);
+                },
+                "and we retrieve the deleted note": {
+                    topic: function(url, cred) {
+                        var callback = this.callback;
+                        httputil.getJSON(url, cred, function(err, obj, res) {
+                            if (err && err.statusCode == 410) {
+                                callback(null);
+                            } else if (err) {
+                                callback(err);
+                            } else {
+                                callback(new Error("Unexpected success!"));
+                            }
+                        });
+                    },
+                    "it is 410 Gone": function(err) {
+                        assert.ifError(err);
+                    }
+                },
+                "and we retrieve the user's feed": {
+                    topic: function(upd, cred) {
+                        var callback = this.callback,
+                            url = "http://localhost:4815/api/user/pippin/feed";
+                        httputil.getJSON(url, cred, function(err, obj, res) {
+                            callback(err, obj);
+                        });
+                    },
+                    "it works": function(err, feed) {
+                        assert.ifError(err);
+                    },
+                    "it has the delete activity": function(err, feed) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                        assert.include(feed, "items");
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 2);
+                        assert.isObject(feed.items[0]);
+                        assert.include(feed.items[0], "verb");
+                        assert.equal("delete", feed.items[0].verb);
+                        assert.include(feed.items[0], "object");
+                        assert.include(feed.items[0].object, "id");
+                        assert.equal(feed.items[0].object.id, feed.items[1].object.id);
+                    }
+                }
             }
         }
     }

@@ -376,16 +376,25 @@ var putter = function(type) {
 
 var deleter = function(type) {
     return function(req, res, next) {
-        var obj = req[type];
+        var obj = req[type],
+            act = new Activity({
+                actor: req.remoteUser.profile,
+                verb: "delete",
+                object: obj
+            });
+
         Step(
             function() {
-                obj.efface(this);
+                newActivity(act, req.remoteUser, this);
             },
-            function(err) {
+            function(err, act) {
+                var d;
                 if (err) {
                     next(err);
                 } else {
                     res.json("Deleted");
+                    d = new Distributor(act);
+                    d.distribute(function(err) {});
                 }
             }
         );
