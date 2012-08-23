@@ -327,6 +327,48 @@ suite.addBatch({
                     assert.include(postnote, "id");
                     assert.equal(inbox.items[0].id, postnote.id);
                 }
+            },
+            "and a user posts a person to their following stream": {
+                topic: function(cl) {
+                    var cb = this.callback,
+                        users = {abbott: {}, costello: {}};
+
+                    Step(
+                        function() {
+                            register(cl, "abbott", "what", this.parallel());
+                            register(cl, "costello", "who", this.parallel());
+                        },
+                        function(err, user1, user2) {
+                            if (err) throw err;
+                            users.abbott.profile = user1.profile;
+                            users.costello.profile = user2.profile;
+                            accessToken(cl, {nickname: "abbott", password: "what"}, this.parallel());
+                            accessToken(cl, {nickname: "costello", password: "who"}, this.parallel());
+                        },
+                        function(err, pair1, pair2) {
+                            if (err) throw err;
+                            users.abbott.pair = pair1;
+                            users.costello.pair = pair2;
+
+                            var url = "http://localhost:4815/api/user/abbott/following",
+                                cred = makeCred(cl, users.abbott.pair);
+
+                            httputil.postJSON(url, cred, users.costello.profile, this);
+                        },
+                        function(err, posted, result) {
+                            cb(err, posted, users);
+                        }
+                    );
+                },
+                "it works": function(err, posted, users) {
+                    assert.ifError(err);
+                },
+                "posted item is person": function(err, posted, users) {
+                    assert.ifError(err);
+                    assert.isObject(posted);
+                    assert.include(posted, "id");
+                    assert.equal(users.costello.profile.id, posted.id);
+                }
             }
         }
     }
