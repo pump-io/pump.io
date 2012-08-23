@@ -1009,10 +1009,37 @@ var userFollowers = function(req, res, next) {
             }
         },
         function(err, people) {
+            var base = "api/user/" + req.user.nickname + "/followers";
             if (err) {
                 next(err);
             } else {
                 collection.items = people;
+                collection.startIndex = args.start;
+                collection.itemsPerPage = args.count;
+
+                collection.links = {
+                    self: {
+                        href: URLMaker.makeURL(base, {offset: args.start, count: args.count})
+                    },
+                    current: {
+                        href: URLMaker.makeURL(base)
+                    }
+                };
+
+                if (args.start > 0) {
+                    collection.links.prev = {
+                        href: URLMaker.makeURL(base, 
+                                               {offset: Math.max(args.start-args.count, 0), 
+                                                count: Math.min(args.count, args.start)})
+                    };
+                }
+
+                if (args.start + people.length < collection.totalItems) {
+                    collection.links.next = {
+                        href: URLMaker.makeURL("api/user/" + req.user.nickname + "/following", 
+                                               {offset: args.start+people.length, count: args.count})
+                    };
+                }
                 res.json(collection);
             }
         }
@@ -1055,10 +1082,39 @@ var userFollowing = function(req, res, next) {
             }
         },
         function(err, people) {
+            var base = "api/user/" + req.user.nickname + "/following";
             if (err) {
                 next(err);
             } else {
                 collection.items = people;
+
+                collection.startIndex = args.start;
+                collection.itemsPerPage = args.count;
+
+                collection.links = {
+                    self: {
+                        href: URLMaker.makeURL(base, {offset: args.start, count: args.count})
+                    },
+                    current: {
+                        href: URLMaker.makeURL(base)
+                    }
+                };
+
+                if (args.start > 0) {
+                    collection.links.prev = {
+                        href: URLMaker.makeURL(base, 
+                                               {offset: Math.max(args.start-args.count, 0), 
+                                                count: Math.min(args.count, args.start)})
+                    };
+                }
+
+                if (args.start + people.length < collection.totalItems) {
+                    collection.links.next = {
+                        href: URLMaker.makeURL("api/user/" + req.user.nickname + "/following", 
+                                               {offset: args.start+people.length, count: args.count})
+                    };
+                }
+                
                 res.json(collection);
             }
         }

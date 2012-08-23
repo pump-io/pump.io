@@ -26,6 +26,7 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     setupApp = oauthutil.setupApp,
     newClient = oauthutil.newClient,
+    newPair = oauthutil.newPair,
     register = oauthutil.register,
     accessToken = oauthutil.accessToken;
 
@@ -50,7 +51,7 @@ var makeCred = function(cl, pair) {
     };
 };
 
-var assertValidList = function(doc, count) {
+var assertValidList = function(doc, total, count) {
     assert.include(doc, "author");
     assert.include(doc.author, "id");
     assert.include(doc.author, "displayName");
@@ -59,10 +60,19 @@ var assertValidList = function(doc, count) {
     assert.include(doc, "items");
     assert.include(doc, "displayName");
     assert.include(doc, "id");
+    assert.include(doc, "itemsPerPage");
+    assert.include(doc, "startIndex");
+    assert.include(doc, "links");
+    assert.include(doc.links, "current");
+    assert.include(doc.links.current, "href");
+    assert.include(doc.links, "self");
+    assert.include(doc.links.self, "href");
     assert.include(doc, "objectTypes");
     assert.include(doc.objectTypes, "person");
+    if (_(total).isNumber()) {
+        assert.equal(doc.totalItems, total);
+    }
     if (_(count).isNumber()) {
-        assert.equal(doc.totalItems, count);
         assert.lengthOf(doc.items, count);
     }
 };
@@ -527,6 +537,291 @@ suite.addBatch({
                 "it is valid": function(err, doc) {
                     assert.ifError(err);
                     assertValidList(doc, 0);
+                }
+            }
+        },
+        "and a lot of users follow one user": {
+
+            topic: function(cl) {
+                var cb = this.callback,
+                    user,
+                    pair;
+
+                Step(
+                    function() {
+                        register(cl, "nymeria", "growl", this);
+                    },
+                    function(err, nymeria) {
+                        if (err) throw err;
+                        user = nymeria;
+                        accessToken(cl, {nickname: "nymeria", password: "growl"}, this);
+                    },
+                    function(err, result) {
+                        var i, group = this.group();
+                        if (err) throw err;
+                        pair = result;
+                        for (i = 0; i < 50; i++) {
+                            newPair(cl, "wolf" + i, "grrrrrr", group());
+                        }
+                    },
+                    function(err, pairs) {
+                        var act, url, cred, i, group = this.group();
+                        if (err) throw err;
+                        act = {
+                            verb: "follow",
+                            object: {
+                                objectType: "person",
+                                id: user.profile.id
+                            }
+                        };
+                        for (i = 0; i < 50; i++) {
+                            httputil.postJSON("http://localhost:4815/api/user/wolf"+i+"/feed", makeCred(cl, pairs[i]), act, group());
+                        }
+                    },
+                    function(err, docs, responses) {
+                        cb(err, pair);
+                    }
+                );
+            },
+            "it works": function(err, pair) {
+                assert.ifError(err);
+            },
+            "and we get the tip of the followers feed": {
+                topic: function(pair, cl) {
+                    var callback = this.callback,
+                        url = "http://localhost:4815/api/user/nymeria/followers",
+                        cred = makeCred(cl, pair);
+                    
+                    httputil.getJSON(url, cred, function(err, doc, resp) {
+                        callback(err, doc);
+                    });
+                },
+                "it works": function(err, feed) {
+                    assert.ifError(err);
+                },
+                "it is valid": function(err, feed) {
+                    assert.ifError(err);
+                    assertValidList(feed, 50, 20);
+                },
+                "it has next but no prev": function(err, feed) {
+                    assert.ifError(err);
+                    assert.include(feed.links, "next");
+                    assert.include(feed.links.next, "href");
+                    assert.isFalse(feed.links.hasOwnProperty("prev"));
+                }
+            },
+            "and we get a non-default count from the feed": {
+                topic: function(pair, cl) {
+                    var callback = this.callback,
+                        url = "http://localhost:4815/api/user/nymeria/followers?count=40",
+                        cred = makeCred(cl, pair);
+                    
+                    httputil.getJSON(url, cred, function(err, doc, resp) {
+                        callback(err, doc);
+                    });
+                },
+                "it works": function(err, feed) {
+                    assert.ifError(err);
+                },
+                "it is valid": function(err, feed) {
+                    assert.ifError(err);
+                    assertValidList(feed, 50, 40);
+                },
+                "it has next but no prev": function(err, feed) {
+                    assert.ifError(err);
+                    assert.include(feed.links, "next");
+                    assert.include(feed.links.next, "href");
+                    assert.isFalse(feed.links.hasOwnProperty("prev"));
+                }
+            },
+            "and we get a very large count from the feed": {
+                topic: function(pair, cl) {
+                    var callback = this.callback,
+                        url = "http://localhost:4815/api/user/nymeria/followers?count=100",
+                        cred = makeCred(cl, pair);
+                    
+                    httputil.getJSON(url, cred, function(err, doc, resp) {
+                        callback(err, doc);
+                    });
+                },
+                "it works": function(err, feed) {
+                    assert.ifError(err);
+                },
+                "it is valid": function(err, feed) {
+                    assert.ifError(err);
+                    assertValidList(feed, 50, 50);
+                },
+                "it has no next and no prev": function(err, feed) {
+                    assert.ifError(err);
+                    assert.isFalse(feed.links.hasOwnProperty("prev"));
+                    assert.isFalse(feed.links.hasOwnProperty("next"));
+                }
+            },
+            "and we get an offset subset from the feed": {
+                topic: function(pair, cl) {
+                    var callback = this.callback,
+                        url = "http://localhost:4815/api/user/nymeria/followers?offset=20",
+                        cred = makeCred(cl, pair);
+                    
+                    httputil.getJSON(url, cred, function(err, doc, resp) {
+                        callback(err, doc);
+                    });
+                },
+                "it works": function(err, feed) {
+                    assert.ifError(err);
+                },
+                "it is valid": function(err, feed) {
+                    assert.ifError(err);
+                    assertValidList(feed, 50, 20);
+                },
+                "it has next and prev": function(err, feed) {
+                    assert.ifError(err);
+                    assert.isTrue(feed.links.hasOwnProperty("prev"));
+                    assert.isTrue(feed.links.hasOwnProperty("next"));
+                }
+            }
+        },
+        "and a user follows a lot of other users": {
+
+            topic: function(cl) {
+                var cb = this.callback,
+                    user,
+                    pair;
+
+                Step(
+                    function() {
+                        register(cl, "varys", "magic", this);
+                    },
+                    function(err, varys) {
+                        if (err) throw err;
+                        user = varys;
+                        accessToken(cl, {nickname: "varys", password: "magic"}, this);
+                    },
+                    function(err, result) {
+                        var i, group = this.group();
+                        if (err) throw err;
+                        pair = result;
+                        for (i = 0; i < 50; i++) {
+                            register(cl, "littlebird"+i, "sekrit", group());
+                        }
+                    },
+                    function(err, users) {
+                        var cred, i, group = this.group();
+                        if (err) throw err;
+                        cred = makeCred(cl, pair);
+                        for (i = 0; i < 50; i++) {
+                            httputil.postJSON("http://localhost:4815/api/user/varys/feed",
+                                              cred,
+                                              {
+                                                  verb: "follow",
+                                                  object: {
+                                                      objectType: "person",
+                                                      id: users[i].profile.id
+                                                  }
+                                              },
+                                              group());
+                        }
+                    },
+                    function(err, docs, responses) {
+                        cb(err, pair);
+                    }
+                );
+            },
+            "it works": function(err, pair) {
+                assert.ifError(err);
+            },
+            "and we get the tip of the following feed": {
+                topic: function(pair, cl) {
+                    var callback = this.callback,
+                        url = "http://localhost:4815/api/user/varys/following",
+                        cred = makeCred(cl, pair);
+                    
+                    httputil.getJSON(url, cred, function(err, doc, resp) {
+                        callback(err, doc);
+                    });
+                },
+                "it works": function(err, feed) {
+                    assert.ifError(err);
+                },
+                "it is valid": function(err, feed) {
+                    assert.ifError(err);
+                    assertValidList(feed, 50, 20);
+                },
+                "it has next but no prev": function(err, feed) {
+                    assert.ifError(err);
+                    assert.include(feed.links, "next");
+                    assert.include(feed.links.next, "href");
+                    assert.isFalse(feed.links.hasOwnProperty("prev"));
+                }
+            },
+            "and we get a non-default count from the feed": {
+                topic: function(pair, cl) {
+                    var callback = this.callback,
+                        url = "http://localhost:4815/api/user/varys/following?count=40",
+                        cred = makeCred(cl, pair);
+                    
+                    httputil.getJSON(url, cred, function(err, doc, resp) {
+                        callback(err, doc);
+                    });
+                },
+                "it works": function(err, feed) {
+                    assert.ifError(err);
+                },
+                "it is valid": function(err, feed) {
+                    assert.ifError(err);
+                    assertValidList(feed, 50, 40);
+                },
+                "it has next but no prev": function(err, feed) {
+                    assert.ifError(err);
+                    assert.include(feed.links, "next");
+                    assert.include(feed.links.next, "href");
+                    assert.isFalse(feed.links.hasOwnProperty("prev"));
+                }
+            },
+            "and we get a very large count from the feed": {
+                topic: function(pair, cl) {
+                    var callback = this.callback,
+                        url = "http://localhost:4815/api/user/varys/following?count=100",
+                        cred = makeCred(cl, pair);
+                    
+                    httputil.getJSON(url, cred, function(err, doc, resp) {
+                        callback(err, doc);
+                    });
+                },
+                "it works": function(err, feed) {
+                    assert.ifError(err);
+                },
+                "it is valid": function(err, feed) {
+                    assert.ifError(err);
+                    assertValidList(feed, 50, 50);
+                },
+                "it has no next and no prev": function(err, feed) {
+                    assert.ifError(err);
+                    assert.isFalse(feed.links.hasOwnProperty("prev"));
+                    assert.isFalse(feed.links.hasOwnProperty("next"));
+                }
+            },
+            "and we get an offset subset from the feed": {
+                topic: function(pair, cl) {
+                    var callback = this.callback,
+                        url = "http://localhost:4815/api/user/varys/following?offset=20",
+                        cred = makeCred(cl, pair);
+                    
+                    httputil.getJSON(url, cred, function(err, doc, resp) {
+                        callback(err, doc);
+                    });
+                },
+                "it works": function(err, feed) {
+                    assert.ifError(err);
+                },
+                "it is valid": function(err, feed) {
+                    assert.ifError(err);
+                    assertValidList(feed, 50, 20);
+                },
+                "it has next and prev": function(err, feed) {
+                    assert.ifError(err);
+                    assert.isTrue(feed.links.hasOwnProperty("prev"));
+                    assert.isTrue(feed.links.hasOwnProperty("next"));
                 }
             }
         }
