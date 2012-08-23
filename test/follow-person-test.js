@@ -368,6 +368,29 @@ suite.addBatch({
                     assert.isObject(posted);
                     assert.include(posted, "id");
                     assert.equal(users.costello.profile.id, posted.id);
+                },
+                "and we check the user's following stream": {
+                    topic: function(posted, users, cl) {
+                        var cb = this.callback,
+                            url = "http://localhost:4815/api/user/abbott/following",
+                            cred = makeCred(cl, users.abbott.pair);
+                        
+                            httputil.getJSON(url, cred, function(err, doc, resp) {
+                                cb(err, doc);
+                            });
+                    },
+                    "it works": function(err, feed) {
+                        assert.ifError(err);
+                    },
+                    "it includes the followed user": function(err, feed) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                        assert.include(feed, "items");
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 1);
+                        assert.isObject(feed.items[0]);
+                        assert.equal("costello", feed.items[0].displayName);
+                    }
                 }
             },
             "and a user posts to someone else's following stream": {
