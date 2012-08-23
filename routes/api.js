@@ -349,14 +349,28 @@ var getter = function(type) {
 
 var putter = function(type) {
     return function(req, res, next) {
-        var obj = req[type];
-        obj.update(req.body, function(err, result) {
-            if (err) {
-                next(err);
-            } else {
-                res.json(result);
+        var obj = req[type],
+            act = new Activity({
+                actor: req.remoteUser.profile,
+                verb: "update",
+                object: _(obj).extend(req.body)
+            });
+
+        Step(
+            function() {
+                newActivity(act, req.remoteUser, this);
+            },
+            function(err, act) {
+                var d;
+                if (err) {
+                    next(err);
+                } else {
+                    res.json(act.object);
+                    d = new Distributor(act);
+                    d.distribute(function(err) {});
+                }
             }
-        });
+        );
     };
 };
 

@@ -323,6 +323,92 @@ suite.addBatch({
                         assert.equal(obj.content, "I like raccoons.");
                     }
                 }
+            },
+            "and we post a note and then PUT to it": {
+                topic: function(cl) {
+                    var callback = this.callback,
+                        feed = "http://localhost:4815/api/user/merry/feed",
+                        cred;
+                    Step(
+                        function() {
+                            newPair(cl, "merry", "weed", this);
+                        },
+                        function(err, pair) {
+                            var act;
+                            if (err) throw err;
+                            cred = makeCred(cl, pair);
+                            act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "note",
+                                    content: "I like weed."
+                                }
+                            };
+
+                            httputil.postJSON(feed, cred, act, this);
+                        },
+                        function(err, post, result) {
+                            if (err) throw err;
+                            var object = _(post.object).clone();
+                            object.content = "I <strong>really</strong> like weed.";
+                            httputil.putJSON(object.links.self.href, cred, object, this);
+                        },
+                        function(err, upd, result) {
+                            if (err) {
+                                callback(err, null, null);
+                            } else {
+                                callback(null, upd, cred);
+                            }
+                        }
+                    );
+                },
+                "it works": function(err, upd, cred) {
+                    assert.ifError(err);
+                },
+                "and we retrieve the updated note": {
+                    topic: function(upd, cred) {
+                        var callback = this.callback,
+                            url = upd.links.self.href;
+                        httputil.getJSON(url, cred, function(err, obj, res) {
+                            callback(err, obj);
+                        });
+                    },
+                    "it works": function(err, obj) {
+                        assert.ifError(err);
+                    },
+                    "it has the updated content": function(err, obj) {
+                        assert.ifError(err);
+                        assert.isObject(obj);
+                        assert.include(obj, "content");
+                        assert.isString(obj.content);
+                        assert.equal("I <strong>really</strong> like weed.", obj.content);
+                    }
+                },
+                "and we retrieve the user's feed": {
+                    topic: function(upd, cred) {
+                        var callback = this.callback,
+                            url = "http://localhost:4815/api/user/merry/feed";
+                        httputil.getJSON(url, cred, function(err, obj, res) {
+                            callback(err, obj);
+                        });
+                    },
+                    "it works": function(err, feed) {
+                        assert.ifError(err);
+                    },
+                    "it has the update activity": function(err, feed) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                        assert.include(feed, "items");
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 2);
+                        assert.isObject(feed.items[0]);
+                        assert.include(feed.items[0], "verb");
+                        assert.equal("update", feed.items[0].verb);
+                        assert.include(feed.items[0], "object");
+                        assert.include(feed.items[0].object, "id");
+                        assert.equal(feed.items[0].object.id, feed.items[1].object.id);
+                    }
+                }
             }
         }
     }
