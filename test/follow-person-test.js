@@ -369,6 +369,52 @@ suite.addBatch({
                     assert.include(posted, "id");
                     assert.equal(users.costello.profile.id, posted.id);
                 }
+            },
+            "and a user posts to someone else's following stream": {
+                topic: function(cl) {
+                    var cb = this.callback,
+                        users = {laurel: {}, hardy: {}, cop: {}};
+
+                    Step(
+                        function() {
+                            register(cl, "laurel", "what", this.parallel());
+                            register(cl, "hardy", "who", this.parallel());
+                            register(cl, "cop", "why", this.parallel());
+                        },
+                        function(err, user1, user2, user3) {
+                            if (err) throw err;
+                            users.laurel.profile = user1.profile;
+                            users.hardy.profile = user2.profile;
+                            users.hardy.profile = user3.profile;
+                            accessToken(cl, {nickname: "laurel", password: "what"}, this.parallel());
+                            accessToken(cl, {nickname: "hardy", password: "who"}, this.parallel());
+                            accessToken(cl, {nickname: "cop", password: "why"}, this.parallel());
+                        },
+                        function(err, pair1, pair2, pair3) {
+                            if (err) throw err;
+                            users.laurel.pair = pair1;
+                            users.hardy.pair = pair2;
+                            users.cop.pair = pair3;
+
+                            var url = "http://localhost:4815/api/user/hardy/following",
+                                cred = makeCred(cl, users.laurel.pair);
+
+                            httputil.postJSON(url, cred, users.cop.profile, this);
+                        },
+                        function(err, posted, result) {
+                            if (err && err.statusCode == 401) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success!"));
+                            }
+                        }
+                    );
+                },
+                "it fails with a 401 error": function(err) {
+                    assert.ifError(err);
+                }
             }
         }
     }
