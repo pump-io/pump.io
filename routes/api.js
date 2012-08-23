@@ -84,7 +84,9 @@ var addRoutes = function(app) {
     app.post("/api/user/:nickname/inbox", notYetImplemented);
 
     app.get("/api/user/:nickname/followers", clientAuth, reqUser, userFollowers);
+
     app.get("/api/user/:nickname/following", clientAuth, reqUser, userFollowing);
+    app.post("/api/user/:nickname/following", clientAuth, reqUser, sameUser, newFollow);
 
     app.get("/api/user/:nickname/favorites", clientAuth, reqUser, userFavorites);
     app.post("/api/user/:nickname/favorites", clientAuth, reqUser, sameUser, newFavorite);
@@ -1035,6 +1037,30 @@ var userFollowing = function(req, res, next) {
             } else {
                 collection.items = people;
                 res.json(collection);
+            }
+        }
+    );
+};
+
+var newFollow = function(req, res, next) {
+    var act = new Activity({
+            actor: req.user.profile,
+            verb: "follow",
+            object: req.body
+        });
+
+    Step(
+        function() {
+            newActivity(act, req.user, this);
+        },
+        function(err, act) {
+            var d;
+            if (err) {
+                next(err);
+            } else {
+                res.json(act.object);
+                d = new Distributor(act);
+                d.distribute(function(err) {});
             }
         }
     );
