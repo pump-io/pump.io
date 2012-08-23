@@ -78,6 +78,29 @@ vows.describe("urlmaker module interface").addBatch({
                     assert.equal(parts.host, "example.com"); // NOT example.com:80
                     assert.equal(parts.path, "/login");
                 }
+            },
+            "and we include parameters": {
+                topic: function(URLMaker) {
+                    URLMaker.hostname = "example.com";
+                    URLMaker.port     = 2342;
+                    return URLMaker.makeURL("/users", {offset: 10, count: 30});
+                },
+                "it exists": function(url) {
+                    assert.isString(url);
+                },
+                "its parts are correct": function(url) {
+                    // parse query params too
+                    var parts = parseURL(url, true);
+                    assert.equal(parts.hostname, "example.com");
+                    assert.equal(parts.port, 2342);
+                    assert.equal(parts.host, "example.com:2342");
+                    assert.equal(parts.pathname, "/users");
+                    assert.isObject(parts.query);
+                    assert.include(parts.query, "offset");
+                    assert.equal(parts.query.offset, 10);
+                    assert.include(parts.query, "count");
+                    assert.equal(parts.query.count, 30);
+                }
             }
         }
     }
