@@ -55,7 +55,7 @@ var assertValidList = function(doc, count) {
 
 var suite = vows.describe("favorite object activity api test");
 
-// A batch to test following/unfollowing users
+// A batch to test favoriting/unfavoriting objects
 
 suite.addBatch({
     "When we set up the app": {
@@ -524,6 +524,94 @@ suite.addBatch({
                     "it includes our object": function(err, doc, act) {
                         assert.ifError(err);
                         assert.equal(doc.items[0].id, act.object.id);
+                    }
+                }
+            },
+            "and a user favorites an object by posting to their favorites stream": {
+                topic: function(cl) {
+                    var cb = this.callback,
+                        pair;
+
+                    Step(
+                        function() {
+                            newPair(cl, "cousinoliver", "jump*the*shark", this);
+                        },
+                        function(err, result) {
+                            if (err) throw err;
+                            pair = result;
+                            var url = "http://localhost:4815/api/user/cousinoliver/favorites",
+                                obj = {
+                                    objectType: "image",
+                                    id: "urn:uuid:ab70a4c0-ed3a-11e1-965f-0024beb67924"
+                                };
+
+                            var cred = makeCred(cl, pair);
+                            httputil.postJSON(url, cred, obj, this);
+                        },
+                        function(err, doc, response) {
+                            cb(err, doc, pair);
+                        }
+                    );
+                },
+                "it works": function(err, obj, pair) {
+                    assert.ifError(err);
+                },
+                "result is the object": function(err, obj, pair) {
+                    assert.ifError(err);
+                    assert.isObject(obj);
+                    assert.include(obj, "id");
+                    assert.equal("urn:uuid:ab70a4c0-ed3a-11e1-965f-0024beb67924", obj.id);
+                },
+                "and we get the user's list of favorites": {
+                    topic: function(act, pair, cl) {
+                        var cb = this.callback,
+                            url = "http://localhost:4815/api/user/cousinoliver/favorites",
+                            cred = makeCred(cl, pair);
+                                
+                        httputil.getJSON(url, cred, function(err, feed, resp) {
+                            cb(err, feed);
+                        });
+                    },
+                    "it works": function(err, feed) {
+                        assert.ifError(err);
+                    },
+                    "it includes our object": function(err, feed) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                        assert.include(feed, "items");
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 1);
+                        assert.isObject(feed.items[0]);
+                        assert.include(feed.items[0], "id");
+                        assert.equal("urn:uuid:ab70a4c0-ed3a-11e1-965f-0024beb67924", feed.items[0].id); 
+                    }
+                },
+                "and we get the user's feed": {
+                    topic: function(act, pair, cl) {
+                        var cb = this.callback,
+                            url = "http://localhost:4815/api/user/cousinoliver/feed",
+                            cred = makeCred(cl, pair);
+                                
+                        httputil.getJSON(url, cred, function(err, feed, resp) {
+                            cb(err, feed);
+                        });
+                    },
+                    "it works": function(err, feed) {
+                        assert.ifError(err);
+                    },
+                    "it includes our favorite activity": function(err, feed) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                        assert.include(feed, "items");
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 1);
+                        assert.isObject(feed.items[0]);
+                        assert.include(feed.items[0], "verb");
+                        assert.equal("favorite", feed.items[0].verb);
+                        assert.include(feed.items[0], "object");
+                        assert.isObject(feed.items[0].object);
+                        assert.include(feed.items[0].object, "id");
+                        assert.equal("urn:uuid:ab70a4c0-ed3a-11e1-965f-0024beb67924", feed.items[0].object.id);
                     }
                 }
             }

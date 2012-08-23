@@ -87,6 +87,7 @@ var addRoutes = function(app) {
     app.get("/api/user/:nickname/following", clientAuth, reqUser, userFollowing);
 
     app.get("/api/user/:nickname/favorites", clientAuth, reqUser, userFavorites);
+    app.post("/api/user/:nickname/favorites", clientAuth, reqUser, sameUser, newFavorite);
 
     app.get("/api/user/:nickname/lists", userAuth, reqUser, sameUser, userLists);
 
@@ -696,7 +697,7 @@ var postActivity = function(req, res, next) {
         function() {
             newActivity(activity, req.user, this);
         },
-        function(err) {
+        function(err, activity) {
             var d;
             if (err) {
                 next(err);
@@ -748,7 +749,13 @@ var newActivity = function(activity, user, callback) {
             user.addToOutbox(activity, this.parallel());
             user.addToInbox(activity, this.parallel());
         },
-        callback
+        function(err) {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, activity);
+            }
+        }
     );
 };
 
@@ -1073,6 +1080,30 @@ var userFavorites = function(req, res, next) {
             } else {
                 collection.items = objects;
                 res.json(collection);
+            }
+        }
+    );
+};
+
+var newFavorite = function(req, res, next) {
+    var act = new Activity({
+            actor: req.user.profile,
+            verb: "favorite",
+            object: req.body
+        });
+
+    Step(
+        function() {
+            newActivity(act, req.user, this);
+        },
+        function(err, act) {
+            var d;
+            if (err) {
+                next(err);
+            } else {
+                res.json(act.object);
+                d = new Distributor(act);
+                d.distribute(function(err) {});
             }
         }
     );
