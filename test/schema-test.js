@@ -64,7 +64,8 @@ var types = [
     "service",
     "task",
     "video",
-    "subscription"
+    "subscription",
+    "pushrequest"
 ];
 
 vows.describe("schema module interface").addBatch({
