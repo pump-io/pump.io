@@ -81,3 +81,6 @@ var hub = function(req, res) {
         res.end("That's not a mode this hub supports.");
     }
 };
+
+exports.addRoutes = addRoutes;
+exports.setHub    = setHub;
