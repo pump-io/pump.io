@@ -101,6 +101,36 @@ vows.describe("urlmaker module interface").addBatch({
                     assert.include(parts.query, "count");
                     assert.equal(parts.query.count, 30);
                 }
+            },
+            "and we check if our URL is ours": {
+                topic: function(URLMaker) {
+                    URLMaker.hostname = "example.com";
+                    URLMaker.port     = 2342;
+                    return URLMaker.ourURL("http://example.com:2342/api/user/evan/feed");
+                },
+                "it is": function(flag) {
+                    assert.isTrue(flag);
+                }
+            },
+            "and we check if URL with wrong hostname is ours": {
+                topic: function(URLMaker) {
+                    URLMaker.hostname = "example.com";
+                    URLMaker.port     = 2342;
+                    return URLMaker.ourURL("http://example.org:2342/api/user/evan/feed");
+                },
+                "it is not": function(flag) {
+                    assert.isFalse(flag);
+                }
+            },
+            "and we check if URL with wrong port is ours": {
+                topic: function(URLMaker) {
+                    URLMaker.hostname = "example.com";
+                    URLMaker.port     = 2342;
+                    return URLMaker.ourURL("http://example.com:1516/api/user/evan/feed");
+                },
+                "it is not": function(flag) {
+                    assert.isFalse(flag);
+                }
             }
         }
     }
