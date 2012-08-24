@@ -1,6 +1,6 @@
-// pushrequest-test.js
+// pushsubscription-test.js
 //
-// Test the pushrequest module
+// Test the pushsubscription module
 //
 // Copyright 2012, StatusNet Inc.
 //
@@ -23,49 +23,52 @@ var assert = require("assert"),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe("pushrequest module interface");
+var suite = vows.describe("pushsubscription module interface");
 
 var testSchema = {
-    pkey: "topic_mode",
-    fields: ["mode",
-             "topic",
+    pkey: "topic",
+    fields: ["uuid",
+             "state",
              "verify_token",
-             "status",
+             "secret",
              "lease_seconds",
              "created",
              "modified"],
-    indices: ["topic", "verify_token"]
+    indices: ["uuid"]
 };
 
 var testData = {
     "create": {
-        mode: "subscribe",
+        status: "subscribing-initial",
         topic: "http://photo.example/alice/feed.json"
     },
     "update": {
-        status: "verified",
+        status: "subscribing-verified",
         lease_seconds: 86400
     }
 };
 
-var mb = modelBatch("pushrequest", "PushRequest", testSchema, testData);
+var mb = modelBatch("pushsubscription", "PushSubscription", testSchema, testData);
 
-mb["When we require the pushrequest module"]
-  ["and we get its PushRequest class export"]
-  ["and we create a pushrequest instance"]
-  ["auto-generated fields are there"] = function(err, created) {
-      assert.isString(created.verify_token);
-      assert.isString(created.topic_mode);
-      assert.isNumber(created.created);
+mb["When we require the pushsubscription module"]
+["and we get its PushSubscription class export"]
+["and we create a pushsubscription instance"]
+["auto-generated fields are there"] = function(err, created) {
+    assert.ifError(err);
+    assert.isString(created.verify_token);
+    assert.isString(created.secret);
+    assert.isString(created.uuid);
+    assert.isNumber(created.created);
+    assert.isNumber(created.modified);
 };
 
-mb["When we require the pushrequest module"]
-["and we get its PushRequest class export"]
-["and we create a pushrequest instance"]
+mb["When we require the pushsubscription module"]
+["and we get its PushSubscription class export"]
+["and we create a pushsubscription instance"]
 ["and we modify it"]
 ["it is modified"] = function(err, updated) {
-    assert.isNumber(updated.modified);
     assert.ifError(err);
+    assert.isNumber(updated.modified);
 };
 
 suite.addBatch(mb);
