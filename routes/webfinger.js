@@ -30,6 +30,7 @@ var databank = require("databank"),
 
 var addRoutes = function(app) {
     app.get("/.well-known/host-meta", hostMeta);
+    app.get("/.well-known/host-meta.json", hostMetaJSON);
 };
 
 var xmlEscape = function(text) {
@@ -46,18 +47,44 @@ var Link = function(attrs) {
     }).join(" ") + " />";
 };
 
+var theLinks = function() {
+    return [
+        {
+            rel: "lrdd",
+            type: "application/xrd+xml",
+            template: URLMaker.makeURL("/api/lrdd", {uri: "{uri}"})
+        },
+        {
+            rel: "lrdd",
+            type: "application/json",
+            template: URLMaker.makeURL("/api/lrdd.json", {uri: "{uri}"})
+        }
+    ];
+};
+
 var hostMeta = function(req, res, next) {
-    
+
+    var i, links;
+
+    // otherwise, xrd
+
+    links = theLinks();
+
     res.writeHead(200, {"Content-Type": "application/xrd+xml"});
     res.write("<?xml version='1.0' encoding='UTF-8'?>\n"+
               "<XRD xmlns='http://docs.oasis-open.org/ns/xri/xrd-1.0'>\n");
 
-    res.write(Link({rel: "lrdd",
-                    type: "application/xrd+xml",
-                    template: URLMaker.makeURL("/lrdd", {uri: "{uri}"})
-                   }) + "\n");
+    for (i = 0; i < links.length; i++) {
+        res.write(Link(links[i]) + "\n");
+    }
     
     res.end("</XRD>\n");
+};
+
+var hostMetaJSON = function(req, res, next) {
+    res.json({
+        links: theLinks()
+    });
 };
 
 exports.addRoutes = addRoutes;

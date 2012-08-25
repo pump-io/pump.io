@@ -44,8 +44,10 @@ suite.addBatch({
         "it works": function(err, app) {
             assert.ifError(err);
         },
-        "and we check the client registration endpoint": 
+        "and we check the host-meta endpoint": 
         httputil.endpoint("/.well-known/host-meta", ["GET"]),
+        "and we check the host-meta.json endpoint": 
+        httputil.endpoint("/.well-known/host-meta.json", ["GET"]),
         "and we GET the host-meta file": {
             topic: function() {
                 var callback = this.callback;
@@ -75,6 +77,37 @@ suite.addBatch({
                 assert.include(res, "headers");
                 assert.include(res.headers, "content-type");
                 assert.equal(res.headers["content-type"], "application/xrd+xml");
+            }
+        },
+        "and we GET the host-meta.json file": {
+            topic: function() {
+                var callback = this.callback;
+                http.get("http://localhost:4815/.well-known/host-meta.json", function(res) {
+                    var body = "";
+                    if (res.statusCode !== 200) {
+                        callback(new Error("Bad status code"), null, null);
+                    } else {
+                        res.setEncoding("utf8");
+                        res.on("data", function(chunk) {
+                            body = body + chunk;
+                        });
+                        res.on("error", function(err) {
+                            callback(err, null, null);
+                        });
+                        res.on("end", function() {
+                            callback(null, body, res);
+                        });
+                    }
+                });
+            },
+            "it works": function(err, body, res) {
+                assert.ifError(err);
+            },
+            "it has a JSON content type": function(err, body, res) {
+                assert.ifError(err);
+                assert.include(res, "headers");
+                assert.include(res.headers, "content-type");
+                assert.equal(res.headers["content-type"], "application/json; charset=utf-8");
             }
         }
     }
