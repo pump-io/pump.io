@@ -27,7 +27,7 @@ var assert = require("assert"),
     actutil = require("./lib/activity"),
     setupApp = oauthutil.setupApp;
 
-var suite = vows.describe("follow person activity test");
+var suite = vows.describe("host meta test");
 
 // A batch to test following/unfollowing users
 
@@ -95,19 +95,50 @@ suite.addBatch({
                             callback(err, null, null);
                         });
                         res.on("end", function() {
-                            callback(null, body, res);
+                            var doc;
+                            try {
+                                doc = JSON.parse(body);
+                                callback(null, doc, res);
+                            } catch (err) {
+                                callback(err, null, null);
+                            }
                         });
                     }
                 });
             },
-            "it works": function(err, body, res) {
+            "it works": function(err, doc, res) {
                 assert.ifError(err);
             },
-            "it has a JSON content type": function(err, body, res) {
+            "it has a JSON content type": function(err, doc, res) {
                 assert.ifError(err);
                 assert.include(res, "headers");
                 assert.include(res.headers, "content-type");
                 assert.equal(res.headers["content-type"], "application/json; charset=utf-8");
+            },
+            "it has lrdd template links": function(err, doc, res) {
+
+                assert.ifError(err);
+
+                assert.include(doc, "links");
+                assert.isArray(doc.links);
+                assert.lengthOf(doc.links, 2);
+
+                assert.isObject(doc.links[0]);
+                assert.include(doc.links[0], "rel");
+                assert.equal(doc.links[0].rel, "lrdd");
+                assert.include(doc.links[0], "type");
+                assert.equal(doc.links[0].type, "application/xrd+xml");
+                assert.include(doc.links[0], "template");
+                assert.isString(doc.links[0].template);
+                assert.match(doc.links[0].template, /{uri}/);
+
+                assert.include(doc.links[1], "rel");
+                assert.equal(doc.links[1].rel, "lrdd");
+                assert.include(doc.links[1], "type");
+                assert.equal(doc.links[1].type, "application/json");
+                assert.include(doc.links[1], "template");
+                assert.isString(doc.links[1].template);
+                assert.match(doc.links[1].template, /{uri}/);
             }
         }
     }
