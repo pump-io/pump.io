@@ -233,7 +233,7 @@ var getfail = function(rel, status) {
             var callback = this.callback;
             http.get("http://localhost:4815" + rel, function(res) {
                 if (res.statusCode !== status) {
-                    callback(new Error("Bad status code"));
+                    callback(new Error("Bad status code: " + res.statusCode));
                 } else {
                     callback(null);
                 }
