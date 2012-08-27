@@ -62,26 +62,32 @@ var typeCheck = function(type) {
 
 var xrdLinkCheck = function(def) {
     return function(err, doc, res) {
-        var i, prop, link;
+        var i, prop, link,
+            testLink = function(obj) {
+                assert.isObject(obj);
+                assert.include(obj, "@");
+                assert.isObject(obj["@"]);
+                for (prop in def.links[i]) {
+                    if (def.links[i].hasOwnProperty(prop)) {
+                        assert.include(obj["@"], prop);
+                        if (_.isRegExp(def.links[i][prop])) {
+                            assert.match(obj["@"][prop], def.links[i][prop]);
+                        } else {
+                            assert.equal(obj["@"][prop], def.links[i][prop]);
+                        }
+                    }
+                }
+            };
         assert.ifError(err);
         assert.isObject(doc);
         assert.include(doc, "Link");
-        assert.isArray(doc.Link);
-        assert.lengthOf(doc.Link, def.links.length);
-
-        for (i = 0; i < def.links.length; i++) {
-            assert.isObject(doc.Link[i]);
-            assert.include(doc.Link[i], "@");
-            assert.isObject(doc.Link[i]["@"]);
-            for (prop in def.links[i]) {
-                if (def.links[i].hasOwnProperty(prop)) {
-                    assert.include(doc.Link[i]["@"], prop);
-                    if (_.isRegExp(def.links[i][prop])) {
-                        assert.match(doc.Link[i]["@"][prop], def.links[i][prop]);
-                    } else {
-                        assert.equal(doc.Link[i]["@"][prop], def.links[i][prop]);
-                    }
-                }
+        if (def.links.length === 1) {
+            testLink(doc.Link);
+        } else {
+            assert.isArray(doc.Link);
+            assert.lengthOf(doc.Link, def.links.length);
+            for (i = 0; i < def.links.length; i++) {
+                testLink(doc.Link[i]);
             }
         }
     };
