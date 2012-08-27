@@ -17,6 +17,7 @@
 // limitations under the License.
 
 var assert = require("assert"),
+    xml2js = require("xml2js"),
     vows = require("vows"),
     Step = require("step"),
     _ = require("underscore"),
@@ -64,19 +65,54 @@ suite.addBatch({
                             callback(err, null, null);
                         });
                         res.on("end", function() {
-                            callback(null, body, res);
+                            var parser = new xml2js.Parser();
+                            parser.parseString(body, function(err, doc) {
+                                if (err) {
+                                    callback(err, null, null);
+                                } else {
+                                    callback(null, doc, res);
+                                }
+                            });
                         });
                     }
                 });
             },
-            "it works": function(err, body, res) {
+            "it works": function(err, doc, res) {
                 assert.ifError(err);
             },
-            "it has an XRD content type": function(err, body, res) {
+            "it has an XRD content type": function(err, doc, res) {
                 assert.ifError(err);
                 assert.include(res, "headers");
                 assert.include(res.headers, "content-type");
                 assert.equal(res.headers["content-type"], "application/xrd+xml");
+            },
+            "it has lrdd template links": function(err, doc, res) {
+                assert.ifError(err);
+                assert.isObject(doc);
+                assert.include(doc, "Link");
+                assert.isArray(doc.Link);
+                assert.lengthOf(doc.Link, 2);
+                assert.isObject(doc.Link[0]);
+                assert.include(doc.Link[0], "@");
+                assert.isObject(doc.Link[0]["@"]);
+                assert.include(doc.Link[0]["@"], "rel");
+                assert.include(doc.Link[0]["@"], "type");
+                assert.include(doc.Link[0]["@"], "template");
+                assert.equal(doc.Link[0]["@"].rel, "lrdd");
+                assert.equal(doc.Link[0]["@"].type, "application/xrd+xml");
+                assert.isString(doc.Link[0]["@"].template);
+                assert.match(doc.Link[0]["@"].template, /{uri}/);
+
+                assert.isObject(doc.Link[1]);
+                assert.include(doc.Link[1], "@");
+                assert.isObject(doc.Link[1]["@"]);
+                assert.include(doc.Link[1]["@"], "rel");
+                assert.include(doc.Link[1]["@"], "type");
+                assert.include(doc.Link[1]["@"], "template");
+                assert.equal(doc.Link[1]["@"].rel, "lrdd");
+                assert.equal(doc.Link[1]["@"].type, "application/json");
+                assert.isString(doc.Link[1]["@"].template);
+                assert.match(doc.Link[1]["@"].template, /{uri}/);
             }
         },
         "and we GET the host-meta.json file": {
