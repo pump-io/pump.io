@@ -52,12 +52,12 @@ var theLinks = function() {
         {
             rel: "lrdd",
             type: "application/xrd+xml",
-            template: URLMaker.makeURL("/api/lrdd", {uri: "{uri}"})
+            template: URLMaker.makeURL("/api/lrdd") + "?uri={uri}"
         },
         {
             rel: "lrdd",
             type: "application/json",
-            template: URLMaker.makeURL("/api/lrdd.json", {uri: "{uri}"})
+            template: URLMaker.makeURL("/api/lrdd.json") + "?uri={uri}"
         }
     ];
 };
