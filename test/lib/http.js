@@ -224,6 +224,27 @@ var delJSON = function(serverUrl, cred, callback) {
     oa["delete"](serverUrl, cred.token, cred.token_secret, jsonHandler(callback));
 };
 
+var getfail = function(rel, status) {
+    if (!status) {
+        status = 400;
+    }
+    return {
+        topic: function() {
+            var callback = this.callback;
+            http.get("http://localhost:4815" + rel, function(res) {
+                if (res.statusCode !== status) {
+                    callback(new Error("Bad status code"));
+                } else {
+                    callback(null);
+                }
+            });
+        },
+        "it fails with the correct error code": function(err) {
+            assert.ifError(err);
+        }
+    };
+};
+
 exports.options = options;
 exports.post = post;
 exports.postJSON = postJSON;
@@ -231,3 +252,4 @@ exports.getJSON = getJSON;
 exports.putJSON = putJSON;
 exports.delJSON = delJSON;
 exports.endpoint = endpoint;
+exports.getfail = getfail;
