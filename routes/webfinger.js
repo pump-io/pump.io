@@ -31,6 +31,8 @@ var databank = require("databank"),
 var addRoutes = function(app) {
     app.get("/.well-known/host-meta", hostMeta);
     app.get("/.well-known/host-meta.json", hostMetaJSON);
+    app.get("/api/lrdd", lrddUser, lrdd);
+    app.get("/api/lrdd.json", lrddUser, lrddJSON);
 };
 
 var xmlEscape = function(text) {
@@ -47,7 +49,7 @@ var Link = function(attrs) {
     }).join(" ") + " />";
 };
 
-var theLinks = function() {
+var hostMetaLinks = function() {
     return [
         {
             rel: "lrdd",
@@ -75,7 +77,7 @@ var hostMeta = function(req, res, next) {
 
     // otherwise, xrd
 
-    links = theLinks();
+    links = hostMetaLinks();
 
     res.writeHead(200, {"Content-Type": "application/xrd+xml"});
     res.write("<?xml version='1.0' encoding='UTF-8'?>\n"+
@@ -90,8 +92,94 @@ var hostMeta = function(req, res, next) {
 
 var hostMetaJSON = function(req, res, next) {
     res.json({
-        links: theLinks()
+        links: hostMetaLinks()
     });
+};
+
+var lrddUser = function(req, res, next) {
+    var uri;
+
+    if (!_(req).has("query") || !_(req.query).has("uri")) {
+        next(new HTTPError("No uri parameter", 400));
+        return;
+    }
+
+    uri = req.query.uri;
+
+    var parts = uri.match(/^(.*)@(.*)$/);
+    
+    if (!parts) {
+        next(new HTTPError("Unrecognized uri parameter", 400));
+        return;
+    }
+
+    if (parts[2] != URLMaker.host) {
+        next(new HTTPError("Unrecognized host", 400));
+        return;
+    }
+    
+    User.get(parts[1], function(err, user) {
+        if (err) {
+            next(err);
+        } else {
+            req.user = user;
+            next();
+        }
+    });
+};
+
+var lrddLinks = function(user) {
+    return [
+        {
+            rel: "http://webfinger.net/rel/profile-page",
+            type: "text/html",
+            href: URLMaker.makeURL("/" + user.nickname)
+        }
+    ];
+};
+
+var lrdd = function(req, res, next) {
+
+    var i, links;
+
+    if (_(req.headers).has("accept") && req.accepts("application/json")) {
+        lrddJSON(req, res, next);
+        return;
+    }
+
+    links = lrddLinks(req.user);
+
+    res.writeHead(200, {"Content-Type": "application/xrd+xml"});
+    res.write("<?xml version='1.0' encoding='UTF-8'?>\n"+
+              "<XRD xmlns='http://docs.oasis-open.org/ns/xri/xrd-1.0'>\n");
+
+    for (i = 0; i < links.length; i++) {
+        res.write(Link(links[i]) + "\n");
+    }
+    
+    res.end("</XRD>\n");
+};
+
+var lrddJSON = function(req, res, next) {
+
+    var i, links;
+
+    if (_(req.headers).has("accept") && req.accepts("application/json")) {
+        lrddJSON(req, res, next);
+        return;
+    }
+
+    links = lrddLinks(req.user);
+
+    res.writeHead(200, {"Content-Type": "application/xrd+xml"});
+    res.write("<?xml version='1.0' encoding='UTF-8'?>\n"+
+              "<XRD xmlns='http://docs.oasis-open.org/ns/xri/xrd-1.0'>\n");
+
+    for (i = 0; i < links.length; i++) {
+        res.write(Link(links[i]) + "\n");
+    }
+    
+    res.end("</XRD>\n");
 };
 
 exports.addRoutes = addRoutes;
