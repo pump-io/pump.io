@@ -176,6 +176,77 @@ suite.addBatch({
                 assert.isString(doc.links[1].template);
                 assert.match(doc.links[1].template, /{uri}/);
             }
+        },
+        "and we GET the host-meta accepting JSON": {
+            topic: function() {
+                var callback = this.callback;
+                var options = {
+                    host: "localhost",
+                    port: "4815",
+                    path: "/.well-known/host-meta",
+                    headers: {
+                        accept: "application/json,*/*"
+                    }
+                };
+                var req = http.request(options, function(res) {
+                    var body = "";
+                    if (res.statusCode !== 200) {
+                        callback(new Error("Bad status code"), null, null);
+                    } else {
+                        res.setEncoding("utf8");
+                        res.on("data", function(chunk) {
+                            body = body + chunk;
+                        });
+                        res.on("error", function(err) {
+                            callback(err, null, null);
+                        });
+                        res.on("end", function() {
+                            var doc;
+                            try {
+                                doc = JSON.parse(body);
+                                callback(null, doc, res);
+                            } catch (err) {
+                                callback(err, null, null);
+                            }
+                        });
+                    }
+                });
+                req.end();
+            },
+            "it works": function(err, doc, res) {
+                assert.ifError(err);
+            },
+            "it has a JSON content type": function(err, doc, res) {
+                assert.ifError(err);
+                assert.include(res, "headers");
+                assert.include(res.headers, "content-type");
+                assert.equal(res.headers["content-type"], "application/json; charset=utf-8");
+            },
+            "it has lrdd template links": function(err, doc, res) {
+
+                assert.ifError(err);
+
+                assert.include(doc, "links");
+                assert.isArray(doc.links);
+                assert.lengthOf(doc.links, 2);
+
+                assert.isObject(doc.links[0]);
+                assert.include(doc.links[0], "rel");
+                assert.equal(doc.links[0].rel, "lrdd");
+                assert.include(doc.links[0], "type");
+                assert.equal(doc.links[0].type, "application/xrd+xml");
+                assert.include(doc.links[0], "template");
+                assert.isString(doc.links[0].template);
+                assert.match(doc.links[0].template, /{uri}/);
+
+                assert.include(doc.links[1], "rel");
+                assert.equal(doc.links[1].rel, "lrdd");
+                assert.include(doc.links[1], "type");
+                assert.equal(doc.links[1].type, "application/json");
+                assert.include(doc.links[1], "template");
+                assert.isString(doc.links[1].template);
+                assert.match(doc.links[1].template, /{uri}/);
+            }
         }
     }
 });

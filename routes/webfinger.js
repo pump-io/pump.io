@@ -66,6 +66,13 @@ var hostMeta = function(req, res, next) {
 
     var i, links;
 
+    // Return JSON if accepted
+
+    if (_(req.headers).has("accept") && req.accepts("application/json")) {
+        hostMetaJSON(req, res, next);
+        return;
+    }
+
     // otherwise, xrd
 
     links = theLinks();
