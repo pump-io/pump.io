@@ -27,7 +27,7 @@ var getXRD = function(url) {
         http.get(url, function(res) {
             var body = "";
             if (res.statusCode !== 200) {
-                callback(new Error("Bad status code"), null, null);
+                callback(new Error("Bad status code ("+res.statusCode+")"), null, null);
             } else {
                 res.setEncoding("utf8");
                 res.on("data", function(chunk) {
@@ -110,7 +110,7 @@ var getJRD = function(url) {
         http.get(url, function(res) {
             var body = "";
             if (res.statusCode !== 200) {
-                callback(new Error("Bad status code"), null, null);
+                callback(new Error("Bad status code ("+res.statusCode+")"), null, null);
             } else {
                 res.setEncoding("utf8");
                 res.on("data", function(chunk) {
