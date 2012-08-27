@@ -26,160 +26,11 @@ var assert = require("assert"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     actutil = require("./lib/activity"),
+    xrdutil = require("./lib/xrd"),
     setupApp = oauthutil.setupApp;
 
+
 var suite = vows.describe("host meta test");
-
-var getXRD = function(url) {
-    return function() {
-        var callback = this.callback;
-        http.get(url, function(res) {
-            var body = "";
-            if (res.statusCode !== 200) {
-                callback(new Error("Bad status code"), null, null);
-            } else {
-                res.setEncoding("utf8");
-                res.on("data", function(chunk) {
-                    body = body + chunk;
-                });
-                res.on("error", function(err) {
-                    callback(err, null, null);
-                });
-                res.on("end", function() {
-                    var parser = new xml2js.Parser();
-                    parser.parseString(body, function(err, doc) {
-                        if (err) {
-                            callback(err, null, null);
-                        } else {
-                            callback(null, doc, res);
-                        }
-                    });
-                });
-            }
-        });
-    };
-};
-
-var typeCheck = function(type) {
-    return function(err, doc, res) {
-        assert.ifError(err);
-        assert.include(res, "headers");
-        assert.include(res.headers, "content-type");
-        assert.equal(res.headers["content-type"], type);
-    };
-};
-
-var xrdLinkCheck = function(def) {
-    return function(err, doc, res) {
-        var i, prop, link;
-        assert.ifError(err);
-        assert.isObject(doc);
-        assert.include(doc, "Link");
-        assert.isArray(doc.Link);
-        assert.lengthOf(doc.Link, def.links.length);
-
-        for (i = 0; i < def.links.length; i++) {
-            assert.isObject(doc.Link[i]);
-            assert.include(doc.Link[i], "@");
-            assert.isObject(doc.Link[i]["@"]);
-            for (prop in def.links[i]) {
-                if (def.links[i].hasOwnProperty(prop)) {
-                    assert.include(doc.Link[i]["@"], prop);
-                    if (_.isRegExp(def.links[i][prop])) {
-                        assert.match(doc.Link[i]["@"][prop], def.links[i][prop]);
-                    } else {
-                        assert.equal(doc.Link[i]["@"][prop], def.links[i][prop]);
-                    }
-                }
-            }
-        }
-    };
-};
-
-var xrdContext = function(url, def) {
-
-    var ctx = {
-        topic: getXRD(url),
-        "it works": function(err, doc, res) {
-            assert.ifError(err);
-        },
-        "it has an XRD content type": typeCheck("application/xrd+xml")
-    };
-
-    if (_(def).has("links")) {
-        ctx["it has the correct links"] = xrdLinkCheck(def);
-    }
-
-    return ctx;
-};
-
-var getJRD = function(url) {
-    return function() {
-        var callback = this.callback;
-        http.get(url, function(res) {
-            var body = "";
-            if (res.statusCode !== 200) {
-                callback(new Error("Bad status code"), null, null);
-            } else {
-                res.setEncoding("utf8");
-                res.on("data", function(chunk) {
-                    body = body + chunk;
-                });
-                res.on("error", function(err) {
-                    callback(err, null, null);
-                });
-                res.on("end", function() {
-                    var doc;
-                    try {
-                        doc = JSON.parse(body);
-                        callback(null, doc, res);
-                    } catch (err) {
-                        callback(err, null, null);
-                    }
-                });
-            }
-        });
-    };
-};
-
-var jrdLinkCheck = function(def) {
-    return function(err, doc, res) {
-        var i, prop, link;
-        assert.ifError(err);
-        assert.isObject(doc);
-        assert.include(doc, "links");
-        assert.isArray(doc.links);
-        assert.lengthOf(doc.links, def.links.length);
-
-        for (i = 0; i < def.links.length; i++) {
-            assert.isObject(doc.links[i]);
-            for (prop in def.links[i]) {
-                if (def.links[i].hasOwnProperty(prop)) {
-                    assert.include(doc.links[i], prop);
-                    if (_.isRegExp(def.links[i][prop])) {
-                        assert.match(doc.links[i][prop], def.links[i][prop]);
-                    } else {
-                        assert.equal(doc.links[i][prop], def.links[i][prop]);
-                    }
-                }
-            }
-        }
-    };
-};
-
-var jrdContext = function(url, def) {
-    var ctx = {
-        topic: getJRD(url),
-        "it works": function(err, doc, res) {
-            assert.ifError(err);
-        },
-        "it has an JRD content type": typeCheck("application/json; charset=utf-8")
-    };
-    if (_(def).has("links")) {
-        ctx["it has the correct links"] = jrdLinkCheck(def);
-    }
-    return ctx;
-};
 
 // hostmeta links
 
@@ -212,10 +63,10 @@ suite.addBatch({
         "and we check the host-meta.json endpoint": 
         httputil.endpoint("/.well-known/host-meta.json", ["GET"]),
         "and we GET the host-meta file": 
-        xrdContext("http://localhost:4815/.well-known/host-meta",
+        xrdutil.xrdContext("http://localhost:4815/.well-known/host-meta",
                    hostmeta),
         "and we GET the host-meta.json file":
-        jrdContext("http://localhost:4815/.well-known/host-meta.json",
+        xrdutil.jrdContext("http://localhost:4815/.well-known/host-meta.json",
                    hostmeta),
         "and we GET the host-meta accepting JSON": {
             topic: function() {
@@ -256,8 +107,8 @@ suite.addBatch({
             "it works": function(err, doc, res) {
                 assert.ifError(err);
             },
-            "it has a JSON content type": typeCheck("application/json; charset=utf-8"),
-            "it has lrdd template links": jrdLinkCheck(hostmeta)
+            "it has a JSON content type": xrdutil.typeCheck("application/json; charset=utf-8"),
+            "it has lrdd template links": xrdutil.jrdLinkCheck(hostmeta)
         }
     }
 });
