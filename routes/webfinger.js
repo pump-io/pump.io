@@ -36,10 +36,10 @@ var addRoutes = function(app) {
 };
 
 var xmlEscape = function(text) {
-   return text.replace(/&/g, "&amp;").
-     replace(/</g, "&lt;").
-     replace(/"/g, "&quot;").
-     replace(/'/g, "&amp;");
+    return text.replace(/&/g, "&amp;").
+        replace(/</g, "&lt;").
+        replace(/"/g, "&quot;").
+        replace(/'/g, "&amp;");
 };
 
 var Link = function(attrs) {
@@ -109,17 +109,19 @@ var lrddUser = function(req, res, next) {
     var parts = uri.match(/^(.*)@(.*)$/);
     
     if (!parts) {
-        next(new HTTPError("Unrecognized uri parameter", 400));
+        next(new HTTPError("Unrecognized uri parameter", 404));
         return;
     }
 
-    if (parts[2] != URLMaker.host) {
-        next(new HTTPError("Unrecognized host", 400));
+    if (parts[2] != URLMaker.hostname) {
+        next(new HTTPError("Unrecognized host", 404));
         return;
     }
     
     User.get(parts[1], function(err, user) {
-        if (err) {
+        if (err && err instanceof databank.NoSuchThingError) {
+            next(new HTTPError(err.message, 404));
+        } else if (err) {
             next(err);
         } else {
             req.user = user;
@@ -161,25 +163,9 @@ var lrdd = function(req, res, next) {
 };
 
 var lrddJSON = function(req, res, next) {
-
-    var i, links;
-
-    if (_(req.headers).has("accept") && req.accepts("application/json")) {
-        lrddJSON(req, res, next);
-        return;
-    }
-
-    links = lrddLinks(req.user);
-
-    res.writeHead(200, {"Content-Type": "application/xrd+xml"});
-    res.write("<?xml version='1.0' encoding='UTF-8'?>\n"+
-              "<XRD xmlns='http://docs.oasis-open.org/ns/xri/xrd-1.0'>\n");
-
-    for (i = 0; i < links.length; i++) {
-        res.write(Link(links[i]) + "\n");
-    }
-    
-    res.end("</XRD>\n");
+    res.json({
+        links: lrddLinks(req.user)
+    });
 };
 
 exports.addRoutes = addRoutes;
