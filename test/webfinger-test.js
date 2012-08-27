@@ -48,7 +48,27 @@ suite.addBatch({
         "and we check the lrdd endpoint": 
         httputil.endpoint("/api/lrdd", ["GET"]),
         "and we check the lrdd.json endpoint": 
-        httputil.endpoint("/api/lrdd.json", ["GET"])
+        httputil.endpoint("/api/lrdd.json", ["GET"]),
+        "and we get the lrdd endpoint with no uri":
+        httputil.getfail("/api/lrdd", 400),
+        "and we get the lrdd endpoint with an empty uri":
+        httputil.getfail("/api/lrdd?uri=", 400),
+        "and we get the lrdd endpoint with an HTTP URI at some other domain":
+        httputil.getfail("/api/lrdd?uri=http://photo.example/evan", 400),
+        "and we get the lrdd endpoint with a Webfinger at some other domain":
+        httputil.getfail("/api/lrdd?uri=evan@photo.example", 400),
+        "and we get the lrdd endpoint with a Webfinger of a non-existent user":
+        httputil.getfail("/api/lrdd.json?uri=evan@localhost", 400),
+        "and we get the lrdd.json endpoint with no uri":
+        httputil.getfail("/api/lrdd.json", 400),
+        "and we get the lrdd.json endpoint with an empty uri":
+        httputil.getfail("/api/lrdd.json?uri=", 400),
+        "and we get the lrdd.json endpoint with an HTTP URI at some other domain":
+        httputil.getfail("/api/lrdd.json?uri=http://photo.example/evan", 400),
+        "and we get the lrdd.json endpoint with a Webfinger at some other domain":
+        httputil.getfail("/api/lrdd.json?uri=evan@photo.example", 400),
+        "and we get the lrdd.json endpoint with a Webfinger of a non-existent user":
+        httputil.getfail("/api/lrdd.json?uri=evan@localhost", 400)
     }
 });
 
