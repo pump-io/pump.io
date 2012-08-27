@@ -1,9 +1,9 @@
-// .well-known/host-meta
+// webfinger.js
 //
+// Tests the Webfinger XRD and JRD endpoints
+// 
 // Copyright 2012 StatusNet Inc.
 //
-// "I never met a host I didn't like"
-// 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -25,12 +25,23 @@ var assert = require("assert"),
     http = require("http"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    xrdutil = require("./lib/xrd"),
     actutil = require("./lib/activity"),
     setupApp = oauthutil.setupApp;
 
 var suite = vows.describe("host meta test");
 
-// A batch to test following/unfollowing users
+var webfinger = {
+    links: [
+        {
+            rel: "http://webfinger.net/rel/profile-page",
+            type: "text/html",
+            href: "http://localhost:4815/alice"
+        }
+    ]
+};
+
+// A batch to test endpoints
 
 suite.addBatch({
     "When we set up the app": {
@@ -52,23 +63,37 @@ suite.addBatch({
         "and we get the lrdd endpoint with no uri":
         httputil.getfail("/api/lrdd", 400),
         "and we get the lrdd endpoint with an empty uri":
-        httputil.getfail("/api/lrdd?uri=", 400),
+        httputil.getfail("/api/lrdd?uri=", 404),
         "and we get the lrdd endpoint with an HTTP URI at some other domain":
-        httputil.getfail("/api/lrdd?uri=http://photo.example/evan", 400),
+        httputil.getfail("/api/lrdd?uri=http://photo.example/evan", 404),
         "and we get the lrdd endpoint with a Webfinger at some other domain":
-        httputil.getfail("/api/lrdd?uri=evan@photo.example", 400),
+        httputil.getfail("/api/lrdd?uri=evan@photo.example", 404),
         "and we get the lrdd endpoint with a Webfinger of a non-existent user":
-        httputil.getfail("/api/lrdd.json?uri=evan@localhost", 400),
+        httputil.getfail("/api/lrdd.json?uri=evan@localhost", 404),
         "and we get the lrdd.json endpoint with no uri":
         httputil.getfail("/api/lrdd.json", 400),
         "and we get the lrdd.json endpoint with an empty uri":
-        httputil.getfail("/api/lrdd.json?uri=", 400),
+        httputil.getfail("/api/lrdd.json?uri=", 404),
         "and we get the lrdd.json endpoint with an HTTP URI at some other domain":
-        httputil.getfail("/api/lrdd.json?uri=http://photo.example/evan", 400),
+        httputil.getfail("/api/lrdd.json?uri=http://photo.example/evan", 404),
         "and we get the lrdd.json endpoint with a Webfinger at some other domain":
-        httputil.getfail("/api/lrdd.json?uri=evan@photo.example", 400),
+        httputil.getfail("/api/lrdd.json?uri=evan@photo.example", 404),
         "and we get the lrdd.json endpoint with a Webfinger of a non-existent user":
-        httputil.getfail("/api/lrdd.json?uri=evan@localhost", 400)
+        httputil.getfail("/api/lrdd.json?uri=evan@localhost", 404),
+        "and we register a client and user": {
+            topic: function() {
+                oauthutil.newCredentials("alice", "testpass", this.callback);
+            },
+            "it works": function(err, cred) {
+                assert.ifError(err);
+            },
+            "and we test the lrdd endpoint":
+            xrdutil.xrdContext("http://localhost:4815/api/lrdd?uri=alice@localhost",
+                               webfinger),
+            "and we test the lrdd.json endpoint":
+            xrdutil.jrdContext("http://localhost:4815/api/lrdd.json?uri=alice@localhost",
+                               webfinger)
+        }
     }
 });
 
