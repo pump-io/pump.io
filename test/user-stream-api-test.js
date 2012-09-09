@@ -64,8 +64,16 @@ suite.addBatch({
             },
             "and we check the feed endpoint": 
             httputil.endpoint("/api/user/dora/feed", ["GET", "POST"]),
+            "and we check the minor feed endpoint": 
+            httputil.endpoint("/api/user/dora/feed/minor", ["GET"]),
+            "and we check the major feed endpoint": 
+            httputil.endpoint("/api/user/dora/feed/major", ["GET"]),
             "and we check the inbox endpoint": 
             httputil.endpoint("/api/user/dora/inbox", ["GET", "POST"]),
+            "and we check the minor inbox endpoint": 
+            httputil.endpoint("/api/user/dora/inbox/minor", ["GET"]),
+            "and we check the major inbox endpoint": 
+            httputil.endpoint("/api/user/dora/inbox/major", ["GET"]),
             "and we get the feed of a new user": {
                 topic: function(cred) {
                     var cb = this.callback;

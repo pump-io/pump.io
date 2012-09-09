@@ -75,12 +75,15 @@ var addRoutes = function(app) {
     // Feeds
 
     app.post("/api/user/:nickname/feed", userAuth, reqUser, sameUser, postActivity);
-    // XXX: privileged access when authenticated
     app.get("/api/user/:nickname/feed", clientAuth, reqUser, userStream);
+    app.get("/api/user/:nickname/feed/major", clientAuth, reqUser, notYetImplemented);
+    app.get("/api/user/:nickname/feed/minor", clientAuth, reqUser, notYetImplemented);
 
     // Inboxen
 
     app.get("/api/user/:nickname/inbox", userAuth, reqUser, sameUser, userInbox);
+    app.get("/api/user/:nickname/inbox/major", userAuth, reqUser, sameUser, notYetImplemented);
+    app.get("/api/user/:nickname/inbox/minor", userAuth, reqUser, sameUser, notYetImplemented);
     app.post("/api/user/:nickname/inbox", notYetImplemented);
 
     app.get("/api/user/:nickname/followers", clientAuth, reqUser, userFollowers);
