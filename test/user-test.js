@@ -912,5 +912,98 @@ suite.addBatch({
     }
 });
 
+// Tests for major, minor streams
+
+suite.addBatch({
+    "When we create a new user": {
+        topic: function() {
+            var User = require("../lib/model/user").User,
+                props = {
+                    nickname: "archie",
+                    password: "bunker"
+                };
+            User.create(props, this.callback);
+        },
+        "it works": function(err, user) {
+            assert.ifError(err);
+        },
+        "And we check their minor inbox": {
+            topic: function(user) {
+                var callback = this.callback;
+                Step(
+                    function() {
+                        user.getMinorInboxStream(this);
+                    },
+                    function(err, str) {
+                        if (err) throw err;
+                        str.getItems(0, 20, this);
+                    },
+                    callback
+                );
+            },
+            "it's empty": function(err, activities) {
+                assert.ifError(err);
+                assert.isEmpty(activities);
+            }
+        },
+        "And we check their minor outbox": {
+            topic: function(user) {
+                var callback = this.callback;
+                Step(
+                    function() {
+                        user.getMinorOutboxStream(this);
+                    },
+                    function(err, str) {
+                        if (err) throw err;
+                        str.getItems(0, 20, this);
+                    },
+                    callback
+                );
+            },
+            "it's empty": function(err, activities) {
+                assert.ifError(err);
+                assert.isEmpty(activities);
+            }
+        },
+        "And we check their major inbox": {
+            topic: function(user) {
+                var callback = this.callback;
+                Step(
+                    function() {
+                        user.getMajorInboxStream(this);
+                    },
+                    function(err, str) {
+                        if (err) throw err;
+                        str.getItems(0, 20, this);
+                    },
+                    callback
+                );
+            },
+            "it's empty": function(err, activities) {
+                assert.ifError(err);
+                assert.isEmpty(activities);
+            }
+        },
+        "And we check their major outbox": {
+            topic: function(user) {
+                var callback = this.callback;
+                Step(
+                    function() {
+                        user.getMajorOutboxStream(this);
+                    },
+                    function(err, str) {
+                        if (err) throw err;
+                        str.getItems(0, 20, this);
+                    },
+                    callback
+                );
+            },
+            "it's empty": function(err, activities) {
+                assert.ifError(err);
+                assert.isEmpty(activities);
+            }
+        }
+    }
+});
 
 suite["export"](module);
