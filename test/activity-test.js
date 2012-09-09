@@ -272,6 +272,9 @@ suite.addBatch({
             },
             "it has the recipients() method": function(activity) {
                 assert.isFunction(activity.recipients);
+            },
+            "it has the isMajor() method": function(activity) {
+                assert.isFunction(activity.isMajor);
             }
         },
         "and we apply() a new post activity": {
@@ -1300,6 +1303,49 @@ suite.addBatch({
             },
             "it works": function(err) {
                 assert.ifError(err);
+            }
+        },
+        "and we check if a major activity is major": {
+            topic: function(Activity) {
+                var act = new Activity({
+                    id: "85931c96-fa24-11e1-8bf3-70f1a154e1aa",
+                    actor: {
+                        objectType: "person",
+                        displayName: "A. Person",
+                        id: "76c50ecc-fa24-11e1-bc3b-70f1a154e1aa"
+                    },
+                    verb: "post",
+                    object: {
+                        id: "aaf962f6-fa24-11e1-b0e6-70f1a154e1aa",
+                        objectType: "note",
+                        content: "Hello, world!"
+                    }
+                });
+                return act.isMajor();
+            },
+            "it is major": function(isMajor) {
+                assert.isTrue(isMajor);
+            }
+        },
+        "and we check if a minor activity is major": {
+            topic: function(Activity) {
+                var act = new Activity({
+                    id: "076f1a4e-fa25-11e1-b51d-70f1a154e1aa",
+                    actor: {
+                        objectType: "person",
+                        displayName: "A. Nother Person",
+                        id: "100c05ea-fa25-11e1-a634-70f1a154e1aa"
+                    },
+                    verb: "favorite",
+                    object: {
+                        id: "237a9998-fa25-11e1-9444-70f1a154e1aa",
+                        objectType: "note"
+                    }
+                });
+                return act.isMajor();
+            },
+            "it is not major": function(isMajor) {
+                assert.isFalse(isMajor);
             }
         }
     }
