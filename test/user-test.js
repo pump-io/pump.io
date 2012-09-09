@@ -927,7 +927,7 @@ suite.addBatch({
         "it works": function(err, user) {
             assert.ifError(err);
         },
-        "And we check their minor inbox": {
+        "and we check their minor inbox": {
             topic: function(user) {
                 var callback = this.callback;
                 Step(
@@ -946,7 +946,7 @@ suite.addBatch({
                 assert.isEmpty(activities);
             }
         },
-        "And we check their minor outbox": {
+        "and we check their minor outbox": {
             topic: function(user) {
                 var callback = this.callback;
                 Step(
@@ -965,7 +965,7 @@ suite.addBatch({
                 assert.isEmpty(activities);
             }
         },
-        "And we check their major inbox": {
+        "and we check their major inbox": {
             topic: function(user) {
                 var callback = this.callback;
                 Step(
@@ -984,7 +984,7 @@ suite.addBatch({
                 assert.isEmpty(activities);
             }
         },
-        "And we check their major outbox": {
+        "and we check their major outbox": {
             topic: function(user) {
                 var callback = this.callback;
                 Step(
@@ -1001,6 +1001,288 @@ suite.addBatch({
             "it's empty": function(err, activities) {
                 assert.ifError(err);
                 assert.isEmpty(activities);
+            }
+        }
+    },
+    "When we create another user": {
+        topic: function() {
+            var User = require("../lib/model/user").User,
+                props = {
+                    nickname: "edith",
+                    password: "bunker"
+                };
+            User.create(props, this.callback);
+        },
+        "it works": function(err, user) {
+            assert.ifError(err);
+        },
+        "and we add a major activity": {
+            topic: function(user) {
+                var act,
+                    props = {
+                        actor: user.profile,
+                        verb: "post",
+                        object: {
+                            objectType: "note",
+                            content: "Cling peaches"
+                        }
+                    },
+                    callback = this.callback;
+
+                Step(
+                    function() {
+                        Activity.create(props, this);
+                    },
+                    function(err, result) {
+                        if (err) throw err;
+                        act = result;
+                        user.addToInbox(act, this.parallel());
+                        user.addToOutbox(act, this.parallel());
+                    },
+                    function(err) {
+                        if (err) {
+                            callback(err, null, null);
+                        } else {
+                            callback(null, user, act);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, user, activity) {
+                assert.ifError(err);
+            },
+            "and we check their minor inbox": {
+                topic: function(user, activity) {
+                    var callback = this.callback;
+                    Step(
+                        function() {
+                            user.getMinorInboxStream(this);
+                        },
+                        function(err, str) {
+                            if (err) throw err;
+                            str.getItems(0, 20, this);
+                        },
+                        callback
+                    );
+                },
+                "it's empty": function(err, activities) {
+                    assert.ifError(err);
+                    assert.isEmpty(activities);
+                }
+            },
+            "and we check their minor outbox": {
+                topic: function(user, activity) {
+                    var callback = this.callback;
+                    Step(
+                        function() {
+                            user.getMinorOutboxStream(this);
+                        },
+                        function(err, str) {
+                            if (err) throw err;
+                            str.getItems(0, 20, this);
+                        },
+                        callback
+                    );
+                },
+                "it's empty": function(err, activities) {
+                    assert.ifError(err);
+                    assert.isEmpty(activities);
+                }
+            },
+            "and we check their major inbox": {
+                topic: function(user, activity) {
+                    var callback = this.callback;
+                    Step(
+                        function() {
+                            user.getMajorInboxStream(this);
+                        },
+                        function(err, str) {
+                            if (err) throw err;
+                            str.getItems(0, 20, this);
+                        },
+                        function(err, activities) {
+                            if (err) {
+                                callback(err, null, null);
+                            } else {
+                                callback(err, activity, activities);
+                            }
+                        }
+                    );
+                },
+                "it's in there": function(err, activity, activities) {
+                    assert.ifError(err);
+                    assert.isArray(activities);
+                    assert.lengthOf(activities, 1);
+                    assert.equal(activities[0], activity.id);
+                }
+            },
+            "and we check their major outbox": {
+                topic: function(user, activity) {
+                    var callback = this.callback;
+                    Step(
+                        function() {
+                            user.getMajorOutboxStream(this);
+                        },
+                        function(err, str) {
+                            if (err) throw err;
+                            str.getItems(0, 20, this);
+                        },
+                        function(err, activities) {
+                            if (err) {
+                                callback(err, null, null);
+                            } else {
+                                callback(err, activity, activities);
+                            }
+                        }
+                    );
+                },
+                "it's in there": function(err, activity, activities) {
+                    assert.ifError(err);
+                    assert.isArray(activities);
+                    assert.lengthOf(activities, 1);
+                    assert.equal(activities[0], activity.id);
+                }
+            }
+        }
+    },
+    "When we create yet another user": {
+        topic: function() {
+            var User = require("../lib/model/user").User,
+                props = {
+                    nickname: "gloria",
+                    password: "bunker"
+                };
+            User.create(props, this.callback);
+        },
+        "it works": function(err, user) {
+            assert.ifError(err);
+        },
+        "and we add a minor activity": {
+            topic: function(user) {
+                var act,
+                    props = {
+                        actor: user.profile,
+                        verb: "favorite",
+                        object: {
+                            objectType: "image",
+                            id: "3740ed6e-fa2b-11e1-9287-70f1a154e1aa"
+                        }
+                    },
+                    callback = this.callback;
+
+                Step(
+                    function() {
+                        Activity.create(props, this);
+                    },
+                    function(err, result) {
+                        if (err) throw err;
+                        act = result;
+                        user.addToInbox(act, this.parallel());
+                        user.addToOutbox(act, this.parallel());
+                    },
+                    function(err) {
+                        if (err) {
+                            callback(err, null, null);
+                        } else {
+                            callback(null, user, act);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, user, activity) {
+                assert.ifError(err);
+            },
+            "and we check their major inbox": {
+                topic: function(user, activity) {
+                    var callback = this.callback;
+                    Step(
+                        function() {
+                            user.getMajorInboxStream(this);
+                        },
+                        function(err, str) {
+                            if (err) throw err;
+                            str.getItems(0, 20, this);
+                        },
+                        callback
+                    );
+                },
+                "it's empty": function(err, activities) {
+                    assert.ifError(err);
+                    assert.isEmpty(activities);
+                }
+            },
+            "and we check their major outbox": {
+                topic: function(user, activity) {
+                    var callback = this.callback;
+                    Step(
+                        function() {
+                            user.getMajorOutboxStream(this);
+                        },
+                        function(err, str) {
+                            if (err) throw err;
+                            str.getItems(0, 20, this);
+                        },
+                        callback
+                    );
+                },
+                "it's empty": function(err, activities) {
+                    assert.ifError(err);
+                    assert.isEmpty(activities);
+                }
+            },
+            "and we check their minor inbox": {
+                topic: function(user, activity) {
+                    var callback = this.callback;
+                    Step(
+                        function() {
+                            user.getMinorInboxStream(this);
+                        },
+                        function(err, str) {
+                            if (err) throw err;
+                            str.getItems(0, 20, this);
+                        },
+                        function(err, activities) {
+                            if (err) {
+                                callback(err, null, null);
+                            } else {
+                                callback(err, activity, activities);
+                            }
+                        }
+                    );
+                },
+                "it's in there": function(err, activity, activities) {
+                    assert.ifError(err);
+                    assert.isArray(activities);
+                    assert.lengthOf(activities, 1);
+                    assert.equal(activities[0], activity.id);
+                }
+            },
+            "and we check their minor outbox": {
+                topic: function(user, activity) {
+                    var callback = this.callback;
+                    Step(
+                        function() {
+                            user.getMinorOutboxStream(this);
+                        },
+                        function(err, str) {
+                            if (err) throw err;
+                            str.getItems(0, 20, this);
+                        },
+                        function(err, activities) {
+                            if (err) {
+                                callback(err, null, null);
+                            } else {
+                                callback(err, activity, activities);
+                            }
+                        }
+                    );
+                },
+                "it's in there": function(err, activity, activities) {
+                    assert.ifError(err);
+                    assert.isArray(activities);
+                    assert.lengthOf(activities, 1);
+                    assert.equal(activities[0], activity.id);
+                }
             }
         }
     }
