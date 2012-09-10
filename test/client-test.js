@@ -76,6 +76,48 @@ suite.addBatch({
         },
         "it works": function(Client) {
             assert.isFunction(Client);
+        },
+        "and we create a client with a 'host' property": {
+            topic: function(Client) {
+                Client.create({host: "photo.example"}, this.callback);
+            },
+            "it works": function(err, client) {
+                assert.ifError(err);
+                assert.isObject(client);
+            }
+        },
+        "and we create a client with a 'webfinger' property": {
+            topic: function(Client) {
+                Client.create({webfinger: "alice@geographic.example"}, this.callback);
+            },
+            "it works": function(err, client) {
+                assert.ifError(err);
+                assert.isObject(client);
+            }
+        },
+        "and we create a client with both 'host' and 'webfinger'": {
+            topic: function(Client) {
+                var callback = this.callback;
+                Client.create({host: "music.example", webfinger: "bob@music.example"}, function(err, client) {
+                    if (err) {
+                        callback(null);
+                    } else {
+                        callback(new Error("Unexpected success"));
+                    }
+                });
+            },
+            "it fails correctly": function(err) {
+                assert.ifError(err);
+            }
+        },
+        "and we create a client with neither 'host' nor 'webfinger'": {
+            topic: function(Client) {
+                Client.create({title: "My program"}, this.callback);
+            },
+            "it works": function(err, client) {
+                assert.ifError(err);
+                assert.isObject(client);
+            }
         }
     }
 });
