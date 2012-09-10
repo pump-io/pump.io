@@ -20,7 +20,8 @@ var http = require("http"),
     assert = require("assert"),
     querystring = require("querystring"),
     _ = require("underscore"),
-    OAuth = require("oauth").OAuth;
+    OAuth = require("oauth").OAuth,
+    urlparse = require("url").parse;
 
 var OAuthJSONError = function(obj) {
     Error.captureStackTrace(this, OAuthJSONError);
@@ -245,6 +246,49 @@ var getfail = function(rel, status) {
     };
 };
 
+var dialbackPost = function(endpoint, id, token, ts, requestBody, contentType, callback) {
+
+    var reqOpts = urlparse(endpoint), auth;
+
+    reqOpts.method = "POST";
+    reqOpts.headers = {
+        "Content-Type": contentType,
+        "Content-Length": requestBody.length,
+        "User-Agent": "activitypump-test/0.1.0dev"
+    };
+
+    if (id.indexOf("@") === -1) {
+        auth = "Dialback host=\"" + id + "\", token=\""+token+"\"";
+    } else {
+        auth = "Dialback webfinger=\"" + id + "\", token=\""+token+"\"";
+    }
+
+    reqOpts.headers["Authorization"] = auth;
+    reqOpts.headers["Date"] = (new Date(ts)).toUTCString();
+
+    var req = http.request(reqOpts, function(res) {
+        var body = "";
+        res.setEncoding("utf8");
+        res.on("data", function(chunk) {
+            body = body + chunk;
+        });
+        res.on("error", function(err) {
+            callback(err, null, null);
+        });
+        res.on("end", function() {
+            callback(null, res, body);
+        });
+    });
+
+    req.on("error", function(err) {
+        callback(err, null, null);
+    });
+
+    req.write(requestBody);
+
+    req.end();
+};
+
 exports.options = options;
 exports.post = post;
 exports.postJSON = postJSON;
@@ -253,3 +297,4 @@ exports.putJSON = putJSON;
 exports.delJSON = delJSON;
 exports.endpoint = endpoint;
 exports.getfail = getfail;
+exports.dialbackPost = dialbackPost;
