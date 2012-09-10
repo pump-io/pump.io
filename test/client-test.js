@@ -31,6 +31,7 @@ var testSchema = {
     fields: ["title",
              "description",
              "host",
+             "webfinger",
              "secret",
              "contacts",
              "logo_url",
@@ -38,14 +39,14 @@ var testSchema = {
              "type",
              "created",
              "updated"],
-    indices: ["title"]
+    indices: ["host", "webfinger"]
 };
 
 var testData = {
     "create": {
         title: "MyApp",
         description: "an app I made",
-        host: "example.com",
+        identity: "example.com",
         contacts: ["evan@example.com"],
         type: "web"
     },
@@ -67,5 +68,16 @@ mb["When we require the client module"]
 };
 
 suite.addBatch(mb);
+
+suite.addBatch({
+    "When we get the Client class": {
+        topic: function() {
+            return require("../lib/model/client").Client;
+        },
+        "it works": function(Client) {
+            assert.isFunction(Client);
+        }
+    }
+});
 
 suite["export"](module);
