@@ -19,6 +19,7 @@
 var assert = require("assert"),
     vows = require("vows"),
     databank = require("databank"),
+    Step = require("step"),
     URLMaker = require("../lib/urlmaker").URLMaker,
     modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
@@ -117,6 +118,76 @@ suite.addBatch({
             "it works": function(err, client) {
                 assert.ifError(err);
                 assert.isObject(client);
+            }
+        },
+        "and we create two clients with the same 'host'": {
+            topic: function(Client) {
+                var callback = this.callback,
+                    client1,
+                    client2;
+
+                Step(
+                    function() {
+                        Client.create({host: "video.example"}, this);
+                    },
+                    function(err, client) {
+                        if (err) throw err;
+                        client1 = client;
+                        Client.create({host: "video.example"}, this);
+                    },
+                    function(err, client) {
+                        if (err) {
+                            callback(err, null, null);
+                        } else {
+                            client2 = client;
+                            callback(err, client1, client2);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, client1, client2) {
+                assert.ifError(err);
+            },
+            "they are distinct": function(err, client1, client2) {
+                assert.ifError(err);
+                assert.isObject(client1);
+                assert.isObject(client2);
+                assert.notEqual(client1.consumer_key, client2.consumer_key);
+            }
+        },
+        "and we create two clients with the same 'webfinger'": {
+            topic: function(Client) {
+                var callback = this.callback,
+                    client1,
+                    client2;
+
+                Step(
+                    function() {
+                        Client.create({webfinger: "charlie@blog.example"}, this);
+                    },
+                    function(err, client) {
+                        if (err) throw err;
+                        client1 = client;
+                        Client.create({webfinger: "charlie@blog.example"}, this);
+                    },
+                    function(err, client) {
+                        if (err) {
+                            callback(err, null, null);
+                        } else {
+                            client2 = client;
+                            callback(err, client1, client2);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, client1, client2) {
+                assert.ifError(err);
+            },
+            "they are distinct": function(err, client1, client2) {
+                assert.ifError(err);
+                assert.isObject(client1);
+                assert.isObject(client2);
+                assert.notEqual(client1.consumer_key, client2.consumer_key);
             }
         }
     }
