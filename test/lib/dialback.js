@@ -63,6 +63,11 @@ var dialbackApp = function(port, hostname, callback) {
         });
     });
 
+    // Validates tokens and hosts for dialback
+    // Invalid stuff: host mismatch, date greater than 5 min from now, invalid@hostname
+    // Everything else is valid
+    // NOTE: this is just for a test; real dialback systems shouldn't work this way!
+
     app.post("/dialback", function(req, res, next) {
 
         var host = req.body.host,
@@ -112,7 +117,7 @@ var dialbackApp = function(port, hostname, callback) {
             return;
         }
 
-        if (token == "invalid") {
+        if (token == "INVALID") {
             res.status(400).send("Invalid token");
             return;
         }
