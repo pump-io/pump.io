@@ -32,7 +32,7 @@ var addRoutes = function(app) {
     app.post("/api/client/register", maybeDialback, clientReg);
 };
 
-var clientReg = function (req, res, next) {
+var clientReg = function(req, res, next) {
 
     var params = req.body,
         props = {},
