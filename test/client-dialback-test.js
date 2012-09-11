@@ -35,7 +35,6 @@ var dbreg = function(id, token, ts, params, callback) {
     httputil.dialbackPost(URL, id, token, ts, requestBody, "application/x-www-form-urlencoded", callback);
 };
 
-
 var assoc = function(id, token, ts) {
     return function() {
         var callback = this.callback;
@@ -54,6 +53,27 @@ var assocFail = function(id, token, ts) {
         "it fails correctly": function(err, res, body) {
             assert.ifError(err);
             assert.equal(res.statusCode, 401);
+        }
+    };
+};
+
+var assocSucceed = function(id, token, ts) {
+    return {
+        topic: assoc(id, token, ts),
+        "it works": function(err, res, body) {
+            assert.ifError(err);
+            assert.greater(res.statusCode, 199);
+            assert.lesser(res.statusCode, 300);
+        },
+        "it looks right": function(err, res, body) {
+            var parsed;
+            assert.ifError(err);
+            assert.greater(res.statusCode, 199);
+            assert.lesser(res.statusCode, 300);
+            parsed = JSON.parse(body);
+            assert.include(parsed, "client_id");
+            assert.include(parsed, "client_secret");
+            assert.include(parsed, "expires_at");
         }
     };
 };
@@ -88,15 +108,23 @@ suite.addBatch({
             assert.ifError(err);
         },
         "and we try to register with an invalid host": 
-        assocFail("social.invalid", "VALID"),
+        assocFail("social.invalid", "VALID1"),
         "and we try to register with an invalid webfinger domain":
-        assocFail("alice@social.invalid", "VALID"),
+        assocFail("alice@social.invalid", "VALID2"),
         "and we try to register with an invalid webfinger": 
-        assocFail("invalid@dialback.localhost", "VALID"),
+        assocFail("invalid@dialback.localhost", "VALID3"),
         "and we try to register with a valid webfinger and invalid token": 
         assocFail("valid@dialback.localhost", "INVALID"),
         "and we try to register with a valid webfinger and valid token and out-of-bounds date":
-        assocFail("valid@dialback.localhost", "VALID", Date.now() - 600000)
+        assocFail("valid1@dialback.localhost", "VALID4", Date.now() - 600000),
+        "and we try to register with a valid host and invalid token": 
+        assocFail("dialback.localhost", "INVALID"),
+        "and we try to register with a valid host and valid token and out-of-bounds date":
+        assocFail("dialback.localhost", "VALID5", Date.now() - 600000),
+        "and we try to register with a valid webfinger and valid token":
+        assocSucceed("valid2@dialback.localhost", "VALID6"),
+        "and we try to register with a valid host and valid token":
+        assocSucceed("dialback.localhost", "VALID7")
     }
 });
 
