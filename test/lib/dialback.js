@@ -1,6 +1,6 @@
-// http.js
+// dialback.js
 //
-// HTTP utilities for testing
+// Dummy server for making dialback requests
 //
 // Copyright 2012, StatusNet Inc.
 //
@@ -121,7 +121,10 @@ var dialbackApp = function(port, hostname, callback) {
             res.status(400).send("Invalid token");
             return;
         }
-        
+
+        // If you lived here you'd be home by now
+
+        res.status(200).send("OK");
     });
 
     app.on("error", function(err) {
