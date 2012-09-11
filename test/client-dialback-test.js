@@ -35,6 +35,29 @@ var dbreg = function(id, token, ts, params, callback) {
     httputil.dialbackPost(URL, id, token, ts, requestBody, "application/x-www-form-urlencoded", callback);
 };
 
+
+var assoc = function(id, token, ts) {
+    return function() {
+        var callback = this.callback;
+        if (!ts) ts = Date.now();
+        dbreg(id,
+              token,
+              ts,
+              {type: "client_associate"},
+              callback);
+    };
+};
+
+var assocFail = function(id, token, ts) {
+    return {
+        topic: assoc(id, token, ts),
+        "it fails correctly": function(err, res, body) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 401);
+        }
+    };
+};
+
 suite.addBatch({
     "When we set up the app": {
         topic: function() {
@@ -64,63 +87,16 @@ suite.addBatch({
         "it works": function(err, app, dbapp) {
             assert.ifError(err);
         },
-        "and we try to register with an invalid host": {
-            topic: function() {
-                var callback = this.callback;
-                dbreg("social.invalid",
-                      "VALID",
-                      Date.now(),
-                      {application_name: "Social Invalid", type: "client_associate"},
-                      function(err, resp, body) {
-                          if (resp && resp.statusCode && resp.statusCode === 401) {
-                              callback(null);
-                          } else {
-                              callback(new Error("Unexpected success"));
-                          }
-                      });
-            },
-            "it fails correctly": function(err) {
-                assert.ifError(err);
-            }
-        },
-        "and we try to register with an invalid webfinger domain": {
-            topic: function() {
-                var callback = this.callback;
-                dbreg("alice@social.invalid",
-                      "VALID",
-                      Date.now(),
-                      {application_name: "Social Invalid", type: "client_associate"},
-                      function(err, resp, body) {
-                          if (resp && resp.statusCode && resp.statusCode === 401) {
-                              callback(null);
-                          } else {
-                              callback(new Error("Unexpected success"));
-                          }
-                      });
-            },
-            "it fails correctly": function(err) {
-                assert.ifError(err);
-            }
-        },
-        "and we try to register with an invalid webfinger": {
-            topic: function() {
-                var callback = this.callback;
-                dbreg("invalid@dialback.localhost",
-                      "VALID",
-                      Date.now(),
-                      {application_name: "Social Invalid", type: "client_associate"},
-                      function(err, resp, body) {
-                          if (resp && resp.statusCode && resp.statusCode === 401) {
-                              callback(null);
-                          } else {
-                              callback(new Error("Unexpected success"));
-                          }
-                      });
-            },
-            "it fails correctly": function(err) {
-                assert.ifError(err);
-            }
-        }
+        "and we try to register with an invalid host": 
+        assocFail("social.invalid", "VALID"),
+        "and we try to register with an invalid webfinger domain":
+        assocFail("alice@social.invalid", "VALID"),
+        "and we try to register with an invalid webfinger": 
+        assocFail("invalid@dialback.localhost", "VALID"),
+        "and we try to register with a valid webfinger and invalid token": 
+        assocFail("valid@dialback.localhost", "INVALID"),
+        "and we try to register with a valid webfinger and valid token and out-of-bounds date":
+        assocFail("valid@dialback.localhost", "VALID", Date.now() - 600000)
     }
 });
 
