@@ -23,6 +23,7 @@ var assert = require("assert"),
     _ = require("underscore"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    dialbackApp = require("./lib/dialback").dialbackApp,
     setupApp = oauthutil.setupApp;
 
 var suite = vows.describe("client registration with dialback");
@@ -37,12 +38,30 @@ var dbreg = function(id, token, ts, params, callback) {
 suite.addBatch({
     "When we set up the app": {
         topic: function() {
-            setupApp(this.callback);
+            var app, callback = this.callback;
+            Step(
+                function() {
+                    setupApp(this);
+                },
+                function(err, result) {
+                    if (err) throw err;
+                    app = result;
+                    dialbackApp(80, "dialback.localhost", this);
+                },
+                function(err, dbapp) {
+                    if (err) {
+                        callback(err, null, null);
+                    } else {
+                        callback(err, app, dbapp);
+                    }
+                }
+            );
         },
-        teardown: function(app) {
+        teardown: function(app, dbapp) {
             app.close();
+            dbapp.close();
         },
-        "it works": function(err, app) {
+        "it works": function(err, app, dbapp) {
             assert.ifError(err);
         },
         "and we try to register with an invalid host": {
@@ -64,10 +83,29 @@ suite.addBatch({
                 assert.ifError(err);
             }
         },
-        "and we try to register with an invalid webfinger": {
+        "and we try to register with an invalid webfinger domain": {
             topic: function() {
                 var callback = this.callback;
                 dbreg("alice@social.invalid",
+                      "VALID",
+                      Date.now(),
+                      {application_name: "Social Invalid", type: "client_associate"},
+                      function(err, body, resp) {
+                          if (err && err.statusCode && err.statusCode === 401) {
+                              callback(null);
+                          } else {
+                              callback(new Error("Unexpected success"));
+                          }
+                      });
+            },
+            "it fails correctly": function(err) {
+                assert.ifError(err);
+            }
+        },
+        "and we try to register with an invalid webfinger": {
+            topic: function() {
+                var callback = this.callback;
+                dbreg("invalid@dialback.localhost",
                       "VALID",
                       Date.now(),
                       {application_name: "Social Invalid", type: "client_associate"},
