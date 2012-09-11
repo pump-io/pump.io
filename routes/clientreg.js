@@ -20,6 +20,8 @@ var _ = require("underscore"),
     Step = require("step"),
     validator = require("validator"),
     check = validator.check,
+    dialback = require("../lib/dialback"),
+    maybeDialback = dialback.maybeDialback,
     Client = require("../lib/model/client").Client,
     HTTPError = require("../lib/httperror").HTTPError;
 
@@ -27,7 +29,7 @@ var addRoutes = function(app) {
 
     // Client registration
 
-    app.post("/api/client/register", clientReg);
+    app.post("/api/client/register", maybeDialback, clientReg);
 };
 
 var clientReg = function (req, res, next) {
@@ -118,6 +120,12 @@ var clientReg = function (req, res, next) {
             next(new HTTPError("redirect_uris must be space-separated URLs.", 400));
             return;
         }
+    }
+
+    if (req.remoteHost) {
+        props.host = req.remoteHost;
+    } else if (req.remoteUser) {
+        props.webfinger = req.remoteUser;
     }
 
     if (type === "client_associate") {

@@ -71,8 +71,8 @@ suite.addBatch({
                       "VALID",
                       Date.now(),
                       {application_name: "Social Invalid", type: "client_associate"},
-                      function(err, body, resp) {
-                          if (err && err.statusCode && err.statusCode === 401) {
+                      function(err, resp, body) {
+                          if (resp && resp.statusCode && resp.statusCode === 401) {
                               callback(null);
                           } else {
                               callback(new Error("Unexpected success"));
@@ -90,8 +90,8 @@ suite.addBatch({
                       "VALID",
                       Date.now(),
                       {application_name: "Social Invalid", type: "client_associate"},
-                      function(err, body, resp) {
-                          if (err && err.statusCode && err.statusCode === 401) {
+                      function(err, resp, body) {
+                          if (resp && resp.statusCode && resp.statusCode === 401) {
                               callback(null);
                           } else {
                               callback(new Error("Unexpected success"));
@@ -109,8 +109,8 @@ suite.addBatch({
                       "VALID",
                       Date.now(),
                       {application_name: "Social Invalid", type: "client_associate"},
-                      function(err, body, resp) {
-                          if (err && err.statusCode && err.statusCode === 401) {
+                      function(err, resp, body) {
+                          if (resp && resp.statusCode && resp.statusCode === 401) {
                               callback(null);
                           } else {
                               callback(new Error("Unexpected success"));
