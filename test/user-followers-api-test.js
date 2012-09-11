@@ -24,6 +24,7 @@ var assert = require("assert"),
     OAuth = require("oauth").OAuth,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    Queue = require("../lib/jankyqueue").Queue,
     setupApp = oauthutil.setupApp,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair,
@@ -557,15 +558,15 @@ suite.addBatch({
                         accessToken(cl, {nickname: "nymeria", password: "growl"}, this);
                     },
                     function(err, result) {
-                        var i, group = this.group();
+                        var i, group = this.group(), q = new Queue(10);
                         if (err) throw err;
                         pair = result;
-                        for (i = 0; i < 50; i++) {
-                            newPair(cl, "wolf" + i, "grrrrrr", group());
+                        for (i = 0; i < 100; i++) {
+                            q.enqueue(newPair, [cl, "wolf" + i, "grrrrrr"], group());
                         }
                     },
                     function(err, pairs) {
-                        var act, url, cred, i, group = this.group();
+                        var act, url, cred, i, group = this.group(), q = new Queue(10);
                         if (err) throw err;
                         act = {
                             verb: "follow",
@@ -574,8 +575,12 @@ suite.addBatch({
                                 id: user.profile.id
                             }
                         };
-                        for (i = 0; i < 50; i++) {
-                            httputil.postJSON("http://localhost:4815/api/user/wolf"+i+"/feed", makeCred(cl, pairs[i]), act, group());
+                        for (i = 0; i < 100; i++) {
+                            q.enqueue(httputil.postJSON, 
+                                      ["http://localhost:4815/api/user/wolf"+i+"/feed",
+                                       makeCred(cl, pairs[i]),
+                                       act],
+                                      group());
                         }
                     },
                     function(err, docs, responses) {
@@ -601,7 +606,7 @@ suite.addBatch({
                 },
                 "it is valid": function(err, feed) {
                     assert.ifError(err);
-                    assertValidList(feed, 50, 20);
+                    assertValidList(feed, 100, 20);
                 },
                 "it has next but no prev": function(err, feed) {
                     assert.ifError(err);
@@ -625,7 +630,7 @@ suite.addBatch({
                 },
                 "it is valid": function(err, feed) {
                     assert.ifError(err);
-                    assertValidList(feed, 50, 40);
+                    assertValidList(feed, 100, 40);
                 },
                 "it has next but no prev": function(err, feed) {
                     assert.ifError(err);
@@ -637,7 +642,7 @@ suite.addBatch({
             "and we get a very large count from the feed": {
                 topic: function(pair, cl) {
                     var callback = this.callback,
-                        url = "http://localhost:4815/api/user/nymeria/followers?count=100",
+                        url = "http://localhost:4815/api/user/nymeria/followers?count=200",
                         cred = makeCred(cl, pair);
                     
                     httputil.getJSON(url, cred, function(err, doc, resp) {
@@ -649,7 +654,7 @@ suite.addBatch({
                 },
                 "it is valid": function(err, feed) {
                     assert.ifError(err);
-                    assertValidList(feed, 50, 50);
+                    assertValidList(feed, 100, 100);
                 },
                 "it has no next and no prev": function(err, feed) {
                     assert.ifError(err);
@@ -672,7 +677,7 @@ suite.addBatch({
                 },
                 "it is valid": function(err, feed) {
                     assert.ifError(err);
-                    assertValidList(feed, 50, 20);
+                    assertValidList(feed, 100, 20);
                 },
                 "it has next and prev": function(err, feed) {
                     assert.ifError(err);
