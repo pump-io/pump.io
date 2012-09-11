@@ -25,7 +25,6 @@ var dialbackApp = function(port, hostname, callback) {
     app.configure(function(){
         app.set("port", port);
         app.use(express.favicon());
-        app.use(express.logger());
         app.use(express.bodyParser());
         app.use(express.methodOverride());
         app.use(app.router);
