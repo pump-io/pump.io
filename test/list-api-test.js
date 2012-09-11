@@ -26,6 +26,7 @@ var assert = require("assert"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     actutil = require("./lib/activity"),
+    Queue = require("../lib/jankyqueue").Queue,
     setupApp = oauthutil.setupApp,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair,
@@ -225,13 +226,22 @@ suite.addBatch({
                                         objectTypes: ["person"]
                                     }
                                 },
-                                acti,
-                                group = this.group();
+                                group = this.group(),
+                                q = new Queue(10);
 
                             for (var i = 0; i < 100; i++) {
-                                acti = _(act).clone();
-                                acti.object.displayName = "Israelites #" + i;
-                                httputil.postJSON(url, cred, acti, group());
+                                q.enqueue(httputil.postJSON, 
+                                          [url,
+                                           cred,
+                                           {
+                                               verb: "post",
+                                               object: {
+                                                   objectType: "collection",
+                                                   objectTypes: ["person"],
+                                                   displayName: "Israelites #" + i
+                                               }
+                                           }],
+                                          group());
                             }
                         },
                         function(err, docs, responses) {
