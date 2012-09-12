@@ -335,6 +335,28 @@ suite.addBatch({
                 "it works": function(err, act, resp) {
                     assert.ifError(err);
                     assert.isObject(act);
+                },
+                "and we check the user's inbox": {
+                    topic: function(act, resp, cred) {
+                        var callback = this.callback,
+                            url = "http://localhost:4815/api/user/louisck/inbox";
+                        httputil.getJSON(url, cred, function(err, feed, result) {
+                            callback(err, feed, act);
+                        });
+                    },
+                    "it works": function(err, feed, act) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                    },
+                    "it includes our posted activity": function(err, feed, act) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                        assert.include(feed, "items");
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 1);
+                        assert.isObject(feed.items[0]);
+                        assert.equal(feed.items[0].id, act.id);
+                    }
                 }
             }
         }
