@@ -36,6 +36,35 @@ var clientCred = function(cl) {
     };
 };
 
+var assoc = function(id, token, ts, callback) {
+
+    var URL = "http://localhost:4815/api/client/register",
+        requestBody = querystring.stringify({type: "client_associate"}),
+        parseJSON = function(err, response, data) {
+            var obj;
+            if (err) {
+                callback(err, null, null);
+            } else {
+                try {
+                    obj = JSON.parse(data);
+                    callback(null, obj, response);
+                } catch (e) {
+                    callback(e, null, null);
+                }
+            }
+        };
+
+    if (!ts) ts = Date.now();
+
+    httputil.dialbackPost(URL, 
+                          id, 
+                          token, 
+                          ts, 
+                          requestBody, 
+                          "application/x-www-form-urlencoded",
+                          parseJSON);
+};
+
 var suite = vows.describe("user inbox API");
 
 suite.addBatch({
@@ -137,6 +166,94 @@ suite.addBatch({
                     Step(
                         function() {
                             newClient(this);
+                        },
+                        function(err, cl) {
+
+                            if (err) throw err;
+
+                            var url = "http://localhost:4815/api/user/louisck/inbox",
+                                act = {
+                                    actor: {
+                                        id: "acct:user1@social.localhost",
+                                        objectType: "person"
+                                    },
+                                    verb: "post",
+                                    object: {
+                                        id: "http://social.localhost/note/2",
+                                        objectType: "note",
+                                        content: "Hello again, world!"
+                                    }
+                                },
+                                cred = clientCred(cl);
+
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, body, res) {
+                            if (err && err.statusCode === 401) {
+                                callback(null);
+                            } else if (err) {
+                                callback(err);
+                            } else {
+                                callback(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                "and it fails correctly": function(err) {
+                    assert.ifError(err);
+                }
+            },
+            "and we post to the inbox with OAuth credentials for a host": {
+                topic: function() {
+                    var callback = this.callback;
+
+                    Step(
+                        function() {
+                            assoc("social.localhost", "VALID1", Date.now(), this);
+                        },
+                        function(err, cl) {
+
+                            if (err) throw err;
+
+                            var url = "http://localhost:4815/api/user/louisck/inbox",
+                                act = {
+                                    actor: {
+                                        id: "acct:user1@social.localhost",
+                                        objectType: "person"
+                                    },
+                                    verb: "post",
+                                    object: {
+                                        id: "http://social.localhost/note/2",
+                                        objectType: "note",
+                                        content: "Hello again, world!"
+                                    }
+                                },
+                                cred = clientCred(cl);
+
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, body, res) {
+                            if (err && err.statusCode === 401) {
+                                callback(null);
+                            } else if (err) {
+                                callback(err);
+                            } else {
+                                callback(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                "and it fails correctly": function(err) {
+                    assert.ifError(err);
+                }
+            },
+            "and we post to the inbox with OAuth credentials for an unrelated webfinger": {
+                topic: function() {
+                    var callback = this.callback;
+
+                    Step(
+                        function() {
+                            assoc("user0@social.localhost", "VALID1", Date.now(), this);
                         },
                         function(err, cl) {
 
