@@ -128,12 +128,6 @@ var dialbackApp = function(port, hostname, callback) {
         callback(err, null);
     });
 
-    // Drop privileges
-
-    app.on('listening', function() {
-        process.setuid("nobody");
-    });
-
     app.listen(port, hostname, function() {
         callback(null, app);
     });
