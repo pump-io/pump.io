@@ -26,7 +26,9 @@ var assert = require("assert"),
     schema = require("../lib/schema").schema,
     URLMaker = require("../lib/urlmaker").URLMaker;
 
-vows.describe("activityobject class interface").addBatch({
+var suite = vows.describe("activityobject class interface");
+
+suite.addBatch({
     "When we require the activityobject module": {
         topic: function() { 
             var cb = this.callback;
@@ -94,6 +96,12 @@ vows.describe("activityobject class interface").addBatch({
             },
             "it has a getObjectStream member": function(ActivityObject) {
                 assert.isFunction(ActivityObject.getObjectStream);
+            },
+            "it has a sameID member": function(ActivityObject) {
+                assert.isFunction(ActivityObject.sameID);
+            },
+            "it has a canonicalID member": function(ActivityObject) {
+                assert.isFunction(ActivityObject.canonicalID);
             },
             "it has an objectTypes member": function(ActivityObject) {
                 assert.isArray(ActivityObject.objectTypes);
@@ -1053,8 +1061,50 @@ vows.describe("activityobject class interface").addBatch({
                     assert.ok(comment.deleted);
                     assert.isUndefined(comment.content);
                 }
+            },
+            "and we canonicalize an http: ID": {
+                topic: function(ActivityObject) {
+                    return ActivityObject.canonicalID("http://social.example/user/1");
+                },
+                "it is unchanged": function(id) {
+                    assert.equal(id, "http://social.example/user/1");
+                }
+            },
+            "and we canonicalize an https: ID": {
+                topic: function(ActivityObject) {
+                    return ActivityObject.canonicalID("https://photo.example/user/1");
+                },
+                "it is unchanged": function(id) {
+                    assert.equal(id, "https://photo.example/user/1");
+                }
+            },
+            "and we canonicalize an acct: ID": {
+                topic: function(ActivityObject) {
+                    return ActivityObject.canonicalID("acct:user@checkin.example");
+                },
+                "it is unchanged": function(id) {
+                    assert.equal(id, "acct:user@checkin.example");
+                }
+            },
+            "and we canonicalize a bare Webfinger": {
+                topic: function(ActivityObject) {
+                    return ActivityObject.canonicalID("user@checkin.example");
+                },
+                "it is unchanged": function(id) {
+                    assert.equal(id, "acct:user@checkin.example");
+                }
+            },
+            "and we compare an acct: URI and a bare Webfinger": {
+                topic: function(ActivityObject) {
+                    return ActivityObject.sameID("acct:user@checkin.example", "user@checkin.example");
+                },
+                "it is a match": function(res) {
+                    assert.isTrue(res);
+                }
             }
         }
     }
-})["export"](module);
+});
+
+suite["export"](module);
 
