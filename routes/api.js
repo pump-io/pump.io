@@ -84,7 +84,7 @@ var addRoutes = function(app) {
     app.get("/api/user/:nickname/inbox", userAuth, reqUser, sameUser, userInbox);
     app.get("/api/user/:nickname/inbox/major", userAuth, reqUser, sameUser, notYetImplemented);
     app.get("/api/user/:nickname/inbox/minor", userAuth, reqUser, sameUser, notYetImplemented);
-    app.post("/api/user/:nickname/inbox", notYetImplemented);
+    app.post("/api/user/:nickname/inbox", remoteUserAuth, notYetImplemented);
 
     app.get("/api/user/:nickname/followers", clientAuth, reqUser, userFollowers);
 
@@ -203,6 +203,50 @@ var userAuth = function(req, res, next) {
 
         req.client = req.getAuthDetails().user.client;
         res.local("client", req.client);
+
+        next();
+    });
+};
+
+// Accept only 2-legged OAuth with
+
+var remoteUserAuth = function(req, res, next) {
+
+    req.client = null;
+    res.local("client", null); // init to null
+    req.remotePerson = null;
+    res.local("person", null);
+
+    req.authenticate(["client"], function(error, authenticated) { 
+
+        var client;
+
+        if (error) {
+            next(error);
+            return;
+        }
+
+        if (!authenticated) {
+            return;
+        }
+        
+        client = req.getAuthDetails().user.client;
+
+        if (!client) {
+            next(new HTTPError("No client", 401));
+            return;
+        }
+
+        if (!client.webfinger) {
+            next(new HTTPError("OAuth key not associated with a webfinger ID", 401));
+            return;
+        }
+
+        req.client = client;
+        req.person = client.webfinger;
+
+        res.local("client", req.client); // init to null
+        res.local("person", req.person); // init to null
 
         next();
     });
