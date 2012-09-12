@@ -219,7 +219,7 @@ var remoteUserAuth = function(req, res, next) {
 
     req.authenticate(["client"], function(error, authenticated) { 
 
-        var client;
+        var id;
 
         if (error) {
             next(error);
@@ -229,26 +229,36 @@ var remoteUserAuth = function(req, res, next) {
         if (!authenticated) {
             return;
         }
-        
-        client = req.getAuthDetails().user.client;
 
-        if (!client) {
-            next(new HTTPError("No client", 401));
-            return;
-        }
+        id = req.getAuthDetails().user.id;
 
-        if (!client.webfinger) {
-            next(new HTTPError("OAuth key not associated with a webfinger ID", 401));
-            return;
-        }
+        Step(
+            function() {
+                Client.get(id, this);
+            },
+            function(err, client) {
+                if (err) {
+                    next(err);
+                    return;
+                }
+                if (!client) {
+                    next(new HTTPError("No client", 401));
+                    return;
+                }
+                if (!client.webfinger) {
+                    next(new HTTPError("OAuth key not associated with a webfinger ID", 401));
+                    return;
+                }
 
-        req.client = client;
-        req.person = client.webfinger;
+                req.client = client;
+                req.person = client.webfinger;
 
-        res.local("client", req.client); // init to null
-        res.local("person", req.person); // init to null
+                res.local("client", req.client); // init to null
+                res.local("person", req.person); // init to null
 
-        next();
+                next();
+            }
+        );
     });
 };
 
