@@ -130,7 +130,7 @@ suite.addBatch({
                     assert.lesser(res.statusCode, 500);
                 }
             },
-            "and we post to the inbox without credentials": {
+            "and we post to the inbox with unattributed OAuth credentials": {
                 topic: function() {
                     var callback = this.callback;
 
