@@ -24,6 +24,7 @@ var databank = require("databank"),
     sanitize = validator.sanitize,
     FilteredStream = require("../lib/filteredstream").FilteredStream,
     HTTPError = require("../lib/httperror").HTTPError,
+    Stamper = require("../lib/stamper").Stamper,
     Activity = require("../lib/model/activity").Activity,
     AppError = require("../lib/model/activity").AppError,
     Collection = require("../lib/model/collection").Collection,
@@ -84,7 +85,7 @@ var addRoutes = function(app) {
     app.get("/api/user/:nickname/inbox", userAuth, reqUser, sameUser, userInbox);
     app.get("/api/user/:nickname/inbox/major", userAuth, reqUser, sameUser, notYetImplemented);
     app.get("/api/user/:nickname/inbox/minor", userAuth, reqUser, sameUser, notYetImplemented);
-    app.post("/api/user/:nickname/inbox", remoteUserAuth, notYetImplemented);
+    app.post("/api/user/:nickname/inbox", remoteUserAuth, reqUser, postToInbox);
 
     app.get("/api/user/:nickname/followers", clientAuth, reqUser, userFollowers);
 
@@ -251,7 +252,7 @@ var remoteUserAuth = function(req, res, next) {
                 }
 
                 req.client = client;
-                req.person = client.webfinger;
+                req.webfinger = client.webfinger;
 
                 res.local("client", req.client); // init to null
                 res.local("person", req.person); // init to null
@@ -785,6 +786,82 @@ var postActivity = function(req, res, next) {
                 // ...then distribute.
                 d = new Distributor(activity);
                 d.distribute(function(err) {});
+            }
+        }
+    );
+};
+
+var postToInbox = function(req, res, next) {
+
+    var activity = new Activity(req.body),
+        user = req.user;
+
+    // Check for actor
+
+    if (!_(activity).has("actor")) {
+        next(new HTTPError("Invalid actor", 400));
+    }
+
+    // If the actor is incorrect, error
+
+    if (!ActivityObject.sameID(activity.actor.id, req.webfinger)) {
+        next(new HTTPError("Invalid actor", 400));
+        return;
+    }
+
+    // Default verb
+
+    if (!_(activity).has("verb") || _(activity.verb).isNull()) {
+        activity.verb = "post";
+    }
+
+    // Add a received timestamp
+
+    activity.received = Stamper.stamp();
+
+    // TODO: return a 202 Accepted here?
+
+    Step(
+        function() {
+            // First, ensure recipients
+            activity.ensureRecipients(this);
+        },
+        function(err) {
+            if (err) throw err;
+            // apply the activity
+            activity.apply(null, this);
+        },
+        function(err) {
+            if (err) {
+                if (err instanceof AppError) {
+                    throw new HTTPError(err.message, 400);
+                } else if (err instanceof NoSuchThingError) {
+                    throw new HTTPError(err.message, 400);
+                } else if (err instanceof AlreadyExistsError) {
+                    throw new HTTPError(err.message, 400);
+                } else if (err instanceof NoSuchItemError) {
+                    throw new HTTPError(err.message, 400);
+                } else if (err instanceof NotInStreamError) {
+                    throw new HTTPError(err.message, 400);
+                } else {
+                    throw err;
+                }
+            }
+            // ...then persist...
+            activity.save(this);
+        },
+        function(err, saved) {
+            if (err) throw err;
+            activity = saved;
+            user.addToInbox(activity, this.parallel());
+        },
+        function(err) {
+            if (err) {
+                next(err);
+            } else {
+                // ...then show (possibly modified) results.
+                // XXX: don't distribute
+                res.json(activity);
             }
         }
     );

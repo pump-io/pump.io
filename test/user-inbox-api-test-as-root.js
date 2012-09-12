@@ -110,6 +110,7 @@ suite.addBatch({
                             id: "acct:user1@social.localhost",
                             objectType: "person"
                         },
+                        id: "http://social.localhost/activity/1",
                         verb: "post",
                         object: {
                             id: "http://social.localhost/note/1",
@@ -177,6 +178,7 @@ suite.addBatch({
                                         id: "acct:user1@social.localhost",
                                         objectType: "person"
                                     },
+                                    id: "http://social.localhost/activity/2",
                                     verb: "post",
                                     object: {
                                         id: "http://social.localhost/note/2",
@@ -221,6 +223,7 @@ suite.addBatch({
                                         id: "acct:user1@social.localhost",
                                         objectType: "person"
                                     },
+                                    id: "http://social.localhost/activity/3",
                                     verb: "post",
                                     object: {
                                         id: "http://social.localhost/note/2",
@@ -253,7 +256,7 @@ suite.addBatch({
 
                     Step(
                         function() {
-                            assoc("user0@social.localhost", "VALID1", Date.now(), this);
+                            assoc("user0@social.localhost", "VALID2", Date.now(), this);
                         },
                         function(err, cl) {
 
@@ -262,12 +265,13 @@ suite.addBatch({
                             var url = "http://localhost:4815/api/user/louisck/inbox",
                                 act = {
                                     actor: {
-                                        id: "acct:user1@social.localhost",
+                                        id: "acct:user2@social.localhost",
                                         objectType: "person"
                                     },
+                                    id: "http://social.localhost/activity/4",
                                     verb: "post",
                                     object: {
-                                        id: "http://social.localhost/note/2",
+                                        id: "http://social.localhost/note/3",
                                         objectType: "note",
                                         content: "Hello again, world!"
                                     }
@@ -277,7 +281,7 @@ suite.addBatch({
                             httputil.postJSON(url, cred, act, this);
                         },
                         function(err, body, res) {
-                            if (err && err.statusCode === 401) {
+                            if (err && err.statusCode === 400) {
                                 callback(null);
                             } else if (err) {
                                 callback(err);
@@ -289,6 +293,48 @@ suite.addBatch({
                 },
                 "and it fails correctly": function(err) {
                     assert.ifError(err);
+                }
+            },
+            "and we post an activity to the inbox with OAuth credentials for the actor": {
+
+                topic: function() {
+                    var callback = this.callback;
+
+                    Step(
+                        function() {
+                            assoc("user3@social.localhost", "VALID1", Date.now(), this);
+                        },
+                        function(err, cl) {
+
+                            if (err) throw err;
+
+                            var url = "http://localhost:4815/api/user/louisck/inbox",
+                                act = {
+                                    actor: {
+                                        id: "acct:user3@social.localhost",
+                                        objectType: "person"
+                                    },
+                                    to: [{objectType: "collection",
+                                          id: "http://social.localhost/user/user2/followers"
+                                         }],
+                                    id: "http://social.localhost/activity/5",
+                                    verb: "post",
+                                    object: {
+                                        id: "http://social.localhost/note/3",
+                                        objectType: "note",
+                                        content: "Hello again, world!"
+                                    }
+                                },
+                                cred = clientCred(cl);
+
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        callback
+                    );
+                },
+                "it works": function(err, act, resp) {
+                    assert.ifError(err);
+                    assert.isObject(act);
                 }
             }
         }
