@@ -10,3 +10,4 @@ exports.ownerURL = "http://example.com/";
 exports.port   = 8000;
 exports.hostname = "example.org";
 exports.nologger = false;
+exports.serverUser = "activitypump";
