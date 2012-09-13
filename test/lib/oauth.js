@@ -36,10 +36,17 @@ OAuthError.prototype.toString = function() {
     return "OAuthError (" + this.statusCode + "):" + this.data;
 };
 
-var requestToken = function(cl, cb) {
+var requestToken = function(cl, hostname, port, cb) {
     var oa;
-    oa = new OAuth("http://localhost:4815/oauth/request_token",
-                   "http://localhost:4815/oauth/access_token",
+
+    if (!port) {
+        cb = hostname;
+        hostname = "localhost";
+        port = 4815;
+    }
+
+    oa = new OAuth("http://"+hostname+":"+port+"/oauth/request_token",
+                   "http://"+hostname+":"+port+"/oauth/access_token",
                    cl.client_id,
                    cl.client_secret,
                    "1.0",
@@ -57,8 +64,15 @@ var requestToken = function(cl, cb) {
     });
 };
 
-var newClient = function(cb) {
-    httputil.post("localhost", 4815, "/api/client/register", {type: "client_associate"}, function(err, res, body) {
+var newClient = function(hostname, port, cb) {
+
+    if (!port) {
+        cb = hostname;
+        hostname = "localhost";
+        port = 4815;
+    }
+
+    httputil.post(hostname, port, "/api/client/register", {type: "client_associate"}, function(err, res, body) {
         var cl;
         if (err) {
             cb(err, null);
@@ -73,19 +87,25 @@ var newClient = function(cb) {
     });
 };
 
-var accessToken = function(cl, user, cb) {
+var accessToken = function(cl, user, hostname, port, cb) {
     var rt;
+
+    if (!port) {
+        cb = hostname;
+        hostname = "localhost";
+        port = 4815;
+    }
 
     Step(
         function() {
-            requestToken(cl, this);
+            requestToken(cl, hostname, port, this);
         },
         function(err, res) {
             var browser;
             if (err) throw err;
             rt = res;
             browser = new Browser({runScripts: false, waitFor: 60000});
-            browser.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, this);
+            browser.visit("http://"+hostname+":"+port+"/oauth/authorize?oauth_token=" + rt.token, this);
         },
         function(err, br) {
             if (err) throw err;
@@ -110,8 +130,8 @@ var accessToken = function(cl, user, cb) {
             if (err) throw err;
             if (!br.success) throw new OAuthError({statusCode: br.statusCode, data: br.error || br.text("#error")});
             verifier = br.text("#verifier");
-            oa = new OAuth("http://localhost:4815/oauth/request_token",
-                           "http://localhost:4815/oauth/access_token",
+            oa = new OAuth("http://"+hostname+":"+port+"/oauth/request_token",
+                           "http://"+hostname+":"+port+"/oauth/access_token",
                            cl.client_id,
                            cl.client_secret,
                            "1.0",
@@ -138,9 +158,15 @@ var accessToken = function(cl, user, cb) {
     );
 };
 
-var register = function(cl, nickname, password, callback) {
+var register = function(cl, nickname, password, hostname, port, callback) {
 
-    httputil.postJSON("http://localhost:4815/api/users", 
+    if (!port) {
+        callback = hostname;
+        hostname = "localhost";
+        port = 4815;
+    }
+
+    httputil.postJSON("http://"+hostname+":"+port+"/api/users", 
                       {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
                       {nickname: nickname, password: password},
                       function(err, body, res) {
@@ -148,17 +174,24 @@ var register = function(cl, nickname, password, callback) {
                       });
 };
 
-var newCredentials = function(nickname, password, cb) {
+var newCredentials = function(nickname, password, hostname, port, cb) {
+
     var cl, user;
 
+    if (!port) {
+        cb = hostname;
+        hostname = "localhost";
+        port = 4815;
+    }
+    
     Step(
         function() {
-            newClient(this);
+            newClient(hostname, port, this);
         },
         function(err, res) {
             if (err) throw err;
             cl = res;
-            newPair(cl, nickname, password, this);
+            newPair(cl, nickname, password, hostname, port, this);
         },
         function(err, res) {
             if (err) {
@@ -172,17 +205,23 @@ var newCredentials = function(nickname, password, cb) {
     );
 };
 
-var newPair = function(cl, nickname, password, cb) {
+var newPair = function(cl, nickname, password, hostname, port, cb) {
     var user;
+
+    if (!port) {
+        cb = hostname;
+        hostname = "localhost";
+        port = 4815;
+    }
 
     Step(
         function() {
-            register(cl, nickname, password, this);
+            register(cl, nickname, password, hostname, port, this);
         },
         function(err, res) {
             if (err) throw err;
             user = {nickname: nickname, password: password};
-            accessToken(cl, user, this);
+            accessToken(cl, user, hostname, port, this);
         },
         function(err, res) {
             if (err) {
@@ -194,17 +233,32 @@ var newPair = function(cl, nickname, password, cb) {
     );
 };
 
-var setupApp = function(callback) {
+// Call as setupApp(port, hostname, callback)
+// setupApp(hostname, callback)
+// setupApp(callback)
 
-    var cb = callback,
-        config = {port: 4815,
-                  hostname: "localhost",
-                  driver: "memory",
+var setupApp = function(port, hostname, callback) {
+
+    var config = {driver: "memory",
                   params: {},
                   nologger: true
                  },
         app = null,
         makeApp = require("../../lib/app").makeApp;
+
+    if (!hostname) {
+        callback = port;
+        hostname = "localhost";
+        port = 4815;
+    }
+
+    if (!callback) {
+        callback = hostname;
+        hostname = "localhost";
+    }
+
+    config.port = port || 4815;
+    config.hostname = hostname || "localhost";
 
     process.env.NODE_ENV = "test";
 
@@ -219,9 +273,9 @@ var setupApp = function(callback) {
         },
         function(err) {
             if (err) {
-                cb(err, null);
+                callback(err, null);
             } else {
-                cb(null, app);
+                callback(null, app);
             }
         }
     );
