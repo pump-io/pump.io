@@ -36,6 +36,24 @@ OAuthJSONError.prototype.toString = function() {
     return "OAuthJSONError (" + this.statusCode + "): " + this.data;
 };
 
+var newOAuth = function(serverURL, cred) {
+    var oa, parts;
+
+    parts = urlparse(serverURL);
+
+    oa = new OAuth("http://"+parts.host+"/oauth/request_token",
+                   "http://"+parts.host+"/oauth/access_token",
+                   cred.consumer_key,
+                   cred.consumer_secret,
+                   "1.0",
+                   null,
+                   "HMAC-SHA1",
+                   null, // nonce size; use default
+                   {"User-Agent": "activitypump-test/0.1.0"});
+
+    return oa;
+};
+
 var endpoint = function(url, methods) {
     var context = {
         topic: function() {
@@ -157,15 +175,7 @@ var postJSON = function(serverUrl, cred, payload, callback) {
 
     var oa, toSend;
 
-    oa = new OAuth("http://localhost:4815/oauth/request_token",
-                   "http://localhost:4815/oauth/access_token",
-                   cred.consumer_key,
-                   cred.consumer_secret,
-                   "1.0",
-                   null,
-                   "HMAC-SHA1",
-                   null, // nonce size; use default
-                   {"User-Agent": "activitypump-test/0.1.0"});
+    oa = newOAuth(serverUrl, cred);
     
     toSend = JSON.stringify(payload);
 
@@ -176,15 +186,7 @@ var putJSON = function(serverUrl, cred, payload, callback) {
 
     var oa, toSend;
 
-    oa = new OAuth("http://localhost:4815/oauth/request_token",
-                   "http://localhost:4815/oauth/access_token",
-                   cred.consumer_key,
-                   cred.consumer_secret,
-                   "1.0",
-                   null,
-                   "HMAC-SHA1",
-                   null, // nonce size; use default
-                   {"User-Agent": "activitypump-test/0.1.0"});
+    oa = newOAuth(serverUrl, cred);
     
     toSend = JSON.stringify(payload);
 
@@ -195,15 +197,7 @@ var getJSON = function(serverUrl, cred, callback) {
 
     var oa, toSend;
 
-    oa = new OAuth("http://localhost:4815/oauth/request_token",
-                   "http://localhost:4815/oauth/access_token",
-                   cred.consumer_key,
-                   cred.consumer_secret,
-                   "1.0",
-                   null,
-                   "HMAC-SHA1",
-                   null, // nonce size; use default
-                   {"User-Agent": "activitypump-test/0.1.0"});
+    oa = newOAuth(serverUrl, cred);
     
     oa.get(serverUrl, cred.token, cred.token_secret, jsonHandler(callback));
 };
@@ -212,15 +206,7 @@ var delJSON = function(serverUrl, cred, callback) {
 
     var oa, toSend;
 
-    oa = new OAuth("http://localhost:4815/oauth/request_token",
-                   "http://localhost:4815/oauth/access_token",
-                   cred.consumer_key,
-                   cred.consumer_secret,
-                   "1.0",
-                   null,
-                   "HMAC-SHA1",
-                   null, // nonce size; use default
-                   {"User-Agent": "activitypump-test/0.1.0"});
+    oa = newOAuth(serverUrl, cred);
     
     oa["delete"](serverUrl, cred.token, cred.token_secret, jsonHandler(callback));
 };
