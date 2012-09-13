@@ -37,6 +37,14 @@ var webfinger = {
             rel: "http://webfinger.net/rel/profile-page",
             type: "text/html",
             href: "http://localhost:4815/alice"
+        },
+        {
+            rel: "activity-inbox",
+            href: "http://localhost:4815/api/user/alice/inbox"
+        },
+        {
+            rel: "activity-outbox",
+            href: "http://localhost:4815/api/user/alice/feed"
         }
     ]
 };
