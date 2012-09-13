@@ -136,6 +136,14 @@ var lrddLinks = function(user) {
             rel: "http://webfinger.net/rel/profile-page",
             type: "text/html",
             href: URLMaker.makeURL("/" + user.nickname)
+        },
+        {
+            rel: "activity-inbox",
+            href: URLMaker.makeURL("/api/user/" + user.nickname + "/inbox")
+        },
+        {
+            rel: "activity-outbox",
+            href: URLMaker.makeURL("/api/user/" + user.nickname + "/feed")
         }
     ];
 };
