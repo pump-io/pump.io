@@ -129,6 +129,30 @@ suite.addBatch({
                         assert.include(feed.items[0], "id");
                         assert.equal(feed.items[0].id, "acct:photog@photo.localhost");
                     }
+                },
+                "and we check the second user's followers list": {
+                    topic: function(body, cred1, cred2) {
+                        var url = "http://photo.localhost/api/user/photog/followers",
+                            callback = this.callback;
+                        
+                        gj(url, cred2, function(err, body, resp) {
+                            if (err) {
+                                callback(err, null);
+                            } else {
+                                callback(null, body);
+                            }
+                        });
+                    },
+                    "it works": function(err, feed) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                        assert.include(feed, "items");
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 1);
+                        assert.isObject(feed.items[0]);
+                        assert.include(feed.items[0], "id");
+                        assert.equal(feed.items[0].id, "acct:maven@social.localhost");
+                    }
                 }
             }
         }
