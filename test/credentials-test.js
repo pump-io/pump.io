@@ -58,6 +58,7 @@ mb["When we require the credentials module"]
   ["and we get its Credentials class export"]
   ["and we create a credentials instance"]
   ["auto-generated fields are there"] = function(err, created) {
+      assert.isString(created.host_and_id);
       assert.isString(created.created);
       assert.isString(created.updated);
 };
