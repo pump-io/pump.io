@@ -268,7 +268,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.isObject(feed);
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 1);
+                        assert.lengthOf(feed.items, 2);
                         assert.isObject(feed.items[0]);
                         assert.isTrue(feed.items[0].hasOwnProperty("bcc"));
                     }
@@ -476,7 +476,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.isObject(feed);
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 1);
+                        assert.lengthOf(feed.items, 2);
                         assert.isObject(feed.items[0]);
                         assert.isTrue(feed.items[0].hasOwnProperty("bto"));
                     }
