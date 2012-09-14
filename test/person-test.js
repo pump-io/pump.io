@@ -108,6 +108,11 @@ suite.addBatch({
                 assert.isObject(person);
                 assert.isFunction(person.followersURL);
             },
+            "it has a getInbox() method": function(err, person) {
+                assert.ifError(err);
+                assert.isObject(person);
+                assert.isFunction(person.getInbox);
+            },
             "and we get its followersURL": {
                 topic: function(person) {
                     person.followersURL(this.callback);
@@ -143,6 +148,20 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.isString(url);
                     assert.equal(url, "http://example.net:4815/api/user/evan/followers");
+                }
+            },
+            "and we get the inbox of the profile": {
+                topic: function(user) {
+                    user.profile.getInbox(this.callback);
+                },
+                "it works": function(err, url) {
+                    assert.ifError(err);
+                    assert.isString(url);
+                },
+                "data is correct": function(err, url) {
+                    assert.ifError(err);
+                    assert.isString(url);
+                    assert.equal(url, "http://example.net:4815/api/user/evan/inbox");
                 }
             }
         }
