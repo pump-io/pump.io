@@ -16,7 +16,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var Step = require("step"),
+var cp = require("child_process"),
+    path = require("path"),
+    Step = require("step"),
     _ = require("underscore"),
     http = require("http"),
     OAuth = require("oauth").OAuth,
@@ -239,13 +241,6 @@ var newPair = function(cl, nickname, password, hostname, port, cb) {
 
 var setupApp = function(port, hostname, callback) {
 
-    var config = {driver: "memory",
-                  params: {},
-                  nologger: true
-                 },
-        app = null,
-        makeApp = require("../../lib/app").makeApp;
-
     if (!hostname) {
         callback = port;
         hostname = "localhost";
@@ -257,28 +252,24 @@ var setupApp = function(port, hostname, callback) {
         hostname = "localhost";
     }
 
-    config.port = port || 4815;
-    config.hostname = hostname || "localhost";
+    port = port || 4815;
+    hostname = hostname || "localhost";
 
-    process.env.NODE_ENV = "test";
+    var child = cp.fork(path.join(__dirname, "app.js"), [hostname, port]);
 
-    Step(
-        function() {
-            makeApp(config, this);
-        },
-        function(err, res) {
-            if (err) throw err;
-            app = res;
-            app.run(this);
-        },
-        function(err) {
-            if (err) {
-                callback(err, null);
-            } else {
-                callback(null, app);
-            }
+    var dummy = {
+        close: function() {
+            child.kill();
         }
-    );
+    };
+
+    child.on("message", function(msg) {
+        if (msg == "listening") {
+            callback(null, dummy);
+        } else if (msg == "error") {
+            callback(new Error("Error from the child"), null);
+        }
+    });
 };
 
 exports.requestToken = requestToken;
