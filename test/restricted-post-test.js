@@ -256,7 +256,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(inbox, "items");
                         assert.isArray(inbox.items);
-                        assert.lengthOf(inbox.items, 1);
+                        assert.lengthOf(inbox.items, 2);
                         assert.equal(inbox.items[0].id, act.id);
                     }
                 },
@@ -770,7 +770,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(inbox, "items");
                         assert.isArray(inbox.items);
-                        assert.lengthOf(inbox.items, 1);
+                        assert.lengthOf(inbox.items, 2);
                         assert.equal(inbox.items[0].id, act.id);
                     }
                 },
