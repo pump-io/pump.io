@@ -264,10 +264,10 @@ var setupApp = function(port, hostname, callback) {
     };
 
     child.on("message", function(msg) {
-        if (msg == "listening") {
+        if (msg.tag == "listening") {
             callback(null, dummy);
-        } else if (msg == "error") {
-            callback(new Error("Error from the child"), null);
+        } else if (msg.tag == "error") {
+            callback(msg.value, null);
         }
     });
 };

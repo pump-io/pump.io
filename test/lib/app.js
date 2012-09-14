@@ -23,9 +23,9 @@ Step(
     },
     function(err) {
         if (err) {
-            process.send("error");
+            process.send({tag: "error", value: err});
         } else {
-            process.send("listening");
+            process.send({tag: "listening"});
         }
     }
 );
