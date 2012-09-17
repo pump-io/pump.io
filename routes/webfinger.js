@@ -60,6 +60,10 @@ var hostMetaLinks = function() {
             rel: "lrdd",
             type: "application/json",
             template: URLMaker.makeURL("/api/lrdd.json") + "?uri={uri}"
+        },
+        {
+            rel: "registration_endpoint",
+            href: URLMaker.makeURL("/api/client/register")
         }
     ];
 };

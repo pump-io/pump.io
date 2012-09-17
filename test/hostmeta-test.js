@@ -29,7 +29,6 @@ var assert = require("assert"),
     xrdutil = require("./lib/xrd"),
     setupApp = oauthutil.setupApp;
 
-
 var suite = vows.describe("host meta test");
 
 // hostmeta links
@@ -40,7 +39,10 @@ var hostmeta = {
              template: /{uri}/},
             {rel: "lrdd",
              type: "application/json",
-             template: /{uri}/}]
+             template: /{uri}/},
+            {rel: "registration_endpoint",
+             href: "http://localhost:4815/api/client/register"
+            }]
 };
 
 // A batch to test hostmeta functions
