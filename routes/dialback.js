@@ -29,10 +29,20 @@ var dialback = function(req, res, next) {
         date = req.body.date,
         url = req.body.url,
         id = host || webfinger,
-        ts;
+        ts,
+        parts;
 
-    if (!host || host != URLMaker.hostname) {
+    if (host && host != URLMaker.hostname) {
         res.status(400).send("Incorrect host");
+        return;
+    } else if (webfinger) {
+        parts = webfinger.split("@");
+        if (parts.length !== 2 || parts[1] != URLMaker.hostname) {
+            res.status(400).send("Incorrect host");
+            return;
+        }
+    } else {
+        res.status(400).send("No identity");
         return;
     }
 
