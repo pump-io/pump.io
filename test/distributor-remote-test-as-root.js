@@ -134,14 +134,16 @@ suite.addBatch({
                     topic: function(body, cred1, cred2) {
                         var url = "http://photo.localhost/api/user/photog/followers",
                             callback = this.callback;
-                        
-                        gj(url, cred2, function(err, body, resp) {
-                            if (err) {
-                                callback(err, null);
-                            } else {
-                                callback(null, body);
-                            }
-                        });
+
+                        setTimeout(function() {
+                            gj(url, cred2, function(err, body, resp) {
+                                if (err) {
+                                    callback(err, null);
+                                } else {
+                                    callback(null, body);
+                                }
+                            });
+                        }, 5000);
                     },
                     "it works": function(err, feed) {
                         assert.ifError(err);
