@@ -160,6 +160,18 @@ suite.addBatch({
             "it has the stopFollowing() method": function(user) {
                 assert.isFunction(user.stopFollowing);
             },
+            "it has the addFollower() method": function(user) {
+                assert.isFunction(user.addFollower);
+            },
+            "it has the addFollowing() method": function(user) {
+                assert.isFunction(user.addFollowing);
+            },
+            "it has the removeFollower() method": function(user) {
+                assert.isFunction(user.removeFollower);
+            },
+            "it has the removeFollowing() method": function(user) {
+                assert.isFunction(user.removeFollowing);
+            },
             "it has the favorite() method": function(user) {
                 assert.isFunction(user.favorite);
             },
@@ -574,7 +586,7 @@ suite.addBatch({
             },
             "and we make one follow the other": {
                 topic: function(users) {
-                    users.shields.follow(users.yarnell.profile.id, this.callback);
+                    users.shields.follow(users.yarnell, this.callback);
                 },
                 "it works": function(err) {
                     assert.ifError(err);
@@ -658,11 +670,11 @@ suite.addBatch({
                         if (err) throw err;
                         users.captain = captain;
                         users.tenille = tenille;
-                        captain.follow(tenille.profile.id, this);
+                        captain.follow(tenille, this);
                     },
                     function(err) {
                         if (err) throw err;
-                        users.captain.stopFollowing(users.tenille.profile.id, this);
+                        users.captain.stopFollowing(users.tenille, this);
                     },
                     function(err) {
                         if (err) {
@@ -741,11 +753,11 @@ suite.addBatch({
                         if (err) throw err;
                         users.boris = boris;
                         users.natasha = natasha;
-                        users.boris.follow(users.natasha.profile.id, this);
+                        users.boris.follow(users.natasha, this);
                     },
                     function(err) {
                         if (err) throw err;
-                        users.boris.follow(users.natasha.profile.id, this);
+                        users.boris.follow(users.natasha, this);
                     },
                     function(err) {
                         if (err) {
@@ -773,7 +785,7 @@ suite.addBatch({
                         if (err) throw err;
                         users.rocky = rocky;
                         users.bullwinkle = bullwinkle;
-                        users.rocky.stopFollowing(users.bullwinkle.profile.id, this);
+                        users.rocky.stopFollowing(users.bullwinkle, this);
                     },
                     function(err) {
                         if (err) {
@@ -823,7 +835,7 @@ suite.addBatch({
                         function() {
                             var i, group = this.group();
                             for (i = 1; i < users.length; i++) {
-                                users[i].follow(users[0].profile.id, group());
+                                users[i].follow(users[0], group());
                             }
                         },
                         function(err) {
