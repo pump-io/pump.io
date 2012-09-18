@@ -172,11 +172,11 @@ suite.addBatch({
             "it has the removeFollowing() method": function(user) {
                 assert.isFunction(user.removeFollowing);
             },
-            "it has the favorite() method": function(user) {
-                assert.isFunction(user.favorite);
+            "it has the addToFavorites() method": function(user) {
+                assert.isFunction(user.addToFavorites);
             },
-            "it has the unfavorite() method": function(user) {
-                assert.isFunction(user.unfavorite);
+            "it has the removeFromFavorites() method": function(user) {
+                assert.isFunction(user.removeFromFavorites);
             },
             "it has a profile attribute": function(user) {
                 assert.isObject(user.profile);

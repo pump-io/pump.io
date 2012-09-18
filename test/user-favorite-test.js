@@ -96,7 +96,7 @@ suite.addBatch({
                         function(err, image) {
                             if (err) throw err;
                             obj = image;
-                            user.favorite(image.id, image.objectType, this);
+                            user.addToFavorites(image, this);
                         },
                         function(err) {
                             if (err) {
@@ -112,7 +112,7 @@ suite.addBatch({
                 },
                 "and it unfavorites that object": {
                     topic: function(image, user) {
-                        user.unfavorite(image.id, image.objectType, this.callback);
+                        user.removeFromFavorites(image, this.callback);
                     },
                     "it works": function(err) {
                         assert.ifError(err);
@@ -123,68 +123,33 @@ suite.addBatch({
                 topic: function(user) {
                     var cb = this.callback;
                     
-                    user.favorite("urn:uuid:5be685ef-f50b-458b-bfd3-3ca004eb0e89", "image", this.callback);
+                    user.addToFavorites({id: "urn:uuid:5be685ef-f50b-458b-bfd3-3ca004eb0e89", objectType: "image"}, this.callback);
                 },
                 "it works": function(err) {
                     assert.ifError(err);
                 },
                 "and it unfavorites that object": {
                     topic: function(user) {
-                        user.unfavorite("urn:uuid:5be685ef-f50b-458b-bfd3-3ca004eb0e89", "image", this.callback);
+                        user.removeFromFavorites({id: "urn:uuid:5be685ef-f50b-458b-bfd3-3ca004eb0e89", objectType: "image"}, this.callback);
                     },
                     "it works": function(err) {
                         assert.ifError(err);
                     }
                 }
             },
-            "and it double-favorites an object": {
-                topic: function(user) {
-                    var cb = this.callback,
-                        Video = require("../lib/model/video").Video,
-                        obj;
-                    
-                    Step(
-                        function() {
-                            Video.create({displayName: "Winning",
-                                          url: "http://www.youtube.com/watch?v=9QS0q3mGPGg"}, this);
-                        },
-                        function(err, video) {
-                            if (err) throw err;
-                            obj = video;
-                            user.favorite(obj.id, obj.objectType, this);
-                        },
-                        function(err) {
-                            if (err) throw err;
-                            user.favorite(obj.id, obj.objectType, this);
-                        },
-                        function(err) {
-                            if (err) {
-                                cb(null);
-                            } else {
-                                cb(new Error("Unexpected success"));
-                            }
-                        }
-                    );
-                },
-                "it fails correctly": function(err) {
-                    assert.ifError(err);
-                }
-            },
             "and it unfavorites an object it never favorited": {
                 topic: function(user) {
                     var cb = this.callback,
-                        Audio = require("../lib/model/audio").Audio,
-                        obj;
+                        Audio = require("../lib/model/audio").Audio;
                     
                     Step(
                         function() {
                             Audio.create({displayName: "Spock",
                                           url: "http://musicbrainz.org/recording/c1038685-49f3-45d7-bb26-1372f1052126"}, this);
                         },
-                        function(err, video) {
+                        function(err, audio) {
                             if (err) throw err;
-                            obj = video;
-                            user.unfavorite(obj.id, obj.objectType, this);
+                            user.removeFromFavorites(audio, this);
                         },
                         function(err) {
                             if (err) {
@@ -286,7 +251,7 @@ suite.addBatch({
                     function(err, results) {
                         if (err) throw err;
                         image = results;
-                        user.favorite(image.id, image.objectType, this);
+                        user.addToFavorites(image, this);
                     },
                     function(err) {
                         if (err) {
@@ -333,38 +298,6 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.equal(count, 1);
                 }
-            },
-            "and we check the image favoriters list": {
-                topic: function(user, image) {
-                    var cb = this.callback;
-                    image.getFavoriters(0, 20, function(err, favers) {
-                        cb(err, favers, user);
-                    });
-                },
-                "it works": function(err, favers, user) {
-                    assert.ifError(err);
-                },
-                "it is the right size": function(err, favers, user) {
-                    assert.ifError(err);
-                    assert.lengthOf(favers, 1);
-                },
-                "it has the right data": function(err, favers, user) {
-                    assert.ifError(err);
-                    assert.equal(favers[0].id, user.profile.id);
-                }
-            },
-            "and we check the image favoriters count": {
-                topic: function(user, image) {
-                    var cb = this.callback;
-                    image.favoritersCount(cb);
-                },
-                "it works": function(err, count) {
-                    assert.ifError(err);
-                },
-                "it is correct": function(err, count) {
-                    assert.ifError(err);
-                    assert.equal(count, 1);
-                }
             }
         },
         "and a new user favors a lot of objects": {
@@ -397,7 +330,7 @@ suite.addBatch({
                         if (err) throw err;
                         images = results;
                         for (i = 0; i < images.length; i++) {
-                            user.favorite(images[i].id, "image", group());
+                            user.addToFavorites(images[i], group());
                         }
                     },
                     function(err) {
@@ -456,42 +389,6 @@ suite.addBatch({
                 "it is correct": function(err, count) {
                     assert.ifError(err);
                     assert.equal(count, 5000);
-                }
-            },
-            "and we check the images favoriters list": {
-                topic: function(user, images) {
-                    var cb = this.callback;
-                    Step(
-                        function() {
-                            var i, group = this.group();
-                            for (i = 0; i < images.length; i++) {
-                                images[i].getFavoriters(0, 20, group());
-                            }
-                        },
-                        function(err, faverses) {
-                            if (err) {
-                                cb(err, null, null);
-                            } else {
-                                cb(null, faverses, user);
-                            }
-                        }
-                    );
-                },
-                "it works": function(err, faverses, user) {
-                    assert.ifError(err);
-                },
-                "it is the right size": function(err, faverses, user) {
-                    assert.ifError(err);
-                    assert.lengthOf(faverses, 5000);
-                    for (var i = 0; i < faverses.length; i++) {
-                        assert.lengthOf(faverses[i], 1);
-                    }
-                },
-                "it has the right data": function(err, faverses, user) {
-                    assert.ifError(err);
-                    for (var i = 0; i < faverses.length; i++) {
-                        assert.equal(faverses[i][0].id, user.profile.id);
-                    }
                 }
             }
         }
