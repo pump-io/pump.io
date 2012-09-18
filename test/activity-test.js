@@ -1064,7 +1064,7 @@ suite.addBatch({
                         if (err) throw err;
                         user1 = result1;
                         user2 = result2;
-                        user2.follow(user1.profile.id, this);
+                        user2.follow(user1, this);
                     },
                     function(err) {
                         if (err) throw err;
