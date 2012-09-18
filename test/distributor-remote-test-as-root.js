@@ -103,7 +103,7 @@ suite.addBatch({
                     assert.isObject(body);
                 },
                 "and we wait a few seconds for delivery": {
-                    topic: function(act, cred1, cred2) {
+                    topic: function() {
                         var callback = this.callback;
                         setTimeout(function() { callback(null); }, 5000);
                     },
@@ -190,6 +190,69 @@ suite.addBatch({
                             assert.isObject(feed.items[0]);
                             assert.include(feed.items[0], "id");
                             assert.equal(feed.items[0].id, act.id);
+                        }
+                    },
+                    "and the second user posts an image": {
+                        topic: function(act, cred1, cred2) {
+                            var url = "http://photo.localhost/api/user/photog/feed",
+                                callback = this.callback,
+                                post = {
+                                    verb: "post",
+                                    object: {
+                                        objectType: "image",
+                                        displayName: "My Photo"
+                                    }
+                                };
+                            
+                            pj(url, cred2, post, function(err, act, resp) {
+                                if (err) {
+                                    callback(err, null);
+                                } else {
+                                    callback(null, act);
+                                }
+                            });
+                        },
+                        "it works": function(err, act) {
+                            assert.ifError(err);
+                            assert.isObject(act);
+                        },
+                        "and we wait a few seconds for delivery": {
+                            topic: function() {
+                                var callback = this.callback;
+                                setTimeout(function() { callback(null); }, 5000);
+                            },
+                            "it works": function(err) {
+                                assert.ifError(err);
+                            },
+                            "and we check the first user's inbox": {
+                                topic: function(posted, followed, cred1, cred2) {
+                                    var callback = this.callback,
+                                        url = "http://social.localhost/api/user/maven/inbox";
+                                    gj(url, cred1, function(err, feed, resp) {
+                                        if (err) {
+                                            callback(err, null, null);
+                                        } else {
+                                            callback(null, feed, posted);
+                                        }
+                                    });
+                                },
+                                "it works": function(err, feed, act) {
+                                    assert.ifError(err);
+                                    assert.isObject(feed);
+                                    assert.isObject(act);
+                                },
+                                "it includes the activity": function(err, feed, act) {
+                                    assert.ifError(err);
+                                    assert.isObject(feed);
+                                    assert.isObject(act);
+                                    assert.include(feed, "items");
+                                    assert.isArray(feed.items);
+                                    assert.lengthOf(feed.items, 2);
+                                    assert.isObject(feed.items[0]);
+                                    assert.include(feed.items[0], "id");
+                                    assert.equal(feed.items[0].id, act.id);
+                                }
+                            }
                         }
                     }
                 }
