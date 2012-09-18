@@ -252,6 +252,100 @@ suite.addBatch({
                                     assert.include(feed.items[0], "id");
                                     assert.equal(feed.items[0].id, act.id);
                                 }
+                            },
+                            "and the first user responds": {
+                                topic: function(posted, followed, cred1, cred2) {
+                                    var callback = this.callback,
+                                        url = "http://social.localhost/api/user/maven/feed",
+                                        postComment = {
+                                            verb: "post",
+                                            object: {
+                                                objectType: "comment",
+                                                inReplyTo: posted.object,
+                                                content: "Nice one!"
+                                            }
+                                        };
+
+                                    pj(url, cred1, postComment, function(err, pc, resp) {
+                                        if (err) {
+                                            callback(err, null);
+                                        } else {
+                                            callback(null, pc);
+                                        }
+                                    });
+                                },
+                                "it works": function(err, pc) {
+                                    assert.ifError(err);
+                                    assert.isObject(pc);
+                                },
+                                "and we wait a few seconds for delivery": {
+                                    topic: function() {
+                                        var callback = this.callback;
+                                        setTimeout(function() { callback(null); }, 5000);
+                                    },
+                                    "it works": function(err) {
+                                        assert.ifError(err);
+                                    },
+                                    "and we check the second user's inbox": {
+                                        topic: function(pc, pi, fu, cred1, cred2) {
+                                            var url = "http://photo.localhost/api/user/photog/inbox",
+                                                callback = this.callback;
+                                            
+                                            gj(url, cred2, function(err, feed, resp) {
+                                                if (err) {
+                                                    callback(err, null, null);
+                                                } else {
+                                                    callback(null, feed, pc);
+                                                }
+                                            });
+                                        },
+                                        "it works": function(err, feed, act) {
+                                            assert.ifError(err);
+                                            assert.isObject(feed);
+                                            assert.isObject(act);
+                                        },
+                                        "it includes the activity": function(err, feed, act) {
+                                            assert.ifError(err);
+                                            assert.isObject(feed);
+                                            assert.isObject(act);
+                                            assert.include(feed, "items");
+                                            assert.isArray(feed.items);
+                                            assert.lengthOf(feed.items, 3);
+                                            assert.isObject(feed.items[0]);
+                                            assert.include(feed.items[0], "id");
+                                            assert.equal(feed.items[0].id, act.id);
+                                        }
+                                    },
+                                    "and we check the image's replies": {
+                                        topic: function(pc, pi, fu, cred1, cred2) {
+                                            var url = pi.object.replies.url,
+                                                callback = this.callback;
+                                            
+                                            gj(url, cred2, function(err, feed, resp) {
+                                                if (err) {
+                                                    callback(err, null, null);
+                                                } else {
+                                                    callback(null, feed, pc);
+                                                }
+                                            });
+                                        },
+                                        "it works": function(err, feed, pc) {
+                                            assert.ifError(err);
+                                            assert.isObject(feed);
+                                        },
+                                        "feed includes the comment": function(err, feed, pc) {
+                                            assert.ifError(err);
+                                            assert.isObject(feed);
+                                            assert.isObject(pc);
+                                            assert.include(feed, "items");
+                                            assert.isArray(feed.items);
+                                            assert.lengthOf(feed.items, 1);
+                                            assert.isObject(feed.items[0]);
+                                            assert.include(feed.items[0], "id");
+                                            assert.equal(feed.items[0].id, pc.object.id);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
