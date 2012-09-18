@@ -54,10 +54,20 @@ var newOAuth = function(serverURL, cred) {
     return oa;
 };
 
-var endpoint = function(url, methods) {
+var endpoint = function(url, hostname, port, methods) {
+
+    if (!port) {
+        methods = hostname;
+        hostname = "localhost";
+        port = 4815;
+    } else if (!methods) {
+        methods = port;
+        port = 80;
+    }
+
     var context = {
         topic: function() {
-            options("localhost", 4815, url, this.callback);
+            options(hostname, port, url, this.callback);
         },
         "it exists": function(err, allow, res, body) {
             assert.ifError(err);
