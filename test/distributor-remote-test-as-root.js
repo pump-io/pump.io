@@ -103,7 +103,7 @@ suite.addBatch({
                     assert.isObject(body);
                 },
                 "and we check the first user's following list": {
-                    topic: function(body, cred1, cred2) {
+                    topic: function(act, cred1, cred2) {
                         var url = "http://social.localhost/api/user/maven/following",
                             callback = this.callback;
                         
@@ -131,7 +131,7 @@ suite.addBatch({
                     }
                 },
                 "and we check the second user's followers list": {
-                    topic: function(body, cred1, cred2) {
+                    topic: function(act, cred1, cred2) {
                         var url = "http://photo.localhost/api/user/photog/followers",
                             callback = this.callback;
 
@@ -154,6 +154,38 @@ suite.addBatch({
                         assert.isObject(feed.items[0]);
                         assert.include(feed.items[0], "id");
                         assert.equal(feed.items[0].id, "acct:maven@social.localhost");
+                    }
+                },
+                "and we check the second user's inbox": {
+                    topic: function(act, cred1, cred2) {
+                        var url = "http://photo.localhost/api/user/photog/inbox",
+                            callback = this.callback;
+                        
+                        setTimeout(function() {
+                            gj(url, cred2, function(err, feed, resp) {
+                                if (err) {
+                                    callback(err, null, null);
+                                } else {
+                                    callback(null, feed, act);
+                                }
+                            });
+                        }, 5000);
+                    },
+                    "it works": function(err, feed, act) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                        assert.isObject(act);
+                    },
+                    "it includes the activity": function(err, feed, act) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                        assert.isObject(act);
+                        assert.include(feed, "items");
+                        assert.isArray(feed.items);
+                        assert.lengthOf(feed.items, 1);
+                        assert.isObject(feed.items[0]);
+                        assert.include(feed.items[0], "id");
+                        assert.equal(feed.items[0].id, act.id);
                     }
                 }
             }
