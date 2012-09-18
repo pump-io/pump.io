@@ -43,7 +43,9 @@ var hostmeta = {
              template: /{uri}/},
             {rel: "registration_endpoint",
              href: "http://social.localhost/api/client/register"
-            }]
+            },
+            {rel: "dialback",
+             href: "http://social.localhost/api/dialback"}]
 };
 
 // A batch to test hostmeta functions

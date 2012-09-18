@@ -42,7 +42,9 @@ var hostmeta = {
              template: /{uri}/},
             {rel: "registration_endpoint",
              href: "http://localhost:4815/api/client/register"
-            }]
+            },
+            {rel: "dialback",
+             href: "http://localhost:4815/api/dialback"}]
 };
 
 // A batch to test hostmeta functions

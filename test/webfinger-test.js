@@ -45,6 +45,10 @@ var webfinger = {
         {
             rel: "activity-outbox",
             href: "http://localhost:4815/api/user/alice/feed"
+        },
+        {
+            rel: "dialback",
+            href: "http://localhost:4815/api/dialback"
         }
     ]
 };

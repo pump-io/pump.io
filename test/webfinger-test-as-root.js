@@ -46,6 +46,10 @@ var webfinger = {
         {
             rel: "activity-outbox",
             href: "http://social.localhost/api/user/whiterabbit/feed"
+        },
+        {
+            rel: "dialback",
+            href: "http://social.localhost/api/dialback"
         }
     ]
 };

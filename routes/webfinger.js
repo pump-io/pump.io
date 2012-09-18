@@ -64,6 +64,10 @@ var hostMetaLinks = function() {
         {
             rel: "registration_endpoint",
             href: URLMaker.makeURL("/api/client/register")
+        },
+        {
+            rel: "dialback",
+            href: URLMaker.makeURL("/api/dialback")
         }
     ];
 };
@@ -148,6 +152,10 @@ var lrddLinks = function(user) {
         {
             rel: "activity-outbox",
             href: URLMaker.makeURL("/api/user/" + user.nickname + "/feed")
+        },
+        {
+            rel: "dialback",
+            href: URLMaker.makeURL("/api/dialback")
         }
     ];
 };
