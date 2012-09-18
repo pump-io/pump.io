@@ -52,7 +52,7 @@ suite.addBatch({
                 }
             });
 
-            app.listen(80, "social.localhost", function() {
+            app.listen(80, "echo.localhost", function() {
                 connected = true;
                 callback(null, app);
             });
@@ -76,7 +76,7 @@ suite.addBatch({
                 topic: function(DialbackClient) {
                     var body = querystring.stringify({type: "client_associate"}),
                         type = "application/x-www-form-urlencoded",
-                        url = "http://social.localhost/echo",
+                        url = "http://echo.localhost/echo",
                         id = "acct:user@photo.example",
                         callback = this.callback;
 
