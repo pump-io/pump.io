@@ -22,10 +22,11 @@ Here's the quick start version of the API:
 
 * Register a new OAuth client by posting to the client registration endpoint.
 * Use OAuth 1.0 to get an OAuth token for the user.
-* Post to the client's feed to create new activities. These can create
-  new content, respond to existing content, or modify the social graph.
-* Read the client's inbox to see stuff that other people have sent to
-  them.
+* Post to the user's activity outbox feed to create new
+  activities. These can create new content, respond to existing
+  content, or modify the social graph.
+* Read from the user's activity inbox to see stuff that other people
+  have sent to them.
 
 ## Activity Streams
 
@@ -126,7 +127,7 @@ Here is a example HTTP request to create a new activity:
     }
 
 Note that the request uses OAuth authorization to authenticate the
-user. The only form of authentication allowed for the activity feed is
+user. The only form of authentication allowed for the activity outbox is
 OAuth; the user must authorize the client before new activities are
 created.
 
@@ -144,6 +145,10 @@ with all the IDs and timestamps filled in.
             "displayName": "Brian Kernighan"
         },
         "verb": "follow",
+        "to": [{
+            "id": "acct:ken@coding.example",
+            "objectType": "person"
+        }],
         "object": {
             "id": "acct:ken@coding.example",
             "objectType": "person",
@@ -160,9 +165,9 @@ valuable.
 
 ### Side-effects
 
-Posted activities may have side-effects; in this case, the actor "bwk"
-has followed another person, "ken", so that activities that "ken"
-shares with his followers will also go to "bwk"'s inbox.
+Posted activities may have side-effects; in the above case, the actor
+"bwk" has followed another person, "ken", so that activities that
+"ken" shares with his followers will also go to "bwk"'s inbox.
 
 Most activity verbs *don't* have side-effects. In this case, the
 ActivityPump will just store the data about the activity, and
@@ -199,20 +204,172 @@ around friendships, groups, events, and playing media.
 
 ### Reading collections
 
+Reading from the activity outbox or activity inbox requires OAuth
+authentication. The activity inbox requires user authorization; you
+can request data from the activity outbox using plain old 2-legged
+OAuth client authentication if you want.
+
+`items` in collections are in roughly reverse chronological ("newest
+first") order.
+
+#### Arguments
+
+Collection URLs can have arguments that change the size of the
+collection. By default, the collection returned will include only the
+most recent activities -- usually 20.
+
+Collection URLs take the following params:
+
+* *count*. The number of items to return (default is usually 20). This
+   maxes out at 200, usually.
+* *offset*. Zero-based offset specifying where in the collection you
+   want to start. Default 0. This is a bad way to do pages, since
+   activities are added at the beginning of the collection.
+* *before*. An activity ID. Will get activities that went into the
+   collection immediately before the specified activity (not
+   inclusive). A good way to "scroll back" in a collection.
+* *since*. An activity ID. Will get activities that went into the
+   collection immediately before the specified activity (not
+   inclusive). A good way to get what's new in a collection since you
+   last polled it.
+
+#### Navigation links
+
+Collection objects include links to help with navigation, using the
+[Multi-page Collections](http://activitystrea.ms/specs/json/schema/activity-schema.html#multipage-collections)
+schema.
+
+Note that because activities are in reverse chronological order,
+understanding what's "next" or "previous" is kind of unintuitive. We
+assume you start with the current activities and scroll backwards in
+time, so "older" stuff is "next" and "newer" stuff is "prev".
+
+* *next* The next _older_ group of activities.
+* *prev* The next _newer_ group of activities. This is provided even
+   if you're looking at the newest activities; it makes it easier to
+   just get the most recent stuff you haven't seen.
+
+It's a good idea to use these links if you're navigating through a
+collection; the chances that both you and I will get all the arguments
+correct in our heads is probably pretty small.
+
 ### Addressing activities
+
+ActivityPump supports the
+[Audience Targeting for JSON Activity Streams](http://activitystrea.ms/specs/json/targeting/1.0/)
+extension, which lets you add addresses to an activity to show to whom
+the activity is directed.
+
+Address properties for an activity include `to`, `cc`, `bto`, and
+`bcc`. The properties are arrays [] of objects {}. The objects should
+include an `id` and `objectType` property; they may include other properties.
+
+Activities that are `to` a user or list will go into their "direct"
+inbox (see below).
+
+`bto` and `bcc` properties won't be shown to any users except the author.
+
+The ActivityPump uses the addresses for three things:
+
+* *Delivery of activities*. Depending on the addresses, the activity
+  will be delivered either to local user inboxes or to remote users
+  (see below!).
+* *Access control to activities*. Requesting an activity directly from
+  its REST endpoint will give a 403 error. Also, feeds are filtered to
+  only show activities that were addressed to the requester.
+* *Access control to objects*. Access to objects generally depends on
+  if the requester was a recipient of the "post" activity that created
+  it. The REST endpoint for an object (see below) will return a 403
+  status code otherwise.
+
+Access control with addresses is inclusive; if an activity is to
+
+#### Types of address
+
+There are four types of address supported:
+
+* *The public*. "The public" is an object with `objectType` equal to
+   "collection" and the special ID
+   "http://activityschema.org/collection/public". Activities addressed
+   to the public will be delivered to all followers, and will be
+   visible to anyone -- even unauthenticated users.
+* *Followers*. A user's own followers can be addressed with an object
+   with `objectType` equal to the follower stream URL of the user --
+   usually
+   `http://<hostname>/api/user/<nickname>/followers`. Activities
+   addressed to followers will be delivered to all followers, and will
+   only be visible to followers.
+* *Users*. Users can be addressed by their profile object --
+   `objectType` is person, and `id` is something like
+   `acct:<nickname>@<hostname>`.
+* *Lists*. Users can create collections of people or other objects. An
+   address with `objectType` "collection" and the ID of one of the
+   actor's own collections will result in delivery to the members of
+   that list, and members of the list will be allowed to view the
+   activity and/or object.
+
+#### Default addresses
+
+Default addresses are added if an activity is posted to the activity
+outbox with no address properties. We try to be reasonable with the
+defaults, as follows:
+
+* If an activity has an object that is `inReplyTo` another object, the
+  addresses for the "post" activity of the original are used.
+* If an activity is an "update" or a "delete" of an object, the
+  addresses for the "post" activity of that object are used.
+* If an activity has an object that is a "person", the person is added
+  as a `to` address.
+* Otherwise, the actor's followers are added as a `cc` address.
+
+These defaults will probably change over time; if you want to make
+sure that specific addresses are used, you should definitely add them
+explicitly.
 
 ## Object endpoints
 
+When objects like a "note" or an "image" are created, they're assigned
+a REST endpoint, usually something like
+`http://<hostname>/api/<objectType>/<id>`, where the <id> is a
+screwy-looking random value. (It's a UUID in URL-safe base-64 format.)
+
+You can get the object endpoint from the object's `links` property;
+it's the link with `rel` value `self`.
+
+Objects respond to HTTP GET requests with an Activity Streams JSON
+representation of the object.
+
+The author of an object can PUT to the object endpoint; this will
+update the object; it will also generate an "update" activity.
+
+The author of an object can DELETE to the object endpoint; this will
+delete the object. It will also generate a "delete" activity. Sending
+a GET to an object endpoint for an object that was deleted will return
+a 410 Gone status code.
+
 ### Links
 
-* Self
+Objects also have a `links` property; it's an array of objects.
 
-### Feeds
+* *self*. The canonical, true, real, one-and-only for-sure HTTP
+   endpoint to retrieve an Activity Streams JSON representation of the
+   object.
 
-* Replies
-* Likes
+### Collections
 
-## Privacy
+Objects have related collections, as defined in the misnamed
+[Responses for Activity Streams](http://activitystrea.ms/specs/json/replies/1.0/). These
+particular properties are probably interesting:
+
+* `replies`. Objects that were posted with an `inReplyTo` value of
+  this object.
+* `likes`. People who have sent a "favorite" activity with this object
+  as the `object` property.
+
+In representations, these collections will use have the first ~4 items
+included in the `items`.
+
+## Activity endpoints
 
 ## Authentication
 
@@ -220,8 +377,12 @@ around friendships, groups, events, and playing media.
 
 ## User registration
 
+### User endpoints
+
 ## Discovery
 
 ## Major and minor feeds
 
-## Server-to-server
+## Direct inbox
+
+## Remote delivery
