@@ -326,6 +326,30 @@ These defaults will probably change over time; if you want to make
 sure that specific addresses are used, you should definitely add them
 explicitly.
 
+### Major and minor feeds
+
+Some activities are more important than others. The ActivityPump
+provides sub-feeds of the outbox and inbox, divided by whether the
+activity is "major" or "minor". Roughly speaking, posting new content
+is "major", and changes to the social graph or reactions to other
+content are "minor".
+
+The feeds are at `/api/user/<nickname>/inbox/major`,
+`/api/user/<nickname>/inbox/minor`, `/api/user/<nickname>/feed/major`,
+and `/api/user/<nickname>/feed/minor`.
+
+The major and minor feeds don't respond to POST requests.
+
+### Direct inbox
+
+Activities that have a `to` or `bto` property that includes the user's
+address will be listed in the user's "direct" inbox. There are major
+and minor variations of this inbox, also.
+
+The feeds are at `/api/user/<nickname>/inbox/direct`,
+`/api/user/<nickname>/inbox/direct/minor`, and
+`/api/user/<nickname>/inbox/direct/major`.
+
 ## Object endpoints
 
 When objects like a "note" or an "image" are created, they're assigned
@@ -355,7 +379,7 @@ Objects also have a `links` property; it's an array of objects.
    endpoint to retrieve an Activity Streams JSON representation of the
    object.
 
-### Collections
+### Collection properties
 
 Objects have related collections, as defined in the misnamed
 [Responses for Activity Streams](http://activitystrea.ms/specs/json/replies/1.0/). These
@@ -369,20 +393,170 @@ particular properties are probably interesting:
 In representations, these collections will use have the first ~4 items
 included in the `items`.
 
+"person" objects have these collections instead.
+
+* `followers`. People who follow this person.
+* `following`. People who this person is following.
+* `lists`. (non-standard) Lists that belong to the user.
+* `favorites`. (non-standard) Objects that the user has sent a
+  "favorite" activity about.
+
+Just for fun's sake, a user can follow someone else by posting to
+their `followers` collection. They can also add a favorite by posting
+the object to their `favorites` collection. Both of these will
+generate the appropriate activity with default addresses.
+
+"collection" objects have this property:
+
+* `members`. The collection of members of the collection (yes, it's
+  weirdly recursive).
+
 ## Activity endpoints
+
+Every activity also has a REST endpoint, usually `http://<hostname>/api/activity/<uuid>`.
+
+It will respond to a GET with the JSON representation of the activity.
+
+The REST endpoints also respond to PUT or DELETE requests. These won't
+cause side-effects, however; deleting a "follow" activity won't change
+the list of followers. It's probably much better to post another
+activity, such as "stop-following", to reverse the effects of an
+activity.
 
 ## Authentication
 
-## Client registration
+Almost all API endpoints require OAuth authentication; most of them
+require user authorization. The OAuth sign-up flow is pretty
+straightforward, with the following endpoints:
+
+* `/oauth/request_token` to get an OAuth request token
+* `/oauth/authorize` to authorize an OAuth request token
+* `/oauth/access_token` to turn a request token into an access token
+
+I can barely understand OAuth 1.0 and I can't figure out OAuth 2.0 at
+all, so I'm sticking with 1.0.
+
+### 2-legged OAuth
+
+The following endpoints only require 2-legged authentication; you
+don't have to get user authorization or provide an `oauth_token`
+parameter. However, getting a user authorization will allow getting
+some stuff that's otherwise private.
+
+* activity outbox
+* followers collection
+* following collection
+* favorites collection
+
+### Client registration
+
+You can request a new client ID for OAuth authentication
+automatically, using
+[OpenID Connect Dynamic Client Registration](http://openid.net/specs/openid-connect-registration-1_0.html). Note
+there's nothing OpenID-ish about this; I just needed a dynamic client
+registration system and used (some of) this spec.
+
+The registration endpoint is at `/api/client/register`. You can also
+discover it in the host-meta file with link-rel
+"registration_endpoint".
+
+The client registration will accept some of the parameters that OpenID
+does. Here's what it supports:
+
+* *type*
+* *client_id*, *client_secret*: only for updates
+* *contacts*
+* *application_type*
+* *application_name*
+* *logo_url*
+* *redirect_uris*
+
+#### Dialback authentication
+
+If you use
+[Dialback Access Authentication](http://tools.ietf.org/html/draft-prodromou-dialback-00)
+when requesting an OAuth client identity, the client ID will be
+associated with the host or webfinger that you use for authentication.
+
+You can then make 2-legged OAuth requests (no oauth_token) to other
+parts of the API, with the authorization of that webfinger or host.
+
+This currently only works with remote delivery (see below), but
+probably other parts of the API will support it in the future.
 
 ## User registration
 
-### User endpoints
+There is a collection of all users at the endpoint `/api/users`. To
+create a new user, POST a user representation (see below) to the
+list. You can also get the latest registered users by GETting the
+collection.
+
+The JSON object representing the user has the following properties:
+
+* `nickname`: The user's nickname. 1-64 characters, including only
+  ASCII capital and lowercase letters and numbers as well as "-", ".",
+  and "_". The nickname is immutable and unique per server; it can't
+  be changed.
+* `password`: The plain-text password. This isn't returned when you
+  GET the user object, but you have to provide it when registering or
+  updating the user.
+* `profile`: a "person" object. This is created automatically when you
+  create a new user; don't try to add it yourself. Don't update this
+  directly; update the person through its object endpoint.
+
+## User objects
+
+Each user has an HTTP endpoint at `/api/user/<nickname>`. It's useful
+to GET the user representation or to get the profile for a user.
+
+The user can PUT a new representation; since `nickname` and `profile`
+are immutable, this is pretty much only useful to change your
+password.
+
+The user can DELETE the endpoint; it will delete the user account, but
+not much else. In particular, it won't clean up all the user's
+activities, profile, followers, following, lists, or published
+objects.
 
 ## Discovery
 
-## Major and minor feeds
+The ActivityPump supports
+[Web Host Metadata](http://tools.ietf.org/html/rfc6415) to discover
+information about users and hosts. It supports the XRD and JRD
+versions of the discovery output; JRD is probably better to use.
 
-## Direct inbox
+For hosts, we provide these link-rel types:
+
+* `lrdd` - to find the endpoint for per-user discovery
+* `registration_endpoint` - to find the endpoint for client
+  registration
+* `dialback` - to find the endpoint for Dialback authentication
+  verification for this host
+
+For users, we support only `<nickname>@<hostname>` ID format. These
+link-rel types are provided:
+
+* `http://webfinger.net/rel/profile-page` - to find the profile page
+* `activity-inbox` - the user's activity inbox
+* `activity-outbox` - the user's activity outbox
+* `dialback` - for Dialback verification for this user
 
 ## Remote delivery
+
+It's possible to deliver activities from a remote host to a user's
+inbox by POSTing to the inbox. You need to use 2-legged OAuth
+authentication, and the client ID used for the OAuth has to be
+associated with the webfinger ID of the actor who did the activity.
+
+When activities are posted to a user's activity outbox with addresses
+of remote users, the ActivityPump tries to deliver them using this
+method. In rough outline:
+
+1. It tries to discover an `activity-inbox` link for the person.
+2. It tries to discover a `registration_endpoint` for the hostname
+   part of the activity-inbox endpoint.
+3. It registers new OAuth credentials for the sender with the remote
+   host.
+4. It POSTs the activity to the person's activity inbox endpoint, with
+   the OAuth credentials.
+
