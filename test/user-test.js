@@ -1300,4 +1300,76 @@ suite.addBatch({
     }
 });
 
+// Test user nickname rules
+
+var goodNickname = function(nickname) {
+    return {
+        topic: function() {
+            var User = require("../lib/model/user").User,
+                props = {
+                    nickname: nickname,
+                    password: "password"
+                };
+            User.create(props, this.callback);
+        },
+        "it works": function(err, user) {
+            assert.ifError(err);
+            assert.isObject(user);
+        },
+        "the nickname is correct": function(err, user) {
+            assert.ifError(err);
+            assert.isObject(user);
+            assert.equal(nickname, user.nickname);
+        }
+    };
+};
+
+var badNickname = function(nickname) {
+    return {
+        topic: function() {
+            var User = require("../lib/model/user").User,
+                props = {
+                    nickname: nickname,
+                    password: "password"
+                },
+                callback = this.callback;
+            User.create(props, function(err, user) {
+                if (err) {
+                    callback(null);
+                } else {
+                    callback(new Error("Unexpected success"));
+                }
+            });
+        },
+        "it fails correctly": function(err) {
+            assert.ifError(err);
+        }
+    };
+};
+
+suite.addBatch({
+    "When we create a new user with a long nickname less than 64 chars": 
+    goodNickname("james_james_morrison_morrison_weatherby_george_dupree"),
+    "When we create a user with a nickname with a -": 
+    goodNickname("captain-caveman"),
+    "When we create a user with a nickname with a _": 
+    goodNickname("captain_caveman"),
+    "When we create a user with a nickname with a .": 
+    goodNickname("captain.caveman"),
+    "When we create a user with a nickname with capital letters": 
+    goodNickname("CaptainCaveman"),
+    "When we create a user with a nickname with one char": 
+    goodNickname("c"),
+    "When we create a new user with a nickname longer than 64 chars": 
+    badNickname("adolphblainecharlesdavidearlfrederickgeraldhubertirvimjohn"+
+                "kennethloydmartinnerooliverpaulquincyrandolphshermanthomasuncas"+
+                "victorwillianxerxesyancyzeus"),
+    "When we create a new user with a nickname with a forbidden character": 
+    badNickname("arnold/palmer"),
+    "When we create a new user with a nickname with a blank": 
+    badNickname("Captain Caveman"),
+    "When we create a new user with an empty nickname": 
+    badNickname("")
+});
+
 suite["export"](module);
