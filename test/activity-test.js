@@ -1305,7 +1305,7 @@ suite.addBatch({
                 assert.ifError(err);
             }
         },
-        "and we check if a major activity is major": {
+        "and we check if posting a note is major": {
             topic: function(Activity) {
                 var act = new Activity({
                     id: "85931c96-fa24-11e1-8bf3-70f1a154e1aa",
@@ -1327,7 +1327,7 @@ suite.addBatch({
                 assert.isTrue(isMajor);
             }
         },
-        "and we check if a minor activity is major": {
+        "and we check if favoriting a note is major": {
             topic: function(Activity) {
                 var act = new Activity({
                     id: "076f1a4e-fa25-11e1-b51d-70f1a154e1aa",
@@ -1340,6 +1340,27 @@ suite.addBatch({
                     object: {
                         id: "237a9998-fa25-11e1-9444-70f1a154e1aa",
                         objectType: "note"
+                    }
+                });
+                return act.isMajor();
+            },
+            "it is not major": function(isMajor) {
+                assert.isFalse(isMajor);
+            }
+        },
+        "and we check if posting a comment is major": {
+            topic: function(Activity) {
+                var act = new Activity({
+                    id: "urn:uuid:076f1a4e-fa25-11e1-b51d-70f1a154e1aa",
+                    actor: {
+                        objectType: "person",
+                        displayName: "Some Other Person",
+                        id: "urn:uuid:4d895fe2-01f2-11e2-a185-70f1a154e1aa"
+                    },
+                    verb: "post",
+                    object: {
+                        id: "urn:uuid:5d09e0f4-01f2-11e2-aa15-70f1a154e1aa",
+                        objectType: "comment"
                     }
                 });
                 return act.isMajor();
