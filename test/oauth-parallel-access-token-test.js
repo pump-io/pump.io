@@ -64,14 +64,14 @@ suite.addBatch({
                         if (err) throw err;
                         cl = res;
                         for (i = 0; i < 25; i++) {
-                            register(cl, "testuser"+i, "password"+i, group());
+                            register(cl, "testuser"+i, "Aigae0aL"+i, group());
                         }
                     },
                     function(err, users) {
                         var i, group = this.group();
                         if (err) throw err;
                         for (i = 0; i < 25; i++) {
-                            accessToken(cl, {nickname: "testuser"+i, password: "password"+i}, group());
+                            accessToken(cl, {nickname: "testuser"+i, password: "Aigae0aL"+i}, group());
                         }
                     },
                     function(err, pairs) {
