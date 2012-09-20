@@ -396,12 +396,12 @@ suite.addBatch({
 
                 Step(
                     function() {
-                        User.create({nickname: "alice", password: "monkey"}, this);
+                        User.create({nickname: "alice", password: "funky_monkey"}, this);
                     },
                     function(err, alice) {
                         if (err) throw err;
                         users.alice = alice;
-                        User.create({nickname: "bob", password: "bob123"}, this);
+                        User.create({nickname: "bob", password: "bob*1234"}, this);
                     },
                     function(err, bob) {
                         if (err) throw err;
@@ -531,7 +531,7 @@ suite.addBatch({
 
                 Step(
                     function() {
-                        User.create({nickname: "charlie", password: "123456"}, this);
+                        User.create({nickname: "charlie", password: "one two three four five six"}, this);
                     },
                     function(err, result) {
                         var act;
@@ -597,8 +597,8 @@ suite.addBatch({
 
                 Step(
                     function() {
-                        User.create({nickname: "david", password: "123456"}, this.parallel());
-                        User.create({nickname: "ethel", password: "123456"}, this.parallel());
+                        User.create({nickname: "david", password: "fig*leaf"}, this.parallel());
+                        User.create({nickname: "ethel", password: "Mer-man!"}, this.parallel());
                     },
                     function(err, result1, result2) {
                         var act;
@@ -664,7 +664,7 @@ suite.addBatch({
 
                 Step(
                     function() {
-                        User.create({nickname: "frank", password: "123456"}, this);
+                        User.create({nickname: "frank", password: "N. Stein"}, this);
                     },
                     function(err, user) {
                         var act;
@@ -917,11 +917,11 @@ suite.addBatch({
                     function() {
                         var props1 = {
                             nickname: "pat",
-                            password: "123456"
+                            password: "the*bunny"
                         },
                             props2 = {
                             nickname: "tap",
-                            password: "123456"
+                            password: "i|would|tap|that"
                         };
                         User.create(props1, this.parallel());
                         User.create(props2, this.parallel());
@@ -990,11 +990,11 @@ suite.addBatch({
                     function() {
                         var props1 = {
                             nickname: "jim",
-                            password: "123456"
+                            password: "dandy,fella"
                         },
                             props2 = {
                             nickname: "zed",
-                            password: "123456"
+                            password: "is*dead,baby"
                         };
                         User.create(props1, this.parallel());
                         User.create(props2, this.parallel());
@@ -1051,11 +1051,11 @@ suite.addBatch({
                     function() {
                         var props1 = {
                             nickname: "robert",
-                            password: "123456"
+                            password: "'srules!"
                         },
                             props2 = {
                             nickname: "kevin",
-                            password: "123456"
+                            password: "*m1tn1ck*"
                         };
                         User.create(props1, this.parallel());
                         User.create(props2, this.parallel());
@@ -1116,11 +1116,11 @@ suite.addBatch({
                     function() {
                         var props1 = {
                             nickname: "steve",
-                            password: "123456"
+                            password: "mcqu33n."
                         },
                             props2 = {
                             nickname: "keith",
-                            password: "123456"
+                            password: "r1ch4rds"
                         };
                         User.create(props1, this.parallel());
                         User.create(props2, this.parallel());
@@ -1179,11 +1179,11 @@ suite.addBatch({
                     function() {
                         var props1 = {
                             nickname: "jim",
-                            password: "123456"
+                            password: "dee*dee*dee"
                         },
                             props2 = {
                             nickname: "zed",
-                            password: "123456"
+                            password: "over*my*head"
                         };
                         User.create(props1, this.parallel());
                         User.create(props2, this.parallel());
