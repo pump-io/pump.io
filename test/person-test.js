@@ -130,7 +130,7 @@ suite.addBatch({
             topic: function(Person) {
                 var User = require("../lib/model/user").User;
 
-                User.create({nickname: "evan", password: "123456"},
+                User.create({nickname: "evan", password: "one23four56"},
                             this.callback);
             },
             "it works": function(err, user) {
