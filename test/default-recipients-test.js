@@ -26,7 +26,6 @@ var assert = require("assert"),
     setupApp = oauthutil.setupApp,
     register = oauthutil.register,
     accessToken = oauthutil.accessToken,
-    newCredentials = oauthutil.newCredentials,
     newPair = oauthutil.newPair,
     newClient = oauthutil.newClient;
 
@@ -126,14 +125,14 @@ suite.addBatch({
                     Step(
                         function() {
                             register(cl, "xtheowl", "b3nfr4nkl1n", this.parallel());
-                            register(cl, "henrietta", "meowpasswordmeow", this.parallel());
+                            register(cl, "henrietta", "meow|password|meow", this.parallel());
                         },
                         function(err, user1, user2) {
                             if (err) throw err;
                             users.xtheowl.profile = user1.profile;
                             users.henrietta.profile = user2.profile;
                             accessToken(cl, {nickname: "xtheowl", password: "b3nfr4nkl1n"}, this.parallel());
-                            accessToken(cl, {nickname: "henrietta", password: "meowpasswordmeow"}, this.parallel());
+                            accessToken(cl, {nickname: "henrietta", password: "meow|password|meow"}, this.parallel());
                         },
                         function(err, pair1, pair2) {
                             var act, cred, url;
@@ -213,7 +212,7 @@ suite.addBatch({
 
                     Step(
                         function() {
-                            newPair(cl, "elaine", "boomerang", this);
+                            newPair(cl, "elaine", "bo0merang", this);
                         },
                         function(err, pair) {
                             var act; 
@@ -277,7 +276,7 @@ suite.addBatch({
 
                     Step(
                         function() {
-                            newPair(cl, "tuesday", "feelings", this);
+                            newPair(cl, "tuesday", "i*have*feelings", this);
                         },
                         function(err, pair) {
                             var act; 
