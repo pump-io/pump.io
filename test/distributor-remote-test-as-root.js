@@ -67,8 +67,8 @@ suite.addBatch({
                 var callback = this.callback;
                 Step(
                     function() {
-                        newCredentials("maven", "tasteful", "social.localhost", 80, this.parallel());
-                        newCredentials("photog", "gritty", "photo.localhost", 80, this.parallel());
+                        newCredentials("maven", "t4steful", "social.localhost", 80, this.parallel());
+                        newCredentials("photog", "gritty*1", "photo.localhost", 80, this.parallel());
                     },
                     callback
                 );
