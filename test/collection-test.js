@@ -82,7 +82,7 @@ suite.addBatch({
                     function() {
                         var props = {
                             nickname: "carlyle",
-                            password: "123456"
+                            password: "1234,5678"
                         };
                         User.create(props, this);
                     },
