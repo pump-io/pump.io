@@ -49,7 +49,7 @@ suite.addBatch({
         },
         "and we get new credentials": {
             topic: function() {
-                newCredentials("gerold", "justaguy", this.callback);
+                newCredentials("gerold", "just*a*guy", this.callback);
             },
             "it works": function(err, cred) {
                 assert.ifError(err);
@@ -211,7 +211,7 @@ suite.addBatch({
                         
                         Step(
                             function() {
-                                newCredentials("harold", "1077", this);
+                                newCredentials("harold", "1077*hastings", this);
                             },
                             function(err, pair) {
                                 var nuke;
@@ -363,7 +363,7 @@ suite.addBatch({
                         
                         Step(
                             function() {
-                                newCredentials("ignace", "katt", this);
+                                newCredentials("ignace", "katt+brick", this);
                             },
                             function(err, pair) {
                                 var nuke;
@@ -547,7 +547,7 @@ suite.addBatch({
                         
                         Step(
                             function() {
-                                newCredentials("jeremy", "bentham", this);
+                                newCredentials("jeremy", "b4ntham!", this);
                             },
                             function(err, pair) {
                                 var nuke;
