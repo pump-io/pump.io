@@ -39,7 +39,7 @@ var testSchema = {
 var testData = {
     "create": {
         nickname: "evan",
-        password: "trustno1",
+        password: "Quie3ien",
         profile: {
             displayName: "Evan Prodromou"
         }
@@ -94,7 +94,7 @@ suite.addBatch({
             topic: function(User) {
                 var props = {
                     nickname: "tom",
-                    password: "123456"
+                    password: "Xae3aiju"
                 };
                 User.create(props, this.callback);
             },
@@ -184,7 +184,7 @@ suite.addBatch({
             },
             "and we check the credentials with the right password": {
                 topic: function(user, User) {
-                    User.checkCredentials("tom", "123456", this.callback);
+                    User.checkCredentials("tom", "Xae3aiju", this.callback);
                 },
                 "it works": function(err, user) {
                     assert.ifError(err);
@@ -228,7 +228,7 @@ suite.addBatch({
                 var cb = this.callback,
                     props = {
                         nickname: "dick",
-                        password: "foobar"
+                        password: "Aaf7Ieki"
                     };
                     
                 User.create(props, function(err, user) {
@@ -260,7 +260,7 @@ suite.addBatch({
                     user = null,
                     props = {
                         nickname: "harry",
-                        password: "un1c0rn"
+                        password: "Ai9AhSha"
                     };
 
                 Step(
@@ -394,7 +394,7 @@ suite.addBatch({
             topic: function(User) {
                 var props = {
                         nickname: "gary",
-                        password: "cows"
+                        password: "eiFoT2Va"
                     };
                 Step(
                     function() {
@@ -437,7 +437,7 @@ suite.addBatch({
                     user = null,
                     props = {
                         nickname: "maurice",
-                        password: "cappadoccia"
+                        password: "cappadoccia1"
                     };
 
                 Step(
@@ -569,8 +569,8 @@ suite.addBatch({
                 var cb = this.callback;
                 Step(
                     function() {
-                        User.create({nickname: "shields", password: "wind"}, this.parallel());
-                        User.create({nickname: "yarnell", password: "rope"}, this.parallel());
+                        User.create({nickname: "shields", password: "1walk1nTheWind"}, this.parallel());
+                        User.create({nickname: "yarnell", password: "1Mpull1ngArope"}, this.parallel());
                     },
                     function(err, shields, yarnell) {
                         if (err) {
@@ -663,8 +663,8 @@ suite.addBatch({
                     users = {};
                 Step(
                     function() {
-                        User.create({nickname: "captain", password: "beachboy"}, this.parallel());
-                        User.create({nickname: "tenille", password: "muskrat"}, this.parallel());
+                        User.create({nickname: "captain", password: "b34chboyW/AHat"}, this.parallel());
+                        User.create({nickname: "tenille", password: "Muskr4t|Sus13"}, this.parallel());
                     },
                     function(err, captain, tenille) {
                         if (err) throw err;
@@ -809,7 +809,7 @@ suite.addBatch({
                     function() {
                         var i, group = this.group();
                         for (i = 0; i < MAX_USERS; i++) {
-                            User.create({nickname: "clown"+i, password: "hahaha"}, group());
+                            User.create({nickname: "clown"+i, password: "Ha6quo6I" + i}, group());
                         }
                     },
                     function(err, users) {
@@ -932,7 +932,7 @@ suite.addBatch({
             var User = require("../lib/model/user").User,
                 props = {
                     nickname: "archie",
-                    password: "bunker"
+                    password: "B0Y|the/way|Glenn+Miller|played"
                 };
             User.create(props, this.callback);
         },
@@ -1021,7 +1021,7 @@ suite.addBatch({
             var User = require("../lib/model/user").User,
                 props = {
                     nickname: "edith",
-                    password: "bunker"
+                    password: "s0ngz|that|made|Th3|h1t|P4r4de"
                 };
             User.create(props, this.callback);
         },
@@ -1162,7 +1162,7 @@ suite.addBatch({
             var User = require("../lib/model/user").User,
                 props = {
                     nickname: "gloria",
-                    password: "bunker"
+                    password: "0h,d4DDY!"
                 };
             User.create(props, this.callback);
         },
@@ -1308,7 +1308,7 @@ var goodNickname = function(nickname) {
             var User = require("../lib/model/user").User,
                 props = {
                     nickname: nickname,
-                    password: "password"
+                    password: "Kei1goos"
                 };
             User.create(props, this.callback);
         },
@@ -1330,11 +1330,11 @@ var badNickname = function(nickname) {
             var User = require("../lib/model/user").User,
                 props = {
                     nickname: nickname,
-                    password: "password"
+                    password: "AQuah5co"
                 },
                 callback = this.callback;
             User.create(props, function(err, user) {
-                if (err) {
+                if (err && err instanceof User.BadNicknameError) {
                     callback(null);
                 } else {
                     callback(new Error("Unexpected success"));
@@ -1369,7 +1369,11 @@ suite.addBatch({
     "When we create a new user with a nickname with a blank": 
     badNickname("Captain Caveman"),
     "When we create a new user with an empty nickname": 
-    badNickname("")
+    badNickname(""),
+    "When we create a new user with nickname 'api'": 
+    badNickname("api"),
+    "When we create a new user with nickname 'oauth'": 
+    badNickname("oauth")
 });
 
 suite["export"](module);
