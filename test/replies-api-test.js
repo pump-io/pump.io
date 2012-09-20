@@ -57,7 +57,7 @@ suite.addBatch({
         },
         "and we get new credentials": {
             topic: function() {
-                newCredentials("macdonald", "theoldflag", this.callback);
+                newCredentials("macdonald", "the|old|flag", this.callback);
             },
             "it works": function(err, cred) {
                 assert.ifError(err);
@@ -126,8 +126,8 @@ suite.addBatch({
             topic: function() {
                 Step(
                     function() {
-                        newCredentials("mackenzie", "railroad", this.parallel());
-                        newCredentials("thompson", "beringsea", this.parallel());
+                        newCredentials("mackenzie", "rail*road", this.parallel());
+                        newCredentials("thompson", "bering*sea", this.parallel());
                     },
                     this.callback
                 );
@@ -253,8 +253,8 @@ suite.addBatch({
             topic: function() {
                 Step(
                     function() {
-                        newCredentials("laurier", "moderation", this.parallel());
-                        newCredentials("borden", "overthere", this.parallel());
+                        newCredentials("laurier", "moderation!", this.parallel());
+                        newCredentials("borden", "over there,", this.parallel());
                     },
                     this.callback
                 );
