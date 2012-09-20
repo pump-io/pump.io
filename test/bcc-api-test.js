@@ -73,10 +73,10 @@ suite.addBatch({
 
                     Step(
                         function() {
-                            register(cl, "gilligan", "sailorhat", this.parallel());
-                            register(cl, "skipper", "coconuts", this.parallel());
-                            register(cl, "professor", "radio", this.parallel());
-                            register(cl, "mrshowell", "pearls", this.parallel());
+                            register(cl, "gilligan", "s4ilorh4t", this.parallel());
+                            register(cl, "skipper", "coc0nuts", this.parallel());
+                            register(cl, "professor", "radi0|rescue", this.parallel());
+                            register(cl, "mrshowell", "pearlsb4sw1ne", this.parallel());
                         },
                         function(err, user1, user2, user3, user4) {
                             if (err) throw err;
@@ -84,10 +84,10 @@ suite.addBatch({
                             users.skipper.profile   = user2.profile;
                             users.professor.profile = user3.profile;
                             users.mrshowell.profile = user4.profile;
-                            accessToken(cl, {nickname: "gilligan", password: "sailorhat"}, this.parallel());
-                            accessToken(cl, {nickname: "skipper", password: "coconuts"}, this.parallel());
-                            accessToken(cl, {nickname: "professor", password: "radio"}, this.parallel());
-                            accessToken(cl, {nickname: "mrshowell", password: "pearls"}, this.parallel());
+                            accessToken(cl, {nickname: "gilligan", password: "s4ilorh4t"}, this.parallel());
+                            accessToken(cl, {nickname: "skipper", password: "coc0nuts"}, this.parallel());
+                            accessToken(cl, {nickname: "professor", password: "radi0|rescue"}, this.parallel());
+                            accessToken(cl, {nickname: "mrshowell", password: "pearlsb4sw1ne"}, this.parallel());
                         },
                         function(err, pair1, pair2, pair3, pair4) {
                             var url, cred, act;
@@ -281,10 +281,10 @@ suite.addBatch({
 
                     Step(
                         function() {
-                            register(cl, "maryanne", "gingham", this.parallel());
-                            register(cl, "ginger", "glamour", this.parallel());
-                            register(cl, "mrhowell", "wealth", this.parallel());
-                            register(cl, "santa", "hohoho", this.parallel());
+                            register(cl, "maryanne", "gingh4m|dr3ss", this.parallel());
+                            register(cl, "ginger", "glamour+m0del", this.parallel());
+                            register(cl, "mrhowell", "w3alth&p0w3r", this.parallel());
+                            register(cl, "santa", "Ho ho ho, merry X-mas!", this.parallel());
                         },
                         function(err, user1, user2, user3, user4) {
                             if (err) throw err;
@@ -292,10 +292,10 @@ suite.addBatch({
                             users.ginger.profile   = user2.profile;
                             users.mrhowell.profile = user3.profile;
                             users.santa.profile = user4.profile;
-                            accessToken(cl, {nickname: "maryanne", password: "gingham"}, this.parallel());
-                            accessToken(cl, {nickname: "ginger", password: "glamour"}, this.parallel());
-                            accessToken(cl, {nickname: "mrhowell", password: "wealth"}, this.parallel());
-                            accessToken(cl, {nickname: "santa", password: "hohoho"}, this.parallel());
+                            accessToken(cl, {nickname: "maryanne", password: "gingh4m|dr3ss"}, this.parallel());
+                            accessToken(cl, {nickname: "ginger", password: "glamour+m0del"}, this.parallel());
+                            accessToken(cl, {nickname: "mrhowell", password: "w3alth&p0w3r"}, this.parallel());
+                            accessToken(cl, {nickname: "santa", password: "Ho ho ho, merry X-mas!"}, this.parallel());
                         },
                         function(err, pair1, pair2, pair3, pair4) {
                             var url, cred, act;
