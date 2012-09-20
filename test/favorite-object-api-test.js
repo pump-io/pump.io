@@ -83,7 +83,7 @@ suite.addBatch({
                     var cb = this.callback;
                     Step(
                         function() {
-                            newPair(cl, "marsha", "hair", this);
+                            newPair(cl, "marsha", "oh! my nose!", this);
                         },
                         function(err, pair) {
                             if (err) throw err;
@@ -111,7 +111,7 @@ suite.addBatch({
                         cred;
                     Step(
                         function() {
-                            newPair(cl, "jan", "marsha", this);
+                            newPair(cl, "jan", "marsha, marsha, marsha!", this);
                         },
                         function(err, pair) {
                             if (err) throw err;
@@ -158,8 +158,8 @@ suite.addBatch({
 
                     Step(
                         function() {
-                            newPair(cl, "cindy", "pigtails", this.parallel());
-                            newPair(cl, "bobby", "baseball", this.parallel());
+                            newPair(cl, "cindy", "pig*tails", this.parallel());
+                            newPair(cl, "bobby", "base*ball", this.parallel());
                         },
                         function(err, cpair, bpair) {
                             if (err) throw err;
@@ -252,8 +252,8 @@ suite.addBatch({
 
                     Step(
                         function() {
-                            newPair(cl, "alice", "backpain", this.parallel());
-                            newPair(cl, "sam", "alice", this.parallel());
+                            newPair(cl, "alice", "back|pain", this.parallel());
+                            newPair(cl, "sam", "alice+the+maid", this.parallel());
                         },
                         function(err, apair, spair) {
                             if (err) throw err;
@@ -323,8 +323,8 @@ suite.addBatch({
 
                     Step(
                         function() {
-                            newPair(cl, "greg", "groovy", this.parallel());
-                            newPair(cl, "peter", "vengeance", this.parallel());
+                            newPair(cl, "greg", "groovy*pad", this.parallel());
+                            newPair(cl, "peter", "vengeance!", this.parallel());
                         },
                         function(err, gpair, ppair) {
                             if (err) throw err;
@@ -424,7 +424,7 @@ suite.addBatch({
                     Step(
                         function() {
                             newPair(cl, "mike", "arch1tecture", this.parallel());
-                            newPair(cl, "carol", "mike", this.parallel());
+                            newPair(cl, "carol", "i{heart}mike", this.parallel());
                         },
                         function(err, mpair, cpair) {
                             if (err) throw err;
@@ -480,7 +480,7 @@ suite.addBatch({
 
                     Step(
                         function() {
-                            newPair(cl, "tiger", "fleapowder", this);
+                            newPair(cl, "tiger", "new flea powder", this);
                         },
                         function(err, pair) {
                             if (err) throw err;
@@ -621,8 +621,8 @@ suite.addBatch({
 
                     Step(
                         function() {
-                            newPair(cl, "doug", "nose", this.parallel());
-                            newPair(cl, "rachel", "dare", this.parallel());
+                            newPair(cl, "doug", "nose*ball", this.parallel());
+                            newPair(cl, "rachel", "dare,you", this.parallel());
                         },
                         function(err, pair1, pair2) {
                             if (err) throw err;
