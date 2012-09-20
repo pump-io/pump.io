@@ -157,7 +157,7 @@ suite.addBatch({
         "and we register a user": {
 
             topic: function(cl) {
-                register(cl, "tyrion", "payURdebts", this.callback);
+                register(cl, "tyrion", "payURd3bts", this.callback);
             },
 
             "it works": function(err, user) {
@@ -291,11 +291,11 @@ suite.addBatch({
                     var cb = this.callback;
                     Step(
                         function() {
-                            register(cl, "cersei", "p0wer", this);
+                            register(cl, "cersei", "i{heart}p0wer", this);
                         },
                         function(err, user2) {
                             if (err) throw err;
-                            accessToken(cl, {nickname: "cersei", password: "p0wer"}, this);
+                            accessToken(cl, {nickname: "cersei", password: "i{heart}p0wer"}, this);
                         },
                         function(err, pair) {
                             if (err) throw err;
@@ -550,19 +550,19 @@ suite.addBatch({
 
                 Step(
                     function() {
-                        register(cl, "nymeria", "growl", this);
+                        register(cl, "nymeria", "gr0000wl", this);
                     },
                     function(err, nymeria) {
                         if (err) throw err;
                         user = nymeria;
-                        accessToken(cl, {nickname: "nymeria", password: "growl"}, this);
+                        accessToken(cl, {nickname: "nymeria", password: "gr0000wl"}, this);
                     },
                     function(err, result) {
                         var i, group = this.group(), q = new Queue(10);
                         if (err) throw err;
                         pair = result;
                         for (i = 0; i < 100; i++) {
-                            q.enqueue(newPair, [cl, "wolf" + i, "grrrrrr"], group());
+                            q.enqueue(newPair, [cl, "wolf" + i, "grrr!grrr!"+i], group());
                         }
                     },
                     function(err, pairs) {
@@ -695,19 +695,19 @@ suite.addBatch({
 
                 Step(
                     function() {
-                        register(cl, "varys", "magic", this);
+                        register(cl, "varys", "i*hate*magic", this);
                     },
                     function(err, varys) {
                         if (err) throw err;
                         user = varys;
-                        accessToken(cl, {nickname: "varys", password: "magic"}, this);
+                        accessToken(cl, {nickname: "varys", password: "i*hate*magic"}, this);
                     },
                     function(err, result) {
                         var i, group = this.group();
                         if (err) throw err;
                         pair = result;
                         for (i = 0; i < 50; i++) {
-                            register(cl, "littlebird"+i, "sekrit", group());
+                            register(cl, "littlebird"+i, "sekrit!"+i, group());
                         }
                     },
                     function(err, users) {
