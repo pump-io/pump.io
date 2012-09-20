@@ -52,7 +52,7 @@ suite.addBatch({
         },
         "and we get new credentials": {
             topic: function() {
-                newCredentials("dora", "v4m0nos", this.callback);
+                newCredentials("dora", "v4m0nos!", this.callback);
             },
             "it works": function(err, cred) {
                 assert.ifError(err);
@@ -275,7 +275,7 @@ suite.addBatch({
         },
         "and we get new credentials": {
             topic: function(app) {
-                newCredentials("diego", "rescue", this.callback);
+                newCredentials("diego", "to*the*rescue", this.callback);
             },
             "it works": function(err, cred) {
                 assert.ifError(err);
@@ -348,11 +348,11 @@ suite.addBatch({
                         };
                     Step(
                         function() {
-                            register(cl, "boots", "bananas", this);
+                            register(cl, "boots", "b4nanazz", this);
                         },
                         function(err, user) {
                             if (err) throw err;
-                            accessToken(cl, {nickname: "boots", password: "bananas"}, this);
+                            accessToken(cl, {nickname: "boots", password: "b4nanazz"}, this);
                         },
                         function(err, pair) {
                             var nuke;
