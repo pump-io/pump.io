@@ -95,7 +95,7 @@ suite.addBatch({
         },
         "and we register a new user": {
             topic: function() {
-                newCredentials("louisck", "hilarious", this.callback);
+                newCredentials("louisck", "hilarious!", this.callback);
             },
             "it works": function(err, cred) {
                 assert.ifError(err);
