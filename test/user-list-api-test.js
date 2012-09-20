@@ -251,19 +251,27 @@ suite.addBatch({
                 assert.isString(cl.client_secret);
             },
             "and we register a user with nickname and password": 
-            registerSucceed({nickname: "withcred", password: "verysecret"}),
+            registerSucceed({nickname: "withcred", password: "very!secret"}),
             "and we register a user with nickname and no password": 
             registerFail({nickname: "nopass"}),
             "and we register a user with password and no nickname": 
-            registerFail({password: "toosecret"}),
+            registerFail({password: "too+secret"}),
+            "and we register a user with a short password": 
+            registerFail({nickname: "shorty", password: "carpet"}),
+            "and we register a user with an all-alpha password": 
+            registerFail({nickname: "allalpha", password: "carpeted"}),
+            "and we register a user with an all-numeric password": 
+            registerFail({nickname: "allnumeric", password: "12345678"}),
+            "and we register a user with a well-known bad password": 
+            registerFail({nickname: "unoriginal", password: "rush2112"}),
             "and we register a user with no data": 
             registerFail({}),
             "and we register two unrelated users":
-            doubleRegisterSucceed({nickname: "able", password: "isuream"},
-                                  {nickname: "baker", password: "flour"}),
+            doubleRegisterSucceed({nickname: "able", password: "i-sure-am"},
+                                  {nickname: "baker", password: "flour'n'water"}),
             "and we register two users with the same nickname":
-            doubleRegisterFail({nickname: "charlie", password: "parker"},
-                               {nickname: "charlie", password: "mccarthy"}),
+            doubleRegisterFail({nickname: "charlie", password: "parker69"},
+                               {nickname: "charlie", password: "mccarthy69"}),
             "and we try to register with URL-encoded params": {
                 topic: function(cl) {
                     var oa, toSend, cb = this.callback;
@@ -385,7 +393,7 @@ suite.addBatch({
                 "and we add a user": {
                     topic: function(ignore, cl) {
                         var cb = this.callback;
-                        register(cl, {nickname: "echo", password: "echoooooooo"}, function(err, body, res) {
+                        register(cl, {nickname: "echo", password: "echo!echo!"}, function(err, body, res) {
                             if (err) {
                                 cb(err, null);
                             } else {
@@ -442,7 +450,7 @@ suite.addBatch({
                                 function() {
                                     var i, group = this.group();
                                     for (i = 0; i < 49; i++) { // have 1 already, total = 50
-                                        register(cl, {nickname: "foxtrot"+i, password: "badpass"}, group());
+                                        register(cl, {nickname: "foxtrot"+i, password: "a*bad*pass*"+i}, group());
                                     }
                                 },
                                 function(err) {
