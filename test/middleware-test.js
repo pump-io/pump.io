@@ -54,8 +54,8 @@ vows.describe("middleware module interface").addBatch({
                 function(err) {
                     if (err) throw err;
                     DatabankObject.bank = db;
-                    User.create({nickname: "robby", password: "kangaroo"}, this.parallel());
-                    User.create({nickname: "maya", password: "mangopickle"}, this.parallel());
+                    User.create({nickname: "robby", password: "smash*a*kangaroo"}, this.parallel());
+                    User.create({nickname: "maya", password: "mango|pickle"}, this.parallel());
                 },
                 function(err, user1, user2) {
                     var mw;
