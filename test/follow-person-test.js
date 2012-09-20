@@ -76,18 +76,18 @@ suite.addBatch({
 
                     Step(
                         function() {
-                            register(cl, "larry", "wiry1", this.parallel());
-                            register(cl, "moe", "bowlcut", this.parallel());
-                            register(cl, "curly", "nyuknyuk", this.parallel());
+                            register(cl, "larry", "wiry1hair", this.parallel());
+                            register(cl, "moe", "bowlcutZ|are|cool", this.parallel());
+                            register(cl, "curly", "nyuk+nyuk+nyuk", this.parallel());
                         },
                         function(err, user1, user2, user3) {
                             if (err) throw err;
                             users.larry.profile = user1.profile;
                             users.moe.profile   = user2.profile;
                             users.curly.profile = user3.profile;
-                            accessToken(cl, {nickname: "larry", password: "wiry1"}, this.parallel());
-                            accessToken(cl, {nickname: "moe", password: "bowlcut"}, this.parallel());
-                            accessToken(cl, {nickname: "curly", password: "nyuknyuk"}, this.parallel());
+                            accessToken(cl, {nickname: "larry", password: "wiry1hair"}, this.parallel());
+                            accessToken(cl, {nickname: "moe", password: "bowlcutZ|are|cool"}, this.parallel());
+                            accessToken(cl, {nickname: "curly", password: "nyuk+nyuk+nyuk"}, this.parallel());
                         },
                         function(err, pair1, pair2, pair3) {
                             if (err) throw err;
@@ -135,14 +135,14 @@ suite.addBatch({
 
                     Step(
                         function() {
-                            register(cl, "heckle", "cigar", this.parallel());
-                            register(cl, "jeckle", "hijinks", this.parallel());
+                            register(cl, "heckle", "have a cigar", this.parallel());
+                            register(cl, "jeckle", "up to hijinks", this.parallel());
                         },
                         function(err, heckle, jeckle) {
                             if (err) throw err;
                             users.heckle = heckle;
                             users.jeckle  = jeckle;
-                            accessToken(cl, {nickname: "heckle", password: "cigar"}, this);
+                            accessToken(cl, {nickname: "heckle", password: "have a cigar"}, this);
                         },
                         function(err, pair) {
                             if (err) throw err;
@@ -192,11 +192,11 @@ suite.addBatch({
 
                     Step(
                         function() {
-                            register(cl, "tom", "cat", this);
+                            register(cl, "tom", "silent*cat", this);
                         },
                         function(err, tom) {
                             if (err) throw err;
-                            accessToken(cl, {nickname: "tom", password: "cat"}, this);
+                            accessToken(cl, {nickname: "tom", password: "silent*cat"}, this);
                         },
                         function(err, pair) {
                             if (err) throw err;
@@ -242,15 +242,15 @@ suite.addBatch({
 
                     Step(
                         function() {
-                            register(cl, "jack", "upthehill", this.parallel());
-                            register(cl, "jill", "pailofwater", this.parallel());
+                            register(cl, "jack", "up|the|hill", this.parallel());
+                            register(cl, "jill", "pail/of/water", this.parallel());
                         },
                         function(err, user1, user2) {
                             if (err) throw err;
                             users.jack.profile = user1.profile;
                             users.jill.profile = user2.profile;
-                            accessToken(cl, {nickname: "jack", password: "upthehill"}, this.parallel());
-                            accessToken(cl, {nickname: "jill", password: "pailofwater"}, this.parallel());
+                            accessToken(cl, {nickname: "jack", password: "up|the|hill"}, this.parallel());
+                            accessToken(cl, {nickname: "jill", password: "pail/of/water"}, this.parallel());
                         },
                         function(err, pair1, pair2) {
                             if (err) throw err;
@@ -335,15 +335,15 @@ suite.addBatch({
 
                     Step(
                         function() {
-                            register(cl, "abbott", "what", this.parallel());
-                            register(cl, "costello", "who", this.parallel());
+                            register(cl, "abbott", "what's|the|name", this.parallel());
+                            register(cl, "costello", "who's+on+3rd", this.parallel());
                         },
                         function(err, user1, user2) {
                             if (err) throw err;
                             users.abbott.profile = user1.profile;
                             users.costello.profile = user2.profile;
-                            accessToken(cl, {nickname: "abbott", password: "what"}, this.parallel());
-                            accessToken(cl, {nickname: "costello", password: "who"}, this.parallel());
+                            accessToken(cl, {nickname: "abbott", password: "what's|the|name"}, this.parallel());
+                            accessToken(cl, {nickname: "costello", password: "who's+on+3rd"}, this.parallel());
                         },
                         function(err, pair1, pair2) {
                             if (err) throw err;
@@ -430,18 +430,18 @@ suite.addBatch({
 
                     Step(
                         function() {
-                            register(cl, "laurel", "what", this.parallel());
-                            register(cl, "hardy", "who", this.parallel());
-                            register(cl, "cop", "why", this.parallel());
+                            register(cl, "laurel", "b0wler*HAT", this.parallel());
+                            register(cl, "hardy", "n0w,st4nley...", this.parallel());
+                            register(cl, "cop", "what's|the|hubbub", this.parallel());
                         },
                         function(err, user1, user2, user3) {
                             if (err) throw err;
                             users.laurel.profile = user1.profile;
                             users.hardy.profile = user2.profile;
                             users.hardy.profile = user3.profile;
-                            accessToken(cl, {nickname: "laurel", password: "what"}, this.parallel());
-                            accessToken(cl, {nickname: "hardy", password: "who"}, this.parallel());
-                            accessToken(cl, {nickname: "cop", password: "why"}, this.parallel());
+                            accessToken(cl, {nickname: "laurel", password: "b0wler*HAT"}, this.parallel());
+                            accessToken(cl, {nickname: "hardy", password: "n0w,st4nley..."}, this.parallel());
+                            accessToken(cl, {nickname: "cop", password: "what's|the|hubbub"}, this.parallel());
                         },
                         function(err, pair1, pair2, pair3) {
                             if (err) throw err;
