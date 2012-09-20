@@ -78,13 +78,13 @@ suite.addBatch({
                     var cb = this.callback,
                         users = {
                             mrmoose: {
-                                password: "pingpongballs"
+                                password: "ping*pong*balls"
                             },
                             mrbunnyrabbit: {
-                                password: "carrots"
+                                password: "i{heart}carrots"
                             },
                             townclown: {
-                                password: "balloons"
+                                password: "balloons?"
                             }
                                
                         };
@@ -592,13 +592,13 @@ suite.addBatch({
                     var cb = this.callback,
                         users = {
                             captain: {
-                                password: "kangaroo"
+                                password: "kangaroo!"
                             },
                             mrgreenjeans: {
-                                password: "animals"
+                                password: "animals_are_great"
                             },
                             dancingbear: {
-                                password: "doll"
+                                password: "hey*doll"
                             }
                                
                         };
