@@ -343,7 +343,7 @@ suite.addBatch({
                     var cb = this.callback;
                     httputil.postJSON("http://localhost:4815/api/users", 
                                       {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
-                                      {nickname: "alice", password: "whiterabbit"},
+                                      {nickname: "alice", password: "white*rabbit"},
                                       function(err, user, resp) {
                                           cb(err, user);
                                       });
