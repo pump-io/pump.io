@@ -146,7 +146,7 @@ vows.describe("provider module interface").addBatch({
 
                         Step(
                             function() {
-                                User.create({nickname: "charlie", password: "hacker"}, this);
+                                User.create({nickname: "charlie", password: "h4X0r*4*u"}, this);
                             },
                             function(err, results) {
                                 if (err) throw err;
@@ -343,7 +343,7 @@ vows.describe("provider module interface").addBatch({
                     topic: function(provider) {
                         var cb = this.callback;
 
-                        User.create({nickname: "david", password: "letmein"}, function(err, user) {
+                        User.create({nickname: "david", password: "log-me-in"}, function(err, user) {
                             if (err) {
                                 cb(err, null);
                             } else {
@@ -386,7 +386,7 @@ vows.describe("provider module interface").addBatch({
                     topic: function(provider) {
                         var cb = this.callback;
 
-                        User.create({nickname: "ernie", password: "letmein"}, function(err, user) {
+                        User.create({nickname: "ernie", password: "let*me*in"}, function(err, user) {
                             if (err) {
                                 cb(err, null);
                             } else {
@@ -415,7 +415,7 @@ vows.describe("provider module interface").addBatch({
                     topic: function(provider) {
                         var cb = this.callback;
 
-                        User.create({nickname: "francine", password: "monkey"}, function(err, user) {
+                        User.create({nickname: "francine", password: "!monkey!"}, function(err, user) {
                             if (err) {
                                 cb(err, null);
                             } else {
@@ -484,7 +484,7 @@ vows.describe("provider module interface").addBatch({
                             function(err, cl) {
                                 if (err) throw err;
                                 client = cl;
-                                User.create({nickname: "franklin", password: "mint"}, this);
+                                User.create({nickname: "franklin", password: "mint condition"}, this);
                             },
                             function(err, u) {
                                 if (err) throw err;
@@ -596,7 +596,7 @@ vows.describe("provider module interface").addBatch({
 
                         Step(
                             function() {
-                                User.create({nickname: "gerald", password: "123456"}, this);
+                                User.create({nickname: "gerald", password: "one23four56"}, this);
                             },
                             function(err, results) {
                                 if (err) throw err;
@@ -816,7 +816,7 @@ vows.describe("provider module interface").addBatch({
 
                         Step(
                             function() {
-                                User.create({nickname: "isadora", password: "123456"}, this);
+                                User.create({nickname: "isadora", password: "dunkin*donuts"}, this);
                             },
                             function(err, results) {
                                 if (err) throw err;
@@ -896,7 +896,7 @@ vows.describe("provider module interface").addBatch({
 
                         Step(
                             function() {
-                                User.create({nickname: "harvey", password: "123456"}, this);
+                                User.create({nickname: "harvey", password: "wall-banger"}, this);
                             },
                             function(err, results) {
                                 if (err) throw err;
@@ -959,7 +959,7 @@ vows.describe("provider module interface").addBatch({
 
                         Step(
                             function() {
-                                User.create({nickname: "ignace", password: "123456"}, this);
+                                User.create({nickname: "ignace", password: "krazy*katt"}, this);
                             },
                             function(err, results) {
                                 if (err) throw err;
@@ -1022,7 +1022,7 @@ vows.describe("provider module interface").addBatch({
 
                         Step(
                             function() {
-                                User.create({nickname: "jerry", password: "123456"}, this);
+                                User.create({nickname: "jerry", password: "sein*feld"}, this);
                             },
                             function(err, results) {
                                 if (err) throw err;
@@ -1092,7 +1092,7 @@ vows.describe("provider module interface").addBatch({
 
                         Step(
                             function() {
-                                User.create({nickname: "karen", password: "123456"}, this);
+                                User.create({nickname: "karen", password: "findl4y."}, this);
                             },
                             function(err, results) {
                                 if (err) throw err;
@@ -1169,7 +1169,7 @@ vows.describe("provider module interface").addBatch({
 
                         Step(
                             function() {
-                                User.create({nickname: "larry", password: "123456"}, this);
+                                User.create({nickname: "larry", password: "leisure*suit"}, this);
                             },
                             function(err, results) {
                                 if (err) throw err;
@@ -1217,7 +1217,7 @@ vows.describe("provider module interface").addBatch({
 
                         Step(
                             function() {
-                                User.create({nickname: "mary", password: "123456"}, this);
+                                User.create({nickname: "mary", password: "quite,contrary"}, this);
                             },
                             function(err, results) {
                                 if (err) throw err;
@@ -1290,7 +1290,7 @@ vows.describe("provider module interface").addBatch({
                         
                         Step(
                             function() {
-                                User.create({nickname: "nancy", password: "changeme"}, this);
+                                User.create({nickname: "nancy", password: "change-me"}, this);
                             },
                             function(err, results) {
                                 if (err) {
@@ -1360,8 +1360,8 @@ vows.describe("provider module interface").addBatch({
                         
                         Step(
                             function() {
-                                User.create({nickname: "paul", password: "austrian"}, this.parallel());
-                                User.create({nickname: "pauline", password: "freezy"}, this.parallel());
+                                User.create({nickname: "paul", password: "austrian,"}, this.parallel());
+                                User.create({nickname: "pauline", password: "freezy*trees"}, this.parallel());
                                 RequestToken.create(props, this.parallel());
                             },
                             function(err, res1, res2, res3) {
@@ -1410,7 +1410,7 @@ vows.describe("provider module interface").addBatch({
                         
                         Step(
                             function() {
-                                User.create({nickname: "quincy", password: "adams"}, this.parallel());
+                                User.create({nickname: "quincy", password: "john*adams"}, this.parallel());
                                 RequestToken.create(props, this.parallel());
                             },
                             function(err, res1, res2) {
@@ -1462,7 +1462,7 @@ vows.describe("provider module interface").addBatch({
                     topic: function(provider) {
                         var cb = this.callback;
                         
-                        User.create({nickname: "ronald", password: "mcdonald"}, function(err, user) {
+                        User.create({nickname: "ronald", password: "mcdonald1"}, function(err, user) {
                             if (err) {
                                 cb(err, null);
                             } else { 
@@ -1523,8 +1523,8 @@ vows.describe("provider module interface").addBatch({
                         
                         Step(
                             function() {
-                                User.create({nickname: "samuel", password: "dinosaur"}, this.parallel());
-                                User.create({nickname: "samantha", password: "wombat"}, this.parallel());
+                                User.create({nickname: "samuel", password: "dinos4ur"}, this.parallel());
+                                User.create({nickname: "samantha", password: "a w0mbat"}, this.parallel());
                                 RequestToken.create(props, this.parallel());
                             },
                             function(err, res1, res2, res3) {
@@ -1573,7 +1573,7 @@ vows.describe("provider module interface").addBatch({
                         
                         Step(
                             function() {
-                                User.create({nickname: "thomas", password: "aquinas"}, this.parallel());
+                                User.create({nickname: "thomas", password: "aquinas1"}, this.parallel());
                                 RequestToken.create(props, this.parallel());
                             },
                             function(err, res1, res2) {
@@ -1707,7 +1707,7 @@ vows.describe("provider module interface").addBatch({
                     topic: function(provider) {
                         var cb = this.callback;
 
-                        User.create({nickname: "ulysses", password: "sgrant"}, function(err, user) {
+                        User.create({nickname: "ulysses", password: "s. grant"}, function(err, user) {
                             if (err) {
                                 cb(err, null);
                             } else {
@@ -1759,7 +1759,7 @@ vows.describe("provider module interface").addBatch({
                     topic: function(provider) {
                         var cb = this.callback;
 
-                        User.create({nickname: "valentine", password: "sday"}, function(err, user) {
+                        User.create({nickname: "valentine", password: "'s day 2012"}, function(err, user) {
                             if (err) {
                                 cb(err, null);
                             } else {
