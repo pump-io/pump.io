@@ -48,7 +48,7 @@ suite.addBatch({
             },
             "and we register a new user": {
                 topic: function(cl) {
-                    oauthutil.register(cl, "carlcraig", "d3tr01t", "social.localhost", 80, this.callback);
+                    oauthutil.register(cl, "carlcraig", "d3tr01t!", "social.localhost", 80, this.callback);
                 },
                 "it works": function(err, user) {
                     assert.ifError(err);
