@@ -83,7 +83,7 @@ suite.addBatch({
                 },
                 "and we register a new user": {
                     topic: function(client, app, oauth) {
-                        oauth.register(client, "alice", "waters", this.callback);
+                        oauth.register(client, "alice", "ch3z|p4niSSe", this.callback);
                     },
                     "it works": function(err, user) {
                         assert.ifError(err);
@@ -91,7 +91,7 @@ suite.addBatch({
                     },
                     "and we get a new access token": {
                         topic: function(user, client, app, oauth) {
-                            oauth.accessToken(client, {nickname: "alice", password: "waters"}, this.callback);
+                            oauth.accessToken(client, {nickname: "alice", password: "ch3z|p4niSSe"}, this.callback);
                         },
                         "it works": function(err, pair) {
                             assert.ifError(err);
@@ -106,7 +106,7 @@ suite.addBatch({
             },
             "and we get new credentials": {
                 topic: function(app, oauth) {
-                    oauth.newCredentials("jasper", "johns", this.callback);
+                    oauth.newCredentials("jasper", "johns,artist", this.callback);
                 },
                 "it works": function(err, cred) {
                     assert.ifError(err);
@@ -126,4 +126,3 @@ suite.addBatch({
 });
 
 suite["export"](module);
-
