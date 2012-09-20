@@ -62,7 +62,7 @@ suite.addBatch({
             topic: function(User) {
                 var props = {
                     nickname: "fred",
-                    password: "cardigan"
+                    password: "a cardigan"
                 };
                 User.create(props, this.callback);
             },
