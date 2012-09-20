@@ -71,7 +71,7 @@ suite.addBatch({
         },
         "and we register a client and user": {
             topic: function() {
-                oauthutil.newCredentials("whiterabbit", "latelatelate", "social.localhost", 80, this.callback);
+                oauthutil.newCredentials("whiterabbit", "late!late!late!", "social.localhost", 80, this.callback);
             },
             "it works": function(err, cred) {
                 assert.ifError(err);
