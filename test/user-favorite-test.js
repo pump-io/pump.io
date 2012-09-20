@@ -70,7 +70,7 @@ suite.addBatch({
             topic: function(User) {
                 var props = {
                     nickname: "bert",
-                    password: "pidgeons"
+                    password: "p1dgeons"
                 };
                 User.create(props, this.callback);
             },
@@ -170,7 +170,7 @@ suite.addBatch({
                 var cb = this.callback,
                     props = {
                         nickname: "carroway",
-                        password: "feldspar"
+                        password: "feld,spar"
                     };
                 Step(
                     function() {
@@ -203,7 +203,7 @@ suite.addBatch({
                 var cb = this.callback,
                     props = {
                         nickname: "cookie",
-                        password: "cookie"
+                        password: "cookies!"
                     };
                 Step(
                     function() {
@@ -238,7 +238,7 @@ suite.addBatch({
 
                 Step(
                     function() {
-                        User.create({nickname: "ernie", password: "rubberduckie"}, this);
+                        User.create({nickname: "ernie", password: "rubber duckie"}, this);
                     },
                     function(err, results) {
                         var Image = require("../lib/model/image").Image;
@@ -309,7 +309,7 @@ suite.addBatch({
 
                 Step(
                     function() {
-                        User.create({nickname: "count", password: "123456"}, this);
+                        User.create({nickname: "count", password: "one,two,three,four"}, this);
                     },
                     function(err, results) {
                         var Image = require("../lib/model/image").Image,
