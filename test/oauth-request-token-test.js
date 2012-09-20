@@ -246,11 +246,11 @@ suite.addBatch({
                     function(err, res) {
                         if (err) throw err;
                         cl = res;
-                        register(cl, "mary", "lamb", this);
+                        register(cl, "mary", "l1ttl3*l4mb", this);
                     },
                     function(err, user) {
                         if (err) throw err;
-                        accessToken(cl, {nickname: "mary", password: "lamb"}, this);
+                        accessToken(cl, {nickname: "mary", password: "l1ttl3*l4mb"}, this);
                     },
                     function(err, pair) {
                         if (err) throw err;
