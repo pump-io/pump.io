@@ -94,7 +94,7 @@ suite.addBatch({
         httputil.getfail("/api/lrdd.json?uri=evan@localhost", 404),
         "and we register a client and user": {
             topic: function() {
-                oauthutil.newCredentials("alice", "testpass", this.callback);
+                oauthutil.newCredentials("alice", "test+pass", this.callback);
             },
             "it works": function(err, cred) {
                 assert.ifError(err);
