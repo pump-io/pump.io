@@ -75,7 +75,7 @@ suite.addBatch({
             "and we make a new user": {
                 topic: function(cl) {
                     var cb = this.callback;
-                    register(cl, "frodo", "iheartsam", function(err, user) {
+                    register(cl, "frodo", "i{heart}sam", function(err, user) {
                         cb(err, user);
                     });
                 },
@@ -86,7 +86,7 @@ suite.addBatch({
                 "and we get a new access token": {
                     topic: function(user, cl) {
                         var cb = this.callback;
-                        accessToken(cl, {nickname: "frodo", password: "iheartsam"}, function(err, pair) {
+                        accessToken(cl, {nickname: "frodo", password: "i{heart}sam"}, function(err, pair) {
                             cb(err, pair);
                         });
                     },
@@ -202,7 +202,7 @@ suite.addBatch({
                         cred;
                     Step(
                         function() {
-                            newPair(cl, "saruman", "orthanc", this);
+                            newPair(cl, "saruman", "orthanc1", this);
                         },
                         function(err, pair) {
                             var act;
@@ -264,7 +264,7 @@ suite.addBatch({
                         cred;
                     Step(
                         function() {
-                            newPair(cl, "radagast", "abird", this);
+                            newPair(cl, "radagast", "i+like+birds", this);
                         },
                         function(err, pair) {
                             var act;
@@ -331,7 +331,7 @@ suite.addBatch({
                         cred;
                     Step(
                         function() {
-                            newPair(cl, "merry", "weed", this);
+                            newPair(cl, "merry", "hobbit:weed", this);
                         },
                         function(err, pair) {
                             var act;
