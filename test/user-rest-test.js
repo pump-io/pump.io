@@ -94,7 +94,7 @@ suite.addBatch({
         "and we register a user": {
 
             topic: function(cl) {
-                register(cl, "zardoz", "m3rl1n", this.callback);
+                register(cl, "zardoz", "this*is*my*gun", this.callback);
             },
 
             "it works": function(err, user) {
@@ -172,7 +172,7 @@ suite.addBatch({
                     var cb = this.callback;
                     Step(
                         function() {
-                            accessToken(cl, {nickname: "zardoz", password: "m3rl1n"}, this);
+                            accessToken(cl, {nickname: "zardoz", password: "this*is*my*gun"}, this);
                         },
                         function(err, pair) {
                             if (err) throw err;
@@ -209,11 +209,11 @@ suite.addBatch({
                     var cb = this.callback;
                     Step(
                         function() {
-                            register(cl, "yankee", "doodle", this);
+                            register(cl, "yankee", "d0odle|d4ndy", this);
                         },
                         function(err, user2) {
                             if (err) throw err;
-                            accessToken(cl, {nickname: "yankee", password: "doodle"}, this);
+                            accessToken(cl, {nickname: "yankee", password: "d0odle|d4ndy"}, this);
                         },
                         function(err, pair) {
                             if (err) throw err;
@@ -300,7 +300,7 @@ suite.addBatch({
         "and we register a user": {
 
             topic: function(cl) {
-                register(cl, "xerxes", "sparta", this.callback);
+                register(cl, "xerxes", "sparta!!", this.callback);
             },
 
             "it works": function(err, user) {
@@ -329,7 +329,7 @@ suite.addBatch({
                     }).on("error", function(err) {
                         cb(err);
                     });
-                    req.write(JSON.stringify({nickname: "xerxes", password: "athens"}));
+                    req.write(JSON.stringify({nickname: "xerxes", password: "athens*1"}));
                     req.end();
                 },
                 "it fails correctly": function(err) {
@@ -340,7 +340,7 @@ suite.addBatch({
                 topic: function(user, cl) {
                     httputil.putJSON("http://localhost:4815/api/user/xerxes",
                                      {consumer_key: "BADKEY", consumer_secret: "BADSECRET"},
-                                     {nickname: "xerxes", password: "thebes"},
+                                     {nickname: "xerxes", password: "6|before|thebes"},
                                      invert(this.callback));
                 },
                 "it fails correctly": function(err) {
@@ -351,7 +351,7 @@ suite.addBatch({
                 topic: function(user, cl) {
                     httputil.putJSON("http://localhost:4815/api/user/xerxes",
                                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
-                                     {nickname: "xerxes", password: "corinth"},
+                                     {nickname: "xerxes", password: "corinth,also"},
                                      invert(this.callback));
                 },
                 "it fails correctly": function(err) {
@@ -363,7 +363,7 @@ suite.addBatch({
                     httputil.putJSON("http://localhost:4815/api/user/xerxes",
                                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
                                       token: "BADTOKEN", token_secret: "BADSECRET"},
-                                     {nickname: "xerxes", password: "thessaly"},
+                                     {nickname: "xerxes", password: "thessaly?"},
                                      invert(this.callback));
                 },
                 "it fails correctly": function(err) {
@@ -376,11 +376,11 @@ suite.addBatch({
                     
                     Step(
                         function() {
-                            register(cl, "themistocles", "salamis", this);
+                            register(cl, "themistocles", "salamis!", this);
                         },
                         function(err, res) {
                             if (err) throw err;
-                            accessToken(cl, {nickname: "themistocles", password: "salamis"}, this);
+                            accessToken(cl, {nickname: "themistocles", password: "salamis!"}, this);
                         },
                         function(err, pair) {
                             if (err) {
@@ -389,7 +389,7 @@ suite.addBatch({
                                 httputil.putJSON("http://localhost:4815/api/user/xerxes",
                                                  {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
                                                   token: pair.token, token_secret: pair.token_secret},
-                                                 {nickname: "xerxes", password: "isuck"},
+                                                 {nickname: "xerxes", password: "isuck!haha"},
                                                  invert(cb));
                             }
                         }
@@ -405,7 +405,7 @@ suite.addBatch({
                     
                     Step(
                         function() {
-                            accessToken(cl, {nickname: "xerxes", password: "sparta"}, this);
+                            accessToken(cl, {nickname: "xerxes", password: "sparta!!"}, this);
                         },
                         function(err, pair) {
                             if (err) {
@@ -414,7 +414,7 @@ suite.addBatch({
                                 httputil.putJSON("http://localhost:4815/api/user/xerxes",
                                                  {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
                                                   token: pair.token, token_secret: pair.token_secret},
-                                                 {nickname: "xerxes", password: "athens"},
+                                                 {nickname: "xerxes", password: "athens+1"},
                                                  cb);
                             }
                         }
@@ -471,14 +471,14 @@ suite.addBatch({
         },
         "and we register a user": {
             topic: function(cl) {
-                register(cl, "c3po", "ihateanakin", this.callback);
+                register(cl, "c3po", "ih8anakin", this.callback);
             },
             "it works": function(err, user) {
                 assert.ifError(err);
             },
             "and we get an access token": {
                 topic: function(user, cl) {
-                    accessToken(cl, {nickname: "c3po", password: "ihateanakin"}, this.callback);
+                    accessToken(cl, {nickname: "c3po", password: "ih8anakin"}, this.callback);
                 },
                 "it works": function(err, pair) {
                     assert.ifError(err);
@@ -492,7 +492,7 @@ suite.addBatch({
                         httputil.putJSON("http://localhost:4815/api/user/c3po",
                                          {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
                                           token: pair.token, token_secret: pair.token_secret},
-                                         {nickname: "c3po", password: "ihateanakin", langs: 6000000},
+                                         {nickname: "c3po", password: "ih8anakin", langs: 6000000},
                                          function(err, body, res) {
                                              cb(err, body);
                                          });
@@ -558,14 +558,14 @@ suite.addBatch({
         },
         "and we register a user": {
             topic: function(cl) {
-                register(cl, "willy", "wonka", this.callback);
+                register(cl, "willy", "w0nka+b4r", this.callback);
             },
             "it works": function(err, user) {
                 assert.ifError(err);
             },
             "and we get an access token": {
                 topic: function(user, cl) {
-                    accessToken(cl, {nickname: "willy", password: "wonka"}, this.callback);
+                    accessToken(cl, {nickname: "willy", password: "w0nka+b4r"}, this.callback);
                 },
                 "it works": function(err, pair) {
                     assert.ifError(err);
@@ -575,7 +575,7 @@ suite.addBatch({
                         httputil.putJSON("http://localhost:4815/api/user/willy",
                                          {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
                                           token: pair.token, token_secret: pair.token_secret},
-                                         {nickname: "william", password: "wonka"},
+                                         {nickname: "william", password: "w0nka+b4r"},
                                          invert(this.callback));
                     },
                     "it fails correctly": function(err) {
@@ -587,7 +587,7 @@ suite.addBatch({
                         httputil.putJSON("http://localhost:4815/api/user/willy",
                                          {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
                                           token: pair.token, token_secret: pair.token_secret},
-                                         {nickname: "willy", password: "wonka", published: "2001-11-10T00:00:00"},
+                                         {nickname: "willy", password: "w0nka+b4r", published: "2001-11-10T00:00:00"},
                                          invert(this.callback));
                     },
                     "it fails correctly": function(err) {
@@ -599,7 +599,7 @@ suite.addBatch({
                         httputil.putJSON("http://localhost:4815/api/user/willy",
                                          {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
                                           token: pair.token, token_secret: pair.token_secret},
-                                         {nickname: "willy", password: "wonka", updated: "2003-11-10T00:00:00"},
+                                         {nickname: "willy", password: "w0nka+b4r", updated: "2003-11-10T00:00:00"},
                                          invert(this.callback));
                     },
                     "it fails correctly": function(err) {
@@ -615,7 +615,7 @@ suite.addBatch({
                         httputil.putJSON("http://localhost:4815/api/user/willy",
                                          {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
                                           token: pair.token, token_secret: pair.token_secret},
-                                         {nickname: "willy", password: "wonka", profile: profile},
+                                         {nickname: "willy", password: "w0nka+b4r", profile: profile},
                                          invert(this.callback));
                     },
                     "it fails correctly": function(err) {
@@ -629,7 +629,7 @@ suite.addBatch({
                         httputil.putJSON("http://localhost:4815/api/user/willy",
                                          {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
                                           token: pair.token, token_secret: pair.token_secret},
-                                         {nickname: "willy", password: "wonka", profile: profile},
+                                         {nickname: "willy", password: "w0nka+b4r", profile: profile},
                                          invert(this.callback));
                     },
                     "it fails correctly": function(err) {
@@ -676,7 +676,7 @@ suite.addBatch({
         },
         "and we register a user": {
             topic: function(cl) {
-                register(cl, "victor", "hugo", this.callback);
+                register(cl, "victor", "les+miz!", this.callback);
             },
             "it works": function(err, user) {
                 assert.ifError(err);
@@ -744,11 +744,11 @@ suite.addBatch({
                     var cb = this.callback;
                     Step(
                         function() {
-                            register(cl, "napoleon", "third", this);
+                            register(cl, "napoleon", "the+3rd!", this);
                         },
                         function(err, res) {
                             if (err) throw err;
-                            accessToken(cl, {nickname: "napoleon", password: "third"}, this);
+                            accessToken(cl, {nickname: "napoleon", password: "the+3rd!"}, this);
                         },
                         function(err, pair) {
                             if (err) {
@@ -771,7 +771,7 @@ suite.addBatch({
                     var cb = this.callback;
                     Step(
                         function() {
-                            accessToken(cl, {nickname: "victor", password: "hugo"}, this);
+                            accessToken(cl, {nickname: "victor", password: "les+miz!"}, this);
                         },
                         function(err, pair) {
                             if (err) {
