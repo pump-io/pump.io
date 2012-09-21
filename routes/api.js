@@ -83,9 +83,13 @@ var addRoutes = function(app) {
     // Inboxen
 
     app.get("/api/user/:nickname/inbox", userAuth, reqUser, sameUser, userInbox);
+    app.post("/api/user/:nickname/inbox", remoteUserAuth, reqUser, postToInbox);
+
     app.get("/api/user/:nickname/inbox/major", userAuth, reqUser, sameUser, notYetImplemented);
     app.get("/api/user/:nickname/inbox/minor", userAuth, reqUser, sameUser, notYetImplemented);
-    app.post("/api/user/:nickname/inbox", remoteUserAuth, reqUser, postToInbox);
+    app.get("/api/user/:nickname/inbox/direct", userAuth, reqUser, sameUser, notYetImplemented);
+    app.get("/api/user/:nickname/inbox/direct/major", userAuth, reqUser, sameUser, notYetImplemented);
+    app.get("/api/user/:nickname/inbox/direct/minor", userAuth, reqUser, sameUser, notYetImplemented);
 
     app.get("/api/user/:nickname/followers", clientAuth, reqUser, userFollowers);
 
