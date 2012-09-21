@@ -903,6 +903,65 @@ suite.addBatch({
                 "and we check the minor direct inbox":
                 emptyFeed("/api/user/isa/inbox/direct/minor")
             }
+        },
+        "and register a couple more users": {
+            topic: function(app) {
+                Step(
+                    function() {
+                        newCredentials("backpack", "loaded|up", this.parallel());
+                        newCredentials("map", "I'mtheMap", this.parallel());
+                    },
+                    this.callback
+                );
+            },
+            "it works": function(err, cred1, cred2) {
+                assert.ifError(err);
+                assert.isObject(cred1);
+                assert.isObject(cred2);
+            },
+            "and we post a bunch of major activities": {
+                topic: function(cred1, cred2) {
+                    var cb = this.callback;
+
+                    Step(
+                        function() {
+                            var group = this.group(),
+                                i,
+                                act = {
+                                    verb: "post",
+                                    to: [cred1.user.profile],
+                                    object: {
+                                        objectType: "comment",
+                                        inReplyTo: {
+                                            id: "urn:uuid:2435a836-042b-11e2-99dd-70f1a154e1aa",
+                                            objectType: "video"
+                                        }
+                                    }
+                                },
+                                newAct,
+                                url = "http://localhost:4815/api/user/map/feed";
+
+                            for (i = 0; i < 100; i++) {
+                                newAct = JSON.parse(JSON.stringify(act));
+                                newAct.object.content = "This is great! " + i,
+                                httputil.postJSON(url, cred2, newAct, group());
+                            }
+                        },
+                        function(err) {
+                            cb(err);
+                        }
+                    );
+                },
+                "it works": function(err) {
+                    assert.ifError(err);
+                },
+                "and we work out the direct inbox":
+                workout("http://localhost:4815/api/user/backpack/inbox/direct"),
+                "and we work out the minor direct inbox":
+                workout("http://localhost:4815/api/user/backpack/inbox/direct/minor"),
+                "and we check the major direct inbox":
+                emptyFeed("/api/user/backpack/inbox/direct/major")
+            }
         }
     }
 });
