@@ -139,6 +139,12 @@ suite.addBatch({
             "it has the getMajorDirectInboxStream() method": function(user) {
                 assert.isFunction(user.getMajorDirectInboxStream);
             },
+            "it has the getDirectMinorInboxStream() method": function(user) {
+                assert.isFunction(user.getDirectMinorInboxStream);
+            },
+            "it has the getDirectMajorInboxStream() method": function(user) {
+                assert.isFunction(user.getDirectMajorInboxStream);
+            },
             "it has the getLists() method": function(user) {
                 assert.isFunction(user.getLists);
             },
@@ -933,6 +939,28 @@ suite.addBatch({
     }
 });
 
+var emptyStreamContext = function(streamgetter) {
+    return {
+        topic: function(user) {
+            var callback = this.callback;
+            Step(
+                function() {
+                    streamgetter(user, this);
+                },
+                function(err, str) {
+                    if (err) throw err;
+                    str.getItems(0, 20, this);
+                },
+                callback
+            );
+        },
+        "it's empty": function(err, activities) {
+            assert.ifError(err);
+            assert.isEmpty(activities);
+        }
+    };
+};
+
 // Tests for major, minor streams
 
 suite.addBatch({
@@ -948,82 +976,22 @@ suite.addBatch({
         "it works": function(err, user) {
             assert.ifError(err);
         },
-        "and we check their minor inbox": {
-            topic: function(user) {
-                var callback = this.callback;
-                Step(
-                    function() {
-                        user.getMinorInboxStream(this);
-                    },
-                    function(err, str) {
-                        if (err) throw err;
-                        str.getItems(0, 20, this);
-                    },
-                    callback
-                );
-            },
-            "it's empty": function(err, activities) {
-                assert.ifError(err);
-                assert.isEmpty(activities);
-            }
-        },
-        "and we check their minor outbox": {
-            topic: function(user) {
-                var callback = this.callback;
-                Step(
-                    function() {
-                        user.getMinorOutboxStream(this);
-                    },
-                    function(err, str) {
-                        if (err) throw err;
-                        str.getItems(0, 20, this);
-                    },
-                    callback
-                );
-            },
-            "it's empty": function(err, activities) {
-                assert.ifError(err);
-                assert.isEmpty(activities);
-            }
-        },
-        "and we check their major inbox": {
-            topic: function(user) {
-                var callback = this.callback;
-                Step(
-                    function() {
-                        user.getMajorInboxStream(this);
-                    },
-                    function(err, str) {
-                        if (err) throw err;
-                        str.getItems(0, 20, this);
-                    },
-                    callback
-                );
-            },
-            "it's empty": function(err, activities) {
-                assert.ifError(err);
-                assert.isEmpty(activities);
-            }
-        },
-        "and we check their major outbox": {
-            topic: function(user) {
-                var callback = this.callback;
-                Step(
-                    function() {
-                        user.getMajorOutboxStream(this);
-                    },
-                    function(err, str) {
-                        if (err) throw err;
-                        str.getItems(0, 20, this);
-                    },
-                    callback
-                );
-            },
-            "it's empty": function(err, activities) {
-                assert.ifError(err);
-                assert.isEmpty(activities);
-            }
-        }
+        "and we check their minor inbox": 
+        emptyStreamContext(function(user, callback) {
+            user.getMinorInboxStream(callback);
+        }),
+        "and we check their minor outbox": 
+        emptyStreamContext(function(user, callback) {
+            user.getMinorOutboxStream(callback);
+        }),
+        "and we check their major inbox": 
+        emptyStreamContext(function(user, callback) {
+            user.getMajorInboxStream(callback);
+        }),
+        "and we check their major inbox": 
+        emptyStreamContext(function(user, callback) {
+            user.getMajorOutboxStream(callback);
+        })
     },
     "When we create another user": {
         topic: function() {
@@ -1383,6 +1351,36 @@ suite.addBatch({
     badNickname("api"),
     "When we create a new user with nickname 'oauth'": 
     badNickname("oauth")
+});
+
+// Tests for direct, direct-major, and direct-minor streams
+
+suite.addBatch({
+    "When we create a new user": {
+        topic: function() {
+            var User = require("../lib/model/user").User,
+                props = {
+                    nickname: "george",
+                    password: "moving-on-up"
+                };
+            User.create(props, this.callback);
+        },
+        "it works": function(err, user) {
+            assert.ifError(err);
+        },
+        "and we check their direct inbox": 
+        emptyStreamContext(function(user, callback) {
+            user.getDirectInboxStream(callback);
+        }),
+        "and we check their direct minor inbox":
+        emptyStreamContext(function(user, callback) {
+            user.getMinorDirectInboxStream(callback);
+        }),
+        "and we check their direct major inbox":
+        emptyStreamContext(function(user, callback) {
+            user.getMajorDirectInboxStream(callback);
+        })
+    }
 });
 
 suite["export"](module);
