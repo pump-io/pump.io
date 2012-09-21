@@ -1243,6 +1243,41 @@ suite.addBatch({
     badNickname("oauth")
 });
 
+var activityMakerContext = function(maker, rest) {
+
+    var ctx = {
+
+        topic: function(toUser, fromUser) {
+            var Activity = require("../lib/model/activity").Activity,
+                callback = this.callback,
+                theAct;
+
+            Step(
+                function() {
+                    var act = maker(toUser, fromUser);
+                    Activity.create(act, this);
+                },
+                function(err, act) {
+                    if (err) throw err;
+                    theAct = act;
+                    toUser.addToInbox(act, this);
+                },
+                function(err) {
+                    callback(err, theAct);
+                }
+            );
+        },
+        "it works": function(err, act) {
+            assert.ifError(err);
+            assert.isObject(act);
+        }
+    };
+
+    _.extend(ctx, rest);
+
+    return ctx;
+};
+
 // Tests for direct, direct-major, and direct-minor streams
 
 suite.addBatch({
@@ -1286,7 +1321,7 @@ suite.addBatch({
                     props2 = {
                         nickname: "florence",
                         password: "maid/up1"
-                };
+                    };
                 Step(
                     function() {
                         User.create(props2, this.parallel());
@@ -1300,95 +1335,201 @@ suite.addBatch({
                 assert.isObject(fromUser);
                 assert.isObject(toUser);
             },
-            "and one user sends a major activity to the other": {
-                topic: function(toUser, fromUser) {
-                    var Activity = require("../lib/model/activity").Activity,
-                        callback = this.callback,
-                        theAct;
-
-                    Step(
-                        function() {
-                            var act = {
-                                actor: fromUser.profile,
-                                to: [toUser.profile],
-                                verb: "post",
-                                object: {
-                                    objectType: "note",
-                                    content: "Please get the door"
-                                }
-                            };
-                            Activity.create(act, this);
-                        },
-                        function(err, act) {
-                            if (err) throw err;
-                            theAct = act;
-                            toUser.addToInbox(act, this);
-                        },
-                        function(err) {
-                            callback(err, theAct);
+            "and one user sends a major activity to the other": 
+            activityMakerContext(
+                function(toUser, fromUser) {
+                    return {
+                        actor: fromUser.profile,
+                        to: [toUser.profile],
+                        verb: "post",
+                        object: {
+                            objectType: "note",
+                            content: "Please get the door"
                         }
-                    );
+                    };
                 },
-                "it works": function(err, act) {
-                    assert.ifError(err);
-                    assert.isObject(act);
-                },
-                "and we check the recipient's direct inbox": 
-                inStreamContext(function(user, callback) {
-                    user.getDirectInboxStream(callback);
+                {
+                    "and we check the recipient's direct inbox": 
+                    inStreamContext(function(user, callback) {
+                        user.getDirectInboxStream(callback);
+                    }),
+                    "and we check the recipient's direct minor inbox": 
+                    notInStreamContext(function(user, callback) {
+                        user.getDirectMinorInboxStream(callback);
+                    }),
+                    "and we check the recipient's direct major inbox": 
+                    inStreamContext(function(user, callback) {
+                        user.getDirectMajorInboxStream(callback);
+                    })
                 }),
-                "and we check the recipient's direct minor inbox": 
-                notInStreamContext(function(user, callback) {
-                    user.getDirectMinorInboxStream(callback);
-                }),
-                "and we check the recipient's direct major inbox": 
-                inStreamContext(function(user, callback) {
-                    user.getDirectMajorInboxStream(callback);
-                })
-            },
-            "and one user sends a minor activity to the other": {
-                topic: function(toUser, fromUser) {
-                    var Activity = require("../lib/model/activity").Activity,
-                        callback = this.callback,
-                        theAct;
-
-                    Step(
-                        function() {
-                            var act = {
-                                actor: fromUser.profile,
-                                to: [toUser.profile],
-                                verb: "follow",
-                                object: toUser.profile
-                            };
-                            Activity.create(act, this);
-                        },
-                        function(err, act) {
-                            if (err) throw err;
-                            theAct = act;
-                            toUser.addToInbox(act, this);
-                        },
-                        function(err) {
-                            callback(err, theAct);
+            "and one user sends a minor activity to the other": 
+            activityMakerContext(
+                function(toUser, fromUser) {
+                    return {
+                        actor: fromUser.profile,
+                        to: [toUser.profile],
+                        verb: "favorite",
+                        object: {
+                            id: "urn:uuid:c6591278-0418-11e2-ade3-70f1a154e1aa",
+                            objectType: "audio"
                         }
-                    );
+                    };
                 },
-                "it works": function(err, act) {
-                    assert.ifError(err);
-                    assert.isObject(act);
+                {
+                    "and we check the recipient's direct inbox": 
+                    inStreamContext(function(user, callback) {
+                        user.getDirectInboxStream(callback);
+                    }),
+                    "and we check the recipient's direct minor inbox": 
+                    inStreamContext(function(user, callback) {
+                        user.getDirectMinorInboxStream(callback);
+                    }),
+                    "and we check the recipient's direct major inbox": 
+                    notInStreamContext(function(user, callback) {
+                        user.getDirectMajorInboxStream(callback);
+                    })
+                }),
+            "and one user sends a major activity bto the other": 
+            activityMakerContext(
+                function(toUser, fromUser) {
+                    return {
+                        actor: fromUser.profile,
+                        bto: [toUser.profile],
+                        verb: "post",
+                        object: {
+                            objectType: "note",
+                            content: "Please wash George's underwear."
+                        }
+                    };
                 },
-                "and we check the recipient's direct inbox": 
-                inStreamContext(function(user, callback) {
-                    user.getDirectInboxStream(callback);
+                {
+                    "and we check the recipient's direct inbox": 
+                    inStreamContext(function(user, callback) {
+                        user.getDirectInboxStream(callback);
+                    }),
+                    "and we check the recipient's direct minor inbox": 
+                    notInStreamContext(function(user, callback) {
+                        user.getDirectMinorInboxStream(callback);
+                    }),
+                    "and we check the recipient's direct major inbox": 
+                    inStreamContext(function(user, callback) {
+                        user.getDirectMajorInboxStream(callback);
+                    })
                 }),
-                "and we check the recipient's direct minor inbox": 
-                inStreamContext(function(user, callback) {
-                    user.getDirectMinorInboxStream(callback);
+            "and one user sends a minor activity bto the other": 
+            activityMakerContext(
+                function(toUser, fromUser) {
+                    return {
+                        actor: fromUser.profile,
+                        bto: [toUser.profile],
+                        verb: "favorite",
+                        object: {
+                            id: "urn:uuid:5982b964-0414-11e2-8ced-70f1a154e1aa",
+                            objectType: "service"
+                        }
+                    };
+                },
+                {
+                    "and we check the recipient's direct inbox": 
+                    inStreamContext(function(user, callback) {
+                        user.getDirectInboxStream(callback);
+                    }),
+                    "and we check the recipient's direct minor inbox": 
+                    inStreamContext(function(user, callback) {
+                        user.getDirectMinorInboxStream(callback);
+                    }),
+                    "and we check the recipient's direct major inbox": 
+                    notInStreamContext(function(user, callback) {
+                        user.getDirectMajorInboxStream(callback);
+                    })
                 }),
-                "and we check the recipient's direct major inbox": 
-                notInStreamContext(function(user, callback) {
-                    user.getDirectMajorInboxStream(callback);
-                })
-            }
+            "and one user sends a minor activity to the public":
+            activityMakerContext(
+                function(toUser, fromUser) {
+                    return {
+                        actor: fromUser.profile,
+                        to: [{
+                            id: "http://activityschema.org/collection/public",
+                            objectType: "collection"
+                        }],
+                        verb: "favorite",
+                        object: {
+                            id: "urn:uuid:0e6b0f90-0413-11e2-84fb-70f1a154e1aa",
+                            objectType: "video"
+                        }
+                    };
+                },
+                {
+                    "and we check the other user's direct inbox": 
+                    notInStreamContext(function(user, callback) {
+                        user.getDirectInboxStream(callback);
+                    }),
+                    "and we check the other user's direct minor inbox": 
+                    notInStreamContext(function(user, callback) {
+                        user.getDirectMinorInboxStream(callback);
+                    }),
+                    "and we check the other user's direct major inbox": 
+                    notInStreamContext(function(user, callback) {
+                        user.getDirectMajorInboxStream(callback);
+                    })
+                }
+            ),
+            "and one user sends a major activity and cc's the other":
+            activityMakerContext(
+                function(toUser, fromUser) {
+                    return {
+                        actor: fromUser.profile,
+                        cc: [toUser.profile],
+                        verb: "post",
+                        object: {
+                            id: "I'm tired.",
+                            objectType: "note"
+                        }
+                    };
+                },
+                {
+                    "and we check the other user's direct inbox": 
+                    notInStreamContext(function(user, callback) {
+                        user.getDirectInboxStream(callback);
+                    }),
+                    "and we check the other user's direct minor inbox": 
+                    notInStreamContext(function(user, callback) {
+                        user.getDirectMinorInboxStream(callback);
+                    }),
+                    "and we check the other user's direct major inbox": 
+                    notInStreamContext(function(user, callback) {
+                        user.getDirectMajorInboxStream(callback);
+                    })
+                }
+            ),
+            "and one user sends a major activity and bcc's the other":
+            activityMakerContext(
+                function(toUser, fromUser) {
+                    return {
+                        actor: fromUser.profile,
+                        bcc: [toUser.profile],
+                        verb: "post",
+                        object: {
+                            id: "It's hot.",
+                            objectType: "note"
+                        }
+                    };
+                },
+                {
+                    "and we check the other user's direct inbox": 
+                    notInStreamContext(function(user, callback) {
+                        user.getDirectInboxStream(callback);
+                    }),
+                    "and we check the other user's direct minor inbox": 
+                    notInStreamContext(function(user, callback) {
+                        user.getDirectMinorInboxStream(callback);
+                    }),
+                    "and we check the other user's direct major inbox": 
+                    notInStreamContext(function(user, callback) {
+                        user.getDirectMajorInboxStream(callback);
+                    })
+                }
+            )
         }
     }
 });
