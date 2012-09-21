@@ -734,7 +734,7 @@ suite.addBatch({
                 assert.isString(cred.token);
                 assert.isString(cred.token_secret);
             },
-            "and we post a bunch of activities": {
+            "and we post a bunch of major activities": {
                 topic: function(cred) {
                     var cb = this.callback;
 
@@ -773,7 +773,15 @@ suite.addBatch({
                 "and we workout the major inbox":
                 workout(MAJORINBOX),
                 "and we workout the major inbox":
-                workout(MAJOROUTBOX)
+                workout(MAJOROUTBOX),
+                "and we check the minor inbox":
+                emptyFeed("/api/user/alicia/inbox/minor"),
+                "and we check the direct inbox":
+                emptyFeed("/api/user/alicia/inbox/direct"),
+                "and we check the direct minor inbox":
+                emptyFeed("/api/user/alicia/inbox/direct/minor"),
+                "and we check the direct major inbox":
+                emptyFeed("/api/user/alicia/inbox/direct/major")
             }
         }
     }
