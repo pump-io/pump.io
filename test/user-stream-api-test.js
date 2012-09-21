@@ -783,6 +783,71 @@ suite.addBatch({
                 "and we check the direct major inbox":
                 emptyFeed("/api/user/alicia/inbox/direct/major")
             }
+        },
+        "and we get new credentials": {
+            topic: function(app) {
+                newCredentials("benny", "my/guys!", this.callback);
+            },
+            "it works": function(err, cred) {
+                assert.ifError(err);
+                assert.isObject(cred);
+                assert.isString(cred.consumer_key);
+                assert.isString(cred.consumer_secret);
+                assert.isString(cred.token);
+                assert.isString(cred.token_secret);
+            },
+            "and we post a bunch of minor activities": {
+                topic: function(cred) {
+                    var cb = this.callback;
+
+                    Step(
+                        function() {
+                            var group = this.group(),
+                                i,
+                                act = {
+                                    verb: "post",
+                                    to: [{
+                                        id: "http://activityschema.org/collection/public",
+                                        objectType: "collection"
+                                    }],
+                                    object: {
+                                        objectType: "comment",
+                                        inReplyTo: {
+                                            id: "urn:uuid:79ce4946-0427-11e2-aa67-70f1a154e1aa",
+                                            objectType: "image"
+                                        }
+                                    }
+                                },
+                                newAct,
+                                url = "http://localhost:4815/api/user/benny/feed";
+
+                            for (i = 0; i < 100; i++) {
+                                newAct = JSON.parse(JSON.stringify(act));
+                                newAct.object.content = "I love it! " + i,
+                                httputil.postJSON(url, cred, newAct, group());
+                            }
+                        },
+                        function(err) {
+                            cb(err);
+                        }
+                    );
+                },
+                "it works": function(err) {
+                    assert.ifError(err);
+                },
+                "and we work out the minor inbox":
+                workout("http://localhost:4815/api/user/benny/inbox/minor"),
+                "and we work out the minor outbox":
+                workout("http://localhost:4815/api/user/benny/feed/minor"),
+                "and we check the major inbox":
+                emptyFeed("/api/user/benny/inbox/major"),
+                "and we check the direct inbox":
+                emptyFeed("/api/user/benny/inbox/direct"),
+                "and we check the direct minor inbox":
+                emptyFeed("/api/user/benny/inbox/direct/minor"),
+                "and we check the direct major inbox":
+                emptyFeed("/api/user/benny/inbox/direct/major")
+            }
         }
     }
 });
