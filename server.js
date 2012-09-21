@@ -16,13 +16,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var makeApp = require("./lib/app").makeApp;
-var config = require("./config");
+var cluster = require("cluster"),
+    os = require("os"),
+    makeApp = require("./lib/app").makeApp,
+    config = require("./config"),
+    cnt,
+    i;
 
-makeApp(config, function(err, app) {
-    if (err) {
-        console.log(err);
-    } else {
-        app.run(function(err) {});
+if (cluster.isMaster) {
+    cnt = config.children || Math.max(os.cpus().length - 1, 1);
+    for (i = 0; i < cnt; i++) {
+        cluster.fork();
     }
-});
+} else { 
+    makeApp(config, function(err, app) {
+        if (err) {
+            console.log(err);
+        } else {
+            app.run(function(err) {});
+        }
+    });
+}
