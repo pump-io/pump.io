@@ -208,7 +208,8 @@ var newCredentials = function(nickname, password, hostname, port, cb) {
 };
 
 var newPair = function(cl, nickname, password, hostname, port, cb) {
-    var user;
+    var user,
+        regd;
 
     if (!port) {
         cb = hostname;
@@ -222,6 +223,7 @@ var newPair = function(cl, nickname, password, hostname, port, cb) {
         },
         function(err, res) {
             if (err) throw err;
+            regd = res;
             user = {nickname: nickname, password: password};
             accessToken(cl, user, hostname, port, this);
         },
@@ -229,6 +231,7 @@ var newPair = function(cl, nickname, password, hostname, port, cb) {
             if (err) {
                 cb(err, null);
             } else {
+                _.extend(res, {user: regd});
                 cb(null, res);
             }
         }
