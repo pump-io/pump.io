@@ -75,10 +75,11 @@ var addRoutes = function(app) {
 
     // Feeds
 
-    app.post("/api/user/:nickname/feed", userAuth, reqUser, sameUser, postActivity);
     app.get("/api/user/:nickname/feed", clientAuth, reqUser, userStream);
-    app.get("/api/user/:nickname/feed/major", clientAuth, reqUser, notYetImplemented);
-    app.get("/api/user/:nickname/feed/minor", clientAuth, reqUser, notYetImplemented);
+    app.post("/api/user/:nickname/feed", userAuth, reqUser, sameUser, postActivity);
+
+    app.get("/api/user/:nickname/feed/major", clientAuth, reqUser, userMajorStream);
+    app.get("/api/user/:nickname/feed/minor", clientAuth, reqUser, userMinorStream);
 
     // Inboxen
 
@@ -937,70 +938,108 @@ var recipientsOnly = function(person) {
 
 var publicOnly = recipientsOnly(null);
 
-var userStream = function(req, res, next) {
+var filteredFeedRoute = function(urlmaker, titlemaker, streammaker) {
 
-    var url = URLMaker.makeURL("api/user/" + req.user.nickname + "/feed"),
-        collection = {
-            author: req.user.profile,
-            displayName: "Activities by " + (req.user.profile.displayName || req.user.nickname),
-            id: url,
-            objectTypes: ["activity"],
-            url: url,
-            links: {
-                first: url,
-                self: url
-            },
-            items: []
-        };
+    return function(req, res, next) {
 
-    var args, str, ids;
+        var url = urlmaker(req),
+            collection = {
+                author: req.user.profile,
+                displayName: titlemaker(req),
+                id: url,
+                objectTypes: ["activity"],
+                url: url,
+                links: {
+                    first: url,
+                    self: url
+                },
+                items: []
+            };
 
-    try {
-        args = streamArgs(req, DEFAULT_ACTIVITIES, MAX_ACTIVITIES);
-    } catch (e) {
-        next(e);
-        return;
-    }
+        var args, str, ids;
 
-    Step(
-        function() {
-            // XXX: stuff this into User
-            req.user.getOutboxStream(this);
-        },
-        function(err, outbox) {
-            if (err) {
-                if (err instanceof NoSuchThingError) {
-                    collection.totalItems = 0;
-                    res.json(collection);
-                } else {
-                    throw err;
-                }
-            } else {
-                // Skip filtering if remote user == author
-                if (req.remoteUser && req.remoteUser.profile.id == req.user.profile.id) {
-                    str = outbox;
-                } else if (!req.remoteUser) {
-                    // XXX: keep a separate stream instead of filtering
-                    str = new FilteredStream(outbox, publicOnly);
-                } else {
-                    str = new FilteredStream(outbox, recipientsOnly(req.remoteUser.profile));
-                }
-
-                getStream(str, args, collection, req.remoteUser, this);
-            }
-        },
-        function(err) {
-            if (err) {
-                next(err);
-            } else {
-                collection.items.forEach(function(act) {
-                    delete act.actor;
-                });
-                res.json(collection);
-            }
+        try {
+            args = streamArgs(req, DEFAULT_ACTIVITIES, MAX_ACTIVITIES);
+        } catch (e) {
+            next(e);
+            return;
         }
-    );
+
+        Step(
+            function() {
+                streammaker(req, this);
+            },
+            function(err, outbox) {
+                if (err) {
+                    if (err instanceof NoSuchThingError) {
+                        collection.totalItems = 0;
+                        res.json(collection);
+                    } else {
+                        throw err;
+                    }
+                } else {
+                    // Skip filtering if remote user == author
+                    if (req.remoteUser && req.remoteUser.profile.id == req.user.profile.id) {
+                        str = outbox;
+                    } else if (!req.remoteUser) {
+                        // XXX: keep a separate stream instead of filtering
+                        str = new FilteredStream(outbox, publicOnly);
+                    } else {
+                        str = new FilteredStream(outbox, recipientsOnly(req.remoteUser.profile));
+                    }
+
+                    getStream(str, args, collection, req.remoteUser, this);
+                }
+            },
+            function(err) {
+                if (err) {
+                    next(err);
+                } else {
+                    collection.items.forEach(function(act) {
+                        delete act.actor;
+                    });
+                    res.json(collection);
+                }
+            }
+        );
+    };
 };
+
+var userStream = filteredFeedRoute(
+    function(req) {
+        return URLMaker.makeURL("api/user/" + req.user.nickname + "/feed");
+    },
+    function(req) {
+        return "Activities by " + (req.user.profile.displayName || req.user.nickname);
+    },
+    function(req, callback) {
+        req.user.getOutboxStream(callback);
+    }
+);
+
+var userMajorStream = filteredFeedRoute(
+    function(req) {
+        return URLMaker.makeURL("api/user/" + req.user.nickname + "/feed/major");
+    },
+    function(req) {
+        return "Major activities by " + (req.user.profile.displayName || req.user.nickname);
+    },
+    function(req, callback) {
+        req.user.getMajorOutboxStream(callback);
+    }
+);
+
+var userMinorStream = filteredFeedRoute(
+    function(req) {
+        return URLMaker.makeURL("api/user/" + req.user.nickname + "/feed/minor");
+    },
+    function(req) {
+        return "Minor activities by " + (req.user.profile.displayName || req.user.nickname);
+    },
+    function(req, callback) {
+        req.user.getMinorOutboxStream(callback);
+    }
+);
 
 var feedRoute = function(urlmaker, titlemaker, streamgetter) {
 
@@ -1055,30 +1094,6 @@ var feedRoute = function(urlmaker, titlemaker, streamgetter) {
         );
     };
 };
-
-var userInbox = feedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox");
-    },
-    function(req) {
-        return "Activities for " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getInboxStream(callback);
-    }
-);
-
-var userInbox = feedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox");
-    },
-    function(req) {
-        return "Activities for " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getInboxStream(callback);
-    }
-);
 
 var userInbox = feedRoute(
     function(req) {
