@@ -130,6 +130,15 @@ suite.addBatch({
             "it has the getMinorInboxStream() method": function(user) {
                 assert.isFunction(user.getMinorInboxStream);
             },
+            "it has the getDirectInboxStream() method": function(user) {
+                assert.isFunction(user.getDirectInboxStream);
+            },
+            "it has the getMinorDirectInboxStream() method": function(user) {
+                assert.isFunction(user.getMinorDirectInboxStream);
+            },
+            "it has the getMajorDirectInboxStream() method": function(user) {
+                assert.isFunction(user.getMajorDirectInboxStream);
+            },
             "it has the getLists() method": function(user) {
                 assert.isFunction(user.getLists);
             },
