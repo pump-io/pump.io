@@ -949,7 +949,7 @@ var emptyStreamContext = function(streamgetter) {
                 },
                 function(err, str) {
                     if (err) throw err;
-                    str.getItems(0, 20, this);
+                    str.getIDs(0, 20, this);
                 },
                 callback
             );
@@ -959,6 +959,44 @@ var emptyStreamContext = function(streamgetter) {
             assert.isEmpty(activities);
         }
     };
+};
+
+var streamCountContext = function(streamgetter, targetCount) {
+    return {
+        topic: function(act, user) {
+            var callback = this.callback;
+            Step(
+                function() {
+                    streamgetter(user, this);
+                },
+                function(err, str) {
+                    if (err) throw err;
+                    str.getIDs(0, 20, this);
+                },
+                function(err, activities) {
+                    callback(err, act, activities);
+                }
+            );
+        },
+        "it's in there": function(err, act, activities) {
+            var matches;
+            assert.ifError(err);
+            assert.isObject(act);
+            assert.isArray(activities);
+            matches = activities.filter(function(item) {
+                return (item == act.id);
+            });
+            assert.lengthOf(matches, targetCount);
+        }
+    };
+};
+
+var inStreamContext = function(streamgetter) {
+    return streamCountContext(streamgetter, 1);
+};
+
+var notInStreamContext = function(streamgetter) {
+    return streamCountContext(streamgetter, 0);
 };
 
 // Tests for major, minor streams
@@ -1356,30 +1394,107 @@ suite.addBatch({
 // Tests for direct, direct-major, and direct-minor streams
 
 suite.addBatch({
-    "When we create a new user": {
+    "When we get the User class": {
         topic: function() {
-            var User = require("../lib/model/user").User,
-                props = {
+            return require("../lib/model/user").User;
+        },
+        "it works": function(User) {
+            assert.isFunction(User);
+        },
+        "and we create a new user": {
+            topic: function(User) {
+                var props = {
                     nickname: "george",
                     password: "moving-on-up"
                 };
-            User.create(props, this.callback);
+                User.create(props, this.callback);
+            },
+            "it works": function(err, user) {
+                assert.ifError(err);
+            },
+            "and we check their direct inbox": 
+            emptyStreamContext(function(user, callback) {
+                user.getDirectInboxStream(callback);
+            }),
+            "and we check their direct minor inbox":
+            emptyStreamContext(function(user, callback) {
+                user.getMinorDirectInboxStream(callback);
+            }),
+            "and we check their direct major inbox":
+            emptyStreamContext(function(user, callback) {
+                user.getMajorDirectInboxStream(callback);
+            })
         },
-        "it works": function(err, user) {
-            assert.ifError(err);
-        },
-        "and we check their direct inbox": 
-        emptyStreamContext(function(user, callback) {
-            user.getDirectInboxStream(callback);
-        }),
-        "and we check their direct minor inbox":
-        emptyStreamContext(function(user, callback) {
-            user.getMinorDirectInboxStream(callback);
-        }),
-        "and we check their direct major inbox":
-        emptyStreamContext(function(user, callback) {
-            user.getMajorDirectInboxStream(callback);
-        })
+        "and we create a pair of users": {
+            topic: function(User) {
+                var props1 = {
+                    nickname: "louise",
+                    password: "moving-on-up2"
+                },
+                    props2 = {
+                        nickname: "florence",
+                        password: "maid/up1"
+                };
+                Step(
+                    function() {
+                        User.create(props2, this.parallel());
+                        User.create(props1, this.parallel());
+                    },
+                    this.callback
+                );
+            },
+            "it works": function(err, toUser, fromUser) {
+                assert.ifError(err);
+                assert.isObject(fromUser);
+                assert.isObject(toUser);
+            },
+            "and one user sends a major activity to the other": {
+                topic: function(toUser, fromUser) {
+                    var Activity = require("../lib/model/activity").Activity,
+                        callback = this.callback,
+                        theAct;
+
+                    Step(
+                        function() {
+                            var act = {
+                                actor: fromUser.profile,
+                                to: [toUser.profile],
+                                verb: "post",
+                                object: {
+                                    objectType: "note",
+                                    content: "Please get the door"
+                                }
+                            };
+                            Activity.create(act, this);
+                        },
+                        function(err, act) {
+                            if (err) throw err;
+                            theAct = act;
+                            toUser.addToInbox(act, this);
+                        },
+                        function(err) {
+                            callback(err, theAct);
+                        }
+                    );
+                },
+                "it works": function(err, act) {
+                    assert.ifError(err);
+                    assert.isObject(act);
+                },
+                "and we check the recipient's direct inbox": 
+                inStreamContext(function(user, callback) {
+                    user.getDirectInboxStream(callback);
+                }),
+                "and we check the recipient's direct minor inbox": 
+                notInStreamContext(function(user, callback) {
+                    user.getDirectMinorInboxStream(callback);
+                }),
+                "and we check the recipient's direct major inbox": 
+                inStreamContext(function(user, callback) {
+                    user.getDirectMajorInboxStream(callback);
+                })
+            }
+        }
     }
 });
 
