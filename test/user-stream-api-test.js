@@ -1,6 +1,6 @@
 // user-stream-api-test.js
 //
-// Test user streams
+// Test user streams API
 //
 // Copyright 2012, StatusNet Inc.
 //
@@ -535,6 +535,178 @@ var validData = function(start, end) {
     };
 };
 
+// Workout a feed endpoint
+
+var workout = function(endpoint) {
+    return {
+        "and we get the default feed": {
+            topic: getDoc(endpoint),
+            "it works": itWorks,
+            "it looks right": validForm(20, 100)
+        },
+        "and we get the full feed": {
+            topic: getDoc(endpoint + "?count=100"),
+            "it works": itWorks,
+            "it looks right": validForm(100, 100),
+            "and we get the feed with a non-zero offset": {
+                topic: cmpDoc(endpoint + "?offset=50"),
+                "it works": itWorks,
+                "it looks right": validForm(20, 100),
+                "it has the right data": validData(50, 70)
+            },
+            "and we get the feed with a zero offset": {
+                topic: cmpDoc(endpoint + "?offset=0"),
+                "it works": itWorks,
+                "it looks right": validForm(20, 100),
+                "it has the right data": validData(0, 20)
+            },
+            "and we get the feed with a non-zero offset and count": {
+                topic: cmpDoc(endpoint + "?offset=20&count=20"),
+                "it works": itWorks,
+                "it looks right": validForm(20, 100),
+                "it has the right data": validData(20, 40)
+            },
+            "and we get the feed with a zero offset and count": {
+                topic: cmpDoc(endpoint + "?offset=0"),
+                "it works": itWorks,
+                "it looks right": validForm(20, 100),
+                "it has the right data": validData(0, 20)
+            },
+            "and we get the feed with a non-zero count": {
+                topic: cmpDoc(endpoint + "?count=50"),
+                "it works": itWorks,
+                "it looks right": validForm(50, 100),
+                "it has the right data": validData(0, 50)
+            },
+            "and we get the feed since a value": {
+                topic: cmpSince(endpoint, 25),
+                "it works": itWorks,
+                "it looks right": validForm(20, 100),
+                "it has the right data": validData(5, 25)
+            },
+            "and we get the feed before a value": {
+                topic: cmpBefore(endpoint, 25),
+                "it works": itWorks,
+                "it looks right": validForm(20, 100),
+                "it has the right data": validData(26, 46)
+            },
+            "and we get the feed since a small value": {
+                topic: cmpSince(endpoint, 5),
+                "it works": itWorks,
+                "it looks right": validForm(5, 100),
+                "it has the right data": validData(0, 5)
+            },
+            "and we get the feed before a big value": {
+                topic: cmpBefore(endpoint, 94),
+                "it works": itWorks,
+                "it looks right": validForm(5, 100),
+                "it has the right data": validData(95, 100)
+            },
+            "and we get the feed since a value with a count": {
+                topic: cmpSince(endpoint, 75, 50),
+                "it works": itWorks,
+                "it looks right": validForm(50, 100),
+                "it has the right data": validData(25, 75)
+            },
+            "and we get the feed before a value with a count": {
+                topic: cmpBefore(endpoint, 35, 50),
+                "it works": itWorks,
+                "it looks right": validForm(50, 100),
+                "it has the right data": validData(36, 86)
+            },
+            "and we get the feed since a value with a zero count": {
+                topic: cmpSince(endpoint, 30, 0),
+                "it works": itWorks,
+                "it looks right": validForm(0, 100)
+            },
+            "and we get the feed before a value with a zero count": {
+                topic: cmpBefore(endpoint, 60, 0),
+                "it works": itWorks,
+                "it looks right": validForm(0, 100)
+            },
+            "and we get the full feed by following 'next' links": {
+                topic: function(full, cred) {
+                    var cb = this.callback,
+                        items = [],
+                        addResultsOf = function(url) {
+                            httputil.getJSON(url, cred, function(err, doc, resp) {
+                                if (err) {
+                                    cb(err, null, null);
+                                } else {
+                                    if (doc.items.length > 0) {
+                                        items = items.concat(doc.items);
+                                        if (doc.links.next) {
+                                            addResultsOf(doc.links.next);
+                                        } else {
+                                            cb(null, items, full);
+                                        }
+                                    } else {
+                                        cb(null, items, full);
+                                    }
+                                }
+                            });
+                        };
+                    addResultsOf(endpoint);
+                },
+                "it works": itWorks,
+                "it looks correct": function(err, items, full) {
+                    assert.isArray(items);
+                    assert.lengthOf(items, full.items.length);
+                    assert.deepEqual(items, full.items);
+                }
+            }
+        },
+        "and we get the feed with a negative count": {
+            topic: failDoc(endpoint + "?count=-30"),
+            "it fails correctly": itFails
+        },
+        "and we get the feed with a negative offset": {
+            topic: failDoc(endpoint + "?offset=-50"),
+            "it fails correctly": itFails
+        },
+        "and we get the feed with a zero offset and zero count": {
+            topic: getDoc(endpoint + "?offset=0&count=0"),
+            "it works": itWorks,
+            "it looks right": validForm(0, 100)
+        },
+        "and we get the feed with a non-zero offset and zero count": {
+            topic: getDoc(endpoint + "?offset=30&count=0"),
+            "it works": itWorks,
+            "it looks right": validForm(0, 100)
+        },
+        "and we get the feed with a non-integer count": {
+            topic: failDoc(endpoint + "?count=foo"),
+            "it fails correctly": itFails
+        },
+        "and we get the feed with a non-integer offset": {
+            topic: failDoc(endpoint + "?offset=bar"),
+            "it fails correctly": itFails
+        },
+        "and we get the feed with a too-large offset": {
+            topic: getDoc(endpoint + "?offset=200"),
+            "it works": itWorks,
+            "it looks right": validForm(0, 100)
+        },
+        "and we get the feed with a too-large count": {
+            topic: getDoc(endpoint + "?count=150"),
+            "it works": itWorks,
+            "it looks right": validForm(100, 100)
+        },
+        "and we get the feed with a disallowed count": {
+            topic: failDoc(endpoint + "?count=1000"),
+            "it fails correctly": itFails
+        },
+        "and we get the feed before a nonexistent id": {
+            topic: failDoc(endpoint + "?before="+encodeURIComponent("http://example.net/nonexistent")),
+            "it fails correctly": itFails
+        },
+        "and we get the feed since a nonexistent id": {
+            topic: failDoc(endpoint + "?since="+encodeURIComponent("http://example.net/nonexistent")),
+            "it fails correctly": itFails
+        }
+    };
+};
+
 suite.addBatch({
     "When we set up the app": {
         topic: function() {
@@ -592,305 +764,10 @@ suite.addBatch({
                 "it works": function(err) {
                     assert.ifError(err);
                 },
-                "and we get the default feed": {
-                    topic: getDoc(BASE),
-                    "it works": itWorks,
-                    "it looks right": validForm(20, 100)
-                },
-                "and we get the full feed": {
-                    topic: getDoc(BASE + "?count=100"),
-                    "it works": itWorks,
-                    "it looks right": validForm(100, 100),
-                    "and we get the feed with a non-zero offset": {
-                        topic: cmpDoc(BASE + "?offset=50"),
-                        "it works": itWorks,
-                        "it looks right": validForm(20, 100),
-                        "it has the right data": validData(50, 70)
-                    },
-                    "and we get the feed with a zero offset": {
-                        topic: cmpDoc(BASE + "?offset=0"),
-                        "it works": itWorks,
-                        "it looks right": validForm(20, 100),
-                        "it has the right data": validData(0, 20)
-                    },
-                    "and we get the feed with a non-zero offset and count": {
-                        topic: cmpDoc(BASE + "?offset=20&count=20"),
-                        "it works": itWorks,
-                        "it looks right": validForm(20, 100),
-                        "it has the right data": validData(20, 40)
-                    },
-                    "and we get the feed with a zero offset and count": {
-                        topic: cmpDoc(BASE + "?offset=0"),
-                        "it works": itWorks,
-                        "it looks right": validForm(20, 100),
-                        "it has the right data": validData(0, 20)
-                    },
-                    "and we get the feed with a non-zero count": {
-                        topic: cmpDoc(BASE + "?count=50"),
-                        "it works": itWorks,
-                        "it looks right": validForm(50, 100),
-                        "it has the right data": validData(0, 50)
-                    },
-                    "and we get the feed since a value": {
-                        topic: cmpSince(BASE, 25),
-                        "it works": itWorks,
-                        "it looks right": validForm(20, 100),
-                        "it has the right data": validData(5, 25)
-                    },
-                    "and we get the feed before a value": {
-                        topic: cmpBefore(BASE, 25),
-                        "it works": itWorks,
-                        "it looks right": validForm(20, 100),
-                        "it has the right data": validData(26, 46)
-                    },
-                    "and we get the feed since a small value": {
-                        topic: cmpSince(BASE, 5),
-                        "it works": itWorks,
-                        "it looks right": validForm(5, 100),
-                        "it has the right data": validData(0, 5)
-                    },
-                    "and we get the feed before a big value": {
-                        topic: cmpBefore(BASE, 94),
-                        "it works": itWorks,
-                        "it looks right": validForm(5, 100),
-                        "it has the right data": validData(95, 100)
-                    },
-                    "and we get the feed since a value with a count": {
-                        topic: cmpSince(BASE, 75, 50),
-                        "it works": itWorks,
-                        "it looks right": validForm(50, 100),
-                        "it has the right data": validData(25, 75)
-                    },
-                    "and we get the feed before a value with a count": {
-                        topic: cmpBefore(BASE, 35, 50),
-                        "it works": itWorks,
-                        "it looks right": validForm(50, 100),
-                        "it has the right data": validData(36, 86)
-                    },
-                    "and we get the feed since a value with a zero count": {
-                        topic: cmpSince(BASE, 30, 0),
-                        "it works": itWorks,
-                        "it looks right": validForm(0, 100)
-                    },
-                    "and we get the feed before a value with a zero count": {
-                        topic: cmpBefore(BASE, 60, 0),
-                        "it works": itWorks,
-                        "it looks right": validForm(0, 100)
-                    },
-                    "and we get the full feed by following 'next' links": {
-                        topic: function(full, cred) {
-                            var cb = this.callback,
-                                items = [],
-                                addResultsOf = function(url) {
-                                    httputil.getJSON(url, cred, function(err, doc, resp) {
-                                        if (err) {
-                                            cb(err, null, null);
-                                        } else {
-                                            if (doc.items.length > 0) {
-                                                items = items.concat(doc.items);
-                                                if (doc.links.next) {
-                                                    addResultsOf(doc.links.next);
-                                                } else {
-                                                    cb(null, items, full);
-                                                }
-                                            } else {
-                                                cb(null, items, full);
-                                            }
-                                        }
-                                    });
-                                };
-                            addResultsOf(BASE);
-                        },
-                        "it works": itWorks,
-                        "it looks correct": function(err, items, full) {
-                            assert.isArray(items);
-                            assert.lengthOf(items, full.items.length);
-                            assert.deepEqual(items, full.items);
-                        }
-                    }
-                },
-                "and we get the feed with a negative count": {
-                    topic: failDoc(BASE + "?count=-30"),
-                    "it fails correctly": itFails
-                },
-                "and we get the feed with a negative offset": {
-                    topic: failDoc(BASE + "?offset=-50"),
-                    "it fails correctly": itFails
-                },
-                "and we get the feed with a zero offset and zero count": {
-                    topic: getDoc(BASE + "?offset=0&count=0"),
-                    "it works": itWorks,
-                    "it looks right": validForm(0, 100)
-                },
-                "and we get the feed with a non-zero offset and zero count": {
-                    topic: getDoc(BASE + "?offset=30&count=0"),
-                    "it works": itWorks,
-                    "it looks right": validForm(0, 100)
-                },
-                "and we get the feed with a non-integer count": {
-                    topic: failDoc(BASE + "?count=foo"),
-                    "it fails correctly": itFails
-                },
-                "and we get the feed with a non-integer offset": {
-                    topic: failDoc(BASE + "?offset=bar"),
-                    "it fails correctly": itFails
-                },
-                "and we get the feed with a too-large offset": {
-                    topic: getDoc(BASE + "?offset=200"),
-                    "it works": itWorks,
-                    "it looks right": validForm(0, 100)
-                },
-                "and we get the feed with a too-large count": {
-                    topic: getDoc(BASE + "?count=150"),
-                    "it works": itWorks,
-                    "it looks right": validForm(100, 100)
-                },
-                "and we get the feed with a disallowed count": {
-                    topic: failDoc(BASE + "?count=1000"),
-                    "it fails correctly": itFails
-                },
-                "and we get the feed before a nonexistent id": {
-                    topic: failDoc(BASE + "?before="+encodeURIComponent("http://example.net/nonexistent")),
-                    "it fails correctly": itFails
-                },
-                "and we get the feed since a nonexistent id": {
-                    topic: failDoc(BASE + "?since="+encodeURIComponent("http://example.net/nonexistent")),
-                    "it fails correctly": itFails
-                },
-                "and we get the default inbox": {
-                    topic: getDoc(INBOX),
-                    "it works": itWorks,
-                    "it looks right": validForm(20, 100)
-                },
-                "and we get the full inbox": {
-                    topic: getDoc(INBOX + "?count=100"),
-                    "it works": itWorks,
-                    "it looks right": validForm(100, 100),
-                    "and we get the inbox with a non-zero offset": {
-                        topic: cmpDoc(INBOX + "?offset=50"),
-                        "it works": itWorks,
-                        "it looks right": validForm(20, 100),
-                        "it has the right data": validData(50, 70)
-                    },
-                    "and we get the inbox with a zero offset": {
-                        topic: cmpDoc(INBOX + "?offset=0"),
-                        "it works": itWorks,
-                        "it looks right": validForm(20, 100),
-                        "it has the right data": validData(0, 20)
-                    },
-                    "and we get the inbox with a non-zero offset and count": {
-                        topic: cmpDoc(INBOX + "?offset=20&count=20"),
-                        "it works": itWorks,
-                        "it looks right": validForm(20, 100),
-                        "it has the right data": validData(20, 40)
-                    },
-                    "and we get the inbox with a zero offset and count": {
-                        topic: cmpDoc(INBOX + "?offset=0"),
-                        "it works": itWorks,
-                        "it looks right": validForm(20, 100),
-                        "it has the right data": validData(0, 20)
-                    },
-                    "and we get the inbox with a non-zero count": {
-                        topic: cmpDoc(INBOX + "?count=50"),
-                        "it works": itWorks,
-                        "it looks right": validForm(50, 100),
-                        "it has the right data": validData(0, 50)
-                    },
-                    "and we get the inbox since a value": {
-                        topic: cmpSince(INBOX, 25),
-                        "it works": itWorks,
-                        "it looks right": validForm(20, 100),
-                        "it has the right data": validData(5, 25)
-                    },
-                    "and we get the inbox before a value": {
-                        topic: cmpBefore(INBOX, 25),
-                        "it works": itWorks,
-                        "it looks right": validForm(20, 100),
-                        "it has the right data": validData(26, 46)
-                    },
-                    "and we get the inbox since a small value": {
-                        topic: cmpSince(INBOX, 5),
-                        "it works": itWorks,
-                        "it looks right": validForm(5, 100),
-                        "it has the right data": validData(0, 5)
-                    },
-                    "and we get the inbox before a big value": {
-                        topic: cmpBefore(INBOX, 94),
-                        "it works": itWorks,
-                        "it looks right": validForm(5, 100),
-                        "it has the right data": validData(95, 100)
-                    },
-                    "and we get the inbox since a value with a count": {
-                        topic: cmpSince(INBOX, 75, 50),
-                        "it works": itWorks,
-                        "it looks right": validForm(50, 100),
-                        "it has the right data": validData(25, 75)
-                    },
-                    "and we get the inbox before a value with a count": {
-                        topic: cmpBefore(INBOX, 35, 50),
-                        "it works": itWorks,
-                        "it looks right": validForm(50, 100),
-                        "it has the right data": validData(36, 86)
-                    },
-                    "and we get the inbox since a value with a zero count": {
-                        topic: cmpSince(INBOX, 30, 0),
-                        "it works": itWorks,
-                        "it looks right": validForm(0, 100)
-                    },
-                    "and we get the inbox before a value with a zero count": {
-                        topic: cmpBefore(INBOX, 60, 0),
-                        "it works": itWorks,
-                        "it looks right": validForm(0, 100)
-                    }
-                },
-                "and we get the inbox with a negative count": {
-                    topic: failDoc(INBOX + "?count=-30"),
-                    "it fails correctly": itFails
-                },
-                "and we get the inbox with a negative offset": {
-                    topic: failDoc(INBOX + "?offset=-50"),
-                    "it fails correctly": itFails
-                },
-                "and we get the inbox with a zero offset and zero count": {
-                    topic: getDoc(INBOX + "?offset=0&count=0"),
-                    "it works": itWorks,
-                    "it looks right": validForm(0, 100)
-                },
-                "and we get the inbox with a non-zero offset and zero count": {
-                    topic: getDoc(INBOX + "?offset=30&count=0"),
-                    "it works": itWorks,
-                    "it looks right": validForm(0, 100)
-                },
-                "and we get the inbox with a non-integer count": {
-                    topic: failDoc(INBOX + "?count=foo"),
-                    "it fails correctly": itFails
-                },
-                "and we get the inbox with a non-integer offset": {
-                    topic: failDoc(INBOX + "?offset=bar"),
-                    "it fails correctly": itFails
-                },
-                "and we get the inbox with a too-large offset": {
-                    topic: getDoc(INBOX + "?offset=200"),
-                    "it works": itWorks,
-                    "it looks right": validForm(0, 100)
-                },
-                "and we get the inbox with a too-large count": {
-                    topic: getDoc(INBOX + "?count=150"),
-                    "it works": itWorks,
-                    "it looks right": validForm(100, 100)
-                },
-                "and we get the inbox with a disallowed count": {
-                    topic: failDoc(INBOX + "?count=1000"),
-                    "it fails correctly": itFails
-                },
-                "and we get the inbox before a nonexistent id": {
-                    topic: failDoc(INBOX + "?before="+encodeURIComponent("http://example.net/nonexistent")),
-                    "it fails correctly": itFails
-                },
-                "and we get the inbox since a nonexistent id": {
-                    topic: failDoc(INBOX + "?since="+encodeURIComponent("http://example.net/nonexistent")),
-                    "it fails correctly": itFails
-                }
+                "and we workout the outbox":
+                workout(BASE),
+                "and we workout the inbox":
+                workout(INBOX)
             }
         }
     }
