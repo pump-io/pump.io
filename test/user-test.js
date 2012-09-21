@@ -1074,106 +1074,30 @@ suite.addBatch({
                         if (err) {
                             callback(err, null, null);
                         } else {
-                            callback(null, user, act);
+                            callback(null, act, user);
                         }
                     }
                 );
             },
-            "it works": function(err, user, activity) {
+            "it works": function(err, activity, user) {
                 assert.ifError(err);
             },
-            "and we check their minor inbox": {
-                topic: function(user, activity) {
-                    var callback = this.callback;
-                    Step(
-                        function() {
-                            user.getMinorInboxStream(this);
-                        },
-                        function(err, str) {
-                            if (err) throw err;
-                            str.getItems(0, 20, this);
-                        },
-                        callback
-                    );
-                },
-                "it's empty": function(err, activities) {
-                    assert.ifError(err);
-                    assert.isEmpty(activities);
-                }
-            },
-            "and we check their minor outbox": {
-                topic: function(user, activity) {
-                    var callback = this.callback;
-                    Step(
-                        function() {
-                            user.getMinorOutboxStream(this);
-                        },
-                        function(err, str) {
-                            if (err) throw err;
-                            str.getItems(0, 20, this);
-                        },
-                        callback
-                    );
-                },
-                "it's empty": function(err, activities) {
-                    assert.ifError(err);
-                    assert.isEmpty(activities);
-                }
-            },
-            "and we check their major inbox": {
-                topic: function(user, activity) {
-                    var callback = this.callback;
-                    Step(
-                        function() {
-                            user.getMajorInboxStream(this);
-                        },
-                        function(err, str) {
-                            if (err) throw err;
-                            str.getItems(0, 20, this);
-                        },
-                        function(err, activities) {
-                            if (err) {
-                                callback(err, null, null);
-                            } else {
-                                callback(err, activity, activities);
-                            }
-                        }
-                    );
-                },
-                "it's in there": function(err, activity, activities) {
-                    assert.ifError(err);
-                    assert.isArray(activities);
-                    assert.lengthOf(activities, 1);
-                    assert.equal(activities[0], activity.id);
-                }
-            },
-            "and we check their major outbox": {
-                topic: function(user, activity) {
-                    var callback = this.callback;
-                    Step(
-                        function() {
-                            user.getMajorOutboxStream(this);
-                        },
-                        function(err, str) {
-                            if (err) throw err;
-                            str.getItems(0, 20, this);
-                        },
-                        function(err, activities) {
-                            if (err) {
-                                callback(err, null, null);
-                            } else {
-                                callback(err, activity, activities);
-                            }
-                        }
-                    );
-                },
-                "it's in there": function(err, activity, activities) {
-                    assert.ifError(err);
-                    assert.isArray(activities);
-                    assert.lengthOf(activities, 1);
-                    assert.equal(activities[0], activity.id);
-                }
-            }
+            "and we check their minor inbox": 
+            notInStreamContext(function(user, callback) {
+                user.getMinorInboxStream(callback);
+            }),
+            "and we check their minor outbox": 
+            notInStreamContext(function(user, callback) {
+                user.getMinorOutboxStream(callback);
+            }),
+            "and we check their major inbox":
+            inStreamContext(function(user, callback) {
+                user.getMajorInboxStream(callback);
+            }),
+            "and we check their major outbox":
+            inStreamContext(function(user, callback) {
+                user.getMajorOutboxStream(callback);
+            })
         }
     },
     "When we create yet another user": {
@@ -1215,106 +1139,30 @@ suite.addBatch({
                         if (err) {
                             callback(err, null, null);
                         } else {
-                            callback(null, user, act);
+                            callback(null, act, user);
                         }
                     }
                 );
             },
-            "it works": function(err, user, activity) {
+            "it works": function(err, activity, user) {
                 assert.ifError(err);
             },
-            "and we check their major inbox": {
-                topic: function(user, activity) {
-                    var callback = this.callback;
-                    Step(
-                        function() {
-                            user.getMajorInboxStream(this);
-                        },
-                        function(err, str) {
-                            if (err) throw err;
-                            str.getItems(0, 20, this);
-                        },
-                        callback
-                    );
-                },
-                "it's empty": function(err, activities) {
-                    assert.ifError(err);
-                    assert.isEmpty(activities);
-                }
-            },
-            "and we check their major outbox": {
-                topic: function(user, activity) {
-                    var callback = this.callback;
-                    Step(
-                        function() {
-                            user.getMajorOutboxStream(this);
-                        },
-                        function(err, str) {
-                            if (err) throw err;
-                            str.getItems(0, 20, this);
-                        },
-                        callback
-                    );
-                },
-                "it's empty": function(err, activities) {
-                    assert.ifError(err);
-                    assert.isEmpty(activities);
-                }
-            },
-            "and we check their minor inbox": {
-                topic: function(user, activity) {
-                    var callback = this.callback;
-                    Step(
-                        function() {
-                            user.getMinorInboxStream(this);
-                        },
-                        function(err, str) {
-                            if (err) throw err;
-                            str.getItems(0, 20, this);
-                        },
-                        function(err, activities) {
-                            if (err) {
-                                callback(err, null, null);
-                            } else {
-                                callback(err, activity, activities);
-                            }
-                        }
-                    );
-                },
-                "it's in there": function(err, activity, activities) {
-                    assert.ifError(err);
-                    assert.isArray(activities);
-                    assert.lengthOf(activities, 1);
-                    assert.equal(activities[0], activity.id);
-                }
-            },
-            "and we check their minor outbox": {
-                topic: function(user, activity) {
-                    var callback = this.callback;
-                    Step(
-                        function() {
-                            user.getMinorOutboxStream(this);
-                        },
-                        function(err, str) {
-                            if (err) throw err;
-                            str.getItems(0, 20, this);
-                        },
-                        function(err, activities) {
-                            if (err) {
-                                callback(err, null, null);
-                            } else {
-                                callback(err, activity, activities);
-                            }
-                        }
-                    );
-                },
-                "it's in there": function(err, activity, activities) {
-                    assert.ifError(err);
-                    assert.isArray(activities);
-                    assert.lengthOf(activities, 1);
-                    assert.equal(activities[0], activity.id);
-                }
-            }
+            "and we check their minor inbox": 
+            inStreamContext(function(user, callback) {
+                user.getMinorInboxStream(callback);
+            }),
+            "and we check their minor outbox": 
+            inStreamContext(function(user, callback) {
+                user.getMinorOutboxStream(callback);
+            }),
+            "and we check their major inbox":
+            notInStreamContext(function(user, callback) {
+                user.getMajorInboxStream(callback);
+            }),
+            "and we check their major outbox":
+            notInStreamContext(function(user, callback) {
+                user.getMajorOutboxStream(callback);
+            })
         }
     }
 });
