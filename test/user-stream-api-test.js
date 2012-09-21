@@ -422,6 +422,8 @@ suite.addBatch({
 
 var BASE = "http://localhost:4815/api/user/alicia/feed";
 var INBOX = "http://localhost:4815/api/user/alicia/inbox";
+var MAJORINBOX = "http://localhost:4815/api/user/alicia/inbox/major";
+var MAJOROUTBOX = "http://localhost:4815/api/user/alicia/feed/major";
 
 var justDoc = function(callback) {
     return function(err, doc, resp) {
@@ -767,7 +769,11 @@ suite.addBatch({
                 "and we workout the outbox":
                 workout(BASE),
                 "and we workout the inbox":
-                workout(INBOX)
+                workout(INBOX),
+                "and we workout the major inbox":
+                workout(MAJORINBOX),
+                "and we workout the major inbox":
+                workout(MAJOROUTBOX)
             }
         }
     }
