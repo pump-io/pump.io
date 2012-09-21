@@ -962,7 +962,7 @@ var emptyStreamContext = function(streamgetter) {
 };
 
 var streamCountContext = function(streamgetter, targetCount) {
-    return {
+    var ctx = {
         topic: function(act, user) {
             var callback = this.callback;
             Step(
@@ -977,18 +977,22 @@ var streamCountContext = function(streamgetter, targetCount) {
                     callback(err, act, activities);
                 }
             );
-        },
-        "it's in there": function(err, act, activities) {
-            var matches;
-            assert.ifError(err);
-            assert.isObject(act);
-            assert.isArray(activities);
-            matches = activities.filter(function(item) {
-                return (item == act.id);
-            });
-            assert.lengthOf(matches, targetCount);
         }
+    },
+    label = (targetCount > 0) ? "it's in there" : "it's not in there";
+
+    ctx[label] = function(err, act, activities) {
+        var matches;
+        assert.ifError(err);
+        assert.isObject(act);
+        assert.isArray(activities);
+        matches = activities.filter(function(item) {
+            return (item == act.id);
+        });
+        assert.lengthOf(matches, targetCount);
     };
+
+    return ctx;
 };
 
 var inStreamContext = function(streamgetter) {
@@ -1491,6 +1495,49 @@ suite.addBatch({
                 }),
                 "and we check the recipient's direct major inbox": 
                 inStreamContext(function(user, callback) {
+                    user.getDirectMajorInboxStream(callback);
+                })
+            },
+            "and one user sends a minor activity to the other": {
+                topic: function(toUser, fromUser) {
+                    var Activity = require("../lib/model/activity").Activity,
+                        callback = this.callback,
+                        theAct;
+
+                    Step(
+                        function() {
+                            var act = {
+                                actor: fromUser.profile,
+                                to: [toUser.profile],
+                                verb: "follow",
+                                object: toUser.profile
+                            };
+                            Activity.create(act, this);
+                        },
+                        function(err, act) {
+                            if (err) throw err;
+                            theAct = act;
+                            toUser.addToInbox(act, this);
+                        },
+                        function(err) {
+                            callback(err, theAct);
+                        }
+                    );
+                },
+                "it works": function(err, act) {
+                    assert.ifError(err);
+                    assert.isObject(act);
+                },
+                "and we check the recipient's direct inbox": 
+                inStreamContext(function(user, callback) {
+                    user.getDirectInboxStream(callback);
+                }),
+                "and we check the recipient's direct minor inbox": 
+                inStreamContext(function(user, callback) {
+                    user.getDirectMinorInboxStream(callback);
+                }),
+                "and we check the recipient's direct major inbox": 
+                notInStreamContext(function(user, callback) {
                     user.getDirectMajorInboxStream(callback);
                 })
             }
