@@ -848,6 +848,61 @@ suite.addBatch({
                 "and we check the direct major inbox":
                 emptyFeed("/api/user/benny/inbox/direct/major")
             }
+        },
+        "and we post a lot of stuff from one user to another": {
+            topic: function(app) {
+                Step(
+                    function() {
+                        newCredentials("isa", "really_smart", this.parallel());
+                        newCredentials("tico", "drives-a-car", this.parallel());
+                    },
+                    this.callback
+                );
+            },
+            "it works": function(err, cred1, cred2) {
+                assert.ifError(err);
+                assert.isObject(cred1);
+                assert.isObject(cred2);
+            },
+            "and we post a bunch of major activities": {
+                topic: function(cred1, cred2) {
+                    var cb = this.callback;
+
+                    Step(
+                        function() {
+                            var group = this.group(),
+                                i,
+                                act = {
+                                    verb: "post",
+                                    to: [cred1.user.profile],
+                                    object: {
+                                        objectType: "note"
+                                    }
+                                },
+                                newAct,
+                                url = "http://localhost:4815/api/user/tico/feed";
+
+                            for (i = 0; i < 100; i++) {
+                                newAct = JSON.parse(JSON.stringify(act));
+                                newAct.object.content = "Hi there! " + i,
+                                httputil.postJSON(url, cred2, newAct, group());
+                            }
+                        },
+                        function(err) {
+                            cb(err);
+                        }
+                    );
+                },
+                "it works": function(err) {
+                    assert.ifError(err);
+                },
+                "and we work out the direct inbox":
+                workout("http://localhost:4815/api/user/isa/inbox/direct"),
+                "and we work out the major direct inbox":
+                workout("http://localhost:4815/api/user/isa/inbox/direct/major"),
+                "and we check the minor direct inbox":
+                emptyFeed("/api/user/isa/inbox/direct/minor")
+            }
         }
     }
 });
