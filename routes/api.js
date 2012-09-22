@@ -560,7 +560,16 @@ var replies = function(type) {
 };
 
 var getUser = function(req, res, next) {
-    res.json(req.user);
+
+    Step(
+        function() {
+            req.user.profile.expandFeeds(this);
+        },
+        function(err) {
+            if (err) next(err);
+            res.json(req.user);
+        }
+    );
 };
 
 var putUser = function(req, res, next) {

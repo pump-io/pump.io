@@ -41,6 +41,33 @@ var invert = function(callback) {
     };
 };
 
+var goodUser = function(err, doc) {
+
+    var profile;
+
+    assert.ifError(err);
+
+    assert.isObject(doc);
+
+    assert.include(doc, "nickname");
+    assert.include(doc, "published");
+    assert.include(doc, "updated");
+
+    assert.include(doc, "profile");
+    assert.isObject(doc.profile);
+
+    profile = doc.profile;
+
+    assert.include(doc.profile, "id");
+    assert.include(doc.profile, "objectType");
+    assert.equal(doc.profile.objectType, "person");
+
+    assert.include(doc.profile, "favorites");
+    assert.include(doc.profile, "followers");
+    assert.include(doc.profile, "following");
+    assert.include(doc.profile, "lists");
+};
+
 suite.addBatch({
 
     "When we set up the app": {
@@ -192,17 +219,7 @@ suite.addBatch({
                         }
                     );
                 },
-                "it works": function(err, doc) {
-                    assert.ifError(err);
-                    assert.include(doc, "nickname");
-                    assert.include(doc, "published");
-                    assert.include(doc, "updated");
-                    assert.include(doc, "profile");
-                    assert.isObject(doc.profile);
-                    assert.include(doc.profile, "id");
-                    assert.include(doc.profile, "objectType");
-                    assert.equal(doc.profile.objectType, "person");
-                }
+                "it works": goodUser
             },
             "and we GET the user data with client credentials and a different user's access token": {
                 topic: function(user, cl) {
@@ -233,17 +250,7 @@ suite.addBatch({
                         }
                     );
                 },
-                "it works": function(err, doc) {
-                    assert.ifError(err);
-                    assert.include(doc, "nickname");
-                    assert.include(doc, "published");
-                    assert.include(doc, "updated");
-                    assert.include(doc, "profile");
-                    assert.isObject(doc.profile);
-                    assert.include(doc.profile, "id");
-                    assert.include(doc.profile, "objectType");
-                    assert.equal(doc.profile.objectType, "person");
-                }
+                "it works": goodUser
             }
         }
     }
