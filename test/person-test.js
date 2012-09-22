@@ -19,6 +19,7 @@
 var assert = require("assert"),
     vows = require("vows"),
     databank = require("databank"),
+    Step = require("step"),
     schema = require("../lib/schema").schema,
     URLMaker = require("../lib/urlmaker").URLMaker,
     modelBatch = require("./lib/model").modelBatch,
@@ -163,6 +164,43 @@ suite.addBatch({
                     assert.isString(url);
                     assert.equal(url, "http://example.net:4815/api/user/evan/inbox");
                 }
+            }
+        },
+        "and we create a user and expand the profile": {
+            topic: function(Person) {
+                var User = require("../lib/model/user").User,
+                    user,
+                    callback = this.callback;
+
+                Step(
+                    function() {
+                        User.create({nickname: "aldus", password: "one23four56"}, this);
+                    },
+                    function(err, result) {
+                        if (err) throw err;
+                        user = result;
+                        user.expand(this);
+                    },
+                    function(err) {
+                        if (err) {
+                            callback(err, null);
+                        } else {
+                            callback(null, user);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, user) {
+                assert.ifError(err);
+            },
+            "the profile has the right links": function(err, user) {
+                assert.ifError(err);
+                assert.isObject(user);
+                assert.isObject(user.profile);
+                assert.isObject(user.profile.links);
+                assert.isObject(user.profile.links.self);
+                assert.isObject(user.profile.links["activity-inbox"]);
+                assert.isObject(user.profile.links["activity-outbox"]);
             }
         }
     }
