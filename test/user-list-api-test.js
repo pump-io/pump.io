@@ -490,6 +490,13 @@ suite.addBatch({
                             assert.equal(collection.totalItems, 50);
                             assert.lengthOf(collection.items, 20);
                         },
+                        "it has the navigation links": function(err, collection) {
+                            assert.ifError(err);
+                            assert.isObject(collection);
+                            assert.isObject(collection.links);
+                            assert.isObject(collection.links.next);
+                            assert.isObject(collection.links.prev);
+                        },
                         "there are no duplicates": function(err, collection) {
                             var i, seen = {}, items = collection.items;
                             for (i = 0; i < items.length; i++) {

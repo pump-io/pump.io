@@ -731,11 +731,16 @@ var createUser = function (req, res, next) {
 
 var listUsers = function(req, res, next) {
 
-    var collection = {
-        displayName: "Users of this service",
-        id: URLMaker.makeURL("api/users"),
-        objectTypes: ["user"]
-    };
+    var url = URLMaker.makeURL("api/users"),
+        collection = {
+            displayName: "Users of this service",
+            id: url,
+            objectTypes: ["user"],
+            links: {
+                first: url,
+                self: url
+            }
+        };
 
     var args, str;
 
@@ -779,6 +784,20 @@ var listUsers = function(req, res, next) {
             }
 
             collection.items = users;
+
+            if (users.length > 0) {
+                collection.links.prev = {
+                    href: collection.url + "?since=" + encodeURIComponent(users[0].nickname)
+                };
+                if ((_(args).has("start") && args.start + users.length < collection.totalItems) ||
+                    (_(args).has("before") && users.length >= args.count) ||
+                    (_(args).has("since"))) {
+                    collection.links.next = {
+                        href: collection.url + "?before=" + encodeURIComponent(users[users.length-1].nickname)
+                    };
+                }
+            }
+
             res.json(collection);
         }
     );
