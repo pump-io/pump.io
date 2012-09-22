@@ -138,14 +138,6 @@ var addRoutes = function(app) {
 
 exports.addRoutes = addRoutes;
 
-var bank = null;
-
-var setBank = function(newBank) {
-    bank = newBank;
-};
-
-exports.setBank = setBank;
-
 // Accept either 2-legged or 3-legged OAuth
 
 var clientAuth = function(req, res, next) {
@@ -587,21 +579,29 @@ var putUser = function(req, res, next) {
 };
 
 var delUser = function(req, res, next) {
-    req.user.del(function(err) {
-        if (err instanceof NoSuchThingError) { // unusual
-            next(new HTTPError(err.message, 404));
-        } else if (err) {
-            next(err);
-        } else {
-            bank.decr("usercount", 0, function(err, value) {
-                if (err) {
-                    next(err);
-                } else {
-                    res.json("Deleted");
-                }
-            });
+
+    var user = req.user;
+
+    Step(
+        function() {
+            user.del(this);
+        },
+        function(err) {
+            if (err) throw err;
+            usersStream(this);
+        },
+        function(err, str) {
+            if (err) throw err;
+            str.remove(user.nickname, this);
+        },
+        function(err) {
+            if (err) {
+                next(err);
+            } else {
+                res.json("Deleted.");
+            }
         }
-    });
+    );
 };
 
 var reqActivity = function(req, res, next) {
@@ -667,6 +667,39 @@ var delActivity = function(req, res, next) {
     );
 };
 
+// Get the stream of all users
+
+var usersStream = function(callback) {
+    
+    Step(
+        function() {
+            Stream.get("user:all", this);
+        },
+        function(err, str) {
+            if (err) {
+                if (err instanceof NoSuchThingError) {
+                    Stream.create({name: "user:all"}, this);
+                } else {
+                    throw err;
+                }
+            } else {
+                callback(null, str);
+            }
+        },
+        function(err, str) {
+            if (err) {
+                if (err instanceof AlreadyExistsError) {
+                    Stream.get("user:all", callback);
+                } else {
+                    callback(err);
+                }
+            } else {
+                callback(null, str);
+            }
+        }
+    );
+};
+
 var createUser = function (req, res, next) {
 
     var user;
@@ -678,13 +711,13 @@ var createUser = function (req, res, next) {
         function (err, value) {
             if (err) throw err;
             user = value;
-            bank.prepend("userlist", 0, user.nickname, this);
+            usersStream(this);
         },
-        function (err, userList) {
+        function (err, str) {
             if (err) throw err;
-            bank.incr("usercount", 0, this);
+            str.deliver(user.nickname, this);
         },
-        function (err, userCount) {
+        function (err) {
             if (err) {
                 next(err);
             } else {
@@ -704,7 +737,7 @@ var listUsers = function(req, res, next) {
         objectTypes: ["user"]
     };
 
-    var args;
+    var args, str;
 
     try {
         args = streamArgs(req, DEFAULT_USERS, MAX_USERS);
@@ -715,47 +748,36 @@ var listUsers = function(req, res, next) {
 
     Step(
         function () {
-            bank.read("usercount", 0, this);
+            usersStream(this);
+        },
+        function(err, result) {
+            if (err) throw err;
+            str = result;
+            str.count(this);
         },
         function(err, totalUsers) {
             if (err) throw err;
             collection.totalItems = totalUsers;
-            bank.slice("userlist", 0, args.start, args.end, this);
-        },
-        function(err, userIds) {
-            if (err) {
-                if (err instanceof NoSuchThingError) { // may catch err in prev func
-                    collection.totalItems = 0;
-                    collection.items = [];
-                    res.json(collection);
-                } else {
-                    throw err;
-                }
-            } else if (userIds.length === 0) {
+            if (totalUsers === 0) {
                 collection.items = [];
                 res.json(collection);
+                return;
             } else {
-                bank.readAll("user", userIds, this);
+                str.getIDs(args.start, args.end, this);
             }
         },
-        function(err, userMap) {
-            var users = [], id, user;
+        function(err, userIds) {
+            if (err) throw err;
+            User.readArray(userIds, this);
+        },
+        function(err, users) {
+            var i;
             if (err) throw err;
 
-            for (id in userMap) {
-                user = new User(userMap[id]);
-                user.sanitize();
-                users.push(user);
+            for (i = 0; i < users.length; i++) {
+                users[i].sanitize();
             }
-            users.sort(function(a, b) {  
-                if (a.published > b.published) {
-                    return -1;  
-                } else if (a.published < b.published) {
-                    return 1;  
-                } else {
-                    return 0;  
-                }
-            });
+
             collection.items = users;
             res.json(collection);
         }
