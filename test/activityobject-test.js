@@ -154,6 +154,14 @@ suite.addBatch({
                     assert.equal(Video, require("../lib/model/video").Video);
                 }
             },
+            "and we get a class by unknown typename": {
+                topic: function(ActivityObject) {
+                    return ActivityObject.toClass("http://underwear.example/type/boxer-briefs");
+                },
+                "it returns the Other": function(Other) {
+                    assert.equal(Other, require("../lib/model/other").Other);
+                }
+            },
             "and we get an object by properties": {
                 topic: function(ActivityObject) {
                     var props = {
@@ -204,11 +212,25 @@ suite.addBatch({
                     };
                     return ActivityObject.toObject(props);
                 },
-                "it fails": function(client) {
-                    assert.isObject(client);
+                "it is an Other": function(user) {
+                    assert.instanceOf(user, require("../lib/model/other").Other);
+                    assert.equal(user.objectType, "user");
                 }
             },
-            "and we create an activityobject object": {
+            "and we get a weird made-up object by its properties": {
+                topic: function(ActivityObject) {
+                    var props = {
+                        objectType: "http://condiment.example/type/spice",
+                        displayName: "Cinnamon"
+                    };
+                    return ActivityObject.toObject(props);
+                },
+                "it is an Other": function(cinnamon) {
+                    assert.instanceOf(cinnamon, require("../lib/model/other").Other);
+                    assert.equal(cinnamon.objectType, "http://condiment.example/type/spice");
+                }
+            },
+           "and we create an activityobject object": {
                 topic: function(ActivityObject) {
                     var props = {
                         objectType: ActivityObject.ARTICLE,
@@ -261,6 +283,21 @@ suite.addBatch({
                         assert.isString(article.published);
                         assert.isString(article.updated);
                     }
+                }
+            },
+            "and we create an activityobject of unknown type": {
+                topic: function(ActivityObject) {
+                    var props = {
+                        objectType: "http://orange.example/type/seed",
+                        displayName: "Seed #3451441"
+                    };
+                    ActivityObject.createObject(props, this.callback);
+                },
+                "it works": function(err, seed) {
+                    assert.ifError(err);
+                    assert.isObject(seed);
+                    assert.instanceOf(seed, require("../lib/model/other").Other);
+                    assert.equal(seed.objectType, "http://orange.example/type/seed");
                 }
             },
             "and we ensure a new activityobject object": {
@@ -344,6 +381,27 @@ suite.addBatch({
                     assert.isString(comment.id);
                     assert.isString(comment.published);
                     assert.isString(comment.updated);
+                }
+            },
+            "and we ensure an activityobject of unrecognized type": {
+                topic: function(ActivityObject) {
+                    var props = {
+                        id: "urn:uuid:4fcc9eda-0469-11e2-a4d5-70f1a154e1aa",
+                        objectType: "http://utensil.example/type/spoon",
+                        displayName: "My spoon"
+                    };
+                    ActivityObject.ensureObject(props, this.callback);
+                },
+                "it works": function(err, article) {
+                    assert.ifError(err);
+                },
+                "it exists": function(err, spoon) {
+                    assert.ifError(err);
+                    assert.isObject(spoon);
+                },
+                "it has the right class": function(err, spoon) {
+                    assert.instanceOf(spoon, require("../lib/model/other").Other);
+                    assert.equal(spoon.objectType, "http://utensil.example/type/spoon");
                 }
             },
             "and we compress an existing object property of an object": {
