@@ -587,6 +587,62 @@ suite.addBatch({
                                     }
                                 }
                             }
+                        },
+                        "and we fetch all users with the navigation links": {
+
+                            topic: function(ignore1, ignore2, ignore3, cl) {
+
+                                var cb = this.callback,
+                                    all = [];
+
+                                Step(
+                                    function() {
+                                        httputil.getJSON("http://localhost:4815/api/users",
+                                                         {consumer_key: cl.client_id, 
+                                                          consumer_secret: cl.client_secret},
+                                                         this);
+                                    },
+                                    function(err, body, resp) {
+                                        if (err) throw err;
+                                        all = all.concat(body.items);
+                                        httputil.getJSON(body.links.next.href, 
+                                                         {consumer_key: cl.client_id, 
+                                                          consumer_secret: cl.client_secret},
+                                                         this);
+                                    },
+                                    function(err, body, resp) {
+                                        if (err) throw err;
+                                        all = all.concat(body.items);
+                                        httputil.getJSON(body.links.next.href, 
+                                                         {consumer_key: cl.client_id, 
+                                                          consumer_secret: cl.client_secret},
+                                                         this);
+                                    },
+                                    function(err, body, resp) {
+                                        if (err) {
+                                            cb(err, null);
+                                        } else {
+                                            all = all.concat(body.items);
+                                            cb(null, all);
+                                        }
+                                    }
+                                );
+                            },
+                            "it works": function(err, users) {
+                                assert.ifError(err);
+                            },
+                            "it has the right number of elements": function(err, users) {
+                                assert.ifError(err);
+                                assert.lengthOf(users, 50);
+                            },
+                            "there are no duplicates": function(err, users) {
+                                var i, j, seen = {};
+                                assert.ifError(err);
+                                for (i = 0; i < users.length; i++) {
+                                    assert.isUndefined(seen[users[i].nickname]);
+                                    seen[users[i].nickname] = true;
+                                }
+                            }
                         }
                     }
                 }

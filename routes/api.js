@@ -768,7 +768,13 @@ var listUsers = function(req, res, next) {
                 res.json(collection);
                 return;
             } else {
-                str.getIDs(args.start, args.end, this);
+                if (_(args).has("before")) {
+                    str.getIDsGreaterThan(args.before, args.count, this);
+                } else if (_(args).has("since")) {
+                    str.getIDsLessThan(args.since, args.count, this);
+                } else {
+                    str.getIDs(args.start, args.end, this);
+                }
             }
         },
         function(err, userIds) {
@@ -787,13 +793,13 @@ var listUsers = function(req, res, next) {
 
             if (users.length > 0) {
                 collection.links.prev = {
-                    href: collection.url + "?since=" + encodeURIComponent(users[0].nickname)
+                    href: url + "?since=" + encodeURIComponent(users[0].nickname)
                 };
                 if ((_(args).has("start") && args.start + users.length < collection.totalItems) ||
                     (_(args).has("before") && users.length >= args.count) ||
                     (_(args).has("since"))) {
                     collection.links.next = {
-                        href: collection.url + "?before=" + encodeURIComponent(users[users.length-1].nickname)
+                        href: url + "?before=" + encodeURIComponent(users[users.length-1].nickname)
                     };
                 }
             }
