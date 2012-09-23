@@ -18,18 +18,24 @@
 
 var _ = require("underscore"),
     Step = require("step"),
+    common = require("./common"),
+    clientCred = common.clientCred,
+    setUserCred = common.setUserCred,
     OAuth = require("oauth").OAuth,
     readline = require('readline'),
-    config = require("./config"),
     argv = require("optimist")
-        .usage("Usage: $0 -s <nickname>")
+        .usage("Usage: $0 -u <username>")
+        .demand(["u"])
+        .alias("u", "username")
         .alias("s", "server")
         .alias("P", "port")
+        .describe("u", "User nickname")
         .describe("s", "Server name (default 'localhost')")
         .describe("P", "Port (default 80)")
         .default("P", 80)
         .default("s", "localhost")
         .argv,
+    username = argv.u,
     server = argv.s,
     port = argv.P,
     cl,
@@ -41,25 +47,21 @@ var rl = readline.createInterface({
     output: process.stdout
 });
 
-if (!_.has(config, "hosts") || !_.has(config.hosts, server)) {
-    console.error("No client key for " + server);
-    process.exit(1);
-}
-
-cl = config.hosts[server];
-
-oa = new OAuth("http://"+server+":"+port+"/oauth/request_token",
-               "http://"+server+":"+port+"/oauth/access_token",
-               cl.key,
-               cl.secret,
-               "1.0",
-               "oob",
-               "HMAC-SHA1",
-               null, // nonce size; use default
-               {"User-Agent": "activitypump-scripts/0.1.0"});
-
-Step(    
+Step(
     function() {
+        clientCred(server, this);
+    },
+    function(err, cred) {
+        if (err) throw err;
+        oa = new OAuth("http://"+server+":"+port+"/oauth/request_token",
+                       "http://"+server+":"+port+"/oauth/access_token",
+                       cred.client_id,
+                       cred.client_secret,
+                       "1.0",
+                       "oob",
+                       "HMAC-SHA1",
+                       null, // nonce size; use default
+                       {"User-Agent": "activitypump-scripts/0.1.0"});
         oa.getOAuthRequestToken(this);
     },
     function(err, token, secret) {
@@ -80,14 +82,15 @@ Step(
         oa.getOAuthAccessToken(rt.token, rt.secret, verifier, this);
     },
     function(err, token, secret, res) {
+        if (err) throw err;
+        setUserCred(username, server, {token: token, token_secret: secret}, this);
+    },
+    function(err) {
         if (err) {
             console.error(err);
         } else {
-            console.dir({
-                token: token,
-                secret: secret
-            });
+            console.log("OK");
+            rl.close();
         }
-        rl.close();
     }
 );
