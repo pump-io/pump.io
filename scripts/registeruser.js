@@ -19,7 +19,7 @@
 var _ = require("underscore"),
     postJSON = require("./common").postJSON,
     argv = require("optimist")
-        .usage("Usage: $0 -u <nickname> -p <num>")
+        .usage("Usage: $0 -u <nickname> -p <password>")
         .demand(["u","p"])
         .alias("u", "username")
         .alias("p", "password")
@@ -27,7 +27,7 @@ var _ = require("underscore"),
         .alias("P", "port")
         .describe("u", "Username to register")
         .describe("p", "Password for user")
-        .describe("s", "Server name (default "localhost")")
+        .describe("s", "Server name (default 'localhost')")
         .describe("P", "Port (default 8001)")
         .default("P", 8001)
         .default("s", "localhost")
