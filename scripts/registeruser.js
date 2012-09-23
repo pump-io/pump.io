@@ -17,7 +17,11 @@
 // limitations under the License.
 
 var _ = require("underscore"),
-    postJSON = require("./common").postJSON,
+    url = require("url"),
+    Step = require("step"),
+    common = require("./common"),
+    clientCred = common.clientCred,
+    postJSON = common.postJSON,
     argv = require("optimist")
         .usage("Usage: $0 -u <nickname> -p <password>")
         .demand(["u","p"])
@@ -28,8 +32,8 @@ var _ = require("underscore"),
         .describe("u", "Username to register")
         .describe("p", "Password for user")
         .describe("s", "Server name (default 'localhost')")
-        .describe("P", "Port (default 8001)")
-        .default("P", 8001)
+        .describe("P", "Port (default 80)")
+        .default("P", 80)
         .default("s", "localhost")
         .argv;
 
@@ -39,10 +43,24 @@ var user = {"nickname": argv.u,
 var server = argv.s;
 var port = argv.P;
 
-postJSON("http://"+server+":"+port+"/api/users", user, function(err, result, body) {
-    if (err) {
-        console.error(err);
-    } else {
-        console.log(body);
+Step(
+    function() {
+        clientCred(server, this);
+    },
+    function(err, cred) {
+        if (err) throw err;
+        var endpoint = url.format({
+            protocol: "http",
+            host: ((port == 80) ? server : server + ":" + port),
+            pathname: "/api/users"
+        });
+        postJSON(endpoint, cred, user, this);
+    },
+    function(err, body, result) {
+        if (err) {
+            console.error(err);
+        } else {
+            console.log(body);
+        }
     }
-});
+);
