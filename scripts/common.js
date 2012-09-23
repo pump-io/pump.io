@@ -1,6 +1,6 @@
 // common.js
 //
-// Common utilities for activityspam scripts
+// Common utilities for activitypump scripts
 //
 // Copyright 2011, 2012 StatusNet Inc.
 //
