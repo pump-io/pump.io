@@ -19,6 +19,7 @@
 var _ = require("underscore"),
     Step = require("step"),
     OAuth = require("oauth").OAuth,
+    readline = require('readline'),
     config = require("./config"),
     argv = require("optimist")
         .usage("Usage: $0 -s <nickname>")
@@ -34,6 +35,11 @@ var _ = require("underscore"),
     cl,
     oa,
     rt;
+
+var rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 
 if (!_.has(config, "hosts") || !_.has(config.hosts, server)) {
     console.error("No client key for " + server);
@@ -63,17 +69,9 @@ Step(
         if (err) throw err;
         rt = {token: token, secret: secret};
         url = "http://"+server+":"+port+"/oauth/authorize?oauth_token=" + rt.token;
-        console.log("Log in here: " + url);
-        console.log("Verifier: ");
-        process.stdin.resume();
-        process.stdin.setEncoding('utf8');
-
-        process.stdin.on('data', function (chunk) {
-            verifier = verifier + chunk;
-        });
-
-        process.stdin.on('end', function () {
-            process.stdin.pause();
+        console.log("Login here: " + url);
+        rl.question("What is the 'verifier' value? ", function(verifier) {
+            verifier.trim();
             callback(null, verifier);
         });
     },
@@ -90,5 +88,6 @@ Step(
                 secret: secret
             });
         }
+        rl.close();
     }
 );
