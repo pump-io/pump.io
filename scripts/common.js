@@ -17,46 +17,58 @@
 // limitations under the License.
 
 var http = require("http"),
+    fs = require("fs"),
+    path = require("path"),
+    Step = require("step"),
+    urlparse = require("url").parse,
     querystring = require("querystring"),
     url = require("url"),
-    config = require("./config"),
     OAuth = require("oauth").OAuth,
     _ = require("underscore");
 
-var postJSON = function(serverUrl, payload, callback) {
+var newOAuth = function(serverURL, cred) {
+    var oa, parts;
 
-    var req, oa, parts, toSend, pair;
+    parts = urlparse(serverURL);
 
-    if (!callback) {
-        callback = postReport(payload);
-    }
-    
-    parts = url.parse(serverUrl);
-
-    if (!_(config).has("hosts") ||
-        !_(config.hosts).has(parts.hostname)) {
-        callback(new Error("No OAuth key for " + parts.hostname), null);
-        return;
-    }
-
-    pair = config.hosts[parts.hostname];
-
-    oa = new OAuth(null, // request token N/A for 2-legged OAuth
-                   null, // access token N/A for 2-legged OAuth
-                   pair.key,
-                   pair.secret,
+    oa = new OAuth("http://"+parts.host+"/oauth/request_token",
+                   "http://"+parts.host+"/oauth/access_token",
+                   cred.client_id,
+                   cred.client_secret,
                    "1.0",
                    null,
                    "HMAC-SHA1",
                    null, // nonce size; use default
-                   {"User-Agent": "activitypump/0.1"});
+                   {"User-Agent": "activitypump-scripts/0.1.0"});
+
+    return oa;
+};
+
+var jsonHandler = function(callback) {
+    return function(err, data, response) {
+        var obj;
+        if (err) {
+            callback(err, null, null);
+        } else {
+            try {
+                obj = JSON.parse(data);
+                callback(null, obj, response);
+            } catch (e) {
+                callback(e, null, null);
+            }
+        }
+    };
+};
+
+var postJSON = function(serverUrl, cred, payload, callback) {
+
+    var oa, toSend;
+
+    oa = newOAuth(serverUrl, cred);
     
     toSend = JSON.stringify(payload);
 
-    oa.post(serverUrl, null, null, toSend, "application/json", function(err, data, response) {
-        // Our callback has swapped args to OAuth module"s
-        callback(err, response, data);
-    });
+    oa.post(serverUrl, cred.token, cred.token_secret, toSend, "application/json", jsonHandler(callback));
 };
 
 var postReport = function(payload) {
@@ -119,6 +131,59 @@ var postArgs = function(serverUrl, args, callback) {
     req.end();
 };
 
+var clientCred = function(host, callback) {
+
+    Step(
+        function() {
+            var credFile = path.join(process.env.HOME, ".pump.d", host + ".json");
+            fs.readFile(credFile, this);
+        },
+        function(err, data) {
+            var cred;
+            if (err) throw err;
+            cred = JSON.parse(data);
+            this(null, cred);
+        },
+        callback
+    );
+};
+
+var setClientCred = function(host, cred, callback) {
+
+    var dirName = path.join(process.env.HOME, ".pump.d"),
+        fname = path.join(dirName, host + ".json");
+
+    Step(
+        function() {
+            fs.stat(dirName, this);
+        },
+        function(err, stat) {
+            if (err) {
+                if (err.code == 'ENOENT') {
+                    fs.mkdir(dirName, 0700, this);
+                } else {
+                    throw err;
+                }
+            } else if (!stat.isDirectory()) {
+                throw new Error(dirName + " is not a directory");
+            } else {
+                this(null);
+            }
+        },
+        function(err) {
+            if (err) throw err;
+            fs.writeFile(fname, JSON.stringify(cred), this);
+        },
+        function(err) {
+            if (err) throw err;
+            fs.chmod(fname, 0600, this);
+        },
+        callback
+    );
+};
+
 exports.postJSON = postJSON;
 exports.postReport = postReport;
 exports.postArgs = postArgs;
+exports.setClientCred = setClientCred;
+exports.clientCred = clientCred;
