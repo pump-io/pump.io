@@ -148,11 +148,30 @@ var clientCred = function(host, callback) {
     );
 };
 
-var setClientCred = function(host, cred, callback) {
+var userCred = function(username, host, callback) {
+    var client;
 
-    var dirName = path.join(process.env.HOME, ".pump.d"),
-        fname = path.join(dirName, host + ".json");
+    Step(
+        function() {
+            clientCred(host, this);
+        },
+        function(err, result) {
+            if (err) throw err;
+            client = result;
+            var credFile = path.join(process.env.HOME, ".pump.d", host, username + ".json");
+            fs.readFile(credFile, this);
+        },
+        function(err, data) {
+            if (err) throw err;
+            var cred = JSON.parse(data);
+            _.extend(cred, client);
+            this(null, cred);
+        },
+        callback
+    );
+};
 
+var ensureDir = function(dirName, callback) {
     Step(
         function() {
             fs.stat(dirName, this);
@@ -169,6 +188,45 @@ var setClientCred = function(host, cred, callback) {
             } else {
                 this(null);
             }
+        },
+        callback
+    );
+};
+
+var setClientCred = function(host, cred, callback) {
+
+    var dirName = path.join(process.env.HOME, ".pump.d"),
+        fname = path.join(dirName, host + ".json");
+
+    Step(
+        function() {
+            ensureDir(dirName, this);
+        },
+        function(err) {
+            if (err) throw err;
+            fs.writeFile(fname, JSON.stringify(cred), this);
+        },
+        function(err) {
+            if (err) throw err;
+            fs.chmod(fname, 0600, this);
+        },
+        callback
+    );
+};
+
+var setUserCred = function(username, host, cred, callback) {
+
+    var pumpdName = path.join(process.env.HOME, ".pump.d"),
+        hostdName = path.join(pumpdName, host),
+        fname = path.join(hostdName, username + ".json");
+
+    Step(
+        function() {
+            ensureDir(pumpdName, this);
+        },
+        function(err) {
+            if (err) throw err;
+            ensureDir(hostdName, this);
         },
         function(err) {
             if (err) throw err;
@@ -187,3 +245,5 @@ exports.postReport = postReport;
 exports.postArgs = postArgs;
 exports.setClientCred = setClientCred;
 exports.clientCred = clientCred;
+exports.userCred = userCred;
+exports.setUserCred = setUserCred;
