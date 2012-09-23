@@ -17,7 +17,11 @@
 // limitations under the License.
 
 var _ = require("underscore"),
-    postArgs = require("./common").postArgs;
+    Step = require("step"),
+    url = require("url"),
+    common = require("./common"),
+    postArgs = common.postArgs,
+    setClientCred = common.setClientCred;
 
 var argv = require("optimist")
         .usage("Usage: $0 -t title -e email [-w|-n]")
@@ -34,7 +38,7 @@ var argv = require("optimist")
         .describe("n", "Native application")
         .describe("s", "Server name")
         .describe("P", "Port")
-        .default("P", 8001)
+        .default("P", 80)
         .default("s", "localhost")
         .argv;
 
@@ -56,10 +60,26 @@ if (argv.email) {
     args.contacts = argv.email;
 };
 
-postArgs("http://"+server+":"+port+"/api/client/register", args, function(err, res, body) {
-    if (err) {
-        console.error(err);
-    } else {
-        console.log(body);
+Step(
+    function() {
+        var endpoint = url.format({
+            protocol: "http",
+            host: ((port == 80) ? server : server + ":" + port),
+            pathname: "/api/client/register"
+        });
+        console.log(endpoint);
+        postArgs(endpoint, args, this);
+    },
+    function(err, res, body) {
+        if (err) throw err;
+        var cred = JSON.parse(body);
+        setClientCred(server, cred, this);
+    },
+    function(err) {
+        if (err) {
+            console.error(err);
+        } else {
+            console.log("OK");
+        }
     }
-});
+);
