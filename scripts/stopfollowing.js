@@ -1,8 +1,8 @@
-// register.js
+// stopfollowing.js
 //
-// Register a new user with the activity pump
+// stop following another user
 //
-// Copyright 2011, StatusNet Inc.
+// Copyright 2011-2012, StatusNet Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,36 +16,65 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var common = require("./common"),
-    postActivity = common.postActivity,
-    getJSON = common.getJSON;
+var _ = require("underscore"),
+    Step = require("step"),
+    url = require("url"),
+    common = require("./common"),
+    userCred = common.userCred,
+    postJSON = common.postJSON,
+    argv = require("optimist")
+        .usage("Usage: $0 -u <username> -o <other>")
+        .demand(["u", "o"])
+        .alias("u", "username")
+        .alias("o", "other")
+        .alias("s", "server")
+        .alias("P", "port")
+        .describe("u", "User nickname")
+        .describe("o", "Other user to stop following")
+        .describe("s", "Server name (default 'localhost')")
+        .describe("P", "Port (default 80)")
+        .default("P", 80)
+        .default("s", "localhost")
+        .argv,
+    username = argv.u,
+    server = argv.s,
+    note = argv.n,
+    port = argv.P,
+    otherId = argv.o;
 
-var nickname = process.argv[2],
-    password = process.argv[3],
-    other = process.argv[4];
+if (otherId.indexOf("@") === -1) {
+    otherId = otherId + "@" + server;
+}
 
-getJSON("http://localhost:8001/api/user/"+other, function(err, otherUser) {
-    var activity,
-	opts = {auth: nickname + ":" + password},
-	url = "http://localhost:8001/api/user/"+nickname+"/feed";
+if (otherId.substr(0, 5) != "acct:") {
+    otherId = "acct:" + otherId;
+}
 
-    if (err) {
-	console.error(err);
-    } else {
-	activity = {"verb": "stop-following",
-		    "object": {
-			"objectType": "person",
-			id: otherUser.profile.id
-		    }
-		   };
-	postActivity(url, activity, opts, function(err, results) {
-	    if (err) {
-		console.error(err);
-	    } else {
-		console.log(results);
+Step(
+    function() {
+        userCred(username, server, this);
+    },
+    function(err, cred) {
+        if (err) throw err;
+	var activity = {
+            "verb": "stop-following",
+	    "object": {
+		"objectType": "person",
+		id: otherId
 	    }
-	});
+	};
+        var endpoint = url.format({
+            protocol: ((port == 443) ? "https" : "http"),
+            host: ((port == 80) ? server : server + ":" + port),
+            pathname: "/api/user/"+username+"/feed"
+        });
+        postJSON(endpoint, cred, activity, this);
+    },
+    function(err, body, resp) {
+        if (err) {
+            console.error(err);
+        } else {
+            console.log("OK");
+        }
     }
-});
-
-
+);
