@@ -30,6 +30,13 @@ var assert = require("assert"),
 
 var suite = vows.describe("smoke test app interface over https");
 
+var clientCred = function(cl) {
+    return {
+        consumer_key: cl.client_id,
+        consumer_secret: cl.client_secret
+    };
+};
+
 // hostmeta links
 
 var hostmeta = {
@@ -143,6 +150,16 @@ suite.addBatch({
                     "and we test the lrdd.json endpoint":
                     xrdutil.jrdContext("https://social.localhost/api/lrdd.json?uri=caterpillar@social.localhost",
                                        webfinger),
+                    "and we get the user": {
+                        topic: function(user, cl) {
+                            var url = "https://social.localhost/api/user/caterpillar";
+                            httputil.getJSON(url, clientCred(cl), this.callback);
+                        },
+                        "it works": function(err, body, resp) {
+                            assert.ifError(err);
+                            assert.isObject(body);
+                        }
+                    },
                     "and we get a new request token": {
                         topic: function(user, cl) {
                             oauthutil.requestToken(cl, "social.localhost", 443, this.callback);
