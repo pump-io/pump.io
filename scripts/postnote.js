@@ -2,7 +2,7 @@
 //
 // Post a note with the given text
 //
-// Copyright 2011, StatusNet Inc.
+// Copyright 2011-2012, StatusNet Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,30 +16,56 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var common = require("./common"),
-    postActivity = common.postActivity;
+var _ = require("underscore"),
+    Step = require("step"),
+    url = require("url"),
+    common = require("./common"),
+    userCred = common.userCred,
+    postJSON = common.postJSON,
+    argv = require("optimist")
+        .usage("Usage: $0 -u <username> -n <your note>")
+        .demand(["u", "n"])
+        .alias("u", "username")
+        .alias("n", "note")
+        .alias("s", "server")
+        .alias("P", "port")
+        .describe("u", "User nickname")
+        .describe("n", "Text of note to post (HTML OK)")
+        .describe("s", "Server name (default 'localhost')")
+        .describe("P", "Port (default 80)")
+        .default("P", 80)
+        .default("s", "localhost")
+        .argv,
+    username = argv.u,
+    server = argv.s,
+    note = argv.n,
+    port = argv.P;
 
-var nickname = process.argv[2],
-    password = process.argv[3],
-    note = process.argv[4];
-
-var activity,
-    opts = {auth: nickname + ":" + password},
-    url = "http://localhost:8001/api/user/"+nickname+"/feed";
-
-activity = {"verb": "post",
-	    "object": {
-		"objectType": "note",
-		"content": note
-	    }
-	   };
-
-postActivity(url, activity, opts, function(err, results) {
-    if (err) {
-	console.error(err);
-    } else {
-	console.log(results);
+Step(
+    function() {
+        userCred(username, server, this);
+    },
+    function(err, cred) {
+        if (err) throw err;
+        var activity = {
+            "verb": "post",
+            "object": {
+	        "objectType": "note",
+	        "content": note
+            }
+        };
+        var endpoint = url.format({
+            protocol: ((port == 443) ? "https" : "http"),
+            host: ((port == 80) ? server : server + ":" + port),
+            pathname: "/api/user/"+username+"/feed"
+        });
+        postJSON(endpoint, cred, activity, this);
+    },
+    function(err, body, resp) {
+        if (err) {
+            console.error(err);
+        } else {
+            console.log("OK");
+        }
     }
-});
-
-
+);
