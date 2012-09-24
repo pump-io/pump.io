@@ -15,16 +15,22 @@
 // limitations under the License.
 
 var assert = require("assert"),
+    urlparse = require("url").parse,
     xml2js = require("xml2js"),
     vows = require("vows"),
     Step = require("step"),
     _ = require("underscore"),
-    http = require("http");
+    http = require("http"),
+    https = require("http");
 
 var getXRD = function(url) {
+    var parts = urlparse(url),
+        mod = (parts.protocol == "https:") ? https : http;            
+
     return function() {
         var callback = this.callback;
-        http.get(url, function(res) {
+
+        mod.get(url, function(res) {
             var body = "";
             if (res.statusCode !== 200) {
                 callback(new Error("Bad status code ("+res.statusCode+")"), null, null);
@@ -111,9 +117,11 @@ var xrdContext = function(url, def) {
 };
 
 var getJRD = function(url) {
+    var parts = urlparse(url),
+        mod = (parts.protocol == "https:") ? https : http;            
     return function() {
         var callback = this.callback;
-        http.get(url, function(res) {
+        mod.get(url, function(res) {
             var body = "";
             if (res.statusCode !== 200) {
                 callback(new Error("Bad status code ("+res.statusCode+")"), null, null);

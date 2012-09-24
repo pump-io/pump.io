@@ -17,6 +17,7 @@
 // limitations under the License.
 
 var http = require("http"),
+    https = require("https"),
     assert = require("assert"),
     querystring = require("querystring"),
     _ = require("underscore"),
@@ -101,7 +102,9 @@ var options = function(host, port, path, callback) {
         }
     };
 
-    var req = http.request(reqOpts, function(res) {
+    var mod = (port == 443) ? https : http;
+
+    var req = mod.request(reqOpts, function(res) {
         var body = "";
         res.setEncoding("utf8");
         res.on("data", function(chunk) {
@@ -142,7 +145,9 @@ var post = function(host, port, path, params, callback) {
         }
     };
 
-    var req = http.request(reqOpts, function(res) {
+    var mod = (port == 443) ? https : http;
+
+    var req = mod.request(reqOpts, function(res) {
         var body = "";
         res.setEncoding("utf8");
         res.on("data", function(chunk) {
@@ -259,10 +264,12 @@ var dialbackPost = function(endpoint, id, token, ts, requestBody, contentType, c
         auth = "Dialback webfinger=\"" + id + "\", token=\""+token+"\"";
     }
 
+    var mod = (reqOpts.protocol == "https:") ? https : http;
+
     reqOpts.headers["Authorization"] = auth;
     reqOpts.headers["Date"] = (new Date(ts)).toUTCString();
 
-    var req = http.request(reqOpts, function(res) {
+    var req = mod.request(reqOpts, function(res) {
         var body = "";
         res.setEncoding("utf8");
         res.on("data", function(chunk) {
