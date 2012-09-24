@@ -91,8 +91,7 @@ var newClient = function(hostname, port, cb) {
     });
 };
 
-var accessToken = function(cl, user, hostname, port, cb) {
-    var rt;
+var authorize = function(cl, rt, user, hostname, port, cb) {
 
     if (!port) {
         cb = hostname;
@@ -102,12 +101,7 @@ var accessToken = function(cl, user, hostname, port, cb) {
 
     Step(
         function() {
-            requestToken(cl, hostname, port, this);
-        },
-        function(err, res) {
             var browser, proto;
-            if (err) throw err;
-            rt = res;
             browser = new Browser({runScripts: false, waitFor: 60000});
 
             proto = (port == 443) ? "https" : "http";
@@ -133,10 +127,28 @@ var accessToken = function(cl, user, hostname, port, cb) {
             br.pressButton("Authorize", this);
         },
         function(err, br) {
-            var oa, verifier, proto;
+            var verifier;
             if (err) throw err;
             if (!br.success) throw new OAuthError({statusCode: br.statusCode, data: br.error || br.text("#error")});
             verifier = br.text("#verifier");
+            this(null, verifier);
+        },
+        cb
+    );
+};
+
+var redeemToken = function(cl, rt, verifier, hostname, port, cb) {
+
+    var proto, oa;
+
+    if (!port) {
+        cb = hostname;
+        hostname = "localhost";
+        port = 4815;
+    }
+
+    Step(
+        function() {
             proto = (port == 443) ? "https" : "http";
             oa = new OAuth(proto+"://"+hostname+":"+port+"/oauth/request_token",
                            proto+"://"+hostname+":"+port+"/oauth/access_token",
@@ -147,7 +159,7 @@ var accessToken = function(cl, user, hostname, port, cb) {
                            "HMAC-SHA1",
                            null, // nonce size; use default
                            {"User-Agent": "activitypump-test/0.1.0"});
-                                        
+            
             oa.getOAuthAccessToken(rt.token, rt.token_secret, verifier, this);
         },
         function(err, token, secret, res) {
@@ -162,6 +174,32 @@ var accessToken = function(cl, user, hostname, port, cb) {
                 pair = {token: token, token_secret: secret};
                 cb(null, pair);
             }
+        }
+    );
+};
+
+var accessToken = function(cl, user, hostname, port, cb) {
+
+    var rt;
+
+    if (!port) {
+        cb = hostname;
+        hostname = "localhost";
+        port = 4815;
+    }
+
+    Step(
+        function() {
+            requestToken(cl, hostname, port, this);
+        },
+        function(err, res) {
+            if (err) throw err;
+            rt = res;
+            authorize(cl, rt, user, hostname, port, this);
+        },
+        function(err, verifier) {
+            if (err) throw err;
+            redeemToken(cl, rt, verifier, hostname, port, this);
         }
     );
 };
@@ -290,4 +328,6 @@ exports.register = register;
 exports.newCredentials = newCredentials;
 exports.newPair = newPair;
 exports.accessToken = accessToken;
+exports.authorize = authorize;
+exports.redeemToken = redeemToken;
 exports.setupApp = setupApp;
