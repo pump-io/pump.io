@@ -28,9 +28,10 @@ var getXRD = function(url) {
         mod = (parts.protocol == "https:") ? https : http;            
 
     return function() {
-        var callback = this.callback;
+        var callback = this.callback,
+            req;
 
-        mod.get(url, function(res) {
+        req = mod.get(url, function(res) {
             var body = "";
             if (res.statusCode !== 200) {
                 callback(new Error("Bad status code ("+res.statusCode+")"), null, null);
@@ -54,6 +55,8 @@ var getXRD = function(url) {
                 });
             }
         });
+
+        req.on("error", function(err) { callback(err, null, null); });
     };
 };
 
@@ -122,8 +125,10 @@ var getJRD = function(url) {
     var parts = urlparse(url),
         mod = (parts.protocol == "https:") ? https : http;            
     return function() {
-        var callback = this.callback;
-        mod.get(url, function(res) {
+        var callback = this.callback,
+            req;
+
+        req = mod.get(url, function(res) {
             var body = "";
             if (res.statusCode !== 200) {
                 callback(new Error("Bad status code ("+res.statusCode+")"), null, null);
@@ -146,6 +151,8 @@ var getJRD = function(url) {
                 });
             }
         });
+
+        req.on("error", function(err) { callback(err, null, null); });
     };
 };
 
