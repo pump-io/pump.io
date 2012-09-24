@@ -11,3 +11,5 @@ exports.port   = 8000;
 exports.hostname = "example.org";
 exports.nologger = false;
 exports.serverUser = "activitypump";
+exports.key    = "/etc/my/keyfile.key";
+exports.cert   = "/etc/my/server.crt";
