@@ -6,7 +6,7 @@ This is the ActivityPump. It's social infrastructure that models most
 of what people want to do with social networks: the social graph,
 activity streams, and so on.
 
-[![Build Status](https://secure.travis-ci.org/evanp/activitypump.png)](http://travis-ci.org/evanp/activitypump)
+[![Build Status](https://secure.travis-ci.org/e14n/activitypump.png)](http://travis-ci.org/e14n/activitypump)
 
 ## License
 
