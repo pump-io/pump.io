@@ -21,7 +21,7 @@ var assert = require("assert"),
     Step = require("step"),
     _ = require("underscore"),
     http = require("http"),
-    https = require("http");
+    https = require("https");
 
 var getXRD = function(url) {
     var parts = urlparse(url),
@@ -105,6 +105,8 @@ var xrdContext = function(url, def) {
         topic: getXRD(url),
         "it works": function(err, doc, res) {
             assert.ifError(err);
+            assert.isObject(doc);
+            assert.isObject(res);
         },
         "it has an XRD content type": typeCheck("application/xrd+xml")
     };
@@ -177,6 +179,8 @@ var jrdContext = function(url, def) {
         topic: getJRD(url),
         "it works": function(err, doc, res) {
             assert.ifError(err);
+            assert.isObject(doc);
+            assert.isObject(res);
         },
         "it has an JRD content type": typeCheck("application/json; charset=utf-8")
     };
