@@ -38,6 +38,15 @@ var clientCred = function(cl) {
     };
 };
 
+var makeCred = function(cl, pair) {
+    return {
+        consumer_key: cl.client_id,
+        consumer_secret: cl.client_secret,
+        token: pair.token,
+        token_secret: pair.token_secret
+    };
+};
+
 var httpsURL = function(url) {
     var parts = urlparse(url);
     return parts.protocol == "https:";
@@ -213,6 +222,34 @@ suite.addBatch({
                                 "it works": function(err, pair) {
                                     assert.ifError(err);
                                     assert.isObject(pair);
+                                },
+                                "and the user posts a note": {
+                                    topic: function(pair, verifier, rt, user, cl) {
+                                        var url = "https://social.localhost/api/user/caterpillar/feed",
+                                            act = {
+                                                verb: "post",
+                                                object: {
+                                                    objectType: "note",
+                                                    content: "Who are you?"
+                                                }
+                                            };
+                                        httputil.postJSON(url, makeCred(cl, pair), act, this.callback);
+                                    },
+                                    "it works": function(err, act) {
+                                        assert.ifError(err);
+                                        assert.isObject(act);
+                                    },
+                                    "URLs look correct": function(err, act) {
+                                        assert.ifError(err);
+                                        assert.isObject(act);
+                                        assert.isTrue(httpsURL(act.url));
+                                        assert.isTrue(httpsURL(act.object.links.self.href));
+                                        assert.isTrue(httpsURL(act.object.likes.url));
+                                        assert.isTrue(httpsURL(act.object.replies.url));
+                                        assert.isTrue(httpsURL(act.actor.links.self.href));
+                                        assert.isTrue(httpsURL(act.actor.links["activity-inbox"].href));
+                                        assert.isTrue(httpsURL(act.actor.links["activity-outbox"].href));
+                                    }
                                 }
                             }
                         }
