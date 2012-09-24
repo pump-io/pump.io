@@ -24,6 +24,7 @@ var assert = require("assert"),
     Step = require("step"),
     http = require("http"),
     https = require("https"),
+    urlparse = require("url").parse,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     xrdutil = require("./lib/xrd");
@@ -35,6 +36,11 @@ var clientCred = function(cl) {
         consumer_key: cl.client_id,
         consumer_secret: cl.client_secret
     };
+};
+
+var httpsURL = function(url) {
+    var parts = urlparse(url);
+    return parts.protocol == "https:";
 };
 
 // hostmeta links
@@ -158,6 +164,20 @@ suite.addBatch({
                         "it works": function(err, body, resp) {
                             assert.ifError(err);
                             assert.isObject(body);
+                        },
+                        "the links look correct": function(err, body, resp) {
+                            assert.ifError(err);
+                            assert.isObject(body);
+                            assert.isObject(body.profile);
+                            assert.equal(body.profile.id, "acct:caterpillar@social.localhost");
+                            assert.equal(body.profile.url, "https://social.localhost/caterpillar");
+                            assert.isTrue(httpsURL(body.profile.links.self.href));
+                            assert.isTrue(httpsURL(body.profile.links["activity-inbox"].href));
+                            assert.isTrue(httpsURL(body.profile.links["activity-outbox"].href));
+                            assert.isTrue(httpsURL(body.profile.followers.url));
+                            assert.isTrue(httpsURL(body.profile.following.url));
+                            assert.isTrue(httpsURL(body.profile.lists.url));
+                            assert.isTrue(httpsURL(body.profile.favorites.url));
                         }
                     },
                     "and we get a new request token": {
