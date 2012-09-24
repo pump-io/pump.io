@@ -47,7 +47,7 @@ var requestToken = function(cl, hostname, port, cb) {
         port = 4815;
     }
 
-    proto = (port == 443) ? "https" : "http";
+    proto = (port === 443) ? "https" : "http";
 
     oa = new OAuth(proto+"://"+hostname+":"+port+"/oauth/request_token",
                    proto+"://"+hostname+":"+port+"/oauth/access_token",
@@ -104,7 +104,7 @@ var authorize = function(cl, rt, user, hostname, port, cb) {
             var browser, proto;
             browser = new Browser({runScripts: false, waitFor: 60000});
 
-            proto = (port == 443) ? "https" : "http";
+            proto = (port === 443) ? "https" : "http";
             
             browser.visit(proto+"://"+hostname+":"+port+"/oauth/authorize?oauth_token=" + rt.token, this);
         },
@@ -149,7 +149,7 @@ var redeemToken = function(cl, rt, verifier, hostname, port, cb) {
 
     Step(
         function() {
-            proto = (port == 443) ? "https" : "http";
+            proto = (port === 443) ? "https" : "http";
             oa = new OAuth(proto+"://"+hostname+":"+port+"/oauth/request_token",
                            proto+"://"+hostname+":"+port+"/oauth/access_token",
                            cl.client_id,
@@ -200,7 +200,8 @@ var accessToken = function(cl, user, hostname, port, cb) {
         function(err, verifier) {
             if (err) throw err;
             redeemToken(cl, rt, verifier, hostname, port, this);
-        }
+        },
+        cb
     );
 };
 
@@ -213,7 +214,7 @@ var register = function(cl, nickname, password, hostname, port, callback) {
         port = 4815;
     }
 
-    proto = (port == 443) ? "https" : http;
+    proto = (port === 443) ? "https" : "http";
 
     httputil.postJSON(proto+"://"+hostname+":"+port+"/api/users", 
                       {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
