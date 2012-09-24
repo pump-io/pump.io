@@ -120,6 +120,18 @@ var clientReg = function(req, res, next) {
             next(new HTTPError("redirect_uris must be space-separated URLs.", 400));
             return;
         }
+
+        if (props.redirect_uris.length == 1) {
+
+            // Does it look like glopped-together URLs?
+
+            var matches = props.redirect_uris[0].match(/https?:/g);
+
+            if (matches.length > 1) {
+                next(new HTTPError("redirect_uris must be space-separated URLs.", 400));
+                return;
+            }
+        }
     }
 
     if (req.remoteHost) {
