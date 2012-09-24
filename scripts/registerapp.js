@@ -67,7 +67,6 @@ Step(
             host: ((port == 80) ? server : server + ":" + port),
             pathname: "/api/client/register"
         });
-        console.log(endpoint);
         postArgs(endpoint, args, this);
     },
     function(err, res, body) {
