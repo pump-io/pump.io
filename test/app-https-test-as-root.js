@@ -24,11 +24,49 @@ var assert = require("assert"),
     Step = require("step"),
     http = require("http"),
     https = require("https"),
-    httputil = require("./lib/http");
+    httputil = require("./lib/http"),
+    oauthutil = require("./lib/oauth"),
+    xrdutil = require("./lib/xrd");
 
-var ignore = function(err) {};
+var suite = vows.describe("smoke test app interface over https");
 
-var suite = vows.describe("app over https");
+// hostmeta links
+
+var hostmeta = {
+    links: [{rel: "lrdd",
+             type: "application/xrd+xml",
+             template: /{uri}/},
+            {rel: "lrdd",
+             type: "application/json",
+             template: /{uri}/},
+            {rel: "registration_endpoint",
+             href: "https://social.localhost/api/client/register"
+            },
+            {rel: "dialback",
+             href: "https://social.localhost/api/dialback"}]
+};
+
+var webfinger = {
+    links: [
+        {
+            rel: "http://webfinger.net/rel/profile-page",
+            type: "text/html",
+            href: "https://social.localhost/caterpillar"
+        },
+        {
+            rel: "activity-inbox",
+            href: "https://social.localhost/api/user/caterpillar/inbox"
+        },
+        {
+            rel: "activity-outbox",
+            href: "https://social.localhost/api/user/caterpillar/feed"
+        },
+        {
+            rel: "dialback",
+            href: "https://social.localhost/api/dialback"
+        }
+    ]
+};
 
 suite.addBatch({
     "When we makeApp()": {
@@ -74,32 +112,74 @@ suite.addBatch({
                 var addr = app.address();
                 assert.equal(addr.port, 443);
             },
-            "and we get the host-meta file": {
+            "and we GET the host-meta file": 
+            xrdutil.xrdContext("https://social.localhost/.well-known/host-meta",
+                               hostmeta),
+            "and we GET the host-meta.json file":
+            xrdutil.jrdContext("https://social.localhost/.well-known/host-meta.json",
+                               hostmeta),
+            "and we register a new client": {
                 topic: function() {
-                    var endpoint = "https://social.localhost/.well-known/host-meta.json",
-                        callback = this.callback,
-                        req;
-                    req = https.get(endpoint, function(res) {
-                        var body = "";
-                        res.setEncoding("utf8");
-                        res.on("data", function(chunk) {
-                            body = body + chunk;
-                        });
-                        res.on("error", function(err) {
-                            callback(err, null, null);
-                        });
-                        res.on("end", function() {
-                            callback(null, res, body);
-                        });
-                    });
-
-                    req.on("error", function(err) {
-                        callback(err, null, null);
-                    });
+                    oauthutil.newClient("social.localhost", 443, this.callback);
                 },
-                "it works": function(err, res, body) {
+                "it works": function(err, cred) {
                     assert.ifError(err);
-                    assert.equal(200, res.statusCode);
+                    assert.isObject(cred);
+                    assert.include(cred, "client_id");
+                    assert.include(cred, "client_secret");
+                    assert.include(cred, "expires_at");
+                },
+                "and we register a new user": {
+                    topic: function(cl) {
+                        oauthutil.register(cl, "caterpillar", "mush+room", "social.localhost", 443, this.callback);
+                    },
+                    "it works": function(err, user) {
+                        assert.ifError(err);
+                        assert.isObject(user);
+                    },
+                    "and we test the lrdd endpoint":
+                    xrdutil.xrdContext("https://social.localhost/api/lrdd?uri=caterpillar@social.localhost",
+                                       webfinger),
+                    "and we test the lrdd.json endpoint":
+                    xrdutil.jrdContext("https://social.localhost/api/lrdd.json?uri=caterpillar@social.localhost",
+                                       webfinger),
+                    "and we get a new request token": {
+                        topic: function(user, cl) {
+                            oauthutil.requestToken(cl, "social.localhost", 443, this.callback);
+                        },
+                        "it works": function(err, rt) {
+                            assert.ifError(err);
+                            assert.isObject(rt);
+                        },
+                        "and we authorize the request token": {
+                            topic: function(rt, user, cl) {
+                                oauthutil.authorize(cl,
+                                                    rt,
+                                                    {nickname: "caterpillar", password: "mush+room"},
+                                                    "social.localhost",
+                                                    443,
+                                                    this.callback); 
+                            },
+                            "it works": function(err, verifier) {
+                                assert.ifError(err);
+                                assert.isString(verifier);
+                            },
+                            "and we get an access token": {
+                                topic: function(verifier, rt, user, cl) {
+                                    oauthutil.redeemToken(cl,
+                                                          rt,
+                                                          verifier,
+                                                          "social.localhost",
+                                                          443,
+                                                          this.callback);
+                                },
+                                "it works": function(err, pair) {
+                                    assert.ifError(err);
+                                    assert.isObject(pair);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
