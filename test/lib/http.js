@@ -134,7 +134,7 @@ var post = function(host, port, path, params, callback) {
     var requestBody = querystring.stringify(params);
 
     var reqOpts = {
-        host: host,
+        hostname: host,
         port: port,
         path: path,
         method: "POST",
