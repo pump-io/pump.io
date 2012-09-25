@@ -20,6 +20,7 @@ var assert = require("assert"),
     vows = require("vows"),
     databank = require("databank"),
     Step = require("step"),
+    _ = require("underscore"),
     schema = require("../lib/schema").schema,
     URLMaker = require("../lib/urlmaker").URLMaker,
     modelBatch = require("./lib/model").modelBatch,
@@ -201,6 +202,29 @@ suite.addBatch({
                 assert.isObject(user.profile.links.self);
                 assert.isObject(user.profile.links["activity-inbox"]);
                 assert.isObject(user.profile.links["activity-outbox"]);
+            },
+            "and we expand the profile's feeds": {
+                topic: function(user) {
+                    var callback = this.callback;
+                    user.profile.expandFeeds(function(err) {
+                        callback(err, user);
+                    });
+                },
+                "the profile has the right feeds": function(err, user) {
+                    assert.ifError(err);
+                    assert.isObject(user);
+                    assert.isObject(user.profile);
+                    assert.isFalse(_(user.profile).has("likes"));
+                    assert.isFalse(_(user.profile).has("replies"));
+                    assert.isObject(user.profile.followers);
+                    assert.isString(user.profile.followers.url);
+                    assert.isObject(user.profile.following);
+                    assert.isString(user.profile.following.url);
+                    assert.isObject(user.profile.lists);
+                    assert.isString(user.profile.lists.url);
+                    assert.isObject(user.profile.favorites);
+                    assert.isString(user.profile.favorites.url);
+                }
             }
         }
     }
