@@ -24,7 +24,7 @@ var assert = require("assert"),
     OAuth = require("oauth").OAuth,
     httputil = require("./lib/http");
 
-var suite = vows.describe("user API");
+var suite = vows.describe("user list API");
 
 var invert = function(callback) {
     return function(err) {
