@@ -31,7 +31,7 @@ var getXRD = function(url) {
         var callback = this.callback,
             req;
 
-        req = mod.get(url, function(res) {
+        req = mod.get(parts, function(res) {
             var body = "";
             if (res.statusCode !== 200) {
                 callback(new Error("Bad status code ("+res.statusCode+")"), null, null);
@@ -128,7 +128,7 @@ var getJRD = function(url) {
         var callback = this.callback,
             req;
 
-        req = mod.get(url, function(res) {
+        req = mod.get(parts, function(res) {
             var body = "";
             if (res.statusCode !== 200) {
                 callback(new Error("Bad status code ("+res.statusCode+")"), null, null);
