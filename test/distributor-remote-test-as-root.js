@@ -22,6 +22,7 @@ var assert = require("assert"),
     http = require("http"),
     querystring = require("querystring"),
     _ = require("underscore"),
+    urlparse = require("url").parse,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     newCredentials = oauthutil.newCredentials,
@@ -32,6 +33,11 @@ var assert = require("assert"),
     setupApp = oauthutil.setupApp;
 
 var suite = vows.describe("distributor remote test");
+
+var serverOf = function(url) {
+    var parts = urlparse(url);
+    return parts.hostname;
+};
 
 suite.addBatch({
     "When we set up two apps": {
@@ -251,6 +257,29 @@ suite.addBatch({
                                     assert.isObject(feed.items[0]);
                                     assert.include(feed.items[0], "id");
                                     assert.equal(feed.items[0].id, act.id);
+                                },
+                                "activity is sanitized": function(err, feed, act) {
+                                    assert.ifError(err);
+                                    assert.isObject(feed);
+                                    assert.isArray(feed.items);
+                                    assert.lengthOf(feed.items, 2);
+                                    assert.isObject(feed.items[0]);
+                                    assert.isObject(feed.items[0].actor);
+                                    assert.isFalse(_(feed.items[0].actor).has("_user"));
+                                },
+                                "activity likes and replies feeds have right host": function(err, feed, act) {
+                                    assert.ifError(err);
+                                    assert.isObject(feed);
+                                    assert.isArray(feed.items);
+                                    assert.lengthOf(feed.items, 2);
+                                    assert.isObject(feed.items[0]);
+                                    assert.isObject(feed.items[0].object);
+                                    assert.isObject(feed.items[0].object.likes);
+                                    assert.isString(feed.items[0].object.likes.url);
+                                    assert.equal(serverOf(feed.items[0].object.likes.url), "photo.localhost");
+                                    assert.isObject(feed.items[0].object.replies);
+                                    assert.isString(feed.items[0].object.replies.url);
+                                    assert.equal(serverOf(feed.items[0].object.replies.url), "photo.localhost");
                                 }
                             },
                             "and the first user responds": {
