@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Activitypump by e14n</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Activitypump</h1>
+          <h2>Social server with an ActivityStreams API</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/e14n/activitypump/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/e14n/activitypump/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/e14n/activitypump" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>ActivityPump</h1>
+
+<p>Version 0.1.0</p>
+
+<p>This is the ActivityPump. It's social infrastructure that models most
+of what people want to do with social networks: the social graph,
+activity streams, and so on.</p>
+
+<p><a href="http://travis-ci.org/e14n/activitypump"><img src="https://secure.travis-ci.org/e14n/activitypump.png" alt="Build Status"></a></p>
+
+<h2>License</h2>
+
+<p>Copyright 2011-2012, StatusNet Inc.</p>
+
+<p>Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+
+<p><a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+
+<h2>What's it for?</h2>
+
+<p>I post something and my followers see it. That's the rough idea behind
+the pump.</p>
+
+<p>There's an API defined in the API.md file. It uses activitystrea.ms
+JSON as the main data and command format.</p>
+
+<p>You can post almost anything that can be represented with activity
+streams -- short or long text, bookmarks, images, video, audio,
+events, geo checkins. You can follow friends, create lists of people,
+and so on.</p>
+
+<p>The software is useful for at least these scenarios:</p>
+
+<ul>
+<li>Mobile-first social networking</li>
+<li>Activity stream functionality for an existing app</li>
+<li>Experimenting with social software</li>
+</ul><p>Version 0.2.0 will have a Web UI, which will probably make the whole
+thing much more enjoyable.</p>
+
+<h2>Installation</h2>
+
+<p>You'll need three things to get started:</p>
+
+<ul>
+<li>node.js 0.8.0 or higher</li>
+<li>npm 1.1.0 or higher</li>
+<li>A database server (see below)</li>
+</ul><p>To install the software, you can clone the git repository, so:</p>
+
+<pre><code>git clone https://github.com/e14n/activitypump.git
+</code></pre>
+
+<p>You can then install the dependencies using <code>npm</code>:</p>
+
+<pre><code>cd activitypump
+npm install
+</code></pre>
+
+<p>To test the install, run:</p>
+
+<pre><code>npm test
+</code></pre>
+
+<h3>Database setup</h3>
+
+<p>ActivityPump uses <a href="https://github.com/evanp/databank">databank</a>
+package to abstract out the data storage for the system. Any databank
+driver should work. Couchbase, MongoDB and Redis are probably the best
+bets for production servers, but the <code>disk</code> or even <code>memory</code> drivers
+can work for testing.</p>
+
+<p>If you're confused, just use the MongoDB one.</p>
+
+<p>You can find other drivers like so:</p>
+
+<pre><code>npm search databank
+</code></pre>
+
+<p>One tricky bit is that the driver you use has to be available to the
+<code>databank</code> package. There are two ways to make that work.</p>
+
+<p>First, you can install globally. For example:</p>
+
+<pre><code>npm install -g databank-mongodb
+</code></pre>
+
+<p>Second, you can install in the <code>databank</code> directory.</p>
+
+<pre><code>cd activitypump/node_modules/databank
+npm install databank-mongodb
+</code></pre>
+
+<p>Note that you also need to install and configure your database server.</p>
+
+<h3>Configuration</h3>
+
+<p>The ActivityPump uses a single <code>config.js</code> file in the main directory
+for configuration options. You can look at <code>config.js.sample</code> for some
+details.</p>
+
+<p>The file is require()'d by code, so it needs to look like this:</p>
+
+<pre><code>module.exports = {
+    key1: "value1",
+    key2: "value2",
+    // ...
+};
+</code></pre>
+
+<p>..or like this:</p>
+
+<pre><code>exports.key1 = "value1";
+exports.key2 = "value2";
+</code></pre>
+
+<p>It's a JavaScript file, so you can put practically anything in there.</p>
+
+<p>Here are the main configuration keys.</p>
+
+<ul>
+<li>
+<em>driver</em> The databank driver you're using. Defaults to "disk", which
+is probably going to be terrible.</li>
+<li>
+<em>params</em> Databank driver params; see the databank driver README for
+details on what to put here.</li>
+<li>
+<em>hostname</em> The hostname of the server. Defaults to "localhost" which
+doesn't do much for you.</li>
+<li>
+<em>port</em> Port to listen on. Defaults to 31337, which is no good. You
+should listen on 80 or 443 if you're going to have anyone use this.</li>
+<li>
+<em>secret</em> A session-generating secret, server-wide password.</li>
+<li>
+<em>noweb</em> Hide the Web interface. Since it's disabled for this release,
+this shouldn't cause you any problems.</li>
+<li>
+<em>site</em> Name of the server, like "My great social service".</li>
+<li>
+<em>owner</em> Name of owning entity, if you want to link to it.</li>
+<li>
+<em>ownerURL</em> URL of owning entity, if you want to link to it.</li>
+<li>
+<em>nologger</em> If you're debugging or whatever, turn off
+logging. Defaults to false (leave logging on).</li>
+<li>
+<em>serverUser</em> If you're listening on a port lower than 1024, you need
+to be root. Set this to the name of a user to change to after the
+server is listening. <code>daemon</code> or <code>nobody</code> are good choices, or you
+can create a user like <code>pump</code> and use that.</li>
+<li>
+<em>key</em> If you're using SSL, the path to the server key, like
+"/etc/ssl/private/myserver.key".</li>
+<li>
+<em>cert</em> If you're using SSL, the path to the server cert, like
+"/etc/ssl/private/myserver.crt".</li>
+</ul><h2>Bugs</h2>
+
+<p>If you find bugs, you can report them here:</p>
+
+<p><a href="https://github.com/e14n/activitypump/issues">https://github.com/e14n/activitypump/issues</a></p>
+
+<p>You can also email me at <a href="mailto:evan@e14n.com">evan@e14n.com</a>.</p>
+        </section>
+
+        <footer>
+          Activitypump is maintained by <a href="https://github.com/e14n">e14n</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
