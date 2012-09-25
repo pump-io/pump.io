@@ -29,13 +29,19 @@ var authenticate = function(req, res) {
         token = parsedUrl.query.oauth_token;
 
     if (!token) {
-        res.render("error", {status: 400, error: new HTTPError("Must provide an oauth_token", 400), title: "Error"});
+        res.render("error", {status: 400,
+                             error: new HTTPError("Must provide an oauth_token", 400),
+                             title: "Error"});
     } else {
         RequestToken.get(token, function(err, rt) {
             if (err) {
-                res.render("error", {status: 400, error: err, title: "Error"});
+                res.render("error", {status: 400,
+                                     error: err,
+                                     title: "Error"});
             } else {
-                res.render("authentication", {title: "Authentication", token: token, nologin: true, error: false});
+                res.render("authentication", {title: "Authentication",
+                                              token: token,
+                                              error: false});
             }
         });
     }
@@ -49,7 +55,6 @@ var authorize = function(err, req, res, authorized, authResults, application, rt
         res.render("authentication", {title: "Authentication",
                                       token: authResults.token,
                                       status: 400,
-                                      nologin: true,
                                       error: err.message});
     } else {
         User.get(rt.username, function(err, user) {
