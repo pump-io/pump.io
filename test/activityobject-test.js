@@ -333,47 +333,6 @@ suite.addBatch({
                     assert.isString(group.updated);
                 }
             },
-            "and we ensure a new activity": {
-                topic: function(ActivityObject) {
-                    var props = {
-                        id: "urn:uuid:9cd092b2-06fe-11e2-9005-70f1a154e1aa",
-                        objectType: "activity",
-                        actor: {
-                            id: "urn:uuid:dd9d9874-0700-11e2-9b91-70f1a154e1aa",
-                            objectType: "person",
-                            displayName: "Brian Kernighan"
-                        },
-                        verb: "post",
-                        object: {
-                            id: "urn:uuid:de1ca6f0-0700-11e2-8b13-70f1a154e1aa",
-                            objectType: "note",
-                            content: "Hello, world."
-                        }
-                    };
-                    ActivityObject.ensureObject(props, this.callback);
-                },
-                "it works": function(err, activity) {
-                    assert.ifError(err);
-                },
-                "it exists": function(err, activity) {
-                    assert.ifError(err);
-                    assert.isObject(activity);
-                },
-                "it has the right class": function(err, activity) {
-                    assert.ifError(err);
-                    assert.instanceOf(activity, require("../lib/model/activity").Activity);
-                },
-                "it has the right passed-in attributes": function(err, activity) {
-                    assert.ifError(err);
-                    assert.equal(activity.objectType, "activity");
-                    assert.equal(activity.verb, "post");
-                },
-                "it has the right auto-created attributes": function(err, activity) {
-                    assert.ifError(err);
-                    assert.instanceOf(activity.actor, require("../lib/model/person").Person);
-                    assert.instanceOf(activity.object, require("../lib/model/note").Note);
-                }
-            },
             "and we ensure an existing activityobject object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
