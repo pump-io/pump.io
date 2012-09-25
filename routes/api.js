@@ -831,7 +831,6 @@ var postActivity = function(req, res, next) {
     if (!_(activity).has("verb") || _(activity.verb).isNull()) {
         activity.verb = "post";
     }
-
     
     Step(
         function() {
@@ -842,6 +841,7 @@ var postActivity = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
+                activity.sanitize();
                 // ...then show (possibly modified) results.
                 res.json(activity);
                 // ...then distribute.
