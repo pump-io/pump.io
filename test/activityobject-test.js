@@ -1159,6 +1159,30 @@ suite.addBatch({
                 "it is a match": function(res) {
                     assert.isTrue(res);
                 }
+            },
+            "and we trim a collection": {
+                topic: function(ActivityObject) {
+                    var props = {
+                        likes: {
+                            totalItems: 30,
+                            items: [
+                                {
+                                    objectType: "person",
+                                    id: "urn:uuid:4f9986da-0748-11e2-9deb-70f1a154e1aa"
+                                }
+                            ],
+                            url: "http://social.example/api/note/10/likes"
+                        }
+                    };
+                    ActivityObject.trimCollection(props, "likes");
+                    return props;
+                },
+                "it works": function(props) {
+                    assert.include(props, "likes");
+                    assert.isFalse(_(props.likes).has("totalItems"));
+                    assert.isFalse(_(props.likes).has("items"));
+                    assert.isTrue(_(props.likes).has("url"));
+                }
             }
         }
     }
