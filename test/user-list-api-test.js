@@ -190,7 +190,9 @@ suite.addBatch({
             });
         },
         teardown: function(app) {
-            app.close();
+            if (app && app.close) {
+                app.close();
+            }
         },
         "it works": function(err, app) {
             assert.ifError(err);
