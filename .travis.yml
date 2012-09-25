@@ -1,7 +1,7 @@
 language: node_js
 node_js:
   - 0.8
-script: "vows test/*-test.js && sudo vows test/*-test-as-root.js"
+script: "vows --spec test/*-test.js; sudo vows --spec test/*-test-as-root.js"
 before_script: 
   - "echo '127.0.69.1 dialback.localhost' | sudo tee -a /etc/hosts"
   - "echo '127.0.69.2 social.localhost' | sudo tee -a /etc/hosts"
