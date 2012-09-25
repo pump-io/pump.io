@@ -62,10 +62,10 @@ var hostmeta = {
              type: "application/json",
              template: /{uri}/},
             {rel: "registration_endpoint",
-             href: "https://social.localhost/api/client/register"
+             href: "https://secure.localhost/api/client/register"
             },
             {rel: "dialback",
-             href: "https://social.localhost/api/dialback"}]
+             href: "https://secure.localhost/api/dialback"}]
 };
 
 var webfinger = {
@@ -73,19 +73,19 @@ var webfinger = {
         {
             rel: "http://webfinger.net/rel/profile-page",
             type: "text/html",
-            href: "https://social.localhost/caterpillar"
+            href: "https://secure.localhost/caterpillar"
         },
         {
             rel: "activity-inbox",
-            href: "https://social.localhost/api/user/caterpillar/inbox"
+            href: "https://secure.localhost/api/user/caterpillar/inbox"
         },
         {
             rel: "activity-outbox",
-            href: "https://social.localhost/api/user/caterpillar/feed"
+            href: "https://secure.localhost/api/user/caterpillar/feed"
         },
         {
             rel: "dialback",
-            href: "https://social.localhost/api/dialback"
+            href: "https://secure.localhost/api/dialback"
         }
     ]
 };
@@ -94,9 +94,9 @@ suite.addBatch({
     "When we makeApp()": {
         topic: function() {
             var config = {port: 443,
-                          hostname: "social.localhost",
-                          key: path.join(__dirname, "data", "social.localhost.key"),
-                          cert: path.join(__dirname, "data", "social.localhost.crt"),
+                          hostname: "secure.localhost",
+                          key: path.join(__dirname, "data", "secure.localhost.key"),
+                          cert: path.join(__dirname, "data", "secure.localhost.crt"),
                           driver: "memory",
                           params: {},
                           nologger: true
@@ -135,14 +135,14 @@ suite.addBatch({
                 assert.equal(addr.port, 443);
             },
             "and we GET the host-meta file": 
-            xrdutil.xrdContext("https://social.localhost/.well-known/host-meta",
+            xrdutil.xrdContext("https://secure.localhost/.well-known/host-meta",
                                hostmeta),
             "and we GET the host-meta.json file":
-            xrdutil.jrdContext("https://social.localhost/.well-known/host-meta.json",
+            xrdutil.jrdContext("https://secure.localhost/.well-known/host-meta.json",
                                hostmeta),
             "and we register a new client": {
                 topic: function() {
-                    oauthutil.newClient("social.localhost", 443, this.callback);
+                    oauthutil.newClient("secure.localhost", 443, this.callback);
                 },
                 "it works": function(err, cred) {
                     assert.ifError(err);
@@ -153,21 +153,21 @@ suite.addBatch({
                 },
                 "and we register a new user": {
                     topic: function(cl) {
-                        oauthutil.register(cl, "caterpillar", "mush+room", "social.localhost", 443, this.callback);
+                        oauthutil.register(cl, "caterpillar", "mush+room", "secure.localhost", 443, this.callback);
                     },
                     "it works": function(err, user) {
                         assert.ifError(err);
                         assert.isObject(user);
                     },
                     "and we test the lrdd endpoint":
-                    xrdutil.xrdContext("https://social.localhost/api/lrdd?uri=caterpillar@social.localhost",
+                    xrdutil.xrdContext("https://secure.localhost/api/lrdd?uri=caterpillar@secure.localhost",
                                        webfinger),
                     "and we test the lrdd.json endpoint":
-                    xrdutil.jrdContext("https://social.localhost/api/lrdd.json?uri=caterpillar@social.localhost",
+                    xrdutil.jrdContext("https://secure.localhost/api/lrdd.json?uri=caterpillar@secure.localhost",
                                        webfinger),
                     "and we get the user": {
                         topic: function(user, cl) {
-                            var url = "https://social.localhost/api/user/caterpillar";
+                            var url = "https://secure.localhost/api/user/caterpillar";
                             httputil.getJSON(url, clientCred(cl), this.callback);
                         },
                         "it works": function(err, body, resp) {
@@ -178,8 +178,8 @@ suite.addBatch({
                             assert.ifError(err);
                             assert.isObject(body);
                             assert.isObject(body.profile);
-                            assert.equal(body.profile.id, "acct:caterpillar@social.localhost");
-                            assert.equal(body.profile.url, "https://social.localhost/caterpillar");
+                            assert.equal(body.profile.id, "acct:caterpillar@secure.localhost");
+                            assert.equal(body.profile.url, "https://secure.localhost/caterpillar");
                             assert.isTrue(httpsURL(body.profile.links.self.href));
                             assert.isTrue(httpsURL(body.profile.links["activity-inbox"].href));
                             assert.isTrue(httpsURL(body.profile.links["activity-outbox"].href));
@@ -191,7 +191,7 @@ suite.addBatch({
                     },
                     "and we get a new request token": {
                         topic: function(user, cl) {
-                            oauthutil.requestToken(cl, "social.localhost", 443, this.callback);
+                            oauthutil.requestToken(cl, "secure.localhost", 443, this.callback);
                         },
                         "it works": function(err, rt) {
                             assert.ifError(err);
@@ -202,7 +202,7 @@ suite.addBatch({
                                 oauthutil.authorize(cl,
                                                     rt,
                                                     {nickname: "caterpillar", password: "mush+room"},
-                                                    "social.localhost",
+                                                    "secure.localhost",
                                                     443,
                                                     this.callback); 
                             },
@@ -215,7 +215,7 @@ suite.addBatch({
                                     oauthutil.redeemToken(cl,
                                                           rt,
                                                           verifier,
-                                                          "social.localhost",
+                                                          "secure.localhost",
                                                           443,
                                                           this.callback);
                                 },
@@ -225,7 +225,7 @@ suite.addBatch({
                                 },
                                 "and the user posts a note": {
                                     topic: function(pair, verifier, rt, user, cl) {
-                                        var url = "https://social.localhost/api/user/caterpillar/feed",
+                                        var url = "https://secure.localhost/api/user/caterpillar/feed",
                                             act = {
                                                 verb: "post",
                                                 object: {
