@@ -35,9 +35,9 @@ suite.addBatch({
     "When we makeApp()": {
         topic: function() {
             var config = {port: 443,
-                          hostname: "social.localhost",
-                          key: path.join(__dirname, "data", "social.localhost.key"),
-                          cert: path.join(__dirname, "data", "social.localhost.crt"),
+                          hostname: "bounce.localhost",
+                          key: path.join(__dirname, "data", "bounce.localhost.key"),
+                          cert: path.join(__dirname, "data", "bounce.localhost.crt"),
                           driver: "memory",
                           params: {},
                           nologger: true,
@@ -81,7 +81,7 @@ suite.addBatch({
                     var callback = this.callback,
                         req;
 
-                    req = http.get("http://social.localhost/.well-known/host-meta", function(res) {
+                    req = http.get("http://bounce.localhost/.well-known/host-meta", function(res) {
                         callback(null, res);
                     });
                     req.on("error", function(err) {
@@ -94,7 +94,7 @@ suite.addBatch({
                 "it redirects to the HTTPS version": function(err, res) {
                     assert.ifError(err);
                     assert.equal(res.statusCode, 301);
-                    assert.equal(res.headers.location, "https://social.localhost/.well-known/host-meta");
+                    assert.equal(res.headers.location, "https://bounce.localhost/.well-known/host-meta");
                 }
             }
         }
