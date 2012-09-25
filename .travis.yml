@@ -3,8 +3,5 @@ node_js:
   - 0.8
 script: "vows --spec test/*-test.js; sudo vows --spec test/*-test-as-root.js"
 before_script: 
-  - "echo '127.0.69.1 dialback.localhost dialback' | sudo tee -a /etc/hosts"
-  - "echo '127.0.69.2 social.localhost social' | sudo tee -a /etc/hosts"
-  - "echo '127.0.69.3 photo.localhost photo' | sudo tee -a /etc/hosts"
-  - "echo '127.0.69.4 echo.localhost echo' | sudo tee -a /etc/hosts"
-  - "echo '127.0.69.5 secure.localhost secure' | sudo tee -a /etc/hosts"
+  - "./test/hosts.sh"
+
