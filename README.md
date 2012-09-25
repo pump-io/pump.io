@@ -82,16 +82,16 @@ You can find other drivers like so:
     npm search databank
 
 One tricky bit is that the driver you use has to be available to the
-`databank` package. There are two ways to make that work:
+`databank` package. There are two ways to make that work.
 
-1. Install globally. For example:
+First, you can install globally. For example:
 
-> npm install -g databank-mongodb
+    npm install -g databank-mongodb
    
-2. Install in the `databank` directory.
+Second, you can install in the `databank` directory.
 
-> cd activitypump/node_modules/databank
-> npm install databank-mongodb
+    cd activitypump/node_modules/databank
+    npm install databank-mongodb
 
 Note that you also need to install and configure your database server.
 
