@@ -158,14 +158,34 @@ suite.addBatch({
                             });
                         },
                         "it works": function(err, feed) {
+                            var maven;
                             assert.ifError(err);
                             assert.isObject(feed);
                             assert.include(feed, "items");
                             assert.isArray(feed.items);
                             assert.lengthOf(feed.items, 1);
                             assert.isObject(feed.items[0]);
-                            assert.include(feed.items[0], "id");
-                            assert.equal(feed.items[0].id, "acct:maven@social.localhost");
+                            maven = feed.items[0];
+                            assert.include(maven, "id");
+                            assert.equal(maven.id, "acct:maven@social.localhost");
+
+                            assert.include(maven, "links");
+                            assert.isObject(maven.links);
+
+                            assert.include(maven.links, "self");
+                            assert.isObject(maven.links.self);
+                            assert.include(maven.links.self, "href");
+                            assert.equal(serverOf(maven.links.self.href), "social.localhost");
+
+                            assert.include(maven.links, "activity-inbox");
+                            assert.isObject(maven.links["activity-inbox"]);
+                            assert.include(maven.links["activity-inbox"], "href");
+                            assert.equal(serverOf(maven.links["activity-inbox"].href), "social.localhost");
+
+                            assert.include(maven.links, "self");
+                            assert.isObject(maven.links["activity-outbox"]);
+                            assert.include(maven.links["activity-outbox"], "href");
+                            assert.equal(serverOf(maven.links["activity-outbox"].href), "social.localhost");
                         }
                     },
                     "and we check the second user's inbox": {
