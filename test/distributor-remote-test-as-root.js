@@ -169,6 +169,26 @@ suite.addBatch({
                             assert.include(maven, "id");
                             assert.equal(maven.id, "acct:maven@social.localhost");
 
+                            assert.include(maven, "followers");
+                            assert.isObject(maven.followers);
+                            assert.include(maven.followers, "url");
+                            assert.equal(serverOf(maven.followers.url), "social.localhost");
+
+                            assert.include(maven, "following");
+                            assert.isObject(maven.following);
+                            assert.include(maven.following, "url");
+                            assert.equal(serverOf(maven.following.url), "social.localhost");
+
+                            assert.include(maven, "favorites");
+                            assert.isObject(maven.favorites);
+                            assert.include(maven.favorites, "url");
+                            assert.equal(serverOf(maven.favorites.url), "social.localhost");
+
+                            assert.include(maven, "lists");
+                            assert.isObject(maven.lists);
+                            assert.include(maven.lists, "url");
+                            assert.equal(serverOf(maven.lists.url), "social.localhost");
+
                             assert.include(maven, "links");
                             assert.isObject(maven.links);
 
