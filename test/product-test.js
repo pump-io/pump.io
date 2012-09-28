@@ -42,7 +42,7 @@ var testData = {
     "create": {
         displayName: "pump.io",
         summary: "DUH what it sounds like LOL",
-        url: "http://activitypump.org/"
+        url: "http://pump.io.org/"
     },
     "update": {
         summary: "Network infrastructure for social tools."

@@ -286,7 +286,7 @@ suite.addBatch({
                                    null,
                                    "HMAC-SHA1",
                                    null, // nonce size; use default
-                                   {"User-Agent": "activitypump-test/0.1.0"});
+                                   {"User-Agent": "pump.io-test/0.1.0"});
                     
                     toSend = querystring.stringify({nickname: "delta", password: "dawn"});
 

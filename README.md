@@ -6,7 +6,7 @@ This is pump.io. It's social infrastructure that models most
 of what people want to do with social networks: the social graph,
 activity streams, and so on.
 
-[![Build Status](https://secure.travis-ci.org/e14n/activitypump.png)](http://travis-ci.org/e14n/activitypump)
+[![Build Status](https://secure.travis-ci.org/e14n/pump.io.png)](http://travis-ci.org/e14n/pump.io)
 
 ## License
 
@@ -60,7 +60,7 @@ To install the software, you can clone the git repository, so:
     
 You can then install the dependencies using `npm`:
 
-    cd activitypump
+    cd pump.io
     npm install
 
 To test the install, run:
@@ -90,7 +90,7 @@ First, you can install globally. For example:
    
 Second, you can install in the `databank` directory.
 
-    cd activitypump/node_modules/databank
+    cd pump.io/node_modules/databank
     npm install databank-mongodb
 
 Note that you also need to install and configure your database server.
@@ -147,7 +147,7 @@ Here are the main configuration keys.
 
 If you find bugs, you can report them here:
 
-https://github.com/e14n/activitypump/issues
+https://github.com/e14n/pump.io/issues
 
 You can also email me at evan@e14n.com.
 

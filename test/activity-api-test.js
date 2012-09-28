@@ -239,7 +239,7 @@ suite.addBatch({
                                 port: 4815,
                                 path: parsed.path,
                                 headers: {
-                                    "User-Agent": "activitypump-test/0.1.0dev",
+                                    "User-Agent": "pump.io-test/0.1.0dev",
                                     "Content-Type": "application/json"
                                 }
                             };
@@ -397,7 +397,7 @@ suite.addBatch({
                                 path: parsed.path,
                                 method: "PUT",
                                 headers: {
-                                    "User-Agent": "activitypump-test/0.1.0dev",
+                                    "User-Agent": "pump.io-test/0.1.0dev",
                                     "Content-Type": "application/json"
                                 }
                             },
@@ -581,7 +581,7 @@ suite.addBatch({
                                 path: parsed.path,
                                 method: "DELETE",
                                 headers: {
-                                    "User-Agent": "activitypump-test/0.1.0dev"
+                                    "User-Agent": "pump.io-test/0.1.0dev"
                                 }
                             };
                         var req = http.request(options, function(res) {

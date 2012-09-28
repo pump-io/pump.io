@@ -2,7 +2,7 @@
 
 // -*- mode: javascript -*-
 
-// activitypump
+// pump.io
 //
 // entry point activity pump application
 //
@@ -30,8 +30,8 @@ var cluster = require("cluster"),
 // Gets the configuration vars for this server from config files
 
 var getConfig = function() {
-    var files = ['/etc/activitypump.json',
-                 path.join(process.env.HOME, ".activitypump.json")],
+    var files = ['/etc/pump.io.json',
+                 path.join(process.env.HOME, ".pump.io.json")],
         config = {},
         i,
         raw,

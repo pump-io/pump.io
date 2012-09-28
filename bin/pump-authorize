@@ -65,7 +65,7 @@ Step(
                        "oob",
                        "HMAC-SHA1",
                        null, // nonce size; use default
-                       {"User-Agent": "activitypump-scripts/0.1.0"});
+                       {"User-Agent": "pump.io-scripts/0.1.0"});
         oa.getOAuthRequestToken(this);
     },
     function(err, token, secret) {

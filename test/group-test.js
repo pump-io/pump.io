@@ -38,7 +38,7 @@ var testSchema = {
 var testData = {
     "create": {
         displayName: "pump.io Developers",
-        url: "http://example.com/group/activitypump-dev"
+        url: "http://example.com/group/pump.io-dev"
     },
     "update": {
         displayName: "pump.io Hackers"

@@ -1,7 +1,7 @@
-// sample configuration file for activitypump
+// sample configuration file for pumpio
 
 exports.driver = 'disk';
-exports.params = {dir: '/tmp/activitypump/'};
+exports.params = {dir: '/tmp/pumpio/'};
 exports.secret = "my dog has fleas";
 exports.noweb  = false;
 exports.site   = "Awesome Sauce";
@@ -10,6 +10,6 @@ exports.ownerURL = "http://example.com/";
 exports.port   = 8000;
 exports.hostname = "example.org";
 exports.nologger = false;
-exports.serverUser = "activitypump";
+exports.serverUser = "pumpio";
 exports.key    = "/etc/my/keyfile.key";
 exports.cert   = "/etc/my/server.crt";
