@@ -1,4 +1,8 @@
-// server.js
+#!/usr/bin/env node
+
+// -*- mode: javascript -*-
+
+// activitypump
 //
 // entry point activity pump application
 //
