@@ -1,5 +1,6 @@
 {
     "name": "activity-pump",
+    "preferGlobal": "true",
     "homepage": "http://activitypump.org/",
     "version": "0.1.0-alpha.1",
     "author": "Evan Prodromou <evan@status.net>",
@@ -24,15 +25,24 @@
                       "validator": "0.4.x",
                       "webfinger": "0.1.x"
 		    },
+    "bin": {
+        "pump": "./bin/pump",
+        "pump-authorize": "./bin/pump-authorize",
+        "pump-follow": "./bin/pump-follow",
+        "pump-post-note": "./bin/pump-post-note",
+        "pump-register-app": "./bin/pump-register-app",
+        "pump-register-user": "./bin/pump-register-user",
+        "pump-stop-following": "./bin/pump-stop-following" 
+    },
     "scripts": {
         "test": "vows test/*-test.js",
-        "start": "node ./server.js"
+        "start": "./bin/pump"
     },
     "repository": {
         "type": "git",
         "url": "git://github.com/evanp/activitypump.git"
     },
-    "keywords": ["activitystreams", "socialnetwork", "app", "server"],
+    "keywords": ["activitystreams", "socialnetwork", "social", "pump", "streams", "api", "app", "server"],
     "licenses": [
         {
             "type": "Apache 2.0",
