@@ -40,7 +40,7 @@ var testSchema = {
 
 var testData = {
     "create": {
-        displayName: "ActivityPump",
+        displayName: "pump.io",
         summary: "DUH what it sounds like LOL",
         url: "http://activitypump.org/"
     },

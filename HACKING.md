@@ -1,6 +1,6 @@
 # HACKING
 
-Some quick documentation for hackery of the ActivityPump.
+Some quick documentation for hackery of pump.io.
 
 ## JAVASCRIPT
 

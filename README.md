@@ -1,8 +1,8 @@
-# ActivityPump
+# pump.io
 
 Version 0.1.0
 
-This is the ActivityPump. It's social infrastructure that models most
+This is pump.io. It's social infrastructure that models most
 of what people want to do with social networks: the social graph,
 activity streams, and so on.
 
@@ -69,7 +69,7 @@ To test the install, run:
     
 ### Database setup
 
-ActivityPump uses [databank](https://github.com/evanp/databank)
+pump.io uses [databank](https://github.com/evanp/databank)
 package to abstract out the data storage for the system. Any databank
 driver should work. Couchbase, MongoDB and Redis are probably the best
 bets for production servers, but the `disk` or even `memory` drivers
@@ -97,7 +97,7 @@ Note that you also need to install and configure your database server.
 
 ### Configuration
 
-The ActivityPump uses a single `config.js` file in the main directory
+pump.io uses a single `config.js` file in the main directory
 for configuration options. You can look at `config.js.sample` for some
 details.
 

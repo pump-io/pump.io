@@ -1,6 +1,6 @@
-# ActivityPump API
+# pump.io API
 
-The ActivityPump API is based on three major technologies:
+pump.io API is based on three major technologies:
 
 - [Activity Streams](http://activitystrea.ms/) for data format
 - [OAuth 1.0](http://tools.ietf.org/html/rfc5849)
@@ -81,7 +81,7 @@ an "acct:" URI, as well as an `url` of a profile page. The object is a
 "note".
 
 The activity streams specification is long; there are also several
-extensions that ActivityPump supports. The
+extensions that pump.io supports. The
 [Activity Base Schema](http://activitystrea.ms/specs/json/schema/activity-schema.html)
 lists some common object types and verbs.
 
@@ -91,7 +91,7 @@ verbs will be stored but won't cause side-effects.
 
 ## Feed basics
 
-Each user account on an ActivityPump has two main feeds:
+Each user account on a pump.io server has two main feeds:
 
 * An *activity outbox* at `/api/user/<nickname>/feed`. This is where
   the user posts new activities, and where others can read the user's
@@ -170,7 +170,7 @@ Posted activities may have side-effects; in the above case, the actor
 "ken" shares with his followers will also go to "bwk"'s inbox.
 
 Most activity verbs *don't* have side-effects. In this case, the
-ActivityPump will just store the data about the activity, and
+pump.io will just store the data about the activity, and
 distribute the activity according to the social graph, but it won't
 change the state of that graph.
 
@@ -255,7 +255,7 @@ correct in our heads is probably pretty small.
 
 ### Addressing activities
 
-ActivityPump supports the
+pump.io supports the
 [Audience Targeting for JSON Activity Streams](http://activitystrea.ms/specs/json/targeting/1.0/)
 extension, which lets you add addresses to an activity to show to whom
 the activity is directed.
@@ -269,7 +269,7 @@ inbox (see below).
 
 `bto` and `bcc` properties won't be shown to any users except the author.
 
-The ActivityPump uses the addresses for three things:
+pump.io uses the addresses for three things:
 
 * *Delivery of activities*. Depending on the addresses, the activity
   will be delivered either to local user inboxes or to remote users
@@ -328,7 +328,7 @@ explicitly.
 
 ### Major and minor feeds
 
-Some activities are more important than others. The ActivityPump
+Some activities are more important than others. pump.io
 provides sub-feeds of the outbox and inbox, divided by whether the
 activity is "major" or "minor". Roughly speaking, posting new content
 is "major", and changes to the social graph or reactions to other
@@ -520,7 +520,7 @@ objects.
 
 ## Discovery
 
-The ActivityPump supports
+pump.io supports
 [Web Host Metadata](http://tools.ietf.org/html/rfc6415) to discover
 information about users and hosts. It supports the XRD and JRD
 versions of the discovery output; JRD is probably better to use.
@@ -549,7 +549,7 @@ authentication, and the client ID used for the OAuth has to be
 associated with the webfinger ID of the actor who did the activity.
 
 When activities are posted to a user's activity outbox with addresses
-of remote users, the ActivityPump tries to deliver them using this
+of remote users, pump.io tries to deliver them using this
 method. In rough outline:
 
 1. It tries to discover an `activity-inbox` link for the person.

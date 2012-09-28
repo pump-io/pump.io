@@ -305,7 +305,7 @@ suite.addBatch({
                     var props = {
                         id: "urn:uuid:2b7cc63f-dd9a-438f-b6d3-846fee2634bf",
                         objectType: ActivityObject.GROUP,
-                        displayName: "ActivityPump Devs"
+                        displayName: "pump.io Devs"
                     };
                     ActivityObject.ensureObject(props, this.callback);
                 },
@@ -325,7 +325,7 @@ suite.addBatch({
                 },
                 "it has the right passed-in attributes": function(err, group) {
                     assert.equal(group.objectType, "group");
-                    assert.equal(group.displayName, "ActivityPump Devs");
+                    assert.equal(group.displayName, "pump.io Devs");
                 },
                 "it has the right auto-created attributes": function(err, group) {
                     assert.isString(group.id);

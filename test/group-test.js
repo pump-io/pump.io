@@ -37,11 +37,11 @@ var testSchema = {
 
 var testData = {
     "create": {
-        displayName: "ActivityPump Developers",
+        displayName: "pump.io Developers",
         url: "http://example.com/group/activitypump-dev"
     },
     "update": {
-        displayName: "ActivityPump Hackers"
+        displayName: "pump.io Hackers"
     }
 };
 
