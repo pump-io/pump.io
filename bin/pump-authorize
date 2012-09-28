@@ -22,7 +22,7 @@
 
 var _ = require("underscore"),
     Step = require("step"),
-    common = require("./common"),
+    common = require("../lib/pumpclient"),
     clientCred = common.clientCred,
     setUserCred = common.setUserCred,
     OAuth = require("oauth").OAuth,

@@ -23,7 +23,7 @@
 var _ = require("underscore"),
     Step = require("step"),
     url = require("url"),
-    common = require("./common"),
+    common = require("../lib/pumpclient"),
     postArgs = common.postArgs,
     setClientCred = common.setClientCred;
 
