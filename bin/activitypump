@@ -22,22 +22,60 @@
 
 var cluster = require("cluster"),
     os = require("os"),
-    makeApp = require("./lib/app").makeApp,
-    config = require("./config"),
-    cnt,
-    i;
+    fs = require("fs"),
+    path = require("path"),
+    _ = require("underscore"),
+    makeApp = require("../lib/app").makeApp;
 
-if (cluster.isMaster) {
-    cnt = config.children || Math.max(os.cpus().length - 1, 1);
-    for (i = 0; i < cnt; i++) {
-        cluster.fork();
-    }
-} else { 
-    makeApp(config, function(err, app) {
-        if (err) {
-            console.log(err);
-        } else {
-            app.run(function(err) {});
+// Gets the configuration vars for this server from config files
+
+var getConfig = function() {
+    var files = ['/etc/activitypump.json',
+                 path.join(process.env.HOME, ".activitypump.json")],
+        config = {},
+        i,
+        raw,
+        parsed;
+
+    // This is all sync
+    for (i = 0; i < files.length; i++) {
+        if (fs.existsSync(files[i])) {
+            raw = fs.readFileSync(files[i]);
+            try {
+                parsed = JSON.parse(raw);
+                _.extend(config, parsed);
+            } catch (err) {
+                console.log(err);
+                process.exit(1);
+            }
         }
-    });
-}
+    }
+
+    return config;
+};
+
+var launchApps = function(config) {
+    var cnt, i;
+
+    if (cluster.isMaster) {
+        cnt = config.children || Math.max(os.cpus().length - 1, 1);
+        for (i = 0; i < cnt; i++) {
+            cluster.fork();
+        }
+    } else { 
+        makeApp(config, function(err, app) {
+            if (err) {
+                console.log(err);
+            } else {
+                app.run(function(err) {});
+            }
+        });
+    }
+};
+
+var main = function() {
+    var config = getConfig();
+    launchApps(config);
+};
+
+main();
