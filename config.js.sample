@@ -1,15 +1,15 @@
-// sample configuration file for pumpio
-
-exports.driver = 'disk';
-exports.params = {dir: '/tmp/pumpio/'};
-exports.secret = "my dog has fleas";
-exports.noweb  = false;
-exports.site   = "Awesome Sauce";
-exports.owner  = "Awesome Inc.";
-exports.ownerURL = "http://example.com/";
-exports.port   = 8000;
-exports.hostname = "example.org";
-exports.nologger = false;
-exports.serverUser = "pumpio";
-exports.key    = "/etc/my/keyfile.key";
-exports.cert   = "/etc/my/server.crt";
+{
+    "driver":  "disk",
+    "params":  {dir: "/tmp/pumpio/"},
+    "secret":  "my dog has fleas",
+    "noweb":  false,
+    "site":  "Awesome Sauce",
+    "owner":  "Awesome Inc.",
+    "ownerURL":  "http://example.com/",
+    "port":  8000,
+    "hostname":  "example.org",
+    "nologger":  false,
+    "serverUser":  "pumpio",
+    "key":  "/etc/my/keyfile.key",
+    "cert":  "/etc/my/server.crt"
+}
