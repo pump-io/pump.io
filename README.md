@@ -56,7 +56,7 @@ You'll need three things to get started:
 
 To install the software, you can clone the git repository, so:
 
-    git clone https://github.com/e14n/activitypump.git
+    git clone https://github.com/e14n/pump.io.git
     
 You can then install the dependencies using `npm`:
 
