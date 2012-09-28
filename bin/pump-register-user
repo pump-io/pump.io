@@ -1,3 +1,7 @@
+#!/usr/bin/env node
+
+// -*- mode: javascript -*-
+
 // registeruser.js
 //
 // Register a new user with the activity pump

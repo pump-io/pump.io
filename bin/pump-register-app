@@ -1,3 +1,7 @@
+#!/usr/bin/env node
+
+// -*- mode: javascript -*-
+
 // registerapp.js
 //
 // Make a new app key and secret

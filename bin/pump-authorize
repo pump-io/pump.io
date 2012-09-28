@@ -1,3 +1,7 @@
+#!/usr/bin/env node
+
+// -*- mode: javascript -*-
+
 // authorize.js
 //
 // Get OAuth token

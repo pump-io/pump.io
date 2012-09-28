@@ -1,3 +1,7 @@
+#!/usr/bin/env node
+
+// -*- mode: javascript -*-
+
 // stopfollowing.js
 //
 // stop following another user

@@ -1,3 +1,7 @@
+#!/usr/bin/env node
+
+// -*- mode: javascript -*-
+
 // follow.js
 //
 // follow another user
