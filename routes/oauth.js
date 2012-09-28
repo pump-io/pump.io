@@ -58,11 +58,17 @@ var authorize = function(err, req, res, authorized, authResults, application, rt
                                       error: err.message});
     } else {
         User.get(rt.username, function(err, user) {
-            res.render("authorization", {title: "Authorization",
-                                         token: authResults.token,
-                                         verifier: authResults.verifier,
-                                         user: user,
-                                         application: application});
+            if (err) {
+                res.render("error", {status: 400,
+                                     error: err,
+                                     title: "Error"});
+            } else {
+                res.render("authorization", {title: "Authorization",
+                                             token: authResults.token,
+                                             verifier: authResults.verifier,
+                                             user: user,
+                                             application: application});
+            }
         });
     }
 };  
