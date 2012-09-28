@@ -1,9 +1,9 @@
 {
-    "name": "activity-pump",
+    "name": "pump.io",
     "preferGlobal": "true",
-    "homepage": "http://activitypump.org/",
+    "homepage": "http://pump.io/",
     "version": "0.1.0-alpha.1",
-    "author": "Evan Prodromou <evan@status.net>",
+    "author": "Evan Prodromou <evan@e14n.com>",
     "devDependencies": {
         "vows": "0.6.x",
         "node-mocks-http": "0.0.x",
@@ -40,7 +40,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git://github.com/evanp/activitypump.git"
+        "url": "git://github.com/e14n/pump.io.git"
     },
     "keywords": ["activitystreams", "socialnetwork", "social", "pump", "streams", "api", "app", "server"],
     "licenses": [
