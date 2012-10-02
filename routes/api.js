@@ -477,7 +477,7 @@ var likes = function(type) {
             },
             function(err, count) {
                 if (err) {
-                    if (err instanceof NoSuchThingError) {
+                    if (err.name == "NoSuchThingError") {
                         collection.totalItems = 0;
                         res.json(collection);
                     } else {
@@ -524,7 +524,7 @@ var replies = function(type) {
             },
             function(err, count) {
                 if (err) {
-                    if (err instanceof NoSuchThingError) {
+                    if (err.name == "NoSuchThingError") {
                         collection.totalItems = 0;
                         res.json(collection);
                     } else {
@@ -677,7 +677,7 @@ var usersStream = function(callback) {
         },
         function(err, str) {
             if (err) {
-                if (err instanceof NoSuchThingError) {
+                if (err.name == "NoSuchThingError") {
                     Stream.create({name: "user:all"}, this);
                 } else {
                     throw err;
@@ -688,7 +688,7 @@ var usersStream = function(callback) {
         },
         function(err, str) {
             if (err) {
-                if (err instanceof AlreadyExistsError) {
+                if (err.name == "AlreadyExistsError") {
                     Stream.get("user:all", callback);
                 } else {
                     callback(err);
@@ -894,15 +894,15 @@ var postToInbox = function(req, res, next) {
         },
         function(err) {
             if (err) {
-                if (err instanceof AppError) {
+                if (err.name == "AppError") {
                     throw new HTTPError(err.message, 400);
-                } else if (err instanceof NoSuchThingError) {
+                } else if (err.name == "NoSuchThingError") {
                     throw new HTTPError(err.message, 400);
-                } else if (err instanceof AlreadyExistsError) {
+                } else if (err.name == "AlreadyExistsError") {
                     throw new HTTPError(err.message, 400);
-                } else if (err instanceof NoSuchItemError) {
+                } else if (err.name == "NoSuchItemError") {
                     throw new HTTPError(err.message, 400);
-                } else if (err instanceof NotInStreamError) {
+                } else if (err.name == "NotInStreamError") {
                     throw new HTTPError(err.message, 400);
                 } else {
                     throw err;
@@ -942,15 +942,15 @@ var newActivity = function(activity, user, callback) {
         },
         function(err) {
             if (err) {
-                if (err instanceof AppError) {
+                if (err.name == "AppError") {
                     throw new HTTPError(err.message, 400);
-                } else if (err instanceof NoSuchThingError) {
+                } else if (err.name == "NoSuchThingError") {
                     throw new HTTPError(err.message, 400);
-                } else if (err instanceof AlreadyExistsError) {
+                } else if (err.name == "AlreadyExistsError") {
                     throw new HTTPError(err.message, 400);
-                } else if (err instanceof NoSuchItemError) {
+                } else if (err.name == "NoSuchItemError") {
                     throw new HTTPError(err.message, 400);
-                } else if (err instanceof NotInStreamError) {
+                } else if (err.name == "NotInStreamError") {
                     throw new HTTPError(err.message, 400);
                 } else {
                     throw err;
@@ -1027,7 +1027,7 @@ var filteredFeedRoute = function(urlmaker, titlemaker, streammaker) {
             },
             function(err, outbox) {
                 if (err) {
-                    if (err instanceof NoSuchThingError) {
+                    if (err.name == "NoSuchThingError") {
                         collection.totalItems = 0;
                         res.json(collection);
                     } else {
@@ -1130,7 +1130,7 @@ var feedRoute = function(urlmaker, titlemaker, streamgetter) {
             },
             function(err, inbox) {
                 if (err) {
-                    if (err instanceof NoSuchThingError) {
+                    if (err.name == "NoSuchThingError") {
                         collection.totalItems = 0;
                         res.json(collection);
                     } else {
@@ -1246,7 +1246,7 @@ var getStream = function(str, args, collection, user, callback) {
         },
         function(err, ids) {
             if (err) {
-                if (err instanceof NotInStreamError) {
+                if (err.name == "NotInStreamError") {
                     throw new HTTPError(err.message, 400);
                 } else {
                     throw err;
@@ -1300,7 +1300,7 @@ var userFollowers = function(req, res, next) {
         },
         function(err, count) {
             if (err) {
-                if (err instanceof NoSuchThingError) {
+                if (err.name == "NoSuchThingError") {
                     collection.totalItems = 0;
                     res.json(collection);
                 } else {
@@ -1373,7 +1373,7 @@ var userFollowing = function(req, res, next) {
         },
         function(err, count) {
             if (err) {
-                if (err instanceof NoSuchThingError) {
+                if (err.name == "NoSuchThingError") {
                     collection.totalItems = 0;
                     res.json(collection);
                 } else {
@@ -1471,7 +1471,7 @@ var userFavorites = function(req, res, next) {
         },
         function(err, count) {
             if (err) {
-                if (err instanceof NoSuchThingError) {
+                if (err.name == "NoSuchThingError") {
                     collection.totalItems = 0;
                     res.json(collection);
                 } else {
@@ -1567,7 +1567,7 @@ var userLists = function(req, res, next) {
         },
         function(err, ids) {
             if (err) {
-                if (err instanceof NotInStreamError) {
+                if (err.name == "NotInStreamError") {
                     throw new HTTPError(err.message, 400);
                 } else {
                     throw err;

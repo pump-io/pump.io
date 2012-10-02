@@ -127,7 +127,7 @@ var lrddUser = function(req, res, next) {
     }
     
     User.get(parts[1], function(err, user) {
-        if (err && err instanceof databank.NoSuchThingError) {
+        if (err && err.name == "NoSuchThingError") {
             next(new HTTPError(err.message, 404));
         } else if (err) {
             next(err);
