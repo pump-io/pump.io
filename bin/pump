@@ -55,10 +55,16 @@ var getConfig = function() {
 };
 
 var launchApps = function(config) {
-    var cnt, i;
+    var cnt, i, unclustered = ["memory", "disk", "leveldb"];
 
     if (cluster.isMaster) {
-        cnt = config.children || Math.max(os.cpus().length - 1, 1);
+        if (_(config).has("children")) {
+            cnt = config.children;
+        } else if (_(config).has("driver") && unclustered.indexOf(config.driver) !== -1) {
+            cnt = 1;
+        } else {
+            cnt = Math.max(os.cpus().length - 1, 1);
+        }
         for (i = 0; i < cnt; i++) {
             cluster.fork();
         }
