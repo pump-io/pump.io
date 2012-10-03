@@ -15,57 +15,87 @@
 // limitations under the License.
 
 var vows = require("vows"),
-    assert = require("assert");
+    assert = require("assert"),
+    databank = require("databank"),
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
 var suite = vows.describe("DialbackClient module interface");
 
 suite.addBatch({
-    "When we require the DialbackClient module": {
+    "When we connect a database": {
         topic: function() {
-            return require("../lib/dialbackclient");
-        },
-        "it works": function(DialbackClient) {
-            assert.isObject(DialbackClient);
-        },
-        "it has a post() method": function(DialbackClient) {
-            assert.isFunction(DialbackClient.post);
-        },
-        "it has a remember() method": function(DialbackClient) {
-            assert.isFunction(DialbackClient.remember);
-        },
-        "it has an isRemembered() method": function(DialbackClient) {
-            assert.isFunction(DialbackClient.isRemembered);
-        },
-        "and we tell it to remember a request": {
-            topic: function(DialbackClient) {
-                return DialbackClient.remember("http://social.example/inbox",
-                                         "acct:user@photo.example",
-                                         1347843277595,
-                                         "_Yh3Fzf4mD4");
-            },
-            "it works": function(res) {
-                assert.isTrue(res);
-            },
-            "and we check if the same values were remembered": {
-                topic: function(res, DialbackClient) {
-                    return DialbackClient.isRemembered("http://social.example/inbox",
-                                                 "acct:user@photo.example",
-                                                 1347843277595,
-                                                 "_Yh3Fzf4mD4");
-                },
-                "it works": function(res) {
-                    assert.isTrue(res);
+            var cb = this.callback,
+                db = Databank.get("memory", {});
+            db.connect({}, function(err) {
+                if (err) {
+                    cb(err, null);
+                } else {
+                    DatabankObject.bank = db;
+                    cb(null, db);
                 }
+            });
+        },
+        "it works": function(err, db) {
+            assert.ifError(err);
+        },
+        teardown: function(db) {
+            if (db && db.close) {
+                db.close(function(err) {});
+            }
+        },
+        "and we require the DialbackClient module": {
+            topic: function() {
+                return require("../lib/dialbackclient");
             },
-            "and we check if other values were remembered": {
-                topic: function(res, DialbackClient) {
-                    return DialbackClient.isRemembered("https://other.example/endpoint",
-                                                 "acct:user2@another.example",
-                                                 1347843277589,
-                                                 "6lTDQzU-jWU");
+            "it works": function(DialbackClient) {
+                assert.isObject(DialbackClient);
+            },
+            "it has a post() method": function(DialbackClient) {
+                assert.isFunction(DialbackClient.post);
+            },
+            "it has a remember() method": function(DialbackClient) {
+                assert.isFunction(DialbackClient.remember);
+            },
+            "it has an isRemembered() method": function(DialbackClient) {
+                assert.isFunction(DialbackClient.isRemembered);
+            },
+            "and we tell it to remember a request": {
+                topic: function(DialbackClient) {
+                    DialbackClient.remember("http://social.example/inbox",
+                                            "acct:user@photo.example",
+                                            1347843277595,
+                                            "_Yh3Fzf4mD4",
+                                            this.callback);
                 },
-                "it returns false": function(res) {
-                    assert.isFalse(res);
+                "it works": function(err) {
+                    assert.ifError(err);
+                },
+                "and we check if the same values were remembered": {
+                    topic: function(DialbackClient) {
+                        DialbackClient.isRemembered("http://social.example/inbox",
+                                                    "acct:user@photo.example",
+                                                    1347843277595,
+                                                    "_Yh3Fzf4mD4",
+                                                    this.callback);
+                    },
+                    "it works": function(err, res) {
+                        assert.ifError(err);
+                        assert.isTrue(res);
+                    }
+                },
+                "and we check if other values were remembered": {
+                    topic: function(DialbackClient) {
+                        DialbackClient.isRemembered("https://other.example/endpoint",
+                                                    "acct:user2@another.example",
+                                                    1347843277589,
+                                                    "6lTDQzU-jWU",
+                                                    this.callback);
+                    },
+                    "it returns false": function(err, res) {
+                        assert.ifError(err);
+                        assert.isFalse(res);
+                    }
                 }
             }
         }

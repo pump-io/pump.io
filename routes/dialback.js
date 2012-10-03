@@ -14,7 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var DialbackClient = require("../lib/dialbackclient"),
+var Step = require("step"),
+    DialbackClient = require("../lib/dialbackclient"),
     URLMaker = require("../lib/urlmaker").URLMaker;
 
 var addRoutes = function(app) {
@@ -63,13 +64,23 @@ var dialback = function(req, res, next) {
         return;
     }
 
-    if (DialbackClient.isRemembered(url, id, token, ts)) {
-        res.status(200).send("OK");
-        return;
-    } else {
-        res.status(400).send("Not my token");
-        return;
-    }
+    Step(
+        function() {
+            DialbackClient.isRemembered(url, id, token, ts, this);
+        },
+        function(err, remembered) {
+            if (err) {
+                next(err);
+                return;
+            }
+
+            if (remembered) {
+                res.status(200).send("OK");
+            } else {
+                res.status(400).send("Not my token");
+            }
+        }
+    );
 };
 
 exports.addRoutes = addRoutes;
