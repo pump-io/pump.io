@@ -25,7 +25,7 @@ var assert = require("assert"),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe("dialbackclientrequest module interface");
+var suite = vows.describe("dialbackrequest module interface");
 
 var testSchema = {
     pkey: "endpoint_id_token_timestamp",
@@ -44,19 +44,19 @@ var testData = {
     }
 };
 
-var mb = modelBatch("dialbackclientrequest",
-                    "DialbackClientRequest",
+var mb = modelBatch("dialbackrequest",
+                    "DialbackRequest",
                     testSchema,
                     testData);
 
-delete mb["When we require the dialbackclientrequest module"]
-["and we get its DialbackClientRequest class export"]
-["and we create a dialbackclientrequest instance"]
+delete mb["When we require the dialbackrequest module"]
+["and we get its DialbackRequest class export"]
+["and we create a dialbackrequest instance"]
 ["auto-generated fields are there"];
 
-delete mb["When we require the dialbackclientrequest module"]
-["and we get its DialbackClientRequest class export"]
-["and we create a dialbackclientrequest instance"]
+delete mb["When we require the dialbackrequest module"]
+["and we get its DialbackRequest class export"]
+["and we create a dialbackrequest instance"]
 ["and we modify it"];
 
 suite.addBatch(mb);
@@ -64,16 +64,16 @@ suite.addBatch(mb);
 suite.addBatch({
     "When we get the class": {
         topic: function() {
-            return require("../lib/model/dialbackclientrequest").DialbackClientRequest;
+            return require("../lib/model/dialbackrequest").DialbackRequest;
         },
-        "it works": function(DialbackClientRequest) {
-            assert.isFunction(DialbackClientRequest);
+        "it works": function(DialbackRequest) {
+            assert.isFunction(DialbackRequest);
         },
-        "it has a cleanup() method": function(DialbackClientRequest) {
-            assert.isFunction(DialbackClientRequest.cleanup);
+        "it has a cleanup() method": function(DialbackRequest) {
+            assert.isFunction(DialbackRequest.cleanup);
         },
         "and we create a lot of requests": {
-            topic: function(DialbackClientRequest) {
+            topic: function(DialbackRequest) {
                 var cb = this.callback;
 
                 Step(
@@ -81,7 +81,7 @@ suite.addBatch({
                         var i, group = this.group(), ts = Date.now() - (24 * 60 * 60 * 1000);
 
                         for (i = 0; i < 100; i++) {
-                            DialbackClientRequest.create({
+                            DialbackRequest.create({
                                 endpoint: "social.example/register",
                                 id: "acct:user@comment.example",
                                 token: "OLDTOKEN"+i,
@@ -95,7 +95,7 @@ suite.addBatch({
                         var i, group = this.group(), ts = Date.now();
 
                         for (i = 0; i < 100; i++) {
-                            DialbackClientRequest.create({
+                            DialbackRequest.create({
                                 endpoint: "social.example/register",
                                 id: "acct:user@comment.example",
                                 token: "RECENT"+i,
@@ -116,8 +116,8 @@ suite.addBatch({
                 assert.ifError(err);
             },
             "and we try to cleanup": {
-                topic: function(DialbackClientRequest) {
-                    DialbackClientRequest.cleanup(this.callback);
+                topic: function(DialbackRequest) {
+                    DialbackRequest.cleanup(this.callback);
                 },
                 "it works": function(err) {
                     assert.ifError(err);
