@@ -17,7 +17,10 @@
 var vows = require("vows"),
     assert = require("assert"),
     express = require("express"),
-    querystring = require("querystring");
+    querystring = require("querystring"),
+    databank = require("databank"),
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject;
 
 var suite = vows.describe("DialbackClient post interface");
 
@@ -67,9 +70,19 @@ suite.addBatch({
         },
         "And we require the DialbackClient module": {
             topic: function() {
-                return require("../lib/dialbackclient");
+                var cb = this.callback,
+                    db = Databank.get("memory", {});
+                db.connect({}, function(err) {
+                    if (err) {
+                        cb(err, null);
+                    } else {
+                        DatabankObject.bank = db;
+                        cb(null, require("../lib/dialbackclient"));
+                    }
+                });
             },
-            "it works": function(DialbackClient) {
+            "it works": function(err, DialbackClient) {
+                assert.ifError(err);
                 assert.isObject(DialbackClient);
             },
             "and we post to the echo endpoint": {
