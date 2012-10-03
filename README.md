@@ -122,6 +122,10 @@ Here are the main configuration keys.
    details on what to put here.
 * *hostname* The hostname of the server. Defaults to "localhost" which
    doesn't do much for you.
+* *address* The address to listen on. Defaults to `hostname`, which is
+   OK for most systems. Use this if you've got some kind of
+   load-balancer or NAS or whatever and your local IP doesn't map to
+   the IP of the hostname.
 * *port* Port to listen on. Defaults to 31337, which is no good. You
    should listen on 80 or 443 if you're going to have anyone use this.
 * *secret* A session-generating secret, server-wide password.
@@ -148,4 +152,3 @@ If you find bugs, you can report them here:
 https://github.com/e14n/pump.io/issues
 
 You can also email me at evan@e14n.com.
-

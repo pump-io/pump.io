@@ -8,6 +8,7 @@
     "ownerURL":  "http://example.com/",
     "port":  8000,
     "hostname":  "example.org",
+    "address":  "pumpio.localhost",
     "nologger":  false,
     "serverUser":  "pumpio",
     "key":  "/etc/my/keyfile.key",
