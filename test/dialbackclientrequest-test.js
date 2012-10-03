@@ -40,7 +40,7 @@ var testData = {
         endpoint: "social.example/register",
         id: "acct:user@comment.example",
         token: "AAAAAA",
-        timestamp: 123456
+        timestamp: Date.now()
     }
 };
 
@@ -60,5 +60,71 @@ delete mb["When we require the dialbackclientrequest module"]
 ["and we modify it"];
 
 suite.addBatch(mb);
+
+suite.addBatch({
+    "When we get the class": {
+        topic: function() {
+            return require("../lib/model/dialbackclientrequest").DialbackClientRequest;
+        },
+        "it works": function(DialbackClientRequest) {
+            assert.isFunction(DialbackClientRequest);
+        },
+        "it has a cleanup() method": function(DialbackClientRequest) {
+            assert.isFunction(DialbackClientRequest.cleanup);
+        },
+        "and we create a lot of requests": {
+            topic: function(DialbackClientRequest) {
+                var cb = this.callback;
+
+                Step(
+                    function() {
+                        var i, group = this.group(), ts = Date.now() - (24 * 60 * 60 * 1000);
+
+                        for (i = 0; i < 100; i++) {
+                            DialbackClientRequest.create({
+                                endpoint: "social.example/register",
+                                id: "acct:user@comment.example",
+                                token: "OLDTOKEN"+i,
+                                timestamp: ts
+                            }, group());
+                        }
+                    },
+                    function(err, reqs) {
+                        if (err) throw err;
+
+                        var i, group = this.group(), ts = Date.now();
+
+                        for (i = 0; i < 100; i++) {
+                            DialbackClientRequest.create({
+                                endpoint: "social.example/register",
+                                id: "acct:user@comment.example",
+                                token: "RECENT"+i,
+                                timestamp: ts
+                            }, group());
+                        }
+                    },
+                    function(err, reqs) {
+                        if (err) {
+                            cb(err);
+                        } else {
+                            cb(null);
+                        }
+                    }
+                );
+            },
+            "it works": function(err) {
+                assert.ifError(err);
+            },
+            "and we try to cleanup": {
+                topic: function(DialbackClientRequest) {
+                    DialbackClientRequest.cleanup(this.callback);
+                },
+                "it works": function(err) {
+                    assert.ifError(err);
+                }
+            }
+        }
+    }
+});
 
 suite["export"](module);
