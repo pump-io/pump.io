@@ -67,7 +67,7 @@ if (argv.email) {
 Step(
     function() {
         var endpoint = url.format({
-            protocol: "http",
+            protocol: ((port == 443) ? "https" : "http"),
             host: ((port == 80) ? server : server + ":" + port),
             pathname: "/api/client/register"
         });

@@ -56,9 +56,10 @@ Step(
         clientCred(server, this);
     },
     function(err, cred) {
+        var proto = (port == 443) ? "https:" : "http:";
         if (err) throw err;
-        oa = new OAuth("http://"+server+":"+port+"/oauth/request_token",
-                       "http://"+server+":"+port+"/oauth/access_token",
+        oa = new OAuth(proto+"//"+server+":"+port+"/oauth/request_token",
+                       proto+"//"+server+":"+port+"/oauth/access_token",
                        cred.client_id,
                        cred.client_secret,
                        "1.0",
@@ -72,9 +73,10 @@ Step(
         var url;
         var callback = this;
         var verifier = "";
+        var proto = (port == 443) ? "https:" : "http:";
         if (err) throw err;
         rt = {token: token, secret: secret};
-        url = "http://"+server+":"+port+"/oauth/authorize?oauth_token=" + rt.token;
+        url = proto+"//"+server+":"+port+"/oauth/authorize?oauth_token=" + rt.token;
         console.log("Login here: " + url);
         rl.question("What is the 'verifier' value? ", function(verifier) {
             verifier.trim();
