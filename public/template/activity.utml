@@ -1,0 +1,16 @@
+<div class="content">
+  <div class="page-header" id="header">
+    <h1><%- (obj.title || (actor.displayName + " " + verb + "ed a " + object.objectType)) %> </h1>
+  </div>
+  <div class="row" id="content">
+    <div class="span14" id="activity">
+      <p class="activity-content">
+        <%- (obj.content || object.summary || object.content || (actor.displayName + " " + verb + "ed " + object.displayName)) %>
+      </p>
+      <p class="activity-meta">
+        <a class="activity-author" href="<%= actor.url %>"><%- actor.displayName %></a>
+        <a class="activity-url" href="<%= obj.url %>"><%- obj.published %></a>
+      </p>
+    </div>
+  </div>
+</div>

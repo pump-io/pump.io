@@ -52,6 +52,7 @@
     <script src="/javascript/bootstrap.min.js"></script>
     <script src="/javascript/underscore-min.js"></script>
     <script src="/javascript/backbone-min.js"></script>
+    <script src="/javascript/activitypump.js"></script>
 
   </body>
 </html>

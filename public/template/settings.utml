@@ -1,0 +1,79 @@
+<div class="span14" id="form">
+
+  <div class="alert" id="alert"></div>
+
+  <form id="settings">
+
+    <fieldset>
+
+      <legend>Account</legend>
+      
+      <div class="clearfix">
+	<label>Username</label>
+	<div class="input">
+          <span class="uneditable-input"><%- nickname %></span>
+	  <span class="help-block">The name you log in with</span>
+	</div>
+      </div>
+
+      <div class="clearfix">
+	<label>Password</label>
+	<div class="input">
+          <input class="span6" id="password" name="password" size="30" type="password" />
+	  <span class="help-block">6-64 char password</span>
+	</div>
+      </div>
+
+      <div class="clearfix">
+	<label>Confirm</label>
+	<div class="input">
+          <input class="span6" id="confirm" name="confirm" size="30" type="password" />
+	  <span class="help-block">Same as above</span>
+	</div>
+      </div>
+
+    </fieldset>
+
+    <fieldset>
+
+      <legend>About you</legend>
+
+      <div class="clearfix">
+	<label for="realname">Real name</label>
+	<div class="input">
+          <input class="span6" id="realname" name="realname" size="30" type="text" value="<%- (profile.displayName || "") %>" />
+	  <span class="help-block">The name you want us to show</span>
+	</div>
+      </div>
+
+      <div class="clearfix">
+	<label for="location">Hometown</label>
+	<div class="input">
+          <input class="span6" id="location" name="location" size="30" type="text" value="<%- ((profile.location) ? (profile.location.displayName || "") : "") %>" />
+	  <span class="help-block">Where you usually are</span>
+	</div>
+      </div>
+
+      <div class="clearfix">
+	<label for="bio">Bio</label>
+	
+	<div class="input">
+          <textarea class="span6" id="bio" name="bio" rows="5"><%- (profile.summary || "") %></textarea>
+          <span class="help-block">
+	    All about you.
+          </span>
+	</div>
+      </div><!-- /clearfix -->
+
+    </fieldset>
+
+    <fieldset>
+      <div class="actions">
+	<input type="submit" class="btn primary" value="Save changes">&nbsp;<button type="reset" class="btn">Cancel</button>
+      </div>
+    </fieldset>  
+
+  </form>
+
+</div>
+

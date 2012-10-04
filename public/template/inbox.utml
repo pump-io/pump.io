@@ -1,0 +1,23 @@
+<div class="content">
+  <div class="page-header" id="header">
+    <h1><%- nickname %></h1>
+  </div>
+  <div class="row" id="content">
+    <div class="span10" id="stream">
+      <ul>
+        <% _.each(stream, function(activity) { %>
+        <li>
+          <p class="activity-content"><%- (activity.content || activity.object.summary || activity.object.content || ((activity.actor||actor).displayName + " " + activity.verb + "ed " + activity.object.displayName))%></p>
+          <p class="activity-meta">
+	    <a class="activity-author" href="<%= activity.actor.url %>"><%- activity.actor.displayName || activity.actor.preferredUsername %></a>
+	    <a class="activity-url" href="<%= activity.url %>"><%- activity.published %></a>
+          </p>
+        </li>   
+        <% }); %>
+      </ul>
+    </div>
+    <div class="span4" id="sidebar">
+      <h3><%- user.nickname %></h3>
+    </div>
+  </div>
+</div>
