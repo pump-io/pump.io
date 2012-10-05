@@ -63,7 +63,7 @@ var testData = {
         verb: "post",
         object: {
             id: "urn:uuid:ad06288c-ec86-11e1-bc32-0024beb67924",
-            displayName: "pump.io-0.1.1",
+            displayName: "pump.io-0.2.0-alpha.1",
             objectType: "application"
         }
     },
