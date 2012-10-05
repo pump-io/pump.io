@@ -144,7 +144,7 @@ suite.addBatch({
                                "oob",
                                "HMAC-SHA1",
                                null, // nonce size; use default
-                               {"User-Agent": "pump.io-test/0.1.0"});
+                               {"User-Agent": "pump.io/0.1.1"});
                                         
                 oa.getOAuthAccessToken("NOTATOKEN", "NOTATOKENSECRET", "NOTAVERIFIER", function(err, token, secret) {
                     if (err) {
@@ -175,7 +175,7 @@ suite.addBatch({
                                            "oob",
                                            "HMAC-SHA1",
                                            null, // nonce size; use default
-                                           {"User-Agent": "pump.io-test/0.1.0"});
+                                           {"User-Agent": "pump.io/0.1.1"});
                         
                         oa.getOAuthAccessToken("NOTATOKEN", "NOTATOKENSECRET", "NOTAVERIFIER", function(err, token, secret) {
                             if (err) {
@@ -213,7 +213,7 @@ suite.addBatch({
                                            "oob",
                                            "HMAC-SHA1",
                                            null, // nonce size; use default
-                                           {"User-Agent": "pump.io-test/0.1.0"});
+                                           {"User-Agent": "pump.io/0.1.1"});
                         
                         oa.getOAuthAccessToken("NOTATOKEN", "NOTATOKENSECRET", "NOTAVERIFIER", function(err, token, secret) {
                             if (err) {
@@ -257,7 +257,7 @@ suite.addBatch({
                                            "oob",
                                            "HMAC-SHA1",
                                            null, // nonce size; use default
-                                           {"User-Agent": "pump.io-test/0.1.0"});
+                                           {"User-Agent": "pump.io/0.1.1"});
                         
                         oa.getOAuthAccessToken(rt.token, "NOTATOKENSECRET", "NOTAVERIFIER", function(err, token, secret) {
                             if (err) {
@@ -304,7 +304,7 @@ suite.addBatch({
                                            "oob",
                                            "HMAC-SHA1",
                                            null, // nonce size; use default
-                                           {"User-Agent": "pump.io-test/0.1.0"});
+                                           {"User-Agent": "pump.io/0.1.1"});
                         
                         oa.getOAuthAccessToken(rt.token, rt.token_secret, "NOTAVERIFIER", function(err, token, secret) {
                             if (err) {
@@ -445,7 +445,7 @@ suite.addBatch({
                                                        "oob",
                                                        "HMAC-SHA1",
                                                        null, // nonce size; use default
-                                                       {"User-Agent": "pump.io-test/0.1.0"});
+                                                       {"User-Agent": "pump.io/0.1.1"});
                                         
                                         oa.getOAuthAccessToken(pair.token, rt.token_secret, pair.verifier, function(err, token, secret) {
                                             if (err) {
@@ -481,7 +481,7 @@ suite.addBatch({
                                                            "oob",
                                                            "HMAC-SHA1",
                                                            null, // nonce size; use default
-                                                           {"User-Agent": "pump.io-test/0.1.0"});
+                                                           {"User-Agent": "pump.io/0.1.1"});
                                             oa.getOAuthAccessToken(pair.token, rt.token_secret, pair.verifier, function(err, token, secret) {
                                                 if (err) {
                                                     cb(null);

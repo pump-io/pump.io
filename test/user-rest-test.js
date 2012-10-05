@@ -323,7 +323,7 @@ suite.addBatch({
                             path: "/api/user/xerxes",
                             method: "PUT",
                             headers: {
-                                "User-Agent": "pump.io-test/0.1.0dev",
+                                "User-Agent": "pump.io/0.1.1",
                                 "Content-Type": "application/json"
                             }
                         };
@@ -697,7 +697,7 @@ suite.addBatch({
                             path: "/api/user/victor",
                             method: "DELETE",
                             headers: {
-                                "User-Agent": "pump.io-test/0.1.0dev"
+                                "User-Agent": "pump.io/0.1.1"
                             }
                         };
                     var req = http.request(options, function(res) {
