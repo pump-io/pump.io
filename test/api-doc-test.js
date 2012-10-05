@@ -20,7 +20,7 @@ var assert = require("assert"),
     vows = require("vows"),
     oauthutil = require("./lib/oauth"),
     Browser = require("zombie"),
-    setupApp = oauthutil.setupApp;
+    setupAppConfig = oauthutil.setupAppConfig;
 
 var suite = vows.describe("api doc test");
 
@@ -29,7 +29,7 @@ var suite = vows.describe("api doc test");
 suite.addBatch({
     "When we set up the app": {
         topic: function() {
-            setupApp(this.callback);
+            setupAppConfig({noweb: true}, this.callback);
         },
         teardown: function(app) {
             if (app && app.close) {

@@ -306,7 +306,26 @@ var setupApp = function(port, hostname, callback) {
     port = port || 4815;
     hostname = hostname || "localhost";
 
-    var child = cp.fork(path.join(__dirname, "app.js"), [hostname, port]);
+    var config = {
+        port: port,
+        hostname: hostname
+    };
+
+    setupAppConfig(config, callback);
+};
+
+var setupAppConfig = function(config, callback) {
+
+    var prop, args = [];
+
+    config.port = config.port || 4815;
+    config.hostname = config.hostname || "localhost";
+
+    for (prop in config) {
+        args.push(prop + "=" + config[prop]);
+    }
+
+    var child = cp.fork(path.join(__dirname, "app.js"), args);
 
     var dummy = {
         close: function() {
@@ -332,3 +351,4 @@ exports.accessToken = accessToken;
 exports.authorize = authorize;
 exports.redeemToken = redeemToken;
 exports.setupApp = setupApp;
+exports.setupAppConfig = setupAppConfig;

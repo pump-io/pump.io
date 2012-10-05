@@ -5,12 +5,18 @@ var Step = require("step"),
 var config = {driver: "memory",
               params: {},
               nologger: true},
-    app = null;
+    app = null,
+    i,
+    parts;
 
 process.env.NODE_ENV = "test";
 
-config.hostname = process.argv[2],
-config.port = parseInt(process.argv[3], 10);
+for (i = 2; i < process.argv.length; i++) {
+    parts = process.argv[i].split("=");
+    config[parts[0]] = parts[1];
+}
+
+config.port = parseInt(config.port, 10);
 
 Step(
     function() {
