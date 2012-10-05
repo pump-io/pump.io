@@ -127,7 +127,7 @@ suite.addBatch({
                             headers: {
                                 "Content-Type": "application/json",
                                 "Content-Length": requestBody.length,
-                                "User-Agent": "pump.io-test/0.1.0dev"
+                                "User-Agent": "pump.io/0.2.0-alpha.1"
                             }
                         },
                         callback = this.callback;
