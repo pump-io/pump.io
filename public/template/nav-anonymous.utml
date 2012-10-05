@@ -1,12 +1,21 @@
-<nav class="topbar">
-  <div class="fill">
-    <div class="container" id="topnav">
-      <a class="brand" href="/">ActivityPump</a>
-      <form id="login" method="get" action="" class="pull-right">
-	<input class="input-small" type="text" name="nickname" placeholder="Username">
-	<input class="input-small" type="password" name="password" placeholder="Password">
-	<button type="submit" class="btn" >Sign in</button>
-      </form>
+<div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar">Register</span>
+        <span class="icon-bar">Login</span>
+      </button>
+      <a class="brand" href="/"><%- site %></a>
+      <div class="nav-collapse collapse pull-right">
+        <ul class="nav">
+          <li>
+            <a id="register" href="/main/register">Register</a>
+          </li>
+          <li>
+            <a id="login" href="/main/login">Login</a>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
-</nav>
+</div>
