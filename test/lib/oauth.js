@@ -57,7 +57,7 @@ var requestToken = function(cl, hostname, port, cb) {
                    "oob",
                    "HMAC-SHA1",
                    null, // nonce size; use default
-                   {"User-Agent": "pump.io-test/0.1.0"});
+                   {"User-Agent": "pump.io/0.1.1"});
     
     oa.getOAuthRequestToken(function(err, token, secret) {
         if (err) {
@@ -158,7 +158,7 @@ var redeemToken = function(cl, rt, verifier, hostname, port, cb) {
                            "oob",
                            "HMAC-SHA1",
                            null, // nonce size; use default
-                           {"User-Agent": "pump.io-test/0.1.0"});
+                           {"User-Agent": "pump.io/0.1.1"});
             
             oa.getOAuthAccessToken(rt.token, rt.token_secret, verifier, this);
         },
