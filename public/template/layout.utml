@@ -34,7 +34,9 @@
         </div> <!-- /navbar-inner -->
       </div> <!-- /navbar -->
 
-      <%= body %>
+      <div class="content">
+        <%= body %>
+      </div>
 
       <hr>
 
