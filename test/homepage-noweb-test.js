@@ -1,6 +1,6 @@
-// homepage-test.js
+// homepage-noweb-test.js
 //
-// Test that the home page shows an invitation to join
+// Test that the home page shows API documentation when noweb is enabled
 //
 // Copyright 2012, StatusNet Inc.
 //
@@ -20,17 +20,16 @@ var assert = require("assert"),
     vows = require("vows"),
     oauthutil = require("./lib/oauth"),
     Browser = require("zombie"),
-    setupApp = oauthutil.setupApp,
     setupAppConfig = oauthutil.setupAppConfig;
 
-var suite = vows.describe("homepage test");
+var suite = vows.describe("homepage with noweb test");
 
 // A batch to test that the API docs are served at root
 
 suite.addBatch({
     "When we set up the app": {
         topic: function() {
-            setupApp(this.callback);
+            setupAppConfig({noweb: 1}, this.callback);
         },
         teardown: function(app) {
             if (app && app.close) {
@@ -54,7 +53,7 @@ suite.addBatch({
             "it has the right title": function(err, br) {
                 assert.ifError(err);
                 assert.isTrue(br.success);
-                assert.equal(br.text("title"), "API - ");
+                assert.equal(br.text("title"), "API - pump.io");
             },
             "it has the right H1": function(err, br) {
                 assert.ifError(err);
