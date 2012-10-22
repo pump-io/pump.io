@@ -4,14 +4,14 @@
 
     <div class="span6">
 
-      <h1>ActivityPump</h1>
+      <h1><%- site %></h1>
 
-      <p>This site runs
-	the <a href="http://activitypump.org/">Activity Pump</a>, the
-	high-performance Open Source social engine. You can use it to
-	share your life with friends, family and colleagues.</p>
+      <p>This site runs <a href="http://pump.io/">pump.io</a>, the
+	high-performance Open Source social engine. It pumps your life
+	in and out of your friends, family and colleagues.</p>
 
-      <p><a class="btn primary large">Get Started &raquo;</a></p>
+      <p><a class="btn primary large" href="/main/register">Get Started &raquo;</a></p>
+
     </div>
 
     <div class="span4">
