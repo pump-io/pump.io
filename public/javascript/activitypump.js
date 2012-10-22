@@ -157,7 +157,7 @@
     });
 
     var MainContent = TemplateView.extend({
-        templateName: 'main-content',
+        templateName: 'main',
         el: '#content'
     });
 
