@@ -1,6 +1,2 @@
-<div class="navbar navbar-inverse">
-  <div class="navbar-inner">
-    <a class="brand" href="/"><%- site %></a>
-  </div>
-</div>
+<a class="brand" href="/"><%- site %></a>
 
