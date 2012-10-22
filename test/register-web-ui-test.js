@@ -84,7 +84,7 @@ suite.addBatch({
                         assert.ok(br.query("div.registration form input[name=\"repeat\"]"));
                     },
                     "the registration form has a submit button": function(br) {
-                        assert.ok(br.query("div.registration form input[type=\"submit\"]"));
+                        assert.ok(br.query("div.registration form button[type=\"submit\"]"));
                     }
                 }
             }

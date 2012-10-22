@@ -1,25 +1,28 @@
-<form class="form-horizontal">
-  <div class="control-group">
-    <label class="control-label" for="nickname">Nickname</label>
-    <div class="controls">
-      <input type="text" id="nickname" size="16" placeholder="Pick a nickname">
+<div class="registration">
+  <form class="form-horizontal">
+    <legend>Register for a new account</legend>
+    <div class="control-group">
+      <label class="control-label" for="nickname">Nickname</label>
+      <div class="controls">
+        <input type="text" id="nickname" name="nickname" size="16" placeholder="Pick a nickname">
+      </div>
     </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label" for="password">Password</label>
-    <div class="controls">
-      <input type="password" id="password" size="16" placeholder="And a password">
+    <div class="control-group">
+      <label class="control-label" for="password">Password</label>
+      <div class="controls">
+        <input type="password" id="password" name="password" size="16" placeholder="And a password">
+      </div>
     </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label" for="repeat">Repeat</label>
-    <div class="controls">
-      <input type="password" id="repeat" size="16" placeholder="Make sure you got it right">
+    <div class="control-group">
+      <label class="control-label" for="repeat">Repeat</label>
+      <div class="controls">
+        <input type="password" id="repeat" name="repeat" size="16" placeholder="Make sure you got it right">
+      </div>
     </div>
-  </div>
-  <div class="control-group">
-    <div class="controls">
-      <button type="submit" class="btn">Register</button>
+    <div class="control-group">
+      <div class="controls">
+        <button type="submit" class="btn">Register</button>
+      </div>
     </div>
-  </div>
-</form>
+  </form>
+</div>

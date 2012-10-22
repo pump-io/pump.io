@@ -228,12 +228,12 @@
     var ActivityPump = Backbone.Router.extend({
 
         routes: {
-            "/":                       "public",    
-            "/:nickname":              "profile",   
-            "/:nickname/inbox":        "inbox",  
-            "/:nickname/activity/:id": "activity",
-            "/main/settings":          "settings",
-            "/main/register":          "register"
+            "":                       "public",    
+            ":nickname":              "profile",   
+            ":nickname/inbox":        "inbox",  
+            ":nickname/activity/:id": "activity",
+            "main/settings":          "settings",
+            "main/register":          "register"
         },
 
 	register: function() {
@@ -331,7 +331,7 @@
 
         var nav;
 
-        if ($("#topnav #login").length > 0) {
+        if ($("div.navbar #login").length > 0) {
             nav = new AnonymousNav({el: "#topnav"});
         } else {
             nav = new UserNav({el: "#topnav"});
