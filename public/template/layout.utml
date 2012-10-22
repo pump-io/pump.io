@@ -54,11 +54,13 @@
     <!-- Le javascript
          ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="/javascript/jquery-1.8.2.min.js"></script>
     <script src="/javascript/json2.min.js"></script>
     <script src="/javascript/bootstrap.min.js"></script>
     <script src="/javascript/underscore-min.js"></script>
     <script src="/javascript/backbone-min.js"></script>
+    <script src="/javascript/oauth.min.js"></script>
+    <script src="/javascript/sha1.min.js"></script>
     <script src="/javascript/activitypump.js"></script>
     <script>
       config = {
