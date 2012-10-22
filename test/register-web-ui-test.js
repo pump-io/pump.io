@@ -20,6 +20,7 @@ var assert = require("assert"),
     vows = require("vows"),
     oauthutil = require("./lib/oauth"),
     Browser = require("zombie"),
+    Step = require("step"),
     setupApp = oauthutil.setupApp,
     setupAppConfig = oauthutil.setupAppConfig;
 
@@ -85,6 +86,40 @@ suite.addBatch({
                     },
                     "the registration form has a submit button": function(br) {
                         assert.ok(br.query("div.registration form button[type=\"submit\"]"));
+                    },
+                    "and we submit the form": {
+                        topic: function(br) {
+                            var callback = this.callback;
+
+                            Step(
+                                function() {
+                                    br.fill("nickname", "sparks", this);
+                                },
+                                function(err, br) {
+                                    if (err) throw err;
+                                    br.fill("password", "redplainsrider1", this);
+                                },
+                                function(err, br) {
+                                    if (err) throw err;
+                                    br.fill("repeat", "redplainsrider1", this);
+                                },
+                                function(err, br) {
+                                    if (err) throw err;
+                                    br.pressButton("button[type=\"submit\"]", this);
+                                },
+                                function(err, br) {
+                                    if (err) {
+                                        callback(err, null);
+                                    } else {
+                                        callback(null, br);
+                                    }
+                                }
+                            );
+                        },
+                        "it works": function(err, br) {
+                            assert.ifError(err);
+                            assert.isTrue(br.success);
+                        }
                     }
                 }
             }
