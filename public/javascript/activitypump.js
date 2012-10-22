@@ -14,6 +14,33 @@
         }
     });
 
+    var oauthify = function(options) {
+
+        if (options.url.indexOf(':') == -1) {
+            if (options.url.substr(0, 1) == '/') {
+                options.url = window.location.protocol + '//' + window.location.host + options.url;
+            } else {
+                options.url = window.location.href.substr(0, window.location.href.lastIndexOf('/') + 1) + options.url;
+            }
+        }
+
+        var message = { action: options.url,
+                        method: options.type,
+                        parameters: [["oauth_version", "1.0"], ["oauth_consumer_key", options.consumerKey]]
+                      };
+
+        OAuth.setTimestampAndNonce(message);
+        OAuth.SignatureMethod.sign(message,
+                                   {consumerSecret: options.consumerSecret,
+                                    tokenSecret: options.tokenSecret});
+
+        var header =  OAuth.getAuthorizationHeader("OAuth", message.parameters);
+
+        options.headers = {Authorization: header};
+
+        return options;
+    };
+
     var ActivityStream = Backbone.Collection.extend({
 	model: Activity,
         parse: function(response) {
@@ -158,7 +185,47 @@
 
     var RegisterContent = TemplateView.extend({
         templateName: 'register',
-        el: '#content'
+        el: '#content',
+        events: {
+            "submit #registration": "register"
+        },
+        register: function() {
+            var view = this,
+                params = {nickname: view.$('#registration input[name="nickname"]').val(),
+                          password: view.$('#registration input[name="password"]').val()},
+                options,
+                onSuccess = function(data, textStatus, jqXHR) {
+                    ap.navigate('/inbox/' + params.nickname);
+                };
+
+            // XXX: validate nickname
+            // XXX: validate password
+            // XXX: make sure repeat = password
+            // 
+            // XXX: compare password to repeat
+
+            options = {
+                contentType: "application/json",
+                data: JSON.stringify(params),
+                dataType: "json",
+                type: "POST",
+                url: "/api/users",
+                success: onSuccess
+            };
+
+            ensureCred(function(err, cred) {
+                if (err) {
+                    console.log("Couldn't get OAuth credentials. :(");
+                } else {
+                    options.consumerKey = cred.clientID;
+                    options.consumerSecret = cred.clientSecret;
+                    options = oauthify(options);
+                    $.ajax(options);
+                }
+            });
+
+            return false;
+        }
     });
 
     var UserPageContent = TemplateView.extend({
@@ -196,7 +263,7 @@
 	    user.save();
 
 	    profile.set({"displayName": this.$('#realname').val(),
-	                 "location": { displayName: this.$('#location').val() },
+	                 "window.location": { displayName: this.$('#window.location').val() },
 	                 "summary": this.$('#bio').val()});
 
 	    profile.save();
@@ -293,9 +360,64 @@
         }
     });
 
+    var clientID, clientSecret, credReq;
+
+    var getCred = function() {
+        if (clientID) {
+            return {clientID: clientID, clientSecret: clientSecret};
+        } else if (localStorage) {
+            clientID = localStorage['cred:clientID'];
+            clientSecret = localStorage['cred:clientSecret'];
+            if (clientID) {
+                return {clientID: clientID, clientSecret: clientSecret};
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    };
+
+    var ensureCred = function(callback) {
+        var cred = getCred();
+        if (cred) {
+            callback(null, cred);
+        } else if (credReq) {
+            credReq.success(function(data) {
+                callback(null, {clientID: data.client_id,
+                                clientSecret: data.client_secret});
+            });
+            credReq.error(function() {
+                callback(new Error("error getting credentials"), null);
+            });
+        } else {
+            credReq = $.post("/api/client/register",
+                               {type: "client_associate",
+                                application_name: config.site + " Web",
+                                application_type: "web"},
+                               function(data) {
+                                   credReq = null;
+                                   clientID = data.client_id;
+                                   clientSecret = data.client_secret;
+                                   if (localStorage) {
+                                       localStorage['cred:clientID'] = clientID;
+                                       localStorage['cred:clientSecret'] = clientSecret;
+                                   }
+                                   callback(null, {clientID: clientID,
+                                                   clientSecret: clientSecret});
+                               },
+                               "json");
+            credReq.error(function() {
+                callback(new Error("error getting credentials"), null);
+            });
+        }
+    };
+
+    var ap;
+
     $(document).ready(function() {
 
-        var ap = new ActivityPump();
+        ap = new ActivityPump();
 
         var bv = new BodyView({router: ap});
 
@@ -306,6 +428,8 @@
         } else {
             nav = new UserNav({el: "#topnav"});
         }
+
+        ensureCred(function(err) {});
 
         Backbone.history.start({pushState: true, silent: true});
     });
