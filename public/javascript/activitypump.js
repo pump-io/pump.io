@@ -151,11 +151,6 @@
         }
     });
 
-    var Header = TemplateView.extend({
-        templateName: 'header',
-        el: '#header'
-    });
-
     var MainContent = TemplateView.extend({
         templateName: 'main',
         el: '#content'
@@ -166,29 +161,14 @@
         el: '#content'
     });
 
-    var UserPageHeader = TemplateView.extend({
-        templateName: 'user-page-header',
-        el: '#header'
-    });
-
     var UserPageContent = TemplateView.extend({
         templateName: 'user-page-content',
         el: '#content'
     });
 
-    var InboxHeader = TemplateView.extend({
-        templateName: 'inbox-header',
-        el: '#header'
-    });
-
     var InboxContent = TemplateView.extend({
         templateName: 'inbox-content',
         el: '#content'
-    });
-
-    var ActivityHeader = TemplateView.extend({
-        templateName: 'activity-header',
-        el: '#header'
     });
 
     var ActivityContent = TemplateView.extend({
@@ -243,18 +223,14 @@
         },
 
 	settings: function() {
-            var header = new Header({model: {title: "Settings", subtitle: ""}}),
-                content = new SettingsContent({model: currentUser});
+            var content = new SettingsContent({model: currentUser});
 
-            header.render();
             content.render();
 	},
 
         "public": function() {
-            var header = new Header({model: {title: "Welcome", subtitle: ""}}),
-                content = new MainContent({});
+            var content = new MainContent({model: {site: config.site}});
 
-            header.render();
             content.render();
         },
 
@@ -264,10 +240,8 @@
 
             user.fetch({success: function(user, response) {
                 stream.fetch({success: function(stream, response) {
-                    var header = new UserPageHeader({model: user}),
-                        content = new UserPageContent({model: {actor: user.toJSON(), stream: stream.toJSON()}});
+                    var content = new UserPageContent({model: {actor: user.toJSON(), stream: stream.toJSON()}});
 
-                    header.render();
                     content.render();
                 }});
             }});
@@ -279,10 +253,8 @@
 
             user.fetch({success: function(user, response) {
                 inbox.fetch({success: function(inbox, response) {
-                    var header = new InboxHeader({model: user}),
-                        content = new InboxContent({model: {user: user.toJSON(), stream: inbox.toJSON()}});
+                    var content = new InboxContent({model: {user: user.toJSON(), stream: inbox.toJSON()}});
 
-                    header.render();
                     content.render();
                 }});
             }});
@@ -292,10 +264,8 @@
             var act = new Activity({uuid: id, userNickname: nickname});
 
             act.fetch({success: function(act, response) {
-                var header = new ActivityHeader({model: act}),
-                    content = new ActivityContent({model: act});
+                var content = new ActivityContent({model: act});
 
-                header.render();
                 content.render();
             }});
         }
