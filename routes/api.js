@@ -709,7 +709,18 @@ var createUser = function (req, res, next) {
             User.create(req.body, this);
         },
         function (err, value) {
-            if (err) throw err;
+            if (err) {
+                // Try to be more specific
+                if (err instanceof User.BadPasswordError) {
+                    throw new HTTPError(err.message, 400);
+                } else if (err instanceof User.BadNicknameError) {
+                    throw new HTTPError(err.message, 400);
+                } else if (err.name == "AlreadyExistsError") {
+                    throw new HTTPError(err.message, 409); // conflict
+                } else {
+                    throw err;
+                }
+            }
             user = value;
             usersStream(this);
         },
