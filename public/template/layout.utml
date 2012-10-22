@@ -11,28 +11,33 @@
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-
+    <style>
+      body {
+      position: relative;
+      padding-top: 40px;
+      }
+    </style>
   </head>
 
   <body>
 
-    <div class="container">
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <% if (remoteUser) { %>
+          <%= partial('nav-loggedin') %>
+          <% } else if (nologin) { %>
+          <%= partial('nav-nologin') %>
+          <% } else { %>
+          <%= partial('nav-anonymous') %>
+          <% } %>
+        </div> <!-- /container -->
+      </div> <!-- /navbar-inner -->
+    </div> <!-- /navbar -->
 
-      <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="navbar-inner">
-          <div class="container">
-            <% if (remoteUser) { %>
-            <%= partial('nav-loggedin') %>
-            <% } else if (nologin) { %>
-            <%= partial('nav-nologin') %>
-            <% } else { %>
-            <%= partial('nav-anonymous') %>
-            <% } %>
-          </div> <!-- /container -->
-        </div> <!-- /navbar-inner -->
-      </div> <!-- /navbar -->
+    <div class="container">
 
       <div class="content">
         <%= body %>
@@ -41,19 +46,20 @@
       <hr>
 
       <footer>
-	<p><a href="http://pump.io/">pump.io</a> software available under the Apache License 2.0.</p>
+        <p><a href="http://pump.io/">pump.io</a> software available under the Apache License 2.0.</p>
       </footer>
 
     </div> <!-- /container -->
 
     <!-- Le javascript
-    ================================================== -->
+         ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script src="/javascript/bootstrap.min.js"></script>
     <script src="/javascript/underscore-min.js"></script>
     <script src="/javascript/backbone-min.js"></script>
     <script src="/javascript/activitypump.js"></script>
 
   </body>
+
 </html>
