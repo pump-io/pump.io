@@ -60,7 +60,11 @@
     <script src="/javascript/underscore-min.js"></script>
     <script src="/javascript/backbone-min.js"></script>
     <script src="/javascript/activitypump.js"></script>
-
+    <script>
+      config = {
+      site: "<%- site %>"
+      };
+    </script>
   </body>
 
 </html>
