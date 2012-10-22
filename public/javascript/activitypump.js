@@ -78,7 +78,7 @@
         templateName: null,
         render: function() {
             var name = this.templateName,
-                url = '/template/'+name+'.template',
+                url = '/template/'+name+'.utml',
                 view = this,
                 json = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model);
 
