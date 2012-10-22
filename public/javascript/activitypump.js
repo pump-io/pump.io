@@ -161,6 +161,11 @@
         el: '#content'
     });
 
+    var RegisterContent = TemplateView.extend({
+        templateName: 'register',
+        el: '#content'
+    });
+
     var UserPageHeader = TemplateView.extend({
         templateName: 'user-page-header',
         el: '#header'
@@ -227,7 +232,14 @@
             "/:nickname":              "profile",   
             "/:nickname/inbox":        "inbox",  
             "/:nickname/activity/:id": "activity",
-            "/main/settings":          "settings"
+            "/main/settings":          "settings",
+            "/main/register":          "register"
+        },
+
+	register: function() {
+            var content = new RegisterContent();
+
+            content.render();
         },
 
 	settings: function() {

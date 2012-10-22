@@ -38,6 +38,8 @@ var addRoutes = function(app) {
 
     app.get("/", maybeAuth, showMain);
 
+    app.get("/main/register", noUser, showRegister);
+
     app.post("/main/login", noUser, handleLogin);
     app.post("/main/logout", mustAuth, handleLogout);
 
@@ -54,6 +56,10 @@ var showSettings = function(req, res, next) {
 
 var showMain = function(req, res, next) {
     res.render("main", {title: "Welcome"});
+};
+
+var showRegister = function(req, res, next) {
+    res.render("register", {title: "Register"});
 };
 
 var handleLogin = function(req, res, next) {
