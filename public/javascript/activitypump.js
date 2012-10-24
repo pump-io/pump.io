@@ -193,36 +193,54 @@
             var view = this,
                 params = {nickname: view.$('#registration input[name="nickname"]').val(),
                           password: view.$('#registration input[name="password"]').val()},
+                repeat = view.$('#registration input[name="repeat"]').val(),
                 options,
+                NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
                 onSuccess = function(data, textStatus, jqXHR) {
                     ap.navigate('/inbox/' + params.nickname);
+                },
+                showError = function(msg) {
                 };
 
-            // XXX: validate nickname
-            // XXX: validate password
-            // XXX: make sure repeat = password
-            // 
-            // XXX: compare password to repeat
+            if (params.password !== repeat) {
 
-            options = {
-                contentType: "application/json",
-                data: JSON.stringify(params),
-                dataType: "json",
-                type: "POST",
-                url: "/api/users",
-                success: onSuccess
-            };
+                showError("password", "Passwords don't match.");
 
-            ensureCred(function(err, cred) {
-                if (err) {
-                    console.log("Couldn't get OAuth credentials. :(");
-                } else {
-                    options.consumerKey = cred.clientID;
-                    options.consumerSecret = cred.clientSecret;
-                    options = oauthify(options);
-                    $.ajax(options);
-                }
-            });
+            } else if (!NICKNAME_RE.test(params.nickname)) {
+
+                showError("nickname", "Nicknames have to be a combination of 1-64 letters or numbers and ., - or _.");
+
+            } else if (params.password.length < 8) {
+
+                showError("password", "Password must be 8 chars or more.");
+
+            } else if (/^[a-z]+$/.test(params.password.toLowerCase()) ||
+                /^[0-9]+$/.test(params.password)) {
+
+                showError("password", "Passwords have to have at least one letter and one number.");
+
+            } else {
+
+                options = {
+                    contentType: "application/json",
+                    data: JSON.stringify(params),
+                    dataType: "json",
+                    type: "POST",
+                    url: "/api/users",
+                    success: onSuccess
+                };
+
+                ensureCred(function(err, cred) {
+                    if (err) {
+                        showError("Couldn't get OAuth credentials. :(");
+                    } else {
+                        options.consumerKey = cred.clientID;
+                        options.consumerSecret = cred.clientSecret;
+                        options = oauthify(options);
+                        $.ajax(options);
+                    }
+                });
+            }
 
             return false;
         }
