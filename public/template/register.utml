@@ -4,13 +4,15 @@
     <div class="control-group">
       <label class="control-label" for="nickname">Nickname</label>
       <div class="controls">
-        <input type="text" id="nickname" name="nickname" size="16" placeholder="Pick a nickname">
+        <input type="text" id="nickname" name="nickname" size="16" placeholder="Pick a good one; you can't change it later">
+        <span class="help-inline">1-64 characters, only letters and numbers and . and - and _</span>
       </div>
     </div>
     <div class="control-group">
       <label class="control-label" for="password">Password</label>
       <div class="controls">
         <input type="password" id="password" name="password" size="16" placeholder="And a password">
+        <span class="help-inline">Eight characters, mixed letters and numbers, not stupid</span>
       </div>
     </div>
     <div class="control-group">
