@@ -274,7 +274,7 @@
                     setNickname(data.nickname);
                     setUserCred(data.token, data.secret);
                     // XXX: one-time on-boarding page
-                    ap.navigate('/inbox/' + params.nickname);
+                    ap.navigate(data.nickname + "/inbox", true);
                 },
                 showError = function(input, msg) {
                     console.log(msg);
@@ -330,7 +330,7 @@
     });
 
     var InboxContent = TemplateView.extend({
-        templateName: 'inbox-content',
+        templateName: 'inbox',
         el: '#content'
     });
 
