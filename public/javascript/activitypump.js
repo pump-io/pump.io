@@ -1,5 +1,75 @@
 (function($, Backbone) {
 
+    // Override backbone sync to use OAuth
+
+    Backbone.sync = function(method, model, options) {
+
+        var getValue = function(object, prop) {
+            if (!(object && object[prop])) return null;
+            return _.isFunction(object[prop]) ? object[prop]() : object[prop];
+        };
+
+        var methodMap = {
+            'create': 'POST',
+            'update': 'PUT',
+            'delete': 'DELETE',
+            'read':   'GET'
+        };
+
+        var type = methodMap[method];
+
+        // Default options, unless specified.
+        options || (options = {});
+
+        // Default JSON-request options.
+        var params = {type: type, dataType: 'json'};
+
+        // Ensure that we have a URL.
+
+        if (!options.url) {
+            params.url = getValue(model, 'url');
+            if (!params.url) { 
+                throw new Error("No URL");
+            }
+        }
+
+        // Ensure that we have the appropriate request data.
+        if (!options.data && model && (method == 'create' || method == 'update')) {
+            params.contentType = 'application/json';
+            params.data = JSON.stringify(model.toJSON());
+        }
+
+        // Don't process data on a non-GET request.
+        if (params.type !== 'GET' && !Backbone.emulateJSON) {
+            params.processData = false;
+        }
+
+        ensureCred(function(err, cred) {
+            var pair;
+            if (err) {
+                console.log("Error getting OAuth credentials.");
+            } else {
+                params = _.extend(params, options);
+
+                params.consumerKey = cred.clientID;
+                params.consumerSecret = cred.clientSecret;
+
+                pair = getUserCred();
+
+                if (pair) {
+                    params.token = pair.token;
+                    params.tokenSecret = pair.secret;
+                }
+
+                params = oauthify(params);
+
+                $.ajax(params);
+            }
+        });
+
+        return null;
+    };
+
     var Activity = Backbone.Model.extend({
         url: function() {
             var links = this.get("links"),
@@ -28,6 +98,10 @@
                         method: options.type,
                         parameters: [["oauth_version", "1.0"], ["oauth_consumer_key", options.consumerKey]]
                       };
+
+        if (options.token) {
+            message.parameters.push(["oauth_token", options.token]);
+        }
 
         OAuth.setTimestampAndNonce(message);
         OAuth.SignatureMethod.sign(message,
