@@ -41,6 +41,8 @@ var assertGoodUser = function(user) {
     assert.include(user, "published");
     assert.include(user, "updated");
     assert.include(user, "profile");
+    assert.include(user, "token");
+    assert.include(user, "secret");
     assert.isObject(user.profile);
     assert.include(user.profile, "id");
     assert.include(user.profile, "objectType");
