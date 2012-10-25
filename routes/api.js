@@ -700,15 +700,15 @@ var usersStream = function(callback) {
     );
 };
 
-var createUser = function (req, res, next) {
+var createUser = function(req, res, next) {
 
     var user;
 
     Step(
-        function () {
+        function() {
             User.create(req.body, this);
         },
-        function (err, value) {
+        function(err, value) {
             if (err) {
                 // Try to be more specific
                 if (err instanceof User.BadPasswordError) {
@@ -724,11 +724,11 @@ var createUser = function (req, res, next) {
             user = value;
             usersStream(this);
         },
-        function (err, str) {
+        function(err, str) {
             if (err) throw err;
             str.deliver(user.nickname, this);
         },
-        function (err) {
+        function(err) {
             if (err) {
                 next(err);
             } else {
@@ -763,7 +763,7 @@ var listUsers = function(req, res, next) {
     }
 
     Step(
-        function () {
+        function() {
             usersStream(this);
         },
         function(err, result) {
