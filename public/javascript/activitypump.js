@@ -197,9 +197,13 @@
                 options,
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
                 onSuccess = function(data, textStatus, jqXHR) {
+                    setNickname(data.nickname);
+                    setUserCred(data.token, data.secret);
+                    // XXX: one-time on-boarding page
                     ap.navigate('/inbox/' + params.nickname);
                 },
-                showError = function(msg) {
+                showError = function(input, msg) {
+                    console.log(msg);
                 };
 
             if (params.password !== repeat) {
@@ -378,7 +382,29 @@
         }
     });
 
-    var clientID, clientSecret, credReq;
+    var clientID,
+        clientSecret,
+        nickname,
+        token,
+        secret,
+        credReq;
+
+    var setNickname = function(userNickname) {
+        nickname = userNickname;
+        if (localStorage) {
+            localStorage['cred:nickname'] = userNickname;
+        }
+    };
+
+    var getNickname = function() {
+        if (nickname) {
+            return nickname;
+        } else if (localStorage) {
+            return localStorage['cred:nickname'];
+        } else {
+            return null;
+        }
+    };
 
     var getCred = function() {
         if (clientID) {
@@ -394,6 +420,28 @@
         } else {
             return null;
         }
+    };
+
+    var getUserCred = function(nickname) {
+        if (token) {
+            return {token: token, secret: secret};
+        } else if (localStorage) {
+            token = localStorage['cred:token'];
+            secret = localStorage['cred:secret'];
+            return {token: token, secret: secret};
+        } else {
+            return null;
+        }
+    };
+
+    var setUserCred = function(userToken, userSecret) {
+        token = userToken;
+        secret = userSecret;
+        if (localStorage) {
+            localStorage['cred:token'] = userToken;
+            localStorage['cred:secret'] = userSecret;
+        }
+        return;
     };
 
     var ensureCred = function(callback) {
