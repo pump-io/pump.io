@@ -160,11 +160,18 @@ var clientAuth = function(req, res, next) {
         if (!authenticated) {
             return;
         }
-        
-        req.client = req.getAuthDetails().user.client;
-        res.local("client", req.client); // init to null
 
-        next();
+        Client.get(req.getAuthDetails().user.id, function(err, client) {
+
+            if (error) {
+                next(error);
+                return;
+            }
+
+            req.client = client;
+            res.local("client", req.client);
+            next();
+        });
     });
 };
 
@@ -729,12 +736,41 @@ var createUser = function(req, res, next) {
             str.deliver(user.nickname, this);
         },
         function(err) {
+            if (err) throw err;
+            newTokenPair(req.app.provider, req.client, user, this);
+        },
+        function(err, pair) {
             if (err) {
                 next(err);
             } else {
                 // Hide the password for output
                 user.sanitize();
+                user.token = pair.access_token;
+                user.secret = pair.token_secret;
                 res.json(user);
+            }
+        }
+    );
+};
+
+var newTokenPair = function(provider, client, user, callback) {
+    Step(
+        function() {
+            provider.generateRequestToken(client.consumer_key, "oob", this);
+        },
+        function(err, rt) {
+            if (err) throw err;
+            provider.associateTokenToUser(user.nickname, rt.token, this);
+        },
+        function(err, rt) {
+            if (err) throw err;
+            provider.generateAccessToken(rt.token, this);
+        },
+        function(err, pair) {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, pair);
             }
         }
     );
