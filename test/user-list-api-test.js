@@ -36,6 +36,17 @@ var invert = function(callback) {
     };
 };
 
+var assertGoodUser = function(user) {
+    assert.include(user, "nickname");
+    assert.include(user, "published");
+    assert.include(user, "updated");
+    assert.include(user, "profile");
+    assert.isObject(user.profile);
+    assert.include(user.profile, "id");
+    assert.include(user.profile, "objectType");
+    assert.equal(user.profile.objectType, "person");
+};
+
 var register = function(cl, params, callback) {
     httputil.postJSON("http://localhost:4815/api/users", 
                       {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
@@ -53,14 +64,7 @@ var registerSucceed = function(params) {
             assert.isObject(user);
         },
         "results are correct": function(err, user, resp) {
-            assert.include(user, "nickname");
-            assert.include(user, "published");
-            assert.include(user, "updated");
-            assert.include(user, "profile");
-            assert.isObject(user.profile);
-            assert.include(user.profile, "id");
-            assert.include(user.profile, "objectType");
-            assert.equal(user.profile.objectType, "person");
+            assertGoodUser(user);
         }
     };
 };
@@ -108,24 +112,10 @@ var doubleRegisterSucceed = function(first, second) {
             assert.ifError(err);
         },
         "user1 is correct": function(err, user1, user2) {
-            assert.include(user1, "nickname");
-            assert.include(user1, "published");
-            assert.include(user1, "updated");
-            assert.include(user1, "profile");
-            assert.isObject(user1.profile);
-            assert.include(user1.profile, "id");
-            assert.include(user1.profile, "objectType");
-            assert.equal(user1.profile.objectType, "person");
+            assertGoodUser(user1);
         },
         "user2 is correct": function(err, user1, user2) {
-            assert.include(user2, "nickname");
-            assert.include(user2, "published");
-            assert.include(user2, "updated");
-            assert.include(user2, "profile");
-            assert.isObject(user2.profile);
-            assert.include(user2.profile, "id");
-            assert.include(user2.profile, "objectType");
-            assert.equal(user2.profile.objectType, "person");
+            assertGoodUser(user2);
         }
     };
 };
