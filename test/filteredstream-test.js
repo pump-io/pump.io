@@ -20,12 +20,16 @@ var assert = require("assert"),
     vows = require("vows"),
     databank = require("databank"),
     Step = require("step"),
+    fs = require("fs"),
+    path = require("path"),
     schema = require("../lib/schema").schema,
     URLMaker = require("../lib/urlmaker").URLMaker,
     Stream = require("../lib/model/stream").Stream,
     Activity = require("../lib/model/activity").Activity,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
+
+var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 
 var suite = vows.describe("filtered stream interface");
 
@@ -39,9 +43,9 @@ suite.addBatch({
 
             // Dummy databank
 
-            var params = {schema: schema};
+            tc.params.schema = schema;
 
-            var db = Databank.get("memory", params);
+            var db = Databank.get(tc.driver, tc.params);
 
             db.connect({}, function(err) {
                 if (err) {

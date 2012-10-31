@@ -20,6 +20,8 @@ var assert = require("assert"),
     vows = require("vows"),
     databank = require("databank"),
     Step = require("step"),
+    fs = require("fs"),
+    path = require("path"),
     httpMocks = require("node-mocks-http"),
     schema = require("../lib/schema"),
     URLMaker = require("../lib/urlmaker").URLMaker,
@@ -29,6 +31,8 @@ var assert = require("assert"),
     DatabankObject = databank.DatabankObject;
 
 var robby, maya;
+
+var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 
 vows.describe("middleware module interface").addBatch({
 
@@ -43,9 +47,9 @@ vows.describe("middleware module interface").addBatch({
 
             // Dummy databank
 
-            var params = {schema: schema};
+            tc.params.schema = schema;
 
-            var db = Databank.get("memory", params);
+            var db = Databank.get(tc.driver, tc.params);
 
             Step(
                 function() {

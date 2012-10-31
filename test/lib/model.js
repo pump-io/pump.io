@@ -20,10 +20,14 @@ var assert = require("assert"),
     vows = require("vows"),
     databank = require("databank"),
     Step = require("step"),
+    fs = require("fs"),
+    path = require("path"),
     URLMaker = require("../../lib/urlmaker").URLMaker,
     schema = require("../../lib/schema").schema,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
+
+var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "config.json")));
 
 var modelBatch = function(typeName, className, testSchema, testData) {
     
@@ -48,9 +52,9 @@ var modelBatch = function(typeName, className, testSchema, testData) {
 
             // Dummy databank
 
-            var params = {schema: schema};
+            tc.params.schema = schema;
 
-            var db = Databank.get("memory", params);
+            var db = Databank.get(tc.driver, tc.params);
 
             db.connect({}, function(err) {
                 var mod;

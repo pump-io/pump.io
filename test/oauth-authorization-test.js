@@ -22,6 +22,8 @@ var assert = require("assert"),
     _ = require("underscore"),
     querystring = require("querystring"),
     http = require("http"),
+    fs = require("fs"),
+    path = require("path"),
     OAuth = require("oauth").OAuth,
     Browser = require("zombie"),
     httputil = require("./lib/http"),
@@ -33,6 +35,7 @@ var assert = require("assert"),
     accessToken = oauthutil.accessToken;
 
 var ignore = function(err) {};
+var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 
 var suite = vows.describe("OAuth authorization");
 
@@ -42,8 +45,8 @@ suite.addBatch({
             var cb = this.callback,
                 config = {port: 4815,
                           hostname: "localhost",
-                          driver: "memory",
-                          params: {},
+                          driver: tc.driver,
+                          params: tc.params,
                           nologger: true
                          },
                 makeApp = require("../lib/app").makeApp;

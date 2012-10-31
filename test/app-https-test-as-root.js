@@ -31,6 +31,8 @@ var assert = require("assert"),
 
 var suite = vows.describe("smoke test app interface over https");
 
+var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
+
 var clientCred = function(cl) {
     return {
         consumer_key: cl.client_id,
@@ -97,8 +99,8 @@ suite.addBatch({
                           hostname: "secure.localhost",
                           key: path.join(__dirname, "data", "secure.localhost.key"),
                           cert: path.join(__dirname, "data", "secure.localhost.crt"),
-                          driver: "memory",
-                          params: {},
+                          driver: tc.driver,
+                          params: tc.params,
                           nologger: true
                          },
                 makeApp = require("../lib/app").makeApp;

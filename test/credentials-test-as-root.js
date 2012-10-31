@@ -21,6 +21,8 @@ var assert = require("assert"),
     Step = require("step"),
     querystring = require("querystring"),
     _ = require("underscore"),
+    fs = require("fs"),
+    path = require("path"),
     databank = require("databank"),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
@@ -32,12 +34,14 @@ var assert = require("assert"),
 
 var suite = vows.describe("credentials module interface");
 
+var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
+
 suite.addBatch({
     "When we set up the app": {
         topic: function() {
             var app,
                 callback = this.callback,
-                db = Databank.get("memory", {});
+                db = Databank.get(tc.driver, tc.params);
 
             Step(
                 function() {

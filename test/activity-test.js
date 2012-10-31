@@ -21,6 +21,8 @@ var assert = require("assert"),
     databank = require("databank"),
     Step = require("step"),
     _ = require("underscore"),
+    fs = require("fs"),
+    path = require("path"),
     URLMaker = require("../lib/urlmaker").URLMaker,
     schema = require("../lib/schema").schema,
     modelBatch = require("./lib/model").modelBatch,
@@ -28,6 +30,8 @@ var assert = require("assert"),
     DatabankObject = databank.DatabankObject;
 
 var suite = vows.describe("activity module interface");
+
+var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 
 var testSchema = {
     pkey: "id", 
@@ -207,9 +211,9 @@ suite.addBatch({
 
             // Dummy databank
 
-            var params = {schema: schema};
+            tc.params.schema = schema;
 
-            var db = Databank.get("memory", params);
+            var db = Databank.get(tc.driver, tc.params);
 
             db.connect({}, function(err) {
 

@@ -20,6 +20,8 @@ var assert = require("assert"),
     vows = require("vows"),
     databank = require("databank"),
     Step = require("step"),
+    fs = require("fs"),
+    path = require("path"),
     schema = require("../lib/schema"),
     URLMaker = require("../lib/urlmaker").URLMaker,
     randomString = require("../lib/randomstring").randomString,
@@ -49,13 +51,15 @@ suite.addBatch({
     }
 });
 
+var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
+
 suite.addBatch({
     "When we makeApp()": {
         topic: function() {
             var config = {port: 4815,
                           hostname: "localhost",
-                          driver: "memory",
-                          params: {},
+                          driver: tc.driver,
+                          params: tc.params,
                           nologger: true
                          },
                 makeApp = require("../lib/app").makeApp;
