@@ -25,7 +25,7 @@
                       "validator": "0.4.x",
                       "webfinger": "0.1.x",
                       "github-flavored-markdown": "1.0.x",
-                      "jankyqueue", "0.1.x"
+                      "jankyqueue": "0.1.x"
 		    },
     "bin": {
         "pump": "./bin/pump",
