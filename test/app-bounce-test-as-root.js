@@ -31,6 +31,8 @@ var assert = require("assert"),
 
 var suite = vows.describe("bounce 80 to 443 app interface");
 
+var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
+
 suite.addBatch({
     "When we makeApp()": {
         topic: function() {
@@ -38,8 +40,8 @@ suite.addBatch({
                           hostname: "bounce.localhost",
                           key: path.join(__dirname, "data", "bounce.localhost.key"),
                           cert: path.join(__dirname, "data", "bounce.localhost.crt"),
-                          driver: "memory",
-                          params: {},
+                          driver: tc.driver,
+                          params: tc.params,
                           nologger: true,
                           bounce: true
                          },

@@ -20,11 +20,15 @@ var assert = require("assert"),
     vows = require("vows"),
     Step = require("step"),
     _ = require("underscore"),
+    fs = require("fs"),
+    path = require("path"),
     querystring = require("querystring"),
     OAuth = require("oauth").OAuth,
     httputil = require("./lib/http");
 
 var suite = vows.describe("user list API");
+
+var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 
 var invert = function(callback) {
     return function(err) {
@@ -159,8 +163,8 @@ suite.addBatch({
             var cb = this.callback,
                 config = {port: 4815,
                           hostname: "localhost",
-                          driver: "memory",
-                          params: {},
+                          driver: tc.driver,
+                          params: tc.params,
                           nologger: true
                          },
                 makeApp = require("../lib/app").makeApp;
@@ -304,8 +308,8 @@ suite.addBatch({
             var cb = this.callback,
                 config = {port: 4815,
                           hostname: "localhost",
-                          driver: "memory",
-                          params: {},
+                          driver: tc.driver,
+                          params: tc.params,
                           nologger: true
                          },
                 makeApp = require("../lib/app").makeApp;

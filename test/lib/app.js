@@ -1,9 +1,13 @@
 var Step = require("step"),
     mod = require("../../lib/app"),
+    fs = require("fs"),
+    path = require("path"),
     makeApp = mod.makeApp;
 
-var config = {driver: "memory",
-              params: {},
+var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "config.json")));
+
+var config = {driver: tc.driver,
+              params: tc.params,
               nologger: true},
     app = null,
     i,

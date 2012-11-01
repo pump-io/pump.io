@@ -21,12 +21,16 @@ var assert = require("assert"),
     databank = require("databank"),
     Step = require("step"),
     _ = require("underscore"),
+    fs = require("fs"),
+    path = require("path"),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
     schema = require("../lib/schema").schema,
     URLMaker = require("../lib/urlmaker").URLMaker;
 
 var suite = vows.describe("activityobject class interface");
+
+var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 
 suite.addBatch({
     "When we require the activityobject module": {
@@ -38,9 +42,9 @@ suite.addBatch({
 
             // Dummy databank
 
-            var params = {schema: schema};
+            tc.params.schema = schema;
 
-            var db = Databank.get("memory", params);
+            var db = Databank.get(tc.driver, tc.params);
 
             db.connect({}, function(err) {
                 var mod;

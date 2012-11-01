@@ -22,6 +22,8 @@ var assert = require("assert"),
     http = require("http"),
     querystring = require("querystring"),
     _ = require("underscore"),
+    fs = require("fs"),
+    path = require("path"),
     Person = require("../lib/model/person").Person,
     databank = require("databank"),
     httputil = require("./lib/http"),
@@ -37,10 +39,12 @@ var assert = require("assert"),
 
 var suite = vows.describe("test discovery of endpoint for a user");
 
+var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
+
 suite.addBatch({
     "When we set up the app": {
         topic: function() {
-            var db = Databank.get("memory", {data: {}});
+            var db = Databank.get(tc.driver, tc.params);
             Step(
                 function() {
                     db.connect({}, this);

@@ -19,10 +19,14 @@ var vows = require("vows"),
     express = require("express"),
     querystring = require("querystring"),
     databank = require("databank"),
+    fs = require("fs"),
+    path = require("path"),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
 var suite = vows.describe("DialbackClient post interface");
+
+var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 
 suite.addBatch({
     "When we set up a dummy echo app": {
@@ -71,7 +75,7 @@ suite.addBatch({
         "And we require the DialbackClient module": {
             topic: function() {
                 var cb = this.callback,
-                    db = Databank.get("memory", {});
+                    db = Databank.get(tc.driver, tc.params);
                 db.connect({}, function(err) {
                     if (err) {
                         cb(err, null);
