@@ -31,7 +31,6 @@ var databank = require("databank"),
     mustAuth = mw.mustAuth,
     sameUser = mw.sameUser,
     noUser = mw.noUser,
-    checkCredentials = mw.checkCredentials,
     NoSuchThingError = databank.NoSuchThingError;
 
 var addRoutes = function(app) {
@@ -69,25 +68,26 @@ var showLogin = function(req, res, next) {
 };
 
 var handleLogin = function(req, res, next) {
+    var user = null;
+
     Step( 
         function () { 
-            checkCredentials(req.body.nickname, req.body.password, this);
+            User.checkCredentials(req.body.nickname, req.body.password, this);
         },
-        function(err, user) {
+        function(err, result) {
             if (err) {
                 if (err instanceof NoSuchThingError) {
-                    next(new HTTPError("Not authorized", 403));
+                    throw new HTTPError("Not authorized", 403);
                 } else {
                     next(err);
                 }
             } else if (!user) {
-                // done here
-                next(new HTTPError("Not authorized", 403));
-            } else {
-                user.expand(this);
+                throw new HTTPError("Not authorized", 403);
             }
+            user = result;
+            user.expand(this);
         },
-        function(err, user) {
+        function(err) {
             if (err) {
                 next(err);
             } else {
