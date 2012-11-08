@@ -187,22 +187,30 @@ var hasToken = function(req) {
 
 var userAuth = function(req, res, next) {
 
+    var log = req.log;
+
     req.remoteUser = null;
     res.local("remoteUser", null); // init to null
     req.client = null;
     res.local("client", null); // init to null
 
+    log.info("Checking for OAuth credentials");
+
     req.authenticate(["user"], function(error, authenticated) { 
 
         if (error) {
+            log.error(error);
             next(error);
             return;
         }
 
         if (!authenticated) {
+            log.info("Authentication failed");
             return;
         }
 
+        log.info("Authentication succeeded");
+        
         req.remoteUser = req.getAuthDetails().user.user;
         res.local("remoteUser", req.remoteUser);
 
