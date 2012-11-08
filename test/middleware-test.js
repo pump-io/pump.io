@@ -83,7 +83,6 @@ vows.describe("middleware module interface").addBatch({
                                                    "mustAuth",
                                                    "sameUser",
                                                    "noUser",
-                                                   "checkCredentials",
                                                    "getCurrentUser",
                                                    "getSessionUser"]),
         "and we use reqUser with no nickname param": {
