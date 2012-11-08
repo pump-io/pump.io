@@ -260,6 +260,9 @@
                     // XXX: reload current data
                     ap.navigate(data.nickname + "/inbox", true);
                 },
+                onError = function(jqXHR, textStatus, errorThrown) {
+                    showError(null, errorThrown);
+                },
                 showError = function(input, msg) {
                     console.log(msg);
                 };
@@ -285,12 +288,13 @@
                     dataType: "json",
                     type: "POST",
                     url: "/main/login",
-                    success: onSuccess
+                    success: onSuccess,
+                    error: onError
                 };
 
                 ensureCred(function(err, cred) {
                     if (err) {
-                        showError("Couldn't get OAuth credentials. :(");
+                        showError(null, "Couldn't get OAuth credentials. :(");
                     } else {
                         options.consumerKey = cred.clientID;
                         options.consumerSecret = cred.clientSecret;
