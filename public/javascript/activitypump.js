@@ -198,22 +198,7 @@
     var AnonymousNav = TemplateView.extend({
         tagname: "div",
         classname: "nav",
-        templateName: 'nav-anonymous',
-        events: {
-            "submit #login": "login"
-        },
-        login: function() {
-            var view = this,
-                params = {nickname: this.$('#login input[name="nickname"]').val(),
-                          password: this.$('#login input[name="password"]').val()};
-
-            $.post("/main/login", params, function(user) {
-                currentUser = new User(user);
-                var un = new UserNav({model: currentUser, el: view.el});
-                un.render();
-            });
-            return false;
-        }
+        templateName: 'nav-anonymous'
     });
 
     var UserNav = TemplateView.extend({
@@ -255,6 +240,68 @@
     var MainContent = TemplateView.extend({
         templateName: 'main',
         el: '#content'
+    });
+
+    var LoginContent = TemplateView.extend({
+        templateName: 'login',
+        el: '#content',
+        events: {
+            "submit #login": "doLogin"
+        },
+        "doLogin": function() {
+            var view = this,
+                params = {nickname: view.$('#login input[name="nickname"]').val(),
+                          password: view.$('#login input[name="password"]').val()},
+                options,
+                NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
+                onSuccess = function(data, textStatus, jqXHR) {
+                    setNickname(data.nickname);
+                    setUserCred(data.token, data.secret);
+                    // XXX: reload current data
+                    ap.navigate(data.nickname + "/inbox", true);
+                },
+                showError = function(input, msg) {
+                    console.log(msg);
+                };
+
+            if (!NICKNAME_RE.test(params.nickname)) {
+
+                showError("nickname", "Nicknames have to be a combination of 1-64 letters or numbers and ., - or _.");
+
+            } else if (params.password.length < 8) {
+
+                showError("password", "Password must be 8 chars or more.");
+
+            } else if (/^[a-z]+$/.test(params.password.toLowerCase()) ||
+                /^[0-9]+$/.test(params.password)) {
+
+                showError("password", "Passwords have to have at least one letter and one number.");
+
+            } else {
+
+                options = {
+                    contentType: "application/json",
+                    data: JSON.stringify(params),
+                    dataType: "json",
+                    type: "POST",
+                    url: "/main/login",
+                    success: onSuccess
+                };
+
+                ensureCred(function(err, cred) {
+                    if (err) {
+                        showError("Couldn't get OAuth credentials. :(");
+                    } else {
+                        options.consumerKey = cred.clientID;
+                        options.consumerSecret = cred.clientSecret;
+                        options = oauthify(options);
+                        $.ajax(options);
+                    }
+                });
+            }
+
+            return false;
+        }
     });
 
     var RegisterContent = TemplateView.extend({
@@ -376,11 +423,18 @@
             ":nickname/inbox":        "inbox",  
             ":nickname/activity/:id": "activity",
             "main/settings":          "settings",
-            "main/register":          "register"
+            "main/register":          "register",
+            "main/login":             "login"
         },
 
 	register: function() {
             var content = new RegisterContent();
+
+            content.render();
+        },
+
+	login: function() {
+            var content = new LoginContent();
 
             content.render();
         },
@@ -557,11 +611,13 @@
 
     $(document).ready(function() {
 
+        var bv,
+            nav,
+            content;
+
         ap = new ActivityPump();
 
-        var bv = new BodyView({router: ap});
-
-        var nav;
+        bv = new BodyView({router: ap});
 
         if ($("div.navbar #login").length > 0) {
             nav = new AnonymousNav({el: "#topnav"});
@@ -571,6 +627,12 @@
 
         ensureCred(function(err) {});
 
+        if ($("#content #login").length > 0) {
+            content = new LoginContent();
+        } else if ($("#content #registration").length > 0) {
+            content = new RegisterContent();
+        }
+        
         Backbone.history.start({pushState: true, silent: true});
     });
 

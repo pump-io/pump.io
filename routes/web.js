@@ -40,7 +40,9 @@ var addRoutes = function(app) {
 
     app.get("/main/register", noUser, showRegister);
 
+    app.get("/main/login", noUser, showLogin);
     app.post("/main/login", noUser, handleLogin);
+
     app.post("/main/logout", mustAuth, handleLogout);
 
     app.get("/main/settings", mustAuth, showSettings);
@@ -60,6 +62,10 @@ var showMain = function(req, res, next) {
 
 var showRegister = function(req, res, next) {
     res.render("register", {title: "Register"});
+};
+
+var showLogin = function(req, res, next) {
+    res.render("login", {title: "Login"});
 };
 
 var handleLogin = function(req, res, next) {
