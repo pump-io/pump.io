@@ -142,6 +142,8 @@ exports.addRoutes = addRoutes;
 
 var clientAuth = function(req, res, next) {
 
+    var log = req.log;
+
     req.client = null;
     res.local("client", null); // init to null
 
@@ -150,18 +152,35 @@ var clientAuth = function(req, res, next) {
         return;
     }
 
+    log.info("Checking for 2-legged OAuth credentials");
+
     req.authenticate(["client"], function(error, authenticated) { 
 
+        var deetz;
+
         if (error) {
+            log.error(err);
             next(error);
             return;
         }
 
         if (!authenticated) {
+            log.info("Not authenticated");
             return;
         }
 
-        Client.get(req.getAuthDetails().user.id, function(err, client) {
+        log.info("Authentication succeeded");
+
+        deetz = req.getAuthDetails();
+
+        log.info(deetz);
+
+        if (!deetz || !deetz.user || !deetz.user.id) {
+            log.info("Incorrect auth details.");
+            return;
+        }
+
+        Client.get(deetz.user.id, function(err, client) {
 
             if (error) {
                 next(error);
@@ -194,9 +213,11 @@ var userAuth = function(req, res, next) {
     req.client = null;
     res.local("client", null); // init to null
 
-    log.info("Checking for OAuth credentials");
+    log.info("Checking for 3-legged OAuth credentials");
 
     req.authenticate(["user"], function(error, authenticated) { 
+
+        var deetz;
 
         if (error) {
             log.error(error);
@@ -210,11 +231,21 @@ var userAuth = function(req, res, next) {
         }
 
         log.info("Authentication succeeded");
-        
-        req.remoteUser = req.getAuthDetails().user.user;
+
+        deetz = req.getAuthDetails();
+
+        log.info(deetz);
+
+        if (!deetz || !deetz.user || !deetz.user.user || !deetz.user.client) {
+            log.info("Incorrect auth details.");
+            next();
+            return;
+        }
+
+        req.remoteUser = deetz.user.user;
         res.local("remoteUser", req.remoteUser);
 
-        req.client = req.getAuthDetails().user.client;
+        req.client = deetz.user.client;
         res.local("client", req.client);
 
         next();
