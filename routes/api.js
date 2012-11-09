@@ -776,7 +776,7 @@ var createUser = function(req, res, next) {
         },
         function(err) {
             if (err) throw err;
-            newTokenPair(req.app.provider, req.client, user, this);
+            req.app.provider.newTokenPair(req.client, user, this);
         },
         function(err, pair) {
             if (err) {
@@ -787,29 +787,6 @@ var createUser = function(req, res, next) {
                 user.token = pair.access_token;
                 user.secret = pair.token_secret;
                 res.json(user);
-            }
-        }
-    );
-};
-
-var newTokenPair = function(provider, client, user, callback) {
-    Step(
-        function() {
-            provider.generateRequestToken(client.consumer_key, "oob", this);
-        },
-        function(err, rt) {
-            if (err) throw err;
-            provider.associateTokenToUser(user.nickname, rt.token, this);
-        },
-        function(err, rt) {
-            if (err) throw err;
-            provider.generateAccessToken(rt.token, this);
-        },
-        function(err, pair) {
-            if (err) {
-                callback(err, null);
-            } else {
-                callback(null, pair);
             }
         }
     );
