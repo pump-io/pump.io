@@ -255,8 +255,12 @@
                 options,
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
                 onSuccess = function(data, textStatus, jqXHR) {
+		    var nav;
                     setNickname(data.nickname);
                     setUserCred(data.token, data.secret);
+                    currentUser = new User(data);
+                    nav = new UserNav({el: ".navbar-inner .container",
+				       model: {user: currentUser.toJSON()}});
                     // XXX: reload current data
                     ap.navigate(data.nickname + "/inbox", true);
                 },
@@ -326,7 +330,7 @@
                     setNickname(data.nickname);
                     setUserCred(data.token, data.secret);
                     currentUser = new User(data);
-                    nav = new UserNav({el: ".navbar-inner .container", model: {user: currentUser}});
+                    nav = new UserNav({el: ".navbar-inner .container", model: {user: currentUser.toJSON()}});
                     nav.render();
                     // XXX: one-time on-boarding page
                     ap.navigate(data.nickname + "/inbox", true);
@@ -661,7 +665,8 @@
 
                 user.fetch({success: function(user, response) {
                     currentUser = user;
-                    var nav = new UserNav({el: ".navbar-inner .container", model: {user: currentUser}});
+                    var nav = new UserNav({el: ".navbar-inner .container",
+					   model: {user: currentUser.toJSON()}});
                     nav.render();
                 }});
             }
