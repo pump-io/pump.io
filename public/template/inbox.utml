@@ -1,6 +1,6 @@
 <div class="content">
   <div class="page-header" id="header">
-    <h1><%- nickname %></h1>
+    <h1><%- user.nickname %></h1>
   </div>
   <div class="row" id="content">
     <div class="span10" id="stream">
