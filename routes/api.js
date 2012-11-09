@@ -134,6 +134,10 @@ var addRoutes = function(app) {
 
     app.get("/api/users", clientAuth, listUsers);
     app.post("/api/users", clientAuth, createUser);
+
+    // Login
+
+    app.post("/api/login", clientAuth, handleLogin);
 };
 
 exports.addRoutes = addRoutes;
@@ -1721,4 +1725,37 @@ var streamArgs = function(req, defaultCount, maxCount) {
     } catch (e) {
         throw new HTTPError(e.message, 400);
     }
+};
+
+var handleLogin = function(req, res, next) {
+
+    var user = null;
+
+    Step( 
+        function () { 
+            User.checkCredentials(req.body.nickname, req.body.password, this);
+        },
+        function(err, result) {
+            if (err) throw err;
+            if (!result) {
+                throw new HTTPError("Incorrect username or password", 401);
+            }
+            user = result;
+            user.expand(this);
+        },
+        function(err) {
+            if (err) throw err;
+            req.app.provider.newTokenPair(req.client, user, this);
+        },
+        function(err, pair) {
+            if (err) {
+                next(err);
+            } else {
+                user.sanitize();
+                user.token = pair.access_token;
+                user.secret = pair.token_secret;
+                res.json(user);
+            }
+        }
+    );
 };

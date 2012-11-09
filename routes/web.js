@@ -40,7 +40,6 @@ var addRoutes = function(app) {
     app.get("/main/register", showRegister);
 
     app.get("/main/login", showLogin);
-    app.post("/main/login", handleLogin);
 
     app.get("/:nickname", reqUser, showStream);
 
@@ -65,38 +64,6 @@ var showRegister = function(req, res, next) {
 
 var showLogin = function(req, res, next) {
     res.render("login", {title: "Login"});
-};
-
-var handleLogin = function(req, res, next) {
-    var user = null;
-
-    Step( 
-        function () { 
-            User.checkCredentials(req.body.nickname, req.body.password, this);
-        },
-        function(err, result) {
-            if (err) throw err;
-            if (!result) {
-                throw new HTTPError("Incorrect username or password", 401);
-            }
-            user = result;
-            user.expand(this);
-        },
-        function(err) {
-            if (err) throw err;
-            req.app.provider.newTokenPair(req.client, user, this);
-        },
-        function(err, pair) {
-            if (err) {
-                next(err);
-            } else {
-                user.sanitize();
-                user.token = pair.access_token;
-                user.secret = pair.token_secret;
-                res.json(user);
-            }
-        }
-    );
 };
 
 var handleLogout = function(req, res, next) {
