@@ -94,10 +94,10 @@
             }
         }
 
-        var message = { action: options.url,
-                        method: options.type,
-                        parameters: [["oauth_version", "1.0"], ["oauth_consumer_key", options.consumerKey]]
-                      };
+        var message = {action: options.url,
+                       method: options.type,
+                       parameters: [["oauth_version", "1.0"],
+                                    ["oauth_consumer_key", options.consumerKey]]};
 
         if (options.token) {
             message.parameters.push(["oauth_token", options.token]);
