@@ -75,24 +75,24 @@ var handleLogin = function(req, res, next) {
             User.checkCredentials(req.body.nickname, req.body.password, this);
         },
         function(err, result) {
-            if (err) {
-                if (err instanceof NoSuchThingError) {
-                    throw new HTTPError("Not authorized", 403);
-                } else {
-                    next(err);
-                }
-            } else if (!user) {
-                throw new HTTPError("Not authorized", 403);
+            if (err) throw err;
+            if (!result) {
+                throw new HTTPError("Incorrect username or password", 401);
             }
             user = result;
             user.expand(this);
         },
         function(err) {
+            if (err) throw err;
+            req.app.provider.newTokenPair(req.client, user, this);
+        },
+        function(err, pair) {
             if (err) {
                 next(err);
             } else {
-                req.session.nickname = user.nickname;
                 user.sanitize();
+                user.token = pair.access_token;
+                user.secret = pair.token_secret;
                 res.json(user);
             }
         }
@@ -100,7 +100,6 @@ var handleLogin = function(req, res, next) {
 };
 
 var handleLogout = function(req, res, next) {
-    delete req.session.nickname;
     res.json("OK");
 };
 

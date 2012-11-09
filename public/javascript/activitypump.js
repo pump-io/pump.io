@@ -322,8 +322,12 @@
                 options,
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
                 onSuccess = function(data, textStatus, jqXHR) {
+                    var nav;
                     setNickname(data.nickname);
                     setUserCred(data.token, data.secret);
+                    currentUser = new User(data);
+                    nav = new UserNav({el: ".navbar-inner .container", model: {user: currentUser}});
+                    nav.render();
                     // XXX: one-time on-boarding page
                     ap.navigate(data.nickname + "/inbox", true);
                 },
@@ -637,13 +641,31 @@
 
         bv = new BodyView({router: ap});
 
-        if ($("div.navbar #login").length > 0) {
-            nav = new AnonymousNav({el: "#topnav"});
-        } else {
-            nav = new UserNav({el: "#topnav"});
-        }
+        nav = new AnonymousNav({el: ".navbar-inner .container"});
 
-        ensureCred(function(err) {});
+        ensureCred(function(err, cred) {
+            var user, nickname;
+
+            if (err) {
+                console.log(err.message);
+                return;
+            }
+
+            nickname = getNickname();
+
+            if (nickname) {
+
+                user = new User({nickname: nickname});
+
+                // XXX: this only has client auth; get something with user auth (direct?)
+
+                user.fetch({success: function(user, response) {
+                    currentUser = user;
+                    var nav = new UserNav({el: ".navbar-inner .container", model: {user: currentUser}});
+                    nav.render();
+                }});
+            }
+        });
 
         if ($("#content #login").length > 0) {
             content = new LoginContent();
