@@ -327,26 +327,39 @@
                     // XXX: one-time on-boarding page
                     ap.navigate(data.nickname + "/inbox", true);
                 },
-                showError = function(input, msg) {
+                onError = function(jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.responseType == "json") {
+                        showError(jqXHR.response.error);
+                    } else if (jqXHR.status == 409) { // conflict
+                        showError("A user with that nickname already exists", "nickname");
+                    } else {
+                        showError(errorThrown);
+                    }
+                },
+                showError = function(msg, input) {
+                    if (input) {
+                        $('#registration input[name="'+input+'"]').addClass('error');
+                    }
+                    $('#registration #error').text(msg);
                     console.log(msg);
                 };
 
             if (params.password !== repeat) {
 
-                showError("password", "Passwords don't match.");
+                showError("Passwords don't match.", "password");
 
             } else if (!NICKNAME_RE.test(params.nickname)) {
 
-                showError("nickname", "Nicknames have to be a combination of 1-64 letters or numbers and ., - or _.");
+                showError("Nicknames have to be a combination of 1-64 letters or numbers and ., - or _.", "nickname");
 
             } else if (params.password.length < 8) {
 
-                showError("password", "Password must be 8 chars or more.");
+                showError("Password must be 8 chars or more.", "password");
 
             } else if (/^[a-z]+$/.test(params.password.toLowerCase()) ||
                 /^[0-9]+$/.test(params.password)) {
 
-                showError("password", "Passwords have to have at least one letter and one number.");
+                showError("Passwords have to have at least one letter and one number.", "password");
 
             } else {
 
@@ -356,7 +369,8 @@
                     dataType: "json",
                     type: "POST",
                     url: "/api/users",
-                    success: onSuccess
+                    success: onSuccess,
+                    error: onError
                 };
 
                 ensureCred(function(err, cred) {
