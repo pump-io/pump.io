@@ -261,6 +261,7 @@
                     currentUser = new User(data);
                     nav = new UserNav({el: ".navbar-inner .container",
 				       model: {user: currentUser.toJSON()}});
+		    nav.render();
                     // XXX: reload current data
                     ap.navigate(data.nickname + "/inbox", true);
                 },

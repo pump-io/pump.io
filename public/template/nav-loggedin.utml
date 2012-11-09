@@ -1,32 +1,19 @@
-<a class="brand" href="/<%= user.nickname %>/inbox">ActivityPump</a>
+<a class="brand" href="/<%- user.nickname %>/inbox">ActivityPump</a>
 
-<div class="pull-left">
-  <ul class="nav">
-    <li>
-      <form action="" class="pull-right">
-        <button href="#" data-controls-modal="modal-post" data-backdrop="true" data-keyboard="true" class="btn primary">Post</button>
-      </form>
-    </li>
-  </ul>
-</div>
-
-<div class="pull-right"> 
-  <ul class="nav">
-    <li>
-      <form action="" class="pull-right">
-        <input class="input-small" type="text" placeholder="Search">
-      </form>
-    </li>
-    <li class="dropdown" data-dropdown="dropdown">
-      <a href="#" class="dropdown-toggle">
-        <img class="pull-left" src="images/anne-24.jpg" width="24" height="24" />&nbsp;<%= user.profile.displayName %>
+<ul class="nav pull-right">
+  <li id="fat-menu" class="dropdown">
+      <a href="/<%- user.nickname %>" id="profile-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown"> 
+	<% if (_(user.profile).has("image")) { %>
+        <img class="pull-left" src="<%- user.profile.image.url %>" width="24" height="24" />&nbsp;
+	<% } %>
+	<%- user.profile.displayName %>
+	<b class="caret"></b>
       </a>
-      <ul class="dropdown-menu">
-	<li><a href="/<%= user.nickname %>">Profile</a></li>
-	<li><a href="/main/settings">Settings</a></li>
-	<li><a href="/main/logout">Log out</a></li>
-      </ul>
-    </li>
-  </ul>
-</div> <!-- pull-right -->
-
+    <ul class="dropdown-menu" role="menu" aria-labelledby="profile-dropdown">
+	<li><a tabindex="-1" href="/<%- user.nickname %>">Profile</a></li>
+	<li><a tabindex="-1" href="/main/settings">Settings</a></li>
+	<li class="divider"></li>
+	<li><a tabindex="-1" href="/main/logout">Log out</a></li>
+    </ul>
+  </li>
+</ul>
