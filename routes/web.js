@@ -35,20 +35,20 @@ var databank = require("databank"),
 
 var addRoutes = function(app) {
 
-    app.get("/", maybeAuth, showMain);
+    app.get("/", showMain);
 
-    app.get("/main/register", noUser, showRegister);
+    app.get("/main/register", showRegister);
 
-    app.get("/main/login", noUser, showLogin);
-    app.post("/main/login", noUser, handleLogin);
+    app.get("/main/login", showLogin);
+    app.post("/main/login", handleLogin);
 
-    app.post("/main/logout", mustAuth, handleLogout);
+    app.get("/:nickname", reqUser, showStream);
 
-    app.get("/main/settings", mustAuth, showSettings);
+    app.get("/:nickname/activity/:uuid", reqUser, showActivity);
 
-    app.get("/:nickname", maybeAuth, reqUser, showStream);
-    app.get("/:nickname/inbox", mustAuth, reqUser, sameUser, showInbox);
-    app.get("/:nickname/activity/:uuid", maybeAuth, reqUser, showActivity);
+    app.get("/:nickname/inbox", reqUser, sameUser, showInbox);
+    app.get("/main/settings", showSettings);
+    app.post("/main/logout", handleLogout);
 };
 
 var showSettings = function(req, res, next) {
