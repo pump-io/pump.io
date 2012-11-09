@@ -1,43 +1,32 @@
-<% /* -*- mode: html -*- */ %>
+<a class="brand" href="/<%= user.nickname %>/inbox">ActivityPump</a>
 
-<a class="brand" href="/<%- remoteUser.nickname %>/inbox">ActivityPump</a>
-<ul class="nav">
-  <li class="active"><a href="/<%- remoteUser.nickname %>/inbox">Home</a></li>
-</ul>
-<div class="pull-right">
+<div class="pull-left">
   <ul class="nav">
-    <li><a href="/<%- remoteUser.nickname %>"><%- remoteUser.nickname %></a></li>
-    <li><a href="/main/settings">Settings</a></li>
-    <li><button href="#" data-controls-modal="modal-post" data-backdrop="true" data-keyboard="true" class="btn">Post</button></li>
-    <li><button href="#" id="logout" class="btn">Logout</button></li>
+    <li>
+      <form action="" class="pull-right">
+        <button href="#" data-controls-modal="modal-post" data-backdrop="true" data-keyboard="true" class="btn primary">Post</button>
+      </form>
+    </li>
   </ul>
 </div>
 
-<div id="modal-post" class="modal hide fade">
-  <div class="modal-header">
-    <a href="#" class="close">&times;</a>
-    <h3>Post</h3>
-  </div>
-  <div class="modal-body">
-    <ul class="tabs" data-tabs="tabs">
-      <li class="active"><a href="#note">Note</a></li>
-      <li><a href="#photo">Photo</a></li>
-    </ul>
-    <div id="post-tags" class="tab-content">
-      <div class="active tab-pane" id="note">
-	<form id="post-note">
-	  <div class="clearfix">
-	    <label for="bio">What&apos;s up?</label>
-	    <div class="input">
-              <textarea class="span6" id="note-content" name="note" rows="5"></textarea>
-	    </div>
-	  </div><!-- /clearfix -->
-	  <input type="submit" class="btn primary" value="Save" />
-	</form>
-      </div>
-      <div class="tab-pane" id="photo">
-        <p>[Photo form]</p>
-      </div>
-    </div>
-  </div>
-</div>
+<div class="pull-right"> 
+  <ul class="nav">
+    <li>
+      <form action="" class="pull-right">
+        <input class="input-small" type="text" placeholder="Search">
+      </form>
+    </li>
+    <li class="dropdown" data-dropdown="dropdown">
+      <a href="#" class="dropdown-toggle">
+        <img class="pull-left" src="images/anne-24.jpg" width="24" height="24" />&nbsp;<%= user.profile.displayName %>
+      </a>
+      <ul class="dropdown-menu">
+	<li><a href="/<%= user.nickname %>">Profile</a></li>
+	<li><a href="/main/settings">Settings</a></li>
+	<li><a href="/main/logout">Log out</a></li>
+      </ul>
+    </li>
+  </ul>
+</div> <!-- pull-right -->
+
