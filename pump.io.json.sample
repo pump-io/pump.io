@@ -1,6 +1,6 @@
 {
     "driver":  "disk",
-    "params":  {dir: "/tmp/pumpio/"},
+    "params":  {"dir": "/tmp/pumpio/"},
     "secret":  "my dog has fleas",
     "noweb":  false,
     "site":  "Awesome Sauce",
