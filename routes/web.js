@@ -31,6 +31,8 @@ var databank = require("databank"),
     mustAuth = mw.mustAuth,
     sameUser = mw.sameUser,
     noUser = mw.noUser,
+    userAuth = mw.userAuth,
+    clientAuth = mw.clientAuth,
     NoSuchThingError = databank.NoSuchThingError;
 
 var addRoutes = function(app) {
@@ -40,6 +42,7 @@ var addRoutes = function(app) {
     app.get("/main/register", showRegister);
 
     app.get("/main/login", showLogin);
+    app.post("/main/login", clientAuth, handleLogin);
 
     app.get("/:nickname", reqUser, showStream);
 
@@ -133,6 +136,39 @@ var showStream = function(req, res, next) {
                                     user: req.remoteUser,
                                     actor: req.user.profile,
                                     activities: activities});
+            }
+        }
+    );
+};
+
+var handleLogin = function(req, res, next) {
+
+    var user = null;
+
+    Step( 
+        function () { 
+            User.checkCredentials(req.body.nickname, req.body.password, this);
+        },
+        function(err, result) {
+            if (err) throw err;
+            if (!result) {
+                throw new HTTPError("Incorrect username or password", 401);
+            }
+            user = result;
+            user.expand(this);
+        },
+        function(err) {
+            if (err) throw err;
+            req.app.provider.newTokenPair(req.client, user, this);
+        },
+        function(err, pair) {
+            if (err) {
+                next(err);
+            } else {
+                user.sanitize();
+                user.token = pair.access_token;
+                user.secret = pair.token_secret;
+                res.json(user);
             }
         }
     );

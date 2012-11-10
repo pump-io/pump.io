@@ -34,12 +34,14 @@ var databank = require("databank"),
     stream = require("../lib/model/stream"),
     Stream = stream.Stream,
     NotInStreamError = stream.NotInStreamError,
-    Client = require("../lib/model/client").Client,
-    mw = require("../lib/middleware"),
     URLMaker = require("../lib/urlmaker").URLMaker,
     Distributor = require("../lib/distributor"),
+    mw = require("../lib/middleware"),
     reqUser = mw.reqUser,
     sameUser = mw.sameUser,
+    clientAuth = mw.clientAuth,
+    userAuth = mw.userAuth,
+    remoteUserAuth = mw.remoteUserAuth,
     NoSuchThingError = databank.NoSuchThingError,
     AlreadyExistsError = databank.AlreadyExistsError,
     NoSuchItemError = databank.NoSuchItemError,
@@ -134,181 +136,9 @@ var addRoutes = function(app) {
 
     app.get("/api/users", clientAuth, listUsers);
     app.post("/api/users", clientAuth, createUser);
-
-    // Login
-
-    app.post("/api/login", clientAuth, handleLogin);
 };
 
 exports.addRoutes = addRoutes;
-
-// Accept either 2-legged or 3-legged OAuth
-
-var clientAuth = function(req, res, next) {
-
-    var log = req.log;
-
-    req.client = null;
-    res.local("client", null); // init to null
-
-    if (hasToken(req)) {
-        userAuth(req, res, next);
-        return;
-    }
-
-    log.info("Checking for 2-legged OAuth credentials");
-
-    req.authenticate(["client"], function(error, authenticated) { 
-
-        var deetz;
-
-        if (error) {
-            log.error(err);
-            next(error);
-            return;
-        }
-
-        if (!authenticated) {
-            log.info("Not authenticated");
-            return;
-        }
-
-        log.info("Authentication succeeded");
-
-        deetz = req.getAuthDetails();
-
-        log.info(deetz);
-
-        if (!deetz || !deetz.user || !deetz.user.id) {
-            log.info("Incorrect auth details.");
-            return;
-        }
-
-        Client.get(deetz.user.id, function(err, client) {
-
-            if (error) {
-                next(error);
-                return;
-            }
-
-            req.client = client;
-            res.local("client", req.client);
-            next();
-        });
-    });
-};
-
-var hasToken = function(req) {
-    return (req &&
-            (_(req.headers).has("authorization") && req.headers.authorization.match(/oauth_token/)) ||
-            (req.query && req.query.oauth_token) ||
-            (req.body && req.headers["content-type"] === "application/x-www-form-urlencoded" && req.body.oauth_token));
-};
-
-// Accept only 3-legged OAuth
-// XXX: It would be nice to merge these two functions
-
-var userAuth = function(req, res, next) {
-
-    var log = req.log;
-
-    req.remoteUser = null;
-    res.local("remoteUser", null); // init to null
-    req.client = null;
-    res.local("client", null); // init to null
-
-    log.info("Checking for 3-legged OAuth credentials");
-
-    req.authenticate(["user"], function(error, authenticated) { 
-
-        var deetz;
-
-        if (error) {
-            log.error(error);
-            next(error);
-            return;
-        }
-
-        if (!authenticated) {
-            log.info("Authentication failed");
-            return;
-        }
-
-        log.info("Authentication succeeded");
-
-        deetz = req.getAuthDetails();
-
-        log.info(deetz);
-
-        if (!deetz || !deetz.user || !deetz.user.user || !deetz.user.client) {
-            log.info("Incorrect auth details.");
-            next();
-            return;
-        }
-
-        req.remoteUser = deetz.user.user;
-        res.local("remoteUser", req.remoteUser);
-
-        req.client = deetz.user.client;
-        res.local("client", req.client);
-
-        next();
-    });
-};
-
-// Accept only 2-legged OAuth with
-
-var remoteUserAuth = function(req, res, next) {
-
-    req.client = null;
-    res.local("client", null); // init to null
-    req.remotePerson = null;
-    res.local("person", null);
-
-    req.authenticate(["client"], function(error, authenticated) { 
-
-        var id;
-
-        if (error) {
-            next(error);
-            return;
-        }
-
-        if (!authenticated) {
-            return;
-        }
-
-        id = req.getAuthDetails().user.id;
-
-        Step(
-            function() {
-                Client.get(id, this);
-            },
-            function(err, client) {
-                if (err) {
-                    next(err);
-                    return;
-                }
-                if (!client) {
-                    next(new HTTPError("No client", 401));
-                    return;
-                }
-                if (!client.webfinger) {
-                    next(new HTTPError("OAuth key not associated with a webfinger ID", 401));
-                    return;
-                }
-
-                req.client = client;
-                req.webfinger = client.webfinger;
-
-                res.local("client", req.client); // init to null
-                res.local("person", req.person); // init to null
-
-                next();
-            }
-        );
-    });
-};
 
 var requester = function(type) {
 
@@ -1727,35 +1557,3 @@ var streamArgs = function(req, defaultCount, maxCount) {
     }
 };
 
-var handleLogin = function(req, res, next) {
-
-    var user = null;
-
-    Step( 
-        function () { 
-            User.checkCredentials(req.body.nickname, req.body.password, this);
-        },
-        function(err, result) {
-            if (err) throw err;
-            if (!result) {
-                throw new HTTPError("Incorrect username or password", 401);
-            }
-            user = result;
-            user.expand(this);
-        },
-        function(err) {
-            if (err) throw err;
-            req.app.provider.newTokenPair(req.client, user, this);
-        },
-        function(err, pair) {
-            if (err) {
-                next(err);
-            } else {
-                user.sanitize();
-                user.token = pair.access_token;
-                user.secret = pair.token_secret;
-                res.json(user);
-            }
-        }
-    );
-};

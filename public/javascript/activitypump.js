@@ -296,7 +296,7 @@
                     data: JSON.stringify(params),
                     dataType: "json",
                     type: "POST",
-                    url: "/api/login",
+                    url: "/main/login",
                     success: onSuccess,
                     error: onError
                 };
