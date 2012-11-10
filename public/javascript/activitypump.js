@@ -207,12 +207,16 @@
         templateName: 'nav-loggedin',
         events: {
             "click #logout": "logout",
+	    "click #profile-dropdown": "profileDropdown",
             "submit #post-note": "postNote"
         },
         initialize: function() {
             _.bindAll(this, "postNote");
             _.bindAll(this, "logout");
         },
+	profileDropdown: function() {
+	    $('#profile-dropdown').dropdown();
+	},
         postNote: function() {
 
             var view = this,
