@@ -359,10 +359,13 @@
                     currentUser = new User(data);
                     nav = new UserNav({el: ".navbar-inner .container", model: {user: currentUser.toJSON()}});
                     nav.render();
+                    // Leave disabled
+                    view.$(':submit').spin(false);
                     // XXX: one-time on-boarding page
                     pump.navigate(data.nickname + "/inbox", true);
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
+                    view.$(':submit').prop("disabled", false).spin(false);
                     if (jqXHR.responseType == "json") {
                         showError(jqXHR.response.error);
                     } else if (jqXHR.status == 409) { // conflict
@@ -397,6 +400,8 @@
                 showError("Passwords have to have at least one letter and one number.", "password");
 
             } else {
+
+                view.$(':submit').prop("disabled", true).spin(true);
 
                 options = {
                     contentType: "application/json",
@@ -510,7 +515,8 @@
 
             user.fetch({success: function(user, response) {
                 stream.fetch({success: function(stream, response) {
-                    var content = new UserPageContent({model: {actor: user.toJSON(), stream: stream.toJSON()}});
+                    var content = new UserPageContent({model: {actor: user.toJSON(),
+                                                               stream: stream.toJSON()}});
 
                     content.render();
                 }});
