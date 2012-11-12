@@ -289,7 +289,7 @@
 				       model: {user: currentUser.toJSON()}});
 		    nav.render();
                     // XXX: reload current data
-                    ap.navigate(data.nickname + "/inbox", true);
+                    pump.navigate(data.nickname + "/inbox", true);
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     showError(null, errorThrown);
@@ -360,7 +360,7 @@
                     nav = new UserNav({el: ".navbar-inner .container", model: {user: currentUser.toJSON()}});
                     nav.render();
                     // XXX: one-time on-boarding page
-                    ap.navigate(data.nickname + "/inbox", true);
+                    pump.navigate(data.nickname + "/inbox", true);
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     if (jqXHR.responseType == "json") {
@@ -468,7 +468,7 @@
         }
     });
 
-    var ActivityPump = Backbone.Router.extend({
+    var Pump = Backbone.Router.extend({
 
         routes: {
             "":                       "public",    
@@ -660,7 +660,7 @@
         }
     };
 
-    var ap;
+    var pump;
 
     $(document).ready(function() {
 
@@ -668,9 +668,9 @@
             nav,
             content;
 
-        ap = new ActivityPump();
+        pump = new Pump();
 
-        bv = new BodyView({router: ap});
+        bv = new BodyView({router: pump});
 
         nav = new AnonymousNav({el: ".navbar-inner .container"});
 

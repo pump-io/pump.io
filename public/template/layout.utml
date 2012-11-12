@@ -61,7 +61,7 @@
     <script src="/javascript/backbone-min.js"></script>
     <script src="/javascript/oauth.min.js"></script>
     <script src="/javascript/sha1.min.js"></script>
-    <script src="/javascript/activitypump.js"></script>
+    <script src="/javascript/pump.js"></script>
     <script>
       config = {
       site: "<%- site %>"
