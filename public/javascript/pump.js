@@ -289,9 +289,11 @@
 				       model: {user: currentUser.toJSON()}});
 		    nav.render();
                     // XXX: reload current data
+                    view.$(':submit').spin(false);
                     pump.navigate(data.nickname + "/inbox", true);
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
+                    view.$(':submit').prop('disabled', false).spin(false);
                     showError(null, errorThrown);
                 },
                 showError = function(input, msg) {
@@ -312,6 +314,8 @@
                 showError("password", "Passwords have to have at least one letter and one number.");
 
             } else {
+
+                view.$(':submit').prop('disabled', true).spin(true);
 
                 options = {
                     contentType: "application/json",
