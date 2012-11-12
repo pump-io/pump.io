@@ -61,6 +61,8 @@
     <script src="/javascript/backbone-min.js"></script>
     <script src="/javascript/oauth.min.js"></script>
     <script src="/javascript/sha1.min.js"></script>
+    <script src="/javascript/spin.min.js"></script>
+    <script src="/javascript/jquery-spin.js"></script>
     <script src="/javascript/pump.js"></script>
     <script>
       config = {
