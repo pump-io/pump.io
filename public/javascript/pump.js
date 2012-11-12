@@ -19,7 +19,8 @@
         var type = methodMap[method];
 
         // Default options, unless specified.
-        options || (options = {});
+
+        options = options || {};
 
         // Default JSON-request options.
         var params = {type: type, dataType: 'json'};
@@ -116,7 +117,7 @@
     };
 
     var ActivityStream = Backbone.Collection.extend({
-	model: Activity,
+        model: Activity,
         parse: function(response) {
             return response.items;
         }
@@ -142,8 +143,28 @@
         }
     });
 
+    var UserMajorInbox = ActivityStream.extend({
+        user: null,
+        initialize: function(models, options) {
+            this.user = options.user;
+        },
+        url: function() {
+            return "/api/user/" + this.user.get("nickname") + "/inbox/major";
+        }
+    });
+
+    var UserMinorInbox = ActivityStream.extend({
+        user: null,
+        initialize: function(models, options) {
+            this.user = options.user;
+        },
+        url: function() {
+            return "/api/user/" + this.user.get("nickname") + "/inbox/minor";
+        }
+    });
+
     var Person = Backbone.Model.extend({
-	url: function() {
+        url: function() {
             var links = this.get("links"),
                 uuid = this.get("uuid");
             if (links && _.isObject(links) && links.self) {
@@ -153,13 +174,13 @@
             } else {
                 return null;
             }
-	}
+        }
     });
 
     var User = Backbone.Model.extend({
-	initialize: function() {
-	    this.profile = new Person(this.get("profile"));
-	},
+        initialize: function() {
+            this.profile = new Person(this.get("profile"));
+        },
         url: function() {
             return "/api/user/" + this.get("nickname");
         },
@@ -168,6 +189,12 @@
         },
         getInbox: function() {
             return new UserInbox([], {user: this});
+        },
+        getMajorInbox: function() {
+            return new UserMajorInbox([], {user: this});
+        },
+        getMinorInbox: function() {
+            return new UserMinorInbox([], {user: this});
         }
     });
 
@@ -207,24 +234,24 @@
         templateName: 'nav-loggedin',
         events: {
             "click #logout": "logout",
-	    "click #profile-dropdown": "profileDropdown"
+            "click #profile-dropdown": "profileDropdown"
         },
-	profileDropdown: function() {
-	    $('#profile-dropdown').dropdown();
-	},
+        profileDropdown: function() {
+            $('#profile-dropdown').dropdown();
+        },
         logout: function() {
             var view = this,
                 options,
                 onSuccess = function(data, textStatus, jqXHR) {
-		    var an;
+                    var an;
                     currentUser = null;
 
-		    setNickname(null);
-	            setUserCred(null, null);
+                    setNickname(null);
+                    setUserCred(null, null);
 
                     an = new AnonymousNav({el: ".navbar-inner .container", model: {site: config.site}});
                     an.render();
-		},
+                },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     showError(errorThrown);
                 },
@@ -243,22 +270,22 @@
             };
 
             ensureCred(function(err, cred) {
-		var pair;
-		if (err) {
+                var pair;
+                if (err) {
                     showError(null, "Couldn't get OAuth credentials. :(");
-		} else {
+                } else {
                     options.consumerKey = cred.clientID;
                     options.consumerSecret = cred.clientSecret;
                     pair = getUserCred();
 
                     if (pair) {
-			options.token = pair.token;
-			options.tokenSecret = pair.secret;
+                        options.token = pair.token;
+                        options.tokenSecret = pair.secret;
                     }
 
                     options = oauthify(options);
                     $.ajax(options);
-		}
+                }
             });
         }
     });
@@ -281,13 +308,13 @@
                 options,
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
                 onSuccess = function(data, textStatus, jqXHR) {
-		    var nav;
+                    var nav;
                     setNickname(data.nickname);
                     setUserCred(data.token, data.secret);
                     currentUser = new User(data);
                     nav = new UserNav({el: ".navbar-inner .container",
-				       model: {user: currentUser.toJSON()}});
-		    nav.render();
+                                       model: {user: currentUser.toJSON()}});
+                    nav.render();
                     // XXX: reload current data
                     view.$(':submit').spin(false);
                     pump.navigate(data.nickname + "/inbox", true);
@@ -309,7 +336,7 @@
                 showError("password", "Password must be 8 chars or more.");
 
             } else if (/^[a-z]+$/.test(params.password.toLowerCase()) ||
-                /^[0-9]+$/.test(params.password)) {
+                       /^[0-9]+$/.test(params.password)) {
 
                 showError("password", "Passwords have to have at least one letter and one number.");
 
@@ -399,7 +426,7 @@
                 showError("Password must be 8 chars or more.", "password");
 
             } else if (/^[a-z]+$/.test(params.password.toLowerCase()) ||
-                /^[0-9]+$/.test(params.password)) {
+                       /^[0-9]+$/.test(params.password)) {
 
                 showError("Passwords have to have at least one letter and one number.", "password");
 
@@ -460,18 +487,18 @@
         saveSettings: function() {
 
             var view = this,
-		user = currentUser,
-		profile = user.profile;
+                user = currentUser,
+                profile = user.profile;
 
-	    user.set({"password": this.$("#password").val()});
+            user.set({"password": this.$("#password").val()});
 
-	    user.save();
+            user.save();
 
-	    profile.set({"displayName": this.$('#realname').val(),
-	                 "window.location": { displayName: this.$('#window.location').val() },
-	                 "summary": this.$('#bio').val()});
+            profile.set({"displayName": this.$('#realname').val(),
+                         "window.location": { displayName: this.$('#window.location').val() },
+                         "summary": this.$('#bio').val()});
 
-	    profile.save();
+            profile.save();
 
             return false;
         }
@@ -489,23 +516,23 @@
             "main/login":             "login"
         },
 
-	register: function() {
+        register: function() {
             var content = new RegisterContent();
 
             content.render();
         },
 
-	login: function() {
+        login: function() {
             var content = new LoginContent();
 
             content.render();
         },
 
-	settings: function() {
+        settings: function() {
             var content = new SettingsContent({model: currentUser});
 
             content.render();
-	},
+        },
 
         "public": function() {
             var content = new MainContent({model: {site: config.site}});
@@ -529,13 +556,20 @@
 
         inbox: function(nickname) {
             var user = new User({nickname: nickname}),
-                inbox = user.getInbox();
+                major = user.getMajorInbox(),
+                minor = user.getMinorInbox();
+
+            // XXX: parallelize
 
             user.fetch({success: function(user, response) {
-                inbox.fetch({success: function(inbox, response) {
-                    var content = new InboxContent({model: {user: user.toJSON(), stream: inbox.toJSON()}});
-
-                    content.render();
+                major.fetch({success: function(major, response) {
+                    minor.fetch({success: function(minor, response) {
+                        var content = new InboxContent({model: {user: user.toJSON(),
+                                                                major: major.toJSON(),
+                                                                minor: minor.toJSON()
+                                                               }});
+                        content.render();
+                    }});
                 }});
             }});
         },
@@ -649,21 +683,21 @@
             });
         } else {
             credReq = $.post("/api/client/register",
-                               {type: "client_associate",
-                                application_name: config.site + " Web",
-                                application_type: "web"},
-                               function(data) {
-                                   credReq = null;
-                                   clientID = data.client_id;
-                                   clientSecret = data.client_secret;
-                                   if (localStorage) {
-                                       localStorage['cred:clientID'] = clientID;
-                                       localStorage['cred:clientSecret'] = clientSecret;
-                                   }
-                                   callback(null, {clientID: clientID,
-                                                   clientSecret: clientSecret});
-                               },
-                               "json");
+                             {type: "client_associate",
+                              application_name: config.site + " Web",
+                              application_type: "web"},
+                             function(data) {
+                                 credReq = null;
+                                 clientID = data.client_id;
+                                 clientSecret = data.client_secret;
+                                 if (localStorage) {
+                                     localStorage['cred:clientID'] = clientID;
+                                     localStorage['cred:clientSecret'] = clientSecret;
+                                 }
+                                 callback(null, {clientID: clientID,
+                                                 clientSecret: clientSecret});
+                             },
+                             "json");
             credReq.error(function() {
                 callback(new Error("error getting credentials"), null);
             });
@@ -703,7 +737,7 @@
                 user.fetch({success: function(user, response) {
                     currentUser = user;
                     var nav = new UserNav({el: ".navbar-inner .container",
-					   model: {user: currentUser.toJSON()}});
+                                           model: {user: currentUser.toJSON()}});
                     nav.render();
                 }});
             }

@@ -1,23 +1,30 @@
-<div class="content">
-  <div class="page-header" id="header">
-    <h1><%- user.nickname %></h1>
-  </div>
-  <div class="row" id="content">
-    <div class="span10" id="stream">
-      <ul>
-        <% _.each(stream, function(activity) { %>
-        <li>
-          <p class="activity-content"><%- (activity.content || activity.object.summary || activity.object.content || ((activity.actor||actor).displayName + " " + activity.verb + "ed " + activity.object.displayName))%></p>
-          <p class="activity-meta">
-	    <a class="activity-author" href="<%= activity.actor.url %>"><%- activity.actor.displayName || activity.actor.preferredUsername %></a>
-	    <a class="activity-url" href="<%= activity.url %>"><%- activity.published %></a>
-          </p>
-        </li>   
-        <% }); %>
-      </ul>
+<div class="inbox">
+  <div class="row">
+    <div class="span9" id="major-stream">
+      <% if (major && major.length) { %>
+      <% _.each(major, function(activity) { %>
+      <div class="row">
+        <div class="span1">
+          <img src="<%- activity.actor.image.url %>" width="40" height="40" />
+        </div>
+        <div class="span8">
+          <% if (activity.object.title) { %>
+          <h2><%- activity.object.title %></h2>
+          <% } %>
+	  <p><small><a href="<%- activity.actor.url %>"><%- activity.actor.displayName %></a> at <a href="<%- activity.url %>"><%- activity.published %></a><% if (activity.location) { %> in <a href="<%- activity.location.url %>"><%- activity.location.displayName %></a><% } %></p>
+        </div>
+        <div class="span8">
+          <%= activity.object.content %>
+	  <div>
+	    <p><a href="#">Like</a> • <a href="#">Comment</a> • <a href="#">Share</a></p>
+	  </div>
+        </div>
+      <% }); %>
+      <% } else { %>
+      <p>No content!</p>
+      <% } %>
     </div>
-    <div class="span4" id="sidebar">
-      <h3><%- user.nickname %></h3>
+    <div class="span3" id="sidebar">
     </div>
   </div>
 </div>
