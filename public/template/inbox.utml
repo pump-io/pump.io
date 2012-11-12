@@ -46,7 +46,7 @@
             <% } %>
           </div>
 	  <div class="span2">
-	    <p><small><%= activity.object.content %></small></p>
+	    <p><small><%= activity.content %></small></p>
 	  </div>
 	</div>
         <% }); %>
