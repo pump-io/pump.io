@@ -207,37 +207,59 @@
         templateName: 'nav-loggedin',
         events: {
             "click #logout": "logout",
-	    "click #profile-dropdown": "profileDropdown",
-            "submit #post-note": "postNote"
-        },
-        initialize: function() {
-            _.bindAll(this, "postNote");
-            _.bindAll(this, "logout");
+	    "click #profile-dropdown": "profileDropdown"
         },
 	profileDropdown: function() {
 	    $('#profile-dropdown').dropdown();
 	},
-        postNote: function() {
-
-            var view = this,
-		user = currentUser,
-		profile = user.profile,
-		act = new Activity(),
-		stream = new UserStream({user: user});
-
-	    stream.create({object: {objectType: "note",
-				    content: this.$("#note-content").val()}});
-
-            return false;
-        },
         logout: function() {
-            var view = this;
-            $.post("/main/logout", {nickname: currentUser.nickname}, function(data) {
-                currentUser = null;
-                var an = new AnonymousNav({el: view.el});
-                an.render();
+            var view = this,
+                options,
+                onSuccess = function(data, textStatus, jqXHR) {
+		    var an;
+                    currentUser = null;
+
+		    setNickname(null);
+	            setUserCred(null, null);
+
+                    an = new AnonymousNav({el: ".navbar-inner .container", model: {site: config.site}});
+                    an.render();
+		},
+                onError = function(jqXHR, textStatus, errorThrown) {
+                    showError(errorThrown);
+                },
+                showError = function(msg) {
+                    console.log(msg);
+                };
+
+            options = {
+                contentType: "application/json",
+                data: "",
+                dataType: "json",
+                type: "POST",
+                url: "/main/logout",
+                success: onSuccess,
+                error: onError
+            };
+
+            ensureCred(function(err, cred) {
+		var pair;
+		if (err) {
+                    showError(null, "Couldn't get OAuth credentials. :(");
+		} else {
+                    options.consumerKey = cred.clientID;
+                    options.consumerSecret = cred.clientSecret;
+                    pair = getUserCred();
+
+                    if (pair) {
+			options.token = pair.token;
+			options.tokenSecret = pair.secret;
+                    }
+
+                    options = oauthify(options);
+                    $.ajax(options);
+		}
             });
-            return false;
         }
     });
 

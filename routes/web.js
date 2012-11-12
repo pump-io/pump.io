@@ -21,7 +21,7 @@ var databank = require("databank"),
     Step = require("step"),
     _ = require("underscore"),
     Activity = require("../lib/model/activity").Activity,
-    RequestToken = require("../lib/model/requesttoken").RequestToken,
+    AccessToken = require("../lib/model/accesstoken").AccessToken,
     User = require("../lib/model/user").User,
     mw = require("../lib/middleware"),
     he = require("../lib/httperror"),
@@ -44,13 +44,14 @@ var addRoutes = function(app) {
     app.get("/main/login", showLogin);
     app.post("/main/login", clientAuth, handleLogin);
 
+    app.post("/main/logout", userAuth, handleLogout);
+
     app.get("/:nickname", reqUser, showStream);
 
     app.get("/:nickname/activity/:uuid", reqUser, showActivity);
 
     app.get("/:nickname/inbox", reqUser, sameUser, showInbox);
     app.get("/main/settings", showSettings);
-    app.post("/main/logout", handleLogout);
 };
 
 var showSettings = function(req, res, next) {
@@ -70,7 +71,29 @@ var showLogin = function(req, res, next) {
 };
 
 var handleLogout = function(req, res, next) {
-    res.json("OK");
+    Step(
+	function() {
+	    AccessToken.search({"consumer_key": req.client.consumer_key,
+				"username": req.remoteUser.nickname},
+			       this);
+	},
+	function(err, tokens) {
+	    var i, group = this.group();
+	    if (err) throw err;
+	    for (i = 0; i < tokens.length; i++) {
+		// XXX: keep for auditing?
+		tokens[i].del(group());
+	    }
+	},
+	function(err) {
+	    if (err) {
+		next(err);
+	    } else {
+		req.remoteUser = null;
+		res.json("OK");
+	    }
+	}
+    );
 };
 
 var showActivity = function(req, res, next) {
