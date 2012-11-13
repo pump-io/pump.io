@@ -71,6 +71,10 @@
         return null;
     };
 
+    var pumpError = function(err) {
+        console.log(err);
+    };
+
     var Activity = Backbone.Model.extend({
         url: function() {
             var links = this.get("links"),
@@ -208,15 +212,31 @@
             var name = this.templateName,
                 url = '/template/'+name+'.utml',
                 view = this,
-                json = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model);
-
+                json = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model),
+                runTemplate = function() {
+                    var template, html;
+                    try {
+                        template = templates[name];
+                        html = template(json);
+                        $(view.el).html(html);
+                    } catch (err) {
+                        pumpError(err);
+                    }
+                };
             if (!templates[name]) {
                 $.get(url, function(data) {
-                    templates[name] = _.template(data);
-                    $(view.el).html(templates[name](json));
+                    var f;
+                    try {
+                        f = _.template(data);
+                        templates[name] = f;
+                    } catch (err) {
+                        pumpError(err);
+                        return;
+                    }
+                    runTemplate();
                 });
             } else {
-                $(view.el).html(templates[name](json));
+                runTemplate();
             }
             return this;
         }
