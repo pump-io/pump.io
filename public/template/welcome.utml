@@ -1,0 +1,17 @@
+<p>
+  Welcome to <a href="<%- service.url %>"><%- service.displayName %></a>!
+  Now that you&apos;re registered, here are a few tips for enjoying yourself fully.
+</p>
+
+<ul>
+  <li>
+    You should modify your <a href="<%- service.url %>main/settings">profile</a> 
+    to let people know more about you.
+  </li>
+</ul>
+
+<p>
+  This message will stay in your inbox so you can refer back. Enjoy
+  yourself and have fun.
+</p>
+

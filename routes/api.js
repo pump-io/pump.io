@@ -583,9 +583,56 @@ var usersStream = function(callback) {
     );
 };
 
+var thisService = function() {
+    return {
+	objectType: ActivityObject.SERVICE,
+	url: URLMaker.makeURL("")
+    };
+};
+
 var createUser = function(req, res, next) {
 
-    var user;
+    var user,
+        registrationActivity = function(user, svc, callback) {
+	    var act = new Activity({
+		actor: user.profile,
+		verb: Activity.JOIN,
+		object: svc
+            });
+	    newActivity(act, user, callback);
+        },
+        welcomeActivity = function(user, svc, callback) {
+            Step(
+                function() {
+                    res.render("welcome",
+                               {profile: user.profile,
+                                service: svc,
+                                layout: false},
+                               this);
+                },
+                function(err, text) {
+                    if (err) throw err;
+	            var act = new Activity({
+		        actor: thisService(),
+		        verb: Activity.POST,
+                        to: [user.profile],
+		        object: {
+		            objectType: ActivityObject.NOTE,
+                            displayName: "Welcome to " + svc.displayName,
+                            content: text
+		        }
+                    });
+	            initActivity(act, this);
+                },
+                function(err, act) {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        callback(null, act);
+                    }
+                }
+            );
+        };
 
     Step(
         function() {
@@ -612,19 +659,21 @@ var createUser = function(req, res, next) {
             str.deliver(user.nickname, this);
         },
         function(err) {
-	    var act;
+            var svc;
             if (err) throw err;
-	    act = new Activity({
-		actor: user.profile,
-		verb: Activity.JOIN,
-		object: {
-		    objectType: ActivityObject.SERVICE,
-		    url: URLMaker.makeURL("")
-		}
-            });
-	    newActivity(act, user, this);
+            svc = thisService();
+            registrationActivity(user, svc, this.parallel());
+            welcomeActivity(user, svc, this.parallel());
         },
-        function(err, act) {
+        function(err, reg, welcome) {
+            var rd, wd;
+            if (err) throw err;
+            rd = new Distributor(reg);
+            rd.distribute(this.parallel());
+            wd = new Distributor(welcome);
+            wd.distribute(this.parallel());
+        },
+        function(err) {
             if (err) throw err;
             req.app.provider.newTokenPair(req.client, user, this);
         },
@@ -841,7 +890,7 @@ var postToInbox = function(req, res, next) {
     );
 };
 
-var newActivity = function(activity, user, callback) {
+var initActivity = function(activity, callback) {
 
     Step(
         function() {
@@ -851,7 +900,7 @@ var newActivity = function(activity, user, callback) {
         function(err) {
             if (err) throw err;
             // First, apply the activity
-            activity.apply(user.profile, this);
+            activity.apply(null, this);
         },
         function(err) {
             if (err) {
@@ -871,6 +920,26 @@ var newActivity = function(activity, user, callback) {
             }
             // ...then persist...
             activity.save(this);
+        },
+        function(err, saved) {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, activity);
+            }
+        }
+    );
+};
+
+var newActivity = function(activity, user, callback) {
+
+    if (!_(activity).has("actor")) {
+        activity.actor = user.profile;
+    }
+
+    Step(
+        function() {
+            initActivity(activity, this);
         },
         function(err, saved) {
             if (err) throw err;
