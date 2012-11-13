@@ -137,6 +137,26 @@
         }
     });
 
+    var UserMajorStream = ActivityStream.extend({
+        user: null,
+        initialize: function(models, options) {
+            this.user = options.user;
+        },
+        url: function() {
+            return "/api/user/" + this.user.get("nickname") + "/feed/major";
+        }
+    });
+
+    var UserMinorStream = ActivityStream.extend({
+        user: null,
+        initialize: function(models, options) {
+            this.user = options.user;
+        },
+        url: function() {
+            return "/api/user/" + this.user.get("nickname") + "/feed/minor";
+        }
+    });
+
     var UserInbox = ActivityStream.extend({
         user: null,
         initialize: function(models, options) {
@@ -190,6 +210,12 @@
         },
         getStream: function() {
             return new UserStream([], {user: this});
+        },
+        getMajorStream: function() {
+            return new UserMajorStream([], {user: this});
+        },
+        getMinorStream: function() {
+            return new UserMinorStream([], {user: this});
         },
         getInbox: function() {
             return new UserInbox([], {user: this});
@@ -481,7 +507,7 @@
     });
 
     var UserPageContent = TemplateView.extend({
-        templateName: 'user-page-content',
+        templateName: 'user',
         el: '#content'
     });
 
@@ -562,14 +588,20 @@
 
         profile: function(nickname) {
             var user = new User({nickname: nickname}),
-                stream = user.getStream();
+                major = user.getMajorStream(),
+                minor = user.getMinorStream();
+
+            // XXX: parallelize this?
 
             user.fetch({success: function(user, response) {
-                stream.fetch({success: function(stream, response) {
-                    var content = new UserPageContent({model: {actor: user.toJSON(),
-                                                               stream: stream.toJSON()}});
-
-                    content.render();
+                major.fetch({success: function(major, response) {
+                    minor.fetch({success: function(minor, response) {
+                        var profile = user.get("profile"),
+                            content = new UserPageContent({model: {profile: profile,
+                                                                   major: major.toJSON(),
+                                                                   minor: minor.toJSON()}});
+                        content.render();
+                    }});
                 }});
             }});
         },
@@ -739,7 +771,7 @@
         nav = new AnonymousNav({el: ".navbar-inner .container"});
 
         ensureCred(function(err, cred) {
-            var user, nickname;
+            var user, nickname, pair;
 
             if (err) {
                 console.log(err.message);
@@ -760,16 +792,27 @@
                                            model: {user: currentUser.toJSON()}});
                     nav.render();
                 }});
+
+                // Re-navigate since we've got credentials
+
+                pump.navigate(window.location.pathname, true);
             }
         });
+
+        // Initialize a view for the current content. Not crazy about this.
 
         if ($("#content #login").length > 0) {
             content = new LoginContent();
         } else if ($("#content #registration").length > 0) {
             content = new RegisterContent();
+        } else if ($("#content #user").length > 0) {
+            content = new UserPageContent({});
+        } else if ($("#content #inbox").length > 0) {
+            content = new InboxContent({});
         }
-        
+
         Backbone.history.start({pushState: true, silent: true});
+
     });
 
 })(window.jQuery, window.Backbone);
