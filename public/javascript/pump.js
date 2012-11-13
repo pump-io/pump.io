@@ -297,6 +297,10 @@
 
                     an = new AnonymousNav({el: ".navbar-inner .container", model: {site: config.site}});
                     an.render();
+
+                    // Reload to clear authenticated stuff
+
+                    pump.navigate(window.location.pathname+"?logout=true", true);
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     showError(errorThrown);
@@ -359,11 +363,12 @@
                     setUserCred(data.token, data.secret);
                     currentUser = new User(data);
                     nav = new UserNav({el: ".navbar-inner .container",
-                                       model: {user: currentUser.toJSON()}});
+                                       model: {site: config.site,
+                                               user: currentUser.toJSON()}});
                     nav.render();
                     // XXX: reload current data
                     view.$(':submit').spin(false);
-                    pump.navigate(data.nickname + "/inbox", true);
+                    pump.navigate("", true);
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     view.$(':submit').prop('disabled', false).spin(false);
@@ -434,12 +439,13 @@
                     setNickname(data.nickname);
                     setUserCred(data.token, data.secret);
                     currentUser = new User(data);
-                    nav = new UserNav({el: ".navbar-inner .container", model: {user: currentUser.toJSON()}});
+                    nav = new UserNav({el: ".navbar-inner .container", model: {site: config.site,
+                                                                               user: currentUser.toJSON()}});
                     nav.render();
                     // Leave disabled
                     view.$(':submit').spin(false);
                     // XXX: one-time on-boarding page
-                    pump.navigate(data.nickname + "/inbox", true);
+                    pump.navigate("", true);
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     view.$(':submit').prop("disabled", false).spin(false);
@@ -553,7 +559,7 @@
     var Pump = Backbone.Router.extend({
 
         routes: {
-            "":                       "public",    
+            "":                       "home",    
             ":nickname":              "profile",   
             ":nickname/inbox":        "inbox",  
             ":nickname/activity/:id": "activity",
@@ -580,10 +586,30 @@
             content.render();
         },
 
-        "public": function() {
-            var content = new MainContent({model: {site: config.site}});
+        "home": function() {
+            var pair = getUserCred();
 
-            content.render();
+            if (pair) {
+                var user = currentUser,
+                    major = user.getMajorInbox(),
+                    minor = user.getMinorInbox();
+
+                // XXX: parallelize
+
+                user.fetch({success: function(user, response) {
+                    major.fetch({success: function(major, response) {
+                        minor.fetch({success: function(minor, response) {
+                            var content = new InboxContent({model: {user: user.toJSON(),
+                                                                    major: major.toJSON(),
+                                                                    minor: minor.toJSON()}});
+                            content.render();
+                        }});
+                    }});
+                }});
+            } else {
+                var content = new MainContent({model: {site: config.site}});
+                content.render();
+            }
         },
 
         profile: function(nickname) {
@@ -607,23 +633,6 @@
         },
 
         inbox: function(nickname) {
-            var user = new User({nickname: nickname}),
-                major = user.getMajorInbox(),
-                minor = user.getMinorInbox();
-
-            // XXX: parallelize
-
-            user.fetch({success: function(user, response) {
-                major.fetch({success: function(major, response) {
-                    minor.fetch({success: function(minor, response) {
-                        var content = new InboxContent({model: {user: user.toJSON(),
-                                                                major: major.toJSON(),
-                                                                minor: minor.toJSON()
-                                                               }});
-                        content.render();
-                    }});
-                }});
-            }});
         },
 
         activity: function(nickname, id) {
@@ -789,7 +798,8 @@
                 user.fetch({success: function(user, response) {
                     currentUser = user;
                     var nav = new UserNav({el: ".navbar-inner .container",
-                                           model: {user: currentUser.toJSON()}});
+                                           model: {site: config.site,
+                                                   user: currentUser.toJSON()}});
                     nav.render();
                 }});
 

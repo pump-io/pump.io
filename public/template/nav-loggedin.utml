@@ -1,4 +1,4 @@
-<a class="brand" href="/<%- user.nickname %>/inbox">ActivityPump</a>
+<a class="brand" href="/"><%- site %></a>
 
 <ul class="nav pull-right">
   <li id="fat-menu" class="dropdown">
