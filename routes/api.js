@@ -612,6 +612,19 @@ var createUser = function(req, res, next) {
             str.deliver(user.nickname, this);
         },
         function(err) {
+	    var act;
+            if (err) throw err;
+	    act = new Activity({
+		actor: user.profile,
+		verb: Activity.JOIN,
+		object: {
+		    objectType: ActivityObject.SERVICE,
+		    url: URLMaker.makeURL("")
+		}
+            });
+	    newActivity(act, user, this);
+        },
+        function(err, act) {
             if (err) throw err;
             req.app.provider.newTokenPair(req.client, user, this);
         },
