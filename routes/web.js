@@ -20,6 +20,8 @@ var databank = require("databank"),
     url = require("url"),
     Step = require("step"),
     _ = require("underscore"),
+    FilteredStream = require("../lib/filteredstream").FilteredStream,
+    publicOnly = require("../lib/filters").publicOnly,
     Activity = require("../lib/model/activity").Activity,
     AccessToken = require("../lib/model/accesstoken").AccessToken,
     User = require("../lib/model/user").User,
@@ -149,16 +151,30 @@ var showStream = function(req, res, next) {
 
     Step(
         function() {
-            req.user.getStream(0, 20, this);
+            req.user.getMajorOutboxStream(this.parallel());
+            req.user.getMinorOutboxStream(this.parallel());
         },
-        function(err, activities) {
+        function(err, majorStream, minorStream) {
+            var majorFiltered, minorFiltered;
+            if (err) throw err;
+            majorFiltered = new FilteredStream(majorStream, publicOnly);
+            minorFiltered = new FilteredStream(majorStream, publicOnly);
+            majorFiltered.getIDs(0, 20, this.parallel());
+            minorFiltered.getIDs(0, 20, this.parallel());
+        },
+        function(err, majorIDs, minorIDs) {
+            if (err) throw err;
+            Activity.readAll(majorIDs, this.parallel());
+            Activity.readAll(minorIDs, this.parallel());
+        },
+        function(err, majorActivities, minorActivities) {
             if (err) {
                 next(err);
             } else {
                 res.render("user", {title: req.user.nickname,
-                                    user: req.remoteUser,
-                                    actor: req.user.profile,
-                                    activities: activities});
+                                    profile: req.user.profile,
+                                    major: majorActivities,
+                                    minor: minorActivities});
             }
         }
     );

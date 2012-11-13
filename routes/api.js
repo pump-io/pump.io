@@ -23,6 +23,9 @@ var databank = require("databank"),
     check = validator.check,
     sanitize = validator.sanitize,
     FilteredStream = require("../lib/filteredstream").FilteredStream,
+    filters = require("../lib/filters"),
+    recipientsOnly = filters.recipientsOnly,
+    publicOnly = filters.publicOnly,
     HTTPError = require("../lib/httperror").HTTPError,
     Stamper = require("../lib/stamper").Stamper,
     Activity = require("../lib/model/activity").Activity,
@@ -871,25 +874,6 @@ var newActivity = function(activity, user, callback) {
         }
     );
 };
-
-var recipientsOnly = function(person) {
-    return function(id, callback) {
-        Step(
-            function() {
-                Activity.get(id, this);
-            },
-            function(err, act) {
-                if (err) throw err;
-                act.checkRecipient(person, this);
-            },
-            callback
-        );
-    };
-};
-
-// Just do this one once
-
-var publicOnly = recipientsOnly(null);
 
 var filteredFeedRoute = function(urlmaker, titlemaker, streammaker) {
 
