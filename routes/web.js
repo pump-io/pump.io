@@ -52,7 +52,6 @@ var addRoutes = function(app) {
 
     app.get("/:nickname/activity/:uuid", reqUser, showActivity);
 
-    app.get("/:nickname/inbox", reqUser, sameUser, showInbox);
     app.get("/main/settings", showSettings);
 };
 
@@ -123,24 +122,6 @@ var showActivity = function(req, res, next) {
                 res.render("activity", {title: "Welcome",
                                         user: req.remoteUser,
                                         activity: activity});
-            }
-        }
-    );
-};
-
-var showInbox = function(req, res, next) {
-
-    Step(
-        function() {
-            req.user.getInbox(0, 20, this);
-        },
-        function(err, activities) {
-            if (err) {
-                next(err);
-            } else {
-                res.render("inbox", {title: "Inbox",
-                                     user: req.remoteUser,
-                                     activities: activities});
             }
         }
     );
