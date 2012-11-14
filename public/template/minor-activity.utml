@@ -1,5 +1,5 @@
 <div class="row">
   <div class="span3">
-    <p><small><%= activity.content %></small></p>
+    <p><small><%= content %></small></p>
   </div>
 </div>
