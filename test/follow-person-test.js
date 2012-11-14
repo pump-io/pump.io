@@ -317,10 +317,10 @@ suite.addBatch({
                     assert.isObject(inbox);
                     assert.include(inbox, "totalItems");
                     assert.isNumber(inbox.totalItems);
-                    assert.equal(inbox.totalItems, 2);
+                    assert.equal(inbox.totalItems, 4);
                     assert.include(inbox, "items");
                     assert.isArray(inbox.items);
-                    assert.lengthOf(inbox.items, 2);
+                    assert.lengthOf(inbox.items, 4);
                     assert.isObject(inbox.items[0]);
                     assert.include(inbox.items[0], "id");
                     assert.isObject(postnote);
@@ -410,7 +410,7 @@ suite.addBatch({
                         assert.isObject(feed);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 1);
+                        assert.lengthOf(feed.items, 2);
                         assert.isObject(feed.items[0]);
                         assert.include(feed.items[0], "verb");
                         assert.equal("follow", feed.items[0].verb);
