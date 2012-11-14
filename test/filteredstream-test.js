@@ -517,7 +517,6 @@ suite.addBatch({
                                 assert.ifError(err);
                                 assert.isArray(people);
                                 assert.lengthOf(people, 10);
-                                console.dir(people);
                                 for (i = 0; i < 10; i++) {
                                     assert.equal(people[i].gender, "f");
                                 }
