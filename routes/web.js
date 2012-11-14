@@ -165,8 +165,8 @@ var showStream = function(req, res, next) {
         helperNames = {"profileBlock": "profile-block",
                        "majorStream": "major-stream",
                        "sidebar": "sidebar",
-                       "majorActivity": "major-activity",
-                       "minorActivity": "minor-activity"},
+                       "majorActivity": "major-activity-headless",
+                       "minorActivity": "minor-activity-headless"},
         getFiltered = function(stream, filter, start, end, callback) {
             var filtered = new FilteredStream(stream, filter);
             Step(

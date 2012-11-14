@@ -556,8 +556,8 @@
         parts: {profileBlock: "profile-block",
                 majorStream: "major-stream",
                 sidebar: "sidebar",
-                majorActivity: "major-activity",
-                minorActivity: "minor-activity"
+                majorActivity: "major-activity-headless",
+                minorActivity: "minor-activity-headless"
                },
         el: '#content'
     });
