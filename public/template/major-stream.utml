@@ -1,0 +1,10 @@
+<div class="span9" id="major-stream">
+  <% if (major && major.length) { %>
+  <% _.each(major, function(activity) { %>
+  <%= majorActivity(activity, _) %>
+  <% }); %>
+  <% } else { %>
+  <p>No content!</p>
+  <% } %>
+</div>
+

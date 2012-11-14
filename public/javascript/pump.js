@@ -234,35 +234,74 @@
 
     var TemplateView = Backbone.View.extend({
         templateName: null,
+        parts: null,
         render: function() {
-            var name = this.templateName,
-                url = '/template/'+name+'.utml',
-                view = this,
-                json = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model),
-                runTemplate = function() {
-                    var template, html;
-                    try {
-                        template = templates[name];
-                        html = template(json);
-                        $(view.el).html(html);
-                    } catch (err) {
-                        pumpError(err);
+            var view = this,
+                getTemplate = function(name, cb) {
+                    var url;
+                    if (_.has(templates, name)) {
+                        cb(null, templates[name]);
+                    } else {
+                        $.get('/template/'+name+'.utml', function(data) {
+                            var f;
+                            try {
+                                f = _.template(data);
+                                templates[name] = f;
+                            } catch (err) {
+                                cb(err, null);
+                                return;
+                            }
+                            cb(null, f);
+                        });
                     }
-                };
-            if (!templates[name]) {
-                $.get(url, function(data) {
-                    var f;
+                },
+                runTemplate = function(template, data, cb) {
+                    var html;
                     try {
-                        f = _.template(data);
-                        templates[name] = f;
+                        html = template(data);
                     } catch (err) {
-                        pumpError(err);
+                        cb(err, null);
                         return;
                     }
-                    runTemplate();
+                    cb(null, html);
+                },
+                setOutput = function(err, html) {
+                    if (err) {
+                        pumpError(err);
+                    } else {
+                        $(view.el).html(html);
+                    }
+                },
+                base = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model),
+                main = _.clone(base),
+                pc,
+                cnt;
+
+            // If there are sub-parts, we do them in parallel then
+            // do the main one. Note: only one level.
+
+            if (view.parts) {
+                pc = 0;
+                cnt = _.keys(view.parts).length;
+                _.each(view.parts, function(templateName, partName) {
+                    getTemplate(templateName, function(err, template) {
+                        if (err) {
+                            pumpError(err);
+                        } else {
+                            pc++;
+                            main[partName] = template;
+                            if (pc >= cnt) {
+                                getTemplate(view.templateName, function(err, template) {
+                                    runTemplate(template, main, setOutput);
+                                });
+                            }
+                        }
+                    });
                 });
             } else {
-                runTemplate();
+                getTemplate(view.templateName, function(err, template) {
+                    runTemplate(template, main, setOutput);
+                });
             }
             return this;
         }
@@ -514,6 +553,12 @@
 
     var UserPageContent = TemplateView.extend({
         templateName: 'user',
+        parts: {profileBlock: "profile-block",
+                majorStream: "major-stream",
+                sidebar: "sidebar",
+                majorActivity: "major-activity",
+                minorActivity: "minor-activity"
+               },
         el: '#content'
     });
 

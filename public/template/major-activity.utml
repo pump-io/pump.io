@@ -1,0 +1,22 @@
+<div class="row">
+  <div class="row">
+    <div class="span8 offset1">
+      <% if (object.title) { %>
+      <h2><%- object.title %></h2>
+      <% } else { %>
+      <%= object.content %>
+      <% } %>
+      <p><small><a href="<%- actor.url %>"><%- actor.displayName %></a> at <a href="<%- url %>"><%- published %></a><% if (location) { %> in <a href="<%- location.url %>"><%- location.displayName %></a><% } %></small></p>
+    </div>
+    <div class="row">
+      <div class="span8 offset1">
+        <% if (object.title) { %>
+        <%= object.content %>
+        <% } %>
+        <div>
+	  <p><a href="#">Like</a> • <a href="#">Comment</a> • <a href="#">Share</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

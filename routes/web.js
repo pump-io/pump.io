@@ -18,6 +18,8 @@
 
 var databank = require("databank"),
     url = require("url"),
+    path = require("path"),
+    fs = require("fs"),
     Step = require("step"),
     _ = require("underscore"),
     FilteredStream = require("../lib/filteredstream").FilteredStream,
@@ -127,38 +129,118 @@ var showActivity = function(req, res, next) {
     );
 };
 
-var showStream = function(req, res, next) {
-    var pump = this;
+var templates = {};
+
+var compileTemplate = function(name, callback) {
+
+    if (_.has(templates, name)) {
+        callback(null, templates[name]);
+        return;
+    }
 
     Step(
         function() {
-            req.user.getMajorOutboxStream(this.parallel());
-            req.user.getMinorOutboxStream(this.parallel());
+            var filename = path.join(__dirname, "..", "public", "template", name + ".utml");
+            fs.readFile(filename, this);
         },
-        function(err, majorStream, minorStream) {
-            var majorFiltered, minorFiltered;
-            if (err) throw err;
-            majorFiltered = new FilteredStream(majorStream, publicOnly);
-            minorFiltered = new FilteredStream(majorStream, publicOnly);
-            majorFiltered.getIDs(0, 20, this.parallel());
-            minorFiltered.getIDs(0, 20, this.parallel());
-        },
-        function(err, majorIDs, minorIDs) {
-            if (err) throw err;
-            Activity.readAll(majorIDs, this.parallel());
-            Activity.readAll(minorIDs, this.parallel());
-        },
-        function(err, majorActivities, minorActivities) {
+        function(err, data) {
+            var fn;
             if (err) {
-                next(err);
+                callback(err, null);
             } else {
-                res.render("user", {title: req.user.nickname,
-                                    profile: req.user.profile,
-                                    major: majorActivities,
-                                    minor: minorActivities});
+                try {
+                    fn = _.template(data.toString());
+                    templates[name] = fn;
+                    callback(null, fn);
+                } catch (e) {
+                    callback(e, null);
+                }
             }
         }
     );
+};
+
+var showStream = function(req, res, next) {
+    var pump = this,
+        helperNames = {"profileBlock": "profile-block",
+                       "majorStream": "major-stream",
+                       "sidebar": "sidebar",
+                       "majorActivity": "major-activity",
+                       "minorActivity": "minor-activity"},
+        getFiltered = function(stream, filter, start, end, callback) {
+            var filtered = new FilteredStream(stream, filter);
+            Step(
+                function() {
+                    filtered.getIDs(0, 20, this);
+                },
+                function(err, ids) {
+                    if (err) throw err;
+                    Activity.readAll(ids, this);
+                },
+                function(err, activities) {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        callback(null, activities);
+                    }
+                }
+            );
+        },
+        getData = function(callback) {
+            Step(
+                function() {
+                    req.user.getMajorOutboxStream(this.parallel());
+                    req.user.getMinorOutboxStream(this.parallel());
+                },
+                function(err, majorStream, minorStream) {
+                    if (err) throw err;
+                    getFiltered(majorStream, publicOnly, 0, 20, this.parallel());
+                    getFiltered(minorStream, publicOnly, 0, 20, this.parallel());
+                },
+                function(err, majorActivities, minorActivities) {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        callback(null, {major: majorActivities,
+                                        minor: minorActivities,
+                                        profile: req.user.profile});
+                    }
+                }
+            );
+        },
+        getHelpers = function(helpers, callback) {
+            Step(
+                function() {
+                    var group = this.group();
+                    _.each(helpers, function(templateName) {
+                        compileTemplate(templateName, group());
+                    });
+                },
+                function(err, functions) {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        callback(null, _.object(_.keys(helpers), functions));
+                    }
+                }
+            );
+        };
+
+        Step(
+            function() {
+                getData(this.parallel());
+                getHelpers(helperNames, this.parallel());
+            },
+            function(err, data, helpers) {
+                if (err) {
+                    next(err);
+                } else {
+                    res.render("user", _.extend({title: req.user.nickname},
+                                                data,
+                                                helpers));
+                }
+            }
+        );
 };
 
 var handleLogin = function(req, res, next) {
