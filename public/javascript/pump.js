@@ -564,6 +564,11 @@
 
     var InboxContent = TemplateView.extend({
         templateName: 'inbox',
+        parts: {majorStream: "major-stream",
+                sidebar: "sidebar",
+                majorActivity: "major-activity",
+                minorActivity: "minor-activity"
+               },
         el: '#content'
     });
 

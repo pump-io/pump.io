@@ -1,57 +1,6 @@
 <div class="inbox">
   <div class="row">
-    <div class="span9" id="major-stream">
-      <% if (major && major.length) { %>
-      <% _.each(major, function(activity) { %>
-      <div class="row">
-        <div class="span1">
-          <% if (activity.actor.image && activity.actor.image.url) { %>
-          <img src="<%- activity.actor.image.url %>" width="40" height="40" />
-          <% } else { %>
-          <img src="/images/default.jpg" width="40" height="40" />
-          <% } %>
-        </div>
-        <div class="span8">
-          <% if (activity.object.title) { %>
-          <h2><%- activity.object.title %></h2>
-          <% } else { %>
-          <%= activity.object.content %>
-          <% } %>
-	  <p><small><a href="<%- activity.actor.url %>"><%- activity.actor.displayName %></a> at <a href="<%- activity.url %>"><%- activity.published %></a><% if (activity.location) { %> in <a href="<%- activity.location.url %>"><%- activity.location.displayName %></a><% } %></small></p>
-        </div>
-        <div class="row">
-          <div class="span8 offset1">
-            <% if (activity.object.title) { %>
-            <%= activity.object.content %>
-            <% } %>
-	    <div>
-	      <p><a href="#">Like</a> • <a href="#">Comment</a> • <a href="#">Share</a></p>
-	    </div>
-          </div>
-          <% }); %>
-          <% } else { %>
-          <p>No content!</p>
-          <% } %>
-        </div>
-      </div>
-    </div>
-    <div class="span3" id="sidebar">
-      <% if (minor && minor.length) { %>
-      <% _.each(minor, function(activity) { %>
-      <div class="row">
-        <div class="span1">
-          <% if (activity.actor.image && activity.actor.image.url) { %>
-          <img src="<%- activity.actor.image.url %>" width="40" height="40" />
-          <% } else { %>
-          <img src="/images/default.jpg" width="40" height="40" />
-          <% } %>
-        </div>
-	<div class="span2">
-	  <p><small><%= activity.content %></small></p>
-	</div>
-      </div>
-      <% }); %>
-      <% } %>
-    </div>
+    <%= majorStream(obj, _) %>
+    <%= sidebar(obj, _) %>
   </div>
 </div>

@@ -160,6 +160,44 @@ var compileTemplate = function(name, callback) {
     );
 };
 
+var getFiltered = function(stream, filter, start, end, callback) {
+    var filtered = new FilteredStream(stream, filter);
+    Step(
+        function() {
+            filtered.getIDs(0, 20, this);
+        },
+        function(err, ids) {
+            if (err) throw err;
+            Activity.readAll(ids, this);
+        },
+        function(err, activities) {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, activities);
+            }
+        }
+    );
+};
+
+var getHelpers = function(helpers, callback) {
+    Step(
+        function() {
+            var group = this.group();
+            _.each(helpers, function(templateName) {
+                compileTemplate(templateName, group());
+            });
+        },
+        function(err, functions) {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, _.object(_.keys(helpers), functions));
+            }
+        }
+    );
+};
+
 var showStream = function(req, res, next) {
     var pump = this,
         helperNames = {"profileBlock": "profile-block",
@@ -167,25 +205,6 @@ var showStream = function(req, res, next) {
                        "sidebar": "sidebar",
                        "majorActivity": "major-activity-headless",
                        "minorActivity": "minor-activity-headless"},
-        getFiltered = function(stream, filter, start, end, callback) {
-            var filtered = new FilteredStream(stream, filter);
-            Step(
-                function() {
-                    filtered.getIDs(0, 20, this);
-                },
-                function(err, ids) {
-                    if (err) throw err;
-                    Activity.readAll(ids, this);
-                },
-                function(err, activities) {
-                    if (err) {
-                        callback(err, null);
-                    } else {
-                        callback(null, activities);
-                    }
-                }
-            );
-        },
         getData = function(callback) {
             Step(
                 function() {
@@ -207,40 +226,23 @@ var showStream = function(req, res, next) {
                     }
                 }
             );
-        },
-        getHelpers = function(helpers, callback) {
-            Step(
-                function() {
-                    var group = this.group();
-                    _.each(helpers, function(templateName) {
-                        compileTemplate(templateName, group());
-                    });
-                },
-                function(err, functions) {
-                    if (err) {
-                        callback(err, null);
-                    } else {
-                        callback(null, _.object(_.keys(helpers), functions));
-                    }
-                }
-            );
         };
 
-        Step(
-            function() {
-                getData(this.parallel());
-                getHelpers(helperNames, this.parallel());
-            },
-            function(err, data, helpers) {
-                if (err) {
-                    next(err);
-                } else {
-                    res.render("user", _.extend({title: req.user.nickname},
-                                                data,
-                                                helpers));
-                }
+    Step(
+        function() {
+            getData(this.parallel());
+            getHelpers(helperNames, this.parallel());
+        },
+        function(err, data, helpers) {
+            if (err) {
+                next(err);
+            } else {
+                res.render("user", _.extend({title: req.user.nickname},
+                                            data,
+                                            helpers));
             }
-        );
+        }
+    );
 };
 
 var handleLogin = function(req, res, next) {
