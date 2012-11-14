@@ -583,11 +583,12 @@ var usersStream = function(callback) {
     );
 };
 
-var thisService = function() {
-    return {
-	objectType: ActivityObject.SERVICE,
-	url: URLMaker.makeURL("")
-    };
+var thisService = function(app) {
+    var Service = require("../lib/model/service").Service;
+    return new Service({
+	url: URLMaker.makeURL("/"),
+        displayName: app.config.site || "pump.io"
+    });
 };
 
 var createUser = function(req, res, next) {
@@ -613,7 +614,7 @@ var createUser = function(req, res, next) {
                 function(err, text) {
                     if (err) throw err;
 	            var act = new Activity({
-		        actor: thisService(),
+		        actor: svc,
 		        verb: Activity.POST,
                         to: [user.profile],
 		        object: {
@@ -661,7 +662,7 @@ var createUser = function(req, res, next) {
         function(err) {
             var svc;
             if (err) throw err;
-            svc = thisService();
+            svc = thisService(req.app);
             registrationActivity(user, svc, this.parallel());
             welcomeActivity(user, svc, this.parallel());
         },
