@@ -604,7 +604,7 @@ suite.addBatch({
                         assert.isObject(feed);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 1);
+                        assert.lengthOf(feed.items, 2);
                         assert.isObject(feed.items[0]);
                         assert.include(feed.items[0], "verb");
                         assert.equal("favorite", feed.items[0].verb);
