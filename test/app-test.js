@@ -75,6 +75,11 @@ suite.addBatch({
         "app has the run() method": function(err, app) {
             assert.isFunction(app.run);
         },
+        "app has the config property": function(err, app) {
+            assert.isObject(app.config);
+            assert.include(app.config, "hostname");
+            assert.equal(app.config.hostname, "localhost");
+        },
         "and we app.run()": {
             topic: function(app) {
                 var cb = this.callback;
