@@ -1,4 +1,4 @@
-// default-recipient-test.js
+// restricted-post-test.js
 //
 // Test setting default recipients for an activity
 //
@@ -235,7 +235,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 1);
+                        assert.lengthOf(feed.items, 2);
                         assert.equal(feed.items[0].id, act.id);
                     }
                 },
@@ -256,7 +256,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(inbox, "items");
                         assert.isArray(inbox.items);
-                        assert.lengthOf(inbox.items, 2);
+                        assert.lengthOf(inbox.items, 4);
                         assert.equal(inbox.items[0].id, act.id);
                     }
                 },
@@ -360,7 +360,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(inbox, "items");
                         assert.isArray(inbox.items);
-                        assert.lengthOf(inbox.items, 1);
+                        assert.lengthOf(inbox.items, 3);
                         assert.equal(inbox.items[0].id, act.id);
                     }
                 },
@@ -461,7 +461,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 0);
+                        assert.lengthOf(feed.items, 1);
                     }
                 },
                 "and a follower reads their own inbox": {
@@ -481,8 +481,8 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(inbox, "items");
                         assert.isArray(inbox.items);
-                        // should be the follow activity
-                        assert.lengthOf(inbox.items, 1);
+                        // should be the follow activity, welcome note, reg activity
+                        assert.lengthOf(inbox.items, 3);
                         assert.notEqual(inbox.items[0].id, act.id);
                     }
                 },
@@ -749,7 +749,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 1);
+                        assert.lengthOf(feed.items, 2);
                         assert.equal(feed.items[0].id, act.id);
                     }
                 },
@@ -770,7 +770,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(inbox, "items");
                         assert.isArray(inbox.items);
-                        assert.lengthOf(inbox.items, 2);
+                        assert.lengthOf(inbox.items, 4);
                         assert.equal(inbox.items[0].id, act.id);
                     }
                 },
@@ -874,7 +874,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(inbox, "totalItems");
                         assert.isNumber(inbox.totalItems);
-                        assert.equal(inbox.totalItems, 0);
+                        assert.equal(inbox.totalItems, 2);
                     }
                 },
                 "and a follower reads the activity": {
@@ -956,7 +956,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 1);
+                        assert.lengthOf(feed.items, 2);
                         assert.equal(feed.items[0].id, act.id);
                     }
                 },
@@ -977,7 +977,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 2);
+                        assert.lengthOf(feed.items, 4);
                         assert.equal(feed.items[0].id, act.id);
                     }
                 },
