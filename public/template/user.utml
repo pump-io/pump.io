@@ -58,17 +58,17 @@
           <% } %>
         </div>
       </div>
-      <div class="span3" id="sidebar">
-        <% if (minor && minor.length) { %>
-        <% _.each(minor, function(activity) { %>
-	<div class="row">
-	  <div class="span3">
-	    <p><small><%= activity.content %></small></p>
-	  </div>
+    </div>
+    <div class="span3" id="sidebar">
+      <% if (minor && minor.length) { %>
+      <% _.each(minor, function(activity) { %>
+      <div class="row">
+	<div class="span3">
+	  <p><small><%= activity.content %></small></p>
 	</div>
-        <% }); %>
-        <% } %>
       </div>
+      <% }); %>
+      <% } %>
     </div>
   </div>
 </div>
