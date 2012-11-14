@@ -35,6 +35,35 @@ var ignore = function(err) {};
 
 var suite = vows.describe("User stream API test");
 
+var sizeFeed = function(endpoint, size) {
+    return {
+        topic: function(cred) {
+            var full = "http://localhost:4815" + endpoint,
+                callback = this.callback;
+
+            httputil.getJSON(full, cred, callback);
+        },
+        "it works": function(err, feed, resp) {
+            assert.ifError(err);
+        },
+        "it looks like a feed": function(err, feed, resp) {
+            assert.ifError(err);
+            assert.isObject(feed);
+            assert.include(feed, "totalItems");
+            assert.include(feed, "items");
+        },
+        "it is empty": function(err, feed, resp) {
+            assert.ifError(err);
+            assert.isObject(feed);
+            assert.include(feed, "totalItems");
+            assert.equal(feed.totalItems, size);
+            assert.include(feed, "items");
+            assert.isArray(feed.items);
+            assert.equal(feed.items.length, size);
+        }
+    };
+};
+
 var emptyFeed = function(endpoint) {
     return {
         topic: function(cred) {
@@ -109,23 +138,23 @@ suite.addBatch({
             "and we check the direct major inbox endpoint": 
             httputil.endpoint("/api/user/bigredchicken/inbox/direct/major", ["GET"]),
             "and we get the feed of a new user": 
-            emptyFeed("/api/user/bigredchicken/feed"),
+            sizeFeed("/api/user/bigredchicken/feed", 1),
             "and we get the minor feed of a new user": 
-            emptyFeed("/api/user/bigredchicken/feed/minor"),
+            sizeFeed("/api/user/bigredchicken/feed/minor", 1),
             "and we get the major feed of a new user": 
             emptyFeed("/api/user/bigredchicken/feed/major"),
             "and we get the inbox of a new user": 
-            emptyFeed("/api/user/bigredchicken/inbox"),
+            sizeFeed("/api/user/bigredchicken/inbox", 2),
             "and we get the minor inbox of a new user": 
-            emptyFeed("/api/user/bigredchicken/inbox/minor"),
+            sizeFeed("/api/user/bigredchicken/inbox/minor", 1),
             "and we get the major inbox of a new user": 
-            emptyFeed("/api/user/bigredchicken/inbox/major"),
+            sizeFeed("/api/user/bigredchicken/inbox/major", 1),
             "and we get the direct inbox of a new user": 
-            emptyFeed("/api/user/bigredchicken/inbox/direct"),
+            sizeFeed("/api/user/bigredchicken/inbox/direct", 1),
             "and we get the direct minor inbox of a new user": 
             emptyFeed("/api/user/bigredchicken/inbox/direct/minor"),
             "and we get the direct major inbox of a new user": 
-            emptyFeed("/api/user/bigredchicken/inbox/direct/major")
+            sizeFeed("/api/user/bigredchicken/inbox/direct/major", 1)
         },
         "and we get more new credentials": {
             topic: function() {
@@ -149,8 +178,8 @@ suite.addBatch({
                                 content: "Hello, world!"
                             }
                         };
-                    httputil.postJSON("http://localhost:4815/api/user/dora/feed", cred, act, function(err, feed, result) {
-                        cb(err, feed);
+                    httputil.postJSON("http://localhost:4815/api/user/dora/feed", cred, act, function(err, act, result) {
+                        cb(err, act);
                     });
                 },
                 "it works": function(err, act) {
@@ -209,8 +238,8 @@ suite.addBatch({
                         assert.isObject(res);
                         assert.include(res, "feed");
                         var feed = res.feed;
-                        assert.equal(feed.totalItems, 1);
-                        assert.lengthOf(feed.items, 1);
+                        assert.equal(feed.totalItems, 2);
+                        assert.equal(feed.items.length, 2);
                     },
                     "it has our activity": function(err, res) {
                         assert.isObject(res);
@@ -249,12 +278,12 @@ suite.addBatch({
                         assert.include(inbox, "objectTypes");
                         assert.include(inbox.objectTypes, "activity");
                     },
-                    "it has one item": function(err, res) {
+                    "it has three items": function(err, res) {
                         assert.isObject(res);
                         assert.include(res, "inbox");
                         var inbox = res.inbox;
-                        assert.equal(inbox.totalItems, 1);
-                        assert.lengthOf(inbox.items, 1);
+                        assert.equal(inbox.totalItems, 3);
+                        assert.equal(inbox.items.length, 3);
                     },
                     "it has our activity": function(err, res) {
                         assert.isObject(res);
@@ -514,7 +543,7 @@ var validForm = function(count, total) {
         assert.include(doc, "id");
         assert.include(doc, "url");
         if (_(count).isNumber()) {
-            assert.lengthOf(doc.items, count);
+            assert.equal(doc.items.length, count);
         }
         if (_(total).isNumber()) {
             assert.equal(doc.totalItems, total);
@@ -539,92 +568,95 @@ var validData = function(start, end) {
 
 // Workout a feed endpoint
 
-var workout = function(endpoint) {
+var workout = function(endpoint, total) {
+    if (!total) {
+        total = 101;
+    }
     return {
         "and we get the default feed": {
             topic: getDoc(endpoint),
             "it works": itWorks,
-            "it looks right": validForm(20, 100)
+            "it looks right": validForm(20, total)
         },
         "and we get the full feed": {
-            topic: getDoc(endpoint + "?count=100"),
+            topic: getDoc(endpoint + "?count="+total),
             "it works": itWorks,
-            "it looks right": validForm(100, 100),
+            "it looks right": validForm(total, total),
             "and we get the feed with a non-zero offset": {
                 topic: cmpDoc(endpoint + "?offset=50"),
                 "it works": itWorks,
-                "it looks right": validForm(20, 100),
+                "it looks right": validForm(20, total),
                 "it has the right data": validData(50, 70)
             },
             "and we get the feed with a zero offset": {
                 topic: cmpDoc(endpoint + "?offset=0"),
                 "it works": itWorks,
-                "it looks right": validForm(20, 100),
+                "it looks right": validForm(20, total),
                 "it has the right data": validData(0, 20)
             },
             "and we get the feed with a non-zero offset and count": {
                 topic: cmpDoc(endpoint + "?offset=20&count=20"),
                 "it works": itWorks,
-                "it looks right": validForm(20, 100),
+                "it looks right": validForm(20, total),
                 "it has the right data": validData(20, 40)
             },
             "and we get the feed with a zero offset and count": {
                 topic: cmpDoc(endpoint + "?offset=0"),
                 "it works": itWorks,
-                "it looks right": validForm(20, 100),
+                "it looks right": validForm(20, total),
                 "it has the right data": validData(0, 20)
             },
             "and we get the feed with a non-zero count": {
                 topic: cmpDoc(endpoint + "?count=50"),
                 "it works": itWorks,
-                "it looks right": validForm(50, 100),
+                "it looks right": validForm(50, total),
                 "it has the right data": validData(0, 50)
             },
             "and we get the feed since a value": {
                 topic: cmpSince(endpoint, 25),
                 "it works": itWorks,
-                "it looks right": validForm(20, 100),
+                "it looks right": validForm(20, total),
                 "it has the right data": validData(5, 25)
             },
             "and we get the feed before a value": {
                 topic: cmpBefore(endpoint, 25),
                 "it works": itWorks,
-                "it looks right": validForm(20, 100),
+                "it looks right": validForm(20, total),
                 "it has the right data": validData(26, 46)
             },
             "and we get the feed since a small value": {
                 topic: cmpSince(endpoint, 5),
                 "it works": itWorks,
-                "it looks right": validForm(5, 100),
+                "it looks right": validForm(5, total),
                 "it has the right data": validData(0, 5)
             },
             "and we get the feed before a big value": {
                 topic: cmpBefore(endpoint, 94),
                 "it works": itWorks,
-                "it looks right": validForm(5, 100),
-                "it has the right data": validData(95, 100)
+                "it looks right": validForm(total - 95, total),
+                "it has the right data": validData(95, total)
             },
             "and we get the feed since a value with a count": {
                 topic: cmpSince(endpoint, 75, 50),
                 "it works": itWorks,
-                "it looks right": validForm(50, 100),
+                "it looks right": validForm(50, total),
                 "it has the right data": validData(25, 75)
             },
             "and we get the feed before a value with a count": {
                 topic: cmpBefore(endpoint, 35, 50),
                 "it works": itWorks,
-                "it looks right": validForm(50, 100),
+                "it looks right": validForm(50, total),
                 "it has the right data": validData(36, 86)
             },
             "and we get the feed since a value with a zero count": {
                 topic: cmpSince(endpoint, 30, 0),
                 "it works": itWorks,
-                "it looks right": validForm(0, 100)
+                "it looks right": validForm(0, total)
             },
             "and we get the feed before a value with a zero count": {
                 topic: cmpBefore(endpoint, 60, 0),
                 "it works": itWorks,
-                "it looks right": validForm(0, 100)
+                "it looks right": validForm(0, total)
             },
             "and we get the full feed by following 'next' links": {
                 topic: function(full, cred) {
@@ -653,7 +685,7 @@ var workout = function(endpoint) {
                 "it works": itWorks,
                 "it looks correct": function(err, items, full) {
                     assert.isArray(items);
-                    assert.lengthOf(items, full.items.length);
+                    assert.equal(items.length, full.items.length);
                     assert.deepEqual(items, full.items);
                 }
             }
@@ -669,12 +701,12 @@ var workout = function(endpoint) {
         "and we get the feed with a zero offset and zero count": {
             topic: getDoc(endpoint + "?offset=0&count=0"),
             "it works": itWorks,
-            "it looks right": validForm(0, 100)
+            "it looks right": validForm(0, total)
         },
         "and we get the feed with a non-zero offset and zero count": {
             topic: getDoc(endpoint + "?offset=30&count=0"),
             "it works": itWorks,
-            "it looks right": validForm(0, 100)
+            "it looks right": validForm(0, total)
         },
         "and we get the feed with a non-integer count": {
             topic: failDoc(endpoint + "?count=foo"),
@@ -687,12 +719,12 @@ var workout = function(endpoint) {
         "and we get the feed with a too-large offset": {
             topic: getDoc(endpoint + "?offset=200"),
             "it works": itWorks,
-            "it looks right": validForm(0, 100)
+            "it looks right": validForm(0, total)
         },
         "and we get the feed with a too-large count": {
             topic: getDoc(endpoint + "?count=150"),
             "it works": itWorks,
-            "it looks right": validForm(100, 100)
+            "it looks right": validForm(total, total)
         },
         "and we get the feed with a disallowed count": {
             topic: failDoc(endpoint + "?count=1000"),
@@ -767,21 +799,21 @@ suite.addBatch({
                     assert.ifError(err);
                 },
                 "and we workout the outbox":
-                workout(BASE),
+                workout(BASE, 101),
                 "and we workout the inbox":
-                workout(INBOX),
+                workout(INBOX, 102),
                 "and we workout the major inbox":
-                workout(MAJORINBOX),
-                "and we workout the major inbox":
-                workout(MAJOROUTBOX),
+                workout(MAJORINBOX, 101),
+                "and we workout the major outbox":
+                workout(MAJOROUTBOX, 100),
                 "and we check the minor inbox":
-                emptyFeed("/api/user/alicia/inbox/minor"),
+                sizeFeed("/api/user/alicia/inbox/minor", 1),
                 "and we check the direct inbox":
-                emptyFeed("/api/user/alicia/inbox/direct"),
+                sizeFeed("/api/user/alicia/inbox/direct", 1),
                 "and we check the direct minor inbox":
                 emptyFeed("/api/user/alicia/inbox/direct/minor"),
                 "and we check the direct major inbox":
-                emptyFeed("/api/user/alicia/inbox/direct/major")
+                sizeFeed("/api/user/alicia/inbox/direct/major", 1)
             }
         },
         "and we get new credentials": {
@@ -836,17 +868,17 @@ suite.addBatch({
                     assert.ifError(err);
                 },
                 "and we work out the minor inbox":
-                workout("http://localhost:4815/api/user/benny/inbox/minor"),
+                workout("http://localhost:4815/api/user/benny/inbox/minor", 101),
                 "and we work out the minor outbox":
-                workout("http://localhost:4815/api/user/benny/feed/minor"),
+                workout("http://localhost:4815/api/user/benny/feed/minor", 101),
                 "and we check the major inbox":
-                emptyFeed("/api/user/benny/inbox/major"),
+                sizeFeed("/api/user/benny/inbox/major", 1),
                 "and we check the direct inbox":
-                emptyFeed("/api/user/benny/inbox/direct"),
+                sizeFeed("/api/user/benny/inbox/direct", 1),
                 "and we check the direct minor inbox":
                 emptyFeed("/api/user/benny/inbox/direct/minor"),
                 "and we check the direct major inbox":
-                emptyFeed("/api/user/benny/inbox/direct/major")
+                sizeFeed("/api/user/benny/inbox/direct/major", 1)
             }
         },
         "and we post a lot of stuff from one user to another": {
@@ -897,9 +929,9 @@ suite.addBatch({
                     assert.ifError(err);
                 },
                 "and we work out the direct inbox":
-                workout("http://localhost:4815/api/user/isa/inbox/direct"),
+                workout("http://localhost:4815/api/user/isa/inbox/direct", 101),
                 "and we work out the major direct inbox":
-                workout("http://localhost:4815/api/user/isa/inbox/direct/major"),
+                workout("http://localhost:4815/api/user/isa/inbox/direct/major", 101),
                 "and we check the minor direct inbox":
                 emptyFeed("/api/user/isa/inbox/direct/minor")
             }
@@ -956,11 +988,11 @@ suite.addBatch({
                     assert.ifError(err);
                 },
                 "and we work out the direct inbox":
-                workout("http://localhost:4815/api/user/backpack/inbox/direct"),
+                workout("http://localhost:4815/api/user/backpack/inbox/direct", 101),
                 "and we work out the minor direct inbox":
-                workout("http://localhost:4815/api/user/backpack/inbox/direct/minor"),
+                workout("http://localhost:4815/api/user/backpack/inbox/direct/minor", 100),
                 "and we check the major direct inbox":
-                emptyFeed("/api/user/backpack/inbox/direct/major")
+                sizeFeed("/api/user/backpack/inbox/direct/major", 1)
             }
         }
     }
