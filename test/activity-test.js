@@ -1403,7 +1403,7 @@ var contentCheck = function(actor, verb, object, expected) {
                 function(err) {
                     if (err) throw err;
                     // Then, save the activity
-                    Activity.create(act, this);
+                    act.save(this);
                 },
                 function(err, saved) {
                     if (err) {
