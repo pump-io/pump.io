@@ -660,6 +660,10 @@ var createUser = function(req, res, next) {
             str.deliver(user.nickname, this);
         },
         function(err) {
+            if (err) throw err;
+            user.expand(this);
+        },
+        function(err) {
             var svc;
             if (err) throw err;
             svc = thisService(req.app);
