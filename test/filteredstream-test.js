@@ -18,6 +18,7 @@
 
 var assert = require("assert"),
     vows = require("vows"),
+    _ = require("underscore"),
     databank = require("databank"),
     Step = require("step"),
     fs = require("fs"),
@@ -375,6 +376,151 @@ suite.addBatch({
                                 assert.isArray(orig);
                                 assert.isArray(ids);
                                 assert.deepEqual(orig, ids);
+                            }
+                        }
+                    }
+                },
+                "and we create a stream with a lot of objects": {
+                    topic: function(FilteredStream) {
+                        var callback = this.callback,
+                            Person = require("../lib/model/person").Person,
+                            names = {
+                                "Norma Lakin": "f",
+                                "Jason Pegram": "m",
+                                "Albert Carner": "m",
+                                "Manuel Chronister": "m",
+                                "Michelle Deleon": "f",
+                                "Jeffery Skaggs": "m",
+                                "Tanya Lawlor": "f",
+                                "Blanche Martins": "f",
+                                "Ruby Slack": "f",
+                                "Kayla Taber": "f",
+                                "Arthur Barrier": "m",
+                                "Becky Repp": "f",
+                                "Sheri Shouse": "f",
+                                "Randy Sealey": "m",
+                                "Aaron Schenk": "m",
+                                "Jeffery Coffey": "m",
+                                "Carole Arce": "f",
+                                "Henry Lockard": "m",
+                                "Steve Stewart": "m",
+                                "Kristine Alaniz": "f",
+                                "Eleanor Edmiston": "f",
+                                "Esther Bruns": "f",
+                                "Amanda Thibodeaux": "f",
+                                "Myrtle Chidester": "f",
+                                "Daniel Eidson": "m",
+                                "Ellen Jacks": "f",
+                                "Ryan Ainsworth": "m",
+                                "Amanda Cameron": "f",
+                                "Jenny Mccaleb": "f"},
+                            addPerson = function(str, name, gender, cb) {
+                                var person;
+                                Step(
+                                    function() {
+                                        Person.create({displayName: name, gender: gender}, this);
+                                    },
+                                    function(err, result) {
+                                        if (err) throw err;
+                                        person = result;
+                                        str.deliverObject({id: person.id, objectType: person.objectType}, this);
+                                    },
+                                    function(err) {
+                                        if (err) {
+                                            cb(err); 
+                                        } else {
+                                            cb(null);
+                                        }
+                                    }
+                                );
+                            },
+                            str;
+
+                        Step(
+                            function() {
+                                Stream.create({name: "test-2"}, this);
+                             },
+                            function(err, result) {
+                                var group = this.group();
+                                if (err) throw err;
+                                str = result;
+                                _.each(names, function(gender, name) {
+                                    addPerson(str, name, gender, group());
+                                });
+                            },
+                            function(err) {
+                                if (err) {
+                                    callback(err, null);
+                                } else {
+                                    callback(null, str);
+                                }
+                            }
+                        );
+                    },
+                    "it works": function(err, str) {
+                        assert.ifError(err);
+                        assert.isObject(str);
+                    },
+                    "and we create a filtered stream of those objects": {
+                        topic: function(str, FilteredStream) {
+                            var Person = require("../lib/model/person").Person,
+                                isFemale = function(item, callback) {
+                                    var ref;
+                                    try {
+                                        ref = JSON.parse(item);
+                                    } catch (err) {
+                                        callback(err, null);
+                                        return;
+                                    }
+
+                                    Step(
+                                        function() {
+                                            Person.get(ref.id, this);
+                                        },
+                                        function(err, person) {
+                                            if (err) {
+                                                callback(err, null);
+                                            } else {
+                                                callback(null, person.gender == "f");
+                                            }
+                                        }
+                                    );
+                                };
+
+                            return new FilteredStream(str, isFemale);
+                        },
+                        "it works": function(filtered) {
+                            assert.isObject(filtered);
+                        },
+                        "and we try to get 10 items": {
+                            topic: function(filtered) {
+                                var callback = this.callback,
+                                    Person = require("../lib/model/person").Person;
+                                
+                                Step(
+                                    function() {
+                                        filtered.getObjects(0, 10, this);
+                                    },
+                                    function(err, refs) {
+                                        var ids;
+                                        if (err) throw err;
+                                        Person.readArray(_.pluck(refs, "id"), this);
+                                    },
+                                    callback
+                                );
+                            },
+                            "it works": function(err, people) {
+                                assert.ifError(err);
+                            },
+                            "it looks correct": function(err, people) {
+                                var i;
+                                assert.ifError(err);
+                                assert.isArray(people);
+                                assert.lengthOf(people, 10);
+                                console.dir(people);
+                                for (i = 0; i < 10; i++) {
+                                    assert.equal(people[i].gender, "f");
+                                }
                             }
                         }
                     }
