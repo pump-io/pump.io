@@ -14,7 +14,7 @@
 		      "connect-auth": "0.5.3",
                       "express": "2.5.x",
                       "utml": "0.2.x",
-                      "underscore": "1.3.x", 
+                      "underscore": "1.4.x", 
     		      "node-uuid": "1.3.x",
 		      "bcrypt": "0.7.x",
 		      "dateformat": "1.x",
