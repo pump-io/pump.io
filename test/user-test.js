@@ -193,6 +193,9 @@ suite.addBatch({
             "it has the removeFromFavorites() method": function(user) {
                 assert.isFunction(user.removeFromFavorites);
             },
+            "it has the favoritesStream() method": function(user) {
+                assert.isFunction(user.favoritesStream);
+            },
             "it has a profile attribute": function(user) {
                 assert.isObject(user.profile);
                 assert.instanceOf(user.profile, require("../lib/model/person").Person);

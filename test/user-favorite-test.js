@@ -169,6 +169,35 @@ suite.addBatch({
                 }
             }
         },
+        "and we get the stream of favorites for a new user": {
+            topic: function(User) {
+                var cb = this.callback,
+                    props = {
+                        nickname: "shambler",
+                        password: "grey|skull1"
+                    };
+                Step(
+                    function() {
+                        User.create(props, this);
+                    },
+                    function(err, user) {
+                        if (err) throw err;
+                        user.favoritesStream(this);
+                    },
+                    function(err, stream) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, stream);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, stream) {
+                assert.ifError(err);
+                assert.isObject(stream);
+            }
+        },
         "and we get the list of favorites for a new user": {
             topic: function(User) {
                 var cb = this.callback,
