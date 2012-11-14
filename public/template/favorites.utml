@@ -1,0 +1,8 @@
+<div class="user">
+  <div class="row">
+    <%= profileBlock(obj, _) %>
+  </div>
+  <div class="row">
+    <%= objectStream(obj, _) %>
+  </div>
+</div>

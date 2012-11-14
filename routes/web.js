@@ -25,6 +25,7 @@ var databank = require("databank"),
     FilteredStream = require("../lib/filteredstream").FilteredStream,
     publicOnly = require("../lib/filters").publicOnly,
     Activity = require("../lib/model/activity").Activity,
+    ActivityObject = require("../lib/model/activityobject").ActivityObject,
     AccessToken = require("../lib/model/accesstoken").AccessToken,
     User = require("../lib/model/user").User,
     mw = require("../lib/middleware"),
@@ -51,6 +52,7 @@ var addRoutes = function(app) {
     app.post("/main/logout", userAuth, handleLogout);
 
     app.get("/:nickname", reqUser, showStream);
+    app.get("/:nickname/favorites", reqUser, showFavorites);
 
     app.get("/:nickname/activity/:uuid", reqUser, showActivity);
 
@@ -240,6 +242,94 @@ var showStream = function(req, res, next) {
                 res.render("user", _.extend({title: req.user.nickname},
                                             data,
                                             helpers));
+            }
+        }
+    );
+};
+
+var publicObjectsOnly = function(item, callback) {
+
+    var ref;
+
+    try {
+        ref = JSON.parse(item);
+    } catch (err) {
+        callback(err, null);
+        return;
+    }
+
+    Step(
+        function() {
+            ActivityObject.getObject(ref.objectType, ref.id, this);
+        },
+        function(err, obj) {
+            if (err) throw err;
+            Activity.postOf(obj, this);
+        },
+        function(err, act) {
+            if (err) throw err;
+            if (!act) {
+                callback(null, false);
+            } else {
+                act.checkRecipient(null, this);
+            }
+        },
+        callback
+    );
+};
+
+var showFavorites = function(req, res, next) {
+
+    var pump = this,
+        helperNames = {"profileBlock": "profile-block",
+                       "objectStream": "object-stream",
+                       "majorObject": "major-object"},
+        getData = function(callback) {
+            req.log.info("Started getting data");
+            Step(
+                function() {
+                    req.user.favoritesStream(this);
+                },
+                function(err, faveStream) {
+                    var filtered;
+                    if (err) throw err;
+                    req.log.info("Got fave stream");
+                    filtered = new FilteredStream(faveStream, publicObjectsOnly);
+                    filtered.getObjects(0, 20, this);
+                },
+                function(err, refs) {
+                    var group = this.group();
+                    if (err) throw err;
+                    req.log.info("Got filtered stream");
+                    _.each(refs, function(ref) {
+                        ActivityObject.getObject(ref.objectType, ref.id, group());
+                    });
+                },
+                function(err, objects) {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        callback(null, {objects: objects,
+                                        profile: req.user.profile});
+                    }
+                }
+            );
+        };
+
+    req.log.info("Started favorites");
+
+    Step(
+        function() {
+            getData(this.parallel());
+            getHelpers(helperNames, this.parallel());
+        },
+        function(err, data, helpers) {
+            if (err) {
+                next(err);
+            } else {
+                res.render("favorites", _.extend({title: req.user.nickname},
+                                                 data,
+                                                 helpers));
             }
         }
     );

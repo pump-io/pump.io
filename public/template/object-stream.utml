@@ -1,0 +1,10 @@
+<div class="span9" id="object-stream">
+  <% if (objects && objects.length) { %>
+  <% _.each(objects, function(object) { %>
+  <%= majorObject(object, _) %>
+  <% }); %>
+  <% } else { %>
+  <p>No content!</p>
+  <% } %>
+</div>
+
