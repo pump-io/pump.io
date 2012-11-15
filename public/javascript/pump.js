@@ -187,7 +187,22 @@
         }
     });
 
-    var Person = Backbone.Model.extend({
+    var ActivityObject = Backbone.Model.extend({
+        url: function() {
+            var links = this.get("links"),
+                uuid = this.get("uuid"),
+                objectType = this.get("objectType");
+            if (links && _.isObject(links) && links.self) {
+                return links.self;
+            } else if (objectType) {
+                return "/api/"+objectType+"/" + uuid;
+            } else {
+                return null;
+            }
+        }
+    });
+
+    var Person = ActivityObject.extend({
         url: function() {
             var links = this.get("links"),
                 uuid = this.get("uuid");
@@ -198,6 +213,50 @@
             } else {
                 return null;
             }
+        }
+    });
+
+    var ActivityObjectStream = Backbone.Collection.extend({
+        model: ActivityObject,
+        parse: function(response) {
+            return response.items;
+        }
+    });
+
+    var PeopleStream = Backbone.Collection.extend({
+        model: Person,
+        parse: function(response) {
+            return response.items;
+        }
+    });
+
+    var UserFollowers = PeopleStream.extend({
+        user: null,
+        initialize: function(models, options) {
+            this.user = options.user;
+        },
+        url: function() {
+            return "/api/user/" + this.user.get("nickname") + "/followers";
+        }
+    });
+
+    var UserFollowing = PeopleStream.extend({
+        user: null,
+        initialize: function(models, options) {
+            this.user = options.user;
+        },
+        url: function() {
+            return "/api/user/" + this.user.get("nickname") + "/following";
+        }
+    });
+
+    var UserFavorites = ActivityObjectStream.extend({
+        user: null,
+        initialize: function(models, options) {
+            this.user = options.user;
+        },
+        url: function() {
+            return "/api/user/" + this.user.get("nickname") + "/favorites";
         }
     });
 
@@ -225,6 +284,15 @@
         },
         getMinorInbox: function() {
             return new UserMinorInbox([], {user: this});
+        },
+        getFollowersStream: function() {
+            return new UserFollowers([], {user: this});
+        },
+        getFollowingStream: function() {
+            return new UserFollowing([], {user: this});
+        },
+        getFavorites: function() {
+            return new UserFavorites([], {user: this});
         }
     });
 
@@ -572,6 +640,33 @@
         el: '#content'
     });
 
+    var FavoritesContent = TemplateView.extend({
+        templateName: 'favorites',
+        parts: {profileBlock: "profile-block",
+                objectStream: "object-stream",
+                majorObject: "major-object"
+               },
+        el: '#content'
+    });
+
+    var FollowersContent = TemplateView.extend({
+        templateName: 'followers',
+        parts: {profileBlock: "profile-block",
+                peopleStream: "people-stream",
+                majorPerson: "major-person"
+               },
+        el: '#content'
+    });
+
+    var FollowingContent = TemplateView.extend({
+        templateName: 'following',
+        parts: {profileBlock: "profile-block",
+                peopleStream: "people-stream",
+                majorPerson: "major-person"
+               },
+        el: '#content'
+    });
+
     var ActivityContent = TemplateView.extend({
         templateName: 'activity-content',
         el: '#content'
@@ -611,7 +706,9 @@
         routes: {
             "":                       "home",    
             ":nickname":              "profile",   
-            ":nickname/inbox":        "inbox",  
+            ":nickname/favorites":    "favorites",  
+            ":nickname/following":    "following",  
+            ":nickname/followers":    "followers",  
             ":nickname/activity/:id": "activity",
             "main/settings":          "settings",
             "main/register":          "register",
@@ -682,7 +779,52 @@
             }});
         },
 
-        inbox: function(nickname) {
+        favorites: function(nickname) {
+            var user = new User({nickname: nickname}),
+                favorites = user.getFavorites();
+
+            // XXX: parallelize this?
+
+            user.fetch({success: function(user, response) {
+                var profile = user.get("profile");
+                favorites.fetch({success: function(major, response) {
+                    var content = new FavoritesContent({model: {profile: profile,
+                                                                objects: favorites.toJSON()}});
+                    content.render();
+                }});
+            }});
+        },
+
+        followers: function(nickname) {
+            var user = new User({nickname: nickname}),
+                followers = user.getFollowersStream();
+
+            // XXX: parallelize this?
+
+            user.fetch({success: function(user, response) {
+                followers.fetch({success: function(followers, response) {
+                    var profile = user.get("profile"),
+                        content = new FollowersContent({model: {profile: profile,
+                                                                people: followers.toJSON()}});
+                    content.render();
+                }});
+            }});
+        },
+
+        following: function(nickname) {
+            var user = new User({nickname: nickname}),
+                following = user.getFollowingStream();
+
+            // XXX: parallelize this?
+
+            user.fetch({success: function(user, response) {
+                following.fetch({success: function(following, response) {
+                    var profile = user.get("profile"),
+                        content = new FollowingContent({model: {profile: profile,
+                                                                people: following.toJSON()}});
+                    content.render();
+                }});
+            }});
         },
 
         activity: function(nickname, id) {
