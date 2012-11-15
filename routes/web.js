@@ -53,6 +53,8 @@ var addRoutes = function(app) {
 
     app.get("/:nickname", reqUser, showStream);
     app.get("/:nickname/favorites", reqUser, showFavorites);
+    app.get("/:nickname/followers", reqUser, showFollowers);
+    app.get("/:nickname/following", reqUser, showFollowing);
 
     app.get("/:nickname/activity/:uuid", reqUser, showActivity);
 
@@ -328,6 +330,86 @@ var showFavorites = function(req, res, next) {
                 next(err);
             } else {
                 res.render("favorites", _.extend({title: req.user.nickname},
+                                                 data,
+                                                 helpers));
+            }
+        }
+    );
+};
+
+var showFollowers = function(req, res, next) {
+
+    var pump = this,
+        helperNames = {"profileBlock": "profile-block",
+                       "peopleStream": "people-stream",
+                       "majorPerson": "major-person"},
+        getData = function(callback) {
+            Step(
+                function() {
+                    req.user.getFollowers(0, 20, this);
+                },
+                function(err, followers) {
+                    if (err) throw err;
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        callback(null, {people: followers,
+                                        profile: req.user.profile});
+                    }
+                }
+            );
+        };
+
+    Step(
+        function() {
+            getData(this.parallel());
+            getHelpers(helperNames, this.parallel());
+        },
+        function(err, data, helpers) {
+            if (err) {
+                next(err);
+            } else {
+                res.render("followers", _.extend({title: req.user.nickname},
+                                                 data,
+                                                 helpers));
+            }
+        }
+    );
+};
+
+var showFollowing = function(req, res, next) {
+
+    var pump = this,
+        helperNames = {"profileBlock": "profile-block",
+                       "peopleStream": "people-stream",
+                       "majorPerson": "major-person"},
+        getData = function(callback) {
+            Step(
+                function() {
+                    req.user.getFollowing(0, 20, this);
+                },
+                function(err, following) {
+                    if (err) throw err;
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        callback(null, {people: following,
+                                        profile: req.user.profile});
+                    }
+                }
+            );
+        };
+
+    Step(
+        function() {
+            getData(this.parallel());
+            getHelpers(helperNames, this.parallel());
+        },
+        function(err, data, helpers) {
+            if (err) {
+                next(err);
+            } else {
+                res.render("following", _.extend({title: req.user.nickname},
                                                  data,
                                                  helpers));
             }

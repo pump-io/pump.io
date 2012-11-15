@@ -1,0 +1,10 @@
+<div class="span9" id="people-stream">
+  <% if (people && people.length) { %>
+  <% _.each(people, function(person) { 
+     obj.person = person; %>
+  <%= majorPerson(obj, _) %>
+  <% }); %>
+  <% } else { %>
+  <p>No content!</p>
+  <% } %>
+</div>
