@@ -1,12 +1,12 @@
 <div class="row">
-  <div class="span3 offset1">
+  <div class="span3">
     <% if (profile.image && profile.image.url) { %>
     <img src="<%- profile.image.url %>" width="128" height="128" />
     <% } else { %>
     <img src="/images/default.jpg" width="128" height="128" />
     <% } %>
   </div>
-  <div class="span6">
+  <div class="span8">
     <h1><%- profile.displayName %> <small><%- profile.preferredUsername %></small></h1>
     <% if (profile.location) { %>
     <p class="location"><%- profile.location.displayName %></p>
@@ -15,6 +15,15 @@
     <p class="summary"><%- profile.summary %></p>
     <% } %>
     <% /* TODO: HOME PAGE HERE */ %>
+  </div>
+  <div class="span1">
+    <div class="pull-right">
+      <p><a href="/main/follow" class="btn primary">Follow</a></p>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="span12">
     <ul class="nav nav-tabs">
       <li><a class="active" href="/<%- profile.preferredUsername %>">Activity</a></li>
       <li><a class="active" href="/<%- profile.preferredUsername %>/favorites">Favorites</a></li>
@@ -22,10 +31,5 @@
       <li><a class="active" href="/<%- profile.preferredUsername %>/following">Following</a></li>
       <li><a class="active" href="/<%- profile.preferredUsername %>/lists">Lists</a></li>
     </ul>
-  </div>
-  <div class="span2">
-    <div class="pull-right">
-      <p><a href="/main/follow" class="btn primary">Follow</a></p>
-    </div>
   </div>
 </div>
