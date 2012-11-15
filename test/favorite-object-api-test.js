@@ -649,6 +649,92 @@ suite.addBatch({
                 "it fails with a 401 Forbidden": function(err) {
                     assert.ifError(err);
                 }
+            },
+            "and one user reads someone else's favorites stream which includes private objects": {
+                topic: function(cl) {
+                    var callback = this.callback,
+                        pairs    = {};
+
+                    // XXX: scraping the bottom of the barrel on
+                    // http://en.wikipedia.org/wiki/List_of_The_Brady_Bunch_characters
+
+                    Step(
+                        function() {
+                            newPair(cl, "paula", "likes2draw", this.parallel());
+                            newPair(cl, "mrrandolph", "im|the|principal", this.parallel());
+                            newPair(cl, "mrsdenton", "hippo|potamus", this.parallel());
+                        },
+                        function(err, pair1, pair2, pair3) {
+                            if (err) throw err;
+                            pairs.paula      = pair1;
+                            pairs.mrrandolph = pair2;
+                            pairs.mrsdenton  = pair3;
+                            var url = "http://localhost:4815/api/user/mrrandolph/feed",
+                                act = {
+                                    verb: "follow",
+                                    object: {
+                                        objectType: "person",
+                                        id: "http://localhost:4815/api/user/paula"
+                                    }
+                                };
+
+                            var cred = makeCred(cl, pairs.mrrandolph);
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, act) {
+                            if (err) throw err;
+                            var url = "http://localhost:4815/api/user/paula/feed",
+                                post = {
+                                    verb: "post",
+                                    to: [{objectType: "collection",
+                                          id: "http://localhost:4815/api/user/paula/followers"}],
+                                    object: {
+                                        objectType: "image",
+                                        displayName: "Mrs. Denton or hippopotamus?",
+                                        url: "http://localhost:4815/images/mrsdenton.jpg"
+                                    }
+                                };
+
+                            var cred = makeCred(cl, pairs.paula);
+                            httputil.postJSON(url, cred, post, this);
+                        },
+                        function(err, post) {
+                            if (err) throw err;
+                            var url = "http://localhost:4815/api/user/mrrandolph/feed",
+                                like = {
+                                    verb: "favorite",
+                                    object: post.object
+                                };
+
+                            var cred = makeCred(cl, pairs.mrrandolph);
+                            httputil.postJSON(url, cred, like, this);
+                        },
+                        function(err, like) {
+                            if (err) throw err;
+                            var url = "http://localhost:4815/api/user/mrrandolph/favorites";
+
+                            var cred = makeCred(cl, pairs.mrsdenton);
+                            httputil.getJSON(url, cred, this);
+                        },
+                        function(err, likes) {
+                            if (err) {
+                                callback(err, null);
+                            } else {
+                                callback(null, likes);
+                            }
+                        }
+                    );
+                },
+                "it works": function(err, likes) {
+                    assert.ifError(err);
+                    assert.isObject(likes);
+                },
+                "it is empty": function(err, likes) {
+                    assert.ifError(err);
+                    assert.include(likes, "items");
+                    assert.isArray(likes.items);
+                    assert.lengthOf(likes.items, 0);
+                }
             }
         }
     }

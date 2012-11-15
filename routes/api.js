@@ -25,6 +25,8 @@ var databank = require("databank"),
     FilteredStream = require("../lib/filteredstream").FilteredStream,
     filters = require("../lib/filters"),
     recipientsOnly = filters.recipientsOnly,
+    objectRecipientsOnly = filters.objectRecipientsOnly,
+    objectPublicOnly = filters.objectPublicOnly,
     publicOnly = filters.publicOnly,
     HTTPError = require("../lib/httperror").HTTPError,
     Stamper = require("../lib/stamper").Stamper,
@@ -1422,9 +1424,9 @@ var userFavorites = function(req, res, next) {
         displayName: "Things that " + (req.user.profile.displayName || req.user.nickname) + " has favorited",
         id: URLMaker.makeURL("api/user/" + req.user.nickname + "/favorites"),
         items: []
-    };
-
-    var args;
+    },
+        args,
+        stream;
 
     try {
         args = streamArgs(req, DEFAULT_FAVORITES, MAX_FAVORITES);
@@ -1435,20 +1437,42 @@ var userFavorites = function(req, res, next) {
 
     Step(
         function() {
-            req.user.favoritesCount(this);
+            req.user.favoritesStream(this);
         },
-        function(err, count) {
-            if (err) {
-                if (err.name == "NoSuchThingError") {
-                    collection.totalItems = 0;
-                    res.json(collection);
-                } else {
-                    throw err;
-                }
-            } else {
-                collection.totalItems = count;
-                req.user.getFavorites(args.start, args.end, this);
+        function(err, result) {
+            var str;
+            if (err) throw err;
+            stream = result;
+            stream.count(this);
+        },
+        function(err, cnt) {
+            var str;
+            if (err) throw err;
+            collection.totalItems = cnt;
+            if (cnt === 0) {
+                res.json(collection);
+                return;
             }
+            if (req.remoteUser && req.remoteUser.profile.id == req.user.profile.id) {
+                // Same user, don't filter
+                str = stream;
+            } else if (!req.remoteUser) {
+                // Public user, filter
+                str = new FilteredStream(stream, objectPublicOnly);
+            } else {
+                // Registered user, filter
+                str = new FilteredStream(stream, objectRecipientsOnly(req.remoteUser.profile));
+            }
+            str.getObjects(args.start, args.end, this);
+        },
+        function(err, refs) {
+            var group = this.group();
+            if (err) throw err;
+            _.each(refs, function(ref) {
+                // XXX: expand?
+                // XXX: expand feeds, too?
+                ActivityObject.getObject(ref.objectType, ref.id, group());
+            });
         },
         function(err, objects) {
             if (err) {
