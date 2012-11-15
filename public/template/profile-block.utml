@@ -15,7 +15,7 @@
     <p class="summary"><%- profile.summary %></p>
     <% } %>
     <% /* TODO: HOME PAGE HERE */ %>
-    <ul class="nav">
+    <ul class="nav nav-tabs">
       <li><a class="active" href="/<%- profile.preferredUsername %>">Activity</a></li>
       <li><a class="active" href="/<%- profile.preferredUsername %>/favorites">Favorites</a></li>
       <li><a class="active" href="/<%- profile.preferredUsername %>/followers">Followers</a></li>
