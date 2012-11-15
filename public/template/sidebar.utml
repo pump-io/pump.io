@@ -1,4 +1,5 @@
 <div class="span3" id="sidebar">
+  <h3>Meanwhile...</h3>
   <% if (minor && minor.length) { %>
   <% _.each(minor, function(activity) { %>
   <%= minorActivity(activity, _) %>

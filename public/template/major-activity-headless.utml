@@ -1,8 +1,8 @@
 <div class="row">
   <div class="row">
     <div class="span8 offset1">
-      <% if (object.title) { %>
-      <h2><%- object.title %></h2>
+      <% if (object.displayName) { %>
+      <h2><%- object.displayName %></h2>
       <% } else { %>
       <%= object.content %>
       <% } %>
@@ -10,7 +10,7 @@
     </div>
     <div class="row">
       <div class="span8 offset1">
-        <% if (object.title) { %>
+        <% if (object.displayName) { %>
         <%= object.content %>
         <% } %>
         <div>

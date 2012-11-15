@@ -1,4 +1,5 @@
 <div class="inbox">
+  <h1>Inbox</h1>
   <div class="row">
     <%= majorStream(obj, _) %>
     <%= sidebar(obj, _) %>
