@@ -24,6 +24,7 @@ var databank = require("databank"),
     _ = require("underscore"),
     FilteredStream = require("../lib/filteredstream").FilteredStream,
     publicOnly = require("../lib/filters").publicOnly,
+    objectPublicOnly = require("../lib/filters").objectPublicOnly,
     Activity = require("../lib/model/activity").Activity,
     ActivityObject = require("../lib/model/activityobject").ActivityObject,
     AccessToken = require("../lib/model/accesstoken").AccessToken,
@@ -249,36 +250,6 @@ var showStream = function(req, res, next) {
     );
 };
 
-var publicObjectsOnly = function(item, callback) {
-
-    var ref;
-
-    try {
-        ref = JSON.parse(item);
-    } catch (err) {
-        callback(err, null);
-        return;
-    }
-
-    Step(
-        function() {
-            ActivityObject.getObject(ref.objectType, ref.id, this);
-        },
-        function(err, obj) {
-            if (err) throw err;
-            Activity.postOf(obj, this);
-        },
-        function(err, act) {
-            if (err) throw err;
-            if (!act) {
-                callback(null, false);
-            } else {
-                act.checkRecipient(null, this);
-            }
-        },
-        callback
-    );
-};
 
 var showFavorites = function(req, res, next) {
 
@@ -287,7 +258,6 @@ var showFavorites = function(req, res, next) {
                        "objectStream": "object-stream",
                        "majorObject": "major-object"},
         getData = function(callback) {
-            req.log.info("Started getting data");
             Step(
                 function() {
                     req.user.favoritesStream(this);
@@ -295,14 +265,12 @@ var showFavorites = function(req, res, next) {
                 function(err, faveStream) {
                     var filtered;
                     if (err) throw err;
-                    req.log.info("Got fave stream");
-                    filtered = new FilteredStream(faveStream, publicObjectsOnly);
+                    filtered = new FilteredStream(faveStream, objectPublicOnly);
                     filtered.getObjects(0, 20, this);
                 },
                 function(err, refs) {
                     var group = this.group();
                     if (err) throw err;
-                    req.log.info("Got filtered stream");
                     _.each(refs, function(ref) {
                         ActivityObject.getObject(ref.objectType, ref.id, group());
                     });
@@ -317,8 +285,6 @@ var showFavorites = function(req, res, next) {
                 }
             );
         };
-
-    req.log.info("Started favorites");
 
     Step(
         function() {
