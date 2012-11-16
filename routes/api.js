@@ -274,7 +274,7 @@ var getter = function(type) {
             },
             function(err) {
                 if (err) throw err;
-                if (obj.replies.totalItems === 0) {
+                if (!_.has(obj, "replies") || !_.isObject(obj.replies) || obj.replies.totalItems === 0) {
                     res.json(obj);
                 } else {
                     obj.getRepliesStream(this);
