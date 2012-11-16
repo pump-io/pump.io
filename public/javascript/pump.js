@@ -579,39 +579,44 @@
                     pump.navigate("", true);
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
-                    view.$(':submit').prop("disabled", false).spin(false);
-                    if (jqXHR.responseType == "json") {
-                        showError(jqXHR.response.error);
-                    } else if (jqXHR.status == 409) { // conflict
-                        showError("A user with that nickname already exists", "nickname");
+                    var type, response;
+                    view.$(':submit').prop('disabled', false).spin(false);
+                    type = jqXHR.getResponseHeader("Content-Type");
+                    if (type && type.indexOf("application/json") !== -1) {
+                        response = JSON.parse(jqXHR.responseText);
+                        showError(null, response.error);
                     } else {
-                        showError(errorThrown);
+                        showError(null, errorThrown);
                     }
                 },
-                showError = function(msg, input) {
-                    if (input) {
-                        $('#registration input[name="'+input+'"]').addClass('error');
+                showError = function(input, msg) {
+                    if ($(".alert-message").length > 0) {
+                        $(".alert-message").text(msg);
+                    } else {
+                        $("div.registration").prepend('<div class="alert alert-error">' +
+                                                      '<a class="close" data-dismiss="alert" href="#">&times;</a>' +
+                                                      '<p class="alert-message">'+ msg + '</p>' +
+                                                      '</div>');
                     }
-                    $('#registration #error').text(msg);
-                    console.log(msg);
+                    $(".alert").alert();
                 };
 
             if (params.password !== repeat) {
 
-                showError("Passwords don't match.", "password");
+                showError("repeat", "Passwords don't match.");
 
             } else if (!NICKNAME_RE.test(params.nickname)) {
 
-                showError("Nicknames have to be a combination of 1-64 letters or numbers and ., - or _.", "nickname");
+                showError("nickname", "Nicknames have to be a combination of 1-64 letters or numbers and ., - or _.");
 
             } else if (params.password.length < 8) {
 
-                showError("Password must be 8 chars or more.", "password");
+                showError("password", "Password must be 8 chars or more.");
 
             } else if (/^[a-z]+$/.test(params.password.toLowerCase()) ||
                        /^[0-9]+$/.test(params.password)) {
 
-                showError("Passwords have to have at least one letter and one number.", "password");
+                showError("password", "Passwords have to have at least one letter and one number.");
 
             } else {
 
@@ -629,7 +634,7 @@
 
                 ensureCred(function(err, cred) {
                     if (err) {
-                        showError("Couldn't get OAuth credentials. :(");
+                        showError(null, "Couldn't get OAuth credentials. :(");
                     } else {
                         options.consumerKey = cred.clientID;
                         options.consumerSecret = cred.clientSecret;
