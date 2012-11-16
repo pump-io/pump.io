@@ -52,6 +52,23 @@
 
     </div> <!-- /container -->
 
+    <div id="modal-note" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="post-label" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 id="post-label">Post a note</h3>
+      </div>
+      <div class="modal-body">
+        <form id="post-note">
+          <fieldset>
+            <textarea id="note-content" class="span5" name="note" rows="6"></textarea>
+          </fieldset>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn primary" id="send-note">Send</button>
+      </div>
+    </div>
+
     <!-- Le javascript
          ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->

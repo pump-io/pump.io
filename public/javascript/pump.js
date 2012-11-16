@@ -28,7 +28,7 @@
         // Ensure that we have a URL.
 
         if (!options.url) {
-            params.url = getValue(model, 'url');
+            params.url = (type == 'POST') ? getValue(model.collection, 'url') : getValue(model, 'url');
             if (!params.url) { 
                 throw new Error("No URL");
             }
@@ -71,9 +71,14 @@
         return null;
     };
 
+    // When errors happen, and you don't know what to do with them,
+    // send them here and I'll figure it out.
+
     var pumpError = function(err) {
         console.log(err);
     };
+
+    // A social activity.
 
     var Activity = Backbone.Model.extend({
         url: function() {
@@ -845,7 +850,8 @@
         },
         el: "body",
         events: {
-            "click a": "navigateToHref"
+            "click a": "navigateToHref",
+            "click #send-note": "postNote"
         },
         navigateToHref: function(ev) {
             var el = (ev.srcElement || ev.currentTarget),
@@ -857,6 +863,27 @@
             }
 
             return false;
+        },
+        postNote: function(ev) {
+            var view = this,
+                text = view.$('#post-note #note-content').val(),
+                act = new Activity({
+                    verb: "post",
+                    object: {
+                        objectType: "note",
+                        content: text
+                    }
+                }),
+                stream = currentUser.getStream();
+
+            view.$('#sendnote').prop("disabled", true).spin(true);
+            
+            stream.create(act, {success: function(act) {
+                view.$('#modal-note').modal('hide');
+                view.$('#sendnote').prop("disabled", false).spin(false);
+                view.$('#note-content').val("");
+                // Reload the current page
+            }});
         }
     });
 

@@ -1,5 +1,9 @@
 <a class="brand" href="/"><%- site %></a>
 
+<button type="button" class="btn primary" data-target="#modal-note" data-toggle="modal">
+  Note <i class="icon-pencil"></i>
+</button>
+
 <ul class="nav pull-right">
   <li id="fat-menu" class="dropdown">
     <a href="#" id="profile-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown"> 
