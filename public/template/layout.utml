@@ -73,6 +73,7 @@
          ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="/javascript/jquery-1.8.2.min.js"></script>
+    <script src="/javascript/jquery.easydate-0.2.4.min.js"></script>
     <script src="/javascript/json2.min.js"></script>
     <script src="/javascript/bootstrap.min.js"></script>
     <script src="/javascript/underscore-min.js"></script>

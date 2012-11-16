@@ -230,9 +230,6 @@ suite.addBatch({
                     assert.lengthOf(list, 1);
                     assert.equal(list[0].id, comment1.id);
                     assert.include(list[0], 'replies');
-                    assert.include(list[0].replies, 'items');
-                    assert.lengthOf(list[0].replies.items, 1);
-                    assert.equal(list[0].replies.items[0].id, comment2.id);
                 }
             }
         },
@@ -374,10 +371,6 @@ suite.addBatch({
                 assert.equal(note.replies.totalItems, 1);
                 assert.include(note.replies, "url");
                 assert.isString(note.replies.url);
-                assert.include(note.replies, "items");
-                assert.isArray(note.replies.items);
-                assert.lengthOf(note.replies.items, 1);
-                assert.equal(note.replies.items[0].id, comment.id);
             }
         }
     }

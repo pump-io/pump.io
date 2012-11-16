@@ -273,9 +273,36 @@ var getter = function(type) {
                 obj.expandFeeds(this);
             },
             function(err) {
+                if (err) throw err;
+                if (obj.replies.totalItems === 0) {
+                    res.json(obj);
+                } else {
+                    obj.getRepliesStream(this);
+                }
+            },
+            function(err, str) {
+                var filtered;
+                if (err) throw err;
+                if (!req.remoteUser) {
+                    // XXX: keep a separate stream instead of filtering
+                    filtered = new FilteredStream(str, objectPublicOnly);
+                } else {
+                    filtered = new FilteredStream(str, objectRecipientsOnly(req.remoteUser.profile));
+                }
+                filtered.getObjects(0, 4, this);
+            },
+            function(err, refs) {
+                var group = this.group();
+                if (err) throw err;
+                _.each(refs, function(ref) {
+                    ActivityObject.getObject(ref.objectType, ref.id, group());
+                });
+            },
+            function(err, objs) {
                 if (err) {
                     next(err);
                 } else {
+                    obj.replies.items = objs;
                     res.json(obj);
                 }
             }
@@ -405,30 +432,36 @@ var replies = function(type) {
 
         Step(
             function() {
-                obj.repliesCount(this);
+                obj.getRepliesStream(this);
             },
-            function(err, count) {
-                if (err) {
-                    if (err.name == "NoSuchThingError") {
-                        collection.totalItems = 0;
-                        res.json(collection);
-                    } else {
-                        throw err;
-                    }
+            function(err, str) {
+                var filtered;
+                if (err) throw err;
+                if (!req.remoteUser) {
+                    // XXX: keep a separate stream instead of filtering
+                    filtered = new FilteredStream(str, objectPublicOnly);
+                } else {
+                    filtered = new FilteredStream(str, objectRecipientsOnly(req.remoteUser.profile));
                 }
-                collection.totalItems = count;
-                obj.getReplies(args.start, args.end, this);
+                filtered.count(this.parallel());
+                filtered.getObjects(args.start, args.end, this.parallel());
             },
-            function(err, replies) {
-                var i = 0;
+            function(err, count, refs) {
+                var group = this.group();
+                if (err) throw err;
+                collection.totalItems = count;
+                _.each(refs, function(ref) {
+                    ActivityObject.getObject(ref.objectType, ref.id, group());
+                });
+            },
+            function(err, objs) {
                 if (err) {
                     next(err);
                 } else {
-                    // Trim the IRT since it's implied
-                    for (i = 0; i < replies.length; i++) {
-                        delete replies[i].inReplyTo;
-                    }
-                    collection.items = replies;
+                    _.each(objs, function(obj) {
+                            delete obj.inReplyTo;
+                    });
+                    collection.items = objs;
                     res.json(collection);
                 }
             }
