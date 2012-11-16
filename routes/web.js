@@ -59,11 +59,16 @@ var addRoutes = function(app) {
 
     app.get("/:nickname/activity/:uuid", reqUser, showActivity);
 
-    app.get("/main/settings", showSettings);
+    // For things that you can only see if you're logged in,
+    // we redirect to the login page, then let you go there
+
+    app.get("/main/settings", loginRedirect("/main/settings"));
 };
 
-var showSettings = function(req, res, next) {
-    res.render("settings", {title: "Settings"});
+var loginRedirect = function(rel) {
+    return function(req, res, next) {
+        res.redirect('/main/login?continue='+rel);
+    };
 };
 
 var showMain = function(req, res, next) {
