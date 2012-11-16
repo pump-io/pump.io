@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row activity" id="<%- id %>">
   <div class="row">
     <div class="span1">
       <% if (actor.image && actor.image.url) { %>
