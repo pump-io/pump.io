@@ -273,9 +273,36 @@ var getter = function(type) {
                 obj.expandFeeds(this);
             },
             function(err) {
+                if (err) throw err;
+                if (obj.replies.totalItems === 0) {
+                    res.json(obj);
+                } else {
+                    obj.getRepliesStream(this);
+                }
+            },
+            function(err, str) {
+                var filtered;
+                if (err) throw err;
+                if (!req.remoteUser) {
+                    // XXX: keep a separate stream instead of filtering
+                    filtered = new FilteredStream(str, objectPublicOnly);
+                } else {
+                    filtered = new FilteredStream(str, objectRecipientsOnly(req.remoteUser.profile));
+                }
+                filtered.getObjects(0, 4, this);
+            },
+            function(err, refs) {
+                var group = this.group();
+                if (err) throw err;
+                _.each(refs, function(ref) {
+                    ActivityObject.getObject(ref.objectType, ref.id, group());
+                });
+            },
+            function(err, objs) {
                 if (err) {
                     next(err);
                 } else {
+                    obj.replies.items = objs;
                     res.json(obj);
                 }
             }
