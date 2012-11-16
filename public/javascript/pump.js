@@ -361,6 +361,7 @@
                         pumpError(err);
                     } else {
                         $(view.el).html(html);
+                        $("abbr.easydate").easydate();
                     }
                 },
                 base = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model),
@@ -1057,6 +1058,8 @@
         } else if ($("#content #inbox").length > 0) {
             content = new InboxContent({});
         }
+
+        $("abbr.easydate").easydate();
 
         Backbone.history.start({pushState: true, silent: true});
 

@@ -13,7 +13,7 @@
       <% } else { %>
       <%= object.content %>
       <% } %>
-      <p><small><a href="<%- actor.url %>"><%- actor.displayName %></a> at <a href="<%- url %>"><%- published %></a><% if (location) { %> in <a href="<%- location.url %>"><%- location.displayName %></a><% } %></small></p>
+      <p><small><a href="<%- actor.url %>"><%- actor.displayName %></a> at <a href="<%- url %>"><abbr title="<%- published %>" class="easydate"><%- published %></abbr></a><% if (location) { %> in <a href="<%- location.url %>"><%- location.displayName %></a><% } %></small></p>
     </div>
   </div>
   <div class="row">
