@@ -503,51 +503,50 @@
                     pump.navigate(continueTo, true);
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
+                    var type, response;
                     view.$(':submit').prop('disabled', false).spin(false);
-                    showError(null, errorThrown);
+                    type = jqXHR.getResponseHeader("Content-Type");
+                    if (type && type.indexOf("application/json") !== -1) {
+                        response = JSON.parse(jqXHR.responseText);
+                        showError(null, response.error);
+                    } else {
+                        showError(null, errorThrown);
+                    }
                 },
                 showError = function(input, msg) {
-                    console.log(msg);
-                };
-
-            if (!NICKNAME_RE.test(params.nickname)) {
-
-                showError("nickname", "Nicknames have to be a combination of 1-64 letters or numbers and ., - or _.");
-
-            } else if (params.password.length < 8) {
-
-                showError("password", "Password must be 8 chars or more.");
-
-            } else if (/^[a-z]+$/.test(params.password.toLowerCase()) ||
-                       /^[0-9]+$/.test(params.password)) {
-
-                showError("password", "Passwords have to have at least one letter and one number.");
-
-            } else {
-
-                view.$(':submit').prop('disabled', true).spin(true);
-
-                options = {
-                    contentType: "application/json",
-                    data: JSON.stringify(params),
-                    dataType: "json",
-                    type: "POST",
-                    url: "/main/login",
-                    success: onSuccess,
-                    error: onError
-                };
-
-                ensureCred(function(err, cred) {
-                    if (err) {
-                        showError(null, "Couldn't get OAuth credentials. :(");
+                    if ($(".alert-message").length > 0) {
+                        $(".alert-message").text(msg);
                     } else {
-                        options.consumerKey = cred.clientID;
-                        options.consumerSecret = cred.clientSecret;
-                        options = oauthify(options);
-                        $.ajax(options);
+                        $("div.login").prepend('<div class="alert alert-error">' +
+                                               '<a class="close" data-dismiss="alert" href="#">&times;</a>' +
+                                               '<p class="alert-message">'+ msg + '</p>' +
+                                               '</div>');
                     }
-                });
-            }
+                    $(".alert").alert();
+                };
+
+            view.$(':submit').prop('disabled', true).spin(true);
+
+            options = {
+                contentType: "application/json",
+                data: JSON.stringify(params),
+                dataType: "json",
+                type: "POST",
+                url: "/main/login",
+                success: onSuccess,
+                error: onError
+            };
+
+            ensureCred(function(err, cred) {
+                if (err) {
+                    showError(null, "Couldn't get OAuth credentials. :(");
+                } else {
+                    options.consumerKey = cred.clientID;
+                    options.consumerSecret = cred.clientSecret;
+                    options = oauthify(options);
+                    $.ajax(options);
+                }
+            });
 
             return false;
         }
