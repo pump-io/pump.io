@@ -361,7 +361,8 @@
                         pumpError(err);
                     } else {
                         $(view.el).html(html);
-                        $("abbr.easydate").easydate();
+                        // Update relative to the new code view
+                        view.$("abbr.easydate").easydate();
                     }
                 },
                 base = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model),
