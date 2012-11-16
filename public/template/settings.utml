@@ -1,38 +1,6 @@
 <div class="span12" id="form">
 
-  <div class="alert" id="alert"></div>
-
   <form id="settings">
-
-    <fieldset>
-
-      <legend>Account</legend>
-      
-      <div class="clearfix">
-	<label>Username</label>
-	<div class="input">
-          <span class="uneditable-input"><%- nickname %></span>
-	  <span class="help-block">The name you log in with</span>
-	</div>
-      </div>
-
-      <div class="clearfix">
-	<label>Password</label>
-	<div class="input">
-          <input class="span6" id="password" name="password" size="30" type="password" />
-	  <span class="help-block">6-64 char password</span>
-	</div>
-      </div>
-
-      <div class="clearfix">
-	<label>Confirm</label>
-	<div class="input">
-          <input class="span6" id="confirm" name="confirm" size="30" type="password" />
-	  <span class="help-block">Same as above</span>
-	</div>
-      </div>
-
-    </fieldset>
 
     <fieldset>
 
@@ -69,7 +37,7 @@
 
     <fieldset>
       <div class="actions">
-	<input type="submit" class="btn primary" value="Save changes">&nbsp;<button type="reset" class="btn">Cancel</button>
+	<input type="submit" class="btn primary" value="Save">
       </div>
     </fieldset>  
 

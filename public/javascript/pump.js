@@ -1,5 +1,28 @@
 (function($, Backbone) {
 
+    var searchParams = function(str) {
+        var params = {},
+            pl     = /\+/g,
+            decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+            pairs;
+
+        if (!str) {
+            str = window.location.search;
+        }
+            
+        pairs = str.substr(1).split("&");
+
+        _.each(pairs, function(pairStr) {
+            var pair = pairStr.split("=", 2),
+                key = decode(pair[0]),
+                value = (pair.length > 1) ? decode(pair[1]) : null;
+            
+            params[key] = value;
+        });
+
+        return params;
+    };
+
     // Override backbone sync to use OAuth
 
     Backbone.sync = function(method, model, options) {
@@ -197,8 +220,13 @@
             var links = this.get("links"),
                 uuid = this.get("uuid"),
                 objectType = this.get("objectType");
-            if (links && _.isObject(links) && links.self) {
-                return links.self;
+            if (links &&
+                _.isObject(links) && 
+                _.has(links, "self") &&
+                _.isObject(links.self) &&
+                _.has(links.self, "href") &&
+                _.isString(links.self.href)) {
+                return links.self.href;
             } else if (objectType) {
                 return "/api/"+objectType+"/" + uuid;
             } else {
@@ -208,17 +236,7 @@
     });
 
     var Person = ActivityObject.extend({
-        url: function() {
-            var links = this.get("links"),
-                uuid = this.get("uuid");
-            if (links && _.isObject(links) && links.self) {
-                return links.self;
-            } else if (uuid) {
-                return "/api/person/" + uuid;
-            } else {
-                return null;
-            }
-        }
+        objectType: "person"
     });
 
     var ActivityObjectStream = Backbone.Collection.extend({
@@ -468,6 +486,8 @@
                 params = {nickname: view.$('#login input[name="nickname"]').val(),
                           password: view.$('#login input[name="password"]').val()},
                 options,
+                sp = searchParams(),
+                continueTo = (_.has(sp, "continue")) ? sp["continue"] : "",
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
                 onSuccess = function(data, textStatus, jqXHR) {
                     var nav;
@@ -480,7 +500,7 @@
                     nav.render();
                     // XXX: reload current data
                     view.$(':submit').spin(false);
-                    pump.navigate("", true);
+                    pump.navigate(continueTo, true);
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     view.$(':submit').prop('disabled', false).spin(false);
@@ -678,10 +698,7 @@
     });
 
     var SettingsContent = TemplateView.extend({
-        initialize: function() {
-            _.bindAll(this, "saveSettings");
-        },
-        templateName: 'settings-content',
+        templateName: 'settings',
         el: '#content',
         events: {
             "submit #settings": "saveSettings"
@@ -692,12 +709,9 @@
                 user = currentUser,
                 profile = user.profile;
 
-            user.set({"password": this.$("#password").val()});
-
-            user.save();
-
             profile.set({"displayName": this.$('#realname').val(),
-                         "window.location": { displayName: this.$('#window.location').val() },
+                         "location": { objectType: "place", 
+                                       displayName: this.$('#location').val() },
                          "summary": this.$('#bio').val()});
 
             profile.save();
