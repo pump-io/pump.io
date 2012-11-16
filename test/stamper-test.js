@@ -60,10 +60,10 @@ vows.describe("stamper module interface").addBatch({
                     assert.isString(ts);
                 },
                 "it looks correct": function(ts) {
-                    assert.match(ts, /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
+                    assert.match(ts, /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/);
                 },
                 "it contains our date": function(ts) {
-                    assert.equal(ts, "2000-01-01T12:34:56");
+                    assert.equal(ts, "2000-01-01T12:34:56Z");
                 }
             },
             "and we unstamp a timestamp": {
