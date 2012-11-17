@@ -63,6 +63,7 @@ var addRoutes = function(app) {
     // we redirect to the login page, then let you go there
 
     app.get("/main/settings", loginRedirect("/main/settings"));
+    app.get("/main/account", loginRedirect("/main/account"));
 };
 
 var loginRedirect = function(rel) {

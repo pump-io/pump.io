@@ -52,7 +52,7 @@
 
         if (!options.url) {
             params.url = (type == 'POST') ? getValue(model.collection, 'url') : getValue(model, 'url');
-            if (!params.url) { 
+            if (!params.url || !_.isString(params.url)) { 
                 throw new Error("No URL");
             }
         }
@@ -397,6 +397,28 @@
                 });
             }
             return this;
+        },
+        showAlert: function(msg, type) {
+            var view = this;
+
+            if (view.$(".alert").length > 0) {
+                view.$(".alert").remove();
+            }
+
+            type = type || "error";
+
+            view.$("legend").after('<div class="alert alert-'+type+'">' +
+                                   '<a class="close" data-dismiss="alert" href="#">&times;</a>' +
+                                   '<p class="alert-message">'+ msg + '</p>' +
+                                   '</div>');
+            
+            view.$(".alert").alert();
+        },
+        showError: function(msg) {
+            this.showAlert(msg, "error");
+        },
+        showSuccess: function(msg) {
+            this.showAlert(msg, "success");
         }
     });
 
@@ -590,17 +612,6 @@
                     } else {
                         showError(null, errorThrown);
                     }
-                },
-                showError = function(input, msg) {
-                    if ($(".alert-message").length > 0) {
-                        $(".alert-message").text(msg);
-                    } else {
-                        $("div.registration").prepend('<div class="alert alert-error">' +
-                                                      '<a class="close" data-dismiss="alert" href="#">&times;</a>' +
-                                                      '<p class="alert-message">'+ msg + '</p>' +
-                                                      '</div>');
-                    }
-                    $(".alert").alert();
                 };
 
             if (params.password !== repeat) {
@@ -715,13 +726,61 @@
                 user = currentUser,
                 profile = user.profile;
 
-            profile.set({"displayName": this.$('#realname').val(),
-                         "location": { objectType: "place", 
-                                       displayName: this.$('#location').val() },
-                         "summary": this.$('#bio').val()});
+            profile.save({"displayName": this.$('#realname').val(),
+                          "location": { objectType: "place", 
+                                        displayName: this.$('#location').val() },
+                          "summary": this.$('#bio').val()},
+                         {success: function(resp, status, xhr) {
+                             user.set("profile", profile);
+                             view.showSuccess("Saved settings.");
+                         },
+                          error: function(model, error, options) {
+                             view.showError("Not saved.");
+                          }});
 
-            profile.save();
+            return false;
+        }
+    });
 
+    var AccountContent = TemplateView.extend({
+        templateName: 'account',
+        el: '#content',
+        events: {
+            "submit #account": "saveAccount"
+        },
+        saveAccount: function() {
+            var view = this,
+                user = currentUser,
+                password = view.$('#password').val(),
+                repeat = view.$('#repeat').val();
+
+            if (password !== repeat) {
+
+                view.showError("Passwords don't match.");
+
+            } else if (password.length < 8) {
+
+                view.showError("Password must be 8 chars or more.");
+
+            } else if (/^[a-z]+$/.test(password.toLowerCase()) ||
+                       /^[0-9]+$/.test(password)) {
+
+                view.showError("Passwords have to have at least one letter and one number.");
+
+            } else {
+                user.save("password",
+                          password,
+                          {
+                              success: function(resp, status, xhr) {
+                                  view.showSuccess("Saved.");
+                              },
+                              error: function(model, error, options) {
+                                  view.showError(error.message);
+                              }
+                          }
+                         );
+            }
+            
             return false;
         }
     });
@@ -736,6 +795,7 @@
             ":nickname/followers":    "followers",  
             ":nickname/activity/:id": "activity",
             "main/settings":          "settings",
+            "main/account":           "account",
             "main/register":          "register",
             "main/login":             "login"
         },
@@ -754,6 +814,12 @@
 
         settings: function() {
             var content = new SettingsContent({model: currentUser});
+
+            content.render();
+        },
+
+        account: function() {
+            var content = new AccountContent({model: currentUser});
 
             content.render();
         },
