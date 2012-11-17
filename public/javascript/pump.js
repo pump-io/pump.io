@@ -9,7 +9,7 @@
         if (!str) {
             str = window.location.search;
         }
-            
+        
         pairs = str.substr(1).split("&");
 
         _.each(pairs, function(pairStr) {
@@ -404,6 +404,12 @@
             }
             return this;
         },
+        stopSpin: function() {
+            this.$(':submit').prop('disabled', false).spin(false);
+        },
+        startSpin: function() {
+            this.$(':submit').prop('disabled', true).spin(true);
+        },
         showAlert: function(msg, type) {
             var view = this;
 
@@ -529,33 +535,22 @@
                                                user: currentUser.toJSON()}});
                     nav.render();
                     // XXX: reload current data
-                    view.$(':submit').spin(false);
+                    view.stopSpin();
                     pump.navigate(continueTo, true);
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     var type, response;
-                    view.$(':submit').prop('disabled', false).spin(false);
+                    view.stopSpin();
                     type = jqXHR.getResponseHeader("Content-Type");
                     if (type && type.indexOf("application/json") !== -1) {
                         response = JSON.parse(jqXHR.responseText);
-                        showError(null, response.error);
+                        view.showError(response.error);
                     } else {
-                        showError(null, errorThrown);
+                        view.showError(errorThrown);
                     }
-                },
-                showError = function(input, msg) {
-                    if ($(".alert-message").length > 0) {
-                        $(".alert-message").text(msg);
-                    } else {
-                        $("div.login").prepend('<div class="alert alert-error">' +
-                                               '<a class="close" data-dismiss="alert" href="#">&times;</a>' +
-                                               '<p class="alert-message">'+ msg + '</p>' +
-                                               '</div>');
-                    }
-                    $(".alert").alert();
                 };
 
-            view.$(':submit').prop('disabled', true).spin(true);
+            view.startSpin();
 
             options = {
                 contentType: "application/json",
@@ -569,7 +564,7 @@
 
             ensureCred(function(err, cred) {
                 if (err) {
-                    showError(null, "Couldn't get OAuth credentials. :(");
+                    view.showError(null, "Couldn't get OAuth credentials. :(");
                 } else {
                     options.consumerKey = cred.clientID;
                     options.consumerSecret = cred.clientSecret;
@@ -604,42 +599,42 @@
                                                                                user: currentUser.toJSON()}});
                     nav.render();
                     // Leave disabled
-                    view.$(':submit').spin(false);
+                    view.stopSpin();
                     // XXX: one-time on-boarding page
                     pump.navigate("", true);
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     var type, response;
-                    view.$(':submit').prop('disabled', false).spin(false);
+                    view.stopSpin();
                     type = jqXHR.getResponseHeader("Content-Type");
                     if (type && type.indexOf("application/json") !== -1) {
                         response = JSON.parse(jqXHR.responseText);
-                        showError(null, response.error);
+                        view.showError(response.error);
                     } else {
-                        showError(null, errorThrown);
+                        view.showError(errorThrown);
                     }
                 };
 
             if (params.password !== repeat) {
 
-                showError("repeat", "Passwords don't match.");
+                view.showError("repeat", "Passwords don't match.");
 
             } else if (!NICKNAME_RE.test(params.nickname)) {
 
-                showError("nickname", "Nicknames have to be a combination of 1-64 letters or numbers and ., - or _.");
+                view.showError("nickname", "Nicknames have to be a combination of 1-64 letters or numbers and ., - or _.");
 
             } else if (params.password.length < 8) {
 
-                showError("password", "Password must be 8 chars or more.");
+                view.showError("password", "Password must be 8 chars or more.");
 
             } else if (/^[a-z]+$/.test(params.password.toLowerCase()) ||
                        /^[0-9]+$/.test(params.password)) {
 
-                showError("password", "Passwords have to have at least one letter and one number.");
+                view.showError("password", "Passwords have to have at least one letter and one number.");
 
             } else {
 
-                view.$(':submit').prop("disabled", true).spin(true);
+                view.startSpin();
 
                 options = {
                     contentType: "application/json",
@@ -653,7 +648,7 @@
 
                 ensureCred(function(err, cred) {
                     if (err) {
-                        showError(null, "Couldn't get OAuth credentials. :(");
+                        view.showError(null, "Couldn't get OAuth credentials. :(");
                     } else {
                         options.consumerKey = cred.clientID;
                         options.consumerSecret = cred.clientSecret;
@@ -732,6 +727,8 @@
                 user = currentUser,
                 profile = user.profile;
 
+            view.startSpin();
+
             profile.save({"displayName": this.$('#realname').val(),
                           "location": { objectType: "place", 
                                         displayName: this.$('#location').val() },
@@ -740,9 +737,11 @@
                              success: function(resp, status, xhr) {
                                  user.set("profile", profile);
                                  view.showSuccess("Saved settings.");
+                                 view.stopSpin();
                              },
                              error: function(model, error, options) {
-                                 view.showError("Not saved.");
+                                 view.showError(error.message);
+                                 view.stopSpin();
                              }
                          });
 
@@ -776,14 +775,19 @@
                 view.showError("Passwords have to have at least one letter and one number.");
 
             } else {
+
+                view.startSpin();
+
                 user.save("password",
                           password,
                           {
                               success: function(resp, status, xhr) {
                                   view.showSuccess("Saved.");
+                                  view.stopSpin();
                               },
                               error: function(model, error, options) {
                                   view.showError(error.message);
+                                  view.stopSpin();
                               }
                           }
                          );
@@ -970,11 +974,11 @@
                 }),
                 stream = currentUser.getStream();
 
-            view.$('#sendnote').prop("disabled", true).spin(true);
+            view.startSpin();
             
             stream.create(act, {success: function(act) {
                 view.$('#modal-note').modal('hide');
-                view.$('#sendnote').prop("disabled", false).spin(false);
+                view.stopSpin();
                 view.$('#note-content').val("");
                 // Reload the current page
             }});
