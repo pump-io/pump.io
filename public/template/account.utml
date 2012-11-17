@@ -1,0 +1,44 @@
+<div class="span12" class="account">
+
+  <form id="account">
+
+    <fieldset>
+
+      <legend>Account</legend>
+      
+      <div class="clearfix">
+	<label>Username</label>
+	<div class="input">
+          <span class="uneditable-input"><%- nickname %></span>
+	  <span class="help-block">The name you log in with (unchangeable!)</span>
+	</div>
+      </div>
+
+      <div class="clearfix">
+	<label>Password</label>
+	<div class="input">
+          <input class="span6" id="password" name="password" size="30" type="password" />
+          <span class="help-block">Eight characters, mixed letters and numbers, not stupid</span>
+	</div>
+      </div>
+
+      <div class="clearfix">
+	<label>Repeat</label>
+	<div class="input">
+          <input class="span6" id="repeat" name="repeat" size="30" type="password" />
+	  <span class="help-block">Check your typing</span>
+	</div>
+      </div>
+
+    </fieldset>
+
+    <fieldset>
+      <div class="actions">
+	<input type="submit" class="btn primary" value="Save changes">&nbsp;<button type="reset" class="btn">Cancel</button>
+      </div>
+    </fieldset>  
+
+  </form>
+
+</div>
+
