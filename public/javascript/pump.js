@@ -284,8 +284,14 @@
     });
 
     var User = Backbone.Model.extend({
+        idAttribute: "nickname",
         initialize: function() {
             this.profile = new Person(this.get("profile"));
+            this.profile.isNew = function() { return false; };
+        },
+        isNew: function() {
+            // Always PUT
+            return false;
         },
         url: function() {
             return "/api/user/" + this.get("nickname");
@@ -730,13 +736,15 @@
                           "location": { objectType: "place", 
                                         displayName: this.$('#location').val() },
                           "summary": this.$('#bio').val()},
-                         {success: function(resp, status, xhr) {
-                             user.set("profile", profile);
-                             view.showSuccess("Saved settings.");
-                         },
-                          error: function(model, error, options) {
-                             view.showError("Not saved.");
-                          }});
+                         {
+                             success: function(resp, status, xhr) {
+                                 user.set("profile", profile);
+                                 view.showSuccess("Saved settings.");
+                             },
+                             error: function(model, error, options) {
+                                 view.showError("Not saved.");
+                             }
+                         });
 
             return false;
         }
@@ -1085,6 +1093,7 @@
         nav = new AnonymousNav({el: ".navbar-inner .container"});
 
         ensureCred(function(err, cred) {
+
             var user, nickname, pair;
 
             if (err) {
