@@ -1098,14 +1098,28 @@
 
                 user = new User({nickname: nickname});
 
-                // XXX: this only has client auth; get something with user auth (direct?)
+                // FIXME: this only has client auth; get something with user auth (direct?)
 
                 user.fetch({success: function(user, response) {
+
+                    var nav, sp, continueTo;
+
                     currentUser = user;
-                    var nav = new UserNav({el: ".navbar-inner .container",
-                                           model: {site: config.site,
-                                                   user: currentUser.toJSON()}});
+                    nav = new UserNav({el: ".navbar-inner .container",
+                                       model: {site: config.site,
+                                               user: currentUser.toJSON()}});
+
                     nav.render();
+
+                    // If we're on the login page, and there's a current
+                    // user, redirect to the actual page
+
+                    if ($("#content .login")) {
+                        content = new LoginContent();
+                        sp = searchParams(),
+                        continueTo = (_.has(sp, "continue")) ? sp["continue"] : "";
+                        pump.navigate(continueTo, true);
+                    }
                 }});
 
                 // Re-navigate since we've got credentials
