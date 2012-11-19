@@ -562,7 +562,9 @@ var getActivity = function(req, res, next) {
 };
 
 var putActivity = function(req, res, next) {
-    req.activity.update(req.body, function(err, result) {
+    var update = Scrubber.scrubActivity(req.body);
+
+    req.activity.update(update, function(err, result) {
         if (err) {
             next(err);
         } else {

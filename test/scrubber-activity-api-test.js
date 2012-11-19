@@ -87,6 +87,63 @@ var badActivity = function(act, property) {
     return context;
 };
 
+var updateActivity = function(act, update) {
+    var feed = "http://localhost:4815/api/user/mickey/feed";
+
+    return {
+        topic: function(cred) {
+            var callback = this.callback;
+            Step(
+                function() {
+                    httputil.postJSON(feed, cred, act, this);
+                },
+                function(err, posted) {
+                    var url, copied;
+                    if (err) throw err;
+                    copied = _.extend(posted, update);
+                    url = posted.links.self.href;
+                    httputil.putJSON(url, cred, copied, this); 
+                },
+                function(err, updated) {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        callback(null, updated);
+                    }
+                }
+            );
+        },
+        "it works": function(err, result, response) {
+            assert.ifError(err);
+            assert.isObject(result);
+        }
+    };
+};
+
+var goodUpdate = function(orig, update, property) {
+    var compare = deepProperty(update, property),
+        context = updateActivity(orig, update);
+    context["it is unchanged"] = function(err, result, response) {
+        assert.ifError(err);
+        assert.isObject(result);
+        assert.equal(deepProperty(result, property), compare);
+    };
+
+    return context;
+};
+
+var badUpdate = function(orig, update, property) {
+    var compare = deepProperty(update, property),
+        context = updateActivity(orig, update);
+    context["it is defanged"] = function(err, result, response) {
+        assert.ifError(err);
+        assert.isObject(result);
+        assert.equal(deepProperty(result, property).indexOf("<script>"), -1);
+    };
+
+    return context;
+};
+
 var suite = vows.describe("Scrubber activity API test");
 
 // A batch to test posting to the regular feed endpoint
@@ -265,7 +322,25 @@ suite.addBatch({
                              summary: DANGEROUS
                          }
                         },
-                        "source.summary")
+                        "source.summary"),
+            "and we update an activity with good content": 
+            goodUpdate({verb: "post",
+                        object: {
+                            objectType: "note",
+                            content: "Hello, world."
+                        }
+                       },
+                       {content: HARMLESS},
+                       "content"),
+            "and we update an activity with bad content": 
+            badUpdate({verb: "post",
+                       object: {
+                           objectType: "note",
+                           content: "Hello, world."
+                       }
+                      },
+                      {content: DANGEROUS},
+                      "content")
         }
     }
 });
