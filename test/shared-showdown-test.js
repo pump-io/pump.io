@@ -39,7 +39,9 @@ suite.addBatch({
         "it works": function(err, app) {
             assert.ifError(err);
         },
-        "and we check the showdown endpoint URL": httputil.endpoint("/shared/showdown.js", ["GET"])
+        "and we check the showdown endpoint URL": httputil.endpoint("/shared/showdown.js", ["GET"]),
+        "and we check the underscore endpoint URL": httputil.endpoint("/shared/underscore.js", ["GET"]),
+        "and we check the underscore-min endpoint URL": httputil.endpoint("/shared/underscore-min.js", ["GET"])
     }
 });
 

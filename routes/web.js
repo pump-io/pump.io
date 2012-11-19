@@ -68,6 +68,8 @@ var addRoutes = function(app) {
     // expose this one file over the web
 
     app.get("/shared/showdown.js", sharedFile("showdown/src/showdown.js"));
+    app.get("/shared/underscore.js", sharedFile("underscore/underscore.js"));
+    app.get("/shared/underscore-min.js", sharedFile("underscore/underscore-min.js"));
 };
 
 var sharedFile = function(fname) {
