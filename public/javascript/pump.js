@@ -366,7 +366,8 @@
                     if (err) {
                         pumpError(err);
                     } else {
-                        $(view.el).html(html);
+                        view.$el.html(html);
+                        view.$el.trigger("pump.rendered");
                         // Update relative to the new code view
                         view.$("abbr.easydate").easydate();
                     }
@@ -446,7 +447,28 @@
         templateName: 'nav-loggedin',
         events: {
             "click #logout": "logout",
+            "click #post-note-button": "postNoteModal",
             "click #profile-dropdown": "profileDropdown"
+        },
+        postNoteModal: function() {
+            var view = this,
+                modalView;
+
+            if (view.postNote) {
+                modalView = view.postNote;
+            } else {
+                modalView = new PostNoteModal({});
+                $("body").append(modalView.el);
+                view.postNote = modalView;
+            }
+
+            // Once it's rendered, show the modal
+
+            modalView.$el.one("pump.rendered", function() {
+                modalView.$("#modal-note").modal('show');
+            });
+
+            modalView.render();
         },
         profileDropdown: function() {
             $('#profile-dropdown').dropdown();
@@ -941,26 +963,13 @@
         }
     });
 
-    var BodyView = Backbone.View.extend({
-        initialize: function(options) {
-            this.router = options.router;
-            _.bindAll(this, "navigateToHref");
-        },
-        el: "body",
+    var PostNoteModal = TemplateView.extend({
+
+        tagname: "div",
+        classname: "modal-holder",
+        templateName: 'post-note',
         events: {
-            "click a": "navigateToHref",
             "click #send-note": "postNote"
-        },
-        navigateToHref: function(ev) {
-            var el = (ev.srcElement || ev.currentTarget),
-                pathname = el.pathname, // XXX: HTML5
-                here = window.location;
-
-            if (!el.host || el.host === here.host) {
-                this.router.navigate(pathname, true);
-            }
-
-            return false;
         },
         postNote: function(ev) {
             var view = this,
@@ -977,11 +986,33 @@
             view.startSpin();
             
             stream.create(act, {success: function(act) {
-                view.$('#modal-note').modal('hide');
+                view.$("#modal-note").modal('hide');
                 view.stopSpin();
                 view.$('#note-content').val("");
                 // Reload the current page
             }});
+        }
+    });
+
+    var BodyView = Backbone.View.extend({
+        initialize: function(options) {
+            this.router = options.router;
+            _.bindAll(this, "navigateToHref");
+        },
+        el: "body",
+        events: {
+            "click a": "navigateToHref"
+        },
+        navigateToHref: function(ev) {
+            var el = (ev.srcElement || ev.currentTarget),
+                pathname = el.pathname, // XXX: HTML5
+                here = window.location;
+
+            if (!el.host || el.host === here.host) {
+                this.router.navigate(pathname, true);
+            }
+
+            return false;
         }
     });
 

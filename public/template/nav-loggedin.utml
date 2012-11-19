@@ -1,6 +1,6 @@
 <a class="brand" href="/"><%- site %></a>
 
-<button type="button" class="btn primary" data-target="#modal-note" data-toggle="modal">
+<button type="button" class="btn primary" id="post-note-button">
   Note <i class="icon-pencil"></i>
 </button>
 
