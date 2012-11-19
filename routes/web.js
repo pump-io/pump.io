@@ -64,6 +64,16 @@ var addRoutes = function(app) {
 
     app.get("/main/settings", loginRedirect("/main/settings"));
     app.get("/main/account", loginRedirect("/main/account"));
+
+    // expose this one file over the web
+
+    app.get("/shared/showdown.js", sharedFile("showdown/src/showdown.js"));
+};
+
+var sharedFile = function(fname) {
+    return function(req, res, next) {
+        res.sendFile(path.join(__dirname, "..", "node_modules", fname));
+    };
 };
 
 var loginRedirect = function(rel) {
