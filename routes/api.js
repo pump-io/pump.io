@@ -1524,10 +1524,11 @@ var userFavorites = function(req, res, next) {
 };
 
 var newFavorite = function(req, res, next) {
-    var act = new Activity({
+    var obj = Scrubber.scrubObject(req.body),
+        act = new Activity({
             actor: req.user.profile,
             verb: "favorite",
-            object: req.body
+            object: obj
         });
 
     Step(
