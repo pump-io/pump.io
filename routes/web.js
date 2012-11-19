@@ -74,7 +74,7 @@ var addRoutes = function(app) {
 
 var sharedFile = function(fname) {
     return function(req, res, next) {
-        res.sendFile(path.join(__dirname, "..", "node_modules", fname));
+        res.sendfile(path.join(__dirname, "..", "node_modules", fname));
     };
 };
 

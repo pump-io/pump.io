@@ -18,11 +18,30 @@
 
 var assert = require("assert"),
     vows = require("vows"),
+    http = require("http"),
     oauthutil = require("./lib/oauth"),
     httputil = require("./lib/http"),
     setupApp = oauthutil.setupApp;
 
 var suite = vows.describe("shared library test");
+
+var testGet = function(rel) {
+    return {
+        topic: function() {
+            var callback = this.callback;
+            http.get("http://localhost:4815" + rel, function(res) {
+                if (res.statusCode !== 200) {
+                    callback(new Error("Bad status code: " + res.statusCode), null);
+                } else {
+                    callback(null, res);
+                }
+            });
+        },
+        "it returns the correct error code": function(err, res) {
+            assert.ifError(err);
+        }
+    };
+};
 
 // A batch to test that the API docs are served at root
 
@@ -41,7 +60,10 @@ suite.addBatch({
         },
         "and we check the showdown endpoint URL": httputil.endpoint("/shared/showdown.js", ["GET"]),
         "and we check the underscore endpoint URL": httputil.endpoint("/shared/underscore.js", ["GET"]),
-        "and we check the underscore-min endpoint URL": httputil.endpoint("/shared/underscore-min.js", ["GET"])
+        "and we check the underscore-min endpoint URL": httputil.endpoint("/shared/underscore-min.js", ["GET"]),
+        "and we get the showdown file": testGet("/shared/showdown.js"),
+        "and we get the underscore file": testGet("/shared/underscore.js"),
+        "and we get the underscore-min file": testGet("/shared/underscore-min.js")
     }
 });
 
