@@ -30,6 +30,7 @@ var databank = require("databank"),
     publicOnly = filters.publicOnly,
     HTTPError = require("../lib/httperror").HTTPError,
     Stamper = require("../lib/stamper").Stamper,
+    Scrubber = require("../lib/scrubber"),
     Activity = require("../lib/model/activity").Activity,
     AppError = require("../lib/model/activity").AppError,
     Collection = require("../lib/model/collection").Collection,
@@ -813,7 +814,8 @@ var listUsers = function(req, res, next) {
 
 var postActivity = function(req, res, next) {
 
-    var activity = new Activity(req.body);
+    var props = Scrubber.scrubActivity(req.body),
+        activity = new Activity(props);
 
     // Add a default actor
 
