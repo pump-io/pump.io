@@ -59,7 +59,7 @@
     <script src="/javascript/jquery.easydate-0.2.4.min.js"></script>
     <script src="/javascript/json2.min.js"></script>
     <script src="/javascript/bootstrap.min.js"></script>
-    <script src="/javascript/underscore-min.js"></script>
+    <script src="/shared/underscore-min.js"></script>
     <script src="/javascript/backbone-min.js"></script>
     <script src="/javascript/oauth.min.js"></script>
     <script src="/javascript/sha1.min.js"></script>
