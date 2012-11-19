@@ -1,6 +1,6 @@
-// shared-showdown-test.js
+// shared-library-test.js
 //
-// Test that showdown.js file is shared correctly
+// Test that files used server- and client-side shared correctly
 //
 // Copyright 2012, StatusNet Inc.
 //
@@ -22,7 +22,7 @@ var assert = require("assert"),
     httputil = require("./lib/http"),
     setupApp = oauthutil.setupApp;
 
-var suite = vows.describe("shared showdown.js file");
+var suite = vows.describe("shared library test");
 
 // A batch to test that the API docs are served at root
 
