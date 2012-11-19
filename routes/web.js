@@ -301,7 +301,7 @@ var showFavorites = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("favorites", _.extend({title: req.user.nickname},
+                res.render("favorites", _.extend({title: req.user.nickname + " favorites"},
                                                  data,
                                                  helpers));
             }
@@ -341,7 +341,7 @@ var showFollowers = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("followers", _.extend({title: req.user.nickname},
+                res.render("followers", _.extend({title: req.user.nickname + " followers"},
                                                  data,
                                                  helpers));
             }
@@ -381,7 +381,7 @@ var showFollowing = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("following", _.extend({title: req.user.nickname},
+                res.render("following", _.extend({title: req.user.nickname + " following"},
                                                  data,
                                                  helpers));
             }
