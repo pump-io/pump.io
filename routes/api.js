@@ -314,10 +314,11 @@ var getter = function(type) {
 var putter = function(type) {
     return function(req, res, next) {
         var obj = req[type],
+            updates = Scrubber.scrubObject(req.body),
             act = new Activity({
                 actor: req.remoteUser.profile,
                 verb: "update",
-                object: _(obj).extend(req.body)
+                object: _(obj).extend(updates)
             });
 
         Step(
