@@ -861,7 +861,8 @@ var postActivity = function(req, res, next) {
 
 var postToInbox = function(req, res, next) {
 
-    var activity = new Activity(req.body),
+    var props = Scrubber.scrubActivity(req.body),
+        activity = new Activity(props),
         user = req.user;
 
     // Check for actor
