@@ -834,8 +834,16 @@
             "main/login":             "login"
         },
 
+        setTitle: function(view, title) {
+            view.$el.one("pump.rendered", function() {
+                $("title").html(title + " - " + config.site);
+            });
+        },
+
         register: function() {
             var content = new RegisterContent();
+
+            this.setTitle(content, "Register");
 
             content.render();
         },
@@ -843,11 +851,15 @@
         login: function() {
             var content = new LoginContent();
 
+            this.setTitle(content, "Login");
+
             content.render();
         },
 
         settings: function() {
             var content = new SettingsContent({model: currentUser});
+
+            this.setTitle(content, "Settings");
 
             content.render();
         },
@@ -855,11 +867,14 @@
         account: function() {
             var content = new AccountContent({model: currentUser});
 
+            this.setTitle(content, "Account");
+
             content.render();
         },
 
         "home": function() {
-            var pair = getUserCred();
+            var router = this,
+                pair = getUserCred();
 
             if (pair) {
                 var user = currentUser,
@@ -874,18 +889,21 @@
                             var content = new InboxContent({model: {user: user.toJSON(),
                                                                     major: major.toJSON(),
                                                                     minor: minor.toJSON()}});
+                            router.setTitle(content, "Home");
                             content.render();
                         }});
                     }});
                 }});
             } else {
                 var content = new MainContent({model: {site: config.site}});
+                router.setTitle(content, "Welcome");
                 content.render();
             }
         },
 
         profile: function(nickname) {
-            var user = new User({nickname: nickname}),
+            var router = this,
+                user = new User({nickname: nickname}),
                 major = user.getMajorStream(),
                 minor = user.getMinorStream();
 
@@ -898,6 +916,7 @@
                             content = new UserPageContent({model: {profile: profile,
                                                                    major: major.toJSON(),
                                                                    minor: minor.toJSON()}});
+                        router.setTitle(content, nickname);
                         content.render();
                     }});
                 }});
@@ -905,7 +924,8 @@
         },
 
         favorites: function(nickname) {
-            var user = new User({nickname: nickname}),
+            var router = this,
+                user = new User({nickname: nickname}),
                 favorites = user.getFavorites();
 
             // XXX: parallelize this?
@@ -915,13 +935,15 @@
                 favorites.fetch({success: function(major, response) {
                     var content = new FavoritesContent({model: {profile: profile,
                                                                 objects: favorites.toJSON()}});
+                    router.setTitle(content, nickname + " favorites");
                     content.render();
                 }});
             }});
         },
 
         followers: function(nickname) {
-            var user = new User({nickname: nickname}),
+            var router = this,
+                user = new User({nickname: nickname}),
                 followers = user.getFollowersStream();
 
             // XXX: parallelize this?
@@ -931,13 +953,15 @@
                     var profile = user.get("profile"),
                         content = new FollowersContent({model: {profile: profile,
                                                                 people: followers.toJSON()}});
+                    router.setTitle(content, nickname + " followers");
                     content.render();
                 }});
             }});
         },
 
         following: function(nickname) {
-            var user = new User({nickname: nickname}),
+            var router = this,
+                user = new User({nickname: nickname}),
                 following = user.getFollowingStream();
 
             // XXX: parallelize this?
@@ -947,17 +971,21 @@
                     var profile = user.get("profile"),
                         content = new FollowingContent({model: {profile: profile,
                                                                 people: following.toJSON()}});
+
+                    router.setTitle(content, nickname + " following");
                     content.render();
                 }});
             }});
         },
 
         activity: function(nickname, id) {
-            var act = new Activity({uuid: id, userNickname: nickname});
+            var router = this,
+                act = new Activity({uuid: id, userNickname: nickname});
 
             act.fetch({success: function(act, response) {
                 var content = new ActivityContent({model: act});
 
+                router.setTitle(content, act.content);
                 content.render();
             }});
         }
