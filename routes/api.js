@@ -812,9 +812,12 @@ var listUsers = function(req, res, next) {
             var i;
             if (err) throw err;
 
-            for (i = 0; i < users.length; i++) {
-                users[i].sanitize();
-            }
+            _.each(users, function(user) {
+                user.sanitize();
+                if (!req.remoteUser || req.remoteUser.nickname != user.nickname) {
+                    delete user.email;
+                }
+            });
 
             collection.items = users;
 

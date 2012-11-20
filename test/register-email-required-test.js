@@ -196,6 +196,100 @@ suite.addBatch({
                         assert.isObject(user);
                         assert.include(user, "email");
                     }
+                },
+                "and we fetch the user feed with client credentials": {
+                    topic: function(user, cl) {
+                        var cred = {
+                            consumer_key: cl.client_id,
+                            consumer_secret: cl.client_secret
+                        };
+                        httputil.getJSON("http://localhost:4815/api/users", cred, this.callback);
+                    },
+                    "it works": function(err, feed, response) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                    },
+                    "the email address is not included": function(err, feed, response) {
+                        var target;
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                        target = _.filter(feed.items, function(user) {
+                            return (user.nickname == "jj");
+                        });
+                        assert.lengthOf(target, 1);
+                        assert.isObject(target[0]);
+                        assert.isFalse(_.has(target[0], "email"));
+                    }
+                },
+                "and we fetch the user feed with user credentials for a different user": {
+                    topic: function(jj, cl) {
+                        var callback = this.callback;
+
+                        Step(
+                            function() {
+                                registerEmail(cl, "thelma", "dance4fun", "thelma@pump.test", this);
+                            },
+                            function(err, thelma) {
+                                if (err) throw err;
+                                var cred = {
+                                    consumer_key: cl.client_id,
+                                    consumer_secret: cl.client_secret,
+                                    token: thelma.token,
+                                    token_secret: thelma.secret
+                                };
+                                httputil.getJSON("http://localhost:4815/api/users", cred, this);
+                            },
+                            function(err, doc, response) {
+                                if (err) {
+                                    callback(err, null);
+                                } else {
+                                    callback(null, doc);
+                                }
+                            }
+                        );
+                    },
+                    "it works": function(err, feed) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                    },
+                    "the email address is not included": function(err, feed) {
+                        var target;
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                        target = _.filter(feed.items, function(user) {
+                            return (user.nickname == "jj");
+                        });
+                        assert.lengthOf(target, 1);
+                        assert.isObject(target[0]);
+                        assert.isFalse(_.has(target[0], "email"));
+                    }
+                },
+                "and we fetch the user feed with user credentials for the same user": {
+                    topic: function(user, cl) {
+                        var cred = {
+                            consumer_key: cl.client_id,
+                            consumer_secret: cl.client_secret,
+                            token: user.token,
+                            token_secret: user.secret
+                        };
+
+                        httputil.getJSON("http://localhost:4815/api/users", cred, this.callback);
+                    },
+                    "it works": function(err, feed) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                    },
+                    "the email address is included": function(err, feed) {
+                        var target;
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                        target = _.filter(feed.items, function(user) {
+                            return (user.nickname == "jj");
+                        });
+                        assert.lengthOf(target, 1);
+                        assert.isObject(target[0]);
+                        assert.isTrue(_.has(target[0], "email"));
+                    }
                 }
             }
         }
