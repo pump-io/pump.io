@@ -479,6 +479,10 @@ var getUser = function(req, res, next) {
         },
         function(err) {
             if (err) next(err);
+            // If no user, or different user, hide email
+            if (!req.remoteUser || (req.remoteUser.nickname != req.user.nickname)) {
+                delete req.user.email;
+            }
             res.json(req.user);
         }
     );
@@ -1709,4 +1713,3 @@ var streamArgs = function(req, defaultCount, maxCount) {
         throw new HTTPError(e.message, 400);
     }
 };
-
