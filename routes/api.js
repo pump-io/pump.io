@@ -682,18 +682,21 @@ var createUser = function(req, res, next) {
     // Email validation
 
     if (_.has(req.app.config, "requireEmail") &&
-        req.app.config.requireEmail &&
-        !_.has(props, "email") || props.email.length === 0) {
-        next(new HTTPError("No email address", 400));
-        return;
-    } else {
-        try {
-            check(props.email).isEmail();
-        } catch(e) {
-            next(new HTTPError(e.message, 400));
+        req.app.config.requireEmail) {
+        if (!_.has(props, "email") ||
+            !_.isString(props.email) ||
+            props.email.length === 0) {
+            next(new HTTPError("No email address", 400));
             return;
+        } else {
+            try {
+                check(props.email).isEmail();
+            } catch(e) {
+                next(new HTTPError(e.message, 400));
+                return;
+            };
         }
-    };
+    }
 
     Step(
         function() {
