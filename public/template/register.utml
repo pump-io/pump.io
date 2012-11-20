@@ -9,6 +9,13 @@
         <span class="help-inline">1-64 characters, only letters and numbers and . and - and _</span>
       </div>
     </div>
+    <div class="control-group" id="nickname-group">
+      <label class="control-label" for="nickname">Email</label>
+      <div class="controls">
+        <input type="text" id="email" name="email" size="16" placeholder="Your email address">
+        <span class="help-inline">For updates and password recovery</span>
+      </div>
+    </div>
     <div class="control-group" id="password-group">
       <label class="control-label" for="password">Password</label>
       <div class="controls">

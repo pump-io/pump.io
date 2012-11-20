@@ -68,7 +68,8 @@
     <script src="/javascript/pump.js"></script>
     <script>
       config = {
-      site: "<%- site %>"
+      site: "<%- site %>",
+      requireEmail: "<%- requireEmail %>"
       };
     </script>
   </body>

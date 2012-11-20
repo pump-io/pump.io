@@ -377,6 +377,10 @@
                 pc,
                 cnt;
 
+            // Add config stuff
+
+            base = _.extend(base, config);
+
             // If there are sub-parts, we do them in parallel then
             // do the main one. Note: only one level.
 
@@ -510,7 +514,7 @@
             ensureCred(function(err, cred) {
                 var pair;
                 if (err) {
-                    showError(null, "Couldn't get OAuth credentials. :(");
+                    showError("Couldn't get OAuth credentials. :(");
                 } else {
                     options.consumerKey = cred.clientID;
                     options.consumerSecret = cred.clientSecret;
@@ -586,7 +590,7 @@
 
             ensureCred(function(err, cred) {
                 if (err) {
-                    view.showError(null, "Couldn't get OAuth credentials. :(");
+                    view.showError("Couldn't get OAuth credentials. :(");
                 } else {
                     options.consumerKey = cred.clientID;
                     options.consumerSecret = cred.clientSecret;
@@ -610,6 +614,7 @@
                 params = {nickname: view.$('#registration input[name="nickname"]').val(),
                           password: view.$('#registration input[name="password"]').val()},
                 repeat = view.$('#registration input[name="repeat"]').val(),
+                email = (config.requireEmail) ? view.$('#registration input[name="email"]').val() : null,
                 options,
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
                 onSuccess = function(data, textStatus, jqXHR) {
@@ -639,22 +644,30 @@
 
             if (params.password !== repeat) {
 
-                view.showError("repeat", "Passwords don't match.");
+                view.showError("Passwords don't match.");
 
             } else if (!NICKNAME_RE.test(params.nickname)) {
 
-                view.showError("nickname", "Nicknames have to be a combination of 1-64 letters or numbers and ., - or _.");
+                view.showError("Nicknames have to be a combination of 1-64 letters or numbers and ., - or _.");
 
             } else if (params.password.length < 8) {
 
-                view.showError("password", "Password must be 8 chars or more.");
+                view.showError("Password must be 8 chars or more.");
 
             } else if (/^[a-z]+$/.test(params.password.toLowerCase()) ||
                        /^[0-9]+$/.test(params.password)) {
 
-                view.showError("password", "Passwords have to have at least one letter and one number.");
+                view.showError("Passwords have to have at least one letter and one number.");
+
+            } else if (config.requireEmail && (!email || email.length == 0)) {
+
+                view.showError("Email address required.");
 
             } else {
+
+                if (config.requireEmail) {
+                    params.email = email;
+                }
 
                 view.startSpin();
 
@@ -670,7 +683,7 @@
 
                 ensureCred(function(err, cred) {
                     if (err) {
-                        view.showError(null, "Couldn't get OAuth credentials. :(");
+                        view.showError("Couldn't get OAuth credentials. :(");
                     } else {
                         options.consumerKey = cred.clientID;
                         options.consumerSecret = cred.clientSecret;
