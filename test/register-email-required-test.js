@@ -18,6 +18,7 @@
 
 var assert = require("assert"),
     vows = require("vows"),
+    simplesmtp = require("simplesmtp"),
     oauthutil = require("./lib/oauth"),
     Browser = require("zombie"),
     Step = require("step"),
@@ -34,19 +35,39 @@ var suite = vows.describe("layout test");
 suite.addBatch({
     "When we set up the app": {
         topic: function() {
-            setupAppConfig({hostname: "localhost",
-                            port: 4815,
-                            requireEmail: true,
-                            smtpserver: "localhost",
-                            smtpport: 1623},
-                           this.callback);
+            var callback = this.callback,
+                smtp = simplesmtp.createServer();
+            Step(
+                function() {
+                    smtp.listen(1623, this); 
+                },
+                function(err) {
+                    if (err) throw err;
+                    setupAppConfig({hostname: "localhost",
+                                    port: 4815,
+                                    requireEmail: true,
+                                    smtpserver: "localhost",
+                                    smtpport: 1623},
+                                   this);
+                },
+                function(err, app) {
+                    if (err) {
+                        callback(err, null, null);
+                    } else {
+                        callback(null, app, smtp);
+                    }
+                }
+            );
         },
-        teardown: function(app) {
+        teardown: function(app, smtp) {
             if (app && app.close) {
                 app.close();
             }
+            if (smtp) {
+                smtp.end(function(err) {});
+            }
         },
-        "it works": function(err, app) {
+        "it works": function(err, app, smtp) {
             assert.ifError(err);
         },
         "and we get a new client": {

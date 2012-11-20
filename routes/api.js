@@ -633,6 +633,7 @@ var thisService = function(app) {
 var createUser = function(req, res, next) {
 
     var user,
+        props = req.body,
         registrationActivity = function(user, svc, callback) {
 	    var act = new Activity({
 		actor: user.profile,
@@ -674,9 +675,25 @@ var createUser = function(req, res, next) {
             );
         };
 
+    // Email validation
+
+    if (_.has(req.app.config, "requireEmail") &&
+        req.app.config.requireEmail &&
+        !_.has(props, "email") || props.email.length === 0) {
+        next(new HTTPError("No email address", 400));
+        return;
+    } else {
+        try {
+            check(props.email).isEmail();
+        } catch(e) {
+            next(new HTTPError(e.message, 400));
+            return;
+        }
+    };
+
     Step(
         function() {
-            User.create(req.body, this);
+            User.create(props, this);
         },
         function(err, value) {
             if (err) {

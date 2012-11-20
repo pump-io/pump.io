@@ -8,7 +8,8 @@
         "vows": "0.6.x",
         "node-mocks-http": "0.0.x",
         "zombie": "0.12.x",
-        "xml2js": "0.1.x"
+        "xml2js": "0.1.x",
+        "simplesmtp": "0.1.x"
     },
     "dependencies": { "connect": "1.8.x",
 		      "connect-auth": "0.5.3",
