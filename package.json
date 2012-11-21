@@ -28,7 +28,8 @@
                       "showdown": "0.3.x",
                       "jankyqueue": "0.1.x",
                       "schlock": "0.2.x",
-                      "bunyan": "0.16.x"
+                      "bunyan": "0.16.x",
+                      "emailjs": "0.3.x"
 		    },
     "bin": {
         "pump": "./bin/pump",
