@@ -40,6 +40,34 @@ var makeCred = function(cl, pair) {
     };
 };
 
+var oneEmail = function(smtp, addr, callback) {
+    var data,
+        isOurs = function(envelope) {
+            return _.has(envelope.to, addr);
+        },
+        starter = function(envelope) {
+            console.dir(envelope);
+            if (isOurs(envelope)) {
+                data = "";
+                smtp.on("data", accumulator);
+                smtp.once("dataReady", ender);    
+            }
+        },
+        accumulator = function(envelope, chunk) {
+            if (isOurs(envelope)) {
+                data = data + chunk.toString();
+            }
+        },
+        ender = function(envelope, callback) {
+            if (isOurs(envelope)) {
+                smtp.removeListener("data", accumulator);
+                callback(null, data);
+            }
+        };
+
+    smtp.on("startData", starter);
+};
+
 var suite = vows.describe("registration with email");
 
 // A batch to test some of the layout basics
@@ -84,7 +112,7 @@ suite.addBatch({
             assert.ifError(err);
         },
         "and we get a new client": {
-            topic: function() {
+            topic: function(app, smtp) {
                 newClient(this.callback);
             },
             "it works": function(err, cl) {
@@ -92,7 +120,7 @@ suite.addBatch({
                 assert.isObject(cl);
             },
             "and we try to register a user with no email address": {
-                topic: function(cl) {
+                topic: function(cl, app, smtp) {
                     var callback = this.callback;
                     register(cl, "florida", "good*times", function(err, result, response) {
                         if (err && err.statusCode == 400) {
@@ -107,9 +135,18 @@ suite.addBatch({
                 }
             },
             "and we register a user with an email address": {
-                topic: function(cl) {
+                topic: function(cl, app, smtp) {
                     var callback = this.callback;
-                    registerEmail(cl, "jj", "dyn|o|mite!", "jamesjr@pump.test", callback);
+                    Step(
+                        function() {
+                            oneEmail(smtp, "jamesjr@pump.test", this.parallel());
+                            registerEmail(cl, "jj", "dyn|o|mite!", "jamesjr@pump.test", this.parallel());
+                        },
+                        function(err, message, user) {
+                            callback(err, user);
+                        }
+                    );
+                        
                 },
                 "it works correctly": function(err, user) {
                     assert.ifError(err);

@@ -677,6 +677,32 @@ var createUser = function(req, res, next) {
                     }
                 }
             );
+        },
+        sendConfirmationEmail = function(user, callback) {
+            Step(
+                function() {
+                    Confirmation.create({nickname: user.nickname,
+                                         email: user.email},
+                                        this);
+                },
+                function(err, confirmation) {
+                    if (err) throw err;
+                    res.render("confirmation-email",
+                               {user: user,
+                                confirmation: confirmation},
+                               this);
+                },
+                function(err, html) {
+                    if (err) throw err;
+                    req.app.sendEmail({to: user.email,
+                                       subject: "Confirm your email address",
+                                       attachment: {data: html,
+                                                    alternative: true}},
+                                      this);
+                },
+                function(err, message) {
+                }
+            );
         };
 
     // Email validation
@@ -725,6 +751,13 @@ var createUser = function(req, res, next) {
         function(err) {
             if (err) throw err;
             user.expand(this);
+        },
+        function(err) {
+            if (req.app.config.requireEmail) {
+                sendConfirmationEmail(user, this);
+            } else {
+                this(null);
+            }
         },
         function(err) {
             var svc;
