@@ -81,6 +81,9 @@ var addRoutes = function(app) {
     app.put("/api/user/:nickname", userAuth, reqUser, sameUser, putUser);
     app.del("/api/user/:nickname", userAuth, reqUser, sameUser, delUser);
 
+    app.get("/api/user/:nickname/profile", clientAuth, reqUser, getter("person"));
+    app.put("/api/user/:nickname/profile", userAuth, reqUser, sameUser, putter("person"));
+
     // Feeds
 
     app.get("/api/user/:nickname/feed", clientAuth, reqUser, userStream);
