@@ -23,6 +23,16 @@
         return params;
     };
 
+    var getContinueTo = function() {
+        var sp = searchParams(),
+            continueTo = (_.has(sp, "continue")) ? sp["continue"] : null;
+        if (continueTo && continueTo.length > 0 && continueTo[0] == "/") {
+            return continueTo;
+        } else {
+            return "";
+        }
+    };
+
     // Override backbone sync to use OAuth
 
     Backbone.sync = function(method, model, options) {
@@ -548,8 +558,7 @@
                 params = {nickname: view.$('#login input[name="nickname"]').val(),
                           password: view.$('#login input[name="password"]').val()},
                 options,
-                sp = searchParams(),
-                continueTo = (_.has(sp, "continue")) ? sp["continue"] : "",
+                continueTo = getContinueTo(),
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
                 onSuccess = function(data, textStatus, jqXHR) {
                     var nav;
@@ -1202,8 +1211,7 @@
                     switch (window.location.pathname) {
                     case "/main/login":
                         content = new LoginContent();
-                        sp = searchParams(),
-                        continueTo = (_.has(sp, "continue")) ? sp["continue"] : "";
+                        continueTo = getContinueTo();
                         pump.navigate(continueTo, true);
                         break;
                     case "/":
