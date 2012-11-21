@@ -1199,11 +1199,16 @@
                     // If we're on the login page, and there's a current
                     // user, redirect to the actual page
 
-                    if ($("#content .login")) {
+                    switch (window.location.pathname) {
+                    case "/main/login":
                         content = new LoginContent();
                         sp = searchParams(),
                         continueTo = (_.has(sp, "continue")) ? sp["continue"] : "";
                         pump.navigate(continueTo, true);
+                        break;
+                    case "/":
+                        pump.home();
+                        break;
                     }
                 }});
 
