@@ -85,40 +85,40 @@ var loginRedirect = function(rel) {
 };
 
 var showMain = function(req, res, next) {
-    res.render("main", {title: "Welcome"});
+    res.render("main", {page: {title: "Welcome"}});
 };
 
 var showRegister = function(req, res, next) {
-    res.render("register", {title: "Register"});
+    res.render("register", {page: {title: "Register"}});
 };
 
 var showLogin = function(req, res, next) {
-    res.render("login", {title: "Login"});
+    res.render("login", {page: {title: "Login"}});
 };
 
 var handleLogout = function(req, res, next) {
     Step(
-	function() {
-	    AccessToken.search({"consumer_key": req.client.consumer_key,
-				"username": req.remoteUser.nickname},
-			       this);
-	},
-	function(err, tokens) {
-	    var i, group = this.group();
-	    if (err) throw err;
-	    for (i = 0; i < tokens.length; i++) {
-		// XXX: keep for auditing?
-		tokens[i].del(group());
-	    }
-	},
-	function(err) {
-	    if (err) {
-		next(err);
-	    } else {
-		req.remoteUser = null;
-		res.json("OK");
-	    }
-	}
+        function() {
+            AccessToken.search({"consumer_key": req.client.consumer_key,
+                                "username": req.remoteUser.nickname},
+                               this);
+        },
+        function(err, tokens) {
+            var i, group = this.group();
+            if (err) throw err;
+            for (i = 0; i < tokens.length; i++) {
+                // XXX: keep for auditing?
+                tokens[i].del(group());
+            }
+        },
+        function(err) {
+            if (err) {
+                next(err);
+            } else {
+                req.remoteUser = null;
+                res.json("OK");
+            }
+        }
     );
 };
 
@@ -144,9 +144,9 @@ var showActivity = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("activity", {title: "Welcome",
-                                        user: req.remoteUser,
-                                        activity: activity});
+                res.render("activity", {page: {title: "Welcome"},
+                                        data: {user: req.remoteUser,
+                                               activity: activity}});
             }
         }
     );
@@ -260,9 +260,9 @@ var showStream = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("user", _.extend({title: req.user.nickname},
-                                            data,
-                                            helpers));
+                res.render("user", {page: {title: req.user.profile.displayName},
+                                    data: data,
+                                    template: helpers});
             }
         }
     );
@@ -313,9 +313,9 @@ var showFavorites = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("favorites", _.extend({title: req.user.nickname + " favorites"},
-                                                 data,
-                                                 helpers));
+                res.render("favorites", {page: {title: req.user.nickname + " favorites"},
+                                         data: data,
+                                         template: helpers});
             }
         }
     );
@@ -353,9 +353,9 @@ var showFollowers = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("followers", _.extend({title: req.user.nickname + " followers"},
-                                                 data,
-                                                 helpers));
+                res.render("followers", {page: {title: req.user.nickname + " followers"},
+                                         data: data,
+                                         template: helpers});
             }
         }
     );
@@ -393,9 +393,9 @@ var showFollowing = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("following", _.extend({title: req.user.nickname + " following"},
-                                                 data,
-                                                 helpers));
+                res.render("following", {page: {title: req.user.nickname + " following"},
+                                         data: data,
+                                         template: helpers});
             }
         }
     );

@@ -1,10 +1,11 @@
 <div class="span9" id="major-stream">
-  <% if (major && major.length) { %>
-  <% _.each(major, function(activity) { %>
-  <%= majorActivity(activity, _) %>
-  <% }); %>
+  <% if (data.major && data.major.length > 0) { %>
+  <% _.each(data.major, function(activity) {
+     data.activity = activity; %>
+  <%= template.majorActivity(obj, _) %>
+  <% delete data.activity; 
+     }); %>
   <% } else { %>
   <p>No content!</p>
   <% } %>
 </div>
-

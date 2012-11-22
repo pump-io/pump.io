@@ -9,7 +9,7 @@
       <div class="clearfix">
 	<label for="realname">Real name</label>
 	<div class="input">
-          <input class="span6" id="realname" name="realname" size="30" type="text" value="<%- (profile.displayName || "") %>" />
+          <input class="span6" id="realname" name="realname" size="30" type="text" value="<%- (data.profile.displayName || "") %>" />
 	  <span class="help-block">The name you want us to show</span>
 	</div>
       </div>
@@ -17,7 +17,7 @@
       <div class="clearfix">
 	<label for="location">Hometown</label>
 	<div class="input">
-          <input class="span6" id="location" name="location" size="30" type="text" value="<%- ((profile.location) ? (profile.location.displayName || "") : "") %>" />
+          <input class="span6" id="location" name="location" size="30" type="text" value="<%- ((data.profile.location) ? (data.profile.location.displayName || "") : "") %>" />
 	  <span class="help-block">Where you usually are</span>
 	</div>
       </div>
@@ -26,7 +26,7 @@
 	<label for="bio">Bio</label>
 	
 	<div class="input">
-          <textarea class="span6" id="bio" name="bio" rows="5"><%- (profile.summary || "") %></textarea>
+          <textarea class="span6" id="bio" name="bio" rows="5"><%- (data.profile.summary || "") %></textarea>
           <span class="help-block">
 	    All about you.
           </span>

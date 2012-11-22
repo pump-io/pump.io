@@ -1,18 +1,18 @@
 <div class="row">
   <div class="span3">
-    <% if (profile.image && profile.image.url) { %>
-    <img src="<%- profile.image.url %>" width="128" height="128" />
+    <% if (data.profile.image && data.profile.image.url) { %>
+    <img src="<%- data.profile.image.url %>" width="128" height="128" />
     <% } else { %>
     <img src="/images/default.jpg" width="128" height="128" />
     <% } %>
   </div>
   <div class="span8">
-    <h1><%- profile.displayName %> <small><%- profile.preferredUsername %></small></h1>
-    <% if (profile.location) { %>
-    <p class="location"><%- profile.location.displayName %></p>
+    <h1><%- data.profile.displayName %> <small><%- data.profile.preferredUsername %></small></h1>
+    <% if (data.profile.location) { %>
+    <p class="location"><%- data.profile.location.displayName %></p>
     <% } %>
-    <% if (profile.summary) { %>
-    <p class="summary"><%- profile.summary %></p>
+    <% if (data.profile.summary) { %>
+    <p class="summary"><%- data.profile.summary %></p>
     <% } %>
     <% /* TODO: HOME PAGE HERE */ %>
   </div>
@@ -25,11 +25,11 @@
 <div class="row">
   <div class="span12">
     <ul class="nav nav-tabs">
-      <li><a class="active" href="/<%- profile.preferredUsername %>">Activity</a></li>
-      <li><a class="active" href="/<%- profile.preferredUsername %>/favorites">Favorites</a></li>
-      <li><a class="active" href="/<%- profile.preferredUsername %>/followers">Followers</a></li>
-      <li><a class="active" href="/<%- profile.preferredUsername %>/following">Following</a></li>
-      <li><a class="active" href="/<%- profile.preferredUsername %>/lists">Lists</a></li>
+      <li><a class="active" href="/<%- data.profile.preferredUsername %>">Activity</a></li>
+      <li><a class="active" href="/<%- data.profile.preferredUsername %>/favorites">Favorites</a></li>
+      <li><a class="active" href="/<%- data.profile.preferredUsername %>/followers">Followers</a></li>
+      <li><a class="active" href="/<%- data.profile.preferredUsername %>/following">Following</a></li>
+      <li><a class="active" href="/<%- data.profile.preferredUsername %>/lists">Lists</a></li>
     </ul>
   </div>
 </div>

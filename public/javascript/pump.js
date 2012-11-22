@@ -345,6 +345,18 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.templates = {};
 
+    Pump.TemplateError = function(template, data, err) {
+        Error.captureStackTrace(this, Pump.TemplateError);
+        this.name     = "TemplateError";
+        this.template = template;
+        this.data     = data;
+        this.wrapped  = err;
+        this.message  = ((_.has(template, "templateName")) ? template.templateName : "unknown-template") + ": " + err.message;
+    };
+
+    Pump.TemplateError.prototype = new Error();
+    Pump.TemplateError.prototype.constructor = Pump.TemplateError;
+
     Pump.TemplateView = Backbone.View.extend({
         templateName: null,
         parts: null,
@@ -359,6 +371,7 @@ var Pump = (function(_, $, Backbone) {
                             var f;
                             try {
                                 f = _.template(data);
+                                f.templateName = name;
                                 Pump.templates[name] = f;
                             } catch (err) {
                                 cb(err, null);
@@ -370,10 +383,12 @@ var Pump = (function(_, $, Backbone) {
                 },
                 runTemplate = function(template, data, cb) {
                     var html;
+                    console.log(template);
+                    console.log(data);
                     try {
                         html = template(data);
                     } catch (err) {
-                        cb(err, null);
+                        cb(new Pump.TemplateError(template, data, err), null);
                         return;
                     }
                     cb(null, html);
@@ -388,14 +403,29 @@ var Pump = (function(_, $, Backbone) {
                         view.$("abbr.easydate").easydate();
                     }
                 },
-                base = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model),
-                main = _.clone(base),
+                main = {
+                    config: Pump.config,
+                    data: {},
+                    template: {},
+                    page: {}
+                },
                 pc,
+                modelName = view.modelName || view.options.modelName || "model",
                 cnt;
 
-            // Add config stuff
+            main.data[modelName] = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model);
 
-            base = _.extend(base, Pump.config);
+            if (_.has(view.options, "data")) {
+                _.each(view.options.data, function(obj, name) {
+                    if (obj.toJSON) {
+                        main.data[name] = obj.toJSON();
+                    } else {
+                        main.data[name] = obj;
+                    }
+                });
+            }
+
+            // XXX: set main.page.title
 
             // If there are sub-parts, we do them in parallel then
             // do the main one. Note: only one level.
@@ -409,7 +439,7 @@ var Pump = (function(_, $, Backbone) {
                             Pump.error(err);
                         } else {
                             pc++;
-                            main[partName] = template;
+                            main.template[partName] = template;
                             if (pc >= cnt) {
                                 getTemplate(view.templateName, function(err, template) {
                                     runTemplate(template, main, setOutput);
@@ -464,6 +494,7 @@ var Pump = (function(_, $, Backbone) {
     Pump.UserNav = Pump.TemplateView.extend({
         tagname: "div",
         classname: "nav",
+        modelName: "user",
         templateName: 'nav-loggedin',
         events: {
             "click #logout": "logout",
@@ -503,7 +534,7 @@ var Pump = (function(_, $, Backbone) {
                     Pump.setNickname(null);
                     Pump.setUserCred(null, null);
 
-                    an = new Pump.AnonymousNav({el: ".navbar-inner .container", model: {site: Pump.config.site}});
+                    an = new Pump.AnonymousNav({el: ".navbar-inner .container"});
                     an.render();
 
                     // Reload to clear authenticated stuff
@@ -572,8 +603,7 @@ var Pump = (function(_, $, Backbone) {
                     Pump.setUserCred(data.token, data.secret);
                     Pump.currentUser = new Pump.User(data);
                     nav = new Pump.UserNav({el: ".navbar-inner .container",
-                                            model: {site: Pump.config.site,
-                                                    user: Pump.currentUser.toJSON()}});
+                                            model: Pump.currentUser});
                     nav.render();
                     // XXX: reload current data
                     view.stopSpin();
@@ -637,8 +667,8 @@ var Pump = (function(_, $, Backbone) {
                     Pump.setNickname(data.nickname);
                     Pump.setUserCred(data.token, data.secret);
                     Pump.currentUser = new Pump.User(data);
-                    nav = new Pump.UserNav({el: ".navbar-inner .container", model: {site: Pump.config.site,
-                                                                                    user: Pump.currentUser.toJSON()}});
+                    nav = new Pump.UserNav({el: ".navbar-inner .container",
+                                            model: Pump.currentUser});
                     nav.render();
                     // Leave disabled
                     view.stopSpin();
@@ -674,7 +704,7 @@ var Pump = (function(_, $, Backbone) {
 
                 view.showError("Passwords have to have at least one letter and one number.");
 
-            } else if (Pump.config.requireEmail && (!email || email.length == 0)) {
+            } else if (Pump.config.requireEmail && (!email || email.length === 0)) {
 
                 view.showError("Email address required.");
 
@@ -714,6 +744,7 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.UserPageContent = Pump.TemplateView.extend({
         templateName: 'user',
+        modelName: "profile",
         parts: {profileBlock: "profile-block",
                 majorStream: "major-stream",
                 sidebar: "sidebar",
@@ -725,6 +756,7 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.InboxContent = Pump.TemplateView.extend({
         templateName: 'inbox',
+        modelName: "user",
         parts: {majorStream: "major-stream",
                 sidebar: "sidebar",
                 majorActivity: "major-activity",
@@ -735,6 +767,7 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.FavoritesContent = Pump.TemplateView.extend({
         templateName: 'favorites',
+        modelName: "profile",
         parts: {profileBlock: "profile-block",
                 objectStream: "object-stream",
                 majorObject: "major-object"
@@ -744,6 +777,7 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.FollowersContent = Pump.TemplateView.extend({
         templateName: 'followers',
+        modelName: "profile",
         parts: {profileBlock: "profile-block",
                 peopleStream: "people-stream",
                 majorPerson: "major-person"
@@ -753,6 +787,7 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.FollowingContent = Pump.TemplateView.extend({
         templateName: 'following',
+        modelName: "profile",
         parts: {profileBlock: "profile-block",
                 peopleStream: "people-stream",
                 majorPerson: "major-person"
@@ -762,12 +797,14 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.ActivityContent = Pump.TemplateView.extend({
         templateName: 'activity-content',
+        modelName: "activity",
         el: '#content'
     });
 
     Pump.SettingsContent = Pump.TemplateView.extend({
         templateName: 'settings',
         el: '#content',
+        modelName: "profile",
         events: {
             "submit #settings": "saveSettings"
         },
@@ -802,6 +839,7 @@ var Pump = (function(_, $, Backbone) {
     Pump.AccountContent = Pump.TemplateView.extend({
         templateName: 'account',
         el: '#content',
+        modelName: "user",
         events: {
             "submit #account": "saveAccount"
         },
@@ -938,7 +976,7 @@ var Pump = (function(_, $, Backbone) {
         },
 
         settings: function() {
-            var content = new Pump.SettingsContent({model: Pump.currentUser});
+            var content = new Pump.SettingsContent({model: Pump.currentUser.get("profile") });
 
             this.setTitle(content, "Settings");
 
@@ -967,16 +1005,17 @@ var Pump = (function(_, $, Backbone) {
                 user.fetch({success: function(user, response) {
                     major.fetch({success: function(major, response) {
                         minor.fetch({success: function(minor, response) {
-                            var content = new Pump.InboxContent({model: {user: user.toJSON(),
-                                                                    major: major.toJSON(),
-                                                                    minor: minor.toJSON()}});
+                            var content = new Pump.InboxContent({model: user,
+                                                                 data: {major: major,
+                                                                        minor: minor}
+                                                                });
                             router.setTitle(content, "Home");
                             content.render();
                         }});
                     }});
                 }});
             } else {
-                var content = new Pump.MainContent({model: {site: Pump.config.site}});
+                var content = new Pump.MainContent();
                 router.setTitle(content, "Welcome");
                 content.render();
             }
@@ -994,9 +1033,9 @@ var Pump = (function(_, $, Backbone) {
                 major.fetch({success: function(major, response) {
                     minor.fetch({success: function(minor, response) {
                         var profile = user.get("profile"),
-                            content = new Pump.UserPageContent({model: {profile: profile,
-                                                                   major: major.toJSON(),
-                                                                   minor: minor.toJSON()}});
+                            content = new Pump.UserPageContent({model: profile,
+                                                                data: { major: major,
+                                                                        minor: minor }});
                         router.setTitle(content, nickname);
                         content.render();
                     }});
@@ -1014,8 +1053,8 @@ var Pump = (function(_, $, Backbone) {
             user.fetch({success: function(user, response) {
                 var profile = user.get("profile");
                 favorites.fetch({success: function(major, response) {
-                    var content = new Pump.FavoritesContent({model: {profile: profile,
-                                                                objects: favorites.toJSON()}});
+                    var content = new Pump.FavoritesContent({model: profile,
+                                                             data: { objects: favorites }});
                     router.setTitle(content, nickname + " favorites");
                     content.render();
                 }});
@@ -1032,8 +1071,8 @@ var Pump = (function(_, $, Backbone) {
             user.fetch({success: function(user, response) {
                 followers.fetch({success: function(followers, response) {
                     var profile = user.get("profile"),
-                        content = new Pump.FollowersContent({model: {profile: profile,
-                                                                people: followers.toJSON()}});
+                        content = new Pump.FollowersContent({model: profile,
+                                                             data: { people: followers }});
                     router.setTitle(content, nickname + " followers");
                     content.render();
                 }});
@@ -1050,8 +1089,8 @@ var Pump = (function(_, $, Backbone) {
             user.fetch({success: function(user, response) {
                 following.fetch({success: function(following, response) {
                     var profile = user.get("profile"),
-                        content = new Pump.FollowingContent({model: {profile: profile,
-                                                                people: following.toJSON()}});
+                        content = new Pump.FollowingContent({model: profile,
+                                                             data: {people: following}});
 
                     router.setTitle(content, nickname + " following");
                     content.render();
@@ -1224,8 +1263,7 @@ var Pump = (function(_, $, Backbone) {
 
                     Pump.currentUser = user;
                     nav = new Pump.UserNav({el: ".navbar-inner .container",
-                                            model: {site: Pump.config.site,
-                                                    user: Pump.currentUser.toJSON()}});
+                                            model: Pump.currentUser});
 
                     nav.render();
 

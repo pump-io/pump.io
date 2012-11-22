@@ -1,8 +1,8 @@
 <div class="user">
   <div class="row">
-    <%= profileBlock(obj, _) %>
+    <%= template.profileBlock(obj, _) %>
   </div>
   <div class="row">
-    <%= objectStream(obj, _) %>
+    <%= template.objectStream(obj, _) %>
   </div>
 </div>

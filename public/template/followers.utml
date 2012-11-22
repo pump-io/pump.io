@@ -1,9 +1,9 @@
 <div class="user-followers">
   <div class="row">
-    <%= profileBlock(obj, _) %>
+    <%= template.profileBlock(obj, _) %>
   </div>
   <div class="row">
     <h2>Followers</h2>
-    <%= peopleStream(obj, _) %>
+    <%= template.peopleStream(obj, _) %>
   </div>
 </div>

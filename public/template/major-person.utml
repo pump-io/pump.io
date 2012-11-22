@@ -1,18 +1,18 @@
 <div class="row">
   <div class="span1">
-    <% if (person.image && person.image.url) { %>
-    <img src="<%- person.image.url %>" width="40" height="40" />
+    <% if (data.person.image && data.person.image.url) { %>
+    <img src="<%- data.person.image.url %>" width="40" height="40" />
     <% } else { %>
     <img src="/images/default.jpg" width="40" height="40" />
     <% } %>
   </div>
   <div class="span6">
-    <h3><a href="<%- person.url %>"><%- person.displayName %></a> <small><%- person.preferredUsername %></small></h3>
-    <% if (person.location) { %>
-    <p class="location"><%- person.location.displayName %></p>
+    <h3><a href="<%- data.person.url %>"><%- data.person.displayName %></a> <small><%- data.person.preferredUsername %></small></h3>
+    <% if (data.person.location) { %>
+    <p class="location"><%- data.person.location.displayName %></p>
     <% } %>
-    <% if (person.summary) { %>
-    <p class="summary"><%- person.summary %></p>
+    <% if (data.person.summary) { %>
+    <p class="summary"><%- data.person.summary %></p>
     <% } %>
   </div>
   <div class="span2">

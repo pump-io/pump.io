@@ -3,7 +3,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
-    <title><%- title %> - <%- site %></title>
+    <title><%- page.title %> - <%- config.site %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Le styles -->
@@ -74,8 +74,8 @@
           Pump.config = {};
       }
       _.extend(Pump.config, {
-          site: "<%- site %>",
-          requireEmail: "<%- requireEmail %>"
+          site: "<%- config.site %>",
+          requireEmail: "<%- config.requireEmail %>"
       });
     </script>
   </body>

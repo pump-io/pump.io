@@ -1,9 +1,9 @@
 <div class="user">
   <div class="row">
-    <%= profileBlock(obj, _) %>
+    <%= template.profileBlock(obj, _) %>
   </div>
   <div class="row">
-    <%= majorStream(obj, _) %>
-    <%= sidebar(obj, _) %>
+    <%= template.majorStream(obj, _) %>
+    <%= template.sidebar(obj, _) %>
   </div>
 </div>

@@ -1,9 +1,10 @@
 <div class="span9" id="people-stream">
-  <% if (people && people.length) { %>
-  <% _.each(people, function(person) { 
-     obj.person = person; %>
-  <%= majorPerson(obj, _) %>
-  <% }); %>
+  <% if (data.people && data.people.length) { %>
+  <% _.each(data.people, function(person) { 
+     data.person = person; %>
+  <%= template.majorPerson(obj, _) %>
+  <% delete data.person;
+     }); %>
   <% } else { %>
   <p>No content!</p>
   <% } %>

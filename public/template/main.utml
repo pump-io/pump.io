@@ -4,7 +4,7 @@
 
     <div class="span6">
 
-      <h1><%- site %></h1>
+      <h1><%- config.site %></h1>
 
       <p>This site runs <a href="http://pump.io/">pump.io</a>, the
 	high-performance Open Source social engine. It pumps your life

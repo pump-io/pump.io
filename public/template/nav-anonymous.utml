@@ -3,7 +3,7 @@
   <span class="icon-bar">Login</span>
 </button>
 
-<a class="brand" href="/"><%- site %></a>
+<a class="brand" href="/"><%- config.site %></a>
 
 <div class="nav-collapse collapse pull-right">
   <ul class="nav">

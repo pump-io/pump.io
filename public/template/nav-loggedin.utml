@@ -1,4 +1,4 @@
-<a class="brand" href="/"><%- site %></a>
+<a class="brand" href="/"><%- config.site %></a>
 
 <button type="button" class="btn primary" id="post-note-button">
   Note <i class="icon-pencil"></i>
@@ -7,14 +7,14 @@
 <ul class="nav pull-right">
   <li id="fat-menu" class="dropdown">
     <a href="#" id="profile-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown"> 
-      <% if (_(user.profile).has("image")) { %>
-      <img class="pull-left" src="<%- user.profile.image.url %>" width="24" height="24" />&nbsp;
+      <% if (_(data.user.profile).has("image")) { %>
+      <img class="pull-left" src="<%- data.user.profile.image.url %>" width="24" height="24" />&nbsp;
       <% } %>
-      <%- user.profile.displayName %>
+      <%- data.user.profile.displayName %>
       <b class="caret"></b>
     </a>
     <ul class="dropdown-menu" role="menu" aria-labelledby="profile-dropdown">
-      <li><a tabindex="-1" href="/<%- user.nickname %>">Profile</a></li>
+      <li><a tabindex="-1" href="/<%- data.user.nickname %>">Profile</a></li>
       <li class="divider"></li>
       <li><a tabindex="-1" href="/main/settings">Settings</a></li>
       <li><a tabindex="-1" href="/main/account">Account</a></li>
