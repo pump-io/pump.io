@@ -67,10 +67,16 @@
     <script src="/javascript/jquery-spin.js"></script>
     <script src="/javascript/pump.js"></script>
     <script>
-      config = {
-      site: "<%- site %>",
-      requireEmail: "<%- requireEmail %>"
-      };
+      if (!Pump) {
+          Pump = {};
+      }
+      if (!Pump.config) {
+          Pump.config = {};
+      }
+      _.extend(Pump.config, {
+          site: "<%- site %>",
+          requireEmail: "<%- requireEmail %>"
+      });
     </script>
   </body>
 

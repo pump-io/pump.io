@@ -1,4 +1,4 @@
-(function($, Backbone) {
+var Pump = (function(_, $, Backbone) {
 
     var searchParams = function(str) {
         var params = {},
@@ -78,24 +78,24 @@
             params.processData = false;
         }
 
-        ensureCred(function(err, cred) {
+        Pump.ensureCred(function(err, cred) {
             var pair;
             if (err) {
-                console.log("Error getting OAuth credentials.");
+                Pump.error("Error getting OAuth credentials.");
             } else {
                 params = _.extend(params, options);
 
                 params.consumerKey = cred.clientID;
                 params.consumerSecret = cred.clientSecret;
 
-                pair = getUserCred();
+                pair = Pump.getUserCred();
 
                 if (pair) {
                     params.token = pair.token;
                     params.tokenSecret = pair.secret;
                 }
 
-                params = oauthify(params);
+                params = Pump.oauthify(params);
 
                 $.ajax(params);
             }
@@ -104,16 +104,22 @@
         return null;
     };
 
+    var Pump = {};
+
     // When errors happen, and you don't know what to do with them,
     // send them here and I'll figure it out.
 
-    var pumpError = function(err) {
+    Pump.error = function(err) {
         console.log(err);
     };
 
+    // This is overwritten by inline script in layout.utml
+
+    Pump.config = {};
+
     // A social activity.
 
-    var Activity = Backbone.Model.extend({
+    Pump.Activity = Backbone.Model.extend({
         url: function() {
             var links = this.get("links"),
                 uuid = this.get("uuid");
@@ -127,7 +133,7 @@
         }
     });
 
-    var oauthify = function(options) {
+    Pump.oauthify = function(options) {
 
         if (options.url.indexOf(':') == -1) {
             if (options.url.substr(0, 1) == '/') {
@@ -158,14 +164,14 @@
         return options;
     };
 
-    var ActivityStream = Backbone.Collection.extend({
-        model: Activity,
+    Pump.ActivityStream = Backbone.Collection.extend({
+        model: Pump.Activity,
         parse: function(response) {
             return response.items;
         }
     });
 
-    var UserStream = ActivityStream.extend({
+    Pump.UserStream = Pump.ActivityStream.extend({
         user: null,
         initialize: function(models, options) {
             this.user = options.user;
@@ -175,7 +181,7 @@
         }
     });
 
-    var UserMajorStream = ActivityStream.extend({
+    Pump.UserMajorStream = Pump.ActivityStream.extend({
         user: null,
         initialize: function(models, options) {
             this.user = options.user;
@@ -185,7 +191,7 @@
         }
     });
 
-    var UserMinorStream = ActivityStream.extend({
+    Pump.UserMinorStream = Pump.ActivityStream.extend({
         user: null,
         initialize: function(models, options) {
             this.user = options.user;
@@ -195,7 +201,7 @@
         }
     });
 
-    var UserInbox = ActivityStream.extend({
+    Pump.UserInbox = Pump.ActivityStream.extend({
         user: null,
         initialize: function(models, options) {
             this.user = options.user;
@@ -205,7 +211,7 @@
         }
     });
 
-    var UserMajorInbox = ActivityStream.extend({
+    Pump.UserMajorInbox = Pump.ActivityStream.extend({
         user: null,
         initialize: function(models, options) {
             this.user = options.user;
@@ -215,7 +221,7 @@
         }
     });
 
-    var UserMinorInbox = ActivityStream.extend({
+    Pump.UserMinorInbox = Pump.ActivityStream.extend({
         user: null,
         initialize: function(models, options) {
             this.user = options.user;
@@ -225,7 +231,7 @@
         }
     });
 
-    var ActivityObject = Backbone.Model.extend({
+    Pump.ActivityObject = Backbone.Model.extend({
         url: function() {
             var links = this.get("links"),
                 uuid = this.get("uuid"),
@@ -245,25 +251,25 @@
         }
     });
 
-    var Person = ActivityObject.extend({
+    Pump.Person = Pump.ActivityObject.extend({
         objectType: "person"
     });
 
-    var ActivityObjectStream = Backbone.Collection.extend({
-        model: ActivityObject,
+    Pump.ActivityObjectStream = Backbone.Collection.extend({
+        model: Pump.ActivityObject,
         parse: function(response) {
             return response.items;
         }
     });
 
-    var PeopleStream = Backbone.Collection.extend({
-        model: Person,
+    Pump.PeopleStream = Backbone.Collection.extend({
+        model: Pump.Person,
         parse: function(response) {
             return response.items;
         }
     });
 
-    var UserFollowers = PeopleStream.extend({
+    Pump.UserFollowers = Pump.PeopleStream.extend({
         user: null,
         initialize: function(models, options) {
             this.user = options.user;
@@ -273,7 +279,7 @@
         }
     });
 
-    var UserFollowing = PeopleStream.extend({
+    Pump.UserFollowing = Pump.PeopleStream.extend({
         user: null,
         initialize: function(models, options) {
             this.user = options.user;
@@ -283,7 +289,7 @@
         }
     });
 
-    var UserFavorites = ActivityObjectStream.extend({
+    Pump.UserFavorites = Pump.ActivityObjectStream.extend({
         user: null,
         initialize: function(models, options) {
             this.user = options.user;
@@ -293,10 +299,10 @@
         }
     });
 
-    var User = Backbone.Model.extend({
+    Pump.User = Backbone.Model.extend({
         idAttribute: "nickname",
         initialize: function() {
-            this.profile = new Person(this.get("profile"));
+            this.profile = new Pump.Person(this.get("profile"));
             this.profile.isNew = function() { return false; };
         },
         isNew: function() {
@@ -307,53 +313,53 @@
             return "/api/user/" + this.get("nickname");
         },
         getStream: function() {
-            return new UserStream([], {user: this});
+            return new Pump.UserStream([], {user: this});
         },
         getMajorStream: function() {
-            return new UserMajorStream([], {user: this});
+            return new Pump.UserMajorStream([], {user: this});
         },
         getMinorStream: function() {
-            return new UserMinorStream([], {user: this});
+            return new Pump.UserMinorStream([], {user: this});
         },
         getInbox: function() {
-            return new UserInbox([], {user: this});
+            return new Pump.UserInbox([], {user: this});
         },
         getMajorInbox: function() {
-            return new UserMajorInbox([], {user: this});
+            return new Pump.UserMajorInbox([], {user: this});
         },
         getMinorInbox: function() {
-            return new UserMinorInbox([], {user: this});
+            return new Pump.UserMinorInbox([], {user: this});
         },
         getFollowersStream: function() {
-            return new UserFollowers([], {user: this});
+            return new Pump.UserFollowers([], {user: this});
         },
         getFollowingStream: function() {
-            return new UserFollowing([], {user: this});
+            return new Pump.UserFollowing([], {user: this});
         },
         getFavorites: function() {
-            return new UserFavorites([], {user: this});
+            return new Pump.UserFavorites([], {user: this});
         }
     });
 
-    var currentUser = null; // XXX: load from server...?
+    Pump.currentUser = null; // XXX: load from server...?
 
-    var templates = {};
+    Pump.templates = {};
 
-    var TemplateView = Backbone.View.extend({
+    Pump.TemplateView = Backbone.View.extend({
         templateName: null,
         parts: null,
         render: function() {
             var view = this,
                 getTemplate = function(name, cb) {
                     var url;
-                    if (_.has(templates, name)) {
-                        cb(null, templates[name]);
+                    if (_.has(Pump.templates, name)) {
+                        cb(null, Pump.templates[name]);
                     } else {
                         $.get('/template/'+name+'.utml', function(data) {
                             var f;
                             try {
                                 f = _.template(data);
-                                templates[name] = f;
+                                Pump.templates[name] = f;
                             } catch (err) {
                                 cb(err, null);
                                 return;
@@ -374,7 +380,7 @@
                 },
                 setOutput = function(err, html) {
                     if (err) {
-                        pumpError(err);
+                        Pump.error(err);
                     } else {
                         view.$el.html(html);
                         view.$el.trigger("pump.rendered");
@@ -389,7 +395,7 @@
 
             // Add config stuff
 
-            base = _.extend(base, config);
+            base = _.extend(base, Pump.config);
 
             // If there are sub-parts, we do them in parallel then
             // do the main one. Note: only one level.
@@ -400,7 +406,7 @@
                 _.each(view.parts, function(templateName, partName) {
                     getTemplate(templateName, function(err, template) {
                         if (err) {
-                            pumpError(err);
+                            Pump.error(err);
                         } else {
                             pc++;
                             main[partName] = template;
@@ -449,13 +455,13 @@
         }
     });
 
-    var AnonymousNav = TemplateView.extend({
+    Pump.AnonymousNav = Pump.TemplateView.extend({
         tagname: "div",
         classname: "nav",
         templateName: 'nav-anonymous'
     });
 
-    var UserNav = TemplateView.extend({
+    Pump.UserNav = Pump.TemplateView.extend({
         tagname: "div",
         classname: "nav",
         templateName: 'nav-loggedin',
@@ -471,7 +477,7 @@
             if (view.postNote) {
                 modalView = view.postNote;
             } else {
-                modalView = new PostNoteModal({});
+                modalView = new Pump.PostNoteModal({});
                 $("body").append(modalView.el);
                 view.postNote = modalView;
             }
@@ -492,23 +498,23 @@
                 options,
                 onSuccess = function(data, textStatus, jqXHR) {
                     var an;
-                    currentUser = null;
+                    Pump.currentUser = null;
 
-                    setNickname(null);
-                    setUserCred(null, null);
+                    Pump.setNickname(null);
+                    Pump.setUserCred(null, null);
 
-                    an = new AnonymousNav({el: ".navbar-inner .container", model: {site: config.site}});
+                    an = new Pump.AnonymousNav({el: ".navbar-inner .container", model: {site: Pump.config.site}});
                     an.render();
 
                     // Reload to clear authenticated stuff
 
-                    pump.navigate(window.location.pathname+"?logout=true", true);
+                    Pump.router.navigate(window.location.pathname+"?logout=true", true);
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     showError(errorThrown);
                 },
                 showError = function(msg) {
-                    console.log(msg);
+                    Pump.error(msg);
                 };
 
             options = {
@@ -521,33 +527,33 @@
                 error: onError
             };
 
-            ensureCred(function(err, cred) {
+            Pump.ensureCred(function(err, cred) {
                 var pair;
                 if (err) {
                     showError("Couldn't get OAuth credentials. :(");
                 } else {
                     options.consumerKey = cred.clientID;
                     options.consumerSecret = cred.clientSecret;
-                    pair = getUserCred();
+                    pair = Pump.getUserCred();
 
                     if (pair) {
                         options.token = pair.token;
                         options.tokenSecret = pair.secret;
                     }
 
-                    options = oauthify(options);
+                    options = Pump.oauthify(options);
                     $.ajax(options);
                 }
             });
         }
     });
 
-    var MainContent = TemplateView.extend({
+    Pump.MainContent = Pump.TemplateView.extend({
         templateName: 'main',
         el: '#content'
     });
 
-    var LoginContent = TemplateView.extend({
+    Pump.LoginContent = Pump.TemplateView.extend({
         templateName: 'login',
         el: '#content',
         events: {
@@ -562,16 +568,16 @@
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
                 onSuccess = function(data, textStatus, jqXHR) {
                     var nav;
-                    setNickname(data.nickname);
-                    setUserCred(data.token, data.secret);
-                    currentUser = new User(data);
-                    nav = new UserNav({el: ".navbar-inner .container",
-                                       model: {site: config.site,
-                                               user: currentUser.toJSON()}});
+                    Pump.setNickname(data.nickname);
+                    Pump.setUserCred(data.token, data.secret);
+                    Pump.currentUser = new Pump.User(data);
+                    nav = new Pump.UserNav({el: ".navbar-inner .container",
+                                            model: {site: Pump.config.site,
+                                                    user: Pump.currentUser.toJSON()}});
                     nav.render();
                     // XXX: reload current data
                     view.stopSpin();
-                    pump.navigate(continueTo, true);
+                    Pump.router.navigate(continueTo, true);
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     var type, response;
@@ -597,13 +603,13 @@
                 error: onError
             };
 
-            ensureCred(function(err, cred) {
+            Pump.ensureCred(function(err, cred) {
                 if (err) {
                     view.showError("Couldn't get OAuth credentials. :(");
                 } else {
                     options.consumerKey = cred.clientID;
                     options.consumerSecret = cred.clientSecret;
-                    options = oauthify(options);
+                    options = Pump.oauthify(options);
                     $.ajax(options);
                 }
             });
@@ -612,7 +618,7 @@
         }
     });
 
-    var RegisterContent = TemplateView.extend({
+    Pump.RegisterContent = Pump.TemplateView.extend({
         templateName: 'register',
         el: '#content',
         events: {
@@ -623,21 +629,21 @@
                 params = {nickname: view.$('#registration input[name="nickname"]').val(),
                           password: view.$('#registration input[name="password"]').val()},
                 repeat = view.$('#registration input[name="repeat"]').val(),
-                email = (config.requireEmail) ? view.$('#registration input[name="email"]').val() : null,
+                email = (Pump.config.requireEmail) ? view.$('#registration input[name="email"]').val() : null,
                 options,
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
                 onSuccess = function(data, textStatus, jqXHR) {
                     var nav;
-                    setNickname(data.nickname);
-                    setUserCred(data.token, data.secret);
-                    currentUser = new User(data);
-                    nav = new UserNav({el: ".navbar-inner .container", model: {site: config.site,
-                                                                               user: currentUser.toJSON()}});
+                    Pump.setNickname(data.nickname);
+                    Pump.setUserCred(data.token, data.secret);
+                    Pump.currentUser = new Pump.User(data);
+                    nav = new Pump.UserNav({el: ".navbar-inner .container", model: {site: Pump.config.site,
+                                                                                    user: Pump.currentUser.toJSON()}});
                     nav.render();
                     // Leave disabled
                     view.stopSpin();
                     // XXX: one-time on-boarding page
-                    pump.navigate("", true);
+                    Pump.router.navigate("", true);
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     var type, response;
@@ -668,13 +674,13 @@
 
                 view.showError("Passwords have to have at least one letter and one number.");
 
-            } else if (config.requireEmail && (!email || email.length == 0)) {
+            } else if (Pump.config.requireEmail && (!email || email.length == 0)) {
 
                 view.showError("Email address required.");
 
             } else {
 
-                if (config.requireEmail) {
+                if (Pump.config.requireEmail) {
                     params.email = email;
                 }
 
@@ -690,13 +696,13 @@
                     error: onError
                 };
 
-                ensureCred(function(err, cred) {
+                Pump.ensureCred(function(err, cred) {
                     if (err) {
                         view.showError("Couldn't get OAuth credentials. :(");
                     } else {
                         options.consumerKey = cred.clientID;
                         options.consumerSecret = cred.clientSecret;
-                        options = oauthify(options);
+                        options = Pump.oauthify(options);
                         $.ajax(options);
                     }
                 });
@@ -706,7 +712,7 @@
         }
     });
 
-    var UserPageContent = TemplateView.extend({
+    Pump.UserPageContent = Pump.TemplateView.extend({
         templateName: 'user',
         parts: {profileBlock: "profile-block",
                 majorStream: "major-stream",
@@ -717,7 +723,7 @@
         el: '#content'
     });
 
-    var InboxContent = TemplateView.extend({
+    Pump.InboxContent = Pump.TemplateView.extend({
         templateName: 'inbox',
         parts: {majorStream: "major-stream",
                 sidebar: "sidebar",
@@ -727,7 +733,7 @@
         el: '#content'
     });
 
-    var FavoritesContent = TemplateView.extend({
+    Pump.FavoritesContent = Pump.TemplateView.extend({
         templateName: 'favorites',
         parts: {profileBlock: "profile-block",
                 objectStream: "object-stream",
@@ -736,7 +742,7 @@
         el: '#content'
     });
 
-    var FollowersContent = TemplateView.extend({
+    Pump.FollowersContent = Pump.TemplateView.extend({
         templateName: 'followers',
         parts: {profileBlock: "profile-block",
                 peopleStream: "people-stream",
@@ -745,7 +751,7 @@
         el: '#content'
     });
 
-    var FollowingContent = TemplateView.extend({
+    Pump.FollowingContent = Pump.TemplateView.extend({
         templateName: 'following',
         parts: {profileBlock: "profile-block",
                 peopleStream: "people-stream",
@@ -754,12 +760,12 @@
         el: '#content'
     });
 
-    var ActivityContent = TemplateView.extend({
+    Pump.ActivityContent = Pump.TemplateView.extend({
         templateName: 'activity-content',
         el: '#content'
     });
 
-    var SettingsContent = TemplateView.extend({
+    Pump.SettingsContent = Pump.TemplateView.extend({
         templateName: 'settings',
         el: '#content',
         events: {
@@ -768,7 +774,7 @@
         saveSettings: function() {
 
             var view = this,
-                user = currentUser,
+                user = Pump.currentUser,
                 profile = user.profile;
 
             view.startSpin();
@@ -793,7 +799,7 @@
         }
     });
 
-    var AccountContent = TemplateView.extend({
+    Pump.AccountContent = Pump.TemplateView.extend({
         templateName: 'account',
         el: '#content',
         events: {
@@ -801,7 +807,7 @@
         },
         saveAccount: function() {
             var view = this,
-                user = currentUser,
+                user = Pump.currentUser,
                 password = view.$('#password').val(),
                 repeat = view.$('#repeat').val();
 
@@ -841,179 +847,7 @@
         }
     });
 
-    var Pump = Backbone.Router.extend({
-
-        routes: {
-            "":                       "home",    
-            ":nickname":              "profile",   
-            ":nickname/favorites":    "favorites",  
-            ":nickname/following":    "following",  
-            ":nickname/followers":    "followers",  
-            ":nickname/activity/:id": "activity",
-            "main/settings":          "settings",
-            "main/account":           "account",
-            "main/register":          "register",
-            "main/login":             "login"
-        },
-
-        setTitle: function(view, title) {
-            view.$el.one("pump.rendered", function() {
-                $("title").html(title + " - " + config.site);
-            });
-        },
-
-        register: function() {
-            var content = new RegisterContent();
-
-            this.setTitle(content, "Register");
-
-            content.render();
-        },
-
-        login: function() {
-            var content = new LoginContent();
-
-            this.setTitle(content, "Login");
-
-            content.render();
-        },
-
-        settings: function() {
-            var content = new SettingsContent({model: currentUser});
-
-            this.setTitle(content, "Settings");
-
-            content.render();
-        },
-
-        account: function() {
-            var content = new AccountContent({model: currentUser});
-
-            this.setTitle(content, "Account");
-
-            content.render();
-        },
-
-        "home": function() {
-            var router = this,
-                pair = getUserCred();
-
-            if (pair) {
-                var user = currentUser,
-                    major = user.getMajorInbox(),
-                    minor = user.getMinorInbox();
-
-                // XXX: parallelize
-
-                user.fetch({success: function(user, response) {
-                    major.fetch({success: function(major, response) {
-                        minor.fetch({success: function(minor, response) {
-                            var content = new InboxContent({model: {user: user.toJSON(),
-                                                                    major: major.toJSON(),
-                                                                    minor: minor.toJSON()}});
-                            router.setTitle(content, "Home");
-                            content.render();
-                        }});
-                    }});
-                }});
-            } else {
-                var content = new MainContent({model: {site: config.site}});
-                router.setTitle(content, "Welcome");
-                content.render();
-            }
-        },
-
-        profile: function(nickname) {
-            var router = this,
-                user = new User({nickname: nickname}),
-                major = user.getMajorStream(),
-                minor = user.getMinorStream();
-
-            // XXX: parallelize this?
-
-            user.fetch({success: function(user, response) {
-                major.fetch({success: function(major, response) {
-                    minor.fetch({success: function(minor, response) {
-                        var profile = user.get("profile"),
-                            content = new UserPageContent({model: {profile: profile,
-                                                                   major: major.toJSON(),
-                                                                   minor: minor.toJSON()}});
-                        router.setTitle(content, nickname);
-                        content.render();
-                    }});
-                }});
-            }});
-        },
-
-        favorites: function(nickname) {
-            var router = this,
-                user = new User({nickname: nickname}),
-                favorites = user.getFavorites();
-
-            // XXX: parallelize this?
-
-            user.fetch({success: function(user, response) {
-                var profile = user.get("profile");
-                favorites.fetch({success: function(major, response) {
-                    var content = new FavoritesContent({model: {profile: profile,
-                                                                objects: favorites.toJSON()}});
-                    router.setTitle(content, nickname + " favorites");
-                    content.render();
-                }});
-            }});
-        },
-
-        followers: function(nickname) {
-            var router = this,
-                user = new User({nickname: nickname}),
-                followers = user.getFollowersStream();
-
-            // XXX: parallelize this?
-
-            user.fetch({success: function(user, response) {
-                followers.fetch({success: function(followers, response) {
-                    var profile = user.get("profile"),
-                        content = new FollowersContent({model: {profile: profile,
-                                                                people: followers.toJSON()}});
-                    router.setTitle(content, nickname + " followers");
-                    content.render();
-                }});
-            }});
-        },
-
-        following: function(nickname) {
-            var router = this,
-                user = new User({nickname: nickname}),
-                following = user.getFollowingStream();
-
-            // XXX: parallelize this?
-
-            user.fetch({success: function(user, response) {
-                following.fetch({success: function(following, response) {
-                    var profile = user.get("profile"),
-                        content = new FollowingContent({model: {profile: profile,
-                                                                people: following.toJSON()}});
-
-                    router.setTitle(content, nickname + " following");
-                    content.render();
-                }});
-            }});
-        },
-
-        activity: function(nickname, id) {
-            var router = this,
-                act = new Activity({uuid: id, userNickname: nickname});
-
-            act.fetch({success: function(act, response) {
-                var content = new ActivityContent({model: act});
-
-                router.setTitle(content, act.content);
-                content.render();
-            }});
-        }
-    });
-
-    var PostNoteModal = TemplateView.extend({
+    Pump.PostNoteModal = Pump.TemplateView.extend({
 
         tagname: "div",
         classname: "modal-holder",
@@ -1024,14 +858,14 @@
         postNote: function(ev) {
             var view = this,
                 text = view.$('#post-note #note-content').val(),
-                act = new Activity({
+                act = new Pump.Activity({
                     verb: "post",
                     object: {
                         objectType: "note",
                         content: text
                     }
                 }),
-                stream = currentUser.getStream();
+                stream = Pump.currentUser.getStream();
 
             view.startSpin();
             
@@ -1044,7 +878,7 @@
         }
     });
 
-    var BodyView = Backbone.View.extend({
+    Pump.BodyView = Backbone.View.extend({
         initialize: function(options) {
             this.router = options.router;
             _.bindAll(this, "navigateToHref");
@@ -1066,23 +900,197 @@
         }
     });
 
-    var clientID,
-        clientSecret,
-        nickname,
-        token,
-        secret,
-        credReq;
+    Pump.Router = Backbone.Router.extend({
 
-    var setNickname = function(userNickname) {
-        nickname = userNickname;
+        routes: {
+            "":                       "home",    
+            ":nickname":              "profile",   
+            ":nickname/favorites":    "favorites",  
+            ":nickname/following":    "following",  
+            ":nickname/followers":    "followers",  
+            ":nickname/activity/:id": "activity",
+            "main/settings":          "settings",
+            "main/account":           "account",
+            "main/register":          "register",
+            "main/login":             "login"
+        },
+
+        setTitle: function(view, title) {
+            view.$el.one("pump.rendered", function() {
+                $("title").html(title + " - " + Pump.config.site);
+            });
+        },
+
+        register: function() {
+            var content = new Pump.RegisterContent();
+
+            this.setTitle(content, "Register");
+
+            content.render();
+        },
+
+        login: function() {
+            var content = new Pump.LoginContent();
+
+            this.setTitle(content, "Login");
+
+            content.render();
+        },
+
+        settings: function() {
+            var content = new Pump.SettingsContent({model: Pump.currentUser});
+
+            this.setTitle(content, "Settings");
+
+            content.render();
+        },
+
+        account: function() {
+            var content = new Pump.AccountContent({model: Pump.currentUser});
+
+            this.setTitle(content, "Account");
+
+            content.render();
+        },
+
+        "home": function() {
+            var router = this,
+                pair = Pump.getUserCred();
+
+            if (pair) {
+                var user = Pump.currentUser,
+                    major = user.getMajorInbox(),
+                    minor = user.getMinorInbox();
+
+                // XXX: parallelize
+
+                user.fetch({success: function(user, response) {
+                    major.fetch({success: function(major, response) {
+                        minor.fetch({success: function(minor, response) {
+                            var content = new Pump.InboxContent({model: {user: user.toJSON(),
+                                                                    major: major.toJSON(),
+                                                                    minor: minor.toJSON()}});
+                            router.setTitle(content, "Home");
+                            content.render();
+                        }});
+                    }});
+                }});
+            } else {
+                var content = new Pump.MainContent({model: {site: Pump.config.site}});
+                router.setTitle(content, "Welcome");
+                content.render();
+            }
+        },
+
+        profile: function(nickname) {
+            var router = this,
+                user = new Pump.User({nickname: nickname}),
+                major = user.getMajorStream(),
+                minor = user.getMinorStream();
+
+            // XXX: parallelize this?
+
+            user.fetch({success: function(user, response) {
+                major.fetch({success: function(major, response) {
+                    minor.fetch({success: function(minor, response) {
+                        var profile = user.get("profile"),
+                            content = new Pump.UserPageContent({model: {profile: profile,
+                                                                   major: major.toJSON(),
+                                                                   minor: minor.toJSON()}});
+                        router.setTitle(content, nickname);
+                        content.render();
+                    }});
+                }});
+            }});
+        },
+
+        favorites: function(nickname) {
+            var router = this,
+                user = new Pump.User({nickname: nickname}),
+                favorites = user.getFavorites();
+
+            // XXX: parallelize this?
+
+            user.fetch({success: function(user, response) {
+                var profile = user.get("profile");
+                favorites.fetch({success: function(major, response) {
+                    var content = new Pump.FavoritesContent({model: {profile: profile,
+                                                                objects: favorites.toJSON()}});
+                    router.setTitle(content, nickname + " favorites");
+                    content.render();
+                }});
+            }});
+        },
+
+        followers: function(nickname) {
+            var router = this,
+                user = new Pump.User({nickname: nickname}),
+                followers = user.getFollowersStream();
+
+            // XXX: parallelize this?
+
+            user.fetch({success: function(user, response) {
+                followers.fetch({success: function(followers, response) {
+                    var profile = user.get("profile"),
+                        content = new Pump.FollowersContent({model: {profile: profile,
+                                                                people: followers.toJSON()}});
+                    router.setTitle(content, nickname + " followers");
+                    content.render();
+                }});
+            }});
+        },
+
+        following: function(nickname) {
+            var router = this,
+                user = new Pump.User({nickname: nickname}),
+                following = user.getFollowingStream();
+
+            // XXX: parallelize this?
+
+            user.fetch({success: function(user, response) {
+                following.fetch({success: function(following, response) {
+                    var profile = user.get("profile"),
+                        content = new Pump.FollowingContent({model: {profile: profile,
+                                                                people: following.toJSON()}});
+
+                    router.setTitle(content, nickname + " following");
+                    content.render();
+                }});
+            }});
+        },
+
+        activity: function(nickname, id) {
+            var router = this,
+                act = new Pump.Activity({uuid: id, userNickname: nickname});
+
+            act.fetch({success: function(act, response) {
+                var content = new Pump.ActivityContent({model: act});
+
+                router.setTitle(content, act.content);
+                content.render();
+            }});
+        }
+    });
+
+    Pump.router = new Pump.Router();
+
+    Pump.clientID = null;
+    Pump.clientSecret = null;
+    Pump.nickname = null;
+    Pump.token = null;
+    Pump.secret = null;
+    Pump.credReq = null;
+
+    Pump.setNickname = function(userNickname) {
+        Pump.nickname = userNickname;
         if (localStorage) {
             localStorage['cred:nickname'] = userNickname;
         }
     };
 
-    var getNickname = function() {
-        if (nickname) {
-            return nickname;
+    Pump.getNickname = function() {
+        if (Pump.nickname) {
+            return Pump.nickname;
         } else if (localStorage) {
             return localStorage['cred:nickname'];
         } else {
@@ -1090,14 +1098,14 @@
         }
     };
 
-    var getCred = function() {
-        if (clientID) {
-            return {clientID: clientID, clientSecret: clientSecret};
+    Pump.getCred = function() {
+        if (Pump.clientID) {
+            return {clientID: Pump.clientID, clientSecret: Pump.clientSecret};
         } else if (localStorage) {
-            clientID = localStorage['cred:clientID'];
-            clientSecret = localStorage['cred:clientSecret'];
-            if (clientID) {
-                return {clientID: clientID, clientSecret: clientSecret};
+            Pump.clientID = localStorage['cred:clientID'];
+            Pump.clientSecret = localStorage['cred:clientSecret'];
+            if (Pump.clientID) {
+                return {clientID: Pump.clientID, clientSecret: Pump.clientSecret};
             } else {
                 return null;
             }
@@ -1106,21 +1114,25 @@
         }
     };
 
-    var getUserCred = function(nickname) {
-        if (token) {
-            return {token: token, secret: secret};
+    Pump.getUserCred = function(nickname) {
+        if (Pump.token) {
+            return {token: Pump.token, secret: Pump.secret};
         } else if (localStorage) {
-            token = localStorage['cred:token'];
-            secret = localStorage['cred:secret'];
-            return {token: token, secret: secret};
+            Pump.token = localStorage['cred:token'];
+            Pump.secret = localStorage['cred:secret'];
+            if (Pump.token) {
+                return {token: Pump.token, secret: Pump.secret};
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
     };
 
-    var setUserCred = function(userToken, userSecret) {
-        token = userToken;
-        secret = userSecret;
+    Pump.setUserCred = function(userToken, userSecret) {
+        Pump.token = userToken;
+        Pump.secret = userSecret;
         if (localStorage) {
             localStorage['cred:token'] = userToken;
             localStorage['cred:secret'] = userSecret;
@@ -1128,42 +1140,40 @@
         return;
     };
 
-    var ensureCred = function(callback) {
-        var cred = getCred();
+    Pump.ensureCred = function(callback) {
+        var cred = Pump.getCred();
         if (cred) {
             callback(null, cred);
-        } else if (credReq) {
-            credReq.success(function(data) {
+        } else if (Pump.credReq) {
+            Pump.credReq.success(function(data) {
                 callback(null, {clientID: data.client_id,
                                 clientSecret: data.client_secret});
             });
-            credReq.error(function() {
+            Pump.credReq.error(function() {
                 callback(new Error("error getting credentials"), null);
             });
         } else {
-            credReq = $.post("/api/client/register",
-                             {type: "client_associate",
-                              application_name: config.site + " Web",
-                              application_type: "web"},
-                             function(data) {
-                                 credReq = null;
-                                 clientID = data.client_id;
-                                 clientSecret = data.client_secret;
-                                 if (localStorage) {
-                                     localStorage['cred:clientID'] = clientID;
-                                     localStorage['cred:clientSecret'] = clientSecret;
-                                 }
-                                 callback(null, {clientID: clientID,
-                                                 clientSecret: clientSecret});
-                             },
-                             "json");
-            credReq.error(function() {
+            Pump.credReq = $.post("/api/client/register",
+                                  {type: "client_associate",
+                                   application_name: Pump.config.site + " Web",
+                                   application_type: "web"},
+                                  function(data) {
+                                      Pump.credReq = null;
+                                      Pump.clientID = data.client_id;
+                                      Pump.clientSecret = data.client_secret;
+                                      if (localStorage) {
+                                          localStorage['cred:clientID'] = Pump.clientID;
+                                          localStorage['cred:clientSecret'] = Pump.clientSecret;
+                                      }
+                                      callback(null, {clientID: Pump.clientID,
+                                                      clientSecret: Pump.clientSecret});
+                                  },
+                                  "json");
+            Pump.credReq.error(function() {
                 callback(new Error("error getting credentials"), null);
             });
         }
     };
-
-    var pump;
 
     $(document).ready(function() {
 
@@ -1171,26 +1181,40 @@
             nav,
             content;
 
-        pump = new Pump();
+        bv = new Pump.BodyView({router: Pump.router});
 
-        bv = new BodyView({router: pump});
+        nav = new Pump.AnonymousNav({el: ".navbar-inner .container"});
 
-        nav = new AnonymousNav({el: ".navbar-inner .container"});
+        // Initialize a view for the current content. Not crazy about this.
 
-        ensureCred(function(err, cred) {
+        if ($("#content #login").length > 0) {
+            content = new Pump.LoginContent();
+        } else if ($("#content #registration").length > 0) {
+            content = new Pump.RegisterContent();
+        } else if ($("#content #user").length > 0) {
+            content = new Pump.UserPageContent({});
+        } else if ($("#content #inbox").length > 0) {
+            content = new Pump.InboxContent({});
+        }
+
+        $("abbr.easydate").easydate();
+
+        Backbone.history.start({pushState: true, silent: true});
+
+        Pump.ensureCred(function(err, cred) {
 
             var user, nickname, pair;
 
             if (err) {
-                console.log(err.message);
+                Pump.error(err.message);
                 return;
             }
 
-            nickname = getNickname();
+            nickname = Pump.getNickname();
 
             if (nickname) {
 
-                user = new User({nickname: nickname});
+                user = new Pump.User({nickname: nickname});
 
                 // FIXME: this only has client auth; get something with user auth (direct?)
 
@@ -1198,10 +1222,10 @@
 
                     var nav, sp, continueTo;
 
-                    currentUser = user;
-                    nav = new UserNav({el: ".navbar-inner .container",
-                                       model: {site: config.site,
-                                               user: currentUser.toJSON()}});
+                    Pump.currentUser = user;
+                    nav = new Pump.UserNav({el: ".navbar-inner .container",
+                                            model: {site: Pump.config.site,
+                                                    user: Pump.currentUser.toJSON()}});
 
                     nav.render();
 
@@ -1210,38 +1234,19 @@
 
                     switch (window.location.pathname) {
                     case "/main/login":
-                        content = new LoginContent();
+                        content = new Pump.LoginContent();
                         continueTo = getContinueTo();
-                        pump.navigate(continueTo, true);
+                        Pump.router.navigate(continueTo, true);
                         break;
                     case "/":
-                        pump.home();
+                        Pump.router.home();
                         break;
                     }
                 }});
-
-                // Re-navigate since we've got credentials
-
-                pump.navigate(window.location.pathname, true);
             }
         });
-
-        // Initialize a view for the current content. Not crazy about this.
-
-        if ($("#content #login").length > 0) {
-            content = new LoginContent();
-        } else if ($("#content #registration").length > 0) {
-            content = new RegisterContent();
-        } else if ($("#content #user").length > 0) {
-            content = new UserPageContent({});
-        } else if ($("#content #inbox").length > 0) {
-            content = new InboxContent({});
-        }
-
-        $("abbr.easydate").easydate();
-
-        Backbone.history.start({pushState: true, silent: true});
-
     });
 
-})(window.jQuery, window.Backbone);
+    return Pump;
+
+})(window._, window.$, window.Backbone);
