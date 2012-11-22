@@ -50,78 +50,64 @@ suite.addBatch({
                 assert.ifError(err);
                 assert.ok(cred);
             },
-            "and we visit the root URL": {
+            "and we visit the login URL": {
                 topic: function() {
                     var browser;
                     browser = new Browser();
 
-                    browser.visit("http://localhost:4815/", this.callback);
+                    browser.visit("http://localhost:4815/main/login", this.callback);
                 },
                 "it works": function(err, br) {
                     assert.ifError(err);
                     assert.isTrue(br.success);
                 },
-                "it has a login link": function(err, br) {
-                    assert.ifError(err);
-                    assert.isTrue(br.success);
-                    assert.equal(br.text("div.navbar a#login"), "Login");
-                },
-                "and we click the login link": {
+                "and we check the content": {
                     topic: function(br) {
-                        br.clickLink("div.navbar a#login", this.callback);
+                        return br;
                     },
-                    "it works": function(err, br) {
-                        assert.ifError(err);
-                        assert.isTrue(br.success);
+                    "it includes a login div": function(br) {
+                        assert.ok(br.query("div.login"));
                     },
-                    "and we check the content": {
+                    "it includes a login form": function(br) {
+                        assert.ok(br.query("div.login form"));
+                    },
+                    "the login form has a nickname field": function(br) {
+                        assert.ok(br.query("div.login form input[name=\"nickname\"]"));
+                    },
+                    "the login form has a password field": function(br) {
+                        assert.ok(br.query("div.login form input[name=\"password\"]"));
+                    },
+                    "the login form has a submit button": function(br) {
+                        assert.ok(br.query("div.login form button[type=\"submit\"]"));
+                    },
+                    "and we submit the form": {
                         topic: function(br) {
-                            return br;
-                        },
-                        "it includes a login div": function(br) {
-                            assert.ok(br.query("div.login"));
-                        },
-                        "it includes a login form": function(br) {
-                            assert.ok(br.query("div.login form"));
-                        },
-                        "the login form has a nickname field": function(br) {
-                            assert.ok(br.query("div.login form input[name=\"nickname\"]"));
-                        },
-                        "the login form has a password field": function(br) {
-                            assert.ok(br.query("div.login form input[name=\"password\"]"));
-                        },
-                        "the login form has a submit button": function(br) {
-                            assert.ok(br.query("div.login form button[type=\"submit\"]"));
-                        },
-                        "and we submit the form": {
-                            topic: function(br) {
-                                var callback = this.callback;
+                            var callback = this.callback;
 
-                                Step(
-                                    function() {
-                                        br.fill("nickname", "croach", this);
-                                    },
-                                    function(err, br) {
-                                        if (err) throw err;
-                                        br.fill("password", "ihave1onus", this);
-                                    },
-                                    function(err, br) {
-                                        if (err) throw err;
-                                        br.pressButton("button[type=\"submit\"]", this);
-                                    },
-                                    function(err, br) {
-                                        if (err) {
-                                            callback(err, null);
-                                        } else {
-                                            callback(null, br);
-                                        }
+                            Step(
+                                function() {
+                                    br.fill("nickname", "croach", this);
+                                },
+                                function(err, br) {
+                                    if (err) throw err;
+                                    br.fill("password", "ihave1onus", this);
+                                },
+                                function(err, br) {
+                                    if (err) throw err;
+                                    br.pressButton("button[type=\"submit\"]", this);
+                                },
+                                function(err, br) {
+                                    if (err) {
+                                        callback(err, null);
+                                    } else {
+                                        callback(null, br);
                                     }
-                                );
-                            },
-                            "it works": function(err, br) {
-                                assert.ifError(err);
-                                assert.isTrue(br.success);
-                            }
+                                }
+                            );
+                        },
+                        "it works": function(err, br) {
+                            assert.ifError(err);
+                            assert.isTrue(br.success);
                         }
                     }
                 }

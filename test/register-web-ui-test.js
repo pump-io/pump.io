@@ -46,80 +46,66 @@ suite.addBatch({
                 var browser;
                 browser = new Browser();
 
-                browser.visit("http://localhost:4815/", this.callback);
+                browser.visit("http://localhost:4815/main/register", this.callback);
             },
             "it works": function(err, br) {
                 assert.ifError(err);
                 assert.isTrue(br.success);
             },
-            "it has a registration link": function(err, br) {
-                assert.ifError(err);
-                assert.isTrue(br.success);
-                assert.equal(br.text("div.navbar a#register"), "Register");
-            },
-            "and we click the register link": {
+            "and we check the content": {
                 topic: function(br) {
-                    br.clickLink("div.navbar a#register", this.callback);
+                    return br;
                 },
-                "it works": function(err, br) {
-                    assert.ifError(err);
-                    assert.isTrue(br.success);
+                "it includes a registration div": function(br) {
+                    assert.ok(br.query("div.registration"));
                 },
-                "and we check the content": {
+                "it includes a registration form": function(br) {
+                    assert.ok(br.query("div.registration form"));
+                },
+                "the registration form has a nickname field": function(br) {
+                    assert.ok(br.query("div.registration form input[name=\"nickname\"]"));
+                },
+                "the registration form has a password field": function(br) {
+                    assert.ok(br.query("div.registration form input[name=\"password\"]"));
+                },
+                "the registration form has a password repeat field": function(br) {
+                    assert.ok(br.query("div.registration form input[name=\"repeat\"]"));
+                },
+                "the registration form has a submit button": function(br) {
+                    assert.ok(br.query("div.registration form button[type=\"submit\"]"));
+                },
+                "and we submit the form": {
                     topic: function(br) {
-                        return br;
-                    },
-                    "it includes a registration div": function(br) {
-                        assert.ok(br.query("div.registration"));
-                    },
-                    "it includes a registration form": function(br) {
-                        assert.ok(br.query("div.registration form"));
-                    },
-                    "the registration form has a nickname field": function(br) {
-                        assert.ok(br.query("div.registration form input[name=\"nickname\"]"));
-                    },
-                    "the registration form has a password field": function(br) {
-                        assert.ok(br.query("div.registration form input[name=\"password\"]"));
-                    },
-                    "the registration form has a password repeat field": function(br) {
-                        assert.ok(br.query("div.registration form input[name=\"repeat\"]"));
-                    },
-                    "the registration form has a submit button": function(br) {
-                        assert.ok(br.query("div.registration form button[type=\"submit\"]"));
-                    },
-                    "and we submit the form": {
-                        topic: function(br) {
-                            var callback = this.callback;
+                        var callback = this.callback;
 
-                            Step(
-                                function() {
-                                    br.fill("nickname", "sparks", this);
-                                },
-                                function(err, br) {
-                                    if (err) throw err;
-                                    br.fill("password", "redplainsrider1", this);
-                                },
-                                function(err, br) {
-                                    if (err) throw err;
-                                    br.fill("repeat", "redplainsrider1", this);
-                                },
-                                function(err, br) {
-                                    if (err) throw err;
-                                    br.pressButton("button[type=\"submit\"]", this);
-                                },
-                                function(err, br) {
-                                    if (err) {
-                                        callback(err, null);
-                                    } else {
-                                        callback(null, br);
-                                    }
+                        Step(
+                            function() {
+                                br.fill("nickname", "sparks", this);
+                            },
+                            function(err, br) {
+                                if (err) throw err;
+                                br.fill("password", "redplainsrider1", this);
+                            },
+                            function(err, br) {
+                                if (err) throw err;
+                                br.fill("repeat", "redplainsrider1", this);
+                            },
+                            function(err, br) {
+                                if (err) throw err;
+                                br.pressButton("button[type=\"submit\"]", this);
+                            },
+                            function(err, br) {
+                                if (err) {
+                                    callback(err, null);
+                                } else {
+                                    callback(null, br);
                                 }
-                            );
-                        },
-                        "it works": function(err, br) {
-                            assert.ifError(err);
-                            assert.isTrue(br.success);
-                        }
+                            }
+                        );
+                    },
+                    "it works": function(err, br) {
+                        assert.ifError(err);
+                        assert.isTrue(br.success);
                     }
                 }
             }
