@@ -30,14 +30,14 @@ var authenticate = function(req, res) {
 
     if (!token) {
         res.render("error", {page: {title: "Error"},
-                             data: {status: 400,
-                                    error: new HTTPError("Must provide an oauth_token", 400)}});
+                             status: 400,
+                             data: {error: new HTTPError("Must provide an oauth_token", 400)}});
     } else {
         RequestToken.get(token, function(err, rt) {
             if (err) {
-                res.render("error", {page: {title: "Error"},
-                                     data: {status: 400,
-                                            error: err}});
+                res.render("error", {status: 400,
+                                     page: {title: "Error"},
+                                     data: {error: err}});
             } else {
                 res.render("authentication", {page: {title: "Authentication"},
                                               data: {token: token,
@@ -52,16 +52,16 @@ var authorize = function(err, req, res, authorized, authResults, application, rt
     var self = this;
     
     if (err) {
-        res.render("authentication", {page: {title: "Authentication"},
+        res.render("authentication", {status: 400,
+                                      page: {title: "Authentication"},
                                       data: {token: authResults.token,
-                                             status: 400,
-                                             error: err.message}});
+                                             error: err}});
     } else {
         User.get(rt.username, function(err, user) {
             if (err) {
-                res.render("error", {page: {title: "Error"},
-                                     data: {status: 400,
-                                            error: err}});
+                res.render("error", {status: 400,
+                                     page: {title: "Error"},
+                                     data: {error: err}});
             } else {
                 res.render("authorization", {page: {title: "Authorization"},
                                              data: {token: authResults.token,
