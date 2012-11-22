@@ -411,6 +411,7 @@ var Pump = (function(_, $, Backbone) {
                 },
                 pc,
                 modelName = view.modelName || view.options.modelName || "model",
+                partials,
                 cnt;
 
             main.data[modelName] = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model);
@@ -424,6 +425,15 @@ var Pump = (function(_, $, Backbone) {
                     }
                 });
             }
+
+            main.partial = function(name) {
+                var template;
+                if (!_.has(partials, name)) {
+                    throw new Error("Unknown partial " + name);
+                } else {
+                    return template(main);
+                }
+            };
 
             // XXX: set main.page.title
 
@@ -439,6 +449,7 @@ var Pump = (function(_, $, Backbone) {
                             Pump.error(err);
                         } else {
                             pc++;
+                            partials[templateName] = template;
                             main.template[partName] = template;
                             if (pc >= cnt) {
                                 getTemplate(view.templateName, function(err, template) {
