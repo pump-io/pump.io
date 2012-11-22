@@ -1,16 +1,16 @@
 <h2>Authorize</h2> 
 
-<p>You are logged in as <strong id="username"><%- user.nickname %></strong>.</p>
+<p>You are logged in as <strong id="username"><%- data.user.nickname %></strong>.</p>
 
 <p>Do you want to authorize this application to access your account?</p>
 
   <table>            
-    <tr><td>Title</td><td id="application-title"><%- application.title %></td></tr>    
-    <tr><td>Description</td><td id="application-description"><%- application.description %></td></tr>    
+    <tr><td>Title</td><td id="application-title"><%- data.application.title %></td></tr>    
+    <tr><td>Description</td><td id="application-description"><%- data.application.description %></td></tr>    
   </table>
 
 <form id="authorize" method="post"> 
-  <input type="hidden" id="oauth_token" name="oauth_token" value="<%- token %>"/> 
-  <input type="hidden" id="verifier" name="verifier" value="<%- verifier %>"/> 
+  <input type="hidden" id="oauth_token" name="oauth_token" value="<%- data.token %>"/> 
+  <input type="hidden" id="verifier" name="verifier" value="<%- data.verifier %>"/> 
   <input type="submit" class="btn btn-primary" value="Authorize"/>
 <form>                

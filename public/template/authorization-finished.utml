@@ -1,7 +1,7 @@
 <h1>Authorization Complete</h2> 
 
-<input type="hidden" name="oauth_token" value="<%- token %>"/> 
-<input type="hidden" name="oauth_verifier" value="<%- verifier %>"/> 
+<input type="hidden" name="oauth_token" value="<%- data.token %>"/> 
+<input type="hidden" name="oauth_verifier" value="<%- data.verifier %>"/> 
 
 <p>
 Your authorization is complete, but the program you are using does not
@@ -10,7 +10,7 @@ documentation for details on how to input these data.
 </p>
 
 <table>            
-  <tr><td>Token</td><td id="token"><%- token %></td></tr>    
-  <tr><td>Verifier</td><td id="verifier"><%- verifier %></td></tr>    
+  <tr><td>Token</td><td id="token"><%- data.token %></td></tr>    
+  <tr><td>Verifier</td><td id="verifier"><%- data.verifier %></td></tr>    
 </table>
 

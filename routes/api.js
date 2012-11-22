@@ -653,8 +653,9 @@ var createUser = function(req, res, next) {
             Step(
                 function() {
                     res.render("welcome",
-                               {profile: user.profile,
-                                service: svc,
+                               {page: {title: "Welcome"},
+                                data: {profile: user.profile,
+                                       service: svc},
                                 layout: false},
                                this);
                 },

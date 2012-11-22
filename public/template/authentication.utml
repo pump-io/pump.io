@@ -1,12 +1,12 @@
 <h1>Login</h1>
 
-<% if (error) { %>
-<p class="alert alert-error"><%- error %></p>
+<% if (data.error) { %>
+<p class="alert alert-error"><%- data.error %></p>
 <% } %>
 
 <form id="oauth-authentication" class="form-horizontal" action="/oauth/authorize" method="post">
   <fieldset>
-    <input type="hidden" name="oauth_token" value="<%- token %>" />
+    <input type="hidden" name="oauth_token" value="<%- data.token %>" />
     <div class="control-group">
       <label class="control-label" for="username">Username</label>
       <div class="controls">
