@@ -445,14 +445,13 @@ var Pump = (function(_, $, Backbone) {
                 pc = 0;
                 cnt = _.keys(view.parts).length;
                 partials = {};
-                _.each(view.parts, function(templateName, partName) {
+                _.each(view.parts, function(templateName) {
                     getTemplate(templateName, function(err, template) {
                         if (err) {
                             Pump.error(err);
                         } else {
                             pc++;
                             partials[templateName] = template;
-                            main.template[partName] = template;
                             if (pc >= cnt) {
                                 getTemplate(view.templateName, function(err, template) {
                                     runTemplate(template, main, setOutput);
@@ -758,53 +757,48 @@ var Pump = (function(_, $, Backbone) {
     Pump.UserPageContent = Pump.TemplateView.extend({
         templateName: 'user',
         modelName: "profile",
-        parts: {profileBlock: "profile-block",
-                majorStream: "major-stream-headless",
-                sidebar: "sidebar-headless",
-                majorActivity: "major-activity-headless",
-                minorActivity: "minor-activity-headless"
-               },
+        parts: ["profile-block",
+                "major-stream-headless",
+                "sidebar-headless",
+                "major-activity-headless",
+                "minor-activity-headless"],
         el: '#content'
     });
 
     Pump.InboxContent = Pump.TemplateView.extend({
         templateName: 'inbox',
         modelName: "user",
-        parts: {majorStream: "major-stream",
-                sidebar: "sidebar",
-                majorActivity: "major-activity",
-                minorActivity: "minor-activity"
-               },
+        parts: ["major-stream",
+                "sidebar",
+                "major-activity",
+                "minor-activity"],
         el: '#content'
     });
 
     Pump.FavoritesContent = Pump.TemplateView.extend({
         templateName: 'favorites',
         modelName: "profile",
-        parts: {profileBlock: "profile-block",
-                objectStream: "object-stream",
-                majorObject: "major-object"
-               },
+        parts: ["profile-block",
+                "object-stream",
+                "major-object"],
         el: '#content'
     });
 
     Pump.FollowersContent = Pump.TemplateView.extend({
         templateName: 'followers',
         modelName: "profile",
-        parts: {profileBlock: "profile-block",
-                peopleStream: "people-stream",
-                majorPerson: "major-person"
-               },
+        parts: ["profile-block",
+                "people-stream",
+                "major-person"],
         el: '#content'
     });
 
     Pump.FollowingContent = Pump.TemplateView.extend({
         templateName: 'following',
         modelName: "profile",
-        parts: {profileBlock: "profile-block",
-                peopleStream: "people-stream",
-                majorPerson: "major-person"
-               },
+        parts: ["profile-block",
+                "people-stream",
+                "major-person"],
         el: '#content'
     });
 
