@@ -381,10 +381,25 @@ var Pump = (function(_, $, Backbone) {
                         });
                     }
                 },
+                getTemplateSync = function(name) {
+                    var f, data, res;
+                    if (_.has(Pump.templates, name)) {
+                        return Pump.templates[name];
+                    } else {
+                        res = $.ajax({url: '/template/'+name+'.utml',
+                                      async: false});
+                        if (res.readyState === 4 &&
+                            ((res.status >= 200 && res.status < 300) || res.status === 304)) {
+                            data = res.responseText;
+                            f = _.template(data);
+                            f.templateName = name;
+                            Pump.templates[name] = f;
+                        }
+                        return f;
+                    }
+                },
                 runTemplate = function(template, data, cb) {
                     var html;
-                    console.log(template);
-                    console.log(data);
                     try {
                         html = template(data);
                     } catch (err) {
@@ -429,11 +444,15 @@ var Pump = (function(_, $, Backbone) {
             main.partial = function(name) {
                 var template;
                 if (!_.has(partials, name)) {
-                    throw new Error("Unknown partial " + name);
-                } else {
-                    template = partials[name];
-                    return template(main);
+                    // XXX: Put partials in the parts array of the
+                    // view to avoid this shameful sync call
+                    partials[name] = getTemplateSync(name);
                 }
+                template = partials[name];
+                if (!template) {
+                    throw new Error("No template for " + name);
+                }
+                return template(main);
             };
 
             // XXX: set main.page.title
