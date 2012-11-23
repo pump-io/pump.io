@@ -14,9 +14,7 @@
         <%= data.activity.object.content %>
         <% } %>
         <% if (data.user) { %>
-        <div>
-	  <p><a href="#">Like</a> • <a href="#">Comment</a> • <a href="#">Share</a></p>
-        </div>
+        <%= partial("responses") %>
         <% } %>
       </div>
     </div>

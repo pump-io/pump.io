@@ -22,12 +22,7 @@
       <%= data.activity.object.content %>
       <% } %>
       <% if (data.user) { %>
-      <div>
-	<p>
-          <a class="favorite" href="#">Like <i class="icon-thumbs-up"></i></a> • 
-          <a class="comment" href="#">Comment <i class="icon-comment"></i></a> • 
-          <a class="share" href="#">Share <i class="icon-share-alt"></i></a></p>
-      </div>
+      <%= partial("responses") %>
       <% } %>
     </div>
   </div>

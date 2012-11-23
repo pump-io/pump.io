@@ -441,6 +441,10 @@ var Pump = (function(_, $, Backbone) {
                 });
             }
 
+            if (Pump.currentUser && !_.has(main.data, "user")) {
+                main.data.user = Pump.currentUser.toJSON();
+            }
+
             main.partial = function(name) {
                 var template;
                 if (!_.has(partials, name)) {
@@ -780,7 +784,8 @@ var Pump = (function(_, $, Backbone) {
                 "major-stream-headless",
                 "sidebar-headless",
                 "major-activity-headless",
-                "minor-activity-headless"],
+                "minor-activity-headless",
+                "responses"],
         el: '#content'
     });
 
@@ -790,12 +795,14 @@ var Pump = (function(_, $, Backbone) {
         parts: ["major-stream",
                 "sidebar",
                 "major-activity",
-                "minor-activity"],
+                "minor-activity",
+                "responses"],
         el: '#content'
     });
 
     Pump.MajorActivityView = Pump.TemplateView.extend({
         templateName: 'major-activity',
+        parts: ["responses"],
         model: Pump.Activity,
         events: {
             "click .favorite": "favoriteObject",
@@ -843,7 +850,8 @@ var Pump = (function(_, $, Backbone) {
         modelName: "profile",
         parts: ["profile-block",
                 "object-stream",
-                "major-object"],
+                "major-object",
+                "responses"],
         el: '#content'
     });
 
@@ -1154,7 +1162,7 @@ var Pump = (function(_, $, Backbone) {
                 followers.fetch({success: function(followers, response) {
                     var profile = user.get("profile"),
                         content = new Pump.FollowersContent({model: profile,
-                                                             data: { people: followers }});
+                                                             data: {people: followers }});
                     router.setTitle(content, nickname + " followers");
                     content.render();
                 }});

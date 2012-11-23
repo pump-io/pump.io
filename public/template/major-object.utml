@@ -21,9 +21,9 @@
       <% if (data.object.title) { %>
       <%= data.object.content %>
       <% } %>
-      <div>
-	<p><a href="#">Like</a> • <a href="#">Comment</a> • <a href="#">Share</a></p>
-      </div>
+      <% if (data.user) { %>
+      <%= partial("responses") %>
+      <% } %>
     </div>
   </div>
 </div>
