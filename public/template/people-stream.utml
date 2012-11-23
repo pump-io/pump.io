@@ -2,7 +2,7 @@
   <% if (data.people && data.people.length) { %>
   <% _.each(data.people, function(person) { 
      data.person = person; %>
-  <%= template.majorPerson(obj, _) %>
+  <%= partial("major-person") %>
   <% delete data.person;
      }); %>
   <% } else { %>

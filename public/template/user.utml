@@ -1,9 +1,9 @@
 <div class="user">
   <div class="row">
-    <%= template.profileBlock(obj, _) %>
+    <%= partial("profile-block") %>
   </div>
   <div class="row">
-    <%= template.majorStream(obj, _) %>
-    <%= template.sidebar(obj, _) %>
+    <%= partial("major-stream-headless") %>
+    <%= partial("sidebar-headless") %>
   </div>
 </div>

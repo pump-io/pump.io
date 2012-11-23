@@ -3,9 +3,8 @@
   <% if (data.minor && data.minor.length > 0) { %>
   <% _.each(data.minor, function(activity) {
      data.activity = activity; %>
-  <%= partial("minor-activity") %>
+  <%= partial("minor-activity-headless") %>
   <% delete data.activity;
      }); %>
   <% } %>
 </div>
-

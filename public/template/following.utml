@@ -1,9 +1,9 @@
 <div class="user">
   <div class="row">
-    <%= template.profileBlock(obj, _) %>
+    <%= partial("profile-block") %>
   </div>
   <div class="row">
     <h2>Following</h2>
-    <%= template.peopleStream(obj, _) %>
+    <%= partial("people-stream") %>
   </div>
 </div>

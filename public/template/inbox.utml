@@ -1,6 +1,6 @@
 <div class="inbox">
   <div class="row">
-    <%= template.majorStream(obj, _) %>
-    <%= template.sidebar(obj, _) %>
+    <%= partial("major-stream") %>
+    <%= partial("sidebar") %>
   </div>
 </div>

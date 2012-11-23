@@ -431,6 +431,7 @@ var Pump = (function(_, $, Backbone) {
                 if (!_.has(partials, name)) {
                     throw new Error("Unknown partial " + name);
                 } else {
+                    template = partials[name];
                     return template(main);
                 }
             };
@@ -443,6 +444,7 @@ var Pump = (function(_, $, Backbone) {
             if (view.parts) {
                 pc = 0;
                 cnt = _.keys(view.parts).length;
+                partials = {};
                 _.each(view.parts, function(templateName, partName) {
                     getTemplate(templateName, function(err, template) {
                         if (err) {
@@ -757,8 +759,8 @@ var Pump = (function(_, $, Backbone) {
         templateName: 'user',
         modelName: "profile",
         parts: {profileBlock: "profile-block",
-                majorStream: "major-stream",
-                sidebar: "sidebar",
+                majorStream: "major-stream-headless",
+                sidebar: "sidebar-headless",
                 majorActivity: "major-activity-headless",
                 minorActivity: "minor-activity-headless"
                },

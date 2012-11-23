@@ -2,7 +2,7 @@
   <% if (data.major && data.major.length > 0) { %>
   <% _.each(data.major, function(activity) {
      data.activity = activity; %>
-  <%= partial("major-activity") %>
+  <%= partial("major-activity-headless") %>
   <% delete data.activity; 
      }); %>
   <% } else { %>
