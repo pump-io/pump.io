@@ -21,9 +21,11 @@
       <% if (data.activity.object.displayName) { %>
       <%= data.activity.object.content %>
       <% } %>
-      <% if (data.user) { %>
-      <%= partial("responses") %>
-      <% } %>
+      <% if (data.user) {
+        data.object = data.activity.object; %>
+        <%= partial("responses") %>
+      <% delete data.object;
+        } %>
     </div>
   </div>
 </div>
