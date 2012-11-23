@@ -796,7 +796,41 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.MajorActivityView = Pump.TemplateView.extend({
         templateName: 'major-activity',
-        model: Pump.Activity
+        model: Pump.Activity,
+        events: {
+            "click .favorite": "favoriteObject",
+            "click .unfavorite": "unfavoriteObject"
+        },
+        favoriteObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "favorite",
+                    object: view.model.get("object")
+                }),
+                stream = Pump.currentUser.getStream();
+
+            stream.create(act, {success: function(act) {
+                view.$(".favorite")
+                    .removeClass("favorite")
+                    .addClass("unfavorite")
+                    .html("Unlike <i class=\"icon-thumbs-down\"></i>");
+            }});
+        },
+        unfavoriteObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "unfavorite",
+                    object: view.model.get("object")
+                }),
+                stream = Pump.currentUser.getStream();
+
+            stream.create(act, {success: function(act) {
+                view.$(".unfavorite")
+                    .removeClass("unfavorite")
+                    .addClass("favorite")
+                    .html("Like <i class=\"icon-thumbs-up\"></i>");
+            }});
+        }
     });
 
     Pump.MinorActivityView = Pump.TemplateView.extend({

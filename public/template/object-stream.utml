@@ -1,8 +1,8 @@
 <div class="span9" id="object-stream">
   <% if (data.objects && data.objects.length) { %>
-  <% _.each(objects, function(object) { 
+  <% _.each(data.objects, function(object) { 
      data.object = object; %>
-  <%= majorObject(obj, _) %>
+  <%= partial('major-object') %>
   <% delete data.object;
      }); %>
   <% } else { %>

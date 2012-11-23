@@ -23,7 +23,7 @@
       <% } %>
       <% if (data.user) { %>
       <div>
-	<p><a href="#">Like</a> • <a href="#">Comment</a> • <a href="#">Share</a></p>
+	<p><a class="favorite" href="#">Like <i class="icon-thumbs-up"></i></a> • <a href="#">Comment</a> • <a href="#">Share</a></p>
       </div>
       <% } %>
     </div>
