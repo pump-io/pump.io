@@ -75,7 +75,7 @@ var sameUser = function(url, objects) {
             assert.isObject(feed);
             assert.include(feed, "items");
             assert.isArray(feed.items);
-            assert.lengthOf(feed.items, 20);
+            assert.lengthOf(feed.items, 10);
             _.each(feed.items, function(object) {
                 assert.isObject(object);
                 assert.include(object, "liked");
@@ -83,18 +83,22 @@ var sameUser = function(url, objects) {
             });
         };
     } else {
-        ctx["all objects have 'liked' property with value 'true'"] = function(err, feed) {
+        ctx["all objects have 'liked' property with correct value"] = function(err, feed) {
             assert.ifError(err);
             assert.isObject(feed);
             assert.include(feed, "items");
             assert.isArray(feed.items);
             assert.lengthOf(feed.items, 20);
-            _.each(feed.items, function(activity) {
+            _.each(feed.items, function(activity, i) {
                 assert.isObject(activity);
                 assert.include(activity, "object");
                 assert.isObject(activity.object);
                 assert.include(activity.object, "liked");
-                assert.isTrue(activity.object.liked);
+                if (activity.object.secretNumber % 2 == 0) {
+                    assert.isTrue(activity.object.liked);
+                } else {
+                    assert.isFalse(activity.object.liked);
+                }
             });
         };
     }
@@ -137,7 +141,7 @@ var justClient = function(url, objects) {
             assert.isObject(feed);
             assert.include(feed, "items");
             assert.isArray(feed.items);
-            assert.lengthOf(feed.items, 20);
+            assert.lengthOf(feed.items, 10);
             _.each(feed.items, function(object) {
                 assert.isObject(object);
                 assert.isFalse(_.has(object, "liked"));
@@ -194,7 +198,7 @@ var otherUser = function(url, objects) {
             assert.isObject(feed);
             assert.include(feed, "items");
             assert.isArray(feed.items);
-            assert.lengthOf(feed.items, 20);
+            assert.lengthOf(feed.items, 10);
             _.each(feed.items, function(object) {
                 assert.isObject(object);
                 assert.include(object, "liked");
@@ -269,6 +273,7 @@ suite.addBatch({
                                         verb: "post",
                                         object: {
                                             objectType: "note",
+                                            secretNumber: i,
                                             content: "Hello, world! " + i
                                         }
                                     };
@@ -278,12 +283,14 @@ suite.addBatch({
                             function(err, posts) {
                                 var group = this.group();
                                 if (err) throw err;
-                                _.each(posts, function(post) {
-                                    var act = {
-                                        verb: "favorite",
-                                        object: post.object
-                                    };
-                                    httputil.postJSON(url, cred, act, group());
+                                _.each(posts, function(post, i) {
+                                    if (post.object.secretNumber % 2 == 0) {
+                                        var act = {
+                                            verb: "favorite",
+                                            object: post.object
+                                        };
+                                        httputil.postJSON(url, cred, act, group());
+                                    }
                                 });
                             },
                             function(err, likes) {
