@@ -13,7 +13,7 @@
       <% } else { %>
       <%= data.object.content %>
       <% } %>
-      <p><% if (data.object.author) { %><small><a href="<%- data.object.author.url %>"><%- data.object.author.displayName %></a><% } %>at <a href="<%- data.object.url %>"><%- data.object.published %></a><% if (data.object.location) { %> in <a href="<%- data.object.location.url %>"><%- data.object.location.displayName %></a><% } %></small></p>
+      <p><% if (data.object.author) { %><small><a href="<%- data.object.author.url %>"><%- data.object.author.displayName %></a><% } %> at <a href="<%- data.object.url %>"><%- data.object.published %></a><% if (data.object.location) { %> in <a href="<%- data.object.location.url %>"><%- data.object.location.displayName %></a><% } %></small></p>
     </div>
   </div>
   <div class="row">
