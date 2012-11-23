@@ -1110,9 +1110,72 @@ var filteredFeedRoute = function(urlmaker, titlemaker, streammaker, finisher) {
     };
 };
 
+var firstFewRepliesFinisher = function(req, collection, callback) {
+
+    var profile = (req.remoteUser) ? req.remoteUser.profile : null,
+        objects = _.pluck(collection.items, "object");
+
+    firstFewReplies(profile, objects, callback);
+};
+
+var firstFewReplies = function(profile, objs, callback) {
+
+    var getReplies = function(obj, callback) {
+
+        if (!_.has(obj, "replies") ||
+            !_.isObject(obj.replies) ||
+            !_.has(obj.replies, "totalItems") ||
+            obj.replies.totalItems === 0) {
+            callback(null);
+            return;
+        }
+
+        Step(
+            function() {
+                obj.getRepliesStream(this);
+            },
+            function(err, str) {
+                var filtered;
+                if (err) throw err;
+                if (!profile) {
+                    filtered = new FilteredStream(str, objectPublicOnly);
+                } else {
+                    filtered = new FilteredStream(str, objectRecipientsOnly(profile));
+                }
+                filtered.getObjects(0, 4, this);
+            },
+            function(err, refs) {
+                var group = this.group();
+                if (err) throw err;
+                _.each(refs, function(ref) {
+                    ActivityObject.getObject(ref.objectType, ref.id, group());
+                });
+            },
+            function(err, objs) {
+                if (err) {
+                    callback(err);
+                } else {
+                    obj.replies.items = objs;
+                    callback(null);
+                }
+            }
+        );
+    };
+
+    Step(
+        function() {
+            var group = this.group();
+            _.each(objs, function(obj) {
+                getReplies(obj, group());
+            });
+        },
+        callback
+    );
+};
+
 // finisher that adds liked flag to stuff
 
-var addLiked = function(req, collection, callback) {
+var addLikedFinisher = function(req, collection, callback) {
 
     // Ignore for non-users
 
@@ -1121,10 +1184,10 @@ var addLiked = function(req, collection, callback) {
         return;
     }
 
-    addObjectsLiked(req.remoteUser.profile, _.pluck(collection.items, "object"), callback);
+    addLiked(req.remoteUser.profile, _.pluck(collection.items, "object"), callback);
 };
 
-var addObjectsLiked = function(profile, objects, callback) {
+var addLiked = function(profile, objects, callback) {
 
     var faveIDs;
 
@@ -1161,6 +1224,22 @@ var addObjectsLiked = function(profile, objects, callback) {
     );
 };
 
+var doFinishers = function(finishers) {
+    return function(req, collection, callback) {
+        Step(
+            function() {
+                var group = this.group();
+                _.each(finishers, function(finisher) {
+                    finisher(req, collection, group());
+                });
+            },
+            callback
+        );
+    };
+};
+
+var majorFinishers = doFinishers([addLikedFinisher, firstFewRepliesFinisher]);
+
 var userStream = filteredFeedRoute(
     function(req) {
         return URLMaker.makeURL("api/user/" + req.user.nickname + "/feed");
@@ -1183,7 +1262,7 @@ var userMajorStream = filteredFeedRoute(
     function(req, callback) {
         req.user.getMajorOutboxStream(callback);
     },
-    addLiked
+    majorFinishers
 );
 
 var userMinorStream = filteredFeedRoute(
@@ -1282,7 +1361,7 @@ var userMajorInbox = feedRoute(
     function(req, callback) {
         req.user.getMajorInboxStream(callback);
     },
-    addLiked
+    majorFinishers
 );
 
 var userMinorInbox = feedRoute(
@@ -1319,7 +1398,7 @@ var userMajorDirectInbox = feedRoute(
     function(req, callback) {
         req.user.getMajorDirectInboxStream(callback);
     },
-    addLiked
+    majorFinishers
 );
 
 var userMinorDirectInbox = feedRoute(
@@ -1617,20 +1696,41 @@ var userFavorites = function(req, res, next) {
             });
         },
         function(err, objects) {
+
+            var group = this.group();
+
             if (err) throw err;
+
             collection.items = objects;
+
+            _.each(objects, function(object) {
+                object.expandFeeds(group());
+            });
+        },
+        function(err) {
+
+            var second;
+
+            if (err) throw err;
+
+            // Add the first few replies for each object
+
+            firstFewReplies((req.remoteUser) ? req.remoteUser.profile : null, collection.items, this.parallel());
+
+            second = this.parallel();
+
             if (!req.remoteUser) { 
                 // No user, no liked
-                this(null);
+                second(null);
             } else if (req.remoteUser.profile.id == req.user.profile.id) {
                 // Same user, all liked (by definition!)
                 _.each(collection.items, function(object) {
                     object.liked = true;
                 });
-                this(null);
+                second(null);
             } else {
                 // Different user; check for likes
-                addObjectsLiked(req.remoteUser.profile, collection.items, this);
+                addLiked(req.remoteUser.profile, collection.items, second);
             }
         },
         function(err) {
