@@ -37,6 +37,7 @@ var databank = require("databank"),
     ActivityObject = require("../lib/model/activityobject").ActivityObject,
     User = require("../lib/model/user").User,
     Edge = require("../lib/model/edge").Edge,
+    Favorite = require("../lib/model/favorite").Favorite,
     stream = require("../lib/model/stream"),
     Stream = stream.Stream,
     NotInStreamError = stream.NotInStreamError,
@@ -1034,7 +1035,7 @@ var newActivity = function(activity, user, callback) {
     );
 };
 
-var filteredFeedRoute = function(urlmaker, titlemaker, streammaker) {
+var filteredFeedRoute = function(urlmaker, titlemaker, streammaker, finisher) {
 
     return function(req, res, next) {
 
@@ -1088,6 +1089,14 @@ var filteredFeedRoute = function(urlmaker, titlemaker, streammaker) {
                 }
             },
             function(err) {
+                if (err) throw err;
+                if (finisher) {
+                    finisher(req, collection, this);
+                } else {
+                    this(null);
+                }
+            },
+            function(err) {
                 if (err) {
                     next(err);
                 } else {
@@ -1099,6 +1108,57 @@ var filteredFeedRoute = function(urlmaker, titlemaker, streammaker) {
             }
         );
     };
+};
+
+// finisher that adds liked flag to stuff
+
+var addLiked = function(req, collection, callback) {
+
+    // Ignore for non-users
+
+    if (!req.remoteUser) {
+        callback(null);
+        return;
+    }
+
+    addObjectsLiked(req.remoteUser.profile, _.pluck(collection.items, "object"), callback);
+};
+
+var addObjectsLiked = function(profile, objects, callback) {
+
+    var faveIDs;
+
+    // Ignore for non-users
+
+    if (!profile) {
+        callback(null);
+        return;
+    }
+
+    faveIDs = objects.map(function(object) {
+        return Favorite.id(profile.id, object.id);
+    });
+
+    Step(
+        function() {
+            Favorite.readAll(faveIDs, this);
+        },
+        function(err, faves) {
+            if (err) {
+                callback(err);
+            } else {
+                _.each(objects, function(object, i) {
+                    var faveID = faveIDs[i];
+                    if (_.has(faves, faveID) && _.isObject(faves[faveID])) {
+                        object.liked = true;
+                    } else {
+                        object.liked = false;
+                    }
+                });
+                callback(null);
+            }
+        }
+    );
 };
 
 var userStream = filteredFeedRoute(
@@ -1122,7 +1182,8 @@ var userMajorStream = filteredFeedRoute(
     },
     function(req, callback) {
         req.user.getMajorOutboxStream(callback);
-    }
+    },
+    addLiked
 );
 
 var userMinorStream = filteredFeedRoute(
@@ -1137,7 +1198,7 @@ var userMinorStream = filteredFeedRoute(
     }
 );
 
-var feedRoute = function(urlmaker, titlemaker, streamgetter) {
+var feedRoute = function(urlmaker, titlemaker, streamgetter, finisher) {
 
     return function(req, res, next) {
 
@@ -1181,6 +1242,14 @@ var feedRoute = function(urlmaker, titlemaker, streamgetter) {
                 }
             },
             function(err) {
+                if (err) throw err;
+                if (finisher) {
+                    finisher(req, collection, this);
+                } else {
+                    this(null);
+                }
+            },
+            function(err) {
                 if (err) {
                     next(err);
                 } else {
@@ -1212,7 +1281,8 @@ var userMajorInbox = feedRoute(
     },
     function(req, callback) {
         req.user.getMajorInboxStream(callback);
-    }
+    },
+    addLiked
 );
 
 var userMinorInbox = feedRoute(
@@ -1248,7 +1318,8 @@ var userMajorDirectInbox = feedRoute(
     },
     function(req, callback) {
         req.user.getMajorDirectInboxStream(callback);
-    }
+    },
+    addLiked
 );
 
 var userMinorDirectInbox = feedRoute(
@@ -1546,10 +1617,26 @@ var userFavorites = function(req, res, next) {
             });
         },
         function(err, objects) {
+            if (err) throw err;
+            collection.items = objects;
+            if (!req.remoteUser) { 
+                // No user, no liked
+                this(null);
+            } else if (req.remoteUser.profile.id == req.user.profile.id) {
+                // Same user, all liked (by definition!)
+                _.each(collection.items, function(object) {
+                    object.liked = true;
+                });
+                this(null);
+            } else {
+                // Different user; check for likes
+                addObjectsLiked(req.remoteUser.profile, collection.items, this);
+            }
+        },
+        function(err) {
             if (err) {
                 next(err);
             } else {
-                collection.items = objects;
                 res.json(collection);
             }
         }
