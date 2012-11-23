@@ -1,4 +1,4 @@
-<div class="row activity" id="<%- data.activity.id %>">
+<div class="row activity major" id="<%- data.activity.id %>">
   <div class="row">
     <div class="span1">
       <% if (data.activity.actor.image && data.activity.actor.image.url) { %>
@@ -21,9 +21,11 @@
       <% if (data.activity.object.displayName) { %>
       <%= data.activity.object.content %>
       <% } %>
+      <% if (data.user) { %>
       <div>
 	<p><a href="#">Like</a> • <a href="#">Comment</a> • <a href="#">Share</a></p>
       </div>
+      <% } %>
     </div>
   </div>
 </div>

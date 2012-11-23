@@ -794,6 +794,16 @@ var Pump = (function(_, $, Backbone) {
         el: '#content'
     });
 
+    Pump.MajorActivityView = Pump.TemplateView.extend({
+        templateName: 'major-activity',
+        model: Pump.Activity
+    });
+
+    Pump.MinorActivityView = Pump.TemplateView.extend({
+        templateName: 'minor-activity',
+        model: Pump.Activity
+    });
+
     Pump.FavoritesContent = Pump.TemplateView.extend({
         templateName: 'favorites',
         modelName: "profile",
@@ -1036,6 +1046,18 @@ var Pump = (function(_, $, Backbone) {
                                                                         minor: minor}
                                                                 });
                             router.setTitle(content, "Home");
+                            content.$el.one("pump.rendered", function() {
+                                content.$(".activity.major").each(function(i) {
+                                    var id = $(this).attr("id"),
+                                        act = major.get(id);
+                                    var aview = new Pump.MajorActivityView({el: this, model: act});
+                                });
+                                content.$(".activity.minor").each(function(i) {
+                                    var id = $(this).attr("id"),
+                                        act = minor.get(id);
+                                    var aview = new Pump.MinorActivityView({el: this, model: act});
+                                });
+                            });
                             content.render();
                         }});
                     }});
