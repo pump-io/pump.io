@@ -203,31 +203,8 @@ var getFiltered = function(stream, filter, start, end, callback) {
     );
 };
 
-var getHelpers = function(helpers, callback) {
-    Step(
-        function() {
-            var group = this.group();
-            _.each(helpers, function(templateName) {
-                compileTemplate(templateName, group());
-            });
-        },
-        function(err, functions) {
-            if (err) {
-                callback(err, null);
-            } else {
-                callback(null, _.object(_.keys(helpers), functions));
-            }
-        }
-    );
-};
-
 var showStream = function(req, res, next) {
     var pump = this,
-        helperNames = {"profileBlock": "profile-block",
-                       "majorStream": "major-stream",
-                       "sidebar": "sidebar",
-                       "majorActivity": "major-activity-headless",
-                       "minorActivity": "minor-activity-headless"},
         getData = function(callback) {
             Step(
                 function() {
@@ -253,16 +230,14 @@ var showStream = function(req, res, next) {
 
     Step(
         function() {
-            getData(this.parallel());
-            getHelpers(helperNames, this.parallel());
+            getData(this);
         },
-        function(err, data, helpers) {
+        function(err, data) {
             if (err) {
                 next(err);
             } else {
                 res.render("user", {page: {title: req.user.profile.displayName},
-                                    data: data,
-                                    template: helpers});
+                                    data: data});
             }
         }
     );
@@ -272,9 +247,6 @@ var showStream = function(req, res, next) {
 var showFavorites = function(req, res, next) {
 
     var pump = this,
-        helperNames = {"profileBlock": "profile-block",
-                       "objectStream": "object-stream",
-                       "majorObject": "major-object"},
         getData = function(callback) {
             Step(
                 function() {
@@ -306,16 +278,14 @@ var showFavorites = function(req, res, next) {
 
     Step(
         function() {
-            getData(this.parallel());
-            getHelpers(helperNames, this.parallel());
+            getData(this);
         },
-        function(err, data, helpers) {
+        function(err, data) {
             if (err) {
                 next(err);
             } else {
                 res.render("favorites", {page: {title: req.user.nickname + " favorites"},
-                                         data: data,
-                                         template: helpers});
+                                         data: data});
             }
         }
     );
@@ -324,9 +294,6 @@ var showFavorites = function(req, res, next) {
 var showFollowers = function(req, res, next) {
 
     var pump = this,
-        helperNames = {"profileBlock": "profile-block",
-                       "peopleStream": "people-stream",
-                       "majorPerson": "major-person"},
         getData = function(callback) {
             Step(
                 function() {
@@ -346,16 +313,14 @@ var showFollowers = function(req, res, next) {
 
     Step(
         function() {
-            getData(this.parallel());
-            getHelpers(helperNames, this.parallel());
+            getData(this);
         },
-        function(err, data, helpers) {
+        function(err, data) {
             if (err) {
                 next(err);
             } else {
                 res.render("followers", {page: {title: req.user.nickname + " followers"},
-                                         data: data,
-                                         template: helpers});
+                                         data: data});
             }
         }
     );
@@ -364,9 +329,6 @@ var showFollowers = function(req, res, next) {
 var showFollowing = function(req, res, next) {
 
     var pump = this,
-        helperNames = {"profileBlock": "profile-block",
-                       "peopleStream": "people-stream",
-                       "majorPerson": "major-person"},
         getData = function(callback) {
             Step(
                 function() {
@@ -387,15 +349,13 @@ var showFollowing = function(req, res, next) {
     Step(
         function() {
             getData(this.parallel());
-            getHelpers(helperNames, this.parallel());
         },
-        function(err, data, helpers) {
+        function(err, data) {
             if (err) {
                 next(err);
             } else {
                 res.render("following", {page: {title: req.user.nickname + " following"},
-                                         data: data,
-                                         template: helpers});
+                                         data: data});
             }
         }
     );
