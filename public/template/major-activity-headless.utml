@@ -8,17 +8,32 @@
       <% } %>
       <p><small><a href="<%- data.activity.url %>"><abbr title="<%- data.activity.published %>" class="easydate"><%- data.activity.published %></abbr></a><% if (data.activity.location) { %> in <a href="<%- data.activity.location.url %>"><%- data.activity.location.displayName %></a><% } %></small></p>
     </div>
-    <div class="row">
-      <div class="span8 offset1">
-        <% if (data.activity.object.displayName) { %>
-        <%= data.activity.object.content %>
-        <% } %>
-        <% if (data.user) {
-           data.object = data.activity.object; %>
-        <%= partial("responses") %>
-        <% delete data.object;
-           } %>
-      </div>
+  </div>
+  <div class="row">
+    <div class="span8 offset1">
+      <% if (data.activity.object.displayName) { %>
+      <%= data.activity.object.content %>
+      <% } %>
+      <% if (data.user) {
+         data.object = data.activity.object; %>
+      <%= partial("responses") %>
+      <% delete data.object;
+         } %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="span8 offset1 replies">
+      <% if (data.activity.object.replies.totalItems > 0) { %>
+      <h3>Replies</h3>
+      <% if (data.activity.object.replies.totalItems > data.activity.object.replies.items.length) { %>
+      <a class="show-all" href="#">Show all <%= data.activity.object.replies.totalItems %> replies</a>
+      <% } %>
+      <% _.each(data.activity.object.replies.items, function(reply) { 
+         data.reply = reply; %>
+      <%= partial("reply") %>
+      <% delete data.reply;
+         }); %>
+      <% } %>
     </div>
   </div>
 </div>

@@ -28,4 +28,20 @@
         } %>
     </div>
   </div>
+  <div class="row">
+    <div class="span8 offset1 replies">
+      <% if (data.activity.object.replies.totalItems > 0) { %>
+      <h3>Replies</h3>
+      <!-- <%= JSON.stringify(data.activity.object.replies) %> -->
+      <% if (data.activity.object.replies.totalItems > data.activity.object.replies.items.length) { %>
+      <a class="show-all" href="#">Show all <%= data.activity.object.replies.totalItems %> replies</a>
+      <% } %>
+      <% _.each(data.activity.object.replies.items, function(reply) { 
+         data.reply = reply; %>
+      <%= partial("reply") %>
+      <% delete data.reply;
+         }); %>
+      <% } %>
+    </div>
+  </div>
 </div>
