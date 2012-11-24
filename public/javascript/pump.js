@@ -521,14 +521,14 @@ var Pump = (function(_, $, Backbone) {
     });
 
     Pump.AnonymousNav = Pump.TemplateView.extend({
-        tagname: "div",
-        classname: "nav",
+        tagName: "div",
+        className: "nav",
         templateName: 'nav-anonymous'
     });
 
     Pump.UserNav = Pump.TemplateView.extend({
-        tagname: "div",
-        classname: "nav",
+        tagName: "div",
+        className: "nav",
         modelName: "user",
         templateName: 'nav-loggedin',
         events: {
@@ -785,7 +785,8 @@ var Pump = (function(_, $, Backbone) {
                 "sidebar-headless",
                 "major-activity-headless",
                 "minor-activity-headless",
-                "responses"],
+                "responses",
+                "reply"],
         el: '#content'
     });
 
@@ -796,7 +797,8 @@ var Pump = (function(_, $, Backbone) {
                 "sidebar",
                 "major-activity",
                 "minor-activity",
-                "responses"],
+                "responses",
+                "reply"],
         el: '#content'
     });
 
@@ -806,7 +808,8 @@ var Pump = (function(_, $, Backbone) {
         model: Pump.Activity,
         events: {
             "click .favorite": "favoriteObject",
-            "click .unfavorite": "unfavoriteObject"
+            "click .unfavorite": "unfavoriteObject",
+            "click .comment": "openComment"
         },
         favoriteObject: function() {
             var view = this,
@@ -837,7 +840,76 @@ var Pump = (function(_, $, Backbone) {
                     .addClass("favorite")
                     .html("Like <i class=\"icon-thumbs-up\"></i>");
             }});
+        },
+        openComment: function() {
+            var view = this,
+                form = new Pump.CommentForm({model: view.model});
+
+            form.$el.on("pump.rendered", function() {
+                view.$(".replies").append(form.el);
+            });
+
+            form.render();
         }
+    });
+
+    Pump.CommentForm = Pump.TemplateView.extend({
+        templateName: 'comment-form',
+        tagName: "div",
+        className: "row comment-form",
+        model: Pump.Activity,
+        events: {
+            "submit .post-comment": "saveComment"
+        },
+        saveComment: function() {
+            var view = this,
+                text = view.$('textarea[name="content"]').val(),
+                orig = view.model.get("object"),
+                act = new Pump.Activity({
+                    verb: "post",
+                    object: {
+                        objectType: "comment",
+                        content: text,
+                        inReplyTo: {
+                            objectType: orig.objectType,
+                            id: orig.id
+                        }
+                    }
+                }),
+                stream = Pump.currentUser.getStream();
+
+            view.startSpin();
+
+            stream.create(act, {success: function(act) {
+
+                var object = new Pump.ActivityObject(act.get("object")),
+                    repl;
+
+                object.set("author", new Pump.Person(act.get("actor")));
+
+                repl = new Pump.ReplyView({model: object});
+
+                // These get stripped for "posts"; re-add it
+
+                repl.$el.on("pump.rendered", function() {
+
+                    view.stopSpin();
+
+                    view.$el.replaceWith(repl.$el);
+                });
+
+                repl.render();
+
+            }});
+
+            return false;
+        }
+    });
+
+    Pump.ReplyView = Pump.TemplateView.extend({
+        templateName: 'reply',
+        model: Pump.ActivityObject,
+        modelName: 'reply'
     });
 
     Pump.MinorActivityView = Pump.TemplateView.extend({
@@ -965,8 +1037,8 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.PostNoteModal = Pump.TemplateView.extend({
 
-        tagname: "div",
-        classname: "modal-holder",
+        tagName: "div",
+        className: "modal-holder",
         templateName: 'post-note',
         events: {
             "click #send-note": "postNote"
