@@ -176,7 +176,7 @@ var Pump = (function(_, $, Backbone) {
                 updater = function(obj, model) {
                     return function(name) {
                         var raw = obj.get(name);
-                        if (obj[name]) {
+                        if (obj[name] && obj[name].set) {
                             obj[name].set(raw);
                         } else if (raw) {
                             obj[name] = new model(raw);
@@ -899,7 +899,7 @@ var Pump = (function(_, $, Backbone) {
             var view = this,
                 act = new Pump.Activity({
                     verb: "favorite",
-                    object: view.model.get("object")
+                    object: view.model.object.toJSON()
                 }),
                 stream = Pump.currentUser.getStream();
 
@@ -914,7 +914,7 @@ var Pump = (function(_, $, Backbone) {
             var view = this,
                 act = new Pump.Activity({
                     verb: "unfavorite",
-                    object: view.model.get("object")
+                    object: view.model.object.toJSON()
                 }),
                 stream = Pump.currentUser.getStream();
 
@@ -948,7 +948,7 @@ var Pump = (function(_, $, Backbone) {
         saveComment: function() {
             var view = this,
                 text = view.$('textarea[name="content"]').val(),
-                orig = view.model.get("object"),
+                orig = view.model.object.toJSON(),
                 act = new Pump.Activity({
                     verb: "post",
                     object: {
@@ -966,10 +966,10 @@ var Pump = (function(_, $, Backbone) {
 
             stream.create(act, {success: function(act) {
 
-                var object = new Pump.ActivityObject(act.get("object")),
+                var object = act.object,
                     repl;
 
-                object.set("author", new Pump.Person(act.get("actor")));
+                object.set("author", act.actor); 
 
                 repl = new Pump.ReplyView({model: object});
 
