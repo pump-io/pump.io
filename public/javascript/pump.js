@@ -132,13 +132,28 @@ var Pump = (function(_, $, Backbone) {
                 }
             });
 
+            _.each(arrays, function(arr) {
+                var raw = act.get(arr);
+                if (raw) {
+                    act[arr] = new Pump.ActivityObjectBag(raw);
+                }
+            });
+
             act.on("change", function(act) {
                 _.each(parts, function(part) {
                     var raw = act.get(part);
                     if (act[part]) {
                         act[part].set(raw);
-                    } else {
+                    } else if (raw) {
                         act[part] = new Pump.ActivityObject(raw);
+                    }
+                });
+                _.each(arrays, function(arr) {
+                    var raw = act.get(arr);
+                    if (act[arr]) {
+                        act[arr].set(raw);
+                    } else if (raw) {
+                        act[arr] = new Pump.ActivityObject(raw);
                     }
                 });
             });
@@ -153,6 +168,12 @@ var Pump = (function(_, $, Backbone) {
             _.each(parts, function(part) {
                 if (_.has(act, part)) {
                     json[part] = act[part].toJSON();
+                }
+            });
+
+            _.each(arrays, function(arr) {
+                if (_.has(act, arr)) {
+                    json[arr] = act[arr].toJSON();
                 }
             });
 
@@ -298,6 +319,12 @@ var Pump = (function(_, $, Backbone) {
         parse: function(response) {
             return response.items;
         }
+    });
+
+    // Unordered, doesn't have an URL
+
+    Pump.ActivityObjectBag = Backbone.Collection.extend({
+        model: Pump.ActivityObject
     });
 
     Pump.PeopleStream = Backbone.Collection.extend({
