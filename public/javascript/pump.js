@@ -120,6 +120,44 @@ var Pump = (function(_, $, Backbone) {
     // A social activity.
 
     Pump.Activity = Backbone.Model.extend({
+        initialize: function() {
+            var act = this,
+                parts = ['actor', 'object', 'target', 'generator', 'provider', 'location'],
+                arrays = ['to', 'cc', 'bto', 'bcc'];
+
+            _.each(parts, function(part) {
+                var raw = act.get(part);
+                if (raw) {
+                    act[part] = new Pump.ActivityObject(raw);
+                }
+            });
+
+            act.on("change", function(act) {
+                _.each(parts, function(part) {
+                    var raw = act.get(part);
+                    if (act[part]) {
+                        act[part].set(raw);
+                    } else {
+                        act[part] = new Pump.ActivityObject(raw);
+                    }
+                });
+            });
+        },
+        toJSON: function() {
+
+            var act = this,
+                parts = ['actor', 'object', 'target', 'generator', 'provider', 'location'],
+                arrays = ['to', 'cc', 'bto', 'bcc'],
+                json = _.clone(act.attributes);
+
+            _.each(parts, function(part) {
+                if (_.has(act, part)) {
+                    json[part] = act[part].toJSON();
+                }
+            });
+
+            return json;
+        },
         url: function() {
             var links = this.get("links"),
                 uuid = this.get("uuid");
