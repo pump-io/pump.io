@@ -303,6 +303,9 @@ var Pump = (function(_, $, Backbone) {
         idAttribute: "nickname",
         initialize: function() {
             this.profile = new Pump.Person(this.get("profile"));
+            this.on("change", function(user) {
+                user.profile.set(user.get("profile"));
+            });
             this.profile.isNew = function() { return false; };
         },
         isNew: function() {
@@ -804,7 +807,8 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.MajorActivityView = Pump.TemplateView.extend({
         templateName: 'major-activity',
-        parts: ["responses"],
+        parts: ["responses",
+                "reply"],
         model: Pump.Activity,
         events: {
             "click .favorite": "favoriteObject",
@@ -906,6 +910,18 @@ var Pump = (function(_, $, Backbone) {
         }
     });
 
+    Pump.MajorObjectView = Pump.TemplateView.extend({
+        templateName: 'major-object',
+        parts: ["responses", "reply"],
+        model: Pump.ActivityObject
+    });
+
+    Pump.MajorPersonView = Pump.TemplateView.extend({
+        templateName: 'major-person',
+        model: Pump.Person,
+        modelName: 'person'
+    });
+
     Pump.ReplyView = Pump.TemplateView.extend({
         templateName: 'reply',
         model: Pump.ActivityObject,
@@ -917,13 +933,20 @@ var Pump = (function(_, $, Backbone) {
         model: Pump.Activity
     });
 
+    Pump.ProfileBlock = Pump.TemplateView.extend({
+        templateName: 'profile-block',
+        model: Pump.Person,
+        modelName: 'profile'
+    });
+
     Pump.FavoritesContent = Pump.TemplateView.extend({
         templateName: 'favorites',
         modelName: "profile",
         parts: ["profile-block",
                 "object-stream",
                 "major-object",
-                "responses"],
+                "responses",
+                "reply"],
         el: '#content'
     });
 
@@ -1126,7 +1149,7 @@ var Pump = (function(_, $, Backbone) {
         },
 
         settings: function() {
-            var content = new Pump.SettingsContent({model: Pump.currentUser.get("profile") });
+            var content = new Pump.SettingsContent({model: Pump.currentUser.profile });
 
             this.setTitle(content, "Settings");
 
@@ -1194,11 +1217,37 @@ var Pump = (function(_, $, Backbone) {
             user.fetch({success: function(user, response) {
                 major.fetch({success: function(major, response) {
                     minor.fetch({success: function(minor, response) {
-                        var profile = user.get("profile"),
+                        var profile = user.profile,
                             content = new Pump.UserPageContent({model: profile,
                                                                 data: { major: major,
                                                                         minor: minor }});
-                        router.setTitle(content, nickname);
+
+                        
+                        router.setTitle(content, profile.get("displayName"));
+
+                        content.$el.one("pump.rendered", function() {
+
+                            // Helper view for the profile block
+
+                            var block = new Pump.ProfileBlock({el: content.$(".profile-block"),
+                                                               model: profile});
+
+                            // Helper view for each major activity
+
+                            content.$(".activity.major").each(function(i) {
+                                var id = $(this).attr("id"),
+                                    act = major.get(id);
+                                var aview = new Pump.MajorActivityView({el: this, model: act});
+                            });
+
+                            // Helper view for each minor activity
+
+                            content.$(".activity.minor").each(function(i) {
+                                var id = $(this).attr("id"),
+                                    act = minor.get(id);
+                                var aview = new Pump.MinorActivityView({el: this, model: act});
+                            });
+                        });
                         content.render();
                     }});
                 }});
@@ -1213,11 +1262,27 @@ var Pump = (function(_, $, Backbone) {
             // XXX: parallelize this?
 
             user.fetch({success: function(user, response) {
-                var profile = user.get("profile");
+                var profile = user.profile;
                 favorites.fetch({success: function(major, response) {
                     var content = new Pump.FavoritesContent({model: profile,
                                                              data: { objects: favorites }});
                     router.setTitle(content, nickname + " favorites");
+                    content.$el.one("pump.rendered", function() {
+
+                        // Helper view for the profile block
+
+                        var block = new Pump.ProfileBlock({el: content.$(".profile-block"),
+                                                           model: profile});
+
+                        // Helper view for each object
+
+                        content.$(".object.major").each(function(i) {
+                            var id = $(this).attr("id"),
+                                obj = favorites.get(id);
+
+                            var aview = new Pump.MajorObjectView({el: this, model: obj});
+                        });
+                    });
                     content.render();
                 }});
             }});
@@ -1228,14 +1293,28 @@ var Pump = (function(_, $, Backbone) {
                 user = new Pump.User({nickname: nickname}),
                 followers = user.getFollowersStream();
 
-            // XXX: parallelize this?
-
             user.fetch({success: function(user, response) {
                 followers.fetch({success: function(followers, response) {
-                    var profile = user.get("profile"),
+                    var profile = user.profile,
                         content = new Pump.FollowersContent({model: profile,
                                                              data: {people: followers }});
                     router.setTitle(content, nickname + " followers");
+                    content.$el.one("pump.rendered", function() {
+
+                        // Helper view for the profile block
+
+                        var block = new Pump.ProfileBlock({el: content.$(".profile-block"),
+                                                           model: profile});
+
+                        // Helper view for each person
+
+                        content.$(".person.major").each(function(i) {
+                            var id = $(this).attr("id"),
+                                person = followers.get(id);
+
+                            var aview = new Pump.MajorPersonView({el: this, model: person});
+                        });
+                    });
                     content.render();
                 }});
             }});
@@ -1250,11 +1329,27 @@ var Pump = (function(_, $, Backbone) {
 
             user.fetch({success: function(user, response) {
                 following.fetch({success: function(following, response) {
-                    var profile = user.get("profile"),
+                    var profile = user.profile,
                         content = new Pump.FollowingContent({model: profile,
                                                              data: {people: following}});
 
                     router.setTitle(content, nickname + " following");
+                    content.$el.one("pump.rendered", function() {
+
+                        // Helper view for the profile block
+
+                        var block = new Pump.ProfileBlock({el: content.$(".profile-block"),
+                                                           model: profile});
+
+                        // Helper view for each person
+
+                        content.$(".person.major").each(function(i) {
+                            var id = $(this).attr("id"),
+                                person = following.get(id);
+
+                            var aview = new Pump.MajorPersonView({el: this, model: person});
+                        });
+                    });
                     content.render();
                 }});
             }});

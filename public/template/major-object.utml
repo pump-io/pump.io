@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row object major" id="<%- data.object.id %>">
   <div class="row">
     <div class="span1">
       <% if (data.object.author && data.object.author.image && data.object.author.image.url) { %>
