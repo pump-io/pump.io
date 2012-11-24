@@ -113,85 +113,6 @@ var Pump = (function(_, $, Backbone) {
         console.log(err);
     };
 
-    // This is overwritten by inline script in layout.utml
-
-    Pump.config = {};
-
-    // A social activity.
-
-    Pump.Activity = Backbone.Model.extend({
-        initialize: function() {
-            var act = this,
-                parts = ['actor', 'object', 'target', 'generator', 'provider', 'location'],
-                arrays = ['to', 'cc', 'bto', 'bcc'];
-
-            _.each(parts, function(part) {
-                var raw = act.get(part);
-                if (raw) {
-                    act[part] = new Pump.ActivityObject(raw);
-                }
-            });
-
-            _.each(arrays, function(arr) {
-                var raw = act.get(arr);
-                if (raw) {
-                    act[arr] = new Pump.ActivityObjectBag(raw);
-                }
-            });
-
-            act.on("change", function(act) {
-                _.each(parts, function(part) {
-                    var raw = act.get(part);
-                    if (act[part]) {
-                        act[part].set(raw);
-                    } else if (raw) {
-                        act[part] = new Pump.ActivityObject(raw);
-                    }
-                });
-                _.each(arrays, function(arr) {
-                    var raw = act.get(arr);
-                    if (act[arr]) {
-                        act[arr].set(raw);
-                    } else if (raw) {
-                        act[arr] = new Pump.ActivityObject(raw);
-                    }
-                });
-            });
-        },
-        toJSON: function() {
-
-            var act = this,
-                parts = ['actor', 'object', 'target', 'generator', 'provider', 'location'],
-                arrays = ['to', 'cc', 'bto', 'bcc'],
-                json = _.clone(act.attributes);
-
-            _.each(parts, function(part) {
-                if (_.has(act, part)) {
-                    json[part] = act[part].toJSON();
-                }
-            });
-
-            _.each(arrays, function(arr) {
-                if (_.has(act, arr)) {
-                    json[arr] = act[arr].toJSON();
-                }
-            });
-
-            return json;
-        },
-        url: function() {
-            var links = this.get("links"),
-                uuid = this.get("uuid");
-            if (links && _.isObject(links) && links.self) {
-                return links.self;
-            } else if (uuid) {
-                return "/api/activity/" + uuid;
-            } else {
-                return null;
-            }
-        }
-    });
-
     Pump.oauthify = function(options) {
 
         if (options.url.indexOf(':') == -1) {
@@ -223,8 +144,145 @@ var Pump = (function(_, $, Backbone) {
         return options;
     };
 
+    // This is overwritten by inline script in layout.utml
+
+    Pump.config = {};
+
+    // A little bit of model sugar
+    // Create Model attributes for our object-y things
+
+    Pump.Model = Backbone.Model.extend({
+
+        activityObjects: [],
+        activityObjectBags: [],
+        activityObjectStreams: [],
+        activityStreams: [],
+
+        initialize: function() {
+
+            var obj = this,
+                neverNew = function() { // XXX: neverNude
+                    return false;
+                },
+                initer = function(obj, model) {
+                    return function(name) {
+                        var raw = obj.get(name);
+                        if (raw) {
+                            obj[name] = new model(raw);
+                            obj[name].isNew = neverNew;
+                        }
+                    };
+                },
+                updater = function(obj, model) {
+                    return function(name) {
+                        var raw = obj.get(name);
+                        if (obj[name]) {
+                            obj[name].set(raw);
+                        } else if (raw) {
+                            obj[name] = new model(raw);
+                            obj[name].isNew = neverNew;
+                        }
+                    };
+                };
+
+            _.each(this.activityObjects, initer(obj, Pump.ActivityObject));
+            _.each(this.activityObjectBags, initer(obj, Pump.ActivityObjectBag));
+            _.each(this.activityObjectStreams, initer(obj, Pump.ActivityObjectStream));
+            _.each(this.activityStreams, initer(obj, Pump.ActivityStream));
+
+            obj.on("change", function(act) {
+                _.each(this.activityObjects, updater(obj, Pump.ActivityObject));
+                _.each(this.activityObjectBags, updater(obj, Pump.ActivityObjectBag));
+                _.each(this.activityObjectStreams, updater(obj, Pump.ActivityObjectStream));
+                _.each(this.activityStreams, updater(obj, Pump.ActivityStream));
+            });
+        },
+        toJSON: function() {
+
+            var obj = this,
+                json = _.clone(obj.attributes),
+                jsoner = function(name) {
+                    if (_.has(obj, name)) {
+                        json[name] = obj[name].toJSON();
+                    }
+                };
+
+            _.each(this.activityObjects, jsoner);
+            _.each(this.activityObjectBags, jsoner);
+            _.each(this.activityObjectStreams, jsoner);
+            _.each(this.activityStreams, jsoner);
+
+            return json;
+        }
+    });
+
+    // A social activity.
+
+    Pump.Activity = Pump.Model.extend({
+        activityObjects: ['actor', 'object', 'target', 'generator', 'provider', 'location'],
+        activityObjectBags: ['to', 'cc', 'bto', 'bcc'],
+        url: function() {
+            var links = this.get("links"),
+                uuid = this.get("uuid");
+            if (links && _.isObject(links) && links.self) {
+                return links.self;
+            } else if (uuid) {
+                return "/api/activity/" + uuid;
+            } else {
+                return null;
+            }
+        }
+    });
+
     Pump.ActivityStream = Backbone.Collection.extend({
         model: Pump.Activity,
+        parse: function(response) {
+            return response.items;
+        }
+    });
+
+    Pump.ActivityObject = Pump.Model.extend({
+        activityObjects: ['author', 'location', 'inReplyTo'],
+        activityObjectBags: ['attachments', 'tags'],
+        activityObjectStreams: ['likes', 'replies'],
+        url: function() {
+            var links = this.get("links"),
+                uuid = this.get("uuid"),
+                objectType = this.get("objectType");
+            if (links &&
+                _.isObject(links) && 
+                _.has(links, "self") &&
+                _.isObject(links.self) &&
+                _.has(links.self, "href") &&
+                _.isString(links.self.href)) {
+                return links.self.href;
+            } else if (objectType) {
+                return "/api/"+objectType+"/" + uuid;
+            } else {
+                return null;
+            }
+        }
+    });
+
+    Pump.Person = Pump.ActivityObject.extend({
+        objectType: "person"
+    });
+
+    Pump.ActivityObjectStream = Backbone.Collection.extend({
+        model: Pump.ActivityObject,
+        parse: function(response) {
+            return response.items;
+        }
+    });
+
+    // Unordered, doesn't have an URL
+
+    Pump.ActivityObjectBag = Backbone.Collection.extend({
+        model: Pump.ActivityObject
+    });
+
+    Pump.PeopleStream = Backbone.Collection.extend({
+        model: Pump.Person,
         parse: function(response) {
             return response.items;
         }
@@ -290,49 +348,6 @@ var Pump = (function(_, $, Backbone) {
         }
     });
 
-    Pump.ActivityObject = Backbone.Model.extend({
-        url: function() {
-            var links = this.get("links"),
-                uuid = this.get("uuid"),
-                objectType = this.get("objectType");
-            if (links &&
-                _.isObject(links) && 
-                _.has(links, "self") &&
-                _.isObject(links.self) &&
-                _.has(links.self, "href") &&
-                _.isString(links.self.href)) {
-                return links.self.href;
-            } else if (objectType) {
-                return "/api/"+objectType+"/" + uuid;
-            } else {
-                return null;
-            }
-        }
-    });
-
-    Pump.Person = Pump.ActivityObject.extend({
-        objectType: "person"
-    });
-
-    Pump.ActivityObjectStream = Backbone.Collection.extend({
-        model: Pump.ActivityObject,
-        parse: function(response) {
-            return response.items;
-        }
-    });
-
-    // Unordered, doesn't have an URL
-
-    Pump.ActivityObjectBag = Backbone.Collection.extend({
-        model: Pump.ActivityObject
-    });
-
-    Pump.PeopleStream = Backbone.Collection.extend({
-        model: Pump.Person,
-        parse: function(response) {
-            return response.items;
-        }
-    });
 
     Pump.UserFollowers = Pump.PeopleStream.extend({
         user: null,
@@ -364,14 +379,14 @@ var Pump = (function(_, $, Backbone) {
         }
     });
 
-    Pump.User = Backbone.Model.extend({
+    Pump.User = Pump.Model.extend({
         idAttribute: "nickname",
+        activityObjects: ['profile'],
         initialize: function() {
-            this.profile = new Pump.Person(this.get("profile"));
-            this.on("change", function(user) {
-                user.profile.set(user.get("profile"));
-            });
-            this.profile.isNew = function() { return false; };
+            Pump.Model.prototype.initialize.apply(this, arguments);
+            if (this.profile) {
+                this.profile.isNew = function() { return false; };
+            }
         },
         isNew: function() {
             // Always PUT
