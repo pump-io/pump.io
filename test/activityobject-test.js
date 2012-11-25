@@ -206,6 +206,9 @@ suite.addBatch({
                 },
                 "it has an efface() method": function(review) {
                     assert.isFunction(review.efface);
+                },
+                "it has an isFollowable() method": function(review) {
+                    assert.isFunction(review.isFollowable);
                 }
             },
             "and we get a non-activityobject model object by its properties": {
@@ -1161,6 +1164,43 @@ suite.addBatch({
                     return ActivityObject.sameID("acct:user@checkin.example", "user@checkin.example");
                 },
                 "it is a match": function(res) {
+                    assert.isTrue(res);
+                }
+            },
+            "and we check if a person is followable": {
+                topic: function(ActivityObject) {
+                    var Person = require("../lib/model/person").Person,
+                        joey = new Person({displayName: "Joey", objectType: "person"});
+                    return joey.isFollowable();
+                },
+                "it is": function(res) {
+                    assert.isTrue(res);
+                }
+            },
+            "and we check if a review is followable": {
+                topic: function(ActivityObject) {
+                    var Review = require("../lib/model/review").Review,
+                        badReview = new Review({displayName: "You suck", objectType: "review"});
+                    return badReview.isFollowable();
+                },
+                "it is not": function(res) {
+                    assert.isFalse(res);
+                }
+            },
+            "and we check if an object with an activity outbox is followable": {
+                topic: function(ActivityObject) {
+                    var Review = require("../lib/model/review").Review,
+                        badReview = new Review({displayName: "You suck",
+                                                objectType: "review",
+                                                links: {
+                                                    "activity-outbox": {
+                                                        href: "http://example.com/review/outbox"
+                                                    }
+                                                }
+                                               });
+                    return badReview.isFollowable();
+                },
+                "it is": function(res) {
                     assert.isTrue(res);
                 }
             },
