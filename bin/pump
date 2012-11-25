@@ -25,17 +25,28 @@ var cluster = require("cluster"),
     fs = require("fs"),
     path = require("path"),
     _ = require("underscore"),
+    argv = require("optimist")
+        .usage("Usage: $0 -c <configfile>")
+        .alias("c", "config")
+        .describe("c", "Configuration file (default: /etc/pump.io.json and ~/.pump.io.json)")
+        .argv,
     makeApp = require("../lib/app").makeApp;
 
 // Gets the configuration vars for this server from config files
 
-var getConfig = function() {
-    var files = ['/etc/pump.io.json',
-                 path.join(process.env.HOME, ".pump.io.json")],
+var getConfig = function(filename) {
+    var files,
         config = {},
         i,
         raw,
         parsed;
+
+    if (filename) {
+        files = [filename];
+    } else {
+        files = ['/etc/pump.io.json',
+                 path.join(process.env.HOME, ".pump.io.json")];
+    }   
 
     // This is all sync
     for (i = 0; i < files.length; i++) {
@@ -80,7 +91,7 @@ var launchApps = function(config) {
 };
 
 var main = function() {
-    var config = getConfig();
+    var config = getConfig(argv.c);
     launchApps(config);
 };
 
