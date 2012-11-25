@@ -272,43 +272,21 @@ var actorOrRecipient = function(req, res, next) {
 
 var getter = function(type) {
     return function(req, res, next) {
-        var obj = req[type];
+        var obj = req[type],
+            profile = (req.remoteUser) ? req.remoteUser.profile : null;
         Step(
             function() {
                 obj.expandFeeds(this);
             },
             function(err) {
                 if (err) throw err;
-                if (!_.has(obj, "replies") || !_.isObject(obj.replies) || obj.replies.totalItems === 0) {
-                    obj.sanitize();
-                    res.json(obj);
-                } else {
-                    obj.getRepliesStream(this);
-                }
+                addLiked(profile, [obj], this.parallel());
+                firstFewReplies(profile, [obj], this.parallel());
             },
-            function(err, str) {
-                var filtered;
-                if (err) throw err;
-                if (!req.remoteUser) {
-                    // XXX: keep a separate stream instead of filtering
-                    filtered = new FilteredStream(str, objectPublicOnly);
-                } else {
-                    filtered = new FilteredStream(str, objectRecipientsOnly(req.remoteUser.profile));
-                }
-                filtered.getObjects(0, 4, this);
-            },
-            function(err, refs) {
-                var group = this.group();
-                if (err) throw err;
-                _.each(refs, function(ref) {
-                    ActivityObject.getObject(ref.objectType, ref.id, group());
-                });
-            },
-            function(err, objs) {
+            function(err) {
                 if (err) {
                     next(err);
                 } else {
-                    obj.replies.items = objs;
                     obj.sanitize();
                     res.json(obj);
                 }

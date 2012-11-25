@@ -169,6 +169,7 @@ suite.addBatch({
                             var url = "http://localhost:4815/api/user/cindy/feed",
                                 act = {
                                     verb: "post",
+                                    to: [pairs.bobby.user.profile],
                                     object: {
                                         objectType: "note",
                                         content: "Let's play dress-up."
@@ -218,6 +219,26 @@ suite.addBatch({
                     "it includes the object": function(err, doc, act) {
                         assert.ifError(err);
                         assert.equal(doc.items[0].id, act.object.id);
+                    }
+                },
+                "and we get the object with the liker's credentials": {
+                    topic: function(act, pairs, cl) {
+                        var cred = makeCred(cl, pairs.bobby),
+                            url = act.object.links.self.href,
+                            cb = this.callback;
+
+                            httputil.getJSON(url, cred, function(err, doc) {
+                                cb(err, doc);
+                            });
+                    },
+                    "it works": function(err, doc) {
+                        assert.ifError(err);
+                        assert.isObject(doc);
+                    },
+                    "it includes the 'liked' flag": function(err, doc) {
+                        assert.ifError(err);
+                        assert.include(doc, 'liked');
+                        assert.isTrue(doc.liked);
                     }
                 },
                 "and we get the list of likes of the object": {
