@@ -158,7 +158,7 @@ var requester = function(type) {
         var uuid = req.params.uuid,
             obj = null;
 
-        Cls.search({"uuid": uuid}, function(err, results) {
+        Cls.search({"_uuid": uuid}, function(err, results) {
             if (err) {
                 next(err);
             } else if (results.length === 0) {
@@ -376,7 +376,7 @@ var likes = function(type) {
 
         var collection = {
             displayName: "People who like " + obj.displayName,
-            id: URLMaker.makeURL("api/" + type + "/" + obj.uuid + "/likes"),
+            id: URLMaker.makeURL("api/" + type + "/" + obj._uuid + "/likes"),
             items: []
         };
 
@@ -423,7 +423,7 @@ var replies = function(type) {
 
         var collection = {
             displayName: "Replies to " + ((obj.displayName) ? obj.displayName : obj.id),
-            id: URLMaker.makeURL("api/" + type + "/" + obj.uuid + "/replies"),
+            id: URLMaker.makeURL("api/" + type + "/" + obj._uuid + "/replies"),
             items: []
         };
 

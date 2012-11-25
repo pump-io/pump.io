@@ -41,10 +41,10 @@ var testSchema = {
              "updated",
              "upstreamDuplicates",
              "url",
-             "uuid",
+             "_uuid",
              "types"
     ],
-    indices: ["uuid"]
+    indices: ["_uuid"]
 };
 
 var testData = {
