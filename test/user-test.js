@@ -30,7 +30,7 @@ var suite = vows.describe("user module interface");
 
 var testSchema = {
     "pkey": "nickname",
-    "fields": ["passwordHash",
+    "fields": ["_passwordHash",
                "published",
                "updated",
                "profile"],
@@ -59,7 +59,7 @@ mb["When we require the user module"]
 ["and we get its User class export"]
 ["and we create an user instance"]
 ["auto-generated fields are there"] = function(err, created) {
-    assert.isString(created.passwordHash);
+    assert.isString(created._passwordHash);
     assert.isString(created.published);
     assert.isString(created.updated);
 };
@@ -269,7 +269,7 @@ suite.addBatch({
             },
             "it is sanitized": function(err, user) {
                 assert.isFalse(_(user).has("password"));
-                assert.isFalse(_(user).has("passwordHash"));
+                assert.isFalse(_(user).has("_passwordHash"));
             }
         },
         "and we create a new user and get its stream": {
