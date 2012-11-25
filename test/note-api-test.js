@@ -182,6 +182,11 @@ suite.addBatch({
                                 assert.include(note.author, "objectType");
                                 assert.isString(note.author.objectType);
                             },
+                            "results don't leak private members": function(err, note, act) {
+                                assert.ifError(err);
+                                assert.isObject(note);
+                                assert.isFalse(_.has(note, "_uuid"));
+                            },
                             "results are what we posted": function(err, note, act) {
                                 assert.equal(note.content, "I'm so scared!");
                                 assert.equal(note.objectType, "note");

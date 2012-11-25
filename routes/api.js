@@ -280,6 +280,7 @@ var getter = function(type) {
             function(err) {
                 if (err) throw err;
                 if (!_.has(obj, "replies") || !_.isObject(obj.replies) || obj.replies.totalItems === 0) {
+                    obj.sanitize();
                     res.json(obj);
                 } else {
                     obj.getRepliesStream(this);
@@ -308,6 +309,7 @@ var getter = function(type) {
                     next(err);
                 } else {
                     obj.replies.items = objs;
+                    obj.sanitize();
                     res.json(obj);
                 }
             }
@@ -334,6 +336,7 @@ var putter = function(type) {
                 if (err) {
                     next(err);
                 } else {
+                    act.object.sanitize();
                     res.json(act.object);
                     d = new Distributor(act);
                     d.distribute(function(err) {});
@@ -465,7 +468,8 @@ var replies = function(type) {
                     next(err);
                 } else {
                     _.each(objs, function(obj) {
-                            delete obj.inReplyTo;
+                        obj.sanitize();
+                        delete obj.inReplyTo;
                     });
                     collection.items = objs;
                     res.json(collection);
@@ -487,6 +491,7 @@ var getUser = function(req, res, next) {
             if (!req.remoteUser || (req.remoteUser.nickname != req.user.nickname)) {
                 delete req.user.email;
             }
+            req.user.sanitize();
             res.json(req.user);
         }
     );
@@ -576,6 +581,7 @@ var putActivity = function(req, res, next) {
         if (err) {
             next(err);
         } else {
+            result.sanitize(req.remoteUser);
             res.json(result);
         }
     });
@@ -960,6 +966,7 @@ var postToInbox = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
+                activity.sanitize();
                 // ...then show (possibly modified) results.
                 // XXX: don't distribute
                 res.json(activity);
@@ -1506,6 +1513,9 @@ var userFollowers = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
+                _.each(people, function(person) {
+                    person.sanitize();
+                });
                 collection.items = people;
                 collection.startIndex = args.start;
                 collection.itemsPerPage = args.count;
@@ -1579,6 +1589,11 @@ var userFollowing = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
+
+                _.each(people, function(person) {
+                    person.sanitize();
+                });
+
                 collection.items = people;
 
                 collection.startIndex = args.start;
@@ -1631,6 +1646,7 @@ var newFollow = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
+                act.object.sanitize();
                 res.json(act.object);
                 d = new Distributor(act);
                 d.distribute(function(err) {});
@@ -1737,6 +1753,9 @@ var userFavorites = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
+                _.each(collection.items, function(object) {
+                    object.sanitize();
+                });
                 res.json(collection);
             }
         }
@@ -1760,6 +1779,7 @@ var newFavorite = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
+                act.object.sanitize();
                 res.json(act.object);
                 d = new Distributor(act);
                 d.distribute(function(err) {});
@@ -1830,6 +1850,9 @@ var userLists = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
+                _.each(collections, function(item) {
+                    item.sanitize();
+                });
                 collection.items = collections;
                 if (collections.length > 0) {
                     collection.links.prev = collection.url + "?since=" + encodeURIComponent(collections[0].id);
