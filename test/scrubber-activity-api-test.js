@@ -144,6 +144,17 @@ var badUpdate = function(orig, update, property) {
     return context;
 };
 
+var privateUpdate = function(orig, update, property) {
+    var context = updateActivity(orig, update);
+    context["private property is ignored"] = function(err, result, response) {
+        assert.ifError(err);
+        assert.isObject(result);
+        assert.isFalse(_.has(result, property));
+    };
+
+    return context;
+};
+
 var suite = vows.describe("Scrubber activity API test");
 
 // A batch to test posting to the regular feed endpoint
@@ -340,7 +351,16 @@ suite.addBatch({
                        }
                       },
                       {content: DANGEROUS},
-                      "content")
+                      "content"),
+            "and we update an activity with a private member": 
+            privateUpdate({verb: "post",
+                           object: {
+                               objectType: "note",
+                               content: "Hello, world."
+                           }
+                          },
+                          {_uuid: "EHLO endofline <BR><BR>"},
+                          "_uuid")
         }
     }
 });

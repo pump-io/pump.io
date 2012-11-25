@@ -87,6 +87,19 @@ var badFavorite = function(obj, property) {
     return context;
 };
 
+var privateFavorite = function(obj, property) {
+
+    var context = postFavorite(obj);
+
+    context["private property is ignored"] = function(err, result, response) {
+        assert.ifError(err);
+        assert.isObject(result);
+        assert.isFalse(_.has(result, property));
+    };
+
+    return context;
+};
+
 var suite = vows.describe("Scrubber favorite API test");
 
 // A batch to test posting to the regular feed endpoint
@@ -135,8 +148,14 @@ suite.addBatch({
                          id: "urn:uuid:9aa42710-3291-11e2-b22d-0024beb67924",
                           summary: DANGEROUS
                          },
-                         "summary")
-
+                         "summary"),
+            "and we favorite an object with a private member": 
+            privateFavorite({objectType: "person",
+                             id: "urn:uuid:20605d22-36ae-11e2-9e3d-70f1a154e1aa",
+                             _user: true,
+                             summary: HARMLESS
+                            },
+                            "_user")
         }
     }
 });

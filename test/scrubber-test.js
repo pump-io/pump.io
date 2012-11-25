@@ -17,7 +17,8 @@
 // limitations under the License.
 
 var assert = require("assert"),
-    vows = require("vows");
+    vows = require("vows"),
+    _ = require("underscore");
 
 var DANGEROUS = "This is a <script>alert('Boo!')</script> dangerous string.";
 var HARMLESS = "This is a harmless string.";
@@ -1028,9 +1029,76 @@ vows.describe("scrubber module interface").addBatch({
                     assert.equal(result.bcc[0].summary.indexOf('<script>'), -1);
                     assert.equal(result.bcc[1].summary.indexOf('<script>'), -1);
                 }
+            },
+            "and we scrub an activity with private members": {
+                topic: function(Scrubber) {
+                    var act = {
+                        _uuid: "MADEUP",
+                        actor: {
+                            objectType: "person",
+                            displayName: "Anonymous"
+                        },
+                        verb: "post",
+                        content: "Anonymous posted a note",
+                        object: {
+                            objectType: "note",
+                            content: "Hello, world!"
+                        }
+                    };
+                    return Scrubber.scrubActivity(act);
+                },
+                "it works": function(result) {
+                    assert.isObject(result);
+                    assert.isFalse(_.has(result, "_uuid"));
+                }
+            },
+            "and we scrub an activity with an actor with private members": {
+                topic: function(Scrubber) {
+                    var act = {
+                        actor: {
+                            objectType: "person",
+                            displayName: "Anonymous",
+                            _user: true
+                        },
+                        verb: "post",
+                        content: "Anonymous posted a note",
+                        object: {
+                            objectType: "note",
+                            content: "Hello, world!"
+                        }
+                    };
+                    return Scrubber.scrubActivity(act);
+                },
+                "it works": function(result) {
+                    assert.isObject(result);
+                    assert.isObject(result.actor);
+                    assert.isFalse(_.has(result.actor, "_user"));
+                }
+            },
+            "and we scrub an activity with an object with private members": {
+                topic: function(Scrubber) {
+                    var act = {
+                        actor: {
+                            objectType: "person",
+                            displayName: "Anonymous"
+                        },
+                        verb: "post",
+                        content: "Anonymous posted a note",
+                        object: {
+                            objectType: "note",
+                            content: "Hello, world!",
+                            _uuid: true
+                        }
+                    };
+                    return Scrubber.scrubActivity(act);
+                },
+                "it works": function(result) {
+                    assert.isObject(result);
+                    assert.isObject(result.object);
+                    assert.isFalse(_.has(result.object, "_uuid"));
+                }
             }
         }
     }
 })["export"](module);
 
- 

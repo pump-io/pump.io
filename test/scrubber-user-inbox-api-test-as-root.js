@@ -151,6 +151,61 @@ suite.addBatch({
                     assert.equal(act.content.indexOf("<script>"), -1);
                     assert.equal(act.object.content.indexOf("<script>"), -1);
                 }
+            },
+            "and we post an activity to the inbox with internal private members": {
+
+                topic: function() {
+                    var callback = this.callback;
+
+                    Step(
+                        function() {
+                            assoc("user5@social.localhost", "VALID1", Date.now(), this);
+                        },
+                        function(err, cl) {
+
+                            if (err) throw err;
+
+                            var url = "http://localhost:4815/api/user/bunny/inbox",
+                                act = {
+                                    _uuid: "AFAKEUUID",
+                                    actor: {
+                                        id: "acct:user5@social.localhost",
+                                        _user: true,
+                                        objectType: "person"
+                                    },
+                                    to: [{objectType: "collection",
+                                          id: "http://social.localhost/user/user5/followers"
+                                         }],
+                                    id: "http://social.localhost/activity/7",
+                                    verb: "post",
+                                    object: {
+                                        id: "http://social.localhost/note/5",
+                                        objectType: "note",
+                                        _uuid: "IMADETHISUP"
+                                    }
+                                },
+                                cred = clientCred(cl);
+
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        callback
+                    );
+                },
+                "it works": function(err, act, resp) {
+                    assert.ifError(err);
+                    assert.isObject(act);
+                },
+                "private stuff is ignored": function(err, act, resp) {
+                    assert.ifError(err);
+                    assert.isObject(act);
+                    assert.isFalse(_.has(act, "_uuid"));
+                    assert.include(act, "actor");
+                    assert.isObject(act.actor);
+                    assert.isFalse(_.has(act.actor, "_user"));
+                    assert.include(act, "object");
+                    assert.isObject(act.object);
+                    assert.isFalse(_.has(act.object, "_user"));
+                }
             }
         }
     }
