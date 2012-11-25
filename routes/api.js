@@ -540,7 +540,7 @@ var delUser = function(req, res, next) {
 var reqActivity = function(req, res, next) {
     var act = null,
         uuid = req.params.uuid;
-    Activity.search({"uuid": uuid}, function(err, results) {
+    Activity.search({"_uuid": uuid}, function(err, results) {
         if (err) {
             next(err);
         } else if (results.length === 0) { // not found
