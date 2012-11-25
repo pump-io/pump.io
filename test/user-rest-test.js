@@ -68,6 +68,7 @@ var goodUser = function(err, doc) {
     assert.include(doc.profile, "lists");
 
     assert.isFalse(_.has(doc.profile, "_uuid"));
+    assert.isFalse(_.has(doc.profile, "_user"));
 };
 
 suite.addBatch({
@@ -182,6 +183,7 @@ suite.addBatch({
                     assert.include(doc.profile, "objectType");
                     assert.equal(doc.profile.objectType, "person");
                     assert.isFalse(_.has(doc.profile, "_uuid"));
+                    assert.isFalse(_.has(doc.profile, "_user"));
                 }
             },
             "and we GET the user data with client credentials and an invalid access token": {
@@ -441,6 +443,7 @@ suite.addBatch({
                     assert.include(doc.profile, "objectType");
                     assert.equal(doc.profile.objectType, "person");
                     assert.isFalse(_.has(doc.profile, "_uuid"));
+                    assert.isFalse(_.has(doc.profile, "_user"));
                 }
             }
         }
