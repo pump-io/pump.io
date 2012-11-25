@@ -1,6 +1,6 @@
 // major-stream-replies-test.js
 //
-// Test that liked objects have "liked" flag in */major streams
+// Test that objects have "replies" stream in */major streams
 //
 // Copyright 2012, StatusNet Inc.
 //
