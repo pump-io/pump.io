@@ -108,23 +108,69 @@ suite.addBatch({
                         },
                         function(err, posted, result) {
                             if (err) {
-                                cb(err, null);
+                                cb(err, null, null);
                             } else {
-                                cb(null, posted);
+                                cb(null, posted, users);
                             }
                         }
                     );
                 },
-                "it works": function(err, act) {
+                "it works": function(err, act, users) {
                     assert.ifError(err);
                 },
-                "results are valid": function(err, act) {
+                "results are valid": function(err, act, users) {
                     assert.ifError(err);
                     actutil.validActivity(act);
                 },
-                "results are correct": function(err, act) {
+                "results are correct": function(err, act, users) {
                     assert.ifError(err);
                     assert.equal(act.verb, "follow");
+                },
+                "and we get the second user's profile with the first user's credentials": {
+                    topic: function(act, users, cl) {
+                        var callback = this.callback,
+                            url = "http://localhost:4815/api/user/moe/profile",
+                            cred = makeCred(cl, users.larry.pair);
+                        
+                        httputil.getJSON(url, cred, function(err, doc, response) {
+                            callback(err, doc);
+                        });
+                    },
+                    "it works": function(err, doc) {
+                        assert.ifError(err);
+                        assert.isObject(doc);
+                    },
+                    "it includes the 'followed' flag": function(err, doc) {
+                        assert.ifError(err);
+                        assert.isObject(doc);
+                        assert.include(doc, "pump_io");
+                        assert.isObject(doc.pump_io);
+                        assert.include(doc.pump_io, "followed");
+                        assert.isTrue(doc.pump_io.followed);
+                    }
+                },
+                "and we get the second user's profile with some other user's credentials": {
+                    topic: function(act, users, cl) {
+                        var callback = this.callback,
+                            url = "http://localhost:4815/api/user/moe/profile",
+                            cred = makeCred(cl, users.curly.pair);
+                        
+                        httputil.getJSON(url, cred, function(err, doc, response) {
+                            callback(err, doc);
+                        });
+                    },
+                    "it works": function(err, doc) {
+                        assert.ifError(err);
+                        assert.isObject(doc);
+                    },
+                    "it includes the 'followed' flag": function(err, doc) {
+                        assert.ifError(err);
+                        assert.isObject(doc);
+                        assert.include(doc, "pump_io");
+                        assert.isObject(doc.pump_io);
+                        assert.include(doc.pump_io, "followed");
+                        assert.isFalse(doc.pump_io.followed);
+                    }
                 }
             },
             "and one user double-follows another": {

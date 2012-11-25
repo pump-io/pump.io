@@ -282,6 +282,9 @@ var getter = function(type) {
                 if (err) throw err;
                 addLiked(profile, [obj], this.parallel());
                 firstFewReplies(profile, [obj], this.parallel());
+                if (obj.isFollowable()) {
+                    addFollowed(profile, [obj], this.parallel());
+                }
             },
             function(err) {
                 if (err) {
@@ -1201,6 +1204,60 @@ var addLiked = function(profile, objects, callback) {
                         object.liked = true;
                     } else {
                         object.liked = false;
+                    }
+                });
+                callback(null);
+            }
+        }
+    );
+};
+
+// finisher that adds followed flag to stuff
+
+var addFollowedFinisher = function(req, collection, callback) {
+
+    // Ignore for non-users
+
+    if (!req.remoteUser) {
+        callback(null);
+        return;
+    }
+
+    addFollowed(req.remoteUser.profile, _.pluck(collection.items, "object"), callback);
+};
+
+var addFollowed = function(profile, objects, callback) {
+
+    var edgeIDs;
+
+    // Ignore for non-users
+
+    if (!profile) {
+        callback(null);
+        return;
+    }
+
+    edgeIDs = objects.map(function(object) {
+        return Edge.id(profile.id, object.id);
+    });
+
+    Step(
+        function() {
+            Edge.readAll(edgeIDs, this);
+        },
+        function(err, edges) {
+            if (err) {
+                callback(err);
+            } else {
+                _.each(objects, function(object, i) {
+                    var edgeID = edgeIDs[i];
+                    if (!_.has(object, "pump_io")) {
+                        object.pump_io = {};
+                    }
+                    if (_.has(edges, edgeID) && _.isObject(edges[edgeID])) {
+                        object.pump_io.followed = true;
+                    } else {
+                        object.pump_io.followed = false;
                     }
                 });
                 callback(null);
