@@ -26,13 +26,12 @@
   </div>
   <div class="span1">
     <div class="pull-right">
-      <% if (data.user && (data.user.profile.id != data.profile.id)) { %>
-      <%     if (data.profile.pump_io.followed) { %>
-      <p><a href="#" class="btn stop-following">Stop following</a></p>
-      <%     } else { %>
-      <p><a href="#" class="btn btn-primary follow">Follow</a></p>
-      <%     }
-         } %>
+      <% /* :( */ 
+         data.oldPerson = data.person; 
+         data.person = data.profile; %>
+      <%= partial("profile-responses") %>
+      <% data.person = data.oldPerson;
+         delete data.oldPerson; %>
     </div>
   </div>
 </div>

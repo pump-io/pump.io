@@ -996,12 +996,6 @@ var Pump = (function(_, $, Backbone) {
         model: Pump.ActivityObject
     });
 
-    Pump.MajorPersonView = Pump.TemplateView.extend({
-        templateName: 'major-person',
-        model: Pump.Person,
-        modelName: 'person'
-    });
-
     Pump.ReplyView = Pump.TemplateView.extend({
         templateName: 'reply',
         model: Pump.ActivityObject,
@@ -1013,10 +1007,7 @@ var Pump = (function(_, $, Backbone) {
         model: Pump.Activity
     });
 
-    Pump.ProfileBlock = Pump.TemplateView.extend({
-        templateName: 'profile-block',
-        model: Pump.Person,
-        modelName: 'profile',
+    Pump.PersonView = Pump.TemplateView.extend({
         events: {
             "click .follow": "followProfile",
             "click .stop-following": "stopFollowingProfile"
@@ -1053,6 +1044,18 @@ var Pump = (function(_, $, Backbone) {
                     .html("Follow");
             }});
         }
+    });
+
+    Pump.MajorPersonView = Pump.PersonView.extend({
+        templateName: 'major-person',
+        model: Pump.Person,
+        modelName: 'person'
+    });
+
+    Pump.ProfileBlock = Pump.PersonView.extend({
+        templateName: 'profile-block',
+        model: Pump.Person,
+        modelName: 'profile'
     });
 
     Pump.FavoritesContent = Pump.TemplateView.extend({

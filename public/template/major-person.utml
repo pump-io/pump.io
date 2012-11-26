@@ -6,7 +6,7 @@
     <img src="/images/default.jpg" width="40" height="40" />
     <% } %>
   </div>
-  <div class="span6">
+  <div class="span7">
     <h3><a href="<%- data.person.url %>"><%- data.person.displayName %></a> <small><%- data.person.preferredUsername %></small></h3>
     <% if (data.person.location) { %>
     <p class="location"><%- data.person.location.displayName %></p>
@@ -15,10 +15,9 @@
     <p class="summary"><%- data.person.summary %></p>
     <% } %>
   </div>
-  <div class="span2">
+  <div class="span1">
     <div class="pull-right">
-      <p><button class="btn">Follow</button></p>
-      <p><button class="btn">Block</button></p>
+      <%= partial("profile-responses") %>
     </div>
   </div>
 </div>
