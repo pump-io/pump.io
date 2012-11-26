@@ -869,7 +869,9 @@ var Pump = (function(_, $, Backbone) {
                 "major-activity-headless",
                 "minor-activity-headless",
                 "responses",
-                "reply"],
+                "reply",
+                "profile-responses"
+               ],
         el: '#content'
     });
 
@@ -1065,7 +1067,8 @@ var Pump = (function(_, $, Backbone) {
                 "object-stream",
                 "major-object",
                 "responses",
-                "reply"],
+                "reply",
+                "profile-responses"],
         el: '#content'
     });
 
@@ -1074,7 +1077,8 @@ var Pump = (function(_, $, Backbone) {
         modelName: "profile",
         parts: ["profile-block",
                 "people-stream",
-                "major-person"],
+                "major-person",
+                "profile-responses"],
         el: '#content'
     });
 
@@ -1083,7 +1087,8 @@ var Pump = (function(_, $, Backbone) {
         modelName: "profile",
         parts: ["profile-block",
                 "people-stream",
-                "major-person"],
+                "major-person",
+                "profile-responses"],
         el: '#content'
     });
 
