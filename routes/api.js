@@ -1509,6 +1509,7 @@ var getStream = function(str, args, collection, user, callback) {
 };
 
 var userFollowers = function(req, res, next) {
+
     var collection = {
         author: req.user.profile,
         displayName: "Followers for " + (req.user.profile.displayName || req.user.nickname),
@@ -1544,14 +1545,30 @@ var userFollowers = function(req, res, next) {
             }
         },
         function(err, people) {
-            var base = "api/user/" + req.user.nickname + "/followers";
-            if (err) {
-                next(err);
+            if (err) throw err;
+
+            collection.items = people;
+
+            if (!req.remoteUser) {
+                this(null);
             } else {
-                _.each(people, function(person) {
+                addFollowed(req.remoteUser.profile, people, this);
+            }
+        },
+        function(err) {
+
+            var base = "api/user/" + req.user.nickname + "/followers";
+
+            if (err) {
+
+                next(err);
+
+            } else {
+
+                _.each(collection.items, function(person) {
                     person.sanitize();
                 });
-                collection.items = people;
+
                 collection.startIndex = args.start;
                 collection.itemsPerPage = args.count;
 
@@ -1572,10 +1589,10 @@ var userFollowers = function(req, res, next) {
                     };
                 }
 
-                if (args.start + people.length < collection.totalItems) {
+                if (args.start + collection.items.length < collection.totalItems) {
                     collection.links.next = {
-                        href: URLMaker.makeURL("api/user/" + req.user.nickname + "/following", 
-                                               {offset: args.start+people.length, count: args.count})
+                        href: URLMaker.makeURL("api/user/" + req.user.nickname + "/followers", 
+                                               {offset: args.start+collection.items.length, count: args.count})
                     };
                 }
                 res.json(collection);
@@ -1585,6 +1602,7 @@ var userFollowers = function(req, res, next) {
 };
 
 var userFollowing = function(req, res, next) {
+
     var collection = {
         author: req.user.profile,
         displayName: "People that " + (req.user.profile.displayName || req.user.nickname) + " is following",
@@ -1620,16 +1638,35 @@ var userFollowing = function(req, res, next) {
             }
         },
         function(err, people) {
+            if (err) throw err;
+
+            collection.items = people;
+
+            if (!req.remoteUser) {
+                // Same user; by definition, all are followed
+                this(null);
+            } else if (req.remoteUser.nickname == req.user.nickname) {
+                // Same user; by definition, all are followed
+                _.each(people, function(person) {
+                    if (!_.has(person, "pump_io")) {
+                        person.pump_io = {};
+                    }
+                    person.pump_io.followed = true;
+                });
+                this(null);
+            } else {
+                addFollowed(req.remoteUser.profile, people, this);
+            }
+        },
+        function(err) {
             var base = "api/user/" + req.user.nickname + "/following";
             if (err) {
                 next(err);
             } else {
 
-                _.each(people, function(person) {
+                _.each(collection.items, function(person) {
                     person.sanitize();
                 });
-
-                collection.items = people;
 
                 collection.startIndex = args.start;
                 collection.itemsPerPage = args.count;
@@ -1651,10 +1688,10 @@ var userFollowing = function(req, res, next) {
                     };
                 }
 
-                if (args.start + people.length < collection.totalItems) {
+                if (args.start + collection.items.length < collection.totalItems) {
                     collection.links.next = {
                         href: URLMaker.makeURL("api/user/" + req.user.nickname + "/following", 
-                                               {offset: args.start+people.length, count: args.count})
+                                               {offset: args.start+collection.items.length, count: args.count})
                     };
                 }
                 

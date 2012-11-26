@@ -482,6 +482,13 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.equal(doc.items[0].id, person.id);
                     assert.equal(doc.items[0].objectType, person.objectType);
+                },
+                "the followed flag is set": function(err, doc, person) {
+                    assert.ifError(err);
+                    assert.includes(doc.items[0], "pump_io");
+                    assert.isObject(doc.items[0].pump_io);
+                    assert.includes(doc.items[0].pump_io, "followed");
+                    assert.isTrue(doc.items[0].pump_io.followed);
                 }
             },
             "and we check the first user's followers list": {
@@ -521,6 +528,13 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.equal(doc.items[0].id, person.id);
                     assert.equal(doc.items[0].objectType, person.objectType);
+                },
+                "the followed flag is not set": function(err, doc, person) {
+                    assert.ifError(err);
+                    assert.includes(doc.items[0], "pump_io");
+                    assert.isObject(doc.items[0].pump_io);
+                    assert.includes(doc.items[0].pump_io, "followed");
+                    assert.isFalse(doc.items[0].pump_io.followed);
                 }
             },
             "and we check the second user's following list": {
