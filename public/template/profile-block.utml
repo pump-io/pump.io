@@ -7,7 +7,15 @@
     <% } %>
   </div>
   <div class="span8">
-    <h1><%- data.profile.displayName %> <small><%- data.profile.preferredUsername %></small></h1>
+    <h1><%- data.profile.displayName %> 
+      <small>
+      <% if (data.profile.id && data.profile.id.substr(0, 5) == 'acct:') { %>
+      <%- data.profile.id.substr(5) %>
+      <% } else { %>
+      <%- data.profile.preferredUsername %>
+      <% } %>
+      </small>
+    </h1>
     <% if (data.profile.location) { %>
     <p class="location"><%- data.profile.location.displayName %></p>
     <% } %>
@@ -22,7 +30,7 @@
       <%     if (data.profile.pump_io.followed) { %>
       <p><a href="#" class="btn stop-following">Stop following</a></p>
       <%     } else { %>
-      <p><a href="#" class="btn btn-primary Follow">Follow</a></p>
+      <p><a href="#" class="btn btn-primary follow">Follow</a></p>
       <%     }
          } %>
     </div>

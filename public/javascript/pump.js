@@ -1016,7 +1016,43 @@ var Pump = (function(_, $, Backbone) {
     Pump.ProfileBlock = Pump.TemplateView.extend({
         templateName: 'profile-block',
         model: Pump.Person,
-        modelName: 'profile'
+        modelName: 'profile',
+        events: {
+            "click .follow": "followProfile",
+            "click .stop-following": "stopFollowingProfile"
+        },
+        followProfile: function() {
+            var view = this,
+                act = {
+                    verb: "follow",
+                    object: view.model.toJSON()
+                },
+                stream = Pump.currentUser.getStream();
+
+            stream.create(act, {success: function(act) {
+                view.$(".follow")
+                    .removeClass("follow")
+                    .removeClass("btn-primary")
+                    .addClass("stop-following")
+                    .html("Stop following");
+            }});
+        },
+        stopFollowingProfile: function() {
+            var view = this,
+                act = {
+                    verb: "stop-following",
+                    object: view.model.toJSON()
+                },
+                stream = Pump.currentUser.getStream();
+
+            stream.create(act, {success: function(act) {
+                view.$(".stop-following")
+                    .removeClass("stop-following")
+                    .addClass("btn-primary")
+                    .addClass("follow")
+                    .html("Follow");
+            }});
+        }
     });
 
     Pump.FavoritesContent = Pump.TemplateView.extend({
