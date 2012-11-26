@@ -52,6 +52,14 @@ var databank = require("databank"),
     NoSuchThingError = databank.NoSuchThingError,
     AlreadyExistsError = databank.AlreadyExistsError,
     NoSuchItemError = databank.NoSuchItemError,
+    finishers = require("../lib/finishers"),
+    addFollowedFinisher = finishers.addFollowedFinisher,
+    addFollowed = finishers.addFollowed,
+    addLikedFinisher = finishers.addLikedFinisher,
+    addLiked = finishers.addLiked,
+    firstFewRepliesFinisher = finishers.firstFewRepliesFinisher,
+    firstFewReplies = finishers.firstFewReplies,
+    doFinishers = finishers.doFinishers,
     DEFAULT_ITEMS = 20,
     DEFAULT_ACTIVITIES = DEFAULT_ITEMS,
     DEFAULT_FAVORITES = DEFAULT_ITEMS,
@@ -1114,187 +1122,6 @@ var filteredFeedRoute = function(urlmaker, titlemaker, streammaker, finisher) {
     };
 };
 
-var firstFewRepliesFinisher = function(req, collection, callback) {
-
-    var profile = (req.remoteUser) ? req.remoteUser.profile : null,
-        objects = _.pluck(collection.items, "object");
-
-    firstFewReplies(profile, objects, callback);
-};
-
-var firstFewReplies = function(profile, objs, callback) {
-
-    var getReplies = function(obj, callback) {
-
-        if (!_.has(obj, "replies") ||
-            !_.isObject(obj.replies) ||
-            !_.has(obj.replies, "totalItems") ||
-            obj.replies.totalItems === 0) {
-            callback(null);
-            return;
-        }
-
-        Step(
-            function() {
-                obj.getRepliesStream(this);
-            },
-            function(err, str) {
-                var filtered;
-                if (err) throw err;
-                if (!profile) {
-                    filtered = new FilteredStream(str, objectPublicOnly);
-                } else {
-                    filtered = new FilteredStream(str, objectRecipientsOnly(profile));
-                }
-                filtered.getObjects(0, 4, this);
-            },
-            function(err, refs) {
-                var group = this.group();
-                if (err) throw err;
-                _.each(refs, function(ref) {
-                    ActivityObject.getObject(ref.objectType, ref.id, group());
-                });
-            },
-            function(err, objs) {
-                if (err) {
-                    callback(err);
-                } else {
-                    obj.replies.items = objs;
-                    callback(null);
-                }
-            }
-        );
-    };
-
-    Step(
-        function() {
-            var group = this.group();
-            _.each(objs, function(obj) {
-                getReplies(obj, group());
-            });
-        },
-        callback
-    );
-};
-
-// finisher that adds liked flag to stuff
-
-var addLikedFinisher = function(req, collection, callback) {
-
-    // Ignore for non-users
-
-    if (!req.remoteUser) {
-        callback(null);
-        return;
-    }
-
-    addLiked(req.remoteUser.profile, _.pluck(collection.items, "object"), callback);
-};
-
-var addLiked = function(profile, objects, callback) {
-
-    var faveIDs;
-
-    // Ignore for non-users
-
-    if (!profile) {
-        callback(null);
-        return;
-    }
-
-    faveIDs = objects.map(function(object) {
-        return Favorite.id(profile.id, object.id);
-    });
-
-    Step(
-        function() {
-            Favorite.readAll(faveIDs, this);
-        },
-        function(err, faves) {
-            if (err) {
-                callback(err);
-            } else {
-                _.each(objects, function(object, i) {
-                    var faveID = faveIDs[i];
-                    if (_.has(faves, faveID) && _.isObject(faves[faveID])) {
-                        object.liked = true;
-                    } else {
-                        object.liked = false;
-                    }
-                });
-                callback(null);
-            }
-        }
-    );
-};
-
-// finisher that adds followed flag to stuff
-
-var addFollowedFinisher = function(req, collection, callback) {
-
-    // Ignore for non-users
-
-    if (!req.remoteUser) {
-        callback(null);
-        return;
-    }
-
-    addFollowed(req.remoteUser.profile, _.pluck(collection.items, "object"), callback);
-};
-
-var addFollowed = function(profile, objects, callback) {
-
-    var edgeIDs;
-
-    // Ignore for non-users
-
-    if (!profile) {
-        callback(null);
-        return;
-    }
-
-    edgeIDs = objects.map(function(object) {
-        return Edge.id(profile.id, object.id);
-    });
-
-    Step(
-        function() {
-            Edge.readAll(edgeIDs, this);
-        },
-        function(err, edges) {
-            if (err) {
-                callback(err);
-            } else {
-                _.each(objects, function(object, i) {
-                    var edgeID = edgeIDs[i];
-                    if (!_.has(object, "pump_io")) {
-                        object.pump_io = {};
-                    }
-                    if (_.has(edges, edgeID) && _.isObject(edges[edgeID])) {
-                        object.pump_io.followed = true;
-                    } else {
-                        object.pump_io.followed = false;
-                    }
-                });
-                callback(null);
-            }
-        }
-    );
-};
-
-var doFinishers = function(finishers) {
-    return function(req, collection, callback) {
-        Step(
-            function() {
-                var group = this.group();
-                _.each(finishers, function(finisher) {
-                    finisher(req, collection, group());
-                });
-            },
-            callback
-        );
-    };
-};
 
 var majorFinishers = doFinishers([addLikedFinisher, firstFewRepliesFinisher]);
 
