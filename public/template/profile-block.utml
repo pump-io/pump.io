@@ -18,7 +18,13 @@
   </div>
   <div class="span1">
     <div class="pull-right">
-      <p><a href="/main/follow" class="btn primary">Follow</a></p>
+      <% if (data.user && (data.user.profile.id != data.profile.id)) { %>
+      <%     if (data.profile.pump_io.followed) { %>
+      <p><a href="#" class="btn stop-following">Stop following</a></p>
+      <%     } else { %>
+      <p><a href="#" class="btn btn-primary Follow">Follow</a></p>
+      <%     }
+         } %>
     </div>
   </div>
 </div>
