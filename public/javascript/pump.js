@@ -173,17 +173,15 @@ var Pump = (function(_, $, Backbone) {
                             obj[name] = new model(raw);
                             obj[name].isNew = neverNew;
                         }
-                    };
-                },
-                updater = function(obj, model) {
-                    return function(name) {
-                        var raw = obj.get(name);
-                        if (obj[name] && obj[name].set) {
-                            obj[name].set(raw);
-                        } else if (raw) {
-                            obj[name] = new model(raw);
-                            obj[name].isNew = neverNew;
-                        }
+                        obj.on("change:"+name, function(changed) {
+                            var raw = obj.get(name);
+                            if (obj[name] && obj[name].set) {
+                                obj[name].set(raw);
+                            } else if (raw) {
+                                obj[name] = new model(raw);
+                                obj[name].isNew = neverNew;
+                            }
+                        });
                     };
                 };
 
@@ -194,14 +192,6 @@ var Pump = (function(_, $, Backbone) {
             _.each(obj.peopleStreams, initer(obj, Pump.PeopleStream));
             _.each(obj.people, initer(obj, Pump.Person));
 
-            obj.on("change", function(act) {
-                _.each(obj.activityObjects, updater(obj, Pump.ActivityObject));
-                _.each(obj.activityObjectBags, updater(obj, Pump.ActivityObjectBag));
-                _.each(obj.activityObjectStreams, updater(obj, Pump.ActivityObjectStream));
-                _.each(obj.activityStreams, updater(obj, Pump.ActivityStream));
-                _.each(obj.peopleStreams, updater(obj, Pump.PeopleStream));
-                _.each(obj.people, updater(obj, Pump.Person));
-            });
         },
         toJSON: function() {
 
@@ -209,7 +199,11 @@ var Pump = (function(_, $, Backbone) {
                 json = _.clone(obj.attributes),
                 jsoner = function(name) {
                     if (_.has(obj, name)) {
-                        json[name] = obj[name].toJSON();
+                        if (obj[name].toCollectionJSON) {
+                            json[name] = obj[name].toCollectionJSON();
+                        } else {
+                            json[name] = obj[name].toJSON();
+                        }
                     }
                 };
 
@@ -225,16 +219,17 @@ var Pump = (function(_, $, Backbone) {
     });
 
     Pump.Collection = Backbone.Collection.extend({
-        initialize: function(models, options) {
+        constructor: function(models, options) {
             var coll = this;
             // If we're being initialized with a JSON Collection, parse it.
             if (_.isObject(models) && !_.isArray(models)) {
                 models = coll.parse(models);
             }
-            Backbone.Collection.prototype.initialize.apply(this, [models, options]);
             if (_.isObject(options) && _.has(options, "url")) {
                 coll.url = options.url;
+                delete options.url;
             }
+            Backbone.Collection.apply(this, [models, options]);
         },
         parse: function(response) {
             if (_.has(response, "url")) {
@@ -248,6 +243,26 @@ var Pump = (function(_, $, Backbone) {
             } else {
                 return [];
             }
+        },
+        toCollectionJSON: function() {
+            var rep = {};
+            if (_.has(this, "totalItems")) {
+                rep.totalItems = this.totalItems;
+            }
+            if (_.has(this, "url")) {
+                rep.url = this.url;
+            }
+            if (_.has(this, "models")) {
+                rep.items = [];
+                _.each(this.models, function(model) {
+                    if (model.toJSON) {
+                        rep.items.push(model.toJSON());
+                    } else {
+                        rep.items.push(model);
+                    }
+                });
+            }
+            return rep;
         }
     });
 
