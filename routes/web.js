@@ -379,6 +379,10 @@ var handleLogin = function(req, res, next) {
         },
         function(err) {
             if (err) throw err;
+            user.profile.expandFeeds(this);
+        },
+        function(err) {
+            if (err) throw err;
             req.app.provider.newTokenPair(req.client, user, this);
         },
         function(err, pair) {
