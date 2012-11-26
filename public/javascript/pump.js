@@ -157,6 +157,8 @@ var Pump = (function(_, $, Backbone) {
         activityObjectBags: [],
         activityObjectStreams: [],
         activityStreams: [],
+        peopleStreams: [],
+        people: [],
 
         initialize: function() {
 
@@ -185,16 +187,20 @@ var Pump = (function(_, $, Backbone) {
                     };
                 };
 
-            _.each(this.activityObjects, initer(obj, Pump.ActivityObject));
-            _.each(this.activityObjectBags, initer(obj, Pump.ActivityObjectBag));
-            _.each(this.activityObjectStreams, initer(obj, Pump.ActivityObjectStream));
-            _.each(this.activityStreams, initer(obj, Pump.ActivityStream));
+            _.each(obj.activityObjects, initer(obj, Pump.ActivityObject));
+            _.each(obj.activityObjectBags, initer(obj, Pump.ActivityObjectBag));
+            _.each(obj.activityObjectStreams, initer(obj, Pump.ActivityObjectStream));
+            _.each(obj.activityStreams, initer(obj, Pump.ActivityStream));
+            _.each(obj.peopleStreams, initer(obj, Pump.PeopleStream));
+            _.each(obj.people, initer(obj, Pump.Person));
 
             obj.on("change", function(act) {
-                _.each(this.activityObjects, updater(obj, Pump.ActivityObject));
-                _.each(this.activityObjectBags, updater(obj, Pump.ActivityObjectBag));
-                _.each(this.activityObjectStreams, updater(obj, Pump.ActivityObjectStream));
-                _.each(this.activityStreams, updater(obj, Pump.ActivityStream));
+                _.each(obj.activityObjects, updater(obj, Pump.ActivityObject));
+                _.each(obj.activityObjectBags, updater(obj, Pump.ActivityObjectBag));
+                _.each(obj.activityObjectStreams, updater(obj, Pump.ActivityObjectStream));
+                _.each(obj.activityStreams, updater(obj, Pump.ActivityStream));
+                _.each(obj.peopleStreams, updater(obj, Pump.PeopleStream));
+                _.each(obj.people, updater(obj, Pump.Person));
             });
         },
         toJSON: function() {
@@ -207,12 +213,41 @@ var Pump = (function(_, $, Backbone) {
                     }
                 };
 
-            _.each(this.activityObjects, jsoner);
-            _.each(this.activityObjectBags, jsoner);
-            _.each(this.activityObjectStreams, jsoner);
-            _.each(this.activityStreams, jsoner);
+            _.each(obj.activityObjects, jsoner);
+            _.each(obj.activityObjectBags, jsoner);
+            _.each(obj.activityObjectStreams, jsoner);
+            _.each(obj.activityStreams, jsoner);
+            _.each(obj.peopleStreams, jsoner);
+            _.each(obj.people, jsoner);
 
             return json;
+        }
+    });
+
+    Pump.Collection = Backbone.Collection.extend({
+        initialize: function(models, options) {
+            var coll = this;
+            // If we're being initialized with a JSON Collection, parse it.
+            if (_.isObject(models) && !_.isArray(models)) {
+                models = coll.parse(models);
+            }
+            Backbone.Collection.prototype.initialize.apply(this, [models, options]);
+            if (_.isObject(options) && _.has(options, "url")) {
+                coll.url = options.url;
+            }
+        },
+        parse: function(response) {
+            if (_.has(response, "url")) {
+                this.url = response.url;
+            }
+            if (_.has(response, "totalItems")) {
+                this.totalItems = response.totalItems;
+            }
+            if (_.has(response, "items")) {
+                return response.items;
+            } else {
+                return [];
+            }
         }
     });
 
@@ -234,11 +269,8 @@ var Pump = (function(_, $, Backbone) {
         }
     });
 
-    Pump.ActivityStream = Backbone.Collection.extend({
-        model: Pump.Activity,
-        parse: function(response) {
-            return response.items;
-        }
+    Pump.ActivityStream = Pump.Collection.extend({
+        model: Pump.Activity
     });
 
     Pump.ActivityObject = Pump.Model.extend({
@@ -265,128 +297,56 @@ var Pump = (function(_, $, Backbone) {
     });
 
     Pump.Person = Pump.ActivityObject.extend({
-        objectType: "person"
+        objectType: "person",
+        activityObjectStreams: ['favorites', 'lists'],
+        peopleStreams: ['followers', 'following'],
+        initialize: function() {
+            Pump.Model.prototype.initialize.apply(this, arguments);
+        }
     });
 
-    Pump.ActivityObjectStream = Backbone.Collection.extend({
-        model: Pump.ActivityObject,
-        parse: function(response) {
-            return response.items;
-        }
+    Pump.ActivityObjectStream = Pump.Collection.extend({
+        model: Pump.ActivityObject
     });
 
     // Unordered, doesn't have an URL
 
-    Pump.ActivityObjectBag = Backbone.Collection.extend({
+    Pump.ActivityObjectBag = Pump.Collection.extend({
         model: Pump.ActivityObject
     });
 
-    Pump.PeopleStream = Backbone.Collection.extend({
-        model: Pump.Person,
-        parse: function(response) {
-            return response.items;
-        }
-    });
-
-    Pump.UserStream = Pump.ActivityStream.extend({
-        user: null,
-        initialize: function(models, options) {
-            this.user = options.user;
-        },
-        url: function() {
-            return "/api/user/" + this.user.get("nickname") + "/feed";
-        }
-    });
-
-    Pump.UserMajorStream = Pump.ActivityStream.extend({
-        user: null,
-        initialize: function(models, options) {
-            this.user = options.user;
-        },
-        url: function() {
-            return "/api/user/" + this.user.get("nickname") + "/feed/major";
-        }
-    });
-
-    Pump.UserMinorStream = Pump.ActivityStream.extend({
-        user: null,
-        initialize: function(models, options) {
-            this.user = options.user;
-        },
-        url: function() {
-            return "/api/user/" + this.user.get("nickname") + "/feed/minor";
-        }
-    });
-
-    Pump.UserInbox = Pump.ActivityStream.extend({
-        user: null,
-        initialize: function(models, options) {
-            this.user = options.user;
-        },
-        url: function() {
-            return "/api/user/" + this.user.get("nickname") + "/inbox";
-        }
-    });
-
-    Pump.UserMajorInbox = Pump.ActivityStream.extend({
-        user: null,
-        initialize: function(models, options) {
-            this.user = options.user;
-        },
-        url: function() {
-            return "/api/user/" + this.user.get("nickname") + "/inbox/major";
-        }
-    });
-
-    Pump.UserMinorInbox = Pump.ActivityStream.extend({
-        user: null,
-        initialize: function(models, options) {
-            this.user = options.user;
-        },
-        url: function() {
-            return "/api/user/" + this.user.get("nickname") + "/inbox/minor";
-        }
-    });
-
-
-    Pump.UserFollowers = Pump.PeopleStream.extend({
-        user: null,
-        initialize: function(models, options) {
-            this.user = options.user;
-        },
-        url: function() {
-            return "/api/user/" + this.user.get("nickname") + "/followers";
-        }
-    });
-
-    Pump.UserFollowing = Pump.PeopleStream.extend({
-        user: null,
-        initialize: function(models, options) {
-            this.user = options.user;
-        },
-        url: function() {
-            return "/api/user/" + this.user.get("nickname") + "/following";
-        }
-    });
-
-    Pump.UserFavorites = Pump.ActivityObjectStream.extend({
-        user: null,
-        initialize: function(models, options) {
-            this.user = options.user;
-        },
-        url: function() {
-            return "/api/user/" + this.user.get("nickname") + "/favorites";
-        }
+    Pump.PeopleStream = Pump.ActivityObjectStream.extend({
+        model: Pump.Person
     });
 
     Pump.User = Pump.Model.extend({
         idAttribute: "nickname",
-        activityObjects: ['profile'],
+        people: ['profile'],
         initialize: function() {
+            var user = this;
+
             Pump.Model.prototype.initialize.apply(this, arguments);
+
             if (this.profile) {
                 this.profile.isNew = function() { return false; };
             }
+
+            // XXX: maybe move some of these to Person...?
+            user.inbox =       new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/inbox"});
+            user.majorInbox =  new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/inbox/major"});
+            user.minorInbox =  new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/inbox/minor"});
+            user.stream =      new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/feed"});
+            user.majorStream = new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/feed/major"});
+            user.minorStream = new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/feed/minor"});
+
+            user.on("change:nickname", function() {
+                user.inbox.url       = "/api/user/" + user.get("nickname") + "/inbox";
+                user.majorInbox.url  = "/api/user/" + user.get("nickname") + "/inbox/major";
+                user.minorInbox.url  = "/api/user/" + user.get("nickname") + "/inbox/minor";
+                user.stream.url      = "/api/user/" + user.get("nickname") + "/feed";
+                user.majorStream.url = "/api/user/" + user.get("nickname") + "/feed/major";
+                user.minorStream.url = "/api/user/" + user.get("nickname") + "/feed/minor";
+            });
         },
         isNew: function() {
             // Always PUT
@@ -394,33 +354,6 @@ var Pump = (function(_, $, Backbone) {
         },
         url: function() {
             return "/api/user/" + this.get("nickname");
-        },
-        getStream: function() {
-            return new Pump.UserStream([], {user: this});
-        },
-        getMajorStream: function() {
-            return new Pump.UserMajorStream([], {user: this});
-        },
-        getMinorStream: function() {
-            return new Pump.UserMinorStream([], {user: this});
-        },
-        getInbox: function() {
-            return new Pump.UserInbox([], {user: this});
-        },
-        getMajorInbox: function() {
-            return new Pump.UserMajorInbox([], {user: this});
-        },
-        getMinorInbox: function() {
-            return new Pump.UserMinorInbox([], {user: this});
-        },
-        getFollowersStream: function() {
-            return new Pump.UserFollowers([], {user: this});
-        },
-        getFollowingStream: function() {
-            return new Pump.UserFollowing([], {user: this});
-        },
-        getFavorites: function() {
-            return new Pump.UserFavorites([], {user: this});
         }
     });
 
@@ -903,7 +836,7 @@ var Pump = (function(_, $, Backbone) {
                     verb: "favorite",
                     object: view.model.object.toJSON()
                 }),
-                stream = Pump.currentUser.getStream();
+                stream = Pump.currentUser.stream;
 
             stream.create(act, {success: function(act) {
                 view.$(".favorite")
@@ -918,7 +851,7 @@ var Pump = (function(_, $, Backbone) {
                     verb: "unfavorite",
                     object: view.model.object.toJSON()
                 }),
-                stream = Pump.currentUser.getStream();
+                stream = Pump.currentUser.stream;
 
             stream.create(act, {success: function(act) {
                 view.$(".unfavorite")
@@ -962,7 +895,7 @@ var Pump = (function(_, $, Backbone) {
                         }
                     }
                 }),
-                stream = Pump.currentUser.getStream();
+                stream = Pump.currentUser.stream;
 
             view.startSpin();
 
@@ -1020,7 +953,7 @@ var Pump = (function(_, $, Backbone) {
                     verb: "follow",
                     object: view.model.toJSON()
                 },
-                stream = Pump.currentUser.getStream();
+                stream = Pump.currentUser.stream;
 
             stream.create(act, {success: function(act) {
                 view.$(".follow")
@@ -1036,7 +969,7 @@ var Pump = (function(_, $, Backbone) {
                     verb: "stop-following",
                     object: view.model.toJSON()
                 },
-                stream = Pump.currentUser.getStream();
+                stream = Pump.currentUser.stream;
 
             stream.create(act, {success: function(act) {
                 view.$(".stop-following")
@@ -1200,7 +1133,7 @@ var Pump = (function(_, $, Backbone) {
                         content: text
                     }
                 }),
-                stream = Pump.currentUser.getStream();
+                stream = Pump.currentUser.stream;
 
             view.startSpin();
             
@@ -1294,8 +1227,8 @@ var Pump = (function(_, $, Backbone) {
 
             if (pair) {
                 var user = Pump.currentUser,
-                    major = user.getMajorInbox(),
-                    minor = user.getMinorInbox();
+                    major = user.majorInbox,
+                    minor = user.minorInbox;
 
                 // XXX: parallelize
 
@@ -1333,8 +1266,8 @@ var Pump = (function(_, $, Backbone) {
         profile: function(nickname) {
             var router = this,
                 user = new Pump.User({nickname: nickname}),
-                major = user.getMajorStream(),
-                minor = user.getMinorStream();
+                major = user.majorStream,
+                minor = user.minorStream;
 
             // XXX: parallelize this?
 
@@ -1380,13 +1313,13 @@ var Pump = (function(_, $, Backbone) {
 
         favorites: function(nickname) {
             var router = this,
-                user = new Pump.User({nickname: nickname}),
-                favorites = user.getFavorites();
+                user = new Pump.User({nickname: nickname});
 
             // XXX: parallelize this?
 
             user.fetch({success: function(user, response) {
-                var profile = user.profile;
+                var profile = user.profile,
+                    favorites = profile.favorites;
                 favorites.fetch({success: function(major, response) {
                     var content = new Pump.FavoritesContent({model: profile,
                                                              data: { objects: favorites }});
@@ -1414,10 +1347,10 @@ var Pump = (function(_, $, Backbone) {
 
         followers: function(nickname) {
             var router = this,
-                user = new Pump.User({nickname: nickname}),
-                followers = user.getFollowersStream();
+                user = new Pump.User({nickname: nickname});
 
             user.fetch({success: function(user, response) {
+                var followers = user.profile.followers;
                 followers.fetch({success: function(followers, response) {
                     var profile = user.profile,
                         content = new Pump.FollowersContent({model: profile,
@@ -1446,12 +1379,12 @@ var Pump = (function(_, $, Backbone) {
 
         following: function(nickname) {
             var router = this,
-                user = new Pump.User({nickname: nickname}),
-                following = user.getFollowingStream();
+                user = new Pump.User({nickname: nickname});
 
             // XXX: parallelize this?
 
             user.fetch({success: function(user, response) {
+                var following = user.profile.following;
                 following.fetch({success: function(following, response) {
                     var profile = user.profile,
                         content = new Pump.FollowingContent({model: profile,
