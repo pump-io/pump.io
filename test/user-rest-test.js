@@ -31,6 +31,31 @@ var assert = require("assert"),
 
 var suite = vows.describe("user REST API");
 
+var makeCred = function(cl, pair) {
+    return {
+        consumer_key: cl.client_id,
+        consumer_secret: cl.client_secret,
+        token: pair.token,
+        token_secret: pair.token_secret
+    };
+};
+
+var makeUserCred = function(cl, user) {
+    return {
+        consumer_key: cl.client_id,
+        consumer_secret: cl.client_secret,
+        token: user.token,
+        token_secret: user.secret
+    };
+};
+
+var clientCred = function(cl) {
+    return {
+        consumer_key: cl.client_id,
+        consumer_secret: cl.client_secret
+    };
+};
+
 var invert = function(callback) {
     return function(err) {
         if (err) {
@@ -68,6 +93,8 @@ var goodUser = function(err, doc) {
     assert.include(doc.profile, "lists");
 
     assert.isFalse(_.has(doc.profile, "_uuid"));
+    assert.isFalse(_.has(doc.profile, "_user"));
+
     assert.isFalse(_.has(doc.profile, "_user"));
 };
 
@@ -801,6 +828,219 @@ suite.addBatch({
                 },
                 "it works": function(err, body, result) {
                     assert.ifError(err);
+                }
+            }
+        }
+    }
+});
+
+suite.addBatch({
+
+    "When we set up the app": {
+
+        topic: function() {
+            var cb = this.callback;
+            setupApp(function(err, app) {
+                if (err) {
+                    cb(err, null, null);
+                } else {
+                    newClient(function(err, cl) {
+                        if (err) {
+                            cb(err, null, null);
+                        } else {
+                            cb(err, cl, app);
+                        }
+                    });
+                }
+            });
+        },
+
+        "it works": function(err, cl, app) {
+            assert.ifError(err);
+            assert.isObject(cl);
+        },
+
+        teardown: function(cl, app) {
+            if (cl && cl.del) {
+                cl.del(function(err) {});
+            }
+            if (app) {
+                app.close();
+            }
+        },
+        "and we register two unrelated users": {
+            topic: function(cl) {
+                var callback = this.callback;
+                Step(
+                    function() {
+                        register(cl, "philip", "of|macedon", this.parallel());
+                        register(cl, "asoka", "in+india", this.parallel());
+                    },
+                    callback
+                );
+            },
+            "it works": function(err, user1, user2) {
+                assert.ifError(err);
+                assert.isObject(user1);
+                assert.isObject(user2);
+            },
+            "and we get the first user with client credentials": {
+                topic: function(user1, user2, cl) {
+                    var cred = clientCred(cl);
+                    httputil.getJSON("http://localhost:4815/api/user/philip",
+                                     cred,
+                                     this.callback);
+                },
+                "it works": function(err, doc, resp) {
+                    assert.ifError(err);
+                },
+                "profile has no pump_io member": function(err, doc, resp) {
+                    assert.ifError(err);
+                    assert.include(doc, "profile");
+                    assert.isObject(doc.profile);
+                    assert.isFalse(_.has(doc.profile, "pump_io"));
+                }
+            },
+            "and we get the first user with his own credentials": {
+                topic: function(user1, user2, cl) {
+                    var cred = makeUserCred(cl, user1);
+                    httputil.getJSON("http://localhost:4815/api/user/philip",
+                                     cred,
+                                     this.callback);
+                },
+                "it works": function(err, doc, resp) {
+                    assert.ifError(err);
+                },
+                "the followed flag is false": function(err, doc, resp) {
+                    assert.ifError(err);
+                    assert.include(doc, "profile");
+                    assert.isObject(doc.profile);
+                    assert.include(doc.profile, "pump_io");
+                    assert.isObject(doc.profile.pump_io);
+                    assert.include(doc.profile.pump_io, "followed");
+                    assert.isFalse(doc.profile.pump_io.followed);
+                }
+            },
+            "and we get the first user with the second's credentials": {
+                topic: function(user1, user2, cl) {
+                    var cred = makeUserCred(cl, user2);
+                    httputil.getJSON("http://localhost:4815/api/user/philip",
+                                     cred,
+                                     this.callback);
+                },
+                "it works": function(err, doc, resp) {
+                    assert.ifError(err);
+                },
+                "the followed flag is false": function(err, doc, resp) {
+                    assert.ifError(err);
+                    assert.include(doc, "profile");
+                    assert.isObject(doc.profile);
+                    assert.include(doc.profile, "pump_io");
+                    assert.isObject(doc.profile.pump_io);
+                    assert.include(doc.profile.pump_io, "followed");
+                    assert.isFalse(doc.profile.pump_io.followed);
+                }
+            }
+        },
+        "and we register two other users": {
+            topic: function(cl) {
+                var callback = this.callback;
+                Step(
+                    function() {
+                        register(cl, "ramses", "phara0h!", this.parallel());
+                        register(cl, "caesar", "don't-stab-me-bro", this.parallel());
+                    },
+                    callback
+                );
+            },
+            "it works": function(err, user1, user2) {
+                assert.ifError(err);
+                assert.isObject(user1);
+                assert.isObject(user2);
+            },
+            "and the second follows the first": {
+                topic: function(user1, user2, cl) {
+                    var callback = this.callback,
+                        cred = makeUserCred(cl, user2),
+                        act = {
+                            verb: "follow",
+                            object: user1.profile
+                        };
+                    Step(
+                        function() {
+                            httputil.postJSON("http://localhost:4815/api/user/caesar/feed",
+                                              cred,
+                                              act,
+                                              this);
+                        },
+                        function(err, doc, response) {
+                            if (err) {
+                                callback(err);
+                            } else {
+                                callback(null);
+                            }
+                        }
+                    );
+                },
+                "it works": function(err) {
+                    assert.ifError(err);
+                },
+                "and we get the first user with client credentials": {
+                    topic: function(user1, user2, cl) {
+                        var cred = clientCred(cl);
+                        httputil.getJSON("http://localhost:4815/api/user/ramses",
+                                         cred,
+                                         this.callback);
+                    },
+                    "it works": function(err, doc, resp) {
+                        assert.ifError(err);
+                    },
+                    "profile has no pump_io member": function(err, doc, resp) {
+                        assert.ifError(err);
+                        assert.include(doc, "profile");
+                        assert.isObject(doc.profile);
+                        assert.isFalse(_.has(doc.profile, "pump_io"));
+                    }
+                },
+                "and we get the first user with his own credentials": {
+                    topic: function(user1, user2, cl) {
+                        var cred = makeUserCred(cl, user1);
+                        httputil.getJSON("http://localhost:4815/api/user/ramses",
+                                         cred,
+                                         this.callback);
+                    },
+                    "it works": function(err, doc, resp) {
+                        assert.ifError(err);
+                    },
+                    "the followed flag is false": function(err, doc, resp) {
+                        assert.ifError(err);
+                        assert.include(doc, "profile");
+                        assert.isObject(doc.profile);
+                        assert.include(doc.profile, "pump_io");
+                        assert.isObject(doc.profile.pump_io);
+                        assert.include(doc.profile.pump_io, "followed");
+                        assert.isFalse(doc.profile.pump_io.followed);
+                    }
+                },
+                "and we get the first user with the second's credentials": {
+                    topic: function(user1, user2, cl) {
+                        var cred = makeUserCred(cl, user2);
+                        httputil.getJSON("http://localhost:4815/api/user/ramses",
+                                         cred,
+                                         this.callback);
+                    },
+                    "it works": function(err, doc, resp) {
+                        assert.ifError(err);
+                    },
+                    "the followed flag is true": function(err, doc, resp) {
+                        assert.ifError(err);
+                        assert.include(doc, "profile");
+                        assert.isObject(doc.profile);
+                        assert.include(doc.profile, "pump_io");
+                        assert.isObject(doc.profile.pump_io);
+                        assert.include(doc.profile.pump_io, "followed");
+                        assert.isTrue(doc.profile.pump_io.followed);
+                    }
                 }
             }
         }

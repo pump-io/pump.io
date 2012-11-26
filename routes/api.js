@@ -467,6 +467,22 @@ var getUser = function(req, res, next) {
             req.user.profile.expandFeeds(this);
         },
         function(err) {
+            if (err) throw err;
+            if (!req.remoteUser) {
+                // skip
+                this(null);
+            } else if (req.remoteUser.nickname == req.user.nickname) {
+                // same user
+                req.user.profile.pump_io = {
+                    followed: false
+                };
+                // skip
+                this(null);
+            } else {
+                addFollowed(req.remoteUser.profile, [req.user.profile], this);
+            }
+        },
+        function(err) {
             if (err) next(err);
             // If no user, or different user, hide email
             if (!req.remoteUser || (req.remoteUser.nickname != req.user.nickname)) {
