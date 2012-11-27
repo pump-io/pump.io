@@ -1,0 +1,11 @@
+<div class="list">
+  <div class="row">
+    <%= partial("profile-block") %>
+  </div>
+  <div class="row">
+    <%= partial("list-menu") %>
+    <% data.people = data.list.members.items; %>
+    <%= partial("people-stream") %>
+    <% delete data.people; %>
+  </div>
+</div>

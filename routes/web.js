@@ -29,6 +29,7 @@ var databank = require("databank"),
     ActivityObject = require("../lib/model/activityobject").ActivityObject,
     AccessToken = require("../lib/model/accesstoken").AccessToken,
     User = require("../lib/model/user").User,
+    Collection = require("../lib/model/collection").Collection,
     mw = require("../lib/middleware"),
     he = require("../lib/httperror"),
     HTTPError = he.HTTPError,
@@ -56,6 +57,9 @@ var addRoutes = function(app) {
     app.get("/:nickname/favorites", reqUser, showFavorites);
     app.get("/:nickname/followers", reqUser, showFollowers);
     app.get("/:nickname/following", reqUser, showFollowing);
+
+    app.get("/:nickname/lists", reqUser, showLists);
+    app.get("/:nickname/list/:uuid", reqUser, showList);
 
     app.get("/:nickname/activity/:uuid", reqUser, showActivity);
 
@@ -393,6 +397,105 @@ var handleLogin = function(req, res, next) {
                 user.token = pair.access_token;
                 user.secret = pair.token_secret;
                 res.json(user);
+            }
+        }
+    );
+};
+
+var getAllLists = function(user, callback) {
+    Step(
+        function() {
+            user.getLists(this);
+        },
+        function(err, str) {
+            if (err) throw err;
+            str.getItems(0, 100, this);
+        },
+        function(err, ids) {
+            if (err) throw err;
+            Collection.readAll(ids, this);
+        },
+        callback
+    );
+};
+
+var showLists = function(req, res, next) {
+
+    var user = req.user;
+
+    Step(
+        function() {
+            getAllLists(user, this);
+        },
+        function(err, lists) {
+            if (err) {
+                next(err);
+            } else {
+                res.render("lists", {page: {title: req.user.profile.displayName + " - Lists"},
+                                     data: {user: req.user,
+                                            profile: req.person,
+                                            lists: lists}});
+            }
+        }
+    );
+};
+
+var showList = function(req, res, next) {
+
+    var user = req.user,
+        getList = function(user, uuid, callback) {
+            var list;
+            Step(
+                function() {
+                    Collection.search({"_uuid": req.params.uuid}, this);
+                },
+                function(err, results) {
+                    if (err) throw err;
+                    if (results.length == 0) throw new HTTPError("Not found", 404);
+                    if (results.length > 1) throw new HTTPError("Too many lists", 500);
+                    list = results;
+                    list.expandFeeds(this);
+                },
+                function(err) {
+                    if (err) throw err;
+                    list.getStream(this);
+                },
+                function(err, str) {
+                    if (err) throw err;
+                    str.getObjects(0, 100, this);
+                },
+                function(err, refs) {
+                    var group = this.group();
+                    if (err) throw err;
+                    _.each(refs, function(ref) {
+                        ActivityObject.getObject(ref.objectType, ref.id, group());
+                    });
+                },
+                function(err, objs) {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        list.members.items = objs;
+                        callback(null, list);
+                    }
+                }
+            );
+        };
+
+    Step(
+        function() {
+            getAllLists(user, this.parallel());
+            getList(req.user, req.param.uuid, this.parallel());
+        },
+        function(err, lists, list) {
+            if (err) {
+                next(err);
+            } else {
+                res.render("list", {page: {title: req.user.profile.displayName + " - Lists"},
+                                     data: {user: req.user,
+                                            profile: req.person,
+                                            lists: lists,
+                                            list: list}});
             }
         }
     );
