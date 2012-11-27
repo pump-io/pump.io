@@ -1040,6 +1040,24 @@ var Pump = (function(_, $, Backbone) {
         el: '#content'
     });
 
+    Pump.ListsContent = Pump.TemplateView.extend({
+        templateName: 'lists',
+        modelName: "profile",
+        parts: ["profile-block",
+                "list-menu"],
+        el: '#content'
+    });
+
+    Pump.ListContent = Pump.TemplateView.extend({
+        templateName: 'list',
+        modelName: "profile",
+        parts: ["profile-block",
+                "people-stream",
+                "major-person",
+                "list-menu"],
+        el: '#content'
+    });
+
     Pump.ActivityContent = Pump.TemplateView.extend({
         templateName: 'activity-content',
         modelName: "activity",
@@ -1192,6 +1210,8 @@ var Pump = (function(_, $, Backbone) {
             ":nickname/following":    "following",  
             ":nickname/followers":    "followers",  
             ":nickname/activity/:id": "activity",
+            ":nickname/lists":        "lists",
+            ":nickname/list/:uuid":   "list",
             "main/settings":          "settings",
             "main/account":           "account",
             "main/register":          "register",
@@ -1423,6 +1443,66 @@ var Pump = (function(_, $, Backbone) {
                         });
                     });
                     content.render();
+                }});
+            }});
+        },
+
+        lists: function(nickname) {
+            var router = this,
+                user = new Pump.User({nickname: nickname});
+
+            // XXX: parallelize this?
+
+            user.fetch({success: function(user, response) {
+                var lists = user.profile.lists;
+                lists.fetch({success: function(lists, response) {
+                    var profile = user.profile,
+                        content = new Pump.ListsContent({model: profile,
+                                                         data: {lists: lists}});
+
+                    router.setTitle(content, nickname + " - lists");
+                    content.$el.one("pump.rendered", function() {
+
+                        // Helper view for the profile block
+
+                        var block = new Pump.ProfileBlock({el: content.$(".profile-block"),
+                                                           model: profile});
+
+                    });
+                    content.render();
+                }});
+            }});
+        },
+
+        list: function(nickname, uuid) {
+
+            var router = this,
+                user = new Pump.User({nickname: nickname}),
+                list = new Pump.ActivityObject({links: {self: {href: "/api/collection/"+uuid}}});
+
+            // XXX: parallelize this?
+
+            user.fetch({success: function(user, response) {
+                var lists = user.profile.lists;
+                lists.fetch({success: function(lists, response) {
+                    list.fetch({success: function(list, response) {
+                        var profile = user.profile,
+                            content = new Pump.ListContent({model: profile,
+                                                            data: {lists: lists,
+                                                                   list: list}});
+
+                        router.setTitle(content, nickname + " - list -" + list.get("displayName"));
+
+                        content.$el.one("pump.rendered", function() {
+
+                            // Helper view for the profile block
+
+                            var block = new Pump.ProfileBlock({el: content.$(".profile-block"),
+                                                               model: profile});
+
+                        });
+                        content.render();
+                    }});
                 }});
             }});
         },

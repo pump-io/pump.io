@@ -1,0 +1,11 @@
+<div class="lists">
+  <div class="row">
+    <%= partial("profile-block") %>
+  </div>
+  <div class="row">
+    <%= partial("list-menu") %>
+    <div class="span9">
+      <p>Click a list name to show a list.</p>
+    </div>
+  </div>
+</div>
