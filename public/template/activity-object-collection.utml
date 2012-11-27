@@ -1,0 +1,25 @@
+<% _.each(coll.items, function(object, index) { %>
+   <% if (index !== 0) { %>, <% } %>
+   <% if (_.has(object, "url")) { %>
+   <a href="<%- object.url %>">
+   <% } %>
+   <% if (data.user && data.user.profile && data.user.profile.id == object.id) { %>
+   You
+   <% } else if (object.id == "http://activityschema.org/collection/public") { %>
+   Public
+   <% } else if (data.activity.actor && data.activity.actor.followers && object.id == data.activity.actor.followers.url) { %>
+   Followers
+   <% } else if (object.displayName) { %>
+   <%- object.displayName %>
+   <% } else if (object.objectType) { %>
+   a(n) <%- object.objectType %> <!-- <%- object.id %> -->
+   <% } %>
+   <% if (_.has(object, "url")) { %>
+   </a>
+   <% } %>
+<% }); %>
+<% if (!_.has(coll.items) || coll.items.length === 0) { %>
+<%- coll.totalItems %> people
+<% } else if (coll.totalItems > coll.items.length) { %>
+and <%- coll.totalItems - coll.items.length %> others
+<% } %>

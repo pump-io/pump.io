@@ -34,12 +34,17 @@
       <% delete data.object;
         } %>
     </div>
+    <% if (data.activity.object.likes.totalItems === 0) { %>
+    <% } else if (data.activity.object.likes.totalItems === 1) { %>
+    <p><small><%= partial("activity-object-collection", {coll: data.activity.object.likes}) %> likes this.</small></p>
+    <% } else { %>
+    <p><small><%= partial("activity-object-collection", {coll: data.activity.object.likes}) %> like this.</small></p>
+    <% } %>
   </div>
   <div class="row">
     <div class="span8 offset1 replies">
       <% if (data.activity.object.replies.totalItems > 0) { %>
       <h3>Replies</h3>
-      <!-- <%= JSON.stringify(data.activity.object.replies) %> -->
       <% if (data.activity.object.replies.totalItems > data.activity.object.replies.items.length) { %>
       <a class="show-all" href="#">Show all <%= data.activity.object.replies.totalItems %> replies</a>
       <% } %>
