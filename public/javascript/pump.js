@@ -326,7 +326,7 @@ var Pump = (function(_, $, Backbone) {
 
     // Unordered, doesn't have an URL
 
-    Pump.ActivityObjectBag = Pump.Collection.extend({
+    Pump.ActivityObjectBag = Backbone.Collection.extend({
         model: Pump.ActivityObject
     });
 
@@ -476,8 +476,14 @@ var Pump = (function(_, $, Backbone) {
                 main.data.user = Pump.currentUser.toJSON();
             }
 
-            main.partial = function(name) {
-                var template;
+            main.partial = function(name, locals) {
+                var template, scoped;
+                if (locals) {
+                    scoped = _.clone(locals);
+                    _.extend(scoped, main);
+                } else {
+                    scoped = main;
+                }
                 if (!_.has(partials, name)) {
                     // XXX: Put partials in the parts array of the
                     // view to avoid this shameful sync call
@@ -487,7 +493,7 @@ var Pump = (function(_, $, Backbone) {
                 if (!template) {
                     throw new Error("No template for " + name);
                 }
-                return template(main);
+                return template(scoped);
             };
 
             // XXX: set main.page.title
