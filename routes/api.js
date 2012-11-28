@@ -154,6 +154,10 @@ var addRoutes = function(app) {
 
     app.get("/api/users", clientAuth, listUsers);
     app.post("/api/users", clientAuth, createUser);
+
+    // File upload
+
+    app.post("/api/upload", userAuth, notYetImplemented);
 };
 
 exports.addRoutes = addRoutes;
