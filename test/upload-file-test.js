@@ -46,6 +46,15 @@ var makeCred = function(cl, pair) {
     };
 };
 
+var assertValidFeed = function(feed) {
+    assert.include(feed, "totalItems");
+    assert.isNumber(feed.totalItems);
+    assert.include(feed, "url");
+    assert.isString(feed.url);
+    assert.include(feed, "items");
+    assert.isArray(feed.items);
+};
+
 suite.addBatch({
     "When we create a temporary upload dir": {
         topic: function() {
@@ -98,7 +107,38 @@ suite.addBatch({
                         assert.isObject(pair);
                     },
                     "and we check the uploads endpoint":
-                    httputil.endpoint("/api/user/mike/uploads", ["POST", "GET"])
+                    httputil.endpoint("/api/user/mike/uploads", ["POST", "GET"]),
+                    "and we get the uploads endpoint of a new user": {
+                        topic: function(pair, cl) {
+                            var cred = makeCred(cl, pair),
+                                callback = this.callback,
+                                url = "http://localhost:4815/api/user/mike/uploads";
+
+                            Step(
+                                function() {
+                                    httputil.getJSON(url, cred, this);
+                                },
+                                function(err, feed, response) {
+                                    return callback(err, feed);
+                                }
+                            );
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                            assert.isObject(feed);
+                        },
+                        "it is correct": function(err, feed) {
+                            assert.ifError(err);
+                            assert.isObject(feed);
+                            assertValidFeed(feed);
+                        },
+                        "it is empty": function(err, feed) {
+                            assert.ifError(err);
+                            assert.isObject(feed);
+                            assert.equal(feed.totalItems, 0);
+                            assert.lengthOf(feed.items, 0);
+                        }
+                    }
                 }
             }
         }

@@ -69,6 +69,7 @@ var databank = require("databank"),
     DEFAULT_FOLLOWING = DEFAULT_ITEMS,
     DEFAULT_USERS = DEFAULT_ITEMS,
     DEFAULT_LISTS = DEFAULT_ITEMS,
+    DEFAULT_UPLOADS = DEFAULT_ITEMS,
     MAX_ITEMS = DEFAULT_ITEMS * 10,
     MAX_ACTIVITIES = MAX_ITEMS,
     MAX_FAVORITES = MAX_ITEMS,
@@ -77,7 +78,8 @@ var databank = require("databank"),
     MAX_FOLLOWERS = MAX_ITEMS,
     MAX_FOLLOWING = MAX_ITEMS,
     MAX_USERS = MAX_ITEMS,
-    MAX_LISTS = MAX_ITEMS;
+    MAX_LISTS = MAX_ITEMS,
+    MAX_UPLOADS = MAX_ITEMS;
 
 // Initialize the app controller
 
@@ -1791,7 +1793,83 @@ var notYetImplemented = function(req, res, next) {
     next(new HTTPError("Not yet implemented", 500));
 };
 
-var userUploads = notYetImplemented;
+var userUploads = function(req, res, next) {
+
+    var url = URLMaker.makeURL("api/user/" + req.user.nickname + "/uploads"),
+        collection = {
+            author: req.user.profile,
+            displayName: "Uploads by " + (req.user.profile.displayName || req.user.nickname),
+            id: url,
+            objectTypes: ["file", "image", "audio", "video"],
+            url: url,
+            links: {
+                first: url,
+                self: url
+            },
+            items: []
+        },
+        args,
+        uploads;
+
+    try {
+        args = streamArgs(req, DEFAULT_UPLOADS, MAX_UPLOADS);
+    } catch (e) {
+        next(e);
+        return;
+    }
+
+    Step(
+        function() {
+            req.user.uploadsStream(this);
+        },
+        function(err, stream) {
+            if (err) throw err;
+            uploads = stream;
+            uploads.count(this);
+        },
+        function(err, totalItems) {
+            if (err) throw err;
+            collection.totalItems = totalItems;
+            if (totalItems === 0) {
+                res.json(collection);
+                return;
+            }
+            if (_(args).has("before")) {
+                uploads.getObjectsGreaterThan(args.before, args.count, this);
+            } else if (_(args).has("since")) {
+                uploads.getObjectsLessThan(args.since, args.count, this);
+            } else {
+                uploads.getObjects(args.start, args.end, this);
+            }
+        },
+        function(err, refs) {
+            var group;
+            if (err) {
+                if (err.name == "NotInStreamError") {
+                    throw new HTTPError(err.message, 400);
+                } else {
+                    throw err;
+                }
+            }
+            group = this.group();
+            _.each(refs, function(ref) {
+                ActivityObject.getObject(ref.objectType, ref.id, group());
+            });
+        },
+        function(err, objects) {
+            if (err) {
+                next(err);
+            } else {
+                _.each(objects, function(object) {
+                    object.sanitize();
+                });
+                collection.items = objects;
+                res.json(collection);
+            }
+        }
+    );
+};
+
 var newUpload = notYetImplemented;
 
 // Since most stream endpoints take the same arguments,
