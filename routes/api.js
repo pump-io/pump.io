@@ -122,6 +122,9 @@ var addRoutes = function(app) {
 
     app.get("/api/user/:nickname/lists", userAuth, reqUser, sameUser, userLists);
 
+    app.get("/api/user/:nickname/uploads", userAuth, reqUser, sameUser, userUploads);
+    app.post("/api/user/:nickname/uploads", userAuth, reqUser, sameUser, newUpload);
+
     for (i = 0; i < ActivityObject.objectTypes.length; i++) {
 
         type = ActivityObject.objectTypes[i];
@@ -154,7 +157,6 @@ var addRoutes = function(app) {
 
     app.get("/api/users", clientAuth, listUsers);
     app.post("/api/users", clientAuth, createUser);
-
 };
 
 exports.addRoutes = addRoutes;
@@ -1789,6 +1791,8 @@ var notYetImplemented = function(req, res, next) {
     next(new HTTPError("Not yet implemented", 500));
 };
 
+var userUploads = notYetImplemented;
+var newUpload = notYetImplemented;
 
 // Since most stream endpoints take the same arguments,
 // consolidate validation and parsing here
