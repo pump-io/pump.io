@@ -171,6 +171,38 @@ suite.addBatch({
                                 assert.isString(doc.fullImage.url);
                                 assert.isFalse(_.has(doc, "_slug"));
                                 assert.isFalse(_.has(doc, "_uuid"));
+                            },
+                            "and we get the uploads endpoint of a new user": {
+                                topic: function(doc, feed, pair, cl) {
+                                    var cred = makeCred(cl, pair),
+                                        callback = this.callback,
+                                        url = "http://localhost:4815/api/user/mike/uploads";
+
+                                    Step(
+                                        function() {
+                                            httputil.getJSON(url, cred, this);
+                                        },
+                                        function(err, feed, response) {
+                                            return callback(err, feed, doc);
+                                        }
+                                    );
+                                },
+                                "it works": function(err, feed, doc) {
+                                    assert.ifError(err);
+                                    assert.isObject(feed);
+                                },
+                                "it is correct": function(err, feed, doc) {
+                                    assert.ifError(err);
+                                    assert.isObject(feed);
+                                    assertValidFeed(feed);
+                                },
+                                "it has our upload": function(err, feed, doc) {
+                                    assert.ifError(err);
+                                    assert.isObject(feed);
+                                    assert.equal(feed.totalItems, 1);
+                                    assert.lengthOf(feed.items, 1);
+                                    assert.equal(feed.items[0].id, doc.id);
+                                }
                             }
                         }
                     }
