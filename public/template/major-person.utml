@@ -7,7 +7,15 @@
     <% } %>
   </div>
   <div class="span7">
-    <h3><a href="<%- data.person.url %>"><%- data.person.displayName %></a> <small><%- data.person.preferredUsername %></small></h3>
+    <h3><a href="<%- data.person.url %>"><%- data.person.displayName %></a> 
+      <small>
+      <% if (data.person.id && data.person.id.substr(0, 5) == 'acct:') { %>
+      <%- data.person.id.substr(5) %>
+      <% } else { %>
+      <%- data.person.preferredUsername %>
+      <% } %>
+      </small>
+    </h3>
     <% if (data.person.location) { %>
     <p class="location"><%- data.person.location.displayName %></p>
     <% } %>
