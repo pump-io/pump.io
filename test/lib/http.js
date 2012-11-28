@@ -21,6 +21,8 @@ var http = require("http"),
     assert = require("assert"),
     querystring = require("querystring"),
     _ = require("underscore"),
+    Step = require("step"),
+    fs = require("fs"),
     OAuth = require("oauth").OAuth,
     urlparse = require("url").parse;
 
@@ -197,6 +199,30 @@ var postJSON = function(serverUrl, cred, payload, callback) {
     oa.post(serverUrl, cred.token, cred.token_secret, toSend, "application/json", jsonHandler(callback));
 };
 
+var postFile = function(serverUrl, cred, fileName, mimeType, callback) {
+
+    Step(
+        function() {
+            fs.readFile(fileName, this);
+        },
+        function(err, data) {
+            var oa;
+            if (err) {
+                callback(err, null, null);
+            } else {
+                oa = newOAuth(serverUrl, cred);
+                oa.post(serverUrl,
+                        cred.token,
+                        cred.token_secret,
+                        data.toString('binary'),
+                        mimeType,
+                        this);
+            }
+        },
+        jsonHandler(callback)
+    );
+};
+
 var putJSON = function(serverUrl, cred, payload, callback) {
 
     var oa, toSend;
@@ -295,6 +321,7 @@ var dialbackPost = function(endpoint, id, token, ts, requestBody, contentType, c
 exports.options = options;
 exports.post = post;
 exports.postJSON = postJSON;
+exports.postFile = postFile;
 exports.getJSON = getJSON;
 exports.putJSON = putJSON;
 exports.delJSON = delJSON;
