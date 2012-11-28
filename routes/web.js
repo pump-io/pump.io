@@ -69,6 +69,9 @@ var addRoutes = function(app) {
     app.get("/main/settings", loginRedirect("/main/settings"));
     app.get("/main/account", loginRedirect("/main/account"));
 
+    app.get("main/uploadtoken", userAuth, uploadToken);
+    app.post("main/uploadfile", userAuth, uploadFile);
+
     // expose this one file over the web
 
     app.get("/shared/showdown.js", sharedFile("showdown/src/showdown.js"));

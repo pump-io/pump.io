@@ -81,8 +81,22 @@ suite.addBatch({
             "it works": function(err, app) {
                 assert.ifError(err);
             },
-            "and we check the upload endpoint": 
-            httputil.endpoint("/api/upload", ["POST"])
+            "and we check the upload file endpoint":
+            httputil.endpoint("/main/uploadfile", ["POST"]),
+            "and we register a client": {
+                topic: function() {
+                    newClient(this.callback);
+                },
+                "it works": function(err, cl) {
+                    assert.ifError(err);
+                    assert.isObject(cl);
+                },
+                "and we create a new user": {
+                    topic: function(cl) {
+                        newPair(cl, "mike", "stormtroopers_hittin_the_ground", this.callback);
+                    }
+                }
+            }
         }
     }
 });
