@@ -9,7 +9,8 @@
         "node-mocks-http": "0.0.x",
         "zombie": "0.12.x",
         "xml2js": "0.1.x",
-        "simplesmtp": "0.1.x"
+        "simplesmtp": "0.1.x",
+        "rimraf": "2.0.x"
     },
     "dependencies": { "connect": "1.8.x",
 		      "connect-auth": "0.5.3",
@@ -29,7 +30,8 @@
                       "jankyqueue": "0.1.x",
                       "schlock": "0.2.x",
                       "bunyan": "0.16.x",
-                      "emailjs": "0.3.x"
+                      "emailjs": "0.3.x",
+                      "mkdirp": "0.3.x"
 		    },
     "bin": {
         "pump": "./bin/pump",

@@ -20,6 +20,9 @@ var databank = require("databank"),
     _ = require("underscore"),
     Step = require("step"),
     validator = require("validator"),
+    path = require("path"),
+    fs = require("fs"),
+    mkdirp = require("mkdirp"),
     check = validator.check,
     sanitize = validator.sanitize,
     FilteredStream = require("../lib/filteredstream").FilteredStream,
@@ -44,11 +47,13 @@ var databank = require("databank"),
     URLMaker = require("../lib/urlmaker").URLMaker,
     Distributor = require("../lib/distributor"),
     mw = require("../lib/middleware"),
+    randomString = require("../lib/randomstring").randomString,
     reqUser = mw.reqUser,
     sameUser = mw.sameUser,
     clientAuth = mw.clientAuth,
     userAuth = mw.userAuth,
     remoteUserAuth = mw.remoteUserAuth,
+    fileContent = mw.fileContent,
     NoSuchThingError = databank.NoSuchThingError,
     AlreadyExistsError = databank.AlreadyExistsError,
     NoSuchItemError = databank.NoSuchItemError,
@@ -69,6 +74,7 @@ var databank = require("databank"),
     DEFAULT_FOLLOWING = DEFAULT_ITEMS,
     DEFAULT_USERS = DEFAULT_ITEMS,
     DEFAULT_LISTS = DEFAULT_ITEMS,
+    DEFAULT_UPLOADS = DEFAULT_ITEMS,
     MAX_ITEMS = DEFAULT_ITEMS * 10,
     MAX_ACTIVITIES = MAX_ITEMS,
     MAX_FAVORITES = MAX_ITEMS,
@@ -77,7 +83,8 @@ var databank = require("databank"),
     MAX_FOLLOWERS = MAX_ITEMS,
     MAX_FOLLOWING = MAX_ITEMS,
     MAX_USERS = MAX_ITEMS,
-    MAX_LISTS = MAX_ITEMS;
+    MAX_LISTS = MAX_ITEMS,
+    MAX_UPLOADS = MAX_ITEMS;
 
 // Initialize the app controller
 
@@ -112,15 +119,30 @@ var addRoutes = function(app) {
     app.get("/api/user/:nickname/inbox/direct/major", userAuth, reqUser, sameUser, userMajorDirectInbox);
     app.get("/api/user/:nickname/inbox/direct/minor", userAuth, reqUser, sameUser, userMinorDirectInbox);
 
+    // Followers
+
     app.get("/api/user/:nickname/followers", clientAuth, reqUser, userFollowers);
+
+    // Following
 
     app.get("/api/user/:nickname/following", clientAuth, reqUser, userFollowing);
     app.post("/api/user/:nickname/following", clientAuth, reqUser, sameUser, newFollow);
 
+    // Favorites
+
     app.get("/api/user/:nickname/favorites", clientAuth, reqUser, userFavorites);
     app.post("/api/user/:nickname/favorites", clientAuth, reqUser, sameUser, newFavorite);
 
+    // Lists
+
     app.get("/api/user/:nickname/lists", userAuth, reqUser, sameUser, userLists);
+
+    // Uploads
+
+    app.get("/api/user/:nickname/uploads", userAuth, reqUser, sameUser, userUploads);
+    app.post("/api/user/:nickname/uploads", userAuth, reqUser, sameUser, fileContent, newUpload);
+
+    // REST endpoints for other stuff
 
     for (i = 0; i < ActivityObject.objectTypes.length; i++) {
 
@@ -1788,6 +1810,196 @@ var notYetImplemented = function(req, res, next) {
     next(new HTTPError("Not yet implemented", 500));
 };
 
+var userUploads = function(req, res, next) {
+
+    var url = URLMaker.makeURL("api/user/" + req.user.nickname + "/uploads"),
+        collection = {
+            author: req.user.profile,
+            displayName: "Uploads by " + (req.user.profile.displayName || req.user.nickname),
+            id: url,
+            objectTypes: ["file", "image", "audio", "video"],
+            url: url,
+            links: {
+                first: url,
+                self: url
+            },
+            items: []
+        },
+        args,
+        uploads;
+
+    try {
+        args = streamArgs(req, DEFAULT_UPLOADS, MAX_UPLOADS);
+    } catch (e) {
+        next(e);
+        return;
+    }
+
+    Step(
+        function() {
+            req.user.uploadsStream(this);
+        },
+        function(err, stream) {
+            if (err) throw err;
+            uploads = stream;
+            uploads.count(this);
+        },
+        function(err, totalItems) {
+            if (err) throw err;
+            collection.totalItems = totalItems;
+            if (totalItems === 0) {
+                res.json(collection);
+                return;
+            }
+            if (_(args).has("before")) {
+                uploads.getObjectsGreaterThan(args.before, args.count, this);
+            } else if (_(args).has("since")) {
+                uploads.getObjectsLessThan(args.since, args.count, this);
+            } else {
+                uploads.getObjects(args.start, args.end, this);
+            }
+        },
+        function(err, refs) {
+            var group;
+            if (err) {
+                if (err.name == "NotInStreamError") {
+                    throw new HTTPError(err.message, 400);
+                } else {
+                    throw err;
+                }
+            }
+            group = this.group();
+            _.each(refs, function(ref) {
+                ActivityObject.getObject(ref.objectType, ref.id, group());
+            });
+        },
+        function(err, objects) {
+            if (err) {
+                next(err);
+            } else {
+                _.each(objects, function(object) {
+                    object.sanitize();
+                });
+                collection.items = objects;
+                res.json(collection);
+            }
+        }
+    );
+};
+
+var newUpload = function(req, res, next) {
+
+    var props,
+        extensions = {
+            "audio/flac": "flac",
+            "audio/mpeg": "mp3",
+            "audio/ogg": "ogg",
+            "audio/x-wav": "wav",
+
+            "image/gif": "gif",
+            "image/jpeg": "jpg",
+            "image/png": "png",
+            "image/svg+xml": "svg",
+
+            "video/3gpp": "3gp",
+            "video/mpeg": "mpg",
+            "video/mp4": "mp4",
+            "video/quicktime": "mov",
+            "video/ogg": "ogv",
+            "video/webm": "webm",
+            "video/x-msvideo": "avi"
+        },
+        now = new Date(),
+        ext = _.has(extensions, req.uploadMimeType) ? extensions[req.uploadMimeType] : "bin",
+        dir = path.join(req.user.nickname,
+                        ""+now.getUTCFullYear(),
+                        ""+(now.getUTCMonth() + 1),
+                        ""+now.getUTCDate()),
+        fulldir = path.join(req.app.config.uploaddir, dir),
+        slug,
+        obj;
+
+    Step(
+        function() {
+            mkdirp(fulldir, this);
+        },
+        function(err) {
+            if (err) throw err;
+            randomString(4, this);
+        },
+        function(err, rnd) {
+            var fname;
+            if (err) throw err;
+            slug = path.join(dir, rnd + "." + ext),
+            fname = path.join(req.app.config.uploaddir, slug);
+            fs.writeFile(fname, req.uploadContent, this);
+        },
+        function(err) {
+            var Cls, url;
+            if (err) throw err;
+
+            url = URLMaker.makeURL("uploads/" + slug);
+
+            if (req.uploadMimeType.match(/^image\//)) {
+                Cls = require("../lib/model/image").Image;
+                props = {
+                    _slug: slug,
+                    author: req.user.profile,
+                    fullImage: {
+                        url: url
+                    }
+                };
+                Cls.create(props, this);
+            } else if (req.uploadMimeType.match(/^audio\//)) {
+                Cls = require("../lib/model/audio").Audio;
+                props = {
+                    _slug: slug,
+                    author: req.user.profile,
+                    stream: {
+                        url: url
+                    }
+                };
+                Cls.create(props, this);
+            } else if (req.uploadMimeType.match(/^video\//)) {
+                Cls = require("../lib/model/video").Video;
+                props = {
+                    _slug: slug,
+                    author: req.user.profile,
+                    stream: {
+                        url: url
+                    }
+                };
+                Cls.create(props, this);
+            } else {
+                Cls = require("../lib/model/file").File;
+                props = {
+                    _slug: slug,
+                    author: req.user.profile,
+                    fileUrl: url,
+                    mimeType: req.uploadMimeType
+                };
+                Cls.create(props, this);
+            }
+        },
+        function(err, result) {
+            if (err) throw err;
+            obj = result;
+            req.user.uploadsStream(this);
+        },
+        function(err, str) {
+            if (err) throw err;
+            str.deliverObject({id: obj.id, objectType: obj.objectType}, this);
+        },
+        function(err) {
+            if (err) {
+                next(err);
+            } else {
+                obj.sanitize();
+                res.json(obj);
+            }
+        }
+    );
+};
 
 // Since most stream endpoints take the same arguments,
 // consolidate validation and parsing here

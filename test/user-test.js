@@ -196,6 +196,9 @@ suite.addBatch({
             "it has the favoritesStream() method": function(user) {
                 assert.isFunction(user.favoritesStream);
             },
+            "it has the uploadsStream() method": function(user) {
+                assert.isFunction(user.uploadsStream);
+            },
             "it has a profile attribute": function(user) {
                 assert.isObject(user.profile);
                 assert.instanceOf(user.profile, require("../lib/model/person").Person);
@@ -1533,6 +1536,33 @@ suite.addBatch({
                     })
                 }
             )
+        }
+    }
+});
+
+suite.addBatch({
+    "When we get the User class": {
+        topic: function() {
+            return require("../lib/model/user").User;
+        },
+        "it works": function(User) {
+            assert.isFunction(User);
+        },
+        "and we create a new user": {
+            topic: function(User) {
+                var props = {
+                    nickname: "whatever",
+                    password: "no-energy"
+                };
+                User.create(props, this.callback);
+            },
+            "it works": function(err, user) {
+                assert.ifError(err);
+            },
+            "and we check their direct inbox": 
+            emptyStreamContext(function(user, callback) {
+                user.uploadsStream(callback);
+            })
         }
     }
 });
