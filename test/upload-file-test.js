@@ -59,7 +59,9 @@ suite.addBatch({
     "When we create a temporary upload dir": {
         topic: function() {
             var callback = this.callback,
-                dirname = path.join(os.tmpDir(), "upload-file-test", Date.now());
+                dirname = path.join(os.tmpDir(),
+                                    "upload-file-test",
+                                    ""+Date.now());
             mkdirp(dirname, function (err) {
                 if (err) {
                     callback(err, null);
@@ -73,9 +75,9 @@ suite.addBatch({
             assert.isString(dir);
         },
         teardown: function(dir) {
-            if (dir) {
-                rimraf(dir, function(err) { });
-            }
+            rimraf(dir, function(err) { 
+                console.dir(err);
+            });
         },
         "and we set up the app": {
             topic: function(dir) {
@@ -137,6 +139,39 @@ suite.addBatch({
                             assert.isObject(feed);
                             assert.equal(feed.totalItems, 0);
                             assert.lengthOf(feed.items, 0);
+                        },
+                        "and we upload a file": {
+                            topic: function(feed, pair, cl) {
+                                var cred = makeCred(cl, pair),
+                                    callback = this.callback,
+                                    url = "http://localhost:4815/api/user/mike/uploads",
+                                    fileName = path.join(__dirname, "data", "image1.jpg");
+
+                                Step(
+                                    function() {
+                                        httputil.postFile(url, cred, fileName, "image/jpeg", this);
+                                    },
+                                    function(err, doc, response) {
+                                        return callback(err, doc);
+                                    }
+                                );
+                            },
+                            "it works": function(err, doc) {
+                                assert.ifError(err);
+                                assert.isObject(doc);
+                            },
+                            "it looks right": function(err, doc) {
+                                assert.ifError(err);
+                                assert.isObject(doc);
+                                assert.include(doc, "objectType");
+                                assert.equal(doc.objectType, "image");
+                                assert.include(doc, "fullImage");
+                                assert.isObject(doc.fullImage);
+                                assert.include(doc.fullImage, "url");
+                                assert.isString(doc.fullImage.url);
+                                assert.isFalse(_.has(doc, "_slug"));
+                                assert.isFalse(_.has(doc, "_uuid"));
+                            }
                         }
                     }
                 }
