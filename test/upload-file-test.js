@@ -172,7 +172,7 @@ suite.addBatch({
                                 assert.isFalse(_.has(doc, "_slug"));
                                 assert.isFalse(_.has(doc, "_uuid"));
                             },
-                            "and we get the uploads endpoint of a new user": {
+                            "and we get the uploads feed again": {
                                 topic: function(doc, feed, pair, cl) {
                                     var cred = makeCred(cl, pair),
                                         callback = this.callback,
@@ -202,6 +202,30 @@ suite.addBatch({
                                     assert.equal(feed.totalItems, 1);
                                     assert.lengthOf(feed.items, 1);
                                     assert.equal(feed.items[0].id, doc.id);
+                                }
+                            },
+                            "and we post an activity with the upload as the object": {
+                                topic: function(upl, feed, pair, cl) {
+                                    var cred = makeCred(cl, pair),
+                                        callback = this.callback,
+                                        url = "http://localhost:4815/api/user/mike/feed",
+                                        act = {
+                                            verb: "post",
+                                            object: upl
+                                        };
+
+                                    Step(
+                                        function() {
+                                            httputil.postJSON(url, cred, act, this);
+                                        },
+                                        function(err, doc, response) {
+                                            return callback(err, doc);
+                                        }
+                                    );
+                                },
+                                "it works": function(err, act) {
+                                    assert.ifError(err);
+                                    assert.isObject(act);
                                 }
                             }
                         }
