@@ -379,6 +379,7 @@ var handleLogin = function(req, res, next) {
                 throw new HTTPError("Incorrect username or password", 401);
             }
             user = result;
+            req.session.nickname = user.nickname;
             user.expand(this);
         },
         function(err) {
