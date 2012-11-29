@@ -184,8 +184,6 @@ var addRoutes = function(app) {
     app.post("/api/users", clientAuth, createUser);
 };
 
-exports.addRoutes = addRoutes;
-
 var requester = function(type) {
 
     var Cls = ActivityObject.toClass(type);
@@ -797,6 +795,10 @@ var createUser = function(req, res, next) {
                 user.sanitize();
                 user.token = pair.access_token;
                 user.secret = pair.token_secret;
+                if (!req.app.config.noweb) {
+                    // XXX: booo! I don't like this
+                    req.session.nickname = user.nickname;
+                }
                 res.json(user);
             }
         }
@@ -2125,3 +2127,5 @@ var streamArgs = function(req, defaultCount, maxCount) {
         throw new HTTPError(e.message, 400);
     }
 };
+
+exports.addRoutes = addRoutes;
