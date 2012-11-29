@@ -138,13 +138,16 @@ var addRoutes = function(app) {
 
     app.get("/api/user/:nickname/lists", userAuth, reqUser, sameUser, userLists);
 
-    // Uploads
+    if (app.config.uploaddir) {
 
-    app.get("/api/user/:nickname/uploads", userAuth, reqUser, sameUser, userUploads);
-    app.post("/api/user/:nickname/uploads", userAuth, reqUser, sameUser, fileContent, newUpload);
+        // Uploads
 
-    app.get("/uploads/*", maybeAuth, uploadedFile);
+        app.get("/api/user/:nickname/uploads", userAuth, reqUser, sameUser, userUploads);
+        app.post("/api/user/:nickname/uploads", userAuth, reqUser, sameUser, fileContent, newUpload);
 
+        app.get("/uploads/*", maybeAuth, uploadedFile);
+    }
+    
     // REST endpoints for other stuff
 
     for (i = 0; i < ActivityObject.objectTypes.length; i++) {
