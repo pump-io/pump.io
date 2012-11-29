@@ -672,7 +672,7 @@ var usersStream = function(callback) {
 var thisService = function(app) {
     var Service = require("../lib/model/service").Service;
     return new Service({
-	url: URLMaker.makeURL("/"),
+        url: URLMaker.makeURL("/"),
         displayName: app.config.site || "pump.io"
     });
 };
@@ -682,12 +682,12 @@ var createUser = function(req, res, next) {
     var user,
         props = req.body,
         registrationActivity = function(user, svc, callback) {
-	    var act = new Activity({
-		actor: user.profile,
-		verb: Activity.JOIN,
-		object: svc
+            var act = new Activity({
+                actor: user.profile,
+                verb: Activity.JOIN,
+                object: svc
             });
-	    newActivity(act, user, callback);
+            newActivity(act, user, callback);
         },
         welcomeActivity = function(user, svc, callback) {
             Step(
@@ -701,17 +701,17 @@ var createUser = function(req, res, next) {
                 },
                 function(err, text) {
                     if (err) throw err;
-	            var act = new Activity({
-		        actor: svc,
-		        verb: Activity.POST,
+                    var act = new Activity({
+                        actor: svc,
+                        verb: Activity.POST,
                         to: [user.profile],
-		        object: {
-		            objectType: ActivityObject.NOTE,
+                        object: {
+                            objectType: ActivityObject.NOTE,
                             displayName: "Welcome to " + svc.displayName,
                             content: text
-		        }
+                        }
                     });
-	            initActivity(act, this);
+                    initActivity(act, this);
                 },
                 function(err, act) {
                     if (err) {
@@ -738,7 +738,7 @@ var createUser = function(req, res, next) {
             } catch(e) {
                 next(new HTTPError(e.message, 400));
                 return;
-            };
+            }
         }
     }
 
