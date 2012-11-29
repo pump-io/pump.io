@@ -78,13 +78,8 @@ vows.describe("middleware module interface").addBatch({
             assert.ifError(err);
             assert.isObject(mw);
         },
-        "and we check its methods": methodContext(["maybeAuth",
-                                                   "reqUser",
-                                                   "mustAuth",
-                                                   "sameUser",
-                                                   "noUser",
-                                                   "getCurrentUser",
-                                                   "getSessionUser"]),
+        "and we check its methods": methodContext(["reqUser",
+                                                   "sameUser"]),
         "and we use reqUser with no nickname param": {
             topic: function(mw) {
                 var cb = this.callback,
