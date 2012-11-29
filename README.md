@@ -144,6 +144,9 @@ Here are the main configuration keys.
    "/etc/ssl/private/myserver.key".
 * *cert* If you're using SSL, the path to the server cert, like
    "/etc/ssl/private/myserver.crt".
+* *uploaddir* If you want to enable file uploads, set this to the
+  full path of a local directory. It should be writeable and readable by the 
+  'serverUser'.
 
 ## Bugs
 
