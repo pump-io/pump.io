@@ -230,6 +230,65 @@ suite.addBatch({
                             }
                         }
                     }
+                },
+                "and we register another user": {
+                    topic: function(cl) {
+                        newPair(cl, "tom", "pick*eat*rate", this.callback);
+                    },
+                    "it works": function(err, pair) {
+                        assert.ifError(err);
+                        assert.isObject(pair);
+                    },
+                    "and we upload a file as a Binary object": {
+                        topic: function(pair, cl) {
+                            var cred = makeCred(cl, pair),
+                                callback = this.callback,
+                                url = "http://localhost:4815/api/user/tom/uploads",
+                                fileName = path.join(__dirname, "data", "image2.jpg");
+
+                            Step(
+                                function() {
+                                    fs.readFile(fileName, this);
+                                },
+                                function(err, data) {
+                                    var bin;
+                                    if (err) throw err;
+                                    bin = {length: data.length,
+                                           mimeType: "image/jpeg"
+                                          };
+                                    bin.data = data.toString("base64")
+                                        .replace(/\+/g, "-")
+                                        .replace(/\//g, "_")
+                                        .replace(/=/g, "");
+                                    
+                                    httputil.postJSON(url, cred, bin, this);
+                                },
+                                function(err, doc, result) {
+                                    if (err) {
+                                        callback(err, null);
+                                    } else {
+                                        callback(null, doc);
+                                    }
+                                }
+                            );
+                        },
+                        "it works": function(err, doc) {
+                            assert.ifError(err);
+                            assert.isObject(doc);
+                        },
+                        "it looks right": function(err, doc) {
+                            assert.ifError(err);
+                            assert.isObject(doc);
+                            assert.include(doc, "objectType");
+                            assert.equal(doc.objectType, "image");
+                            assert.include(doc, "fullImage");
+                            assert.isObject(doc.fullImage);
+                            assert.include(doc.fullImage, "url");
+                            assert.isString(doc.fullImage.url);
+                            assert.isFalse(_.has(doc, "_slug"));
+                            assert.isFalse(_.has(doc, "_uuid"));
+                        }
+                    }
                 }
             }
         }
