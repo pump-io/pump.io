@@ -44,30 +44,30 @@ var databank = require("databank"),
 
 var addRoutes = function(app) {
 
-    app.get("/", showMain);
+    app.get("/", app.session, showMain);
 
-    app.get("/main/register", showRegister);
+    app.get("/main/register", app.session, showRegister);
 
-    app.get("/main/login", showLogin);
-    app.post("/main/login", clientAuth, handleLogin);
+    app.get("/main/login", app.session, showLogin);
+    app.post("/main/login", app.session, clientAuth, handleLogin);
 
-    app.post("/main/logout", userAuth, handleLogout);
+    app.post("/main/logout", app.session, userAuth, handleLogout);
 
-    app.get("/:nickname", reqUser, showStream);
-    app.get("/:nickname/favorites", reqUser, showFavorites);
-    app.get("/:nickname/followers", reqUser, showFollowers);
-    app.get("/:nickname/following", reqUser, showFollowing);
+    app.get("/:nickname", app.session, reqUser, showStream);
+    app.get("/:nickname/favorites", app.session, reqUser, showFavorites);
+    app.get("/:nickname/followers", app.session, reqUser, showFollowers);
+    app.get("/:nickname/following", app.session, reqUser, showFollowing);
 
-    app.get("/:nickname/lists", reqUser, showLists);
-    app.get("/:nickname/list/:uuid", reqUser, showList);
+    app.get("/:nickname/lists", app.session, reqUser, showLists);
+    app.get("/:nickname/list/:uuid", app.session, reqUser, showList);
 
-    app.get("/:nickname/activity/:uuid", reqUser, showActivity);
+    app.get("/:nickname/activity/:uuid", app.session, reqUser, showActivity);
 
     // For things that you can only see if you're logged in,
     // we redirect to the login page, then let you go there
 
-    app.get("/main/settings", loginRedirect("/main/settings"));
-    app.get("/main/account", loginRedirect("/main/account"));
+    app.get("/main/settings", app.session, loginRedirect("/main/settings"));
+    app.get("/main/account", app.session, loginRedirect("/main/account"));
 
     // expose this one file over the web
 
