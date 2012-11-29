@@ -172,6 +172,28 @@ suite.addBatch({
                                 assert.isFalse(_.has(doc, "_slug"));
                                 assert.isFalse(_.has(doc, "_uuid"));
                             },
+                            "and we get the file": {
+                                topic: function(doc, feed, pair, cl) {
+                                    var cred = makeCred(cl, pair),
+                                        callback = this.callback,
+                                        url = doc.fullImage.url,
+                                        oa;
+
+                                    oa = httputil.newOAuth(url, cred);
+                                    
+                                    Step(
+                                        function() {
+                                            oa.get(url, cred.token, cred.token_secret, this);
+                                        },
+                                        function(err, data, response) {
+                                            callback(err, data);
+                                        }
+                                    );
+                                },
+                                "it works": function(err, data) {
+                                    assert.ifError(err);
+                                }
+                            },
                             "and we get the uploads feed again": {
                                 topic: function(doc, feed, pair, cl) {
                                     var cred = makeCred(cl, pair),

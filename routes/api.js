@@ -53,6 +53,7 @@ var databank = require("databank"),
     clientAuth = mw.clientAuth,
     userAuth = mw.userAuth,
     remoteUserAuth = mw.remoteUserAuth,
+    maybeAuth = mw.maybeAuth,
     fileContent = mw.fileContent,
     NoSuchThingError = databank.NoSuchThingError,
     AlreadyExistsError = databank.AlreadyExistsError,
@@ -141,6 +142,8 @@ var addRoutes = function(app) {
 
     app.get("/api/user/:nickname/uploads", userAuth, reqUser, sameUser, userUploads);
     app.post("/api/user/:nickname/uploads", userAuth, reqUser, sameUser, fileContent, newUpload);
+
+    app.get("/uploads/*", maybeAuth, uploadedFile);
 
     // REST endpoints for other stuff
 
@@ -1887,30 +1890,47 @@ var userUploads = function(req, res, next) {
     );
 };
 
+var type2ext = {
+    "audio/flac": "flac",
+    "audio/mpeg": "mp3",
+    "audio/ogg": "ogg",
+    "audio/x-wav": "wav",
+
+    "image/gif": "gif",
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/svg+xml": "svg",
+
+    "video/3gpp": "3gp",
+    "video/mpeg": "mpg",
+    "video/mp4": "mp4",
+    "video/quicktime": "mov",
+    "video/ogg": "ogv",
+    "video/webm": "webm",
+    "video/x-msvideo": "avi"
+};
+
+var ext2type = _.invert(type2ext);
+
+var typeToClass = function(type) {
+    if (!type) {
+        return require("../lib/model/file").File;
+    } else if (type.match(/^image\//)) {
+        return require("../lib/model/image").Image;
+    } else if (type.match(/^audio\//)) {
+        return require("../lib/model/audio").Audio;
+    } else if (type.match(/^video\//)) {
+        return require("../lib/model/video").Video;
+    } else {
+        return require("../lib/model/file").File;
+    }
+};
+
 var newUpload = function(req, res, next) {
 
     var props,
-        extensions = {
-            "audio/flac": "flac",
-            "audio/mpeg": "mp3",
-            "audio/ogg": "ogg",
-            "audio/x-wav": "wav",
-
-            "image/gif": "gif",
-            "image/jpeg": "jpg",
-            "image/png": "png",
-            "image/svg+xml": "svg",
-
-            "video/3gpp": "3gp",
-            "video/mpeg": "mpg",
-            "video/mp4": "mp4",
-            "video/quicktime": "mov",
-            "video/ogg": "ogv",
-            "video/webm": "webm",
-            "video/x-msvideo": "avi"
-        },
         now = new Date(),
-        ext = _.has(extensions, req.uploadMimeType) ? extensions[req.uploadMimeType] : "bin",
+        ext = _.has(type2ext, req.uploadMimeType) ? type2ext[req.uploadMimeType] : "bin",
         dir = path.join(req.user.nickname,
                         ""+now.getUTCFullYear(),
                         ""+(now.getUTCMonth() + 1),
@@ -1940,8 +1960,10 @@ var newUpload = function(req, res, next) {
 
             url = URLMaker.makeURL("uploads/" + slug);
 
-            if (req.uploadMimeType.match(/^image\//)) {
-                Cls = require("../lib/model/image").Image;
+            Cls = typeToClass(req.uploadMimeType);
+
+            switch (Cls.type) {
+            case ActivityObject.IMAGE:
                 props = {
                     _slug: slug,
                     author: req.user.profile,
@@ -1949,9 +1971,9 @@ var newUpload = function(req, res, next) {
                         url: url
                     }
                 };
-                Cls.create(props, this);
-            } else if (req.uploadMimeType.match(/^audio\//)) {
-                Cls = require("../lib/model/audio").Audio;
+                break;
+            case ActivityObject.AUDIO:
+            case ActivityObject.VIDEO:
                 props = {
                     _slug: slug,
                     author: req.user.profile,
@@ -1959,27 +1981,20 @@ var newUpload = function(req, res, next) {
                         url: url
                     }
                 };
-                Cls.create(props, this);
-            } else if (req.uploadMimeType.match(/^video\//)) {
-                Cls = require("../lib/model/video").Video;
-                props = {
-                    _slug: slug,
-                    author: req.user.profile,
-                    stream: {
-                        url: url
-                    }
-                };
-                Cls.create(props, this);
-            } else {
-                Cls = require("../lib/model/file").File;
+                break;
+            case ActivityObject.FILE:
                 props = {
                     _slug: slug,
                     author: req.user.profile,
                     fileUrl: url,
                     mimeType: req.uploadMimeType
                 };
-                Cls.create(props, this);
+                break;
+            default:
+                throw new Error("Unknown type.");
             }
+
+            Cls.create(props, this);
         },
         function(err, result) {
             if (err) throw err;
@@ -1996,6 +2011,53 @@ var newUpload = function(req, res, next) {
             } else {
                 obj.sanitize();
                 res.json(obj);
+            }
+        }
+    );
+};
+
+// Check downloads of uploaded files
+
+var uploadedFile = function(req, res, next) {
+    var slug = req.params[0],
+        ext = slug.match(/\.(.*)$/)[1],
+        type = (_.has(ext2type, ext)) ? ext2type[ext] : null,
+        Cls = typeToClass(type),
+        profile = (req.remoteUser) ? req.remoteUser.profile : null, 
+        obj;
+
+    Step(
+        function() {
+            Cls.search({_slug: slug}, this);
+        },
+        function(err, objs) {
+            if (err) throw err;
+            if (!objs || objs.length !== 1) {
+                throw new Error("Bad number of records for uploads");
+            }
+            obj = objs[0];
+            Activity.postOf(obj, this);
+        },
+        function(err, post) {
+            if (err) throw err;
+            if (post) {
+                post.checkRecipient(profile, this);
+            } else {
+                if (profile &&
+                    obj.author &&
+                    req.remoteUser.profile.id == obj.author.id) {
+                    res.sendfile(path.join(req.app.config.uploaddir, slug));
+                    return;
+                }
+            }
+        },
+        function(err, flag) {
+            if (err) {
+                next(err);
+            } else if (!flag) {
+                next(new HTTPError("Not allowed", 403));
+            } else {
+                res.sendfile(path.join(req.app.config.uploaddir, slug));
             }
         }
     );

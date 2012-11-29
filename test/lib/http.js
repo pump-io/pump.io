@@ -328,3 +328,4 @@ exports.delJSON = delJSON;
 exports.endpoint = endpoint;
 exports.getfail = getfail;
 exports.dialbackPost = dialbackPost;
+exports.newOAuth = newOAuth;
