@@ -452,7 +452,7 @@ var showList = function(req, res, next) {
                 },
                 function(err, results) {
                     if (err) throw err;
-                    if (results.length == 0) throw new HTTPError("Not found", 404);
+                    if (results.length === 0) throw new HTTPError("Not found", 404);
                     if (results.length > 1) throw new HTTPError("Too many lists", 500);
                     list = results;
                     list.expandFeeds(this);
