@@ -23,51 +23,53 @@ var databank = require("databank"),
     Step = require("step"),
     _ = require("underscore"),
     FilteredStream = require("../lib/filteredstream").FilteredStream,
-    publicOnly = require("../lib/filters").publicOnly,
-    objectPublicOnly = require("../lib/filters").objectPublicOnly,
+    filters = require("../lib/filters"),
+    publicOnly = filters.publicOnly,
+    objectPublicOnly = filters.objectPublicOnly,
+    recipientsOnly = filters.recipientsOnly,
+    objectRecipientsOnly = filters.objectRecipientsOnly,
+    always = filters.always,
     Activity = require("../lib/model/activity").Activity,
     ActivityObject = require("../lib/model/activityobject").ActivityObject,
     AccessToken = require("../lib/model/accesstoken").AccessToken,
     User = require("../lib/model/user").User,
     Collection = require("../lib/model/collection").Collection,
     mw = require("../lib/middleware"),
+    sa = require("../lib/sessionauth"),
     he = require("../lib/httperror"),
     HTTPError = he.HTTPError,
-    maybeAuth = mw.maybeAuth,
     reqUser = mw.reqUser,
-    mustAuth = mw.mustAuth,
-    sameUser = mw.sameUser,
-    noUser = mw.noUser,
-    userAuth = mw.userAuth,
+    principal = sa.principal,
+    setPrincipal = sa.setPrincipal,
+    clearPrincipal = sa.clearPrincipal,
     clientAuth = mw.clientAuth,
+    userAuth = mw.userAuth,
     NoSuchThingError = databank.NoSuchThingError;
 
 var addRoutes = function(app) {
 
-    app.get("/", app.session, showMain);
+    app.get("/", app.session, principal, showMain);
 
-    app.get("/main/register", app.session, showRegister);
+    app.get("/main/register", app.session, principal, showRegister);
 
-    app.get("/main/login", app.session, showLogin);
+    app.get("/main/login", app.session, principal, showLogin);
     app.post("/main/login", app.session, clientAuth, handleLogin);
 
-    app.post("/main/logout", app.session, userAuth, handleLogout);
+    app.post("/main/logout", app.session, userAuth, principal, handleLogout);
 
-    app.get("/:nickname", app.session, reqUser, showStream);
-    app.get("/:nickname/favorites", app.session, reqUser, showFavorites);
-    app.get("/:nickname/followers", app.session, reqUser, showFollowers);
-    app.get("/:nickname/following", app.session, reqUser, showFollowing);
+    app.get("/:nickname", app.session, principal, reqUser, showStream);
+    app.get("/:nickname/favorites", app.session, principal, reqUser, showFavorites);
+    app.get("/:nickname/followers", app.session, principal, reqUser, showFollowers);
+    app.get("/:nickname/following", app.session, principal, reqUser, showFollowing);
 
-    app.get("/:nickname/lists", app.session, reqUser, showLists);
-    app.get("/:nickname/list/:uuid", app.session, reqUser, showList);
-
-    app.get("/:nickname/activity/:uuid", app.session, reqUser, showActivity);
+    app.get("/:nickname/lists", app.session, principal, reqUser, showLists);
+    app.get("/:nickname/list/:uuid", app.session, principal, reqUser, showList);
 
     // For things that you can only see if you're logged in,
     // we redirect to the login page, then let you go there
 
-    app.get("/main/settings", app.session, loginRedirect("/main/settings"));
-    app.get("/main/account", app.session, loginRedirect("/main/account"));
+    app.get("/main/settings", loginRedirect("/main/settings"));
+    app.get("/main/account", loginRedirect("/main/account"));
 
     // expose this one file over the web
 
@@ -89,20 +91,95 @@ var loginRedirect = function(rel) {
 };
 
 var showMain = function(req, res, next) {
-    res.render("main", {page: {title: "Welcome"}});
+    if (req.principalUser) {
+        req.log.info({msg: "Showing inbox for logged-in user", user: req.principalUser});
+        showInbox(req, res, next);
+    } else {
+        req.log.info({msg: "Showing welcome page"});
+        res.render("main", {page: {title: "Welcome"}});
+    }
+};
+
+var showInbox = function(req, res, next) {
+
+    var pump = this,
+        user = req.principalUser,
+        profile = req.principal,
+        getMajor = function(callback) {
+            Step(
+                function() {
+                    user.getMajorInboxStream(this);
+                },
+                function(err, str) {
+                    if (err) throw err;
+                    str.getIDs(0, 20, this);
+                },
+                function(err, ids) {
+                    if (err) throw err;
+                    Activity.readArray(ids, this);
+                },
+                callback
+            );
+        },
+        getMinor = function(callback) {
+            Step(
+                function() {
+                    user.getMajorInboxStream(this);
+                },
+                function(err, str) {
+                    if (err) throw err;
+                    str.getIDs(0, 20, this);
+                },
+                function(err, ids) {
+                    if (err) throw err;
+                    Activity.readArray(ids, this);
+                },
+                callback
+            );
+        };
+
+    Step(
+        function() {
+            getMajor(this.parallel());
+            getMinor(this.parallel());
+        },
+        function(err, major, minor) {
+            if (err) {
+                next(err);
+            } else {
+                res.render("inbox", {page: { title: "Home" },
+                                     data: {user: user,
+                                            profile: profile,
+                                            major: major,
+                                            minor: minor}});
+            }
+        }
+    );
 };
 
 var showRegister = function(req, res, next) {
-    res.render("register", {page: {title: "Register"}});
+    if (req.principal) {
+        res.redirect("/");
+    } else {
+        res.render("register", {page: {title: "Register"}});
+    }
 };
 
 var showLogin = function(req, res, next) {
-    res.render("login", {page: {title: "Login"}});
+    if (req.principal) {
+        res.redirect("/");
+    } else {
+        res.render("login", {page: {title: "Login"}});
+    }
 };
 
 var handleLogout = function(req, res, next) {
     Step(
         function() {
+            clearPrincipal(req.session, this);
+        },
+        function(err) {
+            if (err) throw err;
             AccessToken.search({"consumer_key": req.client.consumer_key,
                                 "username": req.remoteUser.nickname},
                                this);
@@ -156,37 +233,6 @@ var showActivity = function(req, res, next) {
     );
 };
 
-var templates = {};
-
-var compileTemplate = function(name, callback) {
-
-    if (_.has(templates, name)) {
-        callback(null, templates[name]);
-        return;
-    }
-
-    Step(
-        function() {
-            var filename = path.join(__dirname, "..", "public", "template", name + ".utml");
-            fs.readFile(filename, this);
-        },
-        function(err, data) {
-            var fn;
-            if (err) {
-                callback(err, null);
-            } else {
-                try {
-                    fn = _.template(data.toString());
-                    templates[name] = fn;
-                    callback(null, fn);
-                } catch (e) {
-                    callback(e, null);
-                }
-            }
-        }
-    );
-};
-
 var getFiltered = function(stream, filter, start, end, callback) {
     var filtered = new FilteredStream(stream, filter);
     Step(
@@ -209,49 +255,59 @@ var getFiltered = function(stream, filter, start, end, callback) {
 
 var showStream = function(req, res, next) {
     var pump = this,
-        getData = function(callback) {
+        principal = req.principal,
+        filter = (principal) ? 
+            ((principal.id == req.user.id) ? always : recipientsOnly(principal)) : publicOnly,
+        getMajor = function(callback) {
             Step(
                 function() {
-                    req.user.getMajorOutboxStream(this.parallel());
-                    req.user.getMinorOutboxStream(this.parallel());
+                    req.user.getMajorOutboxStream(this);
                 },
-                function(err, majorStream, minorStream) {
+                function(err, str) {
                     if (err) throw err;
-                    getFiltered(majorStream, publicOnly, 0, 20, this.parallel());
-                    getFiltered(minorStream, publicOnly, 0, 20, this.parallel());
+                    getFiltered(str, filter, 0, 20, this.parallel());
                 },
-                function(err, majorActivities, minorActivities) {
-                    if (err) {
-                        callback(err, null);
-                    } else {
-                        callback(null, {major: majorActivities,
-                                        minor: minorActivities,
-                                        profile: req.user.profile});
-                    }
-                }
+                callback
+            );
+        },
+        getMinor = function(callback) {
+            Step(
+                function() {
+                    req.user.getMajorOutboxStream(this);
+                },
+                function(err, str) {
+                    if (err) throw err;
+                    getFiltered(str, filter, 0, 20, this.parallel());
+                },
+                callback
             );
         };
 
     Step(
         function() {
-            getData(this);
+            getMajor(this.parallel());
+            getMinor(this.parallel());
         },
-        function(err, data) {
+        function(err, major, minor) {
             if (err) {
                 next(err);
             } else {
                 res.render("user", {page: {title: req.user.profile.displayName},
-                                    data: data});
+                                    data: {major: major,
+                                           minor: minor,
+                                           profile: req.user.profile,
+                                           user: req.principalUser}});
             }
         }
     );
 };
 
-
 var showFavorites = function(req, res, next) {
 
     var pump = this,
-        getData = function(callback) {
+        principal = req.principal,
+        filter = (principal) ? ((principal.id == req.user.profile.id) ? always : objectRecipientsOnly(principal)) : objectPublicOnly,
+        getFavorites = function(callback) {
             Step(
                 function() {
                     req.user.favoritesStream(this);
@@ -259,7 +315,7 @@ var showFavorites = function(req, res, next) {
                 function(err, faveStream) {
                     var filtered;
                     if (err) throw err;
-                    filtered = new FilteredStream(faveStream, objectPublicOnly);
+                    filtered = new FilteredStream(faveStream, filter);
                     filtered.getObjects(0, 20, this);
                 },
                 function(err, refs) {
@@ -273,8 +329,7 @@ var showFavorites = function(req, res, next) {
                     if (err) {
                         callback(err, null);
                     } else {
-                        callback(null, {objects: objects,
-                                        profile: req.user.profile});
+                        callback(null, objects);
                     }
                 }
             );
@@ -282,14 +337,16 @@ var showFavorites = function(req, res, next) {
 
     Step(
         function() {
-            getData(this);
+            getFavorites(this);
         },
-        function(err, data) {
+        function(err, objects) {
             if (err) {
                 next(err);
             } else {
                 res.render("favorites", {page: {title: req.user.nickname + " favorites"},
-                                         data: data});
+                                         data: {objects: objects,
+                                                user: req.principalUser,
+                                                profile: req.user.profile}});
             }
         }
     );
@@ -298,7 +355,7 @@ var showFavorites = function(req, res, next) {
 var showFollowers = function(req, res, next) {
 
     var pump = this,
-        getData = function(callback) {
+        getFollowers = function(callback) {
             Step(
                 function() {
                     req.user.getFollowers(0, 20, this);
@@ -308,8 +365,7 @@ var showFollowers = function(req, res, next) {
                     if (err) {
                         callback(err, null);
                     } else {
-                        callback(null, {people: followers,
-                                        profile: req.user.profile});
+                        callback(null, followers);
                     }
                 }
             );
@@ -317,14 +373,16 @@ var showFollowers = function(req, res, next) {
 
     Step(
         function() {
-            getData(this);
+            getFollowers(this);
         },
-        function(err, data) {
+        function(err, followers) {
             if (err) {
                 next(err);
             } else {
                 res.render("followers", {page: {title: req.user.nickname + " followers"},
-                                         data: data});
+                                         data: {people: followers,
+                                                user: req.principalUser,
+                                                profile: req.user.profile}});
             }
         }
     );
@@ -333,7 +391,7 @@ var showFollowers = function(req, res, next) {
 var showFollowing = function(req, res, next) {
 
     var pump = this,
-        getData = function(callback) {
+        getFollowing = function(callback) {
             Step(
                 function() {
                     req.user.getFollowing(0, 20, this);
@@ -343,8 +401,7 @@ var showFollowing = function(req, res, next) {
                     if (err) {
                         callback(err, null);
                     } else {
-                        callback(null, {people: following,
-                                        profile: req.user.profile});
+                        callback(null, following);
                     }
                 }
             );
@@ -352,14 +409,16 @@ var showFollowing = function(req, res, next) {
 
     Step(
         function() {
-            getData(this.parallel());
+            getFollowing(this);
         },
-        function(err, data) {
+        function(err, following) {
             if (err) {
                 next(err);
             } else {
                 res.render("following", {page: {title: req.user.nickname + " following"},
-                                         data: data});
+                                         data: {people: following,
+                                                user: req.principalUser,
+                                                profile: req.user.profile}});
             }
         }
     );
@@ -379,7 +438,10 @@ var handleLogin = function(req, res, next) {
                 throw new HTTPError("Incorrect username or password", 401);
             }
             user = result;
-            req.session.nickname = user.nickname;
+            setPrincipal(req.session, user.profile, this);
+        },
+        function(err) {
+            if (err) throw err;
             user.expand(this);
         },
         function(err) {
