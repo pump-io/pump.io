@@ -795,10 +795,6 @@ var createUser = function(req, res, next) {
                 user.sanitize();
                 user.token = pair.access_token;
                 user.secret = pair.token_secret;
-                if (!req.app.config.noweb) {
-                    // XXX: booo! I don't like this
-                    req.session.nickname = user.nickname;
-                }
                 res.json(user);
             }
         }
