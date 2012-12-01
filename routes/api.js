@@ -48,6 +48,8 @@ var databank = require("databank"),
     Distributor = require("../lib/distributor"),
     mw = require("../lib/middleware"),
     randomString = require("../lib/randomstring").randomString,
+    finishers = require("../lib/finishers"),
+    mm = require("../lib/mimemap"),
     reqUser = mw.reqUser,
     sameUser = mw.sameUser,
     clientAuth = mw.clientAuth,
@@ -58,7 +60,6 @@ var databank = require("databank"),
     NoSuchThingError = databank.NoSuchThingError,
     AlreadyExistsError = databank.AlreadyExistsError,
     NoSuchItemError = databank.NoSuchItemError,
-    finishers = require("../lib/finishers"),
     addFollowedFinisher = finishers.addFollowedFinisher,
     addFollowed = finishers.addFollowed,
     addLikedFinisher = finishers.addLikedFinisher,
@@ -66,6 +67,9 @@ var databank = require("databank"),
     firstFewRepliesFinisher = finishers.firstFewRepliesFinisher,
     firstFewReplies = finishers.firstFewReplies,
     doFinishers = finishers.doFinishers,
+    typeToClass = mm.typeToClass,
+    typeToExt = mm.typeToExt,
+    extToType = mm.extToType,
     DEFAULT_ITEMS = 20,
     DEFAULT_ACTIVITIES = DEFAULT_ITEMS,
     DEFAULT_FAVORITES = DEFAULT_ITEMS,
@@ -144,8 +148,6 @@ var addRoutes = function(app) {
 
         app.get("/api/user/:nickname/uploads", userAuth, reqUser, sameUser, userUploads);
         app.post("/api/user/:nickname/uploads", userAuth, reqUser, sameUser, fileContent, newUpload);
-
-        app.get("/uploads/*", maybeAuth, uploadedFile);
     }
     
     // REST endpoints for other stuff
@@ -1818,10 +1820,6 @@ var userLists = function(req, res, next) {
     );
 };
 
-var notYetImplemented = function(req, res, next) {
-    next(new HTTPError("Not yet implemented", 500));
-};
-
 var userUploads = function(req, res, next) {
 
     var url = URLMaker.makeURL("api/user/" + req.user.nickname + "/uploads"),
@@ -1899,47 +1897,11 @@ var userUploads = function(req, res, next) {
     );
 };
 
-var type2ext = {
-    "audio/flac": "flac",
-    "audio/mpeg": "mp3",
-    "audio/ogg": "ogg",
-    "audio/x-wav": "wav",
-
-    "image/gif": "gif",
-    "image/jpeg": "jpg",
-    "image/png": "png",
-    "image/svg+xml": "svg",
-
-    "video/3gpp": "3gp",
-    "video/mpeg": "mpg",
-    "video/mp4": "mp4",
-    "video/quicktime": "mov",
-    "video/ogg": "ogv",
-    "video/webm": "webm",
-    "video/x-msvideo": "avi"
-};
-
-var ext2type = _.invert(type2ext);
-
-var typeToClass = function(type) {
-    if (!type) {
-        return require("../lib/model/file").File;
-    } else if (type.match(/^image\//)) {
-        return require("../lib/model/image").Image;
-    } else if (type.match(/^audio\//)) {
-        return require("../lib/model/audio").Audio;
-    } else if (type.match(/^video\//)) {
-        return require("../lib/model/video").Video;
-    } else {
-        return require("../lib/model/file").File;
-    }
-};
-
 var newUpload = function(req, res, next) {
 
     var props,
         now = new Date(),
-        ext = _.has(type2ext, req.uploadMimeType) ? type2ext[req.uploadMimeType] : "bin",
+        ext = typeToExt(req.uploadMimeType),
         dir = path.join(req.user.nickname,
                         ""+now.getUTCFullYear(),
                         ""+(now.getUTCMonth() + 1),
@@ -2020,53 +1982,6 @@ var newUpload = function(req, res, next) {
             } else {
                 obj.sanitize();
                 res.json(obj);
-            }
-        }
-    );
-};
-
-// Check downloads of uploaded files
-
-var uploadedFile = function(req, res, next) {
-    var slug = req.params[0],
-        ext = slug.match(/\.(.*)$/)[1],
-        type = (_.has(ext2type, ext)) ? ext2type[ext] : null,
-        Cls = typeToClass(type),
-        profile = (req.remoteUser) ? req.remoteUser.profile : null, 
-        obj;
-
-    Step(
-        function() {
-            Cls.search({_slug: slug}, this);
-        },
-        function(err, objs) {
-            if (err) throw err;
-            if (!objs || objs.length !== 1) {
-                throw new Error("Bad number of records for uploads");
-            }
-            obj = objs[0];
-            Activity.postOf(obj, this);
-        },
-        function(err, post) {
-            if (err) throw err;
-            if (post) {
-                post.checkRecipient(profile, this);
-            } else {
-                if (profile &&
-                    obj.author &&
-                    req.remoteUser.profile.id == obj.author.id) {
-                    res.sendfile(path.join(req.app.config.uploaddir, slug));
-                    return;
-                }
-            }
-        },
-        function(err, flag) {
-            if (err) {
-                next(err);
-            } else if (!flag) {
-                next(new HTTPError("Not allowed", 403));
-            } else {
-                res.sendfile(path.join(req.app.config.uploaddir, slug));
             }
         }
     );
