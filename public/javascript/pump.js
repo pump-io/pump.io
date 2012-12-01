@@ -793,7 +793,7 @@ var Pump = (function(_, $, Backbone) {
                     data: JSON.stringify(params),
                     dataType: "json",
                     type: "POST",
-                    url: "/api/users",
+                    url: "/main/register",
                     success: onSuccess,
                     error: onError
                 };

@@ -795,6 +795,14 @@ var createUser = function(req, res, next) {
                 user.sanitize();
                 user.token = pair.access_token;
                 user.secret = pair.token_secret;
+                // If called as /main/register; see ./web.js
+                // XXX: Bad hack
+                if (req.session) {
+                    req.session.principal = {
+                        id: user.profile.id,
+                        objectType: user.profile.objectType
+                    };
+                }
                 res.json(user);
             }
         }
@@ -2125,3 +2133,4 @@ var streamArgs = function(req, defaultCount, maxCount) {
 };
 
 exports.addRoutes = addRoutes;
+exports.createUser = createUser;

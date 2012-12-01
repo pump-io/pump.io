@@ -37,6 +37,7 @@ var databank = require("databank"),
     mw = require("../lib/middleware"),
     sa = require("../lib/sessionauth"),
     he = require("../lib/httperror"),
+    api = require("./api"),
     HTTPError = he.HTTPError,
     reqUser = mw.reqUser,
     principal = sa.principal,
@@ -44,13 +45,15 @@ var databank = require("databank"),
     clearPrincipal = sa.clearPrincipal,
     clientAuth = mw.clientAuth,
     userAuth = mw.userAuth,
-    NoSuchThingError = databank.NoSuchThingError;
+    NoSuchThingError = databank.NoSuchThingError,
+    createUser = api.createUser;
 
 var addRoutes = function(app) {
 
     app.get("/", app.session, principal, showMain);
 
     app.get("/main/register", app.session, principal, showRegister);
+    app.post("/main/register", app.session, principal, clientAuth, createUser);
 
     app.get("/main/login", app.session, principal, showLogin);
     app.post("/main/login", app.session, clientAuth, handleLogin);
