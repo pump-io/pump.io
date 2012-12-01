@@ -67,7 +67,8 @@ var types = [
     "credentials",
     "other",
     "dialbackrequest",
-    "session"
+    "session",
+    "sessionlist"
 ];
 
 vows.describe("schema module interface").addBatch({
