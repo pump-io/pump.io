@@ -8,6 +8,7 @@
 
     <!-- Le styles -->
     <link href="/stylesheet/bootstrap.min.css" rel="stylesheet">
+    <link href="/stylesheet/fineuploader.css" rel="stylesheet">
     <style>
       body {
       position: relative;
@@ -65,6 +66,7 @@
     <script src="/javascript/sha1.min.js"></script>
     <script src="/javascript/spin.min.js"></script>
     <script src="/javascript/jquery-spin.js"></script>
+    <script src="/javascript/fineuploader-3.0.min.js"></script>
     <script src="/javascript/pump.js"></script>
     <script>
       if (!Pump) {
