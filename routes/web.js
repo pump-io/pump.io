@@ -37,6 +37,7 @@ var databank = require("databank"),
     mw = require("../lib/middleware"),
     sa = require("../lib/sessionauth"),
     he = require("../lib/httperror"),
+    finishers = require("../lib/finishers"),
     api = require("./api"),
     HTTPError = he.HTTPError,
     reqUser = mw.reqUser,
@@ -46,7 +47,10 @@ var databank = require("databank"),
     clientAuth = mw.clientAuth,
     userAuth = mw.userAuth,
     NoSuchThingError = databank.NoSuchThingError,
-    createUser = api.createUser;
+    createUser = api.createUser,
+    addLiked = finishers.addLiked,
+    firstFewReplies = finishers.firstFewReplies,
+    addFollowed = finishers.addFollowed;
 
 var addRoutes = function(app) {
 
@@ -109,6 +113,7 @@ var showInbox = function(req, res, next) {
         user = req.principalUser,
         profile = req.principal,
         getMajor = function(callback) {
+            var activities;
             Step(
                 function() {
                     user.getMajorInboxStream(this);
@@ -121,7 +126,21 @@ var showInbox = function(req, res, next) {
                     if (err) throw err;
                     Activity.readArray(ids, this);
                 },
-                callback
+                function(err, results) {
+                    var objects;
+                    if (err) throw err;
+                    activities = results;
+                    objects = _.pluck(activities, "object");
+                    addLiked(profile, objects, this.parallel());
+                    firstFewReplies(profile, objects, this.parallel());
+                },
+                function(err) {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        callback(null, activities);
+                    }
+                }
             );
         },
         getMinor = function(callback) {
@@ -147,14 +166,17 @@ var showInbox = function(req, res, next) {
             getMinor(this.parallel());
         },
         function(err, major, minor) {
+            var data;
             if (err) {
                 next(err);
             } else {
+                data = {major: major,
+                        minor: minor};
+                if (user) {
+                    data.user = user;
+                }
                 res.render("inbox", {page: { title: "Home" },
-                                     data: {user: user,
-                                            profile: profile,
-                                            major: major,
-                                            minor: minor}});
+                                     data: data});
             }
         }
     );
@@ -359,12 +381,17 @@ var showFollowers = function(req, res, next) {
 
     var pump = this,
         getFollowers = function(callback) {
+            var followers;
             Step(
                 function() {
                     req.user.getFollowers(0, 20, this);
                 },
-                function(err, followers) {
+                function(err, results) {
                     if (err) throw err;
+                    followers = results;
+                    addFollowed(req.principal, followers, this);
+                },
+                function(err) {
                     if (err) {
                         callback(err, null);
                     } else {
@@ -395,12 +422,17 @@ var showFollowing = function(req, res, next) {
 
     var pump = this,
         getFollowing = function(callback) {
+            var following;
             Step(
                 function() {
                     req.user.getFollowing(0, 20, this);
                 },
-                function(err, following) {
+                function(err, results) {
                     if (err) throw err;
+                    following = results;
+                    addFollowed(req.principal, following, this);
+                },
+                function(err) {
                     if (err) {
                         callback(err, null);
                     } else {
@@ -498,7 +530,7 @@ var showLists = function(req, res, next) {
                 next(err);
             } else {
                 res.render("lists", {page: {title: req.user.profile.displayName + " - Lists"},
-                                     data: {user: req.user,
+                                     data: {user: req.principalUser,
                                             profile: req.person,
                                             lists: lists}});
             }
@@ -558,10 +590,10 @@ var showList = function(req, res, next) {
                 next(err);
             } else {
                 res.render("list", {page: {title: req.user.profile.displayName + " - Lists"},
-                                     data: {user: req.user,
-                                            profile: req.person,
-                                            lists: lists,
-                                            list: list}});
+                                    data: {user: req.principalUser,
+                                           profile: req.person,
+                                           lists: lists,
+                                           list: list}});
             }
         }
     );
