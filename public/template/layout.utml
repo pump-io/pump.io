@@ -27,9 +27,9 @@
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
-          <% if (remoteUser) { %>
+          <% if (_.has(data, "user") && data.user) { %>
           <%= partial('nav-loggedin') %>
-          <% } else if (nologin) { %>
+          <% } else if (page.nologin) { %>
           <%= partial('nav-nologin') %>
           <% } else { %>
           <%= partial('nav-anonymous') %>
