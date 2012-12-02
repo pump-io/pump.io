@@ -571,6 +571,7 @@ var Pump = (function(_, $, Backbone) {
         events: {
             "click #logout": "logout",
             "click #post-note-button": "postNoteModal",
+            "click #post-picture-button": "postPictureModal",
             "click #profile-dropdown": "profileDropdown"
         },
         postNoteModal: function() {
@@ -589,6 +590,26 @@ var Pump = (function(_, $, Backbone) {
 
             modalView.$el.one("pump.rendered", function() {
                 modalView.$("#modal-note").modal('show');
+            });
+
+            modalView.render();
+        },
+        postPictureModal: function() {
+            var view = this,
+                modalView;
+
+            if (view.postPicture) {
+                modalView = view.postPicture;
+            } else {
+                modalView = new Pump.PostPictureModal({});
+                $("body").append(modalView.el);
+                view.postPicture = modalView;
+            }
+
+            // Once it's rendered, show the modal
+
+            modalView.$el.one("pump.rendered", function() {
+                modalView.$("#modal-picture").modal('show');
             });
 
             modalView.render();
@@ -1180,6 +1201,37 @@ var Pump = (function(_, $, Backbone) {
                 view.$("#modal-note").modal('hide');
                 view.stopSpin();
                 view.$('#note-content').val("");
+                // Reload the current page
+            }});
+        }
+    });
+
+    Pump.PostPictureModal = Pump.TemplateView.extend({
+
+        tagName: "div",
+        className: "modal-holder",
+        templateName: 'post-picture',
+        events: {
+            "click #send-picture": "postPicture"
+        },
+        postPicture: function(ev) {
+            var view = this,
+                description = view.$('#post-picture #picture-content').val(),
+                act = new Pump.Activity({
+                    verb: "post",
+                    object: {
+                        objectType: "picture",
+                        content: text
+                    }
+                }),
+                stream = Pump.currentUser.stream;
+
+            view.startSpin();
+            
+            stream.create(act, {success: function(act) {
+                view.$("#modal-picture").modal('hide');
+                view.stopSpin();
+                view.$('#picture-content').val("");
                 // Reload the current page
             }});
         }

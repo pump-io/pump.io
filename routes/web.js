@@ -44,6 +44,7 @@ var databank = require("databank"),
     principal = sa.principal,
     setPrincipal = sa.setPrincipal,
     clearPrincipal = sa.clearPrincipal,
+    principalUserOnly = sa.principalUserOnly,
     clientAuth = mw.clientAuth,
     userAuth = mw.userAuth,
     NoSuchThingError = databank.NoSuchThingError,
@@ -63,6 +64,8 @@ var addRoutes = function(app) {
     app.post("/main/login", app.session, clientAuth, handleLogin);
 
     app.post("/main/logout", app.session, userAuth, principal, handleLogout);
+
+    app.post("/main/upload", app.session, principal, principalUserOnly, uploadFile);
 
     app.get("/:nickname", app.session, principal, reqUser, showStream);
     app.get("/:nickname/favorites", app.session, principal, reqUser, showFavorites);
@@ -597,6 +600,12 @@ var showList = function(req, res, next) {
             }
         }
     );
+};
+
+var uploadFile = function(req, res, next) {
+    var user = req.principalUser;
+
+    next();
 };
 
 exports.addRoutes = addRoutes;
