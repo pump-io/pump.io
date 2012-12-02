@@ -1,13 +1,18 @@
 <a class="brand" href="/"><%- config.site %></a>
 
+<div class="btn-group">
 <button type="button" class="btn primary" id="post-note-button">
   Note <i class="icon-pencil"></i>
 </button>
+<button type="button" class="btn primary" id="post-picture-button">
+  Picture <i class="icon-picture"></i>
+</button>
+</div>
 
 <ul class="nav pull-right">
   <li id="fat-menu" class="dropdown">
     <a href="#" id="profile-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown"> 
-      <% if (_(data.user.profile).has("image")) { %>
+      <% if (_.has(data.user, "profile") && _.isObject(data.user.profile) && _(data.user.profile).has("image")) { %>
       <img class="pull-left" src="<%- data.user.profile.image.url %>" width="24" height="24" />&nbsp;
       <% } %>
       <%- data.user.profile.displayName %>
