@@ -37,6 +37,7 @@ var databank = require("databank"),
     mw = require("../lib/middleware"),
     sa = require("../lib/sessionauth"),
     he = require("../lib/httperror"),
+    Scrubber = require("../lib/scrubber"),
     finishers = require("../lib/finishers"),
     saveUpload = require("../lib/saveupload").saveUpload,
     api = require("./api"),
@@ -610,7 +611,8 @@ var uploadFile = function(req, res, next) {
     var user = req.principalUser,
         uploadDir = req.app.config.uploaddir,
         mimeType,
-        fileName;
+        fileName,
+        params = {};
 
     if (req.xhr) {
         if (_.has(req.headers, "x-mime-type")) {
@@ -619,6 +621,12 @@ var uploadFile = function(req, res, next) {
             mimeType = req.uploadMimeType;
         }
         fileName = req.uploadFile;
+        if (_.has(req.query, "title")) {
+            params.title = req.query.title;
+        }
+        if (_.has(req.query, "description")) {
+            params.description = Scrubber.scrub(req.query.description);
+        }
     } else {
         mimeType = req.files.qqfile.type;
         fileName = req.files.qqfile.path;
@@ -628,7 +636,7 @@ var uploadFile = function(req, res, next) {
 
     Step(
         function() {
-            saveUpload(user, mimeType, fileName, uploadDir, this);
+            saveUpload(user, mimeType, fileName, uploadDir, params, this);
         },
         function(err, obj) {
             var data;
