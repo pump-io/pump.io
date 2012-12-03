@@ -38,6 +38,7 @@ var databank = require("databank"),
     sa = require("../lib/sessionauth"),
     he = require("../lib/httperror"),
     finishers = require("../lib/finishers"),
+    saveUpload = require("../lib/saveupload").saveUpload,
     api = require("./api"),
     HTTPError = he.HTTPError,
     reqUser = mw.reqUser,
@@ -65,7 +66,9 @@ var addRoutes = function(app) {
 
     app.post("/main/logout", app.session, userAuth, principal, handleLogout);
 
-    app.post("/main/upload", app.session, principal, principalUserOnly, uploadFile);
+    if (app.config.uploaddir) {
+        app.post("/main/upload", app.session, principal, principalUserOnly, uploadFile);
+    }
 
     app.get("/:nickname", app.session, principal, reqUser, showStream);
     app.get("/:nickname/favorites", app.session, principal, reqUser, showFavorites);
@@ -604,41 +607,46 @@ var showList = function(req, res, next) {
 
 var uploadFile = function(req, res, next) {
 
-    var user = req.principalUser;
+    var user = req.principalUser,
+        uploadDir = req.app.config.uploaddir,
+        mimeType,
+        fileName;
 
-    // Direct async xhr stream data upload, yeah baby.
-
-    if(req.xhr) {
-
-        var fname = req.header('x-file-name');
-
-        // Be sure you can write to '/tmp/'
-        var tmpfile = '/tmp/'+uuid.v1();
-
-        // Open a temporary writestream
-        var ws = fs.createWriteStream(tmpfile);
-        ws.on('error', function(err) {
-            callback({success: false, error: "Sorry, could not open writestream."});
-        });
-        ws.on('close', function(err) {
-            moveToDestination(tmpfile, targetdir+fname);
-        });
-
-        // Writing filedata into writestream
-        req.on('data', function(data) {
-            ws.write(data);
-        });
-        req.on('end', function() {
-            ws.end();
-        });
+    if (req.xhr) {
+        if (_.has(req.headers, "x-mime-type")) {
+            mimeType = req.headers["x-mime-type"];
+        } else {
+            mimeType = req.uploadMimeType;
+        }
+        fileName = req.uploadFile;
+    } else {
+        mimeType = req.files.qqfile.type;
+        fileName = req.files.qqfile.path;
     }
 
-    // Old form-based upload
+    req.log.info("Uploading " + fileName + " of type " + mimeType);
 
-    else {
-        moveToDestination(req.files.qqfile.path, targetdir+req.files.qqfile.name);
-    }
+    Step(
+        function() {
+            saveUpload(user, mimeType, fileName, uploadDir, this);
+        },
+        function(err, obj) {
+            var data;
+            if (err) {
+                req.log.error(err);
+                data = {"success": false,
+                        "error": "error message to display"};
+                res.send(JSON.stringify(data), {"Content-Type": "text/plain"}, 500);
+            } else {
+                req.log.info("Upload successful");
+                obj.sanitize();
+                req.log.info(obj);
+                data = {success: true,
+                        obj: obj};
+                res.send(JSON.stringify(data), {"Content-Type": "text/plain"}, 200);
+            }
+        }
+    );
 };
-
 
 exports.addRoutes = addRoutes;
