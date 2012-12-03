@@ -1923,7 +1923,7 @@ var newUpload = function(req, res, next) {
             if (err) throw err;
             slug = path.join(dir, rnd + "." + ext),
             fname = path.join(req.app.config.uploaddir, slug);
-            fs.writeFile(fname, req.uploadContent, this);
+            fs.rename(req.uploadFile, fname, this);
         },
         function(err) {
             var Cls, url;
