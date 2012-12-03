@@ -62,6 +62,8 @@ var uploadedFile = function(req, res, next) {
             ((req.principal) ? req.principal : null),
         obj;
 
+    req.log.info({profile: profile, slug: slug}, "Checking permissions");
+
     Step(
         function() {
             Cls.search({_slug: slug}, this);
@@ -72,20 +74,20 @@ var uploadedFile = function(req, res, next) {
                 throw new Error("Bad number of records for uploads");
             }
             obj = objs[0];
+            if (profile &&
+                obj.author &&
+                profile.id == obj.author.id) {
+                res.sendfile(path.join(req.app.config.uploaddir, slug));
+                return;
+            }
             Activity.postOf(obj, this);
         },
         function(err, post) {
             if (err) throw err;
-            if (post) {
-                post.checkRecipient(profile, this);
-            } else {
-                if (profile &&
-                    obj.author &&
-                    req.remoteUser.profile.id == obj.author.id) {
-                    res.sendfile(path.join(req.app.config.uploaddir, slug));
-                    return;
-                }
+            if (!post) {
+                throw new HTTPError("Not allowed", 403);
             }
+            post.checkRecipient(profile, this);
         },
         function(err, flag) {
             if (err) {
