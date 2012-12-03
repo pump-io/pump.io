@@ -615,7 +615,7 @@ var Pump = (function(_, $, Backbone) {
                         endpoint: "/main/upload"
                     },
                     text: {
-                        uploadButton: '<i class="icon-upload icon-white"></i> Upload'
+                        uploadButton: '<i class="icon-upload icon-white"></i> Picture file'
                     },
                     template: '<div class="qq-uploader">' +
                         '<pre class="qq-upload-drop-area"><span>{dragZoneText}</span></pre>' +
@@ -625,7 +625,32 @@ var Pump = (function(_, $, Backbone) {
                     classes: {
                         success: 'alert alert-success',
                         fail: 'alert alert-error'
+                    },
+                    autoUpload: false,
+                    multiple: false,
+                    validation: {
+                        allowedExtensions: ["jpeg", "jpg", "png", "gif", "svg", "svgz"],
+                        acceptFiles: "image/*"
                     }
+                }).on("complete", function(event, id, fileName, responseJSON) {
+
+                    var act = new Pump.Activity({
+                        verb: "post",
+                        object: responseJSON.obj
+                    }),
+                        stream = Pump.currentUser.stream;
+                    
+                    stream.create(act, {success: function(act) {
+
+                        modalView.$("#modal-picture").modal('hide');
+                        modalView.stopSpin();
+                        modalView.$("#picture-fineupload").fineUpload('reset');
+                        modalView.$('#picture-description').val("");
+                        modalView.$('#picture-title').val("");
+                        // Reload the current content
+                    }});
+                }).on("error", function(event, id, fileName, reason) {
+                    modalView.showError(reason);
                 });
             });
 
@@ -1233,24 +1258,26 @@ var Pump = (function(_, $, Backbone) {
         },
         postPicture: function(ev) {
             var view = this,
-                description = view.$('#post-picture #picture-content').val(),
-                act = new Pump.Activity({
-                    verb: "post",
-                    object: {
-                        objectType: "picture",
-                        content: text
-                    }
-                }),
-                stream = Pump.currentUser.stream;
+                description = view.$('#post-picture #picture-description').val(),
+                title = view.$('#post-picture #picture-title').val(),
+                params = {};
+
+            if (title) {
+                params.title = title;
+            }
+
+            // XXX: HTML
+
+            if (description) {
+                params.description = description;
+            }
+
+            view.$("#picture-fineupload").fineUploader('setParams', params);
 
             view.startSpin();
-            
-            stream.create(act, {success: function(act) {
-                view.$("#modal-picture").modal('hide');
-                view.stopSpin();
-                view.$('#picture-content').val("");
-                // Reload the current page
-            }});
+
+            view.$("#picture-fineupload").fineUploader('uploadStoredFiles');
+
         }
     });
 
