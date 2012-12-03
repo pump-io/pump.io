@@ -19,7 +19,7 @@
   <div class="row">
     <div class="span8 offset1">
       <% if (data.activity.object.image && data.activity.object.image.url) { %>
-      <img src="<%- data.activity.object.image.url %>"></img>
+      <p><img src="<%- data.activity.object.image.url %>"></img></p>
       <% } %>
       <% if (data.activity.object.displayName) { %>
       <p><%= data.activity.object.content %></p>
@@ -29,6 +29,12 @@
         <%= partial("responses") %>
       <% delete data.object;
         } %>
+      <% if (data.activity.object.likes.totalItems === 0) { %>
+      <% } else if (data.activity.object.likes.totalItems === 1) { %>
+      <p><small><%= partial("activity-object-collection", {coll: data.activity.object.likes}) %> likes this.</small></p>
+      <% } else { %>
+      <p><small><%= partial("activity-object-collection", {coll: data.activity.object.likes}) %> like this.</small></p>
+      <% } %>
     </div>
   </div>
   <div class="row">
