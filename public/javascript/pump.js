@@ -593,6 +593,7 @@ var Pump = (function(_, $, Backbone) {
             });
 
             modalView.render();
+            return false;
         },
         postPictureModal: function() {
             var view = this,
@@ -655,6 +656,7 @@ var Pump = (function(_, $, Backbone) {
             });
 
             modalView.render();
+            return false;
         },
         profileDropdown: function() {
             $('#profile-dropdown').dropdown();
