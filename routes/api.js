@@ -50,6 +50,7 @@ var databank = require("databank"),
     randomString = require("../lib/randomstring").randomString,
     finishers = require("../lib/finishers"),
     mm = require("../lib/mimemap"),
+    saveUpload = require("../lib/saveupload").saveUpload,
     reqUser = mw.reqUser,
     sameUser = mw.sameUser,
     clientAuth = mw.clientAuth,
@@ -1899,84 +1900,16 @@ var userUploads = function(req, res, next) {
 
 var newUpload = function(req, res, next) {
 
-    var props,
-        now = new Date(),
-        ext = typeToExt(req.uploadMimeType),
-        dir = path.join(req.user.nickname,
-                        ""+now.getUTCFullYear(),
-                        ""+(now.getUTCMonth() + 1),
-                        ""+now.getUTCDate()),
-        fulldir = path.join(req.app.config.uploaddir, dir),
-        slug,
-        obj;
+    var user = req.remoteUser,
+        mimeType = req.uploadMimeType,
+        fileName = req.uploadFile,
+        uploadDir = req.app.config.uploaddir;
 
     Step(
         function() {
-            mkdirp(fulldir, this);
+            saveUpload(user, mimeType, fileName, uploadDir, this);
         },
-        function(err) {
-            if (err) throw err;
-            randomString(4, this);
-        },
-        function(err, rnd) {
-            var fname;
-            if (err) throw err;
-            slug = path.join(dir, rnd + "." + ext),
-            fname = path.join(req.app.config.uploaddir, slug);
-            fs.rename(req.uploadFile, fname, this);
-        },
-        function(err) {
-            var Cls, url;
-            if (err) throw err;
-
-            url = URLMaker.makeURL("uploads/" + slug);
-
-            Cls = typeToClass(req.uploadMimeType);
-
-            switch (Cls.type) {
-            case ActivityObject.IMAGE:
-                props = {
-                    _slug: slug,
-                    author: req.user.profile,
-                    fullImage: {
-                        url: url
-                    }
-                };
-                break;
-            case ActivityObject.AUDIO:
-            case ActivityObject.VIDEO:
-                props = {
-                    _slug: slug,
-                    author: req.user.profile,
-                    stream: {
-                        url: url
-                    }
-                };
-                break;
-            case ActivityObject.FILE:
-                props = {
-                    _slug: slug,
-                    author: req.user.profile,
-                    fileUrl: url,
-                    mimeType: req.uploadMimeType
-                };
-                break;
-            default:
-                throw new Error("Unknown type.");
-            }
-
-            Cls.create(props, this);
-        },
-        function(err, result) {
-            if (err) throw err;
-            obj = result;
-            req.user.uploadsStream(this);
-        },
-        function(err, str) {
-            if (err) throw err;
-            str.deliverObject({id: obj.id, objectType: obj.objectType}, this);
-        },
-        function(err) {
+        function(err, obj) {
             if (err) {
                 next(err);
             } else {
