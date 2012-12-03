@@ -77,7 +77,8 @@
       }
       _.extend(Pump.config, {
           site: "<%- config.site %>",
-          requireEmail: "<%- config.requireEmail %>"
+          requireEmail: "<%- config.requireEmail %>",
+          canUpload: "<%- config.canUpload %>"
       });
     </script>
   </body>

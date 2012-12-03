@@ -4,9 +4,11 @@
 <button type="button" class="btn primary" id="post-note-button">
   Note <i class="icon-pencil"></i>
 </button>
+<% if (config.canUpload) { %>
 <button type="button" class="btn primary" id="post-picture-button">
   Picture <i class="icon-picture"></i>
 </button>
+<% } %>
 </div>
 
 <ul class="nav pull-right">
