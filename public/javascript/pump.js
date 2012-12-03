@@ -614,7 +614,18 @@ var Pump = (function(_, $, Backbone) {
                     request: {
                         endpoint: "/main/upload"
                     },
-                    debug: true
+                    text: {
+                        uploadButton: '<i class="icon-upload icon-white"></i> Upload'
+                    },
+                    template: '<div class="qq-uploader">' +
+                        '<pre class="qq-upload-drop-area"><span>{dragZoneText}</span></pre>' +
+                        '<div class="qq-upload-button btn btn-success">{uploadButtonText}</div>' +
+                        '<ul class="qq-upload-list"></ul>' +
+                        '</div>',
+                    classes: {
+                        success: 'alert alert-success',
+                        fail: 'alert alert-error'
+                    }
                 });
             });
 
