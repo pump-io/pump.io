@@ -597,7 +597,7 @@ var Pump = (function(_, $, Backbone) {
         postPictureModal: function() {
             var view = this,
                 modalView;
-
+            
             if (view.postPicture) {
                 modalView = view.postPicture;
             } else {
@@ -610,6 +610,12 @@ var Pump = (function(_, $, Backbone) {
 
             modalView.$el.one("pump.rendered", function() {
                 modalView.$("#modal-picture").modal('show');
+                modalView.$("#picture-fineupload").fineUploader({
+                    request: {
+                        endpoint: "/main/upload"
+                    },
+                    debug: true
+                });
             });
 
             modalView.render();

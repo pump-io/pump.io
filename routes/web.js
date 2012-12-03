@@ -603,9 +603,42 @@ var showList = function(req, res, next) {
 };
 
 var uploadFile = function(req, res, next) {
+
     var user = req.principalUser;
 
-    next();
+    // Direct async xhr stream data upload, yeah baby.
+
+    if(req.xhr) {
+
+        var fname = req.header('x-file-name');
+
+        // Be sure you can write to '/tmp/'
+        var tmpfile = '/tmp/'+uuid.v1();
+
+        // Open a temporary writestream
+        var ws = fs.createWriteStream(tmpfile);
+        ws.on('error', function(err) {
+            callback({success: false, error: "Sorry, could not open writestream."});
+        });
+        ws.on('close', function(err) {
+            moveToDestination(tmpfile, targetdir+fname);
+        });
+
+        // Writing filedata into writestream
+        req.on('data', function(data) {
+            ws.write(data);
+        });
+        req.on('end', function() {
+            ws.end();
+        });
+    }
+
+    // Old form-based upload
+
+    else {
+        moveToDestination(req.files.qqfile.path, targetdir+req.files.qqfile.name);
+    }
 };
+
 
 exports.addRoutes = addRoutes;

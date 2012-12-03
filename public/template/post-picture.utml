@@ -4,14 +4,14 @@
     <h3 id="post-label">Post a picture</h3>
   </div>
   <div class="modal-body">
+    <div id="picture-fineupload"></div>
     <form id="post-picture" action="/main/upload" enctype="multipart/form-data">
       <fieldset>
-        <label for="picture">File to upload</label>
-        <input type="file" id="picture" placeholder="image file" name="picture"></input>
         <label for="title">Title</label>
         <input type="text" id="title" placeholder="(optional)" name="title"></input>
         <label for="description">Title</label>
-        <textarea id="description" class="span5" name="description" placeholder="Description (optional)" rows="3"></textarea>
+        <textarea id="description" class="span5" name="description" placeholder="Description (optional)" rows="3">
+        </textarea>
       </fieldset>
     </form>
   </div>
