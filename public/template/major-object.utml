@@ -18,8 +18,11 @@
   </div>
   <div class="row">
     <div class="span8 offset1">
-      <% if (data.object.title) { %>
-      <%= data.object.content %>
+      <% if (data.object.image && data.object.image.url) { %>
+      <img src="<%- data.object.image.url %>"></img>
+      <% } %>
+      <% if (data.object.displayName) { %>
+      <p><%= data.object.content %></p>
       <% } %>
       <% if (data.user) { %>
       <%= partial("responses") %>

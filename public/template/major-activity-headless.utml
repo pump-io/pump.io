@@ -18,14 +18,17 @@
   </div>
   <div class="row">
     <div class="span8 offset1">
+      <% if (data.activity.object.image && data.activity.object.image.url) { %>
+      <img src="<%- data.activity.object.image.url %>"></img>
+      <% } %>
       <% if (data.activity.object.displayName) { %>
-      <%= data.activity.object.content %>
+      <p><%= data.activity.object.content %></p>
       <% } %>
       <% if (data.user) {
-         data.object = data.activity.object; %>
-      <%= partial("responses") %>
+        data.object = data.activity.object; %>
+        <%= partial("responses") %>
       <% delete data.object;
-         } %>
+        } %>
     </div>
   </div>
   <div class="row">
