@@ -33,9 +33,9 @@ var path = require("path"),
 
 var addRoutes = function(app) {
     if (app.session) {
-        app.get("/uploads/*", everyAuth, uploadedFile);
-    } else {
         app.get("/uploads/*", app.session, everyAuth, uploadedFile);
+    } else {
+        app.get("/uploads/*", everyAuth, uploadedFile);
     }
 };
 
