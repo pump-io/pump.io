@@ -1304,6 +1304,12 @@ var Pump = (function(_, $, Backbone) {
         }
     });
 
+    Pump.AvatarContent = Pump.ContentView.extend({
+        templateName: 'avatar',
+        el: '#content',
+        modelName: "profile"
+    });
+
     Pump.PostNoteModal = Pump.TemplateView.extend({
 
         tagName: "div",
@@ -1418,6 +1424,7 @@ var Pump = (function(_, $, Backbone) {
             ":nickname/list/:uuid":   "list",
             "main/settings":          "settings",
             "main/account":           "account",
+            "main/avatar":            "avatar",
             "main/register":          "register",
             "main/login":             "login"
         },
@@ -1456,6 +1463,14 @@ var Pump = (function(_, $, Backbone) {
             Pump.content = new Pump.AccountContent({model: Pump.currentUser});
 
             this.setTitle(Pump.content, "Account");
+
+            Pump.content.render();
+        },
+
+        avatar: function() {
+            Pump.content = new Pump.AvatarContent({model: Pump.currentUser.profile});
+
+            this.setTitle(Pump.content, "Avatar");
 
             Pump.content.render();
         },

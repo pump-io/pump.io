@@ -84,6 +84,7 @@ var addRoutes = function(app) {
 
     app.get("/main/settings", loginRedirect("/main/settings"));
     app.get("/main/account", loginRedirect("/main/account"));
+    app.get("/main/avatar", loginRedirect("/main/avatar"));
 
     // expose this one file over the web
 
