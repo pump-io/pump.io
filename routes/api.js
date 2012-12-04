@@ -736,8 +736,12 @@ var listUsers = function(req, res, next) {
             id: url,
             objectTypes: ["user"],
             links: {
-                first: url,
-                self: url
+                first: {
+                    href: url
+                },
+                self: {
+                    href: url
+                }
             }
         };
 
@@ -1012,8 +1016,12 @@ var filteredFeedRoute = function(urlmaker, titlemaker, streammaker, finisher) {
                 objectTypes: ["activity"],
                 url: url,
                 links: {
-                    first: url,
-                    self: url
+                    first: {
+                        href: url
+                    },
+                    self: {
+                        href: url
+                    }
                 },
                 items: []
             };
@@ -1127,8 +1135,12 @@ var feedRoute = function(urlmaker, titlemaker, streamgetter, finisher) {
                 objectTypes: ["activity"],
                 url: url,
                 links: {
-                    first: url,
-                    self: url
+                    first: {
+                        href: url
+                    },
+                    self: {
+                        href: url
+                    }
                 },
                 items: []
             };
@@ -1291,11 +1303,15 @@ var getStream = function(str, args, collection, user, callback) {
                 });
                 collection.items = activities;
                 if (activities.length > 0) {
-                    collection.links.prev = collection.url + "?since=" + encodeURIComponent(activities[0].id);
+                    collection.links.prev = {
+                        href: collection.url + "?since=" + encodeURIComponent(activities[0].id)
+                    };
                     if ((_(args).has("start") && args.start + activities.length < collection.totalItems) ||
                         (_(args).has("before") && activities.length >= args.count) ||
                         (_(args).has("since"))) {
-                        collection.links.next = collection.url + "?before=" + encodeURIComponent(activities[activities.length-1].id);
+                        collection.links.next = {
+                            href: collection.url + "?before=" + encodeURIComponent(activities[activities.length-1].id)
+                        };
                     }
                 }
                 callback(null);
@@ -1666,8 +1682,12 @@ var userLists = function(req, res, next) {
             objectTypes: ["collection"],
             url: url,
             links: {
-                first: url,
-                self: url
+                first: {
+                    href: url
+                },
+                self: {
+                    href: url
+                }
             },
             items: []
         };
@@ -1724,12 +1744,15 @@ var userLists = function(req, res, next) {
                 });
                 collection.items = collections;
                 if (collections.length > 0) {
-                    collection.links.prev = collection.url + "?since=" + encodeURIComponent(collections[0].id);
+                    collection.links.prev = {
+                        href: collection.url + "?since=" + encodeURIComponent(collections[0].id)
+                    };
                     if ((_(args).has("start") && args.start + collections.length < collection.totalItems) ||
                         (_(args).has("before") && collections.length >= args.count) ||
                         (_(args).has("since"))) {
-                        collection.links.next = collection.url + "?before=" + 
-                            encodeURIComponent(collections[collections.length-1].id);
+                        collection.links.next = {
+                            href: collection.url + "?before=" + encodeURIComponent(collections[collections.length-1].id)
+                        };
                     }
                 }
                 res.json(collection);
@@ -1748,8 +1771,12 @@ var userUploads = function(req, res, next) {
             objectTypes: ["file", "image", "audio", "video"],
             url: url,
             links: {
-                first: url,
-                self: url
+                first: {
+                    href: url
+                },
+                self: {
+                    href: url
+                }
             },
             items: []
         },
