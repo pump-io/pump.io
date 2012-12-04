@@ -76,7 +76,6 @@ suite.addBatch({
         },
         teardown: function(dir) {
             rimraf(dir, function(err) { 
-                console.dir(err);
             });
         },
         "and we set up the app": {

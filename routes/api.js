@@ -47,6 +47,7 @@ var databank = require("databank"),
     URLMaker = require("../lib/urlmaker").URLMaker,
     Distributor = require("../lib/distributor"),
     mw = require("../lib/middleware"),
+    omw = require("../lib/objectmiddleware"),
     randomString = require("../lib/randomstring").randomString,
     finishers = require("../lib/finishers"),
     mm = require("../lib/mimemap"),
@@ -58,6 +59,9 @@ var databank = require("databank"),
     remoteUserAuth = mw.remoteUserAuth,
     maybeAuth = mw.maybeAuth,
     fileContent = mw.fileContent,
+    requestObject = omw.requestObject,
+    authorOnly = omw.authorOnly,
+    authorOrRecipient = omw.authorOrRecipient,
     NoSuchThingError = databank.NoSuchThingError,
     AlreadyExistsError = databank.AlreadyExistsError,
     NoSuchItemError = databank.NoSuchItemError,
@@ -103,8 +107,8 @@ var addRoutes = function(app) {
     app.put("/api/user/:nickname", userAuth, reqUser, sameUser, putUser);
     app.del("/api/user/:nickname", userAuth, reqUser, sameUser, delUser);
 
-    app.get("/api/user/:nickname/profile", clientAuth, reqUser, getter("person"));
-    app.put("/api/user/:nickname/profile", userAuth, reqUser, sameUser, putter("person"));
+    app.get("/api/user/:nickname/profile", clientAuth, reqUser, personType, getObject);
+    app.put("/api/user/:nickname/profile", userAuth, reqUser, sameUser, personType, putObject);
 
     // Feeds
 
@@ -151,35 +155,20 @@ var addRoutes = function(app) {
         app.post("/api/user/:nickname/uploads", userAuth, reqUser, sameUser, fileContent, newUpload);
     }
     
-    // REST endpoints for other stuff
-
-    for (i = 0; i < ActivityObject.objectTypes.length; i++) {
-
-        type = ActivityObject.objectTypes[i];
-
-        url = "/api/" + type + "/" + ":uuid";
-
-        // person
-
-        if (type === "person") {
-            authz = userOnly;
-        } else {
-            authz = authorOnly(type);
-        }
-
-        app.get(url, clientAuth, requester(type), authorOrRecipient(type), getter(type));
-        app.put(url, userAuth, requester(type), authz, putter(type));
-        app.del(url, userAuth, requester(type), authz, deleter(type));
-
-        app.get("/api/" + type + "/" + ":uuid/likes", clientAuth, requester(type), authorOrRecipient(type), likes(type));
-        app.get("/api/" + type + "/" + ":uuid/replies", clientAuth, requester(type), authorOrRecipient(type), replies(type));
-    }
-    
     // Activities
 
     app.get("/api/activity/:uuid", clientAuth, reqActivity, actorOrRecipient, getActivity);
     app.put("/api/activity/:uuid", userAuth, reqActivity, actorOnly, putActivity);
     app.del("/api/activity/:uuid", userAuth, reqActivity, actorOnly, delActivity);
+
+    // Other objects
+
+    app.get("/api/:type/:uuid", clientAuth, requestObject, authorOrRecipient, getObject);
+    app.put("/api/:type/:uuid", userAuth, requestObject, authorOnly, putObject);
+    app.del("/api/:type/:uuid", userAuth, requestObject, authorOnly, deleteObject);
+
+    app.get("/api/:type/:uuid/likes", clientAuth, requestObject, authorOrRecipient, objectLikes);
+    app.get("/api/:type/:uuid/replies", clientAuth, requestObject, authorOrRecipient, objectReplies);
 
     // Global user list
 
@@ -187,38 +176,9 @@ var addRoutes = function(app) {
     app.post("/api/users", clientAuth, createUser);
 };
 
-var requester = function(type) {
-
-    var Cls = ActivityObject.toClass(type);
-
-    return function(req, res, next) {
-        var uuid = req.params.uuid,
-            obj = null;
-
-        Cls.search({"_uuid": uuid}, function(err, results) {
-            if (err) {
-                next(err);
-            } else if (results.length === 0) {
-                next(new HTTPError("Can't find a " + type + " with ID = " + uuid, 404));
-            } else if (results.length > 1) {
-                next(new HTTPError("Too many " + type + " objects with ID = " + req.params.uuid, 500));
-            } else {
-                obj = results[0];
-                if (obj.hasOwnProperty("deleted")) {
-                    next(new HTTPError("Deleted", 410));
-                } else {
-                    obj.expand(function(err) {
-                        if (err) {
-                            next(err);
-                        } else {
-                            req[type] = obj;
-                            next();
-                        }
-                    });
-                }
-            }
-        });
-    };
+var personType = function(req, res, next) {
+    req.type = "person";
+    next();
 };
 
 var userOnly = function(req, res, next) {
@@ -230,51 +190,6 @@ var userOnly = function(req, res, next) {
     } else {
         next(new HTTPError("Only the user can modify this profile.", 403));
     }
-};
-
-var authorOnly = function(type) {
-
-    return function(req, res, next) {
-        var obj = req[type];
-
-        if (obj && obj.author && obj.author.id == req.remoteUser.profile.id) {
-            next();
-        } else {
-            next(new HTTPError("Only the author can modify this object.", 403));
-        }
-    };
-};
-
-var authorOrRecipient = function(type) {
-
-    return function(req, res, next) {
-        var obj = req[type],
-            user = req.remoteUser,
-            person = (user) ? user.profile : null;
-
-        if (obj && obj.author && person && obj.author.id == person.id) {
-            next();
-        } else {
-            Step(
-                function() {
-                    Activity.postOf(obj, this);
-                },
-                function(err, act) {
-                    if (err) throw err;
-                    act.checkRecipient(person, this);
-                },
-                function(err, isRecipient) {
-                    if (err) {
-                        next(err);
-                    } else if (isRecipient) {
-                        next();
-                    } else {
-                        next(new HTTPError("Only the author and recipients can view this object.", 403));
-                    }
-                }
-            );
-        }
-    };
 };
 
 var actorOnly = function(req, res, next) {
@@ -307,194 +222,195 @@ var actorOrRecipient = function(req, res, next) {
     }
 };
 
-var getter = function(type) {
-    return function(req, res, next) {
-        var obj = req[type],
-            profile = (req.remoteUser) ? req.remoteUser.profile : null;
-        Step(
-            function() {
-                obj.expandFeeds(this);
-            },
-            function(err) {
-                if (err) throw err;
-                addLiked(profile, [obj], this.parallel());
-                firstFewReplies(profile, [obj], this.parallel());
-                if (obj.isFollowable()) {
-                    addFollowed(profile, [obj], this.parallel());
-                }
-            },
-            function(err) {
-                if (err) {
-                    next(err);
+var getObject = function(req, res, next) {
+    
+    var type = req.type,
+        obj = req[type],
+        profile = (req.remoteUser) ? req.remoteUser.profile : null;
+
+    Step(
+        function() {
+            obj.expandFeeds(this);
+        },
+        function(err) {
+            if (err) throw err;
+            addLiked(profile, [obj], this.parallel());
+            firstFewReplies(profile, [obj], this.parallel());
+            if (obj.isFollowable()) {
+                addFollowed(profile, [obj], this.parallel());
+            }
+        },
+        function(err) {
+            if (err) {
+                next(err);
+            } else {
+                obj.sanitize();
+                res.json(obj);
+            }
+        }
+    );
+};
+
+var putObject = function(req, res, next) {
+
+    var type = req.type,
+        obj = req[type],
+        updates = Scrubber.scrubObject(req.body),
+        act = new Activity({
+            actor: req.remoteUser.profile,
+            verb: "update",
+            object: _(obj).extend(updates)
+        });
+
+    Step(
+        function() {
+            newActivity(act, req.remoteUser, this);
+        },
+        function(err, act) {
+            var d;
+            if (err) {
+                next(err);
+            } else {
+                act.object.sanitize();
+                res.json(act.object);
+                d = new Distributor(act);
+                d.distribute(function(err) {});
+            }
+        }
+    );
+};
+
+var deleteObject = function(req, res, next) {
+
+    var type = req.type,
+        obj = req[type],
+        act = new Activity({
+            actor: req.remoteUser.profile,
+            verb: "delete",
+            object: obj
+        });
+
+    Step(
+        function() {
+            newActivity(act, req.remoteUser, this);
+        },
+        function(err, act) {
+            var d;
+            if (err) {
+                next(err);
+            } else {
+                res.json("Deleted");
+                d = new Distributor(act);
+                d.distribute(function(err) {});
+            }
+        }
+    );
+};
+
+var objectLikes = function(req, res, next) {
+
+    var type = req.type,
+        obj = req[type];
+
+    var collection = {
+        displayName: "People who like " + obj.displayName,
+        id: URLMaker.makeURL("api/" + type + "/" + obj._uuid + "/likes"),
+        items: []
+    };
+
+    var args;
+
+    try {
+        args = streamArgs(req, DEFAULT_LIKES, MAX_LIKES);
+    } catch (e) {
+        next(e);
+        return;
+    }
+
+    Step(
+        function() {
+            obj.favoritersCount(this);
+        },
+        function(err, count) {
+            if (err) {
+                if (err.name == "NoSuchThingError") {
+                    collection.totalItems = 0;
+                    res.json(collection);
                 } else {
+                    throw err;
+                }
+            }
+            collection.totalItems = count;
+            obj.getFavoriters(args.start, args.end, this);
+        },
+        function(err, likers) {
+            if (err) {
+                next(err);
+            } else {
+                collection.items = likers;
+                res.json(collection);
+            }
+        }
+    );
+};
+
+var objectReplies = function(req, res, next) {
+
+    var type = req.type,
+        obj = req[type];
+
+    var collection = {
+        displayName: "Replies to " + ((obj.displayName) ? obj.displayName : obj.id),
+        id: URLMaker.makeURL("api/" + type + "/" + obj._uuid + "/replies"),
+        items: []
+    };
+
+    var args;
+
+    try {
+        args = streamArgs(req, DEFAULT_REPLIES, MAX_REPLIES);
+    } catch (e) {
+        next(e);
+        return;
+    }
+
+    Step(
+        function() {
+            obj.getRepliesStream(this);
+        },
+        function(err, str) {
+            var filtered;
+            if (err) throw err;
+            if (!req.remoteUser) {
+                // XXX: keep a separate stream instead of filtering
+                filtered = new FilteredStream(str, objectPublicOnly);
+            } else {
+                filtered = new FilteredStream(str, objectRecipientsOnly(req.remoteUser.profile));
+            }
+            filtered.count(this.parallel());
+            filtered.getObjects(args.start, args.end, this.parallel());
+        },
+        function(err, count, refs) {
+            var group = this.group();
+            if (err) throw err;
+            collection.totalItems = count;
+            _.each(refs, function(ref) {
+                ActivityObject.getObject(ref.objectType, ref.id, group());
+            });
+        },
+        function(err, objs) {
+            if (err) {
+                next(err);
+            } else {
+                _.each(objs, function(obj) {
                     obj.sanitize();
-                    res.json(obj);
-                }
-            }
-        );
-    };
-};
-
-var putter = function(type) {
-    return function(req, res, next) {
-        var obj = req[type],
-            updates = Scrubber.scrubObject(req.body),
-            act = new Activity({
-                actor: req.remoteUser.profile,
-                verb: "update",
-                object: _(obj).extend(updates)
-            });
-
-        Step(
-            function() {
-                newActivity(act, req.remoteUser, this);
-            },
-            function(err, act) {
-                var d;
-                if (err) {
-                    next(err);
-                } else {
-                    act.object.sanitize();
-                    res.json(act.object);
-                    d = new Distributor(act);
-                    d.distribute(function(err) {});
-                }
-            }
-        );
-    };
-};
-
-var deleter = function(type) {
-    return function(req, res, next) {
-        var obj = req[type],
-            act = new Activity({
-                actor: req.remoteUser.profile,
-                verb: "delete",
-                object: obj
-            });
-
-        Step(
-            function() {
-                newActivity(act, req.remoteUser, this);
-            },
-            function(err, act) {
-                var d;
-                if (err) {
-                    next(err);
-                } else {
-                    res.json("Deleted");
-                    d = new Distributor(act);
-                    d.distribute(function(err) {});
-                }
-            }
-        );
-    };
-};
-
-var likes = function(type) {
-    return function(req, res, next) {
-        var obj = req[type];
-
-        var collection = {
-            displayName: "People who like " + obj.displayName,
-            id: URLMaker.makeURL("api/" + type + "/" + obj._uuid + "/likes"),
-            items: []
-        };
-
-        var args;
-
-        try {
-            args = streamArgs(req, DEFAULT_LIKES, MAX_LIKES);
-        } catch (e) {
-            next(e);
-            return;
-        }
-
-        Step(
-            function() {
-                obj.favoritersCount(this);
-            },
-            function(err, count) {
-                if (err) {
-                    if (err.name == "NoSuchThingError") {
-                        collection.totalItems = 0;
-                        res.json(collection);
-                    } else {
-                        throw err;
-                    }
-                }
-                collection.totalItems = count;
-                obj.getFavoriters(args.start, args.end, this);
-            },
-            function(err, likers) {
-                if (err) {
-                    next(err);
-                } else {
-                    collection.items = likers;
-                    res.json(collection);
-                }
-            }
-        );
-    };
-};
-
-var replies = function(type) {
-    return function(req, res, next) {
-        var obj = req[type];
-
-        var collection = {
-            displayName: "Replies to " + ((obj.displayName) ? obj.displayName : obj.id),
-            id: URLMaker.makeURL("api/" + type + "/" + obj._uuid + "/replies"),
-            items: []
-        };
-
-        var args;
-
-        try {
-            args = streamArgs(req, DEFAULT_REPLIES, MAX_REPLIES);
-        } catch (e) {
-            next(e);
-            return;
-        }
-
-        Step(
-            function() {
-                obj.getRepliesStream(this);
-            },
-            function(err, str) {
-                var filtered;
-                if (err) throw err;
-                if (!req.remoteUser) {
-                    // XXX: keep a separate stream instead of filtering
-                    filtered = new FilteredStream(str, objectPublicOnly);
-                } else {
-                    filtered = new FilteredStream(str, objectRecipientsOnly(req.remoteUser.profile));
-                }
-                filtered.count(this.parallel());
-                filtered.getObjects(args.start, args.end, this.parallel());
-            },
-            function(err, count, refs) {
-                var group = this.group();
-                if (err) throw err;
-                collection.totalItems = count;
-                _.each(refs, function(ref) {
-                    ActivityObject.getObject(ref.objectType, ref.id, group());
+                    delete obj.inReplyTo;
                 });
-            },
-            function(err, objs) {
-                if (err) {
-                    next(err);
-                } else {
-                    _.each(objs, function(obj) {
-                        obj.sanitize();
-                        delete obj.inReplyTo;
-                    });
-                    collection.items = objs;
-                    res.json(collection);
-                }
+                collection.items = objs;
+                res.json(collection);
             }
-        );
-    };
+        }
+    );
 };
 
 var getUser = function(req, res, next) {

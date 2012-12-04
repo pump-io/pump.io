@@ -1310,6 +1310,15 @@ var Pump = (function(_, $, Backbone) {
         modelName: "profile"
     });
 
+    Pump.ObjectContent = Pump.ContentView.extend({
+        templateName: 'object',
+        modelName: "object",
+        parts: ["responses",
+                "reply",
+                "activity-object-collection"],
+        el: '#content'
+    });
+
     Pump.PostNoteModal = Pump.TemplateView.extend({
 
         tagName: "div",
@@ -1422,6 +1431,7 @@ var Pump = (function(_, $, Backbone) {
             ":nickname/activity/:id": "activity",
             ":nickname/lists":        "lists",
             ":nickname/list/:uuid":   "list",
+            ":nickname/:type/:uuid":  "object",
             "main/settings":          "settings",
             "main/account":           "account",
             "main/avatar":            "avatar",
@@ -1738,6 +1748,20 @@ var Pump = (function(_, $, Backbone) {
                 Pump.content = new Pump.ActivityContent({model: act});
 
                 router.setTitle(Pump.content, act.content);
+                Pump.content.render();
+            }});
+        },
+        
+        object: function(nickname, type, uuid) {
+            var router = this,
+                obj = new Pump.ActivityObject({uuid: uuid, objectType: type, userNickname: nickname});
+
+            obj.fetch({success: function(obj, response) {
+
+                Pump.content = new Pump.ObjectContent({model: obj});
+                
+                router.setTitle(Pump.content, obj.displayName || obj.objectType + "by" + nickname);
+
                 Pump.content.render();
             }});
         }
