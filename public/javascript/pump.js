@@ -745,13 +745,12 @@ var Pump = (function(_, $, Backbone) {
                 continueTo = getContinueTo(),
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
                 onSuccess = function(data, textStatus, jqXHR) {
-                    var nav;
                     Pump.setNickname(data.nickname);
                     Pump.setUserCred(data.token, data.secret);
                     Pump.currentUser = new Pump.User(data);
-                    nav = new Pump.UserNav({el: ".navbar-inner .container",
-                                            model: Pump.currentUser});
-                    nav.render();
+                    Pump.nav = new Pump.UserNav({el: ".navbar-inner .container",
+                                                 model: Pump.currentUser});
+                    Pump.nav.render();
                     // XXX: reload current data
                     view.stopSpin();
                     Pump.router.navigate(continueTo, true);
@@ -810,13 +809,12 @@ var Pump = (function(_, $, Backbone) {
                 options,
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
                 onSuccess = function(data, textStatus, jqXHR) {
-                    var nav;
                     Pump.setNickname(data.nickname);
                     Pump.setUserCred(data.token, data.secret);
                     Pump.currentUser = new Pump.User(data);
-                    nav = new Pump.UserNav({el: ".navbar-inner .container",
-                                            model: Pump.currentUser});
-                    nav.render();
+                    Pump.nav = new Pump.UserNav({el: ".navbar-inner .container",
+                                                 model: Pump.currentUser});
+                    Pump.nav.render();
                     // Leave disabled
                     view.stopSpin();
                     // XXX: one-time on-boarding page
@@ -1835,12 +1833,8 @@ var Pump = (function(_, $, Backbone) {
 
     $(document).ready(function() {
 
-        var bv,
-            nav;
-
-        bv = new Pump.BodyView({router: Pump.router});
-
-        nav = new Pump.AnonymousNav({el: ".navbar-inner .container"});
+        Pump.bodyView = new Pump.BodyView({router: Pump.router});
+        Pump.nav = new Pump.AnonymousNav({el: ".navbar-inner .container"});
 
         // Initialize a view for the current content. Not crazy about this.
 
@@ -1877,13 +1871,13 @@ var Pump = (function(_, $, Backbone) {
 
                 user.fetch({success: function(user, response) {
 
-                    var nav, sp, continueTo;
+                    var sp, continueTo;
 
                     Pump.currentUser = user;
-                    nav = new Pump.UserNav({el: ".navbar-inner .container",
-                                            model: Pump.currentUser});
+                    Pump.nav = new Pump.UserNav({el: ".navbar-inner .container",
+                                                 model: Pump.currentUser});
 
-                    nav.render();
+                    Pump.nav.render();
 
                     // If we're on the login page, and there's a current
                     // user, redirect to the actual page
