@@ -35,3 +35,13 @@
     </ul>
   </li>
 </ul>
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-success" id="inbox-button">
+  <i class="icon-envelope icon-white"></i> 3
+</button>
+<button type="button" class="btn btn-success" id="update-button">
+  <i class="icon-exclamation-sign icon-white"></i> 1
+</button>
+</div>
+
