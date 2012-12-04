@@ -5,5 +5,10 @@
       <a href="<%- list.url %>"><%- list.displayName %></a>
     </li>
     <% }); %>
+    <% if (data.user && data.user.profile.id == data.profile.id) { %>
+    <li class="add-a-list">
+      <a href="#" class="new-list">New list...</a>
+    </li>
+    <% } %>
   </ul>
 </div>
