@@ -6,7 +6,7 @@
       <% } else { %>
       <%= data.activity.object.content %>
       <% } %>
-      <p><small><a href="<%- data.activity.url %>"><abbr title="<%- data.activity.published %>" class="easydate"><%- data.activity.published %></abbr></a><% if (data.activity.location) { %> in <a href="<%- data.activity.location.url %>"><%- data.activity.location.displayName %></a><% } %>
+      <p><small><a href="<%- data.activity.object.url || data.activity.url %>"><abbr title="<%- data.activity.published %>" class="easydate"><%- data.activity.published %></abbr></a><% if (data.activity.location) { %> in <a href="<%- data.activity.location.url %>"><%- data.activity.location.displayName %></a><% } %>
         <% if (data.activity.to && data.activity.to.length > 0) { %>
         To: <%= partial("activity-object-list", {objects: data.activity.to}) %>
         <% } %>

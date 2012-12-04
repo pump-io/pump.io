@@ -47,6 +47,7 @@ var databank = require("databank"),
     URLMaker = require("../lib/urlmaker").URLMaker,
     Distributor = require("../lib/distributor"),
     mw = require("../lib/middleware"),
+    omw = require("../lib/objectmiddleware"),
     randomString = require("../lib/randomstring").randomString,
     finishers = require("../lib/finishers"),
     mm = require("../lib/mimemap"),
@@ -58,6 +59,9 @@ var databank = require("databank"),
     remoteUserAuth = mw.remoteUserAuth,
     maybeAuth = mw.maybeAuth,
     fileContent = mw.fileContent,
+    requestObject = omw.requestObject,
+    authorOnly = omw.authorOnly,
+    authorOrRecipient = omw.authorOrRecipient,
     NoSuchThingError = databank.NoSuchThingError,
     AlreadyExistsError = databank.AlreadyExistsError,
     NoSuchItemError = databank.NoSuchItemError,
@@ -177,47 +181,6 @@ var personType = function(req, res, next) {
     next();
 };
 
-var requestObject = function(req, res, next) {
-
-    var type = req.params.type,
-        uuid = req.params.uuid,
-        Cls,
-        obj = null;
-
-    if (_.contains(ActivityObject.objectTypes, type) || type == "other") {
-        req.type = type;
-    } else {
-        next(new HTTPError("Unknown type: " + type, 404));
-        return;
-    }
-
-    Cls = ActivityObject.toClass(type);
-    
-    Cls.search({"_uuid": uuid}, function(err, results) {
-        if (err) {
-            next(err);
-        } else if (results.length === 0) {
-            next(new HTTPError("Can't find a " + type + " with ID = " + uuid, 404));
-        } else if (results.length > 1) {
-            next(new HTTPError("Too many " + type + " objects with ID = " + req.params.uuid, 500));
-        } else {
-            obj = results[0];
-            if (obj.hasOwnProperty("deleted")) {
-                next(new HTTPError("Deleted", 410));
-            } else {
-                obj.expand(function(err) {
-                    if (err) {
-                        next(err);
-                    } else {
-                        req[type] = obj;
-                        next();
-                    }
-                });
-            }
-        }
-    });
-};
-
 var userOnly = function(req, res, next) {
     var person = req.person,
         user = req.remoteUser;
@@ -226,49 +189,6 @@ var userOnly = function(req, res, next) {
         next();
     } else {
         next(new HTTPError("Only the user can modify this profile.", 403));
-    }
-};
-
-var authorOnly = function(req, res, next) {
-
-    var type = req.type,
-        obj = req[type];
-
-    if (obj && obj.author && obj.author.id == req.remoteUser.profile.id) {
-        next();
-    } else {
-        next(new HTTPError("Only the author can modify this object.", 403));
-    }
-};
-
-var authorOrRecipient = function(req, res, next) {
-
-    var type = req.type,
-        obj = req[type],
-        user = req.remoteUser,
-        person = (user) ? user.profile : null;
-
-    if (obj && obj.author && person && obj.author.id == person.id) {
-        next();
-    } else {
-        Step(
-            function() {
-                Activity.postOf(obj, this);
-            },
-            function(err, act) {
-                if (err) throw err;
-                act.checkRecipient(person, this);
-            },
-            function(err, isRecipient) {
-                if (err) {
-                    next(err);
-                } else if (isRecipient) {
-                    next();
-                } else {
-                    next(new HTTPError("Only the author and recipients can view this object.", 403));
-                }
-            }
-        );
     }
 };
 
