@@ -452,6 +452,47 @@ suite.addBatch({
                 }
             }
         },
+        "and we create a new user and get its galleries stream": {
+            topic: function(User) {
+                var props = {
+                        nickname: "chumwick",
+                        password: "eiFoT2Va"
+                    };
+                Step(
+                    function() {
+                        User.create(props, this);
+                    },
+                    function(err, user) {
+                        if (err) throw err;
+                        user.getLists("image", this);
+                    },
+                    this.callback
+                );
+            },
+            "it works": function(err, stream) {
+                assert.ifError(err);
+                assert.isObject(stream);
+            },
+            "and we get the count of lists": {
+                topic: function(stream) {
+                    stream.count(this.callback);
+                },
+                "it is five": function(err, count) {
+                    assert.ifError(err);
+                    assert.equal(count, 1);
+                }
+            },
+            "and we get the first few lists": {
+                topic: function(stream) {
+                    stream.getItems(0, 20, this.callback);
+                },
+                "it is a single-element list": function(err, ids) {
+                    assert.ifError(err);
+                    assert.isArray(ids);
+                    assert.lengthOf(ids, 1);
+                }
+            }
+        },
         "and we create a new user and get its inbox": {
             topic: function(User) {
                 var cb = this.callback,
