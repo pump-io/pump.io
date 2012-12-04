@@ -319,6 +319,7 @@ var showStream = function(req, res, next) {
         function() {
             getMajor(this.parallel());
             getMinor(this.parallel());
+            addFollowed(principal, [req.user.profile], this.parallel());
         },
         function(err, major, minor) {
             if (err) {
@@ -369,7 +370,8 @@ var showFavorites = function(req, res, next) {
 
     Step(
         function() {
-            getFavorites(this);
+            getFavorites(this.parallel());
+            addFollowed(principal, [req.user.profile], this.parallel());
         },
         function(err, objects) {
             if (err) {
@@ -410,7 +412,8 @@ var showFollowers = function(req, res, next) {
 
     Step(
         function() {
-            getFollowers(this);
+            getFollowers(this.parallel());
+            addFollowed(principal, [req.user.profile], this.parallel());
         },
         function(err, followers) {
             if (err) {
@@ -451,7 +454,8 @@ var showFollowing = function(req, res, next) {
 
     Step(
         function() {
-            getFollowing(this);
+            getFollowing(this.parallel());
+            addFollowed(principal, [req.user.profile], this.parallel());
         },
         function(err, following) {
             if (err) {
@@ -526,11 +530,13 @@ var getAllLists = function(user, callback) {
 
 var showLists = function(req, res, next) {
 
-    var user = req.user;
+    var user = req.user,
+        principal = req.principal;
 
     Step(
         function() {
-            getAllLists(user, this);
+            getAllLists(user, this.parallel());
+            addFollowed(principal, [req.user.profile], this.parallel());
         },
         function(err, lists) {
             if (err) {
@@ -538,7 +544,7 @@ var showLists = function(req, res, next) {
             } else {
                 res.render("lists", {page: {title: req.user.profile.displayName + " - Lists"},
                                      data: {user: req.principalUser,
-                                            profile: req.person,
+                                            profile: req.user.profile,
                                             lists: lists}});
             }
         }
@@ -548,6 +554,7 @@ var showLists = function(req, res, next) {
 var showList = function(req, res, next) {
 
     var user = req.user,
+        principal = req.principal,
         getList = function(user, uuid, callback) {
             var list;
             Step(
@@ -591,6 +598,7 @@ var showList = function(req, res, next) {
         function() {
             getAllLists(user, this.parallel());
             getList(req.user, req.param.uuid, this.parallel());
+            addFollowed(principal, [req.user.profile], this.parallel());
         },
         function(err, lists, list) {
             if (err) {
@@ -598,7 +606,7 @@ var showList = function(req, res, next) {
             } else {
                 res.render("list", {page: {title: req.user.profile.displayName + " - Lists"},
                                     data: {user: req.principalUser,
-                                           profile: req.person,
+                                           profile: req.user.profile,
                                            lists: lists,
                                            list: list}});
             }
