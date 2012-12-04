@@ -1,45 +1,41 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <title>pump.io by e14n</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <title>Activitypump by e14n</title>
   </head>
-
   <body>
-    <div id="container">
-      <div class="inner">
+    <div class="wrapper">
+      <header>
+        <h1>pump.io</h1>
+        <p>Social server with an ActivityStreams API</p>
 
-        <header>
-          <h1>Activitypump</h1>
-          <h2>Social server with an ActivityStreams API</h2>
-        </header>
+        <p class="view"><a href="https://github.com/e14n/pump.io">View the Project on GitHub <small>e14n/pump.io</small></a></p>
 
-        <section id="downloads" class="clearfix">
-          <a href="https://github.com/e14n/activitypump/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-          <a href="https://github.com/e14n/activitypump/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
-          <a href="https://github.com/e14n/activitypump" id="view-on-github" class="button"><span>View on GitHub</span></a>
-        </section>
 
-        <hr>
+        <ul>
+          <li><a href="https://github.com/e14n/pump.io/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/e14n/pump.io/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/e14n/pump.io">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>pump.io</h1>
 
-        <section id="main_content">
-          <h1>ActivityPump</h1>
+<p>Version 0.2.0-alpha.1</p>
 
-<p>Version 0.1.0</p>
+<p>This is pump.io. It's a stream server that does most of what people
+really want from a social network.</p>
 
-<p>This is the ActivityPump. It's social infrastructure that models most
-of what people want to do with social networks: the social graph,
-activity streams, and so on.</p>
-
-<p><a href="http://travis-ci.org/e14n/activitypump"><img src="https://secure.travis-ci.org/e14n/activitypump.png" alt="Build Status"></a></p>
+<p><a href="http://travis-ci.org/e14n/pump.io"><img src="https://secure.travis-ci.org/e14n/pump.io.png" alt="Build Status"></a></p>
 
 <h2>License</h2>
 
@@ -87,14 +83,25 @@ thing much more enjoyable.</p>
 <li>node.js 0.8.0 or higher</li>
 <li>npm 1.1.0 or higher</li>
 <li>A database server (see below)</li>
-</ul><p>To install the software, you can clone the git repository, so:</p>
+</ul><p>The easiest way is to install the software globally using npm, like
+so:</p>
 
-<pre><code>git clone https://github.com/e14n/activitypump.git
+<pre><code>npm install -g pump.io
+</code></pre>
+
+<p>That should set up all the files and dependencies for you.</p>
+
+<h3>Local install</h3>
+
+<p>If you want to set up the software in its own directory, you can clone
+the git repository, so:</p>
+
+<pre><code>git clone https://github.com/e14n/pump.io.git
 </code></pre>
 
 <p>You can then install the dependencies using <code>npm</code>:</p>
 
-<pre><code>cd activitypump
+<pre><code>cd pump.io
 npm install
 </code></pre>
 
@@ -105,13 +112,13 @@ npm install
 
 <h3>Database setup</h3>
 
-<p>ActivityPump uses <a href="https://github.com/evanp/databank">databank</a>
+<p>pump.io uses <a href="https://github.com/evanp/databank">databank</a>
 package to abstract out the data storage for the system. Any databank
 driver should work. Couchbase, MongoDB and Redis are probably the best
 bets for production servers, but the <code>disk</code> or even <code>memory</code> drivers
 can work for testing.</p>
 
-<p>If you're confused, just use the MongoDB one.</p>
+<p>If you're confused, just use the MongoDB one, <code>databank-mongodb</code>.</p>
 
 <p>You can find other drivers like so:</p>
 
@@ -126,9 +133,11 @@ can work for testing.</p>
 <pre><code>npm install -g databank-mongodb
 </code></pre>
 
+<p>Use this if you installed the pump.io package globally.</p>
+
 <p>Second, you can install in the <code>databank</code> directory.</p>
 
-<pre><code>cd activitypump/node_modules/databank
+<pre><code>cd pump.io/node_modules/databank
 npm install databank-mongodb
 </code></pre>
 
@@ -136,26 +145,11 @@ npm install databank-mongodb
 
 <h3>Configuration</h3>
 
-<p>The ActivityPump uses a single <code>config.js</code> file in the main directory
-for configuration options. You can look at <code>config.js.sample</code> for some
-details.</p>
+<p>pump.io uses a JSON file for configuration. It should be at
+<code>/etc/pump.io.json</code>.</p>
 
-<p>The file is require()'d by code, so it needs to look like this:</p>
-
-<pre><code>module.exports = {
-    key1: "value1",
-    key2: "value2",
-    // ...
-};
-</code></pre>
-
-<p>..or like this:</p>
-
-<pre><code>exports.key1 = "value1";
-exports.key2 = "value2";
-</code></pre>
-
-<p>It's a JavaScript file, so you can put practically anything in there.</p>
+<p>The <code>pump.io.json.sample</code> file should give you an idea of how to use
+it.</p>
 
 <p>Here are the main configuration keys.</p>
 
@@ -169,6 +163,11 @@ details on what to put here.</li>
 <li>
 <em>hostname</em> The hostname of the server. Defaults to "localhost" which
 doesn't do much for you.</li>
+<li>
+<em>address</em> The address to listen on. Defaults to <code>hostname</code>, which is
+OK for most systems. Use this if you've got some kind of
+load-balancer or NAS or whatever and your local IP doesn't map to
+the IP of the hostname.</li>
 <li>
 <em>port</em> Port to listen on. Defaults to 31337, which is no good. You
 should listen on 80 or 443 if you're going to have anyone use this.</li>
@@ -197,22 +196,24 @@ can create a user like <code>pump</code> and use that.</li>
 <li>
 <em>cert</em> If you're using SSL, the path to the server cert, like
 "/etc/ssl/private/myserver.crt".</li>
+<li>
+<em>uploaddir</em> If you want to enable file uploads, set this to the
+full path of a local directory. It should be writeable and readable by the 
+'serverUser'.</li>
 </ul><h2>Bugs</h2>
 
 <p>If you find bugs, you can report them here:</p>
 
-<p><a href="https://github.com/e14n/activitypump/issues">https://github.com/e14n/activitypump/issues</a></p>
+<p><a href="https://github.com/e14n/pump.io/issues">https://github.com/e14n/pump.io/issues</a></p>
 
 <p>You can also email me at <a href="mailto:evan@e14n.com">evan@e14n.com</a>.</p>
-        </section>
-
-        <footer>
-          Activitypump is maintained by <a href="https://github.com/e14n">e14n</a><br>
-          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
-        </footer>
-
-        
-      </div>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/e14n">e14n</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
     </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
   </body>
 </html>
