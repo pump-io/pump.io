@@ -111,7 +111,7 @@ suite.addBatch({
                         function(err, pair) {
                             if (err) throw err;
                             var cred = makeCred(cl, pair),
-                                url = "http://localhost:4815/api/user/eekamouse/lists";
+                                url = "http://localhost:4815/api/user/eekamouse/lists/person";
 
                             httputil.getJSON(url, cred, this);
                         },
@@ -179,7 +179,7 @@ suite.addBatch({
                     topic: function(act, pair, cl) {
                         var cb = this.callback,
                             cred = makeCred(cl, pair),
-                            url = "http://localhost:4815/api/user/yellowman/lists";
+                            url = "http://localhost:4815/api/user/yellowman/lists/person";
 
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc, act.object);
@@ -262,7 +262,7 @@ suite.addBatch({
                     topic: function(acts, pair, cl) {
                         var cb = this.callback,
                             cred = makeCred(cl, pair),
-                            url = "http://localhost:4815/api/user/dekker/lists";
+                            url = "http://localhost:4815/api/user/dekker/lists/person";
 
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc);
@@ -329,7 +329,7 @@ suite.addBatch({
                     topic: function(act, pair, cl) {
                         var cb = this.callback,
                             cred = makeCred(cl, pair),
-                            url = "http://localhost:4815/api/user/maxromeo/lists";
+                            url = "http://localhost:4815/api/user/maxromeo/lists/person";
 
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc);

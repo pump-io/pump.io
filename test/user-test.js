@@ -423,7 +423,7 @@ suite.addBatch({
                     },
                     function(err, user) {
                         if (err) throw err;
-                        user.getLists(this);
+                        user.getLists("person", this);
                     },
                     this.callback
                 );

@@ -141,7 +141,7 @@ var addRoutes = function(app) {
 
     // Lists
 
-    app.get("/api/user/:nickname/lists", userAuth, reqUser, sameUser, userLists);
+    app.get("/api/user/:nickname/lists/:type", userAuth, reqUser, sameUser, userLists);
 
     if (app.config.uploaddir) {
 
@@ -1741,10 +1741,11 @@ var newFavorite = function(req, res, next) {
 };
 
 var userLists = function(req, res, next) {
-    var url = URLMaker.makeURL("api/user/" + req.user.nickname + "/lists"),
+    var type = req.params.type,
+        url = URLMaker.makeURL("api/user/" + req.user.nickname + "/lists/" + type),
         collection = {
             author: req.user.profile,
-            displayName: "Lists for " + (req.user.profile.displayName || req.user.nickname),
+            displayName: "Collections of " + type + "s for " + (req.user.profile.displayName || req.user.nickname),
             id: url,
             objectTypes: ["collection"],
             url: url,
@@ -1766,7 +1767,7 @@ var userLists = function(req, res, next) {
 
     Step(
         function() {
-            req.user.getLists(this);
+            req.user.getLists(type, this);
         },
         function(err, stream) {
             if (err) throw err;

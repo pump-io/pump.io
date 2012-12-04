@@ -125,7 +125,7 @@ suite.addBatch({
                         var callback = this.callback;
                         Step(
                             function() {
-                                user.getLists(this);
+                                user.getLists("person", this);
                             },
                             function(err, stream) {
                                 if (err) throw err;

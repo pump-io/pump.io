@@ -83,7 +83,7 @@ suite.addBatch({
             },
             "and we get their list stream": {
                 topic: function(user) {
-                    user.getLists(this.callback);
+                    user.getLists("person", this.callback);
                 },
                 "it works": function(err, stream) {
                     assert.ifError(err);
