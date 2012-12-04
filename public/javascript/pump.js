@@ -238,6 +238,14 @@ var Pump = (function(_, $, Backbone) {
             if (_.has(response, "totalItems")) {
                 this.totalItems = response.totalItems;
             }
+            if (_.has(response, "links")) {
+                if (_.has(response.links, "next")) {
+                    this.nextLink = response.links.next.href;
+                }
+                if (_.has(response.links, "prev")) {
+                    this.prevLink = response.links.prev.href;
+                }
+            }
             if (_.has(response, "items")) {
                 return response.items;
             } else {
