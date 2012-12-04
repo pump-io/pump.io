@@ -141,7 +141,7 @@ var addRoutes = function(app) {
 
     // Lists
 
-    app.get("/api/user/:nickname/lists", userAuth, reqUser, sameUser, userLists);
+    app.get("/api/user/:nickname/lists", clientAuth, reqUser, userLists);
 
     if (app.config.uploaddir) {
 
