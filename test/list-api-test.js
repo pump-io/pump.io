@@ -887,6 +887,68 @@ suite.addBatch({
                 "it fails correctly": function(err) {
                     assert.ifError(err);
                 }
+            },
+            "and a user adds someone to a list by posting to the members feed": {
+                topic: function(cl) {
+                    var cb = this.callback,
+                        pair1 = null,
+                        pair2 = null,
+                        cred1 = null,
+                        cred2 = null,
+                        url1 = "http://localhost:4815/api/user/keith/feed",
+                        url2 = "http://localhost:4815/api/user/lloyd/feed",
+                        list;
+
+                    Step(
+                        function() {
+                            newPair(cl, "keith", "Moow0eec", this.parallel());
+                            newPair(cl, "lloyd", "nohkoo8I", this.parallel());
+                        },
+                        function(err, results1, results2) {
+                            if (err) throw err;
+                            pair1 = results1;
+                            pair2 = results2;
+                            cred1 = makeCred(cl, pair1);
+                            cred2 = makeCred(cl, pair2);
+                            var act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "collection",
+                                    displayName: "Itals",
+                                    objectTypes: ["person"]
+                                }
+                            };
+                            httputil.postJSON(url1, cred1, act, this);
+                        },
+                        function(err, doc, response) {
+                            if (err) throw err;
+                            list = doc.object;
+                            httputil.postJSON(list.members.url, cred1, pair2.user.profile, this);
+                        },
+                        function(err, doc, response) {
+                            cb(err, cred1, doc, list);
+                        }
+                    );
+                },
+                "it works": function(err, cred, person, list) {
+                    assert.ifError(err);
+                    assert.isObject(list);
+                },
+                "and we check the list members": {
+                    topic: function(cred, person, list) {
+                        httputil.getJSON(list.id + "/members", cred, this.callback);
+                    },
+                    "it works": function(err, doc, result) {
+                        assert.ifError(err);
+                        assert.isObject(doc);
+                    },
+                    "it includes that user": function(err, doc, result) {
+                        assert.ifError(err);
+                        assert.include(doc, "items");
+                        assert.isArray(doc.items);
+                        assert.lengthOf(doc.items, 1);
+                    }
+                }
             }
         }
     }

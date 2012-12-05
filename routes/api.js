@@ -182,6 +182,7 @@ var addRoutes = function(app) {
     // Collection members
 
     app.get("/api/collection/:uuid/members", clientAuth, requestCollection, authorOrRecipient, collectionMembers);
+    app.post("/api/collection/:uuid/members", userAuth, requestCollection, authorOnly, newMember);
 };
 
 // XXX: use a common function instead of faking up params
@@ -2025,6 +2026,35 @@ var collectionMembers = function(req, res, next) {
                 }
 
                 res.json(feed);
+            }
+        }
+    );
+};
+
+var newMember = function(req, res, next) {
+
+    var coll = req.collection,
+        obj = Scrubber.scrubObject(req.body),
+        act = new Activity({
+            verb: "add",
+            object: obj,
+            target: coll
+        });
+
+
+    Step(
+        function() {
+            newActivity(act, req.remoteUser, this);
+        },
+        function(err, act) {
+            var d;
+            if (err) {
+                next(err);
+            } else {
+                act.object.sanitize();
+                res.json(act.object);
+                d = new Distributor(act);
+                d.distribute(function(err) {});
             }
         }
     );
