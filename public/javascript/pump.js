@@ -938,7 +938,7 @@ var Pump = (function(_, $, Backbone) {
 
             aview.$el.on("pump.rendered", function() {
                 aview.$el.hide();
-                view.$("#sidebar").prepend(aview.$el);
+                view.$("#minor-stream").prepend(aview.$el);
                 aview.$el.slideDown('slow');
             });
             aview.render();
@@ -976,7 +976,7 @@ var Pump = (function(_, $, Backbone) {
 
             aview.$el.on("pump.rendered", function() {
                 aview.$el.hide();
-                view.$("#sidebar").prepend(aview.$el);
+                view.$("#minor-stream").prepend(aview.$el);
                 aview.$el.slideDown('slow');
             });
             aview.render();
