@@ -597,6 +597,9 @@ var Pump = (function(_, $, Backbone) {
             // Once it's rendered, show the modal
 
             modalView.$el.one("pump.rendered", function() {
+                modalView.$('#note-content').wysihtml5({
+                    customTemplates: Pump.wysihtml5Tmpl
+                });
                 modalView.$("#modal-note").modal('show');
             });
 
@@ -618,7 +621,9 @@ var Pump = (function(_, $, Backbone) {
             // Once it's rendered, show the modal
 
             modalView.$el.one("pump.rendered", function() {
-                modalView.$("#modal-picture").modal('show');
+                modalView.$('#picture-description').wysihtml5({
+                    customTemplates: Pump.wysihtml5Tmpl
+                });
                 modalView.$("#picture-fineupload").fineUploader({
                     request: {
                         endpoint: "/main/upload"
@@ -662,6 +667,7 @@ var Pump = (function(_, $, Backbone) {
                 }).on("error", function(event, id, fileName, reason) {
                     modalView.showError(reason);
                 });
+                modalView.$("#modal-picture").modal('show');
             });
 
             modalView.render();
@@ -1863,6 +1869,27 @@ var Pump = (function(_, $, Backbone) {
         }
     };
 
+    Pump.wysihtml5Tmpl = {
+        "emphasis": function(locale) {
+            return "<li>" +
+                "<div class='btn-group'>" +
+                "<a class='btn' data-wysihtml5-command='bold' title='"+locale.emphasis.bold+"'><i class='icon-bold'></i></a>" +
+                "<a class='btn' data-wysihtml5-command='italic' title='"+locale.emphasis.italic+"'><i class='icon-italic'></i></a>" +
+                "<a class='btn' data-wysihtml5-command='underline' title='"+locale.emphasis.underline+"'>_</a>" +
+                "</div>" +
+                "</li>";
+        }
+    };
+
+    Pump.setupWysiHTML5 = function() {
+
+        // Set wysiwyg defaults
+
+        $.fn.wysihtml5.defaultOptions["font-styles"] = false;
+        $.fn.wysihtml5.defaultOptions["image"] = false;
+        $.fn.wysihtml5.defaultOptions["customTemplates"] = Pump.wysihtml5Tmpl;
+    };
+
     $(document).ready(function() {
 
         Pump.bodyView = new Pump.BodyView({router: Pump.router});
@@ -1883,6 +1910,8 @@ var Pump = (function(_, $, Backbone) {
         $("abbr.easydate").easydate();
 
         Backbone.history.start({pushState: true, silent: true});
+
+        Pump.setupWysiHTML5();
 
         Pump.ensureCred(function(err, cred) {
 
@@ -1928,6 +1957,7 @@ var Pump = (function(_, $, Backbone) {
             }
         });
     });
+
 
     return Pump;
 
