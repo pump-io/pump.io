@@ -173,7 +173,15 @@ suite.addBatch({
                     assert.include(act.object, "members");
                     assert.isObject(act.object.members);
                     assert.include(act.object.members, "totalItems");
+                    assert.include(act.object.members, "url");
+                    assert.equal(act.object.members.url, act.object.id + "/members");
                     assert.equal(act.object.members.totalItems, 0);
+                    assert.include(act.object, "links");
+                    assert.isObject(act.object.links);
+                    assert.include(act.object.links, "self");
+                    assert.isObject(act.object.links.self);
+                    assert.include(act.object.links.self, "href");
+                    assert.equal(act.object.links.self.href, act.object.id);
                 },
                 "and we get the list of lists owned by the user": {
                     topic: function(act, pair, cl) {
