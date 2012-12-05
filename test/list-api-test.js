@@ -503,7 +503,7 @@ suite.addBatch({
                     topic: function(act, pair, cl) {
                         var cb = this.callback,
                             cred = makeCred(cl, pair),
-                            url = act.target.id;
+                            url = act.target.id + "/members"; // XXX
 
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc, act.object);
@@ -516,8 +516,10 @@ suite.addBatch({
                     },
                     "it includes that user": function(err, list, person) {
                         assert.ifError(err);
-                        assert.lengthOf(list.members.items, 1);
-                        assert.equal(list.members.items[0].id, person.id);
+                        assert.include(list, "items");
+                        assert.isArray(list.items);
+                        assert.lengthOf(list.items, 1);
+                        assert.equal(list.items[0].id, person.id);
                     },
                     "and the user removes the other user from the list": {
                         topic: function(list, person, act, pair, cl) {
@@ -527,7 +529,7 @@ suite.addBatch({
                                 ract = {
                                     verb: "remove",
                                     object: person,
-                                    target: list
+                                    target: act.target
                                 };
                             httputil.postJSON(url, cred, ract, cb);
                         },
@@ -539,7 +541,7 @@ suite.addBatch({
                             topic: function(doc, response, list, person, act, pair, cl) {
                                 var cb = this.callback,
                                     cred = makeCred(cl, pair),
-                                    url = act.target.id;
+                                    url = act.target.id + "/members"; // XXX
 
                                 httputil.getJSON(url, cred, function(err, doc, response) {
                                     cb(err, doc, act.object);
@@ -552,7 +554,10 @@ suite.addBatch({
                             },
                             "it does not include that user": function(err, list, person) {
                                 assert.ifError(err);
-                                assert.equal(list.members.totalItems, 0);
+                                assert.equal(list.totalItems, 0);
+                                assert.include(list, "items");
+                                assert.isArray(list.items);
+                                assert.lengthOf(list.items, 0);
                             }
                         }
                     }

@@ -84,6 +84,7 @@ var databank = require("databank"),
     DEFAULT_REPLIES = DEFAULT_ITEMS,
     DEFAULT_FOLLOWERS = DEFAULT_ITEMS,
     DEFAULT_FOLLOWING = DEFAULT_ITEMS,
+    DEFAULT_MEMBERS = DEFAULT_ITEMS,
     DEFAULT_USERS = DEFAULT_ITEMS,
     DEFAULT_LISTS = DEFAULT_ITEMS,
     DEFAULT_UPLOADS = DEFAULT_ITEMS,
@@ -94,6 +95,7 @@ var databank = require("databank"),
     MAX_REPLIES = MAX_ITEMS,
     MAX_FOLLOWERS = MAX_ITEMS,
     MAX_FOLLOWING = MAX_ITEMS,
+    MAX_MEMBERS = MAX_ITEMS,
     MAX_USERS = MAX_ITEMS,
     MAX_LISTS = MAX_ITEMS,
     MAX_UPLOADS = MAX_ITEMS;
@@ -176,6 +178,17 @@ var addRoutes = function(app) {
 
     app.get("/api/users", clientAuth, listUsers);
     app.post("/api/users", clientAuth, createUser);
+
+    // Collection members
+
+    app.get("/api/collection/:uuid/members", clientAuth, requestCollection, authorOrRecipient, collectionMembers);
+};
+
+// XXX: use a common function instead of faking up params
+
+var requestCollection = function(req, res, next) {
+    req.params.type = "collection";
+    requestObject(req, res, next);
 };
 
 var personType = function(req, res, next) {
@@ -1867,6 +1880,151 @@ var newUpload = function(req, res, next) {
             } else {
                 obj.sanitize();
                 res.json(obj);
+            }
+        }
+    );
+};
+
+var collectionMembers = function(req, res, next) {
+
+    var coll = req.collection,
+        profile = (req.remoteUser) ? req.remoteUser.profile : null, 
+        base = "/api/collection/"+coll._uuid+"/members",
+        url = URLMaker.makeURL(base),
+        feed = {
+            author: coll.author,
+            displayName: "Members of " + (coll.displayName || "a collection") + " by " + coll.author.displayName,
+            id: url,
+            objectTypes: coll.objectTypes,
+            links: {
+                first: {
+                    href: url
+                }
+            },
+            items: []
+        },
+        args,
+        str;
+
+    try {
+        args = streamArgs(req, DEFAULT_MEMBERS, MAX_MEMBERS);
+    } catch (e) {
+        next(e);
+        return;
+    }
+
+    Step(
+        function() {
+            coll.getStream(this);
+        },
+        function(err, result) {
+            if (err) throw err;
+            str = result;
+            str.count(this);
+        },
+        function(err, count) {
+            var filtered;
+            if (err) {
+                if (err.name == "NoSuchThingError") {
+                    feed.totalItems = 0;
+                    res.json(feed);
+                    return;
+                } else {
+                    throw err;
+                }
+            } else {
+                feed.totalItems = count;
+                if (!profile) {
+                    filtered = new FilteredStream(str, objectPublicOnly);
+                } else if (profile.id == coll.author.id) {
+                    // no filter
+                    filtered = str;
+                } else {
+                    filtered = new FilteredStream(str, objectRecipientsOnly(profile));
+                }
+                filtered.getObjects(args.start, args.end, this);
+            }
+        },
+        function(err, refs) {
+            var group;
+            if (err) throw err;
+            group = this.group();
+            _.each(refs, function(ref) {
+                ActivityObject.getObject(ref.objectType, ref.id, group());
+            });
+        },
+        function(err, objects) {
+
+            var third, followable;
+
+            if (err) throw err;
+
+            feed.items = objects;
+
+            // Add the first few replies for each object
+
+            firstFewReplies(profile, feed.items, this.parallel());
+
+            // Add the first few "likers" for each object
+
+            addLikers(profile, feed.items, this.parallel());
+
+            third = this.parallel();
+
+            if (!profile) { 
+                // No user, no liked
+                third(null);
+            } else {
+                // Different user; check for likes
+                addLiked(profile, feed.items, third);
+            }
+
+            followable = _.filter(feed.items, function(obj) {
+                return obj.isFollowable();
+            });
+
+            addFollowed(profile, followable, this.parallel());
+        },
+        function(err) {
+
+            if (err) {
+
+                next(err);
+
+            } else {
+
+                _.each(feed.items, function(obj) {
+                    obj.sanitize();
+                });
+
+                feed.startIndex = args.start;
+                feed.itemsPerPage = args.count;
+
+                feed.links = {
+                    self: {
+                        href: URLMaker.makeURL(base, {offset: args.start, count: args.count})
+                    },
+                    current: {
+                        href: URLMaker.makeURL(base)
+                    }
+                };
+
+                if (args.start > 0) {
+                    feed.links.prev = {
+                        href: URLMaker.makeURL(base, 
+                                               {offset: Math.max(args.start-args.count, 0), 
+                                                count: Math.min(args.count, args.start)})
+                    };
+                }
+
+                if (args.start + feed.items.length < feed.totalItems) {
+                    feed.links.next = {
+                        href: URLMaker.makeURL(base, 
+                                               {offset: args.start+feed.items.length, count: args.count})
+                    };
+                }
+
+                res.json(feed);
             }
         }
     );
