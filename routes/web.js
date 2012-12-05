@@ -53,6 +53,7 @@ var databank = require("databank"),
     NoSuchThingError = databank.NoSuchThingError,
     createUser = api.createUser,
     addLiked = finishers.addLiked,
+    addLikers = finishers.addLikers,
     firstFewReplies = finishers.firstFewReplies,
     addFollowed = finishers.addFollowed,
     requestObject = omw.requestObject;
@@ -143,6 +144,7 @@ var showInbox = function(req, res, next) {
                     activities = results;
                     objects = _.pluck(activities, "object");
                     addLiked(profile, objects, this.parallel());
+                    addLikers(profile, objects, this.parallel());
                     firstFewReplies(profile, objects, this.parallel());
                 },
                 function(err) {
@@ -729,6 +731,7 @@ var showObject = function(req, res, next) {
         function(err) {
             if (err) throw err;
             addLiked(profile, [obj], this.parallel());
+            addLikers(profile, [obj], this.parallel());
             firstFewReplies(profile, [obj], this.parallel());
             if (obj.isFollowable()) {
                 addFollowed(profile, [obj], this.parallel());
