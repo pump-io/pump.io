@@ -69,6 +69,8 @@ var databank = require("databank"),
     addFollowed = finishers.addFollowed,
     addLikedFinisher = finishers.addLikedFinisher,
     addLiked = finishers.addLiked,
+    addLikersFinisher = finishers.addLikersFinisher,
+    addLikers = finishers.addLikers,
     firstFewRepliesFinisher = finishers.firstFewRepliesFinisher,
     firstFewReplies = finishers.firstFewReplies,
     doFinishers = finishers.doFinishers,
@@ -235,6 +237,7 @@ var getObject = function(req, res, next) {
         function(err) {
             if (err) throw err;
             addLiked(profile, [obj], this.parallel());
+            addLikers(profile, [obj], this.parallel());
             firstFewReplies(profile, [obj], this.parallel());
             if (obj.isFollowable()) {
                 addFollowed(profile, [obj], this.parallel());
@@ -1084,7 +1087,7 @@ var filteredFeedRoute = function(urlmaker, titlemaker, streammaker, finisher) {
 };
 
 
-var majorFinishers = doFinishers([addLikedFinisher, firstFewRepliesFinisher]);
+var majorFinishers = doFinishers([addLikedFinisher, firstFewRepliesFinisher, addLikersFinisher]);
 
 var userStream = filteredFeedRoute(
     function(req) {
@@ -1609,28 +1612,33 @@ var userFavorites = function(req, res, next) {
         },
         function(err) {
 
-            var second;
+            var third,
+                profile = (req.remoteUser) ? req.remoteUser.profile : null;
 
             if (err) throw err;
 
             // Add the first few replies for each object
 
-            firstFewReplies((req.remoteUser) ? req.remoteUser.profile : null, collection.items, this.parallel());
+            firstFewReplies(profile, collection.items, this.parallel());
 
-            second = this.parallel();
+            // Add the first few "likers" for each object
+
+            addLikers(profile, collection.items, this.parallel());
+
+            third = this.parallel();
 
             if (!req.remoteUser) { 
                 // No user, no liked
-                second(null);
+                third(null);
             } else if (req.remoteUser.profile.id == req.user.profile.id) {
                 // Same user, all liked (by definition!)
                 _.each(collection.items, function(object) {
                     object.liked = true;
                 });
-                second(null);
+                third(null);
             } else {
                 // Different user; check for likes
-                addLiked(req.remoteUser.profile, collection.items, second);
+                addLiked(req.remoteUser.profile, collection.items, third);
             }
         },
         function(err) {
