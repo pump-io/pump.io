@@ -896,6 +896,7 @@ var Pump = (function(_, $, Backbone) {
         templateName: 'user',
         modelName: "profile",
         parts: ["profile-block",
+                "user-content-activities",
                 "major-stream-headless",
                 "sidebar-headless",
                 "major-activity-headless",
@@ -941,6 +942,19 @@ var Pump = (function(_, $, Backbone) {
             aview.render();
         }
 
+    });
+
+    Pump.ActivitiesUserContent = Pump.TemplateView.extend({
+        templateName: 'user-content-activities',
+        modelName: 'profile',
+        parts: ["major-stream-headless",
+                "sidebar-headless",
+                "major-activity-headless",
+                "minor-activity-headless",
+                "responses",
+                "reply",
+                "profile-responses"],
+        el: '#user-content'
     });
 
     Pump.InboxContent = Pump.ContentView.extend({
@@ -1589,25 +1603,36 @@ var Pump = (function(_, $, Backbone) {
             user.fetch({success: function(user, response) {
                 major.fetch({success: function(major, response) {
                     minor.fetch({success: function(minor, response) {
-                        var profile = user.profile;
+                        var profile = user.profile,
+                            view;
 
                         Pump.content = new Pump.UserPageContent({model: profile,
                                                                  data: { major: major,
                                                                          minor: minor }});
-
                         
                         router.setTitle(Pump.content, profile.get("displayName"));
 
-                        Pump.content.$el.one("pump.rendered", function() {
+                        if ($("#user-content").length > 0) {
+                            Pump.userContent = new Pump.ActivitiesUserContent({model: profile,
+                                                                               data: { major: major,
+                                                                                       minor: minor }});
+                            view = Pump.userContent;
+                        } else {
+                            view = Pump.content;
+                            view.$el.one("pump.rendered", function() {
 
-                            // Helper view for the profile block
+                                // Helper view for the profile block
 
-                            var block = new Pump.ProfileBlock({el: Pump.content.$(".profile-block"),
-                                                               model: profile});
+                                var block = new Pump.ProfileBlock({el: Pump.content.$(".profile-block"),
+                                                                   model: profile});
+                            });
+                        }
+
+                        view.$el.one("pump.rendered", function() {
 
                             // Helper view for each major activity
 
-                            Pump.content.$(".activity.major").each(function(i) {
+                            view.$(".activity.major").each(function(i) {
                                 var id = $(this).attr("id"),
                                     act = major.get(id);
                                 var aview = new Pump.MajorActivityHeadlessView({el: this, model: act});
@@ -1615,13 +1640,14 @@ var Pump = (function(_, $, Backbone) {
 
                             // Helper view for each minor activity
 
-                            Pump.content.$(".activity.minor").each(function(i) {
+                            view.$(".activity.minor").each(function(i) {
                                 var id = $(this).attr("id"),
                                     act = minor.get(id);
                                 var aview = new Pump.MinorActivityHeadlessView({el: this, model: act});
                             });
                         });
-                        Pump.content.render();
+
+                        view.render();
                     }});
                 }});
             }});
@@ -1640,6 +1666,8 @@ var Pump = (function(_, $, Backbone) {
                     Pump.content = new Pump.FavoritesContent({model: profile,
                                                               data: { objects: favorites }});
                     router.setTitle(Pump.content, nickname + " favorites");
+
+                    
                     Pump.content.$el.one("pump.rendered", function() {
 
                         // Helper view for the profile block
