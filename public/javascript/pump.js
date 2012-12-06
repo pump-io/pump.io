@@ -1187,12 +1187,24 @@ var Pump = (function(_, $, Backbone) {
         templateName: 'favorites',
         modelName: "profile",
         parts: ["profile-block",
+                "user-content-favorites",
                 "object-stream",
                 "major-object",
                 "responses",
                 "reply",
                 "profile-responses"],
         el: '#content'
+    });
+
+    Pump.FavoritesUserContent = Pump.ContentView.extend({
+        templateName: 'user-content-favorites',
+        modelName: "profile",
+        parts: ["object-stream",
+                "major-object",
+                "responses",
+                "reply",
+                "profile-responses"],
+        el: '#user-content'
     });
 
     Pump.FollowersContent = Pump.ContentView.extend({
@@ -1663,28 +1675,50 @@ var Pump = (function(_, $, Backbone) {
                 var profile = user.profile,
                     favorites = profile.favorites;
                 favorites.fetch({success: function(major, response) {
+
+                    var view;
+
                     Pump.content = new Pump.FavoritesContent({model: profile,
                                                               data: { objects: favorites }});
+
                     router.setTitle(Pump.content, nickname + " favorites");
 
-                    
-                    Pump.content.$el.one("pump.rendered", function() {
+                    if ($("#user-content").length > 0) {
 
-                        // Helper view for the profile block
+                        Pump.userContent = new Pump.FavoritesUserContent({model: profile,
+                                                                          data: { objects: favorites }});
+                        view = Pump.userContent;
 
-                        var block = new Pump.ProfileBlock({el: Pump.content.$(".profile-block"),
-                                                           model: profile});
+                    } else {
 
+                        view = Pump.content;
+                        view.$el.one("pump.rendered", function() {
+
+                            // Helper view for the profile block
+
+                            var block = new Pump.ProfileBlock({el: Pump.content.$(".profile-block"),
+                                                               model: profile});
+
+                            // Helper view for user content
+
+                            Pump.userContent = new Pump.FavoritesUserContent({el: Pump.content.$("#user-content"),
+                                                                              model: profile,
+                                                                              data: { objects: favorites }});
+                        });
+                    }
+
+                    view.$el.one("pump.rendered", function() {
                         // Helper view for each object
 
-                        Pump.content.$(".object.major").each(function(i) {
+                        view.$(".object.major").each(function(i) {
                             var id = $(this).attr("id"),
                                 obj = favorites.get(id);
 
                             var aview = new Pump.MajorObjectView({el: this, model: obj});
                         });
                     });
-                    Pump.content.render();
+
+                    view.render();
                 }});
             }});
         },
