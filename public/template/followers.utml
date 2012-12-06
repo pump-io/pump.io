@@ -4,6 +4,8 @@
   </div>
   <div class="row">
     <h2>Followers</h2>
-    <%= partial("people-stream") %>
+    <div class="span9">
+      <%= partial("people-stream") %>
+    </div>
   </div>
 </div>

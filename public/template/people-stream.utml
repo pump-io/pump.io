@@ -1,4 +1,4 @@
-<div class="span9" id="people-stream">
+<div id="people-stream">
   <% if (data.people && data.people.length) { %>
   <% _.each(data.people, function(person) { 
      data.person = person; %>

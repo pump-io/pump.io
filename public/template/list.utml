@@ -4,8 +4,12 @@
   </div>
   <div class="row">
     <%= partial("list-menu") %>
+    <div class="span9">
+      <a class="btn btn-primary" class="add-list-member">Add a member</a>
+
     <% data.people = data.list.members.items; %>
     <%= partial("people-stream") %>
     <% delete data.people; %>
+    </div>
   </div>
 </div>
