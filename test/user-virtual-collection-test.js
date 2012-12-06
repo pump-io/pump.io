@@ -77,10 +77,18 @@ suite.addBatch({
             },
             "and we get the followers collection": {
                 topic: function(user) {
-                    var id = "http://example.net/api/"+user.nickname+"/followers",
-                        callback = this.callback;
+                    var callback = this.callback;
 
-                    Collection.get(id, callback);
+                    Step(
+                        function() {
+                            user.profile.expandFeeds(this);
+                        },
+                        function(err) {
+                            if (err) throw err;
+                            Collection.get(user.profile.followers.url, callback);
+                        },
+                        callback
+                    );
                 },
                 "it works": function(err, coll) {
                     assert.ifError(err);
@@ -89,11 +97,11 @@ suite.addBatch({
                 "it has the right members": function(err, coll) {
                     assert.ifError(err);
                     assert.isObject(coll);
-                    assert.equal(coll.id, "http://example.net/api/jared/followers");
+                    assert.equal(coll.id, "http://example.net/api/user/jared/followers");
                     assert.equal(coll.url, "http://example.net/jared/followers");
                     assert.equal(coll.displayName, "Followers");
-                    assert.equal(coll.links.self.href, "http://example.net/api/jared/followers");
-                    assert.equal(coll.members.url, "http://example.net/api/jared/followers");
+                    assert.equal(coll.links.self.href, "http://example.net/api/user/jared/followers");
+                    assert.equal(coll.members.url, "http://example.net/api/user/jared/followers");
                 },
                 "and we check if it's a list": {
                     topic: function(coll) {
@@ -107,10 +115,18 @@ suite.addBatch({
             },
             "and we get the following collection": {
                 topic: function(user) {
-                    var id = "http://example.net/api/"+user.nickname+"/following",
-                        callback = this.callback;
+                    var callback = this.callback;
 
-                    Collection.get(id, callback);
+                    Step(
+                        function() {
+                            user.profile.expandFeeds(this);
+                        },
+                        function(err) {
+                            if (err) throw err;
+                            Collection.get(user.profile.following.url, callback);
+                        },
+                        callback
+                    );
                 },
                 "it works": function(err, coll) {
                     assert.ifError(err);
@@ -119,11 +135,11 @@ suite.addBatch({
                 "it has the right members": function(err, coll) {
                     assert.ifError(err);
                     assert.isObject(coll);
-                    assert.equal(coll.id, "http://example.net/api/jared/following");
+                    assert.equal(coll.id, "http://example.net/api/user/jared/following");
                     assert.equal(coll.url, "http://example.net/jared/following");
                     assert.equal(coll.displayName, "Following");
-                    assert.equal(coll.links.self.href, "http://example.net/api/jared/following");
-                    assert.equal(coll.members.url, "http://example.net/api/jared/following");
+                    assert.equal(coll.links.self.href, "http://example.net/api/user/jared/following");
+                    assert.equal(coll.members.url, "http://example.net/api/user/jared/following");
                 },
                 "and we check if it's a list": {
                     topic: function(coll) {
