@@ -2,6 +2,8 @@
 
   <form id="avatar">
 
+    <div id="avatar-fineupload"></div>
+
     <ul class="thumbnails">
     <li class="span4">
     <a href="#" class="thumbnail">
@@ -37,7 +39,7 @@
 
     <fieldset>
       <div class="actions">
-	<input type="submit" class="btn btn-primary" value="Save">
+	<input type="submit" class="btn btn-primary" value="Set avatar">
       </div>
     </fieldset>  
 
