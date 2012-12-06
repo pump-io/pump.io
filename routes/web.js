@@ -87,6 +87,7 @@ var addRoutes = function(app) {
 
     app.get("/main/settings", loginRedirect("/main/settings"));
     app.get("/main/account", loginRedirect("/main/account"));
+    app.get("/main/avatar", loginRedirect("/main/avatar"));
 
     app.get("/:nickname/:type/:uuid", app.session, principal, requestObject, reqUser, userIsAuthor, principalAuthorOrRecipient, showObject);
 

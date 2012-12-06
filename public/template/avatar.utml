@@ -1,0 +1,47 @@
+<div class="span12" id="avatar-content">
+
+  <form id="avatar">
+
+    <ul class="thumbnails">
+    <li class="span4">
+    <a href="#" class="thumbnail">
+    <img src="http://placehold.it/300x200" alt="">
+    </a>
+    </li>
+    <li class="span4">
+    <a href="#" class="thumbnail">
+    <img src="http://placehold.it/300x200" alt="">
+    </a>
+    </li>
+    <li class="span4">
+    <a href="#" class="thumbnail">
+    <img src="http://placehold.it/300x200" alt="">
+    </a>
+    </li>
+    <li class="span4">
+    <a href="#" class="thumbnail">
+    <img src="http://placehold.it/300x200" alt="">
+    </a>
+    </li>
+    <li class="span4">
+    <a href="#" class="thumbnail">
+    <img src="http://placehold.it/300x200" alt="">
+    </a>
+    </li>
+    <li class="span4">
+    <a href="#" class="thumbnail">
+    <img src="http://placehold.it/300x200" alt="">
+    </a>
+    </li>
+    </ul>
+
+    <fieldset>
+      <div class="actions">
+	<input type="submit" class="btn btn-primary" value="Save">
+      </div>
+    </fieldset>  
+
+  </form>
+
+</div>
+

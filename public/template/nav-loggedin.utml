@@ -24,6 +24,7 @@
       <li><a tabindex="-1" href="/<%- data.user.nickname %>">Profile</a></li>
       <li class="divider"></li>
       <li><a tabindex="-1" href="/main/settings">Settings</a></li>
+      <li><a tabindex="-1" href="/main/avatar">Avatar</a></li>
       <li><a tabindex="-1" href="/main/account">Account</a></li>
       <li class="divider"></li>
       <li><a tabindex="-1" id="logout" href="#">Log out</a></li>
