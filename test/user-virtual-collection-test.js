@@ -41,6 +41,7 @@ suite.addBatch({
             // Need this to make IDs
 
             URLMaker.hostname = "example.net";
+            URLMaker.port = 80;
 
             // Dummy databank
 
@@ -97,11 +98,11 @@ suite.addBatch({
                 "it has the right members": function(err, coll) {
                     assert.ifError(err);
                     assert.isObject(coll);
-                    assert.equal(coll.id, "http://example.net/api/user/jared/followers");
-                    assert.equal(coll.url, "http://example.net/jared/followers");
+                    assert.equal(coll.id, URLMaker.makeURL("/api/user/jared/followers"));
+                    assert.equal(coll.url, URLMaker.makeURL("/jared/followers"));
                     assert.equal(coll.displayName, "Followers");
-                    assert.equal(coll.links.self.href, "http://example.net/api/user/jared/followers");
-                    assert.equal(coll.members.url, "http://example.net/api/user/jared/followers");
+                    assert.equal(coll.links.self.href, URLMaker.makeURL("/api/user/jared/followers"));
+                    assert.equal(coll.members.url, URLMaker.makeURL("/api/user/jared/followers"));
                 },
                 "and we check if it's a list": {
                     topic: function(coll) {
@@ -135,11 +136,11 @@ suite.addBatch({
                 "it has the right members": function(err, coll) {
                     assert.ifError(err);
                     assert.isObject(coll);
-                    assert.equal(coll.id, "http://example.net/api/user/jared/following");
-                    assert.equal(coll.url, "http://example.net/jared/following");
+                    assert.equal(coll.id, URLMaker.makeURL("api/user/jared/following"));
+                    assert.equal(coll.url, URLMaker.makeURL("/jared/following"));
                     assert.equal(coll.displayName, "Following");
-                    assert.equal(coll.links.self.href, "http://example.net/api/user/jared/following");
-                    assert.equal(coll.members.url, "http://example.net/api/user/jared/following");
+                    assert.equal(coll.links.self.href, URLMaker.makeURL("/api/user/jared/following"));
+                    assert.equal(coll.members.url, URLMaker.makeURL("/api/user/jared/following"));
                 },
                 "and we check if it's a list": {
                     topic: function(coll) {
