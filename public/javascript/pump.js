@@ -452,7 +452,7 @@ var Pump = (function(_, $, Backbone) {
                         Pump.error(err);
                     } else {
                         view.$el.html(html);
-                        view.$el.trigger("pump.rendered");
+                        view.$el.trigger("pump.rendered", view);
                         // Update relative to the new code view
                         view.$("abbr.easydate").easydate();
                     }
@@ -583,48 +583,23 @@ var Pump = (function(_, $, Backbone) {
             "click #profile-dropdown": "profileDropdown"
         },
         postNoteModal: function() {
-            var view = this,
-                modalView;
-
-            if (view.postNote) {
-                modalView = view.postNote;
-            } else {
-                modalView = new Pump.PostNoteModal({});
-                $("body").append(modalView.el);
-                view.postNote = modalView;
-            }
-
-            // Once it's rendered, show the modal
-
-            modalView.$el.one("pump.rendered", function() {
-                modalView.$('#note-content').wysihtml5({
+            Pump.showModal(Pump.PostNoteModal, function(view) {
+                view.$('#note-content').wysihtml5({
                     customTemplates: Pump.wysihtml5Tmpl
                 });
-                modalView.$("#modal-note").modal('show');
+                view.$(".pump-modal").modal('show');
             });
-
-            modalView.render();
             return false;
         },
         postPictureModal: function() {
-            var view = this,
-                modalView;
-            
-            if (view.postPicture) {
-                modalView = view.postPicture;
-            } else {
-                modalView = new Pump.PostPictureModal({});
-                $("body").append(modalView.el);
-                view.postPicture = modalView;
-            }
 
-            // Once it's rendered, show the modal
+            Pump.showModal(Pump.PostPictureModal, function(view) {
 
-            modalView.$el.one("pump.rendered", function() {
-                modalView.$('#picture-description').wysihtml5({
+                view.$('#picture-description').wysihtml5({
                     customTemplates: Pump.wysihtml5Tmpl
                 });
-                modalView.$("#picture-fineupload").fineUploader({
+
+                view.$("#picture-fineupload").fineUploader({
                     request: {
                         endpoint: "/main/upload"
                     },
@@ -655,22 +630,20 @@ var Pump = (function(_, $, Backbone) {
                         stream = Pump.currentUser.stream;
                     
                     stream.create(act, {success: function(act) {
-
-                        modalView.$("#modal-picture").modal('hide');
-                        modalView.stopSpin();
-                        modalView.$("#picture-fineupload").fineUploader('reset');
-                        modalView.$('#picture-description').val("");
-                        modalView.$('#picture-title').val("");
+                        view.$("#modal-picture").modal('hide');
+                        view.stopSpin();
+                        view.$("#picture-fineupload").fineUploader('reset');
+                        Pump.resetWysihtml5(view.$('#picture-description'));
+                        view.$('#picture-title').val("");
                         // Reload the current content
                         Pump.addMajorActivity(act);
                     }});
                 }).on("error", function(event, id, fileName, reason) {
-                    modalView.showError(reason);
+                    view.showError(reason);
                 });
-                modalView.$("#modal-picture").modal('show');
-            });
 
-            modalView.render();
+                view.$(".pump-modal").modal('show');
+            });
             return false;
         },
         profileDropdown: function() {
@@ -1225,7 +1198,17 @@ var Pump = (function(_, $, Backbone) {
                 "people-stream",
                 "major-person",
                 "list-menu"],
-        el: '#content'
+        el: '#content',
+        events: {
+            "click #add-list-member": "addListMember"
+        },
+        addListMember: function() {
+            var view = this,
+                profile = this.profile,
+                list = this.options.data.list;
+
+            
+        }
     });
 
     Pump.ActivityContent = Pump.ContentView.extend({
@@ -1352,7 +1335,7 @@ var Pump = (function(_, $, Backbone) {
             stream.create(act, {success: function(act) {
                 view.$("#modal-note").modal('hide');
                 view.stopSpin();
-                view.$('#note-content').val("");
+                Pump.resetWysihtml5(view.$('#note-content'));
                 // Reload the current page
                 Pump.addMajorActivity(act);
             }});
@@ -1413,6 +1396,42 @@ var Pump = (function(_, $, Backbone) {
             return false;
         }
     });
+
+    Pump.modals = {};
+
+    Pump.showModal = function(Cls, options, callback) {
+
+        var modalView,
+            templateName = Cls.prototype.templateName;
+
+        if (!callback) {
+            callback = options;
+            options = {};
+        }
+
+        if (_.has(Pump.modals, templateName)) {
+            modalView = Pump.modals[templateName];
+            modalView.$(".pump-modal").modal('show');
+        } else {
+            modalView = new Cls(options);
+            $("body").append(modalView.el);
+            Pump.modals[templateName] = modalView;
+            modalView.$el.one("pump.rendered", function() {
+                callback(modalView);
+            });
+            // Once it's rendered, show the modal
+            modalView.render();
+        }
+    };
+
+    Pump.resetWysihtml5 = function(el) {
+        var fancy = el.data('wysihtml5');
+        if (fancy && fancy.editor && fancy.editor.clear) {
+            fancy.editor.clear();
+        }
+        $(".wysihtml5-command-active", fancy.toolbar).removeClass("wysihtml5-command-active");
+        return el;
+    };
 
     Pump.addMajorActivity = function(act) {
         if (Pump.content) {
