@@ -2,10 +2,7 @@
   <div class="row">
     <%= partial("profile-block") %>
   </div>
-  <div class="row">
-    <h2>Following</h2>
-    <div class="span9">
-      <%= partial("people-stream") %>
-    </div>
+  <div class="row" id="user-content">
+    <%= partial("user-content-following") %>
   </div>
 </div>

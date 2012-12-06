@@ -1,0 +1,3 @@
+<%= partial("major-stream-headless") %>
+<%= partial("sidebar-headless") %>
+

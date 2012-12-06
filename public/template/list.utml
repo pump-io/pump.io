@@ -2,13 +2,7 @@
   <div class="row">
     <%= partial("profile-block") %>
   </div>
-  <div class="row">
-    <%= partial("list-menu") %>
-    <div class="span9">
-      <a class="btn btn-primary" class="add-list-member">Add a member</a>
-      <% data.people = data.list.members.items; %>
-      <%= partial("people-stream") %>
-      <% delete data.people; %>
-    </div>
+  <div class="row" id="user-content">
+    <%= partial("user-content-list") %>
   </div>
 </div>

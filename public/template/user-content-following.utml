@@ -1,0 +1,4 @@
+<h2>Following</h2>
+<div class="span9">
+  <%= partial("people-stream") %>
+</div>

@@ -2,8 +2,7 @@
   <div class="row">
     <%= partial("profile-block") %>
   </div>
-  <div class="row">
-    <%= partial("major-stream-headless") %>
-    <%= partial("sidebar-headless") %>
+  <div class="row" id="user-content">
+    <%= partial("user-content-activities") %>
   </div>
 </div>
