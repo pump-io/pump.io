@@ -551,11 +551,18 @@ var validForm = function(count, total) {
         assert.include(doc, "links");
         assert.isObject(doc.links);
         assert.include(doc.links, "self");
-        assert.isString(doc.links.self);
+        assert.isObject(doc.links.self);
+        assert.include(doc.links.self, "href");
+        assert.isString(doc.links.self.href);
         assert.include(doc.links, "first");
-        assert.isString(doc.links.first);
+        assert.isObject(doc.links.first);
+        assert.include(doc.links.first, "href");
+        assert.isString(doc.links.first.href);
         if (_(count).isNumber() && count !== 0) {
             assert.include(doc.links, "prev");
+            assert.isObject(doc.links.prev);
+            assert.include(doc.links.prev, "href");
+            assert.isString(doc.links.prev.href);
         }
     };
 };
@@ -670,7 +677,7 @@ var workout = function(endpoint, total) {
                                     if (doc.items.length > 0) {
                                         items = items.concat(doc.items);
                                         if (doc.links.next) {
-                                            addResultsOf(doc.links.next);
+                                            addResultsOf(doc.links.next.href);
                                         } else {
                                             cb(null, items, full);
                                         }

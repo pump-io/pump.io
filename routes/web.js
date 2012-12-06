@@ -35,6 +35,7 @@ var databank = require("databank"),
     User = require("../lib/model/user").User,
     Collection = require("../lib/model/collection").Collection,
     mw = require("../lib/middleware"),
+    omw = require("../lib/objectmiddleware"),
     sa = require("../lib/sessionauth"),
     he = require("../lib/httperror"),
     Scrubber = require("../lib/scrubber"),
@@ -52,8 +53,10 @@ var databank = require("databank"),
     NoSuchThingError = databank.NoSuchThingError,
     createUser = api.createUser,
     addLiked = finishers.addLiked,
+    addLikers = finishers.addLikers,
     firstFewReplies = finishers.firstFewReplies,
-    addFollowed = finishers.addFollowed;
+    addFollowed = finishers.addFollowed,
+    requestObject = omw.requestObject;
 
 var addRoutes = function(app) {
 
@@ -84,6 +87,8 @@ var addRoutes = function(app) {
 
     app.get("/main/settings", loginRedirect("/main/settings"));
     app.get("/main/account", loginRedirect("/main/account"));
+
+    app.get("/:nickname/:type/:uuid", app.session, principal, requestObject, reqUser, userIsAuthor, principalAuthorOrRecipient, showObject);
 
     // expose this one file over the web
 
@@ -139,6 +144,7 @@ var showInbox = function(req, res, next) {
                     activities = results;
                     objects = _.pluck(activities, "object");
                     addLiked(profile, objects, this.parallel());
+                    addLikers(profile, objects, this.parallel());
                     firstFewReplies(profile, objects, this.parallel());
                 },
                 function(err) {
@@ -660,6 +666,90 @@ var uploadFile = function(req, res, next) {
                 data = {success: true,
                         obj: obj};
                 res.send(JSON.stringify(data), {"Content-Type": "text/plain"}, 200);
+            }
+        }
+    );
+};
+
+var userIsAuthor = function(req, res, next) {
+    var user = req.user,
+        person = req.person,
+        type = req.type,
+        obj = req[type],
+        author = obj.author;
+
+    if (person && author && person.id == author.id) {
+        next();
+    } else {
+        next(new HTTPError("No " + type + " by " + user.nickname + " with uuid " + obj._uuid, 404));
+        return;
+    }
+};
+
+var principalAuthorOrRecipient = function(req, res, next) {
+
+    var type = req.type,
+        obj = req[type],
+        user = req.principalUser,
+        person = req.principal;
+
+    if (obj && obj.author && person && obj.author.id == person.id) {
+        next();
+    } else {
+        Step(
+            function() {
+                Activity.postOf(obj, this);
+            },
+            function(err, act) {
+                if (err) throw err;
+                act.checkRecipient(person, this);
+            },
+            function(err, isRecipient) {
+                if (err) {
+                    next(err);
+                } else if (isRecipient) {
+                    next();
+                } else {
+                    next(new HTTPError("Only the author and recipients can view this object.", 403));
+                }
+            }
+        );
+    }
+};
+
+var showObject = function(req, res, next) {
+
+    var type = req.type,
+        obj = req[type],
+        person = req.person,
+        profile = req.principal;
+
+    Step(
+        function() {
+            obj.expandFeeds(this);
+        },
+        function(err) {
+            if (err) throw err;
+            addLiked(profile, [obj], this.parallel());
+            addLikers(profile, [obj], this.parallel());
+            firstFewReplies(profile, [obj], this.parallel());
+            if (obj.isFollowable()) {
+                addFollowed(profile, [obj], this.parallel());
+            }
+        },
+        function(err) {
+            var title;
+            if (err) {
+                next(err);
+            } else {
+                if (obj.displayName) {
+                    title = obj.displayName;
+                } else {
+                    title = type + " by " + person.displayName;
+                }
+                res.render("object", {page: {title: title},
+                                      data: {user: req.principalUser,
+                                             object: obj}});
             }
         }
     );

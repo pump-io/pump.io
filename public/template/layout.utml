@@ -9,6 +9,7 @@
     <!-- Le styles -->
     <link href="/stylesheet/bootstrap.min.css" rel="stylesheet">
     <link href="/stylesheet/fineuploader.css" rel="stylesheet">
+    <link href="/stylesheet/bootstrap-wysihtml5.css" rel="stylesheet">
     <style>
       body {
       position: relative;
@@ -67,6 +68,8 @@
     <script src="/javascript/spin.min.js"></script>
     <script src="/javascript/jquery-spin.js"></script>
     <script src="/javascript/jquery.fineuploader-3.0.min.js"></script>
+    <script src="/javascript/wysihtml5-0.3.0.min.js"></script>
+    <script src="/javascript/bootstrap-wysihtml5.js"></script>
     <script src="/javascript/pump.js"></script>
     <script>
       if (!Pump) {

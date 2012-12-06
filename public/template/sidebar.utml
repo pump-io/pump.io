@@ -1,5 +1,6 @@
 <div class="span3" id="sidebar">
   <h3>Meanwhile...</h3>
+  <div id="minor-stream">
   <% if (data.minor && data.minor.length > 0) { %>
   <% _.each(data.minor, function(activity) {
      data.activity = activity; %>
@@ -7,5 +8,6 @@
   <% delete data.activity;
      }); %>
   <% } %>
+  </div>
 </div>
 

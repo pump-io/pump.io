@@ -238,6 +238,14 @@ var Pump = (function(_, $, Backbone) {
             if (_.has(response, "totalItems")) {
                 this.totalItems = response.totalItems;
             }
+            if (_.has(response, "links")) {
+                if (_.has(response.links, "next")) {
+                    this.nextLink = response.links.next.href;
+                }
+                if (_.has(response.links, "prev")) {
+                    this.prevLink = response.links.prev.href;
+                }
+            }
             if (_.has(response, "items")) {
                 return response.items;
             } else {
@@ -589,6 +597,9 @@ var Pump = (function(_, $, Backbone) {
             // Once it's rendered, show the modal
 
             modalView.$el.one("pump.rendered", function() {
+                modalView.$('#note-content').wysihtml5({
+                    customTemplates: Pump.wysihtml5Tmpl
+                });
                 modalView.$("#modal-note").modal('show');
             });
 
@@ -610,7 +621,9 @@ var Pump = (function(_, $, Backbone) {
             // Once it's rendered, show the modal
 
             modalView.$el.one("pump.rendered", function() {
-                modalView.$("#modal-picture").modal('show');
+                modalView.$('#picture-description').wysihtml5({
+                    customTemplates: Pump.wysihtml5Tmpl
+                });
                 modalView.$("#picture-fineupload").fineUploader({
                     request: {
                         endpoint: "/main/upload"
@@ -654,6 +667,7 @@ var Pump = (function(_, $, Backbone) {
                 }).on("error", function(event, id, fileName, reason) {
                     modalView.showError(reason);
                 });
+                modalView.$("#modal-picture").modal('show');
             });
 
             modalView.render();
@@ -930,7 +944,7 @@ var Pump = (function(_, $, Backbone) {
 
             aview.$el.on("pump.rendered", function() {
                 aview.$el.hide();
-                view.$("#sidebar").prepend(aview.$el);
+                view.$("#minor-stream").prepend(aview.$el);
                 aview.$el.slideDown('slow');
             });
             aview.render();
@@ -968,7 +982,7 @@ var Pump = (function(_, $, Backbone) {
 
             aview.$el.on("pump.rendered", function() {
                 aview.$el.hide();
-                view.$("#sidebar").prepend(aview.$el);
+                view.$("#minor-stream").prepend(aview.$el);
                 aview.$el.slideDown('slow');
             });
             aview.render();
@@ -1304,6 +1318,15 @@ var Pump = (function(_, $, Backbone) {
         }
     });
 
+    Pump.ObjectContent = Pump.ContentView.extend({
+        templateName: 'object',
+        modelName: "object",
+        parts: ["responses",
+                "reply",
+                "activity-object-collection"],
+        el: '#content'
+    });
+
     Pump.PostNoteModal = Pump.TemplateView.extend({
 
         tagName: "div",
@@ -1416,6 +1439,7 @@ var Pump = (function(_, $, Backbone) {
             ":nickname/activity/:id": "activity",
             ":nickname/lists":        "lists",
             ":nickname/list/:uuid":   "list",
+            ":nickname/:type/:uuid":  "object",
             "main/settings":          "settings",
             "main/account":           "account",
             "main/register":          "register",
@@ -1725,6 +1749,20 @@ var Pump = (function(_, $, Backbone) {
                 router.setTitle(Pump.content, act.content);
                 Pump.content.render();
             }});
+        },
+        
+        object: function(nickname, type, uuid) {
+            var router = this,
+                obj = new Pump.ActivityObject({uuid: uuid, objectType: type, userNickname: nickname});
+
+            obj.fetch({success: function(obj, response) {
+
+                Pump.content = new Pump.ObjectContent({model: obj});
+                
+                router.setTitle(Pump.content, obj.displayName || obj.objectType + "by" + nickname);
+
+                Pump.content.render();
+            }});
         }
     });
 
@@ -1831,6 +1869,27 @@ var Pump = (function(_, $, Backbone) {
         }
     };
 
+    Pump.wysihtml5Tmpl = {
+        "emphasis": function(locale) {
+            return "<li>" +
+                "<div class='btn-group'>" +
+                "<a class='btn' data-wysihtml5-command='bold' title='"+locale.emphasis.bold+"'><i class='icon-bold'></i></a>" +
+                "<a class='btn' data-wysihtml5-command='italic' title='"+locale.emphasis.italic+"'><i class='icon-italic'></i></a>" +
+                "<a class='btn' data-wysihtml5-command='underline' title='"+locale.emphasis.underline+"'>_</a>" +
+                "</div>" +
+                "</li>";
+        }
+    };
+
+    Pump.setupWysiHTML5 = function() {
+
+        // Set wysiwyg defaults
+
+        $.fn.wysihtml5.defaultOptions["font-styles"] = false;
+        $.fn.wysihtml5.defaultOptions["image"] = false;
+        $.fn.wysihtml5.defaultOptions["customTemplates"] = Pump.wysihtml5Tmpl;
+    };
+
     $(document).ready(function() {
 
         Pump.bodyView = new Pump.BodyView({router: Pump.router});
@@ -1851,6 +1910,8 @@ var Pump = (function(_, $, Backbone) {
         $("abbr.easydate").easydate();
 
         Backbone.history.start({pushState: true, silent: true});
+
+        Pump.setupWysiHTML5();
 
         Pump.ensureCred(function(err, cred) {
 
@@ -1896,6 +1957,7 @@ var Pump = (function(_, $, Backbone) {
             }
         });
     });
+
 
     return Pump;
 
