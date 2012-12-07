@@ -1,7 +1,12 @@
 <ul class="nav nav-tabs nav-stacked">
   <% _.each(data.lists, function(list) { %>
   <li class="<%- ((data.list && data.list.id == list.id) ? 'list active' : 'list') %>">
-    <a href="<%- list.url %>"><%- list.displayName %></a>
+    <a href="<%- list.url %>">
+      <%- list.displayName %>
+      <% if (list.members && _.has(list.members, "totalItems")) { %>
+      <span class="label"><%- list.members.totalItems %></span>
+      <% } %>
+    </a>
   </li>
   <% }); %>
   <% if (data.user && data.user.profile.id == data.profile.id) { %>
