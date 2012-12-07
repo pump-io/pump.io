@@ -38,11 +38,31 @@
 <div class="row">
   <div class="span12">
     <ul class="nav nav-tabs">
-      <li><a class="active" href="/<%- data.profile.preferredUsername %>">Activity</a></li>
-      <li><a class="active" href="/<%- data.profile.preferredUsername %>/favorites">Favorites</a></li>
-      <li><a class="active" href="/<%- data.profile.preferredUsername %>/followers">Followers</a></li>
-      <li><a class="active" href="/<%- data.profile.preferredUsername %>/following">Following</a></li>
-      <li><a class="active" href="/<%- data.profile.preferredUsername %>/lists">Lists</a></li>
+      <li><a href="/<%- data.profile.preferredUsername %>">Activity</a></li>
+      <li><a href="/<%- data.profile.preferredUsername %>/favorites">Favorites
+        <% if (data.profile.favorites && _.has(data.profile.favorites, "totalItems")) { %>
+        <span class="label"><%- data.profile.favorites.totalItems %></span>
+        <% } %>
+        </a>
+      </li>
+      <li><a href="/<%- data.profile.preferredUsername %>/followers">Followers
+        <% if (data.profile.followers && _.has(data.profile.followers, "totalItems")) { %>
+        <span class="label"><%- data.profile.followers.totalItems %></span>
+        <% } %>
+        </a>
+      </li>
+      <li><a href="/<%- data.profile.preferredUsername %>/following">Following
+        <% if (data.profile.following && _.has(data.profile.following, "totalItems")) { %>
+        <span class="label"><%- data.profile.following.totalItems %></span>
+        <% } %>
+        </a>
+      </li>
+      <li><a href="/<%- data.profile.preferredUsername %>/lists">Lists
+        <% if (data.profile.lists && _.has(data.profile.lists, "totalItems")) { %>
+        <span class="label"><%- data.profile.lists.totalItems %></span>
+        <% } %>
+        </a>
+      </li>
     </ul>
   </div>
 </div>
