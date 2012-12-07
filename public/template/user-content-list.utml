@@ -1,7 +1,6 @@
+<div class="span3 list-menu">
 <%= partial("list-menu") %>
-<div class="span9">
-  <a class="btn btn-primary" class="add-list-member">Add a member</a>
-  <% data.people = data.list.members.items; %>
-  <%= partial("people-stream") %>
-  <% delete data.people; %>
+</div>
+<div class="span9" id="list-content">
+  <%= partial("list-content-list") %>
 </div>

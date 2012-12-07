@@ -511,6 +511,7 @@ var Pump = (function(_, $, Backbone) {
                     scoped = main;
                 }
                 if (!_.has(partials, name)) {
+                    console.log("Didn't preload template " + name + " so fetching sync");
                     // XXX: Put partials in the parts array of the
                     // view to avoid this shameful sync call
                     partials[name] = getTemplateSync(name);
@@ -903,7 +904,9 @@ var Pump = (function(_, $, Backbone) {
                 "minor-activity-headless",
                 "responses",
                 "reply",
-                "profile-responses"
+                "profile-responses",
+                "activity-object-list",
+                "activity-object-collection"
                ],
         el: '#content',
         addMajorActivity: function(act) {
@@ -953,7 +956,9 @@ var Pump = (function(_, $, Backbone) {
                 "minor-activity-headless",
                 "responses",
                 "reply",
-                "profile-responses"],
+                "profile-responses",
+                "activity-object-list",
+                "activity-object-collection"],
         el: '#user-content'
     });
 
@@ -965,7 +970,9 @@ var Pump = (function(_, $, Backbone) {
                 "major-activity",
                 "minor-activity",
                 "responses",
-                "reply"],
+                "reply",
+                "activity-object-list",
+                "activity-object-collection"],
         el: '#content',
         addMajorActivity: function(act) {
             var view = this,
@@ -1192,7 +1199,9 @@ var Pump = (function(_, $, Backbone) {
                 "major-object",
                 "responses",
                 "reply",
-                "profile-responses"],
+                "profile-responses",
+                "activity-object-list",
+                "activity-object-collection"],
         el: '#content'
     });
 
@@ -1203,7 +1212,8 @@ var Pump = (function(_, $, Backbone) {
                 "major-object",
                 "responses",
                 "reply",
-                "profile-responses"],
+                "profile-responses",
+                "activity-object-collection"],
         el: '#user-content'
     });
 
@@ -1259,8 +1269,15 @@ var Pump = (function(_, $, Backbone) {
     Pump.ListsUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-lists',
         modelName: "profile",
-        parts: ["list-menu"],
+        parts: ["list-menu",
+                "list-content-lists"],
         el: '#user-content'
+    });
+
+    Pump.ListsListContent = Pump.TemplateView.extend({
+        templateName: 'list-content-lists',
+        modelName: "profile",
+        el: '#list-content'
     });
 
     Pump.ListContent = Pump.ContentView.extend({
@@ -1268,6 +1285,7 @@ var Pump = (function(_, $, Backbone) {
         modelName: "profile",
         parts: ["profile-block",
                 'user-content-list',
+                "list-content-list",
                 "people-stream",
                 "major-person",
                 "list-menu"],
@@ -1278,9 +1296,18 @@ var Pump = (function(_, $, Backbone) {
         templateName: 'user-content-list',
         modelName: "profile",
         parts: ["people-stream",
+                "list-content-list",
                 "major-person",
                 "list-menu"],
         el: '#user-content'
+    });
+
+    Pump.ListListContent = Pump.TemplateView.extend({
+        templateName: 'list-content-list',
+        modelName: "profile",
+        parts: ["people-stream",
+                "major-person"],
+        el: '#list-content'
     });
 
     Pump.ActivityContent = Pump.ContentView.extend({
@@ -1535,6 +1562,7 @@ var Pump = (function(_, $, Backbone) {
         delete options.title;
         
         Pump.content = new contentView(options);
+        Pump.router.setTitle(Pump.content, title);
 
         if ($("#user-content").length > 0) {
 
@@ -1564,7 +1592,40 @@ var Pump = (function(_, $, Backbone) {
         view.render();
     };
 
+    Pump.setListContent = function(options, callback) {
+
+        var view,
+            contentView = options.contentView,
+            userContentView = options.userContentView,
+            listContentView = options.listContentView,
+            title = options.title;
+
+        if ($("#list-content").length > 0) {
+
+            Pump.content = new contentView(options);
+            Pump.userContent = new userContentView(options);
+            Pump.listContent = new listContentView(options);
+            Pump.router.setTitle(Pump.content, title);
+
+            view = Pump.listContent;
+            
+            view.$el.one("pump.rendered", function() {
+                callback(view);
+            });
+
+            view.render();
+
+        } else {
+            Pump.setUserContent(options, function(view) {
+                Pump.listContent = new listContentView(_.extend({el: view.$("#list-content")}, options));
+                callback(Pump.listContent);
+            });
+        }
+    };
+
     Pump.content = null;
+    Pump.userContent = null;
+    Pump.listContent = null;
 
     Pump.Router = Backbone.Router.extend({
 
@@ -1810,11 +1871,12 @@ var Pump = (function(_, $, Backbone) {
                     var profile = user.profile,
                         options = {contentView: Pump.ListsContent,
                                    userContentView: Pump.ListsUserContent,
+                                   listContentView: Pump.ListsListContent,
                                    title: nickname + " lists",
                                    model: profile,
                                    data: {lists: lists}};
 
-                    Pump.setUserContent(options, function(view) {
+                    Pump.setListContent(options, function(view) {
                         // Nothing to do!
                     });
                 }});
@@ -1836,13 +1898,14 @@ var Pump = (function(_, $, Backbone) {
                         var profile = user.profile,
                             options = {contentView: Pump.ListContent,
                                        userContentView: Pump.ListUserContent,
+                                       listContentView: Pump.ListListContent,
                                        title: nickname + " - list -" + list.get("displayName"),
                                        model: profile,
                                        data: {lists: lists,
                                               list: list}};
 
-                        Pump.setUserContent(options, function(view) {
-                            // XXX: helper for each person
+                        Pump.setListContent(options, function(view) {
+                            // Nothing to do!
                         });
                     }});
                 }});

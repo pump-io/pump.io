@@ -1,4 +1,6 @@
+<div class="span3 list-menu">
 <%= partial("list-menu") %>
-<div class="span9">
-  <p>Click a list name to show a list.</p>
+</div>
+<div class="span9" id="list-content">
+<%= partial("list-content-lists") %>
 </div>
