@@ -327,6 +327,7 @@ var showStream = function(req, res, next) {
             getMajor(this.parallel());
             getMinor(this.parallel());
             addFollowed(principal, [req.user.profile], this.parallel());
+            req.user.profile.expandFeeds(this.parallel());
         },
         function(err, major, minor) {
             if (err) {
@@ -379,6 +380,7 @@ var showFavorites = function(req, res, next) {
         function() {
             getFavorites(this.parallel());
             addFollowed(principal, [req.user.profile], this.parallel());
+            req.user.profile.expandFeeds(this.parallel());
         },
         function(err, objects) {
             if (err) {
@@ -421,6 +423,7 @@ var showFollowers = function(req, res, next) {
         function() {
             getFollowers(this.parallel());
             addFollowed(principal, [req.user.profile], this.parallel());
+            req.user.profile.expandFeeds(this.parallel());
         },
         function(err, followers) {
             if (err) {
@@ -463,6 +466,7 @@ var showFollowing = function(req, res, next) {
         function() {
             getFollowing(this.parallel());
             addFollowed(principal, [req.user.profile], this.parallel());
+            req.user.profile.expandFeeds(this.parallel());
         },
         function(err, following) {
             if (err) {
@@ -521,7 +525,7 @@ var handleLogin = function(req, res, next) {
 var getAllLists = function(user, callback) {
     Step(
         function() {
-            user.getLists(this);
+            user.getLists("person", this);
         },
         function(err, str) {
             if (err) throw err;
@@ -544,6 +548,7 @@ var showLists = function(req, res, next) {
         function() {
             getAllLists(user, this.parallel());
             addFollowed(principal, [req.user.profile], this.parallel());
+            req.user.profile.expandFeeds(this.parallel());
         },
         function(err, lists) {
             if (err) {
@@ -606,6 +611,7 @@ var showList = function(req, res, next) {
             getAllLists(user, this.parallel());
             getList(req.user, req.param.uuid, this.parallel());
             addFollowed(principal, [req.user.profile], this.parallel());
+            req.user.profile.expandFeeds(this.parallel());
         },
         function(err, lists, list) {
             if (err) {
