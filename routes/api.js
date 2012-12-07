@@ -1714,7 +1714,7 @@ var userLists = function(req, res, next) {
             items: []
         };
 
-    var args, lists;
+    var args, lists, stream;
 
     try {
         args = streamArgs(req, DEFAULT_LISTS, MAX_LISTS);
@@ -1727,10 +1727,10 @@ var userLists = function(req, res, next) {
         function() {
             req.user.getLists(type, this);
         },
-        function(err, stream) {
+        function(err, result) {
             if (err) throw err;
-            lists = stream;
-            lists.count(this);
+            stream = result;
+            stream.count(this);
         },
         function(err, totalItems) {
             if (err) throw err;
@@ -1740,11 +1740,11 @@ var userLists = function(req, res, next) {
                 return;
             }
             if (_(args).has("before")) {
-                lists.getIDsGreaterThan(args.before, args.count, this);
+                stream.getIDsGreaterThan(args.before, args.count, this);
             } else if (_(args).has("since")) {
-                lists.getIDsLessThan(args.since, args.count, this);
+                stream.getIDsLessThan(args.since, args.count, this);
             } else {
-                lists.getIDs(args.start, args.end, this);
+                stream.getIDs(args.start, args.end, this);
             }
         },
         function(err, ids) {
@@ -1757,23 +1757,31 @@ var userLists = function(req, res, next) {
             }
             Collection.readArray(ids, this);
         },
-        function(err, collections) {
+        function(err, results) {
+            var group = this.group();
+            if (err) throw err;
+            lists = results;
+            _.each(lists, function(list) {
+                list.expandFeeds(group());
+            });
+        },
+        function(err) {
             if (err) {
                 next(err);
             } else {
-                _.each(collections, function(item) {
+                _.each(lists, function(item) {
                     item.sanitize();
                 });
-                collection.items = collections;
-                if (collections.length > 0) {
+                collection.items = lists;
+                if (lists.length > 0) {
                     collection.links.prev = {
-                        href: collection.url + "?since=" + encodeURIComponent(collections[0].id)
+                        href: collection.url + "?since=" + encodeURIComponent(lists[0].id)
                     };
-                    if ((_(args).has("start") && args.start + collections.length < collection.totalItems) ||
-                        (_(args).has("before") && collections.length >= args.count) ||
+                    if ((_(args).has("start") && args.start + lists.length < collection.totalItems) ||
+                        (_(args).has("before") && lists.length >= args.count) ||
                         (_(args).has("since"))) {
                         collection.links.next = {
-                            href: collection.url + "?before=" + encodeURIComponent(collections[collections.length-1].id)
+                            href: collection.url + "?before=" + encodeURIComponent(lists[lists.length-1].id)
                         };
                     }
                 }
