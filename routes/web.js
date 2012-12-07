@@ -523,6 +523,8 @@ var handleLogin = function(req, res, next) {
 };
 
 var getAllLists = function(user, callback) {
+    var lists;
+
     Step(
         function() {
             user.getLists("person", this);
@@ -535,7 +537,23 @@ var getAllLists = function(user, callback) {
             if (err) throw err;
             Collection.readAll(ids, this);
         },
-        callback
+        function(err, objs) {
+            var group;
+            if (err) throw err;
+            lists = objs;
+            group = this.group();
+            // XXX: Unencapsulate this and do it in 1-2 calls
+            _.each(lists, function(list) {
+                list.expandFeeds(group());
+            });
+        },
+        function(err) {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, lists);
+            }
+        }
     );
 };
 
@@ -577,7 +595,7 @@ var showList = function(req, res, next) {
                     if (err) throw err;
                     if (results.length === 0) throw new HTTPError("Not found", 404);
                     if (results.length > 1) throw new HTTPError("Too many lists", 500);
-                    list = results;
+                    list = results[0];
                     list.expandFeeds(this);
                 },
                 function(err) {
