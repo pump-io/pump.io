@@ -1496,9 +1496,10 @@ var Pump = (function(_, $, Backbone) {
 
             if (!el.host || el.host === here.host) {
                 this.router.navigate(pathname, true);
+                return false;
+            } else {
+                return true;
             }
-
-            return false;
         }
     });
 
