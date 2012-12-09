@@ -21,7 +21,11 @@
       <b class="caret"></b>
     </a>
     <ul class="dropdown-menu" role="menu" aria-labelledby="profile-dropdown">
-      <li><a tabindex="-1" href="/<%- data.user.nickname %>">Profile</a></li>
+      <li><a tabindex="-1" href="/<%- data.user.nickname %>">Activity</a></li>
+      <li><a tabindex="-1" href="/<%- data.user.nickname %>/favorites">Favorites</a></li>
+      <li><a tabindex="-1" href="/<%- data.user.nickname %>/followers">Followers</a></li>
+      <li><a tabindex="-1" href="/<%- data.user.nickname %>/following">Following</a></li>
+      <li><a tabindex="-1" href="/<%- data.user.nickname %>/lists">Lists</a></li>
       <li class="divider"></li>
       <li><a tabindex="-1" href="/main/settings">Settings</a></li>
       <li><a tabindex="-1" href="/main/avatar">Avatar</a></li>
