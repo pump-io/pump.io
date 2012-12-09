@@ -652,12 +652,12 @@ var Pump = (function(_, $, Backbone) {
                     }
                 }).on("complete", function(event, id, fileName, responseJSON) {
 
-                    var act = new Pump.Activity({
-                        verb: "post",
-                        object: responseJSON.obj
-                    }),
-                        stream = Pump.currentUser.stream;
-                    
+                    var stream = Pump.currentUser.stream,
+                        act = new Pump.Activity({
+                            verb: "post",
+                            object: responseJSON.obj
+                        });
+                        
                     stream.create(act, {success: function(act) {
                         view.$("#modal-picture").modal('hide');
                         view.stopSpin();
@@ -1436,6 +1436,8 @@ var Pump = (function(_, $, Backbone) {
         postNote: function(ev) {
             var view = this,
                 text = view.$('#post-note #note-content').val(),
+                to = view.$('#post-note #note-to').val(),
+                cc = view.$('#post-note #note-cc').val(),
                 act = new Pump.Activity({
                     verb: "post",
                     object: {
@@ -1443,7 +1445,26 @@ var Pump = (function(_, $, Backbone) {
                         content: text
                     }
                 }),
-                stream = Pump.currentUser.stream;
+                stream = Pump.currentUser.stream,
+                strToObj = function(str) {
+                    var colon = str.indexOf(":"),
+                        type = str.substr(0, colon),
+                        id = str.substr(colon+1);
+                    return new Pump.ActivityObject({
+                        id: id,
+                        objectType: type
+                    });
+                },
+                toBag = new Pump.ActivityObjectBag(_.map(to, strToObj)),
+                ccBag = new Pump.ActivityObjectBag(_.map(cc, strToObj));
+
+            if (to && to.length > 0) {
+                act.to = toBag;
+            }
+
+            if (cc && cc.length > 0) {
+                act.cc = ccBag;
+            }
 
             view.startSpin();
             
