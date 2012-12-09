@@ -602,12 +602,22 @@ var Pump = (function(_, $, Backbone) {
             "click #profile-dropdown": "profileDropdown"
         },
         postNoteModal: function() {
-            Pump.showModal(Pump.PostNoteModal, function(view) {
-                view.$('#note-content').wysihtml5({
-                    customTemplates: Pump.wysihtml5Tmpl
-                });
-                view.$(".pump-modal").modal('show');
-            });
+            var profile = Pump.currentUser.profile,
+                lists = profile.lists,
+                following = profile.following;
+
+            lists.fetch({success: function() {
+                following.fetch({success: function() {
+                    Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.currentUser}}, function(view) {
+                        view.$('#note-content').wysihtml5({
+                            customTemplates: Pump.wysihtml5Tmpl
+                        });
+                        view.$("#note-to").select2();
+                        view.$("#note-cc").select2();
+                        view.$(".pump-modal").modal('show');
+                    });
+                }});
+            }});
             return false;
         },
         postPictureModal: function() {
