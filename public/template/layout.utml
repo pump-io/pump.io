@@ -6,10 +6,11 @@
     <title><%- page.title %> - <%- config.site %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Le styles -->
     <link href="/stylesheet/bootstrap.min.css" rel="stylesheet">
     <link href="/stylesheet/fineuploader.css" rel="stylesheet">
     <link href="/stylesheet/bootstrap-wysihtml5.css" rel="stylesheet">
+    <link href="/stylesheet/select2.css" rel="stylesheet">
+
     <style>
       body {
       position: relative;
@@ -18,7 +19,6 @@
     </style>
     <link href="/stylesheet/bootstrap-responsive.min.css" rel="stylesheet">
 
-    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
         <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -54,9 +54,6 @@
 
     </div> <!-- /container -->
 
-    <!-- Le javascript
-         ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
     <script src="/javascript/jquery-1.8.2.min.js"></script>
     <script src="/javascript/jquery.easydate-0.2.4.min.js"></script>
     <script src="/javascript/json2.min.js"></script>
@@ -70,6 +67,7 @@
     <script src="/javascript/jquery.fineuploader-3.0.min.js"></script>
     <script src="/javascript/wysihtml5-0.3.0.min.js"></script>
     <script src="/javascript/bootstrap-wysihtml5.js"></script>
+    <script src="/javascript/select2.min.js"></script>
     <script src="/javascript/pump.js"></script>
     <script>
       if (!Pump) {
