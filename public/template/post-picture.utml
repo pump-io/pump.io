@@ -9,9 +9,51 @@
       <fieldset>
         <label for="title">Title</label>
         <input type="text" id="picture-title" placeholder="(optional)" name="title"></input>
-        <label for="description">Title</label>
+        <label for="description">Description</label>
         <textarea id="picture-description" class="span5" name="description" placeholder="Description (optional)" rows="3">
         </textarea>
+        <div>
+          <label for="picture-to">To</label>
+          <select name="to" id="picture-to" multiple="" style="width: 80%">
+            <option value="collection:http://activityschema.org/collection/public">Public</option>
+            <option value="collection:<%- data.user.profile.followers.url %>">Followers</option>
+            <% if (data.user.profile.lists.totalItems > 0) { %>
+            <optgroup label="Lists">
+              <% _.each(data.user.profile.lists.items, function(list) { %>
+              <option value="collection:<%- list.id %>"><%- list.displayName %></option>
+              <% }); %>
+            </optgroup>
+            <% } %>
+            <% if (data.user.profile.following.totalItems > 0) { %>x
+            <optgroup label="People">
+              <% _.each(data.user.profile.following.items, function(contact) { %>
+              <option value="<%- contact.objectType %>:<%- contact.id %>"><%- contact.displayName %></option>
+              <% }); %>
+            </optgroup>
+            <% } %>
+          </select>
+        </div>
+        <div>
+          <label for="picture-cc">CC</label>
+          <select name="cc" id="picture-cc" multiple="" style="width: 80%">
+            <option value="collection:http://activityschema.org/collection/public">Public</option>
+            <option selected="selected" value="collection:<%- data.user.profile.followers.url %>">Followers</option>
+            <% if (data.user.profile.lists.totalItems > 0) { %>
+            <optgroup label="Lists">
+              <% _.each(data.user.profile.lists.items, function(list) { %>
+              <option value="collection:<%- list.id %>"><%- list.displayName %></option>
+              <% }); %>
+            </optgroup>
+            <% } %>
+            <% if (data.user.profile.following.totalItems > 0) { %>x
+            <optgroup label="People">
+              <% _.each(data.user.profile.following.items, function(contact) { %>
+              <option value="<%- contact.objectType %>:<%- contact.id %>"><%- contact.displayName %></option>
+              <% }); %>
+            </optgroup>
+            <% } %>
+          </select>
+        </div>
       </fieldset>
     </form>
   </div>

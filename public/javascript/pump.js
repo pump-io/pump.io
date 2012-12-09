@@ -621,58 +621,88 @@ var Pump = (function(_, $, Backbone) {
             return false;
         },
         postPictureModal: function() {
+            var profile = Pump.currentUser.profile,
+                lists = profile.lists,
+                following = profile.following;
 
-            Pump.showModal(Pump.PostPictureModal, function(view) {
+            lists.fetch({success: function() {
+                following.fetch({success: function() {
 
-                view.$('#picture-description').wysihtml5({
-                    customTemplates: Pump.wysihtml5Tmpl
-                });
+                    Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.currentUser}}, function(view) {
 
-                view.$("#picture-fineupload").fineUploader({
-                    request: {
-                        endpoint: "/main/upload"
-                    },
-                    text: {
-                        uploadButton: '<i class="icon-upload icon-white"></i> Picture file'
-                    },
-                    template: '<div class="qq-uploader">' +
-                        '<pre class="qq-upload-drop-area"><span>{dragZoneText}</span></pre>' +
-                        '<div class="qq-upload-button btn btn-success">{uploadButtonText}</div>' +
-                        '<ul class="qq-upload-list"></ul>' +
-                        '</div>',
-                    classes: {
-                        success: 'alert alert-success',
-                        fail: 'alert alert-error'
-                    },
-                    autoUpload: false,
-                    multiple: false,
-                    validation: {
-                        allowedExtensions: ["jpeg", "jpg", "png", "gif", "svg", "svgz"],
-                        acceptFiles: "image/*"
-                    }
-                }).on("complete", function(event, id, fileName, responseJSON) {
+                        view.$("#picture-to").select2();
+                        view.$("#picture-cc").select2();
 
-                    var stream = Pump.currentUser.stream,
-                        act = new Pump.Activity({
-                            verb: "post",
-                            object: responseJSON.obj
+                        view.$('#picture-description').wysihtml5({
+                            customTemplates: Pump.wysihtml5Tmpl
                         });
-                        
-                    stream.create(act, {success: function(act) {
-                        view.$("#modal-picture").modal('hide');
-                        view.stopSpin();
-                        view.$("#picture-fineupload").fineUploader('reset');
-                        Pump.resetWysihtml5(view.$('#picture-description'));
-                        view.$('#picture-title').val("");
-                        // Reload the current content
-                        Pump.addMajorActivity(act);
-                    }});
-                }).on("error", function(event, id, fileName, reason) {
-                    view.showError(reason);
-                });
 
-                view.$(".pump-modal").modal('show');
-            });
+                        view.$("#picture-fineupload").fineUploader({
+                            request: {
+                                endpoint: "/main/upload"
+                            },
+                            text: {
+                                uploadButton: '<i class="icon-upload icon-white"></i> Picture file'
+                            },
+                            template: '<div class="qq-uploader">' +
+                                '<pre class="qq-upload-drop-area"><span>{dragZoneText}</span></pre>' +
+                                '<div class="qq-upload-button btn btn-success">{uploadButtonText}</div>' +
+                                '<ul class="qq-upload-list"></ul>' +
+                                '</div>',
+                            classes: {
+                                success: 'alert alert-success',
+                                fail: 'alert alert-error'
+                            },
+                            autoUpload: false,
+                            multiple: false,
+                            validation: {
+                                allowedExtensions: ["jpeg", "jpg", "png", "gif", "svg", "svgz"],
+                                acceptFiles: "image/*"
+                            }
+                        }).on("complete", function(event, id, fileName, responseJSON) {
+
+                            var stream = Pump.currentUser.stream,
+                                to = view.$('#post-picture #picture-to').val(),
+                                cc = view.$('#post-picture #picture-cc').val(),
+                                strToObj = function(str) {
+                                    var colon = str.indexOf(":"),
+                                        type = str.substr(0, colon),
+                                        id = str.substr(colon+1);
+                                    return new Pump.ActivityObject({
+                                        id: id,
+                                        objectType: type
+                                    });
+                                },
+                                act = new Pump.Activity({
+                                    verb: "post",
+                                    object: responseJSON.obj
+                                });
+
+                            if (to && to.length > 0) {
+                                act.to = new Pump.ActivityObjectBag(_.map(to, strToObj));
+                            }
+
+                            if (cc && cc.length > 0) {
+                                act.cc = new Pump.ActivityObjectBag(_.map(cc, strToObj));
+                            }
+
+                            stream.create(act, {success: function(act) {
+                                view.$("#modal-picture").modal('hide');
+                                view.stopSpin();
+                                view.$("#picture-fineupload").fineUploader('reset');
+                                Pump.resetWysihtml5(view.$('#picture-description'));
+                                view.$('#picture-title').val("");
+                                // Reload the current content
+                                Pump.addMajorActivity(act);
+                            }});
+                        }).on("error", function(event, id, fileName, reason) {
+                            view.showError(reason);
+                        });
+
+                        view.$(".pump-modal").modal('show');
+                    });
+                }});
+            }});
             return false;
         },
         profileDropdown: function() {
@@ -1454,16 +1484,14 @@ var Pump = (function(_, $, Backbone) {
                         id: id,
                         objectType: type
                     });
-                },
-                toBag = new Pump.ActivityObjectBag(_.map(to, strToObj)),
-                ccBag = new Pump.ActivityObjectBag(_.map(cc, strToObj));
+                };
 
             if (to && to.length > 0) {
-                act.to = toBag;
+                act.to = new Pump.ActivityObjectBag(_.map(to, strToObj));
             }
 
             if (cc && cc.length > 0) {
-                act.cc = ccBag;
+                act.cc = new Pump.ActivityObjectBag(_.map(cc, strToObj));
             }
 
             view.startSpin();
