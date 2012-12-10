@@ -104,6 +104,20 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.isObject(act);
                     },
+                    "it has an empty shares member": function(err, act) {
+                        assert.ifError(err);
+                        assert.isObject(act);
+                        assert.include(act, "object");
+                        assert.isObject(act.object);
+                        assert.include(act.object, "shares");
+                        assert.isObject(act.object.shares);
+                        assert.include(act.object.shares, "totalItems");
+                        assert.isNumber(act.object.shares.totalItems);
+                        assert.equal(act.object.shares.totalItems, 0);
+                        assert.include(act.object.shares, "url");
+                        assert.isString(act.object.shares.url);
+                        assert.equal(act.object.shares.url, act.object.id + "/shares");
+                    },
                     "and another user shares it": {
                         topic: function(post, pairs, cl) {
                             var callback = this.callback;

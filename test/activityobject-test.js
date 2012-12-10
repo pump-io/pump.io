@@ -209,6 +209,12 @@ suite.addBatch({
                 },
                 "it has an isFollowable() method": function(review) {
                     assert.isFunction(review.isFollowable);
+                },
+                "it has a getSharesStream() method": function(review) {
+                    assert.isFunction(review.getSharesStream);
+                },
+                "it has a sharesCount() method": function(review) {
+                    assert.isFunction(review.sharesCount);
                 }
             },
             "and we get a non-activityobject model object by its properties": {
