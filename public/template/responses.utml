@@ -6,6 +6,10 @@
     <a class="favorite" href="#">Like <i class="icon-thumbs-up"></i></a> • 
     <% } %>
     <a class="comment" href="#">Comment <i class="icon-comment"></i></a> • 
+    <% if (data.object.shared) { %>
+    <a class="unshare" href="#">Unshare <i class="icon-remove"></i></a>
+    <% } else { %>
     <a class="share" href="#">Share <i class="icon-share-alt"></i></a>
+    <% } %>
   </p>
 </div>

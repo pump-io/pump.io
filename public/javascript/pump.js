@@ -317,7 +317,7 @@ var Pump = (function(_, $, Backbone) {
     Pump.ActivityObject = Pump.Model.extend({
         activityObjects: ['author', 'location', 'inReplyTo'],
         activityObjectBags: ['attachments', 'tags'],
-        activityObjectStreams: ['likes', 'replies'],
+        activityObjectStreams: ['likes', 'replies', 'shares'],
         url: function() {
             var links = this.get("links"),
                 uuid = this.get("uuid"),
@@ -1050,6 +1050,8 @@ var Pump = (function(_, $, Backbone) {
         events: {
             "click .favorite": "favoriteObject",
             "click .unfavorite": "unfavoriteObject",
+            "click .share": "shareObject",
+            "click .unshare": "unshareObject",
             "click .comment": "openComment"
         },
         favoriteObject: function() {
@@ -1081,6 +1083,38 @@ var Pump = (function(_, $, Backbone) {
                     .removeClass("unfavorite")
                     .addClass("favorite")
                     .html("Like <i class=\"icon-thumbs-up\"></i>");
+                Pump.addMinorActivity(act);
+            }});
+        },
+        shareObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "share",
+                    object: view.model.object.toJSON()
+                }),
+                stream = Pump.currentUser.stream;
+
+            stream.create(act, {success: function(act) {
+                view.$(".share")
+                    .removeClass("share")
+                    .addClass("unshare")
+                    .html("Unshare <i class=\"icon-remove\"></i>");
+                Pump.addMajorActivity(act);
+            }});
+        },
+        unshareObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "unshare",
+                    object: view.model.object.toJSON()
+                }),
+                stream = Pump.currentUser.stream;
+
+            stream.create(act, {success: function(act) {
+                view.$(".unshare")
+                    .removeClass("unshare")
+                    .addClass("share")
+                    .html("Share <i class=\"icon-share-alt\"></i>");
                 Pump.addMinorActivity(act);
             }});
         },
