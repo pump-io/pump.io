@@ -68,7 +68,8 @@ var types = [
     "other",
     "dialbackrequest",
     "session",
-    "sessionlist"
+    "sessionlist",
+    "share"
 ];
 
 vows.describe("schema module interface").addBatch({
