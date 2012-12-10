@@ -56,6 +56,7 @@ var databank = require("databank"),
     addShared = finishers.addShared,
     addLikers = finishers.addLikers,
     firstFewReplies = finishers.firstFewReplies,
+    firstFewShares = finishers.firstFewShares,
     addFollowed = finishers.addFollowed,
     requestObject = omw.requestObject;
 
@@ -149,6 +150,7 @@ var showInbox = function(req, res, next) {
                     addShared(profile, objects, this.parallel());
                     addLikers(profile, objects, this.parallel());
                     firstFewReplies(profile, objects, this.parallel());
+                    firstFewShares(profile, objects, this.parallel());
                 },
                 function(err) {
                     if (err) {
@@ -761,6 +763,7 @@ var showObject = function(req, res, next) {
             addShared(profile, [obj], this.parallel());
             addLikers(profile, [obj], this.parallel());
             firstFewReplies(profile, [obj], this.parallel());
+            firstFewShares(profile, [obj], this.parallel());
             if (obj.isFollowable()) {
                 addFollowed(profile, [obj], this.parallel());
             }
