@@ -77,6 +77,8 @@ var databank = require("databank"),
     addShared = finishers.addShared,
     firstFewRepliesFinisher = finishers.firstFewRepliesFinisher,
     firstFewReplies = finishers.firstFewReplies,
+    firstFewSharesFinisher = finishers.firstFewSharesFinisher,
+    firstFewShares = finishers.firstFewShares,
     doFinishers = finishers.doFinishers,
     typeToClass = mm.typeToClass,
     typeToExt = mm.typeToExt,
@@ -261,6 +263,7 @@ var getObject = function(req, res, next) {
             addLikers(profile, [obj], this.parallel());
             addShared(profile, [obj], this.parallel());
             firstFewReplies(profile, [obj], this.parallel());
+            firstFewShares(profile, [obj], this.parallel());
             if (obj.isFollowable()) {
                 addFollowed(profile, [obj], this.parallel());
             }
@@ -1164,7 +1167,11 @@ var filteredFeedRoute = function(urlmaker, titlemaker, streammaker, finisher) {
 };
 
 
-var majorFinishers = doFinishers([addLikedFinisher, firstFewRepliesFinisher, addLikersFinisher, addSharedFinisher]);
+var majorFinishers = doFinishers([addLikedFinisher,
+                                  firstFewRepliesFinisher,
+                                  addLikersFinisher,
+                                  addSharedFinisher,
+                                  firstFewSharesFinisher]);
 
 var userStream = filteredFeedRoute(
     function(req) {
@@ -1698,6 +1705,10 @@ var userFavorites = function(req, res, next) {
 
             firstFewReplies(profile, collection.items, this.parallel());
 
+            // Add the first few replies for each object
+
+            firstFewShares(profile, collection.items, this.parallel());
+
             // Add the first few "likers" for each object
 
             addLikers(profile, collection.items, this.parallel());
@@ -2050,6 +2061,10 @@ var collectionMembers = function(req, res, next) {
             // Add the first few replies for each object
 
             firstFewReplies(profile, feed.items, this.parallel());
+
+            // Add the first few shares for each object
+
+            firstFewShares(profile, feed.items, this.parallel());
 
             // Add the first few "likers" for each object
 

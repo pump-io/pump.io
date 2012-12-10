@@ -69,6 +69,8 @@ var correctShares = function(feed) {
         assert.include(act.object.shares, "totalItems");
         if (act.object.secretNumber % 2) {
             assert.equal(act.object.shares.totalItems, 1);
+            assert.include(act.object.shares, "items");
+            assert.lengthOf(act.object.shares.items, 1);
         } else {
             assert.equal(act.object.shares.totalItems, 0);
         }
