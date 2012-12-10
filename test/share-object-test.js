@@ -207,6 +207,82 @@ suite.addBatch({
                         }
                     }
                 }
+            },
+            "and we register some other users": {
+                topic: function(cl) {
+                    var callback = this.callback;
+                    Step(
+                        function() {
+                            var group = this.group();
+                            newPair(cl, "parker", "enough-rope", group());
+                            newPair(cl, "woolcott", "i-came-to-dinner", group());
+                        },
+                        callback
+                    );
+                },
+                "it works": function(err, pairs) {
+                    assert.ifError(err);
+                    assert.isArray(pairs);
+                },
+                "and one user posts something and another user shares then unshares it and we get the feed of shares": {
+                    topic: function(pairs, cl) {
+                        var callback = this.callback,
+                            url0 = "http://localhost:4815/api/user/parker/feed",
+                            url1 = "http://localhost:4815/api/user/woolcott/feed",
+                            cred0 = makeCred(cl, pairs[0]),
+                            cred1 = makeCred(cl, pairs[1]);
+
+                        Step(
+                            function() {
+                                var act = {
+                                        verb: "post",
+                                        object: {
+                                            objectType: "note",
+                                            content: "How could they tell?"
+                                        }
+                                    };
+                                httputil.postJSON(url0, cred0, act, this);
+                            },
+                            function(err, post, response) {
+                                var act;
+                                if (err) throw err;
+                                act = {
+                                    verb: "share",
+                                    object: post.object
+                                };
+                                httputil.postJSON(url1, cred1, act, this);
+                            },
+                            function(err, share, response) {
+                                var act;
+                                if (err) throw err;
+                                act = {
+                                    verb: "unshare",
+                                    object: share.object
+                                };
+                                httputil.postJSON(url1, cred1, act, this);
+                            },
+                            function(err, unshare, response) {
+                                if (err) throw err;
+                                httputil.getJSON(unshare.object.shares.url, cred0, this);
+                            },
+                            function(err, feed, response) {
+                                callback(err, feed);
+                            }
+                        );
+                    },
+                    "it works": function(err, feed) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                    },
+                    "feed is empty": function(err, feed) {
+                        assert.ifError(err);
+                        assert.isObject(feed);
+                        assert.include(feed, "items");
+                        assert.include(feed, "totalItems");
+                        assert.equal(feed.totalItems, 0);
+                        assert.isEmpty(feed.items);
+                    }
+                }
             }
         }
     }
