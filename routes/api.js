@@ -74,6 +74,7 @@ var databank = require("databank"),
     addLikersFinisher = finishers.addLikersFinisher,
     addLikers = finishers.addLikers,
     addSharedFinisher = finishers.addSharedFinisher,
+    addShared = finishers.addShared,
     firstFewRepliesFinisher = finishers.firstFewRepliesFinisher,
     firstFewReplies = finishers.firstFewReplies,
     doFinishers = finishers.doFinishers,
@@ -258,6 +259,7 @@ var getObject = function(req, res, next) {
             if (err) throw err;
             addLiked(profile, [obj], this.parallel());
             addLikers(profile, [obj], this.parallel());
+            addShared(profile, [obj], this.parallel());
             firstFewReplies(profile, [obj], this.parallel());
             if (obj.isFollowable()) {
                 addFollowed(profile, [obj], this.parallel());
@@ -1699,6 +1701,10 @@ var userFavorites = function(req, res, next) {
             // Add the first few "likers" for each object
 
             addLikers(profile, collection.items, this.parallel());
+
+            // Add the shared flag for each object
+
+            addShared(profile, collection.items, this.parallel());
 
             third = this.parallel();
 
