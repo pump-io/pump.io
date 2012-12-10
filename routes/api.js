@@ -84,6 +84,7 @@ var databank = require("databank"),
     DEFAULT_FAVORITES = DEFAULT_ITEMS,
     DEFAULT_LIKES = DEFAULT_ITEMS,
     DEFAULT_REPLIES = DEFAULT_ITEMS,
+    DEFAULT_SHARES = DEFAULT_ITEMS,
     DEFAULT_FOLLOWERS = DEFAULT_ITEMS,
     DEFAULT_FOLLOWING = DEFAULT_ITEMS,
     DEFAULT_MEMBERS = DEFAULT_ITEMS,
@@ -95,6 +96,7 @@ var databank = require("databank"),
     MAX_FAVORITES = MAX_ITEMS,
     MAX_LIKES = MAX_ITEMS,
     MAX_REPLIES = MAX_ITEMS,
+    MAX_SHARES = MAX_ITEMS,
     MAX_FOLLOWERS = MAX_ITEMS,
     MAX_FOLLOWING = MAX_ITEMS,
     MAX_MEMBERS = MAX_ITEMS,
@@ -175,6 +177,7 @@ var addRoutes = function(app) {
 
     app.get("/api/:type/:uuid/likes", clientAuth, requestObject, authorOrRecipient, objectLikes);
     app.get("/api/:type/:uuid/replies", clientAuth, requestObject, authorOrRecipient, objectReplies);
+    app.get("/api/:type/:uuid/shares", clientAuth, requestObject, authorOrRecipient, objectShares);
 
     // Global user list
 
@@ -424,6 +427,61 @@ var objectReplies = function(req, res, next) {
                 _.each(objs, function(obj) {
                     obj.sanitize();
                     delete obj.inReplyTo;
+                });
+                collection.items = objs;
+                res.json(collection);
+            }
+        }
+    );
+};
+
+// Feed of actors (usually persons) who have shared the object
+// It's stored as a stream, so we get those
+
+var objectShares = function(req, res, next) {
+
+    var type = req.type,
+        obj = req[type];
+
+    var collection = {
+        displayName: "Shares of " + ((obj.displayName) ? obj.displayName : obj.id),
+        id: URLMaker.makeURL("api/" + type + "/" + obj._uuid + "/shares"),
+        items: []
+    };
+
+    var args;
+
+    try {
+        args = streamArgs(req, DEFAULT_SHARES, MAX_SHARES);
+    } catch (e) {
+        next(e);
+        return;
+    }
+
+    Step(
+        function() {
+            obj.getSharesStream(this);
+        },
+        function(err, str) {
+            var filtered;
+            if (err) throw err;
+            str.count(this.parallel());
+            str.getObjects(args.start, args.end, this.parallel());
+        },
+        function(err, count, refs) {
+            var group = this.group();
+            if (err) throw err;
+            collection.totalItems = count;
+            _.each(refs, function(ref) {
+                ActivityObject.getObject(ref.objectType, ref.id, group());
+            });
+        },
+        function(err, objs) {
+            if (err) {
+                next(err);
+            } else {
+                _.each(objs, function(obj) {
+                    obj.sanitize();
                 });
                 collection.items = objs;
                 res.json(collection);

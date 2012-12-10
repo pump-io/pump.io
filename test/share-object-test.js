@@ -179,6 +179,21 @@ suite.addBatch({
                                 assert.include(doc.items[0], "id");
                                 assert.equal(doc.items[0].id, share.id);
                             }
+                        },
+                        "and we check the shared object's shares feed": {
+                            topic: function(share, post, pairs, cl) {
+                                var callback = this.callback,
+                                    cred = makeCred(cl, pairs[0]),
+                                    url = post.object.shares.url;
+
+                                httputil.getJSON(url, cred, function(err, doc, result) {
+                                    callback(err, doc, share.actor);
+                                });
+                            },
+                            "it works": function(err, feed, sharer) {
+                                assert.ifError(err, feed);
+                                assert.isObject(feed);
+                            }
                         }
                     }
                 }
