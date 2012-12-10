@@ -75,6 +75,51 @@ var correctShares = function(feed) {
     });
 };
 
+var haveShared = function(feed) {
+    assert.include(feed, "items");
+    assert.isArray(feed.items);
+    assert.lengthOf(feed.items, 20);
+    _.each(feed.items, function(act) {
+        assert.include(act, "object");
+        assert.isObject(act.object);
+        assert.include(act.object, "pump_io");
+        assert.isObject(act.object.pump_io);
+        assert.include(act.object.pump_io, "shared");
+        assert.isBoolean(act.object.pump_io.shared);
+    });
+};
+
+var noShared = function(feed) {
+    assert.include(feed, "items");
+    assert.isArray(feed.items);
+    assert.lengthOf(feed.items, 20);
+    _.each(feed.items, function(act) {
+        assert.include(act, "object");
+        assert.isObject(act.object);
+        assert.isFalse(_.has(act.object, "pump_io") && _.has(act.object.pump_io, "shared"));
+    });
+};
+
+var sharedIs = function(val) {
+    return function(feed) {
+        assert.include(feed, "items");
+        assert.isArray(feed.items);
+        assert.lengthOf(feed.items, 20);
+        _.each(feed.items, function(act) {
+            assert.include(act, "object");
+            assert.isObject(act.object);
+            assert.include(act.object, "pump_io");
+            assert.isObject(act.object.pump_io);
+            assert.include(act.object.pump_io, "shared");
+            if (act.object.secretNumber % 2) {
+                assert.equal(act.object.pump_io.shared, val);
+            } else {
+                assert.equal(act.object.pump_io.shared, false);
+            }
+        });
+    };
+};
+
 var sameUser = function(url, objects) {
 
     var ctx = {
@@ -104,7 +149,9 @@ var sameUser = function(url, objects) {
                 return feed;
             },
             "all items have shares": haveShares,
-            "some items have non-empty shares": correctShares
+            "some items have non-empty shares": correctShares,
+            "all items have the shared flag": haveShared,
+            "all items have shared = false": sharedIs(false)
         }
     };
     
@@ -143,7 +190,8 @@ var justClient = function(url, objects) {
                 return feed;
             },
             "all items have shares": haveShares,
-            "some items have non-empty shares": correctShares
+            "some items have non-empty shares": correctShares,
+            "no items have the shared flag": noShared
         }
     };
     
@@ -179,7 +227,9 @@ var otherUser = function(url, objects) {
                 return feed;
             },
             "all items have shares": haveShares,
-            "some items have non-empty shares": correctShares
+            "some items have non-empty shares": correctShares,
+            "all items have the shared flag": haveShared,
+            "all items have correct shared value": sharedIs(true)
         }
     };
     

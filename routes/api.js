@@ -73,6 +73,7 @@ var databank = require("databank"),
     addLiked = finishers.addLiked,
     addLikersFinisher = finishers.addLikersFinisher,
     addLikers = finishers.addLikers,
+    addSharedFinisher = finishers.addSharedFinisher,
     firstFewRepliesFinisher = finishers.firstFewRepliesFinisher,
     firstFewReplies = finishers.firstFewReplies,
     doFinishers = finishers.doFinishers,
@@ -1161,7 +1162,7 @@ var filteredFeedRoute = function(urlmaker, titlemaker, streammaker, finisher) {
 };
 
 
-var majorFinishers = doFinishers([addLikedFinisher, firstFewRepliesFinisher, addLikersFinisher]);
+var majorFinishers = doFinishers([addLikedFinisher, firstFewRepliesFinisher, addLikersFinisher, addSharedFinisher]);
 
 var userStream = filteredFeedRoute(
     function(req) {
