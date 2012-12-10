@@ -1999,7 +1999,8 @@ var Pump = (function(_, $, Backbone) {
                                               list: list}};
 
                         Pump.setListContent(options, function(view) {
-                            // Nothing to do!
+                            Pump.userContent.$("#list-menu .active").removeClass("active");
+                            Pump.userContent.$("#list-menu li[data-list-id='"+list.id+"']").addClass("active");
                         });
                     }});
                 }});

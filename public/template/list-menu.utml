@@ -1,6 +1,6 @@
-<ul class="nav nav-tabs nav-stacked">
+<ul class="nav nav-tabs nav-stacked" id="list-menu">
   <% _.each(data.lists, function(list) { %>
-  <li class="<%- ((data.list && data.list.id == list.id) ? 'list active' : 'list') %>">
+  <li class="<%- ((data.list && data.list.id == list.id) ? 'list active' : 'list') %>" data-list-id="<%- list.id %>">
     <a href="<%- list.url %>">
       <%- list.displayName %>
       <% if (list.members && _.has(list.members, "totalItems")) { %>
