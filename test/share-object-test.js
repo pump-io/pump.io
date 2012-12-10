@@ -60,54 +60,37 @@ suite.addBatch({
                 assert.ifError(err);
                 assert.isObject(cl);
             },
-            "and one user posts an object": {
+            "and we register some users": {
                 topic: function(cl) {
                     var callback = this.callback;
-
                     Step(
                         function() {
-                            newPair(cl, "kaufman", "can't take it with you", this);
+                            var group = this.group();
+                            newPair(cl, "kaufman", "can't take it with you", group());
+                            newPair(cl, "benchley", "how-to-sleep", group());
                         },
-                        function(err, pair) {
-                            var url, cred, act;
-                            if (err) throw err;
-                            url = "http://localhost:4815/api/user/kaufman/feed";
-                            cred = makeCred(cl, pair);
-                            act = {
-                                verb: "post",
-                                object: {
-                                    objectType: "note",
-                                    content: "Shoot her."
-                                }
-                            };
-
-                            httputil.postJSON(url, cred, act, this);
-                        },
-                        function(err, act, response) {
-                            callback(err, act);
-                        }
+                        callback
                     );
                 },
-                "it works": function(err, act) {
+                "it works": function(err, pairs) {
                     assert.ifError(err);
-                    assert.isObject(act);
+                    assert.isArray(pairs);
                 },
-                "and another user shares it": {
-                    topic: function(post, cl) {
+                "and one user posts an object": {
+                    topic: function(pairs, cl) {
                         var callback = this.callback;
 
                         Step(
                             function() {
-                                newPair(cl, "benchley", "how-to-sleep", this);
-                            },
-                            function(err, pair) {
                                 var url, cred, act;
-                                if (err) throw err;
-                                url = "http://localhost:4815/api/user/benchley/feed";
-                                cred = makeCred(cl, pair);
+                                url = "http://localhost:4815/api/user/kaufman/feed";
+                                cred = makeCred(cl, pairs[0]);
                                 act = {
-                                    verb: "share",
-                                    object: post.object
+                                    verb: "post",
+                                    object: {
+                                        objectType: "note",
+                                        content: "Shoot her."
+                                    }
                                 };
 
                                 httputil.postJSON(url, cred, act, this);
@@ -121,17 +104,68 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.isObject(act);
                     },
-                    "it is cc the sharer's followers": function(err, act) {
-                        assert.ifError(err);
-                        assert.isObject(act);
-                        assert.include(act, "cc");
-                        assert.isArray(act.cc);
-                        assert.lengthOf(act.cc, 1);
-                        assert.isObject(act.cc[0]);
-                        assert.include(act.cc[0], "objectType");
-                        assert.equal(act.cc[0].objectType, "collection");
-                        assert.include(act.cc[0], "id");
-                        assert.equal(act.cc[0].id, "http://localhost:4815/api/user/benchley/followers");
+                    "and another user shares it": {
+                        topic: function(post, pairs, cl) {
+                            var callback = this.callback;
+
+                            Step(
+                                function() {
+                                    var url, cred, act;
+                                    url = "http://localhost:4815/api/user/benchley/feed";
+                                    cred = makeCred(cl, pairs[1]);
+                                    act = {
+                                        verb: "share",
+                                        object: post.object
+                                    };
+
+                                    httputil.postJSON(url, cred, act, this);
+                                },
+                                function(err, act, response) {
+                                    callback(err, act);
+                                }
+                            );
+                        },
+                        "it works": function(err, act) {
+                            assert.ifError(err);
+                            assert.isObject(act);
+                        },
+                        "it is cc the sharer's followers": function(err, act) {
+                            assert.ifError(err);
+                            assert.isObject(act);
+                            assert.include(act, "cc");
+                            assert.isArray(act.cc);
+                            assert.lengthOf(act.cc, 1);
+                            assert.isObject(act.cc[0]);
+                            assert.include(act.cc[0], "objectType");
+                            assert.equal(act.cc[0].objectType, "collection");
+                            assert.include(act.cc[0], "id");
+                            assert.equal(act.cc[0].id, "http://localhost:4815/api/user/benchley/followers");
+                        },
+                        "and we check the sharer's major feed": {
+                            topic: function(share, post, pairs, cl) {
+                                var callback = this.callback,
+                                    cred = makeCred(cl, pairs[1]),
+                                    url = "http://localhost:4815/api/user/benchley/feed/major";
+
+                                httputil.getJSON(url, cred, function(err, doc, result) {
+                                    callback(err, doc, share);
+                                });
+                            },
+                            "it works": function(err, doc, share) {
+                                assert.ifError(err);
+                                assert.isObject(doc);
+                            },
+                            "it includes the share activity": function(err, doc, share) {
+                                assert.ifError(err);
+                                assert.isObject(doc);
+                                assert.include(doc, "items");
+                                assert.isArray(doc.items);
+                                assert.lengthOf(doc.items, 1);
+                                assert.isObject(doc.items[0]);
+                                assert.include(doc.items[0], "id");
+                                assert.equal(doc.items[0].id, share.id);
+                            }
+                        }
                     }
                 }
             }
