@@ -28,9 +28,11 @@ var databank = require("databank"),
     FilteredStream = require("../lib/filteredstream").FilteredStream,
     filters = require("../lib/filters"),
     recipientsOnly = filters.recipientsOnly,
+    publicOnly = filters.publicOnly,
     objectRecipientsOnly = filters.objectRecipientsOnly,
     objectPublicOnly = filters.objectPublicOnly,
-    publicOnly = filters.publicOnly,
+    idRecipientsOnly = filters.idRecipientsOnly,
+    idPublicOnly = filters.idPublicOnly,
     HTTPError = require("../lib/httperror").HTTPError,
     Stamper = require("../lib/stamper").Stamper,
     Scrubber = require("../lib/scrubber"),
@@ -1696,6 +1698,7 @@ var newFavorite = function(req, res, next) {
 
 var userLists = function(req, res, next) {
     var type = req.params.type,
+        profile = (req.remoteUser) ? req.remoteUser.profile : null,
         url = URLMaker.makeURL("api/user/" + req.user.nickname + "/lists/" + type),
         collection = {
             author: req.user.profile,
@@ -1733,18 +1736,27 @@ var userLists = function(req, res, next) {
             stream.count(this);
         },
         function(err, totalItems) {
+            var filtered;
             if (err) throw err;
             collection.totalItems = totalItems;
             if (totalItems === 0) {
                 res.json(collection);
                 return;
             }
-            if (_(args).has("before")) {
-                stream.getIDsGreaterThan(args.before, args.count, this);
-            } else if (_(args).has("since")) {
-                stream.getIDsLessThan(args.since, args.count, this);
+            if (!profile) {
+                filtered = new FilteredStream(stream, idPublicOnly(Collection.type));
+            } else if (profile.id == req.user.profile.id) {
+                filtered = stream;
             } else {
-                stream.getIDs(args.start, args.end, this);
+                filtered = new FilteredStream(stream, idRecipientsOnly(profile, Collection.type));
+            }
+
+            if (_(args).has("before")) {
+                filtered.getIDsGreaterThan(args.before, args.count, this);
+            } else if (_(args).has("since")) {
+                filtered.getIDsLessThan(args.since, args.count, this);
+            } else {
+                filtered.getIDs(args.start, args.end, this);
             }
         },
         function(err, ids) {
