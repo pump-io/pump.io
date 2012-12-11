@@ -235,8 +235,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 2);
-                        assert.equal(feed.items[0].id, act.id);
+                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
                     }
                 },
                 "and the author reads their own inbox": {
@@ -256,8 +255,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(inbox, "items");
                         assert.isArray(inbox.items);
-                        assert.lengthOf(inbox.items, 4);
-                        assert.equal(inbox.items[0].id, act.id);
+                        assert.ok(_.find(inbox.items, function(item) { return item.id == act.id; }));
                     }
                 },
                 "and the recipient reads the activity": {
@@ -339,8 +337,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 1);
-                        assert.equal(feed.items[0].id, act.id);
+                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
                     }
                 },
                 "and the recipient reads their own inbox": {
@@ -360,8 +357,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(inbox, "items");
                         assert.isArray(inbox.items);
-                        assert.lengthOf(inbox.items, 3);
-                        assert.equal(inbox.items[0].id, act.id);
+                        assert.ok(_.find(inbox.items, function(item) { return item.id == act.id; }));
                     }
                 },
                 "and a follower reads the activity": {
@@ -461,7 +457,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 1);
+                        assert.isEmpty(_.where(feed.items, {id: act.id}));
                     }
                 },
                 "and a follower reads their own inbox": {
@@ -482,8 +478,7 @@ suite.addBatch({
                         assert.include(inbox, "items");
                         assert.isArray(inbox.items);
                         // should be the follow activity, welcome note, reg activity
-                        assert.lengthOf(inbox.items, 3);
-                        assert.notEqual(inbox.items[0].id, act.id);
+                        assert.isEmpty(_.where(inbox.items, {id: act.id}));
                     }
                 },
                 "and an anonymous user reads the activity": {
@@ -583,7 +578,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 0);
+                        assert.isEmpty(_.where(feed.items, {id: act.id}));
                     }
                 }
             },
@@ -749,8 +744,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 2);
-                        assert.equal(feed.items[0].id, act.id);
+                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
                     }
                 },
                 "and the author reads their own inbox": {
@@ -770,8 +764,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(inbox, "items");
                         assert.isArray(inbox.items);
-                        assert.lengthOf(inbox.items, 4);
-                        assert.equal(inbox.items[0].id, act.id);
+                        assert.ok(_.find(inbox.items, function(item) { return item.id == act.id; }));
                     }
                 },
                 "and an unrelated user reads the activity": {
@@ -853,8 +846,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 1);
-                        assert.equal(feed.items[0].id, act.id);
+                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
                     }
                 },
                 "and an unrelated user reads their own inbox": {
@@ -874,7 +866,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(inbox, "totalItems");
                         assert.isNumber(inbox.totalItems);
-                        assert.equal(inbox.totalItems, 2);
+                        assert.isEmpty(_.where(inbox.items, {id: act.id}));
                     }
                 },
                 "and a follower reads the activity": {
@@ -956,8 +948,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 2);
-                        assert.equal(feed.items[0].id, act.id);
+                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
                     }
                 },
                 "and a follower reads their own inbox": {
@@ -977,8 +968,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 4);
-                        assert.equal(feed.items[0].id, act.id);
+                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
                     }
                 },
                 "and an anonymous user reads the activity": {
@@ -1061,8 +1051,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 1);
-                        assert.equal(feed.items[0].id, act.id);
+                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
                     }
                 }
             }
