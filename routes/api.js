@@ -721,6 +721,31 @@ var createUser = function(req, res, next) {
                     }
                 }
             );
+        },
+        defaultLists = function(user, callback) {
+            Step(
+                function(err, str) {
+                    var lists = ["Friends", "Family", "Acquaintances", "Coworkers"],
+                        group = this.group();
+
+                    if (err) throw err;
+
+                    _.each(lists, function(list) {
+                        var act = new Activity({
+                            verb: Activity.CREATE,
+                            to: [{objectType: ActivityObject.COLLECTION,
+                                  id: user.profile.followers.url}],
+                            object: {
+                                objectType: ActivityObject.COLLECTION,
+                                displayName: list,
+                                objectTypes: ["person"]
+                            }
+                        });
+                        newActivity(act, user, group());
+                    });
+                },
+                callback
+            );
         };
 
     // Email validation
@@ -776,14 +801,19 @@ var createUser = function(req, res, next) {
             svc = thisService(req.app);
             registrationActivity(user, svc, this.parallel());
             welcomeActivity(user, svc, this.parallel());
+            defaultLists(user, this.parallel());
         },
-        function(err, reg, welcome) {
-            var rd, wd;
+        function(err, reg, welcome, lists) {
+            var rd, wd, group = this.group();
             if (err) throw err;
             rd = new Distributor(reg);
-            rd.distribute(this.parallel());
+            rd.distribute(group());
             wd = new Distributor(welcome);
-            wd.distribute(this.parallel());
+            wd.distribute(group());
+            _.each(lists, function(list) {
+                var d = new Distributor(list);
+                d.distribute(group());
+            });
         },
         function(err) {
             if (err) throw err;

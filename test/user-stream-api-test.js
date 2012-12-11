@@ -138,15 +138,15 @@ suite.addBatch({
             "and we check the direct major inbox endpoint": 
             httputil.endpoint("/api/user/bigredchicken/inbox/direct/major", ["GET"]),
             "and we get the feed of a new user": 
-            sizeFeed("/api/user/bigredchicken/feed", 1),
+            sizeFeed("/api/user/bigredchicken/feed", 5),
             "and we get the minor feed of a new user": 
-            sizeFeed("/api/user/bigredchicken/feed/minor", 1),
+            sizeFeed("/api/user/bigredchicken/feed/minor", 5),
             "and we get the major feed of a new user": 
             emptyFeed("/api/user/bigredchicken/feed/major"),
             "and we get the inbox of a new user": 
-            sizeFeed("/api/user/bigredchicken/inbox", 2),
+            sizeFeed("/api/user/bigredchicken/inbox", 6),
             "and we get the minor inbox of a new user": 
-            sizeFeed("/api/user/bigredchicken/inbox/minor", 1),
+            sizeFeed("/api/user/bigredchicken/inbox/minor", 5),
             "and we get the major inbox of a new user": 
             sizeFeed("/api/user/bigredchicken/inbox/major", 1),
             "and we get the direct inbox of a new user": 
@@ -234,12 +234,12 @@ suite.addBatch({
                         assert.include(feed, "objectTypes");
                         assert.include(feed.objectTypes, "activity");
                     },
-                    "it has one object": function(err, res) {
+                    "it has six objects": function(err, res) {
                         assert.isObject(res);
                         assert.include(res, "feed");
                         var feed = res.feed;
-                        assert.equal(feed.totalItems, 2);
-                        assert.equal(feed.items.length, 2);
+                        assert.equal(feed.totalItems, 6);
+                        assert.equal(feed.items.length, 6);
                     },
                     "it has our activity": function(err, res) {
                         assert.isObject(res);
@@ -278,12 +278,12 @@ suite.addBatch({
                         assert.include(inbox, "objectTypes");
                         assert.include(inbox.objectTypes, "activity");
                     },
-                    "it has three items": function(err, res) {
+                    "it has seven items": function(err, res) {
                         assert.isObject(res);
                         assert.include(res, "inbox");
                         var inbox = res.inbox;
-                        assert.equal(inbox.totalItems, 3);
-                        assert.equal(inbox.items.length, 3);
+                        assert.equal(inbox.totalItems, 7);
+                        assert.equal(inbox.items.length, 7);
                     },
                     "it has our activity": function(err, res) {
                         assert.isObject(res);
@@ -577,7 +577,7 @@ var validData = function(start, end) {
 
 var workout = function(endpoint, total) {
     if (!total) {
-        total = 101;
+        total = 105;
     }
     return {
         "and we get the default feed": {
@@ -806,11 +806,11 @@ suite.addBatch({
                     assert.ifError(err);
                 },
                 "and we workout the outbox":
-                workout(BASE, 101),
+                workout(BASE, 105),
                 "and we workout the inbox":
                 workout(INBOX, 102),
                 "and we workout the major inbox":
-                workout(MAJORINBOX, 101),
+                workout(MAJORINBOX, 105),
                 "and we workout the major outbox":
                 workout(MAJOROUTBOX, 100),
                 "and we check the minor inbox":
@@ -875,9 +875,9 @@ suite.addBatch({
                     assert.ifError(err);
                 },
                 "and we work out the minor inbox":
-                workout("http://localhost:4815/api/user/benny/inbox/minor", 101),
+                workout("http://localhost:4815/api/user/benny/inbox/minor", 105),
                 "and we work out the minor outbox":
-                workout("http://localhost:4815/api/user/benny/feed/minor", 101),
+                workout("http://localhost:4815/api/user/benny/feed/minor", 105),
                 "and we check the major inbox":
                 sizeFeed("/api/user/benny/inbox/major", 1),
                 "and we check the direct inbox":
