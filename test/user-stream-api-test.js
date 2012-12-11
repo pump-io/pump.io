@@ -537,6 +537,8 @@ var validForm = function(count, total) {
         assert.include(doc.author, "id");
         assert.include(doc.author, "displayName");
         assert.include(doc.author, "objectType");
+        assert.isFalse(_.has(doc.author, "_user"));
+        assert.isFalse(_.has(doc.author, "_uuid"));
         assert.include(doc, "totalItems");
         assert.include(doc, "items");
         assert.include(doc, "displayName");

@@ -1189,6 +1189,9 @@ var filteredFeedRoute = function(urlmaker, titlemaker, streammaker, finisher) {
                     collection.items.forEach(function(act) {
                         delete act.actor;
                     });
+                    if (_.has(collection, "author")) {
+                        collection.author.sanitize();
+                    }
                     res.json(collection);
                 }
             }
@@ -1279,6 +1282,9 @@ var feedRoute = function(urlmaker, titlemaker, streamgetter, finisher) {
                 if (err) {
                     if (err.name == "NoSuchThingError") {
                         collection.totalItems = 0;
+                        if (_.has(collection, "author")) {
+                            collection.author.sanitize();
+                        }
                         res.json(collection);
                     } else {
                         throw err;
@@ -1299,6 +1305,9 @@ var feedRoute = function(urlmaker, titlemaker, streamgetter, finisher) {
                 if (err) {
                     next(err);
                 } else {
+                    if (_.has(collection, "author")) {
+                        collection.author.sanitize();
+                    }
                     res.json(collection);
                 }
             }
@@ -1464,6 +1473,9 @@ var userFollowers = function(req, res, next) {
             if (err) {
                 if (err.name == "NoSuchThingError") {
                     collection.totalItems = 0;
+                    if (_.has(collection, "author")) {
+                        collection.author.sanitize();
+                    }
                     res.json(collection);
                 } else {
                     throw err;
@@ -1524,6 +1536,9 @@ var userFollowers = function(req, res, next) {
                                                {offset: args.start+collection.items.length, count: args.count})
                     };
                 }
+                if (_.has(collection, "author")) {
+                    collection.author.sanitize();
+                }
                 res.json(collection);
             }
         }
@@ -1557,6 +1572,9 @@ var userFollowing = function(req, res, next) {
             if (err) {
                 if (err.name == "NoSuchThingError") {
                     collection.totalItems = 0;
+                    if (_.has(collection, "author")) {
+                        collection.author.sanitize();
+                    }
                     res.json(collection);
                 } else {
                     throw err;
@@ -1624,6 +1642,9 @@ var userFollowing = function(req, res, next) {
                     };
                 }
                 
+                if (_.has(collection, "author")) {
+                    collection.author.sanitize();
+                }
                 res.json(collection);
             }
         }
@@ -1688,6 +1709,9 @@ var userFavorites = function(req, res, next) {
             if (err) throw err;
             collection.totalItems = cnt;
             if (cnt === 0) {
+                if (_.has(collection, "author")) {
+                    collection.author.sanitize();
+                }
                 res.json(collection);
                 return;
             }
@@ -1770,6 +1794,9 @@ var userFavorites = function(req, res, next) {
                 _.each(collection.items, function(object) {
                     object.sanitize();
                 });
+                if (_.has(collection, "author")) {
+                    collection.author.sanitize();
+                }
                 res.json(collection);
             }
         }
@@ -1846,6 +1873,9 @@ var userLists = function(req, res, next) {
             if (err) throw err;
             collection.totalItems = totalItems;
             if (totalItems === 0) {
+                if (_.has(collection, "author")) {
+                    collection.author.sanitize();
+                }
                 res.json(collection);
                 return;
             }
@@ -1903,6 +1933,9 @@ var userLists = function(req, res, next) {
                         };
                     }
                 }
+                if (_.has(collection, "author")) {
+                    collection.author.sanitize();
+                }
                 res.json(collection);
             }
         }
@@ -1951,6 +1984,9 @@ var userUploads = function(req, res, next) {
             if (err) throw err;
             collection.totalItems = totalItems;
             if (totalItems === 0) {
+                if (_.has(collection, "author")) {
+                    collection.author.sanitize();
+                }
                 res.json(collection);
                 return;
             }
@@ -1984,6 +2020,9 @@ var userUploads = function(req, res, next) {
                     object.sanitize();
                 });
                 collection.items = objects;
+                if (_.has(collection, "author")) {
+                    collection.author.sanitize();
+                }
                 res.json(collection);
             }
         }
@@ -2054,6 +2093,9 @@ var collectionMembers = function(req, res, next) {
             if (err) {
                 if (err.name == "NoSuchThingError") {
                     feed.totalItems = 0;
+                    if (_.has(feed, "author")) {
+                        feed.author.sanitize();
+                    }
                     res.json(feed);
                     return;
                 } else {
@@ -2153,6 +2195,10 @@ var collectionMembers = function(req, res, next) {
                         href: URLMaker.makeURL(base, 
                                                {offset: args.start+feed.items.length, count: args.count})
                     };
+                }
+
+                if (_.has(feed, "author")) {
+                    feed.author.sanitize();
                 }
 
                 res.json(feed);
