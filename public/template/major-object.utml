@@ -33,6 +33,12 @@
       <% } else { %>
       <p><small><%= partial("activity-object-collection", {coll: data.object.likes}) %> like this.</small></p>
       <% } %>
+      <% if (data.object.shares.totalItems === 0) { %>
+      <% } else if (data.object.shares.totalItems === 1) { %>
+      <p><small><%= partial("activity-object-collection", {coll: data.object.shares}) %> shared this.</small></p>
+      <% } else { %>
+      <p><small><%= partial("activity-object-collection", {coll: data.object.shares}) %> shared this.</small></p>
+      <% } %>
     </div>
   </div>
 </div>
