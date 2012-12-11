@@ -1651,7 +1651,8 @@ var Pump = (function(_, $, Backbone) {
         var view,
             contentView = options.contentView,
             userContentView = options.userContentView,
-            title = options.title;
+            title = options.title,
+            id = options.model.get("id");
 
         delete options.contentView;
         delete options.userContentView;
@@ -1660,7 +1661,7 @@ var Pump = (function(_, $, Backbone) {
         Pump.content = new contentView(options);
         Pump.router.setTitle(Pump.content, title);
 
-        if ($("#user-content").length > 0) {
+        if ($("#user-content").length > 0 && $("#profile-block").attr("data-profile-id") == id) {
 
             Pump.userContent = new userContentView(options);
 
@@ -1674,7 +1675,7 @@ var Pump = (function(_, $, Backbone) {
 
                 // Helper view for the profile block
 
-                var block = new Pump.ProfileBlock({el: Pump.content.$(".profile-block"),
+                var block = new Pump.ProfileBlock({el: Pump.content.$("#profile-block"),
                                                    model: options.model});
 
                 Pump.userContent = new userContentView(_.extend({el: Pump.content.$("#user-content")}, options));
@@ -1694,9 +1695,10 @@ var Pump = (function(_, $, Backbone) {
             contentView = options.contentView,
             userContentView = options.userContentView,
             listContentView = options.listContentView,
-            title = options.title;
+            title = options.title,
+            id = options.model.get("id");
 
-        if ($("#list-content").length > 0) {
+        if ($("#list-content").length > 0 && $("#list-menu").attr("data-profile-id") == id) {
 
             Pump.content = new contentView(options);
             Pump.userContent = new userContentView(options);

@@ -1,4 +1,4 @@
-<div class="row profile-block">
+<div class="row" id="profile-block" data-profile-id="<%- data.profile.id %>">>
   <div class="span3">
     <% if (data.profile.image && data.profile.image.url) { %>
     <img src="<%- data.profile.image.url %>" width="128" height="128" />

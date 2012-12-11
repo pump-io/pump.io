@@ -1,4 +1,4 @@
-<ul class="nav nav-tabs nav-stacked" id="list-menu">
+<ul class="nav nav-tabs nav-stacked" id="list-menu" data-profile-id="<%- data.profile.id %>">
   <% _.each(data.lists, function(list) { %>
   <li class="<%- ((data.list && data.list.id == list.id) ? 'list active' : 'list') %>" data-list-id="<%- list.id %>">
     <a href="<%- list.url %>">
