@@ -601,7 +601,7 @@ suite.addBatch({
                         assert.isObject(feed);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 1);
+                        assert.greater(feed.items.length, 0);
                         assert.isObject(feed.items[0]);
                         assert.include(feed.items[0], "id");
                         assert.equal("urn:uuid:ab70a4c0-ed3a-11e1-965f-0024beb67924", feed.items[0].id); 
@@ -625,7 +625,7 @@ suite.addBatch({
                         assert.isObject(feed);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 2);
+                        assert.greater(feed.items.length, 0);
                         assert.isObject(feed.items[0]);
                         assert.include(feed.items[0], "verb");
                         assert.equal("favorite", feed.items[0].verb);
