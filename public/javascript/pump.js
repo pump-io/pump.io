@@ -1336,7 +1336,8 @@ var Pump = (function(_, $, Backbone) {
         modelName: "profile",
         parts: ["profile-block",
                 'user-content-lists',
-                "list-menu"],
+                "list-menu",
+                "profile-responses"],
         el: '#content'
     });
 
@@ -1358,6 +1359,7 @@ var Pump = (function(_, $, Backbone) {
         templateName: 'list',
         modelName: "profile",
         parts: ["profile-block",
+                "profile-responses",
                 'user-content-list',
                 "list-content-list",
                 "people-stream",
