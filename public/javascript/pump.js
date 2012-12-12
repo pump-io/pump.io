@@ -16,6 +16,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// XXX: this module has grown bit by bit, and needs to be broken up
+// or I'm going to go crazy. Maybe models, views, and router + setup?
+// Also consider requireJS and AMD
+
 var Pump = (function(_, $, Backbone) {
 
     var searchParams = function(str) {
