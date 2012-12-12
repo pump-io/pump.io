@@ -1299,7 +1299,9 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.ListMenuItem = Pump.TemplateView.extend({
         templateName: "list-menu-item",
-        modelName: "listItem"
+        modelName: "listItem",
+        tagName: "ul",
+        className: "list-menu-wrapper"
     });
 
     Pump.ListsListContent = Pump.TemplateView.extend({
@@ -1665,11 +1667,12 @@ var Pump = (function(_, $, Backbone) {
                     if ($("#list-menu-inner").length > 0) {
                         aview = new Pump.ListMenuItem({model: act.object});
                         aview.$el.one("ready", function() {
-                            aview.$el.hide();
-                            $("#list-menu-inner").prepend(aview.$el);
-                            aview.$el.slideDown('fast');
+                            var el = aview.$("li");
+                            el.hide();
+                            $("#list-menu-inner").prepend(el);
+                            el.slideDown('fast');
                             // Go to the new list page
-                            Pump.router.navigate(act.object.url, true);
+                            Pump.router.navigate(act.object.get("url"), true);
                         });
                         aview.render();
                     }
