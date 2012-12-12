@@ -415,8 +415,17 @@ var Pump = (function(_, $, Backbone) {
     Pump.TemplateError.prototype.constructor = Pump.TemplateError;
 
     Pump.TemplateView = Backbone.View.extend({
+        setElement: function(element, delegate) {
+            Backbone.View.prototype.setElement.apply(this, arguments);
+            if (element) {
+                this.ready();
+            }
+        },
         templateName: null,
         parts: null,
+        ready: function() {
+            // Do nothing by default
+        },
         render: function() {
             var view = this,
                 getTemplate = function(name, cb) {
@@ -470,7 +479,10 @@ var Pump = (function(_, $, Backbone) {
                         Pump.error(err);
                     } else {
                         view.$el.html(html);
-                        view.$el.trigger("pump.rendered", view);
+                        // Let sub-classes do post-rendering setup
+                        view.ready();
+                        // Let others see that we're done
+                        view.$el.trigger("ready", view);
                         // Update relative to the new code view
                         view.$("abbr.easydate").easydate();
                     }
@@ -959,7 +971,7 @@ var Pump = (function(_, $, Backbone) {
             }
 
             aview = new Pump.MajorActivityHeadlessView({model: act});
-            aview.$el.on("pump.rendered", function() {
+            aview.$el.one("ready", function() {
                 aview.$el.hide();
                 view.$("#major-stream").prepend(aview.$el);
                 aview.$el.slideDown('slow');
@@ -977,7 +989,7 @@ var Pump = (function(_, $, Backbone) {
 
             aview = new Pump.MinorActivityHeadlessView({model: act});
 
-            aview.$el.on("pump.rendered", function() {
+            aview.$el.one("ready", function() {
                 aview.$el.hide();
                 view.$("#minor-stream").prepend(aview.$el);
                 aview.$el.slideDown('slow');
@@ -1019,7 +1031,7 @@ var Pump = (function(_, $, Backbone) {
                 aview;
             if (view && view.$(".activity.major")) {
                 aview = new Pump.MajorActivityView({model: act});
-                aview.$el.on("pump.rendered", function() {
+                aview.$el.one("ready", function() {
                     aview.$el.hide();
                     view.$("#major-stream").prepend(aview.$el);
                     aview.$el.slideDown('slow');
@@ -1032,7 +1044,7 @@ var Pump = (function(_, $, Backbone) {
                 aview;
             aview = new Pump.MinorActivityView({model: act});
 
-            aview.$el.on("pump.rendered", function() {
+            aview.$el.one("ready", function() {
                 aview.$el.hide();
                 view.$("#minor-stream").prepend(aview.$el);
                 aview.$el.slideDown('slow');
@@ -1122,7 +1134,7 @@ var Pump = (function(_, $, Backbone) {
             var view = this,
                 form = new Pump.CommentForm({model: view.model});
 
-            form.$el.on("pump.rendered", function() {
+            form.$el.one("ready", function() {
                 view.$(".replies").append(form.el);
             });
 
@@ -1174,7 +1186,7 @@ var Pump = (function(_, $, Backbone) {
 
                 // These get stripped for "posts"; re-add it
 
-                repl.$el.on("pump.rendered", function() {
+                repl.$el.one("ready", function() {
 
                     view.stopSpin();
 
@@ -1617,7 +1629,7 @@ var Pump = (function(_, $, Backbone) {
             modalView = new Cls(options);
             $("body").append(modalView.el);
             Pump.modals[templateName] = modalView;
-            modalView.$el.one("pump.rendered", function() {
+            modalView.$el.one("ready", function() {
                 callback(modalView);
             });
             // Once it's rendered, show the modal
@@ -1671,7 +1683,7 @@ var Pump = (function(_, $, Backbone) {
             
             view = Pump.content;
 
-            view.$el.one("pump.rendered", function() {
+            view.$el.one("ready", function() {
 
                 // Helper view for the profile block
 
@@ -1682,7 +1694,7 @@ var Pump = (function(_, $, Backbone) {
             });
         }
 
-        view.$el.one("pump.rendered", function() {
+        view.$el.one("ready", function() {
             callback(view);
         });
 
@@ -1707,7 +1719,7 @@ var Pump = (function(_, $, Backbone) {
 
             view = Pump.listContent;
             
-            view.$el.one("pump.rendered", function() {
+            view.$el.one("ready", function() {
                 callback(view);
             });
 
@@ -1745,7 +1757,7 @@ var Pump = (function(_, $, Backbone) {
         },
 
         setTitle: function(view, title) {
-            view.$el.one("pump.rendered", function() {
+            view.$el.one("ready", function() {
                 $("title").html(title + " - " + Pump.config.site);
             });
         },
@@ -1809,7 +1821,7 @@ var Pump = (function(_, $, Backbone) {
                                                                          minor: minor}
                                                                  });
                             router.setTitle(Pump.content, "Home");
-                            Pump.content.$el.one("pump.rendered", function() {
+                            Pump.content.$el.one("ready", function() {
                                 Pump.content.$(".activity.major").each(function(i) {
                                     var id = $(this).attr("id"),
                                         act = major.get(id);
