@@ -1285,6 +1285,23 @@ var Pump = (function(_, $, Backbone) {
         el: '#user-content'
     });
 
+    Pump.ListMenu = Pump.TemplateView.extend({
+        templateName: "list-menu",
+        modelName: "profile",
+        el: '.list-menu-block',
+        events: {
+            "click .new-list": "newList"
+        },
+        newList: function() {
+            Pump.showModal(Pump.NewListModal, {data: {user: Pump.currentUser}});
+        }
+    });
+
+    Pump.ListMenuItem = Pump.TemplateView.extend({
+        templateName: "list-menu-item",
+        modelName: "listItem"
+    });
+
     Pump.ListsListContent = Pump.TemplateView.extend({
         templateName: 'list-content-lists',
         modelName: "profile",
@@ -1592,6 +1609,77 @@ var Pump = (function(_, $, Backbone) {
         }
     });
 
+    Pump.NewListModal = Pump.TemplateView.extend({
+
+        tagName: "div",
+        className: "modal-holder",
+        templateName: 'new-list',
+        ready: function() {
+            var view = this;
+            view.$('#list-description').wysihtml5({
+                customTemplates: Pump.wysihtml5Tmpl
+            });
+        },
+        events: {
+            "click #save-new-list": "saveNewList"
+        },
+        saveNewList: function() {
+            var view = this,
+                description = view.$('#new-list #list-description').val(),
+                name = view.$('#new-list #list-name').val(),
+                act,
+                stream = Pump.currentUser.stream;
+
+            if (!name) {
+                view.showError("Your list must have a name.");
+            } else {
+
+                // XXX: any other validation? Check uniqueness here?
+
+                // XXX: to/cc ?
+
+                act = new Pump.Activity({
+                    verb: "create",
+                    object: new Pump.ActivityObject({
+                        objectType: "collection",
+                        objectTypes: ["person"],
+                        displayName: name,
+                        content: description
+                    })
+                });
+                
+                view.startSpin();
+
+                stream.create(act, {success: function(act) {
+                    var aview;
+
+                    view.$(".pump-modal").modal('hide');
+                    view.stopSpin();
+                    Pump.resetWysihtml5(view.$('#list-description'));
+                    view.$('#list-name').val("");
+
+                    // it's minor
+
+                    Pump.addMinorActivity(act);
+
+                    if ($("#list-menu-inner").length > 0) {
+                        aview = new Pump.ListMenuItem({model: act.object});
+                        aview.$el.one("ready", function() {
+                            aview.$el.hide();
+                            $("#list-menu-inner").prepend(aview.$el);
+                            aview.$el.slideDown('fast');
+                            // Go to the new list page
+                            Pump.router.navigate(act.object.url, true);
+                        });
+                        aview.render();
+                    }
+                }});
+            }
+
+            return false;
+        }
+    });
+
     Pump.BodyView = Backbone.View.extend({
         initialize: function(options) {
             this.router = options.router;
@@ -1735,6 +1823,7 @@ var Pump = (function(_, $, Backbone) {
 
         } else {
             Pump.setUserContent(options, function(view) {
+                Pump.listMenu    = new Pump.ListMenu(_.extend({el: view.$("#list-menu")}, options));
                 Pump.listContent = new listContentView(_.extend({el: view.$("#list-content")}, options));
                 callback(Pump.listContent);
             });

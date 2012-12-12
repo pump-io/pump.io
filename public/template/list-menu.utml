@@ -1,13 +1,8 @@
-<ul class="nav nav-tabs nav-stacked" id="list-menu" data-profile-id="<%- data.profile.id %>">
+<ul class="nav nav-tabs nav-stacked" id="list-menu-inner" data-profile-id="<%- data.profile.id %>">
   <% _.each(data.lists, function(list) { %>
-  <li class="<%- ((data.list && data.list.id == list.id) ? 'list active' : 'list') %>" data-list-id="<%- list.id %>">
-    <a href="<%- list.url %>">
-      <%- list.displayName %>
-      <% if (list.members && _.has(list.members, "totalItems")) { %>
-      <span class="label"><%- list.members.totalItems %></span>
-      <% } %>
-    </a>
-  </li>
+  <% data.listItem = list; %>
+  <%= partial("list-menu-item") %>
+  <% delete data.listItem; %>
   <% }); %>
   <% if (data.user && data.user.profile.id == data.profile.id) { %>
   <li class="add-a-list">
