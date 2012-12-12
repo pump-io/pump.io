@@ -620,14 +620,7 @@ var Pump = (function(_, $, Backbone) {
 
             lists.fetch({success: function() {
                 following.fetch({success: function() {
-                    Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.currentUser}}, function(view) {
-                        view.$('#note-content').wysihtml5({
-                            customTemplates: Pump.wysihtml5Tmpl
-                        });
-                        view.$("#note-to").select2();
-                        view.$("#note-cc").select2();
-                        view.$(".pump-modal").modal('show');
-                    });
+                    Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.currentUser}});
                 }});
             }});
             return false;
@@ -639,80 +632,7 @@ var Pump = (function(_, $, Backbone) {
 
             lists.fetch({success: function() {
                 following.fetch({success: function() {
-
-                    Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.currentUser}}, function(view) {
-
-                        view.$("#picture-to").select2();
-                        view.$("#picture-cc").select2();
-
-                        view.$('#picture-description').wysihtml5({
-                            customTemplates: Pump.wysihtml5Tmpl
-                        });
-
-                        view.$("#picture-fineupload").fineUploader({
-                            request: {
-                                endpoint: "/main/upload"
-                            },
-                            text: {
-                                uploadButton: '<i class="icon-upload icon-white"></i> Picture file'
-                            },
-                            template: '<div class="qq-uploader">' +
-                                '<pre class="qq-upload-drop-area"><span>{dragZoneText}</span></pre>' +
-                                '<div class="qq-upload-button btn btn-success">{uploadButtonText}</div>' +
-                                '<ul class="qq-upload-list"></ul>' +
-                                '</div>',
-                            classes: {
-                                success: 'alert alert-success',
-                                fail: 'alert alert-error'
-                            },
-                            autoUpload: false,
-                            multiple: false,
-                            validation: {
-                                allowedExtensions: ["jpeg", "jpg", "png", "gif", "svg", "svgz"],
-                                acceptFiles: "image/*"
-                            }
-                        }).on("complete", function(event, id, fileName, responseJSON) {
-
-                            var stream = Pump.currentUser.stream,
-                                to = view.$('#post-picture #picture-to').val(),
-                                cc = view.$('#post-picture #picture-cc').val(),
-                                strToObj = function(str) {
-                                    var colon = str.indexOf(":"),
-                                        type = str.substr(0, colon),
-                                        id = str.substr(colon+1);
-                                    return new Pump.ActivityObject({
-                                        id: id,
-                                        objectType: type
-                                    });
-                                },
-                                act = new Pump.Activity({
-                                    verb: "post",
-                                    object: responseJSON.obj
-                                });
-
-                            if (to && to.length > 0) {
-                                act.to = new Pump.ActivityObjectBag(_.map(to, strToObj));
-                            }
-
-                            if (cc && cc.length > 0) {
-                                act.cc = new Pump.ActivityObjectBag(_.map(cc, strToObj));
-                            }
-
-                            stream.create(act, {success: function(act) {
-                                view.$("#modal-picture").modal('hide');
-                                view.stopSpin();
-                                view.$("#picture-fineupload").fineUploader('reset');
-                                Pump.resetWysihtml5(view.$('#picture-description'));
-                                view.$('#picture-title').val("");
-                                // Reload the current content
-                                Pump.addMajorActivity(act);
-                            }});
-                        }).on("error", function(event, id, fileName, reason) {
-                            view.showError(reason);
-                        });
-
-                        view.$(".pump-modal").modal('show');
-                    });
+                    Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.currentUser}});
                 }});
             }});
             return false;
@@ -1508,6 +1428,14 @@ var Pump = (function(_, $, Backbone) {
         tagName: "div",
         className: "modal-holder",
         templateName: 'post-note',
+        ready: function() {
+            var view = this;
+            view.$('#note-content').wysihtml5({
+                customTemplates: Pump.wysihtml5Tmpl
+            });
+            view.$("#note-to").select2();
+            view.$("#note-cc").select2();
+        },
         events: {
             "click #send-note": "postNote"
         },
@@ -1555,12 +1483,85 @@ var Pump = (function(_, $, Backbone) {
     });
 
     Pump.PostPictureModal = Pump.TemplateView.extend({
-
         tagName: "div",
         className: "modal-holder",
         templateName: 'post-picture',
         events: {
             "click #send-picture": "postPicture"
+        },
+        ready: function() {
+            var view = this;
+
+            view.$("#picture-to").select2();
+            view.$("#picture-cc").select2();
+
+            view.$('#picture-description').wysihtml5({
+                customTemplates: Pump.wysihtml5Tmpl
+            });
+
+            if (view.$("#picture-fineupload").length > 0) {
+                view.$("#picture-fineupload").fineUploader({
+                    request: {
+                        endpoint: "/main/upload"
+                    },
+                    text: {
+                        uploadButton: '<i class="icon-upload icon-white"></i> Picture file'
+                    },
+                    template: '<div class="qq-uploader">' +
+                        '<pre class="qq-upload-drop-area"><span>{dragZoneText}</span></pre>' +
+                        '<div class="qq-upload-button btn btn-success">{uploadButtonText}</div>' +
+                        '<ul class="qq-upload-list"></ul>' +
+                        '</div>',
+                    classes: {
+                        success: 'alert alert-success',
+                        fail: 'alert alert-error'
+                    },
+                    autoUpload: false,
+                    multiple: false,
+                    validation: {
+                        allowedExtensions: ["jpeg", "jpg", "png", "gif", "svg", "svgz"],
+                        acceptFiles: "image/*"
+                    }
+                }).on("complete", function(event, id, fileName, responseJSON) {
+
+                    var stream = Pump.currentUser.stream,
+                        to = view.$('#post-picture #picture-to').val(),
+                        cc = view.$('#post-picture #picture-cc').val(),
+                        strToObj = function(str) {
+                            var colon = str.indexOf(":"),
+                                type = str.substr(0, colon),
+                                id = str.substr(colon+1);
+                            return new Pump.ActivityObject({
+                                id: id,
+                                objectType: type
+                            });
+                        },
+                        act = new Pump.Activity({
+                            verb: "post",
+                            object: responseJSON.obj
+                        });
+
+                    if (to && to.length > 0) {
+                        act.to = new Pump.ActivityObjectBag(_.map(to, strToObj));
+                    }
+
+                    if (cc && cc.length > 0) {
+                        act.cc = new Pump.ActivityObjectBag(_.map(cc, strToObj));
+                    }
+
+                    stream.create(act, {success: function(act) {
+                        view.$("#modal-picture").modal('hide');
+                        view.stopSpin();
+                        view.$("#picture-fineupload").fineUploader('reset');
+                        Pump.resetWysihtml5(view.$('#picture-description'));
+                        view.$('#picture-title').val("");
+                        // Reload the current content
+                        Pump.addMajorActivity(act);
+                    }});
+                }).on("error", function(event, id, fileName, reason) {
+                    view.showError(reason);
+                });
+            }
         },
         postPicture: function(ev) {
             var view = this,
@@ -1622,17 +1623,20 @@ var Pump = (function(_, $, Backbone) {
             options = {};
         }
 
+        // If we've got it attached already, just show it
         if (_.has(Pump.modals, templateName)) {
             modalView = Pump.modals[templateName];
             modalView.$(".pump-modal").modal('show');
         } else {
+            // Otherwise, create a view
             modalView = new Cls(options);
             $("body").append(modalView.el);
             Pump.modals[templateName] = modalView;
+            // When it's ready, show immediately
             modalView.$el.one("ready", function() {
-                callback(modalView);
+                modalView.$(".pump-modal").modal('show');
             });
-            // Once it's rendered, show the modal
+            // render it (will fire "ready")
             modalView.render();
         }
     };
