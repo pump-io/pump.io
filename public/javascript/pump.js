@@ -1358,30 +1358,82 @@ var Pump = (function(_, $, Backbone) {
                 "profile-responses",
                 "activity-object-list",
                 "activity-object-collection"],
-        el: '#content'
+        el: '#content',
+        ready: function() {
+
+            var view = this,
+                profile = view.options.data.profile,
+                major = view.options.data.major,
+                minor = view.options.data.minor;
+
+            if (!view.profileBlock) {
+                view.profileBlock = new Pump.ProfileBlock({model: profile});
+            }
+
+            view.profileBlock.setElement(view.$("#profile-block"));
+            
+            if (!view.userContent) {
+                view.userContent = new Pump.FavoritesUserContent({collection: major,
+                                                                  data: {profile: profile}});
+            }
+
+            view.userContent.setElement(view.$("#user-content"));
+        }
     });
 
     Pump.FavoritesUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-favorites',
-        modelName: "profile",
+        modelName: "objects",
         parts: ["object-stream",
                 "major-object",
                 "responses",
                 "reply",
                 "profile-responses",
                 "activity-object-collection"],
-        el: '#user-content'
+        el: '#user-content',
+        ready: function() {
+            var view = this,
+                collection = view.collection;
+
+            collection.each(function(object) {
+                var $el = view.$("div[data-object-id='"+object.id+"']"),
+                    aview;
+
+                if ($el.length > 0) {
+                    aview = new Pump.MajorObjectView({model: object});
+                    aview.setElement($el);
+                }
+            });
+        }
     });
 
     Pump.FollowersContent = Pump.ContentView.extend({
         templateName: 'followers',
-        modelName: "profile",
         parts: ["profile-block",
                 "user-content-followers",
                 "people-stream",
                 "major-person",
                 "profile-responses"],
-        el: '#content'
+        el: '#content',
+        ready: function() {
+
+            var view = this,
+                profile = view.options.data.profile,
+                people = view.options.data.people;
+
+            if (!view.profileBlock) {
+                view.profileBlock = new Pump.ProfileBlock({model: profile});
+            }
+
+            view.profileBlock.setElement(view.$("#profile-block"));
+            
+            if (!view.userContent) {
+                view.userContent = new Pump.FollowersUserContent({collection: people,
+                                                                  data: {profile: profile}});
+            }
+
+            view.userContent.setElement(view.$("#user-content"));
+        }
     });
 
     Pump.FollowersUserContent = Pump.TemplateView.extend({
@@ -1390,7 +1442,21 @@ var Pump = (function(_, $, Backbone) {
         parts: ["people-stream",
                 "major-person",
                 "profile-responses"],
-        el: '#user-content'
+        el: '#user-content',
+        ready: function() {
+            var view = this,
+                collection = view.collection;
+
+            collection.each(function(person) {
+                var $el = view.$("div[data-person-id='"+person.id+"']"),
+                    aview;
+
+                if ($el.length > 0) {
+                    aview = new Pump.MajorPersonView({model: person});
+                    aview.setElement($el);
+                }
+            });
+        }
     });
 
     Pump.FollowingContent = Pump.ContentView.extend({
@@ -1401,16 +1467,48 @@ var Pump = (function(_, $, Backbone) {
                 "people-stream",
                 "major-person",
                 "profile-responses"],
-        el: '#content'
+        el: '#content',
+        ready: function() {
+
+            var view = this,
+                profile = view.options.data.profile,
+                people = view.options.data.people;
+
+            if (!view.profileBlock) {
+                view.profileBlock = new Pump.ProfileBlock({model: profile});
+            }
+
+            view.profileBlock.setElement(view.$("#profile-block"));
+            
+            if (!view.userContent) {
+                view.userContent = new Pump.FollowingUserContent({collection: people,
+                                                                  data: {profile: profile}});
+            }
+
+            view.userContent.setElement(view.$("#user-content"));
+        }
     });
 
     Pump.FollowingUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-following',
-        modelName: "profile",
         parts: ["people-stream",
                 "major-person",
                 "profile-responses"],
-        el: '#user-content'
+        el: '#user-content',
+        ready: function() {
+            var view = this,
+                collection = view.collection;
+
+            collection.each(function(person) {
+                var $el = view.$("div[data-person-id='"+person.id+"']"),
+                    aview;
+
+                if ($el.length > 0) {
+                    aview = new Pump.MajorPersonView({model: person});
+                    aview.setElement($el);
+                }
+            });
+        }
     });
 
     Pump.ListsContent = Pump.ContentView.extend({
@@ -1421,7 +1519,26 @@ var Pump = (function(_, $, Backbone) {
                 "list-menu",
                 "list-menu-item",
                 "profile-responses"],
-        el: '#content'
+        el: '#content',
+        ready: function() {
+
+            var view = this,
+                profile = view.options.data.profile,
+                lists = view.options.data.lists;
+
+            if (!view.profileBlock) {
+                view.profileBlock = new Pump.ProfileBlock({model: profile});
+            }
+
+            view.profileBlock.setElement(view.$("#profile-block"));
+            
+            if (!view.userContent) {
+                view.userContent = new Pump.ListsUserContent({data: {profile: profile,
+                                                                     lists: lists}});
+            }
+
+            view.userContent.setElement(view.$("#user-content"));
+        }
     });
 
     Pump.ListsUserContent = Pump.TemplateView.extend({
@@ -1443,6 +1560,20 @@ var Pump = (function(_, $, Backbone) {
         },
         newList: function() {
             Pump.showModal(Pump.NewListModal, {data: {user: Pump.currentUser}});
+        },
+        ready: function() {
+            var view = this,
+                collection = view.collection;
+
+            collection.each(function(person) {
+                var $el = view.$("div[data-person-id='"+person.id+"']"),
+                    aview;
+
+                if ($el.length > 0) {
+                    aview = new Pump.ListMenuItem({model: lists});
+                    aview.setElement($el);
+                }
+            });
         }
     });
 
@@ -1952,18 +2083,9 @@ var Pump = (function(_, $, Backbone) {
             view = Pump.userContent;
             
         } else {
-            
+
             view = Pump.content;
 
-            view.$el.one("ready", function() {
-
-                // Helper view for the profile block
-
-                var block = new Pump.ProfileBlock({el: Pump.content.$("#profile-block"),
-                                                   model: options.model});
-
-                Pump.userContent = new userContentView(_.extend({el: Pump.content.$("#user-content")}, options));
-            });
         }
 
         view.$el.one("ready", function() {
@@ -2138,16 +2260,10 @@ var Pump = (function(_, $, Backbone) {
                         contentView: Pump.FavoritesContent,
                         userContentView: Pump.FavoritesUserContent,
                         title: nickname + " favorites",
-                        model: profile,
-                        data: { objects: favorites }
+                        data: { objects: favorites,
+                                profile: profile }
                     };
                     Pump.setUserContent(options, function(view) {
-                        view.$(".object.major").each(function(i) {
-                            var id = $(this).attr("id"),
-                                obj = favorites.get(id);
-
-                            var aview = new Pump.MajorObjectView({el: this, model: obj});
-                        });
                     });
                 }});
             }});
