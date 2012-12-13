@@ -28,7 +28,6 @@
 
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
-        <div class="container">
           <% if (_.has(data, "user") && data.user) { %>
           <%= partial('nav-loggedin') %>
           <% } else if (page.nologin) { %>
@@ -36,7 +35,6 @@
           <% } else { %>
           <%= partial('nav-anonymous') %>
           <% } %>
-        </div> <!-- /container -->
       </div> <!-- /navbar-inner -->
     </div> <!-- /navbar -->
 

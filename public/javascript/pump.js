@@ -435,6 +435,7 @@ var Pump = (function(_, $, Backbone) {
             Backbone.View.prototype.setElement.apply(this, arguments);
             if (element) {
                 this.ready();
+                this.trigger("ready");
             }
         },
         templateName: null,
@@ -491,14 +492,15 @@ var Pump = (function(_, $, Backbone) {
                     cb(null, html);
                 },
                 setOutput = function(err, html) {
+                    var $old, $new;
                     if (err) {
                         Pump.error(err);
                     } else {
-                        view.$el.html(html);
+                        view.setHTML(html);
                         // Let sub-classes do post-rendering setup
                         view.ready();
                         // Let others see that we're done
-                        view.$el.trigger("ready", view);
+                        view.trigger("ready");
                         // Update relative to the new code view
                         view.$("abbr.easydate").easydate();
                     }
@@ -609,18 +611,27 @@ var Pump = (function(_, $, Backbone) {
         },
         showSuccess: function(msg) {
             this.showAlert(msg, "success");
+        },
+        setHTML: function(html) {
+            var view = this,
+                $old = view.$el,
+                $new = $(html);
+
+            $old.replaceWith($new);
+            view.setElement($new);
+            $old = null;
         }
     });
 
     Pump.AnonymousNav = Pump.TemplateView.extend({
         tagName: "div",
-        className: "nav",
+        className: "container",
         templateName: 'nav-anonymous'
     });
 
     Pump.UserNav = Pump.TemplateView.extend({
         tagName: "div",
-        className: "nav",
+        className: "container",
         modelName: "user",
         templateName: 'nav-loggedin',
         events: {
@@ -721,13 +732,11 @@ var Pump = (function(_, $, Backbone) {
     });
 
     Pump.MainContent = Pump.ContentView.extend({
-        templateName: 'main',
-        el: '#content'
+        templateName: 'main'
     });
 
     Pump.LoginContent = Pump.ContentView.extend({
         templateName: 'login',
-        el: '#content',
         events: {
             "submit #login": "doLogin"
         },
@@ -790,7 +799,6 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.RegisterContent = Pump.ContentView.extend({
         templateName: 'register',
-        el: '#content',
         events: {
             "submit #registration": "register"
         },
@@ -895,7 +903,6 @@ var Pump = (function(_, $, Backbone) {
                 "activity-object-list",
                 "activity-object-collection"
                ],
-        el: '#content',
         addMajorActivity: function(act) {
             var view = this,
                 profile = this.options.data.profile,
@@ -906,7 +913,7 @@ var Pump = (function(_, $, Backbone) {
             }
 
             aview = new Pump.MajorActivityHeadlessView({model: act});
-            aview.$el.one("ready", function() {
+            aview.on("ready", function() {
                 aview.$el.hide();
                 view.$("#major-stream").prepend(aview.$el);
                 aview.$el.slideDown('slow');
@@ -924,7 +931,7 @@ var Pump = (function(_, $, Backbone) {
 
             aview = new Pump.MinorActivityHeadlessView({model: act});
 
-            aview.$el.one("ready", function() {
+            aview.on("ready", function() {
                 aview.$el.hide();
                 view.$("#minor-stream").prepend(aview.$el);
                 aview.$el.slideDown('slow');
@@ -1109,13 +1116,12 @@ var Pump = (function(_, $, Backbone) {
                 "reply",
                 "activity-object-list",
                 "activity-object-collection"],
-        el: '#content',
         addMajorActivity: function(act) {
             var view = this,
                 aview;
             if (view && view.$(".activity.major")) {
                 aview = new Pump.MajorActivityView({model: act});
-                aview.$el.one("ready", function() {
+                aview.on("ready", function() {
                     aview.$el.hide();
                     view.$("#major-stream").prepend(aview.$el);
                     aview.$el.slideDown('slow');
@@ -1128,7 +1134,7 @@ var Pump = (function(_, $, Backbone) {
                 aview;
             aview = new Pump.MinorActivityView({model: act});
 
-            aview.$el.one("ready", function() {
+            aview.on("ready", function() {
                 aview.$el.hide();
                 view.$("#minor-stream").prepend(aview.$el);
                 aview.$el.slideDown('slow');
@@ -1242,7 +1248,7 @@ var Pump = (function(_, $, Backbone) {
             var view = this,
                 form = new Pump.CommentForm({model: view.model});
 
-            form.$el.one("ready", function() {
+            form.on("ready", function() {
                 view.$(".replies").append(form.el);
             });
 
@@ -1293,7 +1299,7 @@ var Pump = (function(_, $, Backbone) {
 
                 // These get stripped for "posts"; re-add it
 
-                repl.$el.one("ready", function() {
+                repl.on("ready", function() {
 
                     view.stopSpin();
 
@@ -1390,7 +1396,6 @@ var Pump = (function(_, $, Backbone) {
                 "profile-responses",
                 "activity-object-list",
                 "activity-object-collection"],
-        el: '#content',
         ready: function() {
 
             var view = this,
@@ -1456,7 +1461,6 @@ var Pump = (function(_, $, Backbone) {
                 "people-stream",
                 "major-person",
                 "profile-responses"],
-        el: '#content',
         ready: function() {
 
             var view = this,
@@ -1519,7 +1523,6 @@ var Pump = (function(_, $, Backbone) {
                 "people-stream",
                 "major-person",
                 "profile-responses"],
-        el: '#content',
         ready: function() {
             var view = this,
                 profile = view.options.data.profile,
@@ -1588,7 +1591,6 @@ var Pump = (function(_, $, Backbone) {
                 "list-menu",
                 "list-menu-item",
                 "profile-responses"],
-        el: '#content',
         ready: function() {
             
             var view = this,
@@ -1696,7 +1698,6 @@ var Pump = (function(_, $, Backbone) {
                 "list-menu",
                 "list-menu-item"
                ],
-        el: '#content',
         ready: function() {
 
             var view = this,
@@ -1792,13 +1793,11 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.ActivityContent = Pump.ContentView.extend({
         templateName: 'activity-content',
-        modelName: "activity",
-        el: '#content'
+        modelName: "activity"
     });
 
     Pump.SettingsContent = Pump.ContentView.extend({
         templateName: 'settings',
-        el: '#content',
         modelName: "profile",
         events: {
             "submit #settings": "saveSettings"
@@ -1833,7 +1832,6 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.AccountContent = Pump.ContentView.extend({
         templateName: 'account',
-        el: '#content',
         modelName: "user",
         events: {
             "submit #account": "saveAccount"
@@ -1882,7 +1880,6 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.AvatarContent = Pump.ContentView.extend({
         templateName: 'avatar',
-        el: '#content',
         modelName: "profile"
     });
 
@@ -1891,8 +1888,7 @@ var Pump = (function(_, $, Backbone) {
         modelName: "object",
         parts: ["responses",
                 "reply",
-                "activity-object-collection"],
-        el: '#content'
+                "activity-object-collection"]
     });
 
     Pump.PostNoteModal = Pump.TemplateView.extend({
@@ -2115,7 +2111,7 @@ var Pump = (function(_, $, Backbone) {
 
                     if ($("#list-menu-inner").length > 0) {
                         aview = new Pump.ListMenuItem({model: act.object});
-                        aview.$el.one("ready", function() {
+                        aview.on("ready", function() {
                             var el = aview.$("li");
                             el.hide();
                             $("#list-menu-inner").prepend(el);
@@ -2164,7 +2160,8 @@ var Pump = (function(_, $, Backbone) {
                 profile = options.model || (options.data) ? options.data.profile : null,
                 userContentOptions,
                 listContentOptions,
-                newView;
+                newView,
+                parent;
 
             // XXX: double-check this
 
@@ -2198,16 +2195,22 @@ var Pump = (function(_, $, Backbone) {
                     }
 
                     body.content.userContent.listContent = new options.listContentView(listContentOptions);
+                    parent = "#list-content";
                     newView = body.content.userContent.listContent;
 
                 } else {
+                    parent = "#user-content";
                     newView = body.content.userContent;
                 }
             } else {
+                parent = "#content";
                 newView = body.content;
             }
 
-            body.setTitle(title);
+            newView.on("ready", function() {
+                body.setTitle(title);
+                body.$(parent).append(newView.$el);
+            });
 
             newView.render();
         }
@@ -2232,10 +2235,10 @@ var Pump = (function(_, $, Backbone) {
         } else {
             // Otherwise, create a view
             modalView = new Cls(options);
-            $("body").append(modalView.el);
             Pump.modals[templateName] = modalView;
             // When it's ready, show immediately
-            modalView.$el.one("ready", function() {
+            modalView.on("ready", function() {
+                $("body").append(modalView.el);
                 modalView.$(".pump-modal").modal('show');
             });
             // render it (will fire "ready")
