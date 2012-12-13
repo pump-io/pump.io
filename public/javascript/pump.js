@@ -996,15 +996,17 @@ var Pump = (function(_, $, Backbone) {
             var view = this,
                 collection = this.collection;
 
-            collection.each(function(activity) {
-                var $el = view.$("div[data-activity-id='"+activity.id+"']"),
-                    aview;
+            if (collection) {
+                collection.each(function(activity) {
+                    var $el = view.$("div[data-activity-id='"+activity.id+"']"),
+                        aview;
 
-                if ($el.length > 0) {
-                    aview = new Pump.MajorActivityHeadlessView({model: activity});
-                    aview.setElement($el);
-                }
-            });
+                    if ($el.length > 0) {
+                        aview = new Pump.MajorActivityHeadlessView({model: activity});
+                        aview.setElement($el);
+                    }
+                });
+            }
         }
     });
 
@@ -1017,15 +1019,17 @@ var Pump = (function(_, $, Backbone) {
             var view = this,
                 collection = this.collection;
 
-            collection.each(function(activity) {
-                var $el = view.$("div[data-activity-id='"+activity.id+"']"),
-                    aview;
+            if (collection) {
+                collection.each(function(activity) {
+                    var $el = view.$("div[data-activity-id='"+activity.id+"']"),
+                        aview;
 
-                if ($el.length > 0) {
-                    aview = new Pump.MinorActivityHeadlessView({model: activity});
-                    aview.setElement($el);
-                }
-            });
+                    if ($el.length > 0) {
+                        aview = new Pump.MinorActivityHeadlessView({model: activity});
+                        aview.setElement($el);
+                    }
+                });
+            }
         }
     });
 
@@ -1041,15 +1045,17 @@ var Pump = (function(_, $, Backbone) {
             var view = this,
                 collection = this.collection;
 
-            collection.each(function(activity) {
-                var $el = view.$("div[data-activity-id='"+activity.id+"']"),
-                    aview;
+            if (collection) {
+                collection.each(function(activity) {
+                    var $el = view.$("div[data-activity-id='"+activity.id+"']"),
+                        aview;
 
-                if ($el.length > 0) {
-                    aview = new Pump.MajorActivityView({model: activity});
-                    aview.setElement($el);
-                }
-            });
+                    if ($el.length > 0) {
+                        aview = new Pump.MajorActivityView({model: activity});
+                        aview.setElement($el);
+                    }
+                });
+            }
         }
     });
 
@@ -1062,15 +1068,17 @@ var Pump = (function(_, $, Backbone) {
             var view = this,
                 collection = this.collection;
 
-            collection.each(function(activity) {
-                var $el = view.$("div[data-activity-id='"+activity.id+"']"),
-                    aview;
+            if (collection) {
+                collection.each(function(activity) {
+                    var $el = view.$("div[data-activity-id='"+activity.id+"']"),
+                        aview;
 
-                if ($el.length > 0) {
-                    aview = new Pump.MinorActivityView({model: activity});
-                    aview.setElement($el);
-                }
-            });
+                    if ($el.length > 0) {
+                        aview = new Pump.MinorActivityView({model: activity});
+                        aview.setElement($el);
+                    }
+                });
+            }
         }
     });
 
@@ -1395,15 +1403,17 @@ var Pump = (function(_, $, Backbone) {
             var view = this,
                 collection = view.collection;
 
-            collection.each(function(object) {
-                var $el = view.$("div[data-object-id='"+object.id+"']"),
-                    aview;
+            if (collection) {
+                collection.each(function(object) {
+                    var $el = view.$("div[data-object-id='"+object.id+"']"),
+                        aview;
 
-                if ($el.length > 0) {
-                    aview = new Pump.MajorObjectView({model: object});
-                    aview.setElement($el);
-                }
-            });
+                    if ($el.length > 0) {
+                        aview = new Pump.MajorObjectView({model: object});
+                        aview.setElement($el);
+                    }
+                });
+            }
         }
     });
 
@@ -1447,15 +1457,17 @@ var Pump = (function(_, $, Backbone) {
             var view = this,
                 collection = view.collection;
 
-            collection.each(function(person) {
-                var $el = view.$("div[data-person-id='"+person.id+"']"),
-                    aview;
+            if (collection) {
+                collection.each(function(person) {
+                    var $el = view.$("div[data-person-id='"+person.id+"']"),
+                        aview;
 
-                if ($el.length > 0) {
-                    aview = new Pump.MajorPersonView({model: person});
-                    aview.setElement($el);
-                }
-            });
+                    if ($el.length > 0) {
+                        aview = new Pump.MajorPersonView({model: person});
+                        aview.setElement($el);
+                    }
+                });
+            }
         }
     });
 
@@ -1490,6 +1502,14 @@ var Pump = (function(_, $, Backbone) {
     });
 
     Pump.FollowingUserContent = Pump.TemplateView.extend({
+        initialize: function(options) {
+            Pump.TemplateView.prototype.initialize.apply(this, arguments);
+            if (!_.has(options, "collection") &&
+                _.has(options, "data") &&
+                _.has(options.data, "people")) {
+                this.collection = options.data.people;
+            }
+        },
         templateName: 'user-content-following',
         parts: ["people-stream",
                 "major-person",
@@ -1499,15 +1519,17 @@ var Pump = (function(_, $, Backbone) {
             var view = this,
                 collection = view.collection;
 
-            collection.each(function(person) {
-                var $el = view.$("div[data-person-id='"+person.id+"']"),
-                    aview;
+            if (collection) {
+                collection.each(function(person) {
+                    var $el = view.$("div[data-person-id='"+person.id+"']"),
+                        aview;
 
-                if ($el.length > 0) {
-                    aview = new Pump.MajorPersonView({model: person});
-                    aview.setElement($el);
-                }
-            });
+                    if ($el.length > 0) {
+                        aview = new Pump.MajorPersonView({model: person});
+                        aview.setElement($el);
+                    }
+                });
+            }
         }
     });
 
@@ -1547,7 +1569,20 @@ var Pump = (function(_, $, Backbone) {
         parts: ["list-menu",
                 "list-menu-item",
                 "list-content-lists"],
-        el: '#user-content'
+        el: '#user-content',
+        ready: function() {
+
+            var view = this,
+                profile = view.options.data.profile,
+                lists = view.options.data.lists;
+
+            if (!view.listMenu) {
+                view.listMenu = new Pump.ListMenu({collection: lists,
+                                                   data: {profile: profile}});
+            }
+
+            view.listMenu.setElement(view.$("#list-menu"));
+        }
     });
 
     Pump.ListMenu = Pump.TemplateView.extend({
@@ -1565,15 +1600,17 @@ var Pump = (function(_, $, Backbone) {
             var view = this,
                 collection = view.collection;
 
-            collection.each(function(person) {
-                var $el = view.$("div[data-person-id='"+person.id+"']"),
-                    aview;
+            if (collection) {
+                collection.each(function(list) {
+                    var $el = view.$("div[data-list-id='"+list.id+"']"),
+                        aview;
 
-                if ($el.length > 0) {
-                    aview = new Pump.ListMenuItem({model: lists});
-                    aview.setElement($el);
-                }
-            });
+                    if ($el.length > 0) {
+                        aview = new Pump.ListMenuItem({model: list});
+                        aview.setElement($el);
+                    }
+                });
+            }
         }
     });
 
@@ -1586,13 +1623,11 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.ListsListContent = Pump.TemplateView.extend({
         templateName: 'list-content-lists',
-        modelName: "profile",
         el: '#list-content'
     });
 
     Pump.ListContent = Pump.ContentView.extend({
         templateName: 'list',
-        modelName: "profile",
         parts: ["profile-block",
                 "profile-responses",
                 'user-content-list',
@@ -1602,27 +1637,82 @@ var Pump = (function(_, $, Backbone) {
                 "list-menu",
                 "list-menu-item"
                ],
-        el: '#content'
+        el: '#content',
+        ready: function() {
+
+            var view = this,
+                profile = view.options.data.profile,
+                lists = view.options.data.lists,
+                list = view.options.data.list;
+
+            if (!view.profileBlock) {
+                view.profileBlock = new Pump.ProfileBlock({model: profile});
+            }
+
+            view.profileBlock.setElement(view.$("#profile-block"));
+            
+            if (!view.userContent) {
+                view.userContent = new Pump.ListUserContent({data: {profile: profile,
+                                                                    lists: lists,
+                                                                    list: list}});
+            }
+
+            view.userContent.setElement(view.$("#user-content"));
+        }
     });
 
     Pump.ListUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-list',
-        modelName: "profile",
         parts: ["people-stream",
                 "list-content-list",
                 "major-person",
                 "list-menu-item",
                 "list-menu"
                ],
-        el: '#user-content'
+        el: '#user-content',
+        ready: function() {
+
+            var view = this,
+                profile = view.options.data.profile,
+                lists = view.options.data.lists,
+                list = view.options.data.list;
+
+            if (!view.listMenu) {
+                view.listMenu = new Pump.ListMenu({collection: lists,
+                                                   data: {profile: profile}});
+            }
+
+            view.listMenu.setElement(view.$("#list-menu"));
+
+            if (!view.listContent) {
+                view.listContent = new Pump.ListListContent({model: list,
+                                                             data: {profile: profile}});
+            }
+
+            view.listContent.setElement(view.$("#list-content"));
+        }
     });
 
     Pump.ListListContent = Pump.TemplateView.extend({
         templateName: 'list-content-list',
-        modelName: "profile",
         parts: ["people-stream",
                 "major-person"],
-        el: '#list-content'
+        ready: function() {
+            var view = this,
+                collection = view.collection;
+
+            if (collection) {
+                collection.each(function(person) {
+                    var $el = view.$("div[data-person-id='"+person.id+"']"),
+                        aview;
+
+                    if ($el.length > 0) {
+                        aview = new Pump.MajorPersonView({model: person});
+                        aview.setElement($el);
+                    }
+                });
+            }
+        }
     });
 
     Pump.ActivityContent = Pump.ContentView.extend({
@@ -2060,7 +2150,9 @@ var Pump = (function(_, $, Backbone) {
         var view,
             contentView = options.contentView,
             userContentView = options.userContentView,
+            userContentCollection = options.userContentCollection,
             title = options.title,
+            userContentOptions,
             profile;
 
         if (options.model) {
@@ -2078,14 +2170,18 @@ var Pump = (function(_, $, Backbone) {
 
         if ($("#user-content").length > 0 && $("#profile-block").attr("data-profile-id") == profile.get("id")) {
 
-            Pump.userContent = new userContentView(options);
+            if (userContentCollection) {
+                userContentOptions = _.extend({collection: userContentCollection}, options);
+            } else {
+                userContentOptions = options;
+            }
+
+            Pump.userContent = new userContentView(userContentOptions);
 
             view = Pump.userContent;
             
         } else {
-
             view = Pump.content;
-
         }
 
         view.$el.one("ready", function() {
@@ -2255,10 +2351,11 @@ var Pump = (function(_, $, Backbone) {
             user.fetch({success: function(user, response) {
                 var profile = user.profile,
                     favorites = profile.favorites;
-                favorites.fetch({success: function(major, response) {
+                favorites.fetch({success: function(favorites, response) {
                     var options = {
                         contentView: Pump.FavoritesContent,
                         userContentView: Pump.FavoritesUserContent,
+                        userContentCollection: favorites,
                         title: nickname + " favorites",
                         data: { objects: favorites,
                                 profile: profile }
@@ -2279,9 +2376,10 @@ var Pump = (function(_, $, Backbone) {
                     var profile = user.profile,
                         options = {contentView: Pump.FollowersContent,
                                    userContentView: Pump.FollowersUserContent,
+                                   userContentCollection: followers,
                                    title: nickname + " followers",
-                                   model: profile,
-                                   data: {people: followers }};
+                                   data: {people: followers,
+                                          profile: profile}};
 
                     Pump.setUserContent(options, function(view) {
                         view.$(".person.major").each(function(i) {
@@ -2307,9 +2405,10 @@ var Pump = (function(_, $, Backbone) {
                     var profile = user.profile,
                         options = {contentView: Pump.FollowingContent,
                                    userContentView: Pump.FollowingUserContent,
+                                   userContentCollection: following,
                                    title: nickname + " following",
-                                   model: profile,
-                                   data: {people: following }};
+                                   data: {people: following,
+                                          profile: profile}};
 
                     Pump.setUserContent(options, function(view) {
                         view.$(".person.major").each(function(i) {
@@ -2337,8 +2436,8 @@ var Pump = (function(_, $, Backbone) {
                                    userContentView: Pump.ListsUserContent,
                                    listContentView: Pump.ListsListContent,
                                    title: nickname + " lists",
-                                   model: profile,
-                                   data: {lists: lists}};
+                                   data: {lists: lists,
+                                          profile: profile}};
 
                     Pump.setListContent(options, function(view) {
                         // Nothing to do!
@@ -2364,9 +2463,9 @@ var Pump = (function(_, $, Backbone) {
                                        userContentView: Pump.ListUserContent,
                                        listContentView: Pump.ListListContent,
                                        title: nickname + " - list -" + list.get("displayName"),
-                                       model: profile,
                                        data: {lists: lists,
-                                              list: list}};
+                                              list: list,
+                                              profile: profile}};
 
                         Pump.setListContent(options, function(view) {
                             Pump.userContent.$("#list-menu .active").removeClass("active");
