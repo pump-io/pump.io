@@ -1273,6 +1273,7 @@ var Pump = (function(_, $, Backbone) {
         parts: ["profile-block",
                 'user-content-lists',
                 "list-menu",
+                "list-menu-item",
                 "profile-responses"],
         el: '#content'
     });
@@ -1281,6 +1282,7 @@ var Pump = (function(_, $, Backbone) {
         templateName: 'user-content-lists',
         modelName: "profile",
         parts: ["list-menu",
+                "list-menu-item",
                 "list-content-lists"],
         el: '#user-content'
     });
@@ -1288,6 +1290,7 @@ var Pump = (function(_, $, Backbone) {
     Pump.ListMenu = Pump.TemplateView.extend({
         templateName: "list-menu",
         modelName: "profile",
+        parts: ["list-menu-item"],
         el: '.list-menu-block',
         events: {
             "click .new-list": "newList"
@@ -1319,7 +1322,9 @@ var Pump = (function(_, $, Backbone) {
                 "list-content-list",
                 "people-stream",
                 "major-person",
-                "list-menu"],
+                "list-menu",
+                "list-menu-item"
+               ],
         el: '#content'
     });
 
@@ -1329,7 +1334,9 @@ var Pump = (function(_, $, Backbone) {
         parts: ["people-stream",
                 "list-content-list",
                 "major-person",
-                "list-menu"],
+                "list-menu-item",
+                "list-menu"
+               ],
         el: '#user-content'
     });
 
