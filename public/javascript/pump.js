@@ -419,6 +419,15 @@ var Pump = (function(_, $, Backbone) {
     Pump.TemplateError.prototype.constructor = Pump.TemplateError;
 
     Pump.TemplateView = Backbone.View.extend({
+        initialize: function(options) {
+            var view = this;
+            if (view.model) {
+                view.model.on("change", function(options) {
+                    // When a change has happened, re-render
+                    view.render();
+                });
+            }
+        },
         setElement: function(element, delegate) {
             Backbone.View.prototype.setElement.apply(this, arguments);
             if (element) {
