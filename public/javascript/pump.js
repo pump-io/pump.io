@@ -1930,7 +1930,13 @@ var Pump = (function(_, $, Backbone) {
             contentView = options.contentView,
             userContentView = options.userContentView,
             title = options.title,
-            id = options.model.get("id");
+            profile;
+
+        if (options.model) {
+            profile = options.model;
+        } else if (options.data && options.data.profile) {
+            profile = options.data.profile;
+        }
 
         delete options.contentView;
         delete options.userContentView;
@@ -1939,7 +1945,7 @@ var Pump = (function(_, $, Backbone) {
         Pump.content = new contentView(options);
         Pump.router.setTitle(Pump.content, title);
 
-        if ($("#user-content").length > 0 && $("#profile-block").attr("data-profile-id") == id) {
+        if ($("#user-content").length > 0 && $("#profile-block").attr("data-profile-id") == profile.get("id")) {
 
             Pump.userContent = new userContentView(options);
 
@@ -1974,7 +1980,16 @@ var Pump = (function(_, $, Backbone) {
             userContentView = options.userContentView,
             listContentView = options.listContentView,
             title = options.title,
-            id = options.model.get("id");
+            profile,
+            id;
+
+        if (options.model) {
+            profile = options.model;
+        } else if (options.data && options.data.profile) {
+            profile = options.data.profile;
+        }
+
+        id = profile.get("id");
 
         if ($("#list-content").length > 0 && $("#list-menu").attr("data-profile-id") == id) {
 
@@ -2097,9 +2112,9 @@ var Pump = (function(_, $, Backbone) {
                             options = {contentView: Pump.UserPageContent,
                                        userContentView: Pump.ActivitiesUserContent,
                                        title: profile.get("displayName"),
-                                       model: profile,
                                        data: { major: major,
-                                               minor: minor }};
+                                               minor: minor,
+                                               profile: profile }};
 
                         Pump.setUserContent(options, function(view) {
                             // Do nothing!
