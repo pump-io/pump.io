@@ -1773,6 +1773,20 @@ var Pump = (function(_, $, Backbone) {
         }
     };
 
+    Pump.setContent = function(options, callback) {
+
+        var View = options.view,
+            title = options.title;
+
+        // XXX: double-check this
+
+        Pump.content = new View(options);
+
+        Pump.router.setTitle(Pump.content, title);
+        
+        Pump.content.render();
+    };
+
     Pump.setUserContent = function(options, callback) {
 
         var view,
@@ -1830,6 +1844,7 @@ var Pump = (function(_, $, Backbone) {
             Pump.content = new contentView(options);
             Pump.userContent = new userContentView(options);
             Pump.listContent = new listContentView(options);
+
             Pump.router.setTitle(Pump.content, title);
 
             view = Pump.listContent;
@@ -1879,43 +1894,33 @@ var Pump = (function(_, $, Backbone) {
         },
 
         register: function() {
-            Pump.content = new Pump.RegisterContent();
-
-            this.setTitle(Pump.content, "Register");
-
-            Pump.content.render();
+            Pump.setContent({view: Pump.RegisterContent,
+                             model: {},
+                             title: "Register"});
         },
 
         login: function() {
-            Pump.content = new Pump.LoginContent();
-
-            this.setTitle(Pump.content, "Login");
-
-            Pump.content.render();
+            Pump.setContent({view: Pump.LoginContent,
+                             model: {},
+                             title: "Login"});
         },
 
         settings: function() {
-            Pump.content = new Pump.SettingsContent({model: Pump.currentUser.profile });
-
-            this.setTitle(Pump.content, "Settings");
-
-            Pump.content.render();
+            Pump.setContent({view: Pump.SettingsContent,
+                             model: Pump.currentUser.profile,
+                             title: "Settings"});
         },
 
         account: function() {
-            Pump.content = new Pump.AccountContent({model: Pump.currentUser});
-
-            this.setTitle(Pump.content, "Account");
-
-            Pump.content.render();
+            Pump.setContent({view: Pump.AccountContent,
+                             model: Pump.currentUser,
+                             title: "Account"});
         },
 
         avatar: function() {
-            Pump.content = new Pump.AvatarContent({model: Pump.currentUser.profile});
-
-            this.setTitle(Pump.content, "Avatar");
-
-            Pump.content.render();
+            Pump.setContent({view: Pump.AvatarContent,
+                             model: Pump.currentUser.profile,
+                             title: "Avatar"});
         },
 
         "home": function() {
