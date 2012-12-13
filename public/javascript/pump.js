@@ -420,9 +420,12 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.TemplateView = Backbone.View.extend({
         initialize: function(options) {
-            var view = this;
-            if (view.model) {
-                view.model.on("change", function(options) {
+            var view = this,
+                source = (_.has(view, "collection")) ? view.collection :
+                         (_.has(view, "model")) ? view.model : null;
+
+            if (source && _.isFunction(source.on)) {
+                source.on("change", function(options) {
                     // When a change has happened, re-render
                     view.render();
                 });
@@ -880,7 +883,6 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.UserPageContent = Pump.ContentView.extend({
         templateName: 'user',
-        modelName: "profile",
         parts: ["profile-block",
                 "user-content-activities",
                 "major-stream-headless",
@@ -928,13 +930,31 @@ var Pump = (function(_, $, Backbone) {
                 aview.$el.slideDown('slow');
             });
             aview.render();
-        }
+        },
+        ready: function() {
 
+            var view = this,
+                profile = view.options.data.profile,
+                major = view.options.data.major,
+                minor = view.options.data.minor;
+
+            if (!view.profileBlock) {
+                view.profileBlock = new Pump.ProfileBlock({model: profile});
+            }
+
+            view.profileBlock.setElement(view.$("#profile-block"));
+            
+            if (!view.userContent) {
+                view.userContent = new Pump.ActivitiesUserContent({data: {minor: minor,
+                                                                          major: major}});
+            }
+
+            view.userContent.setElement(view.$("#user-content"));
+        }
     });
 
     Pump.ActivitiesUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-activities',
-        modelName: 'profile',
         parts: ["major-stream-headless",
                 "sidebar-headless",
                 "major-activity-headless",
@@ -944,7 +964,114 @@ var Pump = (function(_, $, Backbone) {
                 "profile-responses",
                 "activity-object-list",
                 "activity-object-collection"],
-        el: '#user-content'
+        el: '#user-content',
+        ready: function() {
+            var view = this,
+                major = view.options.data.major,
+                minor = view.options.data.minor;
+
+            if (!view.majorStreamView) {
+                view.majorStreamView = new Pump.MajorStreamHeadlessView({collection: major});
+            }
+
+            view.majorStreamView.setElement(view.$("#major-stream"));
+                                                             
+            if (!view.minorStreamView) {
+                view.minorStreamView = new Pump.MinorStreamHeadlessView({collection: minor});
+            }
+
+            view.minorStreamView.setElement(view.$("#sidebar"));
+        }
+    });
+
+    Pump.MajorStreamHeadlessView = Pump.TemplateView.extend({
+        templateName: 'major-stream-headless',
+        modelName: 'major',
+        parts: ["major-activity-headless",
+                "responses",
+                "reply",
+                "activity-object-list",
+                "activity-object-collection"],
+        ready: function() {
+            var view = this,
+                collection = this.collection;
+
+            collection.each(function(activity) {
+                var $el = view.$("div[data-activity-id='"+activity.id+"']"),
+                    aview;
+
+                if ($el.length > 0) {
+                    aview = new Pump.MajorActivityHeadlessView({model: activity});
+                    aview.setElement($el);
+                }
+            });
+        }
+    });
+
+    Pump.MinorStreamHeadlessView = Pump.TemplateView.extend({
+        templateName: 'sidebar',
+        modelName: 'minor',
+        parts: ["minor-activity-headless"],
+        ready: function() {
+
+            var view = this,
+                collection = this.collection;
+
+            collection.each(function(activity) {
+                var $el = view.$("div[data-activity-id='"+activity.id+"']"),
+                    aview;
+
+                if ($el.length > 0) {
+                    aview = new Pump.MinorActivityHeadlessView({model: activity});
+                    aview.setElement($el);
+                }
+            });
+        }
+    });
+
+    Pump.MajorStreamView = Pump.TemplateView.extend({
+        templateName: 'major-stream',
+        modelName: 'major',
+        parts: ["major-activity",
+                "responses",
+                "reply",
+                "activity-object-list",
+                "activity-object-collection"],
+        ready: function() {
+            var view = this,
+                collection = this.collection;
+
+            collection.each(function(activity) {
+                var $el = view.$("div[data-activity-id='"+activity.id+"']"),
+                    aview;
+
+                if ($el.length > 0) {
+                    aview = new Pump.MajorActivityView({model: activity});
+                    aview.setElement($el);
+                }
+            });
+        }
+    });
+
+    Pump.MinorStreamView = Pump.TemplateView.extend({
+        templateName: 'sidebar',
+        modelName: 'minor',
+        parts: ["minor-activity"],
+        ready: function() {
+
+            var view = this,
+                collection = this.collection;
+
+            collection.each(function(activity) {
+                var $el = view.$("div[data-activity-id='"+activity.id+"']"),
+                    aview;
+
+                if ($el.length > 0) {
+                    aview = new Pump.MinorActivityView({model: activity});
+                    aview.setElement($el);
+                }
+            });
+        }
     });
 
     Pump.InboxContent = Pump.ContentView.extend({
@@ -983,6 +1110,23 @@ var Pump = (function(_, $, Backbone) {
                 aview.$el.slideDown('slow');
             });
             aview.render();
+        },
+        ready: function() {
+            var view = this,
+                major = view.options.data.major,
+                minor = view.options.data.minor;
+
+            if (!view.majorStreamView) {
+                view.majorStreamView = new Pump.MajorStreamView({collection: major});
+            }
+
+            view.majorStreamView.setElement(view.$("#major-stream"));
+                                                             
+            if (!view.minorStreamView) {
+                view.minorStreamView = new Pump.MinorStreamView({collection: minor});
+            }
+
+            view.minorStreamView.setElement(view.$("#sidebar"));
         }
     });
 
@@ -990,7 +1134,6 @@ var Pump = (function(_, $, Backbone) {
         templateName: 'major-activity',
         parts: ["responses",
                 "reply"],
-        model: Pump.Activity,
         modelName: "activity",
         events: {
             "click .favorite": "favoriteObject",
@@ -1085,7 +1228,6 @@ var Pump = (function(_, $, Backbone) {
         templateName: 'comment-form',
         tagName: "div",
         className: "row comment-form",
-        model: Pump.Activity,
         events: {
             "submit .post-comment": "saveComment"
         },
@@ -1138,19 +1280,16 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.MajorObjectView = Pump.TemplateView.extend({
         templateName: 'major-object',
-        parts: ["responses", "reply"],
-        model: Pump.ActivityObject
+        parts: ["responses", "reply"]
     });
 
     Pump.ReplyView = Pump.TemplateView.extend({
         templateName: 'reply',
-        model: Pump.ActivityObject,
         modelName: 'reply'
     });
 
     Pump.MinorActivityView = Pump.TemplateView.extend({
         templateName: 'minor-activity',
-        model: Pump.Activity,
         modelName: "activity"
     });
 
@@ -1199,13 +1338,11 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.MajorPersonView = Pump.PersonView.extend({
         templateName: 'major-person',
-        model: Pump.Person,
         modelName: 'person'
     });
 
     Pump.ProfileBlock = Pump.PersonView.extend({
         templateName: 'profile-block',
-        model: Pump.Person,
         modelName: 'profile'
     });
 
@@ -1895,13 +2032,11 @@ var Pump = (function(_, $, Backbone) {
 
         register: function() {
             Pump.setContent({view: Pump.RegisterContent,
-                             model: {},
                              title: "Register"});
         },
 
         login: function() {
             Pump.setContent({view: Pump.LoginContent,
-                             model: {},
                              title: "Login"});
         },
 
@@ -1924,8 +2059,7 @@ var Pump = (function(_, $, Backbone) {
         },
 
         "home": function() {
-            var router = this,
-                pair = Pump.getUserCred();
+            var pair = Pump.getUserCred();
 
             if (pair) {
                 var user = Pump.currentUser,
@@ -1934,34 +2068,17 @@ var Pump = (function(_, $, Backbone) {
 
                 // XXX: parallelize
 
-                user.fetch({success: function(user, response) {
-                    major.fetch({success: function(major, response) {
-                        minor.fetch({success: function(minor, response) {
-                            Pump.content = new Pump.InboxContent({model: user,
-                                                                  data: {major: major,
-                                                                         minor: minor}
-                                                                 });
-                            router.setTitle(Pump.content, "Home");
-                            Pump.content.$el.one("ready", function() {
-                                Pump.content.$(".activity.major").each(function(i) {
-                                    var id = $(this).attr("id"),
-                                        act = major.get(id);
-                                    var aview = new Pump.MajorActivityView({el: this, model: act});
-                                });
-                                Pump.content.$(".activity.minor").each(function(i) {
-                                    var id = $(this).attr("id"),
-                                        act = minor.get(id);
-                                    var aview = new Pump.MinorActivityView({el: this, model: act});
-                                });
-                            });
-                            Pump.content.render();
-                        }});
+                major.fetch({success: function(major, response) {
+                    minor.fetch({success: function(minor, response) {
+                        Pump.setContent({view: Pump.InboxContent,
+                                         data: {major: major,
+                                                minor: minor},
+                                         title: "Home"});
                     }});
                 }});
             } else {
-                Pump.content = new Pump.MainContent();
-                router.setTitle(Pump.content, "Welcome");
-                Pump.content.render();
+                Pump.setContent({view: Pump.MainContent,
+                                 title: "Welcome"});
             }
         },
 
@@ -1985,22 +2102,7 @@ var Pump = (function(_, $, Backbone) {
                                                minor: minor }};
 
                         Pump.setUserContent(options, function(view) {
-
-                            // Helper view for each major activity
-
-                            view.$(".activity.major").each(function(i) {
-                                var id = $(this).attr("id"),
-                                    act = major.get(id);
-                                var aview = new Pump.MajorActivityHeadlessView({el: this, model: act});
-                            });
-
-                            // Helper view for each minor activity
-
-                            view.$(".activity.minor").each(function(i) {
-                                var id = $(this).attr("id"),
-                                    act = minor.get(id);
-                                var aview = new Pump.MinorActivityHeadlessView({el: this, model: act});
-                            });
+                            // Do nothing!
                         });
                     }});
                 }});

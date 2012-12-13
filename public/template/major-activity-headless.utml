@@ -1,4 +1,4 @@
-<div class="row activity major headless" id="<%- data.activity.id %>">
+<div class="row activity major headless" data-activity-id="<%- data.activity.id %>">
   <div class="row">
     <div class="span8 offset1">
       <% if (data.activity.object.displayName) { %>
