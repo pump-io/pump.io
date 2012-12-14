@@ -615,7 +615,7 @@ var Pump = (function(_, $, Backbone) {
         setHTML: function(html) {
             var view = this,
                 $old = view.$el,
-                $new = $(html);
+                $new = $(html).first();
 
             $old.replaceWith($new);
             view.setElement($new);
@@ -979,7 +979,6 @@ var Pump = (function(_, $, Backbone) {
                 "profile-responses",
                 "activity-object-list",
                 "activity-object-collection"],
-        el: '#user-content',
         ready: function() {
             var view = this,
                 major = view.options.data.major,
@@ -1435,7 +1434,6 @@ var Pump = (function(_, $, Backbone) {
                 "reply",
                 "profile-responses",
                 "activity-object-collection"],
-        el: '#user-content',
         ready: function() {
             var view = this,
                 collection = view.collection;
@@ -1496,7 +1494,6 @@ var Pump = (function(_, $, Backbone) {
         parts: ["people-stream",
                 "major-person",
                 "profile-responses"],
-        el: '#user-content',
         ready: function() {
             var view = this,
                 collection = view.collection;
@@ -1564,7 +1561,6 @@ var Pump = (function(_, $, Backbone) {
         parts: ["people-stream",
                 "major-person",
                 "profile-responses"],
-        el: '#user-content',
         ready: function() {
             var view = this,
                 collection = view.collection;
@@ -1626,7 +1622,6 @@ var Pump = (function(_, $, Backbone) {
         parts: ["list-menu",
                 "list-menu-item",
                 "list-content-lists"],
-        el: '#user-content',
         ready: function() {
 
             var view = this,
@@ -1737,7 +1732,6 @@ var Pump = (function(_, $, Backbone) {
                 "list-menu-item",
                 "list-menu"
                ],
-        el: '#user-content',
         ready: function() {
 
             var view = this,
@@ -2207,9 +2201,9 @@ var Pump = (function(_, $, Backbone) {
                 newView = body.content;
             }
 
-            newView.on("ready", function() {
+            newView.once("ready", function() {
                 body.setTitle(title);
-                body.$(parent).append(newView.$el);
+                body.$(parent).children().replaceWith(newView.$el);
             });
 
             newView.render();
