@@ -1,9 +1,9 @@
 <div class="container span9">
   <div class="row">
     <div class="pull-right">
-    <% if (data.user && data.user.profile && data.user.profile.id == data.profile.id) { %>
-    <a class="btn" class="add-list-member">Add a member</a>
-    <% } %>
+      <% if (data.user && data.user.profile && data.user.profile.id == data.profile.id) { %>
+      <a class="btn" class="add-list-member">Add a member</a>
+      <% } %>
     </div>
     <h3><%- data.list.displayName %></h3>
     <% if (data.list.content) { %>

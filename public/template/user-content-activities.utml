@@ -1,3 +1,4 @@
-<%= partial("major-stream-headless") %>
-<%= partial("sidebar-headless") %>
-
+<div class="activities user-content">
+  <%= partial("major-stream-headless") %>
+  <%= partial("sidebar-headless") %>
+</div>
