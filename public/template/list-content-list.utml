@@ -1,4 +1,4 @@
-<div class="container span9">
+<div class="container span9" id="list-content-list">
   <div class="row">
     <div class="pull-right">
       <% if (data.user && data.user.profile && data.user.profile.id == data.profile.id) { %>

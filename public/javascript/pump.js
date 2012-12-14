@@ -945,7 +945,7 @@ var Pump = (function(_, $, Backbone) {
                 major = view.options.data.major,
                 minor = view.options.data.minor,
                 profileBlockEl = view.$("#profile-block"),
-                userContentEl = view.$("#user-content");
+                userContentEl = view.$("#user-content-activities");
 
             if (profileBlockEl.length > 0) {
                 if (view.profileBlock) {
@@ -1402,7 +1402,7 @@ var Pump = (function(_, $, Backbone) {
                 major = view.options.data.major,
                 minor = view.options.data.minor,
                 profileBlockEl = view.$("#profile-block"),
-                userContentEl = view.$("#user-content");
+                userContentEl = view.$("#user-content-favorites");
 
             if (profileBlockEl.length > 0) {
                 if (view.profileBlock) {
@@ -1465,7 +1465,7 @@ var Pump = (function(_, $, Backbone) {
                 profile = view.options.data.profile,
                 people = view.options.data.people,
                 profileBlockEl = view.$("#profile-block"),
-                userContentEl = view.$("#user-content");
+                userContentEl = view.$("#user-content-followers");
 
             if (profileBlockEl.length > 0) {
                 if (view.profileBlock) {
@@ -1525,7 +1525,7 @@ var Pump = (function(_, $, Backbone) {
                 profile = view.options.data.profile,
                 people = view.options.data.people,
                 profileBlockEl = view.$("#profile-block"),
-                userContentEl = view.$("#user-content");
+                userContentEl = view.$("#user-content-following");
 
             if (profileBlockEl.length > 0) {
                 if (view.profileBlock) {
@@ -1593,7 +1593,7 @@ var Pump = (function(_, $, Backbone) {
                 profile = view.options.data.profile,
                 lists = view.options.data.lists,
                 profileBlockEl = view.$("#profile-block"),
-                userContentEl = view.$("#user-content");
+                userContentEl = view.$("#user-content-lists");
 
             if (profileBlockEl.length > 0) {
                 if (view.profileBlock) {
@@ -1627,7 +1627,7 @@ var Pump = (function(_, $, Backbone) {
             var view = this,
                 profile = view.options.data.profile,
                 lists = view.options.data.lists,
-                listMenuEl = view.$("#list-menu");
+                listMenuEl = view.$("#list-menu-inner");
 
             if (listMenuEl.length > 0) {
                 if (view.listMenu) {
@@ -1678,8 +1678,7 @@ var Pump = (function(_, $, Backbone) {
     });
 
     Pump.ListsListContent = Pump.TemplateView.extend({
-        templateName: 'list-content-lists',
-        el: '#list-content'
+        templateName: 'list-content-lists'
     });
 
     Pump.ListContent = Pump.ContentView.extend({
@@ -1700,7 +1699,7 @@ var Pump = (function(_, $, Backbone) {
                 lists = view.options.data.lists,
                 list = view.options.data.list,
                 profileBlockEl = view.$("#profile-block"),
-                userContentEl = view.$("#user-content");
+                userContentEl = view.$("#user-content-list");
 
             if (profileBlockEl.length > 0) {
                 if (view.profileBlock) {
@@ -1738,8 +1737,8 @@ var Pump = (function(_, $, Backbone) {
                 profile = view.options.data.profile,
                 lists = view.options.data.lists,
                 list = view.options.data.list,
-                listMenuEl = view.$("#list-menu"),
-                listContentEl = view.$("#list-content");
+                listMenuEl = view.$("#list-menu-inner"),
+                listContentEl = view.$("#list-content-list");
 
             if (listMenuEl.length > 0) {
                 if (view.listMenu) {
