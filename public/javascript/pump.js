@@ -496,11 +496,8 @@ var Pump = (function(_, $, Backbone) {
                     if (err) {
                         Pump.error(err);
                     } else {
+                        // Triggers "ready"
                         view.setHTML(html);
-                        // Let sub-classes do post-rendering setup
-                        view.ready();
-                        // Let others see that we're done
-                        view.trigger("ready");
                         // Update relative to the new code view
                         view.$("abbr.easydate").easydate();
                     }
