@@ -334,6 +334,44 @@ var Pump = (function(_, $, Backbone) {
             // Don't JSONize models; too much likelihood of a loop
             return rep;
         }
+    },
+    {
+        cache: {},
+        keyAttr: "url", // works for in-model collections
+        unique: function(models, options) {
+            var inst,
+                cls = this,
+                key,
+                cached;
+
+            // If we're being initialized with a JSON Collection, parse it.
+            if (_.isObject(models) && !_.isArray(models)) {
+                key = models[cls.keyAttr];
+            } else if (_.isObject(options) && _.has(options, cls.keyAttr)) {
+                key = options[cls.keyAttr];
+            }
+
+            if (key && _.has(cls.cache, key)) {
+                cached = cls.cache[key];
+                return cached;
+            }
+
+            inst = new cls(models, options);
+
+            if (key) {
+                cls.cache[key] = inst;
+            }
+
+            inst.on("change:"+cls.keyAttr, function(model, key) {
+                var oldKey = model.previous(cls.keyAttr);
+                if (oldKey && _.has(cls.cache, oldKey)) {
+                    delete cls.cache[oldKey];
+                }
+                cls.cache[key] = inst;
+            });
+
+            return inst;
+        }
     });
 
     // A social activity.
@@ -413,12 +451,12 @@ var Pump = (function(_, $, Backbone) {
             Pump.Model.prototype.initialize.apply(this, arguments);
 
             // XXX: maybe move some of these to Person...?
-            user.inbox =       new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/inbox"});
-            user.majorInbox =  new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/inbox/major"});
-            user.minorInbox =  new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/inbox/minor"});
-            user.stream =      new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/feed"});
-            user.majorStream = new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/feed/major"});
-            user.minorStream = new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/feed/minor"});
+            user.inbox =       Pump.ActivityStream.unique([], {url: "/api/user/" + user.get("nickname") + "/inbox"});
+            user.majorInbox =  Pump.ActivityStream.unique([], {url: "/api/user/" + user.get("nickname") + "/inbox/major"});
+            user.minorInbox =  Pump.ActivityStream.unique([], {url: "/api/user/" + user.get("nickname") + "/inbox/minor"});
+            user.stream =      Pump.ActivityStream.unique([], {url: "/api/user/" + user.get("nickname") + "/feed"});
+            user.majorStream = Pump.ActivityStream.unique([], {url: "/api/user/" + user.get("nickname") + "/feed/major"});
+            user.minorStream = Pump.ActivityStream.unique([], {url: "/api/user/" + user.get("nickname") + "/feed/minor"});
 
             user.on("change:nickname", function() {
                 user.inbox.url       = "/api/user/" + user.get("nickname") + "/inbox";
