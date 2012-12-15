@@ -192,7 +192,12 @@ var Pump = (function(_, $, Backbone) {
                     return function(name) {
                         var raw = obj.get(name);
                         if (raw) {
-                            obj[name] = new model(raw);
+                            // use unique for cached stuff
+                            if (model.unique) {
+                                obj[name] = model.unique(raw);
+                            } else {
+                                obj[name] = new model(raw);
+                            }
                             obj[name].isNew = neverNew;
                         }
                         obj.on("change:"+name, function(changed) {
@@ -200,7 +205,11 @@ var Pump = (function(_, $, Backbone) {
                             if (obj[name] && obj[name].set) {
                                 obj[name].set(raw);
                             } else if (raw) {
-                                obj[name] = new model(raw);
+                                if (model.unique) {
+                                    obj[name] = model.unique(raw);
+                                } else {
+                                    obj[name] = new model(raw);
+                                }
                                 obj[name].isNew = neverNew;
                             }
                         });
@@ -238,6 +247,42 @@ var Pump = (function(_, $, Backbone) {
 
             return json;
         }
+    },
+    {
+        cache: {},
+        keyAttr: "id", // works for activities and activityobjects
+        unique: function(props) {
+            var inst,
+                cls = this,
+                key = props[cls.keyAttr],
+                cached;
+
+            if (key && _.has(cls.cache, key)) {
+                cached = cls.cache[key];
+                // Check the updated flag
+                if (_.has(props, "updated") &&
+                    cached.has("updated") &&
+                    cached.get("updated") >= props.updated) {
+                    return cached;
+                }
+            }
+
+            inst = new cls(props);
+
+            if (key) {
+                cls.cache[key] = inst;
+            }
+
+            inst.on("change:"+cls.keyAttr, function(model, key) {
+                var oldKey = model.previous(cls.keyAttr);
+                if (oldKey && _.has(cls.cache, oldKey)) {
+                    delete cls.cache[oldKey];
+                }
+                cls.cache[key] = inst;
+            });
+
+            return inst;
+        }
     });
 
     Pump.Collection = Backbone.Collection.extend({
@@ -251,6 +296,10 @@ var Pump = (function(_, $, Backbone) {
                 coll.url = options.url;
                 delete options.url;
             }
+            // Use unique() to get unique items
+            models = _.map(models, function(raw) {
+                return coll.model.unique(raw);
+            });
             Backbone.Collection.apply(this, [models, options]);
         },
         parse: function(response) {
@@ -281,16 +330,6 @@ var Pump = (function(_, $, Backbone) {
             }
             if (_.has(this, "url")) {
                 rep.url = this.url;
-            }
-            if (_.has(this, "models")) {
-                rep.items = [];
-                _.each(this.models, function(model) {
-                    if (model.toJSON) {
-                        rep.items.push(model.toJSON());
-                    } else {
-                        rep.items.push(model);
-                    }
-                });
             }
             return rep;
         }
@@ -372,10 +411,6 @@ var Pump = (function(_, $, Backbone) {
 
             Pump.Model.prototype.initialize.apply(this, arguments);
 
-            if (this.profile) {
-                this.profile.isNew = function() { return false; };
-            }
-
             // XXX: maybe move some of these to Person...?
             user.inbox =       new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/inbox"});
             user.majorInbox =  new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/inbox/major"});
@@ -400,6 +435,10 @@ var Pump = (function(_, $, Backbone) {
         url: function() {
             return "/api/user/" + this.get("nickname");
         }
+    },
+    {
+        cache: {}, // separate cache
+        keyAttr: "nickname" // cache by nickname
     });
 
     Pump.currentUser = null; // XXX: load from server...?
@@ -808,7 +847,7 @@ var Pump = (function(_, $, Backbone) {
                 onSuccess = function(data, textStatus, jqXHR) {
                     Pump.setNickname(data.nickname);
                     Pump.setUserCred(data.token, data.secret);
-                    Pump.currentUser = new Pump.User(data);
+                    Pump.currentUser = Pump.User.unique(data);
                     Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
                                                       model: Pump.currentUser});
                     Pump.body.nav.render();
@@ -871,7 +910,7 @@ var Pump = (function(_, $, Backbone) {
                 onSuccess = function(data, textStatus, jqXHR) {
                     Pump.setNickname(data.nickname);
                     Pump.setUserCred(data.token, data.secret);
-                    Pump.currentUser = new Pump.User(data);
+                    Pump.currentUser = Pump.User.unique(data);
                     Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
                                                       model: Pump.currentUser});
                     Pump.body.nav.render();
@@ -2017,7 +2056,12 @@ var Pump = (function(_, $, Backbone) {
                 here = window.location;
 
             if (!el.host || el.host === here.host) {
-                Pump.router.navigate(pathname, true);
+                try {
+                    Pump.router.navigate(pathname, true);
+                } catch (e) {
+                    Pump.error(e);
+                }
+                // Always return false
                 return false;
             } else {
                 return true;
@@ -2224,7 +2268,7 @@ var Pump = (function(_, $, Backbone) {
 
         profile: function(nickname) {
             var router = this,
-                user = new Pump.User({nickname: nickname}),
+                user = Pump.User.unique({nickname: nickname}),
                 major = user.majorStream,
                 minor = user.minorStream;
 
@@ -2247,7 +2291,7 @@ var Pump = (function(_, $, Backbone) {
 
         favorites: function(nickname) {
             var router = this,
-                user = new Pump.User({nickname: nickname});
+                user = Pump.User.unique({nickname: nickname});
 
             // XXX: parallelize this?
 
@@ -2269,7 +2313,7 @@ var Pump = (function(_, $, Backbone) {
 
         followers: function(nickname) {
             var router = this,
-                user = new Pump.User({nickname: nickname});
+                user = Pump.User.unique({nickname: nickname});
 
             user.fetch({success: function(user, response) {
                 var followers = user.profile.followers;
@@ -2288,7 +2332,7 @@ var Pump = (function(_, $, Backbone) {
 
         following: function(nickname) {
             var router = this,
-                user = new Pump.User({nickname: nickname});
+                user = Pump.User.unique({nickname: nickname});
 
             // XXX: parallelize this?
 
@@ -2309,7 +2353,7 @@ var Pump = (function(_, $, Backbone) {
 
         lists: function(nickname) {
             var router = this,
-                user = new Pump.User({nickname: nickname});
+                user = Pump.User.unique({nickname: nickname});
 
             // XXX: parallelize this?
 
@@ -2331,8 +2375,8 @@ var Pump = (function(_, $, Backbone) {
         list: function(nickname, uuid) {
 
             var router = this,
-                user = new Pump.User({nickname: nickname}),
-                list = new Pump.ActivityObject({links: {self: {href: "/api/collection/"+uuid}}});
+                user = Pump.User.unique({nickname: nickname}),
+                list = Pump.ActivityObject.unique({links: {self: {href: "/api/collection/"+uuid}}});
 
             // XXX: parallelize this?
 
@@ -2361,7 +2405,7 @@ var Pump = (function(_, $, Backbone) {
 
         object: function(nickname, type, uuid) {
             var router = this,
-                obj = new Pump.ActivityObject({uuid: uuid, objectType: type, userNickname: nickname});
+                obj = Pump.ActivityObject.unique({uuid: uuid, objectType: type, userNickname: nickname});
 
             obj.fetch({success: function(obj, response) {
                 Pump.body.setContent({contentView: Pump.ObjectContent,
