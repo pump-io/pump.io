@@ -331,6 +331,7 @@ var Pump = (function(_, $, Backbone) {
             if (_.has(this, "url")) {
                 rep.url = this.url;
             }
+            // Don't JSONize models; too much likelihood of a loop
             return rep;
         }
     });
