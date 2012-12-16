@@ -83,7 +83,15 @@ var Pump = (function(_, $, Backbone) {
         // Ensure that we have a URL.
 
         if (!options.url) {
-            params.url = (type == 'POST') ? getValue(model.collection, 'url') : getValue(model, 'url');
+
+            if (type == 'POST') {
+                params.url = getValue(model.collection, 'url');
+            } else if (type == 'GET' && options.update && model.prevLink) {
+                params.url = model.prevLink;
+            } else {
+                params.url = getValue(model, 'url');
+            }
+
             if (!params.url || !_.isString(params.url)) { 
                 throw new Error("No URL");
             }
@@ -498,12 +506,31 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.TemplateView = Backbone.View.extend({
         initialize: function(options) {
-            var view = this,
-                source = (_.has(view, "collection")) ? view.collection :
-                    (_.has(view, "model")) ? view.model : null;
+            var view = this;
 
-            if (source) {
-                view.listenTo(source, "change", function(options) {
+            if (_.has(view, "model")) {
+                view.listenTo(view.model, "change", function(options) {
+                    // When a change has happened, re-render
+                    view.render();
+                });
+                view.listenTo(view.model, "destroy", function(options) {
+                    // When a change has happened, re-render
+                    view.remove();
+                });
+            } else if (_.has(view, "collection")) {
+                view.listenTo(view.collection, "add", function(model, collection, options) {
+                    // When a change has happened, re-render
+                    view.render();
+                });
+                view.listenTo(view.collection, "remove", function(model, collection, options) {
+                    // When a change has happened, re-render
+                    view.render();
+                });
+                view.listenTo(view.collection, "reset", function(collection, options) {
+                    // When a change has happened, re-render
+                    view.render();
+                });
+                view.listenTo(view.collection, "sort", function(collection, options) {
                     // When a change has happened, re-render
                     view.render();
                 });
@@ -651,7 +678,11 @@ var Pump = (function(_, $, Backbone) {
                 partials,
                 cnt;
 
-            main.data[modelName] = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model);
+            if (view.collection) {
+                main.data[modelName] = view.collection.toJSON();
+            } else if (view.model) {
+                main.data[modelName] = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model);
+            }
 
             if (_.has(view.options, "data")) {
                 _.each(view.options.data, function(obj, name) {
@@ -2595,12 +2626,12 @@ var Pump = (function(_, $, Backbone) {
 
         if (content.majorStreamView) {
             major = content.majorStreamView.collection;
-            major.fetch();
+            major.fetch({update: true, remove: false});
         }
 
         if (content.minorStreamView) {
             minor = content.minorStreamView.collection;
-            minor.fetch();
+            minor.fetch({update: true, remove: false});
         }
 
         return true;
