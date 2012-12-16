@@ -502,8 +502,8 @@ var Pump = (function(_, $, Backbone) {
                 source = (_.has(view, "collection")) ? view.collection :
                     (_.has(view, "model")) ? view.model : null;
 
-            if (source && _.isFunction(source.on)) {
-                source.on("change", function(options) {
+            if (source) {
+                view.listenTo(source, "change", function(options) {
                     // When a change has happened, re-render
                     view.render();
                 });
@@ -631,7 +631,6 @@ var Pump = (function(_, $, Backbone) {
                     cb(null, html);
                 },
                 setOutput = function(err, html) {
-                    var $old, $new;
                     if (err) {
                         Pump.error(err);
                     } else {
