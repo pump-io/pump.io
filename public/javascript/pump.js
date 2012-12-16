@@ -2575,6 +2575,37 @@ var Pump = (function(_, $, Backbone) {
         $.fn.wysihtml5.defaultOptions["customTemplates"] = Pump.wysihtml5Tmpl;
     };
 
+    Pump.refreshStreams = function() {
+
+        var major,
+            minor,
+            content;
+
+        if (Pump.body && Pump.body.content) {
+            if (Pump.body.content.userContent) {
+                if (Pump.body.content.userContent.listContent) {
+                    content = Pump.body.content.userContent.listContent;
+                } else {
+                    content = Pump.body.content.userContent;
+                }
+            } else {
+                content = Pump.body.content;
+            }
+        }
+
+        if (content.majorStreamView) {
+            major = content.majorStreamView.collection;
+            major.fetch();
+        }
+
+        if (content.minorStreamView) {
+            minor = content.minorStreamView.collection;
+            minor.fetch();
+        }
+
+        return true;
+    };
+
     $(document).ready(function() {
 
         // XXX: set up initial models
@@ -2605,6 +2636,10 @@ var Pump = (function(_, $, Backbone) {
         Backbone.history.start({pushState: true, silent: true});
 
         Pump.setupWysiHTML5();
+
+        // Refresh the streams every 60 seconds
+
+        Pump.refreshStreamsID = setInterval(Pump.refreshStreams, 60000);
 
         Pump.ensureCred(function(err, cred) {
 
