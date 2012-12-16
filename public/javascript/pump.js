@@ -401,7 +401,14 @@ var Pump = (function(_, $, Backbone) {
     });
 
     Pump.ActivityStream = Pump.Collection.extend({
-        model: Pump.Activity
+        model: Pump.Activity,
+        add: function(models, options) {
+            // Always add at the beginning of the list
+            if (!_.has(options, 'at')) {
+                options.at = 0;
+            }
+            Backbone.Collection.prototype.add.apply(this, [models, options]);
+        }
     });
 
     Pump.ActivityObject = Pump.Model.extend({
