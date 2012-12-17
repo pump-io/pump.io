@@ -67,8 +67,9 @@
     <script src="/javascript/bootstrap-wysihtml5.js"></script>
     <script src="/javascript/select2.min.js"></script>
     <script src="/javascript/pump.js"></script>
+    <% if (config.socket_io) { %>
     <script src="/socket.io/socket.io.js"></script>
-
+    <% } %>
     <script>
       if (!Pump) {
           Pump = {};
@@ -79,7 +80,8 @@
       _.extend(Pump.config, {
           site: "<%- config.site %>",
           requireEmail: "<%- config.requireEmail %>",
-          canUpload: "<%- config.canUpload %>"
+          canUpload: "<%- config.canUpload %>",
+          socket_io: <%- config.socket_io %>
       });
     </script>
   </body>

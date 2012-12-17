@@ -2697,7 +2697,9 @@ var Pump = (function(_, $, Backbone) {
 
         // Connect to current server
 
-        Pump.socket = io.connect(here.protocol + "//" + here.host);
+        if (Pump.config.socket_io) {
+            Pump.socket = io.connect(here.protocol + "//" + here.host);
+        }
 
         Pump.ensureCred(function(err, cred) {
 
