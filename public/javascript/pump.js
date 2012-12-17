@@ -568,29 +568,51 @@ var Pump = (function(_, $, Backbone) {
             }
 
             _.each(subs, function(def, selector) {
-                var el = view.$(selector),
-                    options = {el: el},
+
+                var $el = view.$(selector),
+                    options,
                     sub,
                     id;
 
                 if (def.attr && view[def.attr]) {
-                    view[def.attr].setElement(el);
+                    view[def.attr].setElement($el);
                     return;
                 }
 
-                if (def.idAttr) {
-                    id = el.attr(def.idAttr);
-                    if (!id) {
-                        return;
+                if (def.idAttr && view.collection) {
+
+                    if (def.map) {
+                        if (!view[def.map]) {
+                            view[def.map] = {};
+                        }
                     }
-                    if (!view.collection) {
-                        return;
-                    }
-                    options.model = view.collection.get(id);
-                    if (!options.model) {
-                        return;
-                    }
+
+                    $el.each(function(i, el) {
+
+                        var id = $(el).attr(def.idAttr),
+                            options = {el: el};
+
+                        if (!id) {
+                            return;
+                        }
+
+                        options.model = view.collection.get(id);
+
+                        if (!options.model) {
+                            return;
+                        }
+
+                        sub = new Pump[def.subView](options);
+
+                        if (def.map) {
+                            view[def.map][id] = sub;
+                        }
+                    });
+
+                    return;
                 }
+
+                options = {el: $el};
 
                 if (def.subOptions) {
                     if (def.subOptions.model) {
@@ -611,11 +633,6 @@ var Pump = (function(_, $, Backbone) {
                    
                 if (def.attr) {
                     view[def.attr] = sub;
-                } else if (def.map) {
-                    if (!view[def.map]) {
-                        view[def.map] = {};
-                    }
-                    view[def.map][options.model.id] = sub;
                 }
             });
         },
