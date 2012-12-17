@@ -2652,7 +2652,13 @@ var Pump = (function(_, $, Backbone) {
         return true;
     };
 
+    // Our socket.io socket
+
+    Pump.socket = null;
+
     $(document).ready(function() {
+
+        var here = window.location;
 
         // XXX: set up initial models
         
@@ -2686,6 +2692,10 @@ var Pump = (function(_, $, Backbone) {
         // Refresh the streams every 60 seconds
 
         Pump.refreshStreamsID = setInterval(Pump.refreshStreams, 60000);
+
+        // Connect to current server
+
+        Pump.socket = io.connect(here.protocol + "//" + here.host);
 
         Pump.ensureCred(function(err, cred) {
 
