@@ -128,6 +128,30 @@ suite.addBatch({
                         assert.isObject(reg.generator);
                         assert.equal(reg.generator.displayName, "Generator Test");
                     }
+                },
+                "and we post a note": {
+                    topic: function(pair, cl) {
+                        var cb = this.callback,
+                            cred = makeCred(cl, pair),
+                            url = "http://localhost:4815/api/user/george/feed",
+                            act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "note",
+                                    content: "Hello, world!"
+                                }
+                            };
+                        
+                        httputil.postJSON(url, cred, act, function(err, doc, resp) {
+                            cb(err, doc);
+                        });
+                    },
+                    "the resulting activity has a generator": function(err, act) {
+                        assert.ifError(err);
+                        assert.isObject(act);
+                        assert.isObject(act.generator);
+                        assert.equal(act.generator.displayName, "Generator Test");
+                    }
                 }
             }
         }

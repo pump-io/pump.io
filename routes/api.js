@@ -995,6 +995,10 @@ var postActivity = function(req, res, next) {
         return;
     }
 
+    // XXX: we overwrite anything here
+
+    activity.generator = req.generator;
+
     // Default verb
 
     if (!_(activity).has("verb") || _(activity.verb).isNull()) {
