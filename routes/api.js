@@ -55,6 +55,7 @@ var databank = require("databank"),
     mm = require("../lib/mimemap"),
     saveUpload = require("../lib/saveupload").saveUpload,
     reqUser = mw.reqUser,
+    reqGenerator = mw.reqGenerator,
     sameUser = mw.sameUser,
     clientAuth = mw.clientAuth,
     userAuth = mw.userAuth,
@@ -195,29 +196,6 @@ var addRoutes = function(app) {
 
     app.get("/api/collection/:uuid/members", clientAuth, requestCollection, authorOrRecipient, collectionMembers);
     app.post("/api/collection/:uuid/members", userAuth, requestCollection, authorOnly, reqGenerator, newMember);
-};
-
-// Add a generator object to writeable requests
-
-var reqGenerator = function(req, res, next) {
-    var client = req.client;
-
-    if (!client) {
-        next(new HTTPError("No client", 500));
-        return;
-    }
-
-    Step(
-        function() {
-            client.asActivityObject(this);
-        },
-        function(err, obj) {
-            if (err) throw err;
-            req.generator = obj;
-            this(null);
-        },
-        next
-    );
 };
 
 // XXX: use a common function instead of faking up params
