@@ -1935,7 +1935,7 @@ var Pump = (function(_, $, Backbone) {
             view.startSpin();
             
             stream.create(act, {success: function(act) {
-                view.$("#modal-note").modal('hide');
+                view.$el.modal('hide');
                 view.stopSpin();
                 Pump.resetWysihtml5(view.$('#note-content'));
                 // Reload the current page
@@ -2012,7 +2012,7 @@ var Pump = (function(_, $, Backbone) {
                     }
 
                     stream.create(act, {success: function(act) {
-                        view.$("#modal-picture").modal('hide');
+                        view.$el.modal('hide');
                         view.stopSpin();
                         view.$("#picture-fineupload").fineUploader('reset');
                         Pump.resetWysihtml5(view.$('#picture-description'));
@@ -2094,7 +2094,7 @@ var Pump = (function(_, $, Backbone) {
                 stream.create(act, {success: function(act) {
                     var aview;
 
-                    view.$(".pump-modal").modal('hide');
+                    view.$el.modal('hide');
                     view.stopSpin();
                     Pump.resetWysihtml5(view.$('#list-description'));
                     view.$('#list-name').val("");
@@ -2239,7 +2239,7 @@ var Pump = (function(_, $, Backbone) {
         // If we've got it attached already, just show it
         if (_.has(Pump.modals, templateName)) {
             modalView = Pump.modals[templateName];
-            modalView.$(".pump-modal").modal('show');
+            modalView.$el.modal('show');
         } else {
             // Otherwise, create a view
             modalView = new Cls(options);
@@ -2247,7 +2247,7 @@ var Pump = (function(_, $, Backbone) {
             // When it's ready, show immediately
             modalView.on("ready", function() {
                 $("body").append(modalView.el);
-                modalView.$(".pump-modal").modal('show');
+                modalView.$el.modal('show');
             });
             // render it (will fire "ready")
             modalView.render();
