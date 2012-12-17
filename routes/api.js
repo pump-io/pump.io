@@ -116,8 +116,8 @@ var addRoutes = function(app) {
 
     // Users
     app.get("/api/user/:nickname", clientAuth, reqUser, getUser);
-    app.put("/api/user/:nickname", userAuth, reqUser, sameUser, reqGenerator, putUser);
-    app.del("/api/user/:nickname", userAuth, reqUser, sameUser, reqGenerator, delUser);
+    app.put("/api/user/:nickname", userAuth, reqUser, sameUser, putUser);
+    app.del("/api/user/:nickname", userAuth, reqUser, sameUser, delUser);
 
     app.get("/api/user/:nickname/profile", clientAuth, reqUser, personType, getObject);
     app.put("/api/user/:nickname/profile", userAuth, reqUser, sameUser, personType, reqGenerator, putObject);

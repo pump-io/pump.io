@@ -153,6 +153,56 @@ suite.addBatch({
                         assert.equal(act.generator.displayName, "Generator Test");
                     }
                 },
+                "and we post an activity to the minor feed": {
+                    topic: function(pair, cl) {
+                        var cb = this.callback,
+                            cred = makeCred(cl, pair),
+                            url = "http://localhost:4815/api/user/george/feed/minor",
+                            act = {
+                                verb: "like",
+                                object: {
+                                    objectType: "note",
+                                    id: "urn:uuid:995bb4c8-4870-11e2-b2db-2c8158efb9e9",
+                                    content: "i love george"
+                                }
+                            };
+                        
+                        httputil.postJSON(url, cred, act, function(err, doc, resp) {
+                            cb(err, doc);
+                        });
+                    },
+                    "the resulting activity has a generator": function(err, act) {
+                        assert.ifError(err);
+                        assert.isObject(act);
+                        assert.isObject(act.generator);
+                        assert.equal(act.generator.displayName, "Generator Test");
+                    }
+                },
+                "and we post an activity to the major feed": {
+                    topic: function(pair, cl) {
+                        var cb = this.callback,
+                            cred = makeCred(cl, pair),
+                            url = "http://localhost:4815/api/user/george/feed/major",
+                            act = {
+                                verb: "post",
+                                object: {
+                                    id: "urn:uuid:7045fd3c-4870-11e2-b038-2c8158efb9e9",
+                                    objectType: "image",
+                                    displayName: "rosy2.jpg"
+                                }
+                            };
+                        
+                        httputil.postJSON(url, cred, act, function(err, doc, resp) {
+                            cb(err, doc);
+                        });
+                    },
+                    "the resulting activity has a generator": function(err, act) {
+                        assert.ifError(err);
+                        assert.isObject(act);
+                        assert.isObject(act.generator);
+                        assert.equal(act.generator.displayName, "Generator Test");
+                    }
+                },
                 "and we follow someone by posting to the following list": {
                     topic: function(pair, cl) {
                         var cb = this.callback,
