@@ -515,7 +515,7 @@ var Pump = (function(_, $, Backbone) {
         initialize: function(options) {
             var view = this;
 
-            if (_.has(view, "model")) {
+            if (_.has(view, "model") && _.isObject(view.model)) {
                 view.listenTo(view.model, "change", function(options) {
                     // When a change has happened, re-render
                     view.render();
@@ -524,7 +524,7 @@ var Pump = (function(_, $, Backbone) {
                     // When a change has happened, re-render
                     view.remove();
                 });
-            } else if (_.has(view, "collection")) {
+            } else if (_.has(view, "collection") && _.isObject(view.collection)) {
                 view.listenTo(view.collection, "add", function(model, collection, options) {
                     // When a change has happened, re-render
                     view.render();
