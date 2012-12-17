@@ -173,8 +173,8 @@ var addRoutes = function(app) {
     // Activities
 
     app.get("/api/activity/:uuid", clientAuth, reqActivity, actorOrRecipient, getActivity);
-    app.put("/api/activity/:uuid", userAuth, reqActivity, actorOnly, reqGenerator, putActivity);
-    app.del("/api/activity/:uuid", userAuth, reqActivity, actorOnly, reqGenerator, delActivity);
+    app.put("/api/activity/:uuid", userAuth, reqActivity, actorOnly, putActivity);
+    app.del("/api/activity/:uuid", userAuth, reqActivity, actorOnly, delActivity);
 
     // Other objects
 
@@ -1862,7 +1862,8 @@ var newFavorite = function(req, res, next) {
         act = new Activity({
             actor: req.user.profile,
             verb: "favorite",
-            object: obj
+            object: obj,
+            generator: req.generator
         });
 
     Step(
