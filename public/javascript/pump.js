@@ -1309,7 +1309,7 @@ var Pump = (function(_, $, Backbone) {
                     verb: "favorite",
                     object: view.model.object.toJSON()
                 }),
-                stream = Pump.currentUser.stream;
+                stream = Pump.currentUser.minorStream;
 
             stream.create(act, {success: function(act) {
                 view.$(".favorite")
@@ -1325,7 +1325,7 @@ var Pump = (function(_, $, Backbone) {
                     verb: "unfavorite",
                     object: view.model.object.toJSON()
                 }),
-                stream = Pump.currentUser.stream;
+                stream = Pump.currentUser.minorStream;
 
             stream.create(act, {success: function(act) {
                 view.$(".unfavorite")
@@ -1341,7 +1341,7 @@ var Pump = (function(_, $, Backbone) {
                     verb: "share",
                     object: view.model.object.toJSON()
                 }),
-                stream = Pump.currentUser.stream;
+                stream = Pump.currentUser.majorStream;
 
             stream.create(act, {success: function(act) {
                 view.$(".share")
@@ -1357,7 +1357,7 @@ var Pump = (function(_, $, Backbone) {
                     verb: "unshare",
                     object: view.model.object.toJSON()
                 }),
-                stream = Pump.currentUser.stream;
+                stream = Pump.currentUser.minorStream;
 
             stream.create(act, {success: function(act) {
                 view.$(".unshare")
@@ -1411,7 +1411,7 @@ var Pump = (function(_, $, Backbone) {
                         }
                     }
                 }),
-                stream = Pump.currentUser.stream;
+                stream = Pump.currentUser.minorStream;
 
             view.startSpin();
 
@@ -1917,7 +1917,7 @@ var Pump = (function(_, $, Backbone) {
                         content: text
                     }
                 }),
-                stream = Pump.currentUser.stream,
+                stream = Pump.currentUser.majorStream,
                 strToObj = function(str) {
                     var colon = str.indexOf(":"),
                         type = str.substr(0, colon),
@@ -1990,7 +1990,7 @@ var Pump = (function(_, $, Backbone) {
                     }
                 }).on("complete", function(event, id, fileName, responseJSON) {
 
-                    var stream = Pump.currentUser.stream,
+                    var stream = Pump.currentUser.majorStream,
                         to = view.$('#post-picture #picture-to').val(),
                         cc = view.$('#post-picture #picture-cc').val(),
                         strToObj = function(str) {
@@ -2073,7 +2073,7 @@ var Pump = (function(_, $, Backbone) {
                 description = view.$('#new-list #list-description').val(),
                 name = view.$('#new-list #list-name').val(),
                 act,
-                stream = Pump.currentUser.stream;
+                stream = Pump.currentUser.minorStream;
 
             if (!name) {
                 view.showError("Your list must have a name.");
