@@ -85,6 +85,23 @@ suite.addBatch({
             "it works": function(err, client) {
                 assert.ifError(err);
                 assert.isObject(client);
+            },
+            "and we get its activity object": {
+                topic: function(client) {
+                    client.asActivityObject(this.callback);
+                },
+                "it is a service": function(err, obj) {
+                    assert.ifError(err);
+                    assert.isObject(obj);
+                    assert.include(obj, "objectType");
+                    assert.equal(obj.objectType, "service");
+                },
+                "it has the host as ID": function(err, obj) {
+                    assert.ifError(err);
+                    assert.isObject(obj);
+                    assert.include(obj, "id");
+                    assert.equal(obj.id, "photo.example");
+                }
             }
         },
         "and we create a client with a 'webfinger' property": {
@@ -94,6 +111,23 @@ suite.addBatch({
             "it works": function(err, client) {
                 assert.ifError(err);
                 assert.isObject(client);
+            },
+            "and we get its activity object": {
+                topic: function(client) {
+                    client.asActivityObject(this.callback);
+                },
+                "it is a person": function(err, obj) {
+                    assert.ifError(err);
+                    assert.isObject(obj);
+                    assert.include(obj, "objectType");
+                    assert.equal(obj.objectType, "person");
+                },
+                "it has the webfinger as ID": function(err, obj) {
+                    assert.ifError(err);
+                    assert.isObject(obj);
+                    assert.include(obj, "id");
+                    assert.equal(obj.id, "alice@geographic.example");
+                }
             }
         },
         "and we create a client with both 'host' and 'webfinger'": {
@@ -118,6 +152,17 @@ suite.addBatch({
             "it works": function(err, client) {
                 assert.ifError(err);
                 assert.isObject(client);
+            },
+            "and we get its activity object": {
+                topic: function(client) {
+                    client.asActivityObject(this.callback);
+                },
+                "it is an application": function(err, obj) {
+                    assert.ifError(err);
+                    assert.isObject(obj);
+                    assert.include(obj, "objectType");
+                    assert.equal(obj.objectType, "application");
+                }
             }
         },
         "and we create two clients with the same 'host'": {
