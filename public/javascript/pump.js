@@ -2639,14 +2639,16 @@ var Pump = (function(_, $, Backbone) {
             }
         }
 
-        if (content.majorStreamView) {
-            major = content.majorStreamView.collection;
-            major.fetch({update: true, remove: false});
-        }
+        if (content) {
+            if (content.majorStreamView) {
+                major = content.majorStreamView.collection;
+                major.fetch({update: true, remove: false});
+            }
 
-        if (content.minorStreamView) {
-            minor = content.minorStreamView.collection;
-            minor.fetch({update: true, remove: false});
+            if (content.minorStreamView) {
+                minor = content.minorStreamView.collection;
+                minor.fetch({update: true, remove: false});
+            }
         }
 
         return true;
