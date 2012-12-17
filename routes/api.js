@@ -2271,7 +2271,8 @@ var newMember = function(req, res, next) {
         act = new Activity({
             verb: "add",
             object: obj,
-            target: coll
+            target: coll,
+            generator: req.generator
         });
 
 

@@ -404,6 +404,61 @@ suite.addBatch({
                             assert.equal(del.generator.displayName, "Generator Test");
                         }
                     }
+                },
+                "and we add a person to a list by posting to the members feed": {
+                    topic: function(pair, cl) {
+                        var cb = this.callback,
+                            cred = makeCred(cl, pair);
+
+                        Step(
+                            function() {
+                                var url = "http://localhost:4815/api/user/george/lists/person";
+                                httputil.getJSON(url, cred, this);
+                            },
+                            function(err, doc, resp) {
+                                var list, person;
+                                if (err) throw err;
+                                list = _.find(doc.items, function(item) {
+                                    return item.displayName == "Family";
+                                });
+                                person = {
+                                    objectType: "person",
+                                    id: "urn:uuid:2dbe56f6-4877-11e2-a117-2c8158efb9e9",
+                                    displayName: "Elroy Jetson"
+                                };
+                                httputil.postJSON(list.members.url, cred, person, this);
+                            },
+                            function(err, doc, resp) {
+                                cb(err);
+                            }
+                        );
+                    },
+                    "it works": function(err) {
+                        assert.ifError(err);
+                    },
+                    "and we check the user's feed": {
+                        topic: function(pair, cl) {
+                            var cb = this.callback,
+                                cred = makeCred(cl, pair),
+                                url = "http://localhost:4815/api/user/george/feed";
+                            
+                            httputil.getJSON(url, cred, function(err, doc, resp) {
+                                cb(err, doc);
+                            });
+                        },
+                        "add activity has our generator": function(err, doc) {
+                            var add;
+                            assert.ifError(err);
+                            assert.isObject(doc);
+                            assert.isArray(doc.items);
+                            add = _.find(doc.items, function(activity) {
+                                return activity.verb == "add";
+                            });
+                            assert.ok(add);
+                            assert.isObject(add.generator);
+                            assert.equal(add.generator.displayName, "Generator Test");
+                        }
+                    }
                 }
             }
         }
