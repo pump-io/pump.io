@@ -130,6 +130,9 @@ var addRoutes = function(app) {
     app.get("/api/user/:nickname/feed/major", clientAuth, reqUser, userMajorStream);
     app.get("/api/user/:nickname/feed/minor", clientAuth, reqUser, userMinorStream);
 
+    app.post("/api/user/:nickname/feed/major", userAuth, reqUser, sameUser, isMajor, postActivity);
+    app.post("/api/user/:nickname/feed/minor", userAuth, reqUser, sameUser, isMinor, postActivity);
+
     // Inboxen
 
     app.get("/api/user/:nickname/inbox", userAuth, reqUser, sameUser, userInbox);
@@ -204,6 +207,28 @@ var requestCollection = function(req, res, next) {
 var personType = function(req, res, next) {
     req.type = "person";
     next();
+};
+
+var isMajor = function(req, res, next) {
+    var props = Scrubber.scrubActivity(req.body),
+        activity = new Activity(props);
+
+    if (activity.isMajor()) {
+        next();
+    } else {
+        next(new HTTPError("Only major activities to this feed.", 400));
+    }
+};
+
+var isMinor = function(req, res, next) {
+    var props = Scrubber.scrubActivity(req.body),
+        activity = new Activity(props);
+
+    if (!activity.isMajor()) {
+        next();
+    } else {
+        next(new HTTPError("Only minor activities to this feed.", 400));
+    }
 };
 
 var userOnly = function(req, res, next) {
