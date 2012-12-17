@@ -1,14 +1,16 @@
-<form class="post-comment">
-  <fieldset>
-    <div class="control-group">
-      <div class="controls">
-        <textarea class="span5" name="content" rows="6"></textarea>
+<div class="row">
+  <form class="post-comment">
+    <fieldset>
+      <div class="control-group">
+        <div class="controls">
+          <textarea class="span5" name="content" rows="6"></textarea>
+        </div>
       </div>
-    </div>
-    <div class="control-group">
-      <div class="controls">
-        <button type="submit" class="btn btn-primary">Comment</button>
+      <div class="control-group">
+        <div class="controls">
+          <button type="submit" class="btn btn-primary">Comment</button>
+        </div>
       </div>
-    </div>
-  </fieldset>
-</form>
+    </fieldset>
+  </form>
+</div>

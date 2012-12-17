@@ -1369,13 +1369,17 @@ var Pump = (function(_, $, Backbone) {
         },
         openComment: function() {
             var view = this,
-                form = new Pump.CommentForm({model: view.model});
+                form;
 
-            form.on("ready", function() {
-                view.$(".replies").append(form.el);
-            });
-
-            form.render();
+            if (view.$("form.post-comment").length > 0) {
+                view.$("form.post-comment textarea").focus();
+            } else {
+                form = new Pump.CommentForm({original: view.model.object});
+                form.on("ready", function() {
+                    view.$(".replies").append(form.$el);
+                });
+                form.render();
+            }
         }
     });
 
@@ -1395,15 +1399,15 @@ var Pump = (function(_, $, Backbone) {
         saveComment: function() {
             var view = this,
                 text = view.$('textarea[name="content"]').val(),
-                orig = view.model.object.toJSON(),
+                orig = view.options.original,
                 act = new Pump.Activity({
                     verb: "post",
                     object: {
                         objectType: "comment",
                         content: text,
                         inReplyTo: {
-                            objectType: orig.objectType,
-                            id: orig.id
+                            objectType: orig.get("objectType"),
+                            id: orig.get("id")
                         }
                     }
                 }),
