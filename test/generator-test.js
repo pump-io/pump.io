@@ -347,6 +347,63 @@ suite.addBatch({
                             assert.equal(update.generator.displayName, "Generator Test");
                         }
                     }
+                },
+                "and we delete a note by DELETE": {
+                    topic: function(pair, cl) {
+                        var cb = this.callback,
+                            cred = makeCred(cl, pair),
+                            url = "http://localhost:4815/api/user/george/feed";
+
+                        Step(
+                            function() {
+                                var act = {
+                                    verb: "post",
+                                    object: {
+                                        objectType: "note",
+                                        content: "I quit."
+                                    }
+                                };
+                        
+                                httputil.postJSON(url, cred, act, this);
+                            },
+                            function(err, doc, resp) {
+                                var url, obj;
+                                if (err) throw err;
+                                obj = doc.object;
+                                url = obj.links.self.href;
+                                httputil.delJSON(url, cred, this);
+                            },
+                            function(err, doc, resp) {
+                                cb(err);
+                            }
+                        );
+                    },
+                    "it works": function(err) {
+                        assert.ifError(err);
+                    },
+                    "and we check the user's feed": {
+                        topic: function(pair, cl) {
+                            var cb = this.callback,
+                                cred = makeCred(cl, pair),
+                                url = "http://localhost:4815/api/user/george/feed";
+                            
+                            httputil.getJSON(url, cred, function(err, doc, resp) {
+                                cb(err, doc);
+                            });
+                        },
+                        "delete activity has our generator": function(err, doc) {
+                            var del;
+                            assert.ifError(err);
+                            assert.isObject(doc);
+                            assert.isArray(doc.items);
+                            del = _.find(doc.items, function(activity) {
+                                return activity.verb == "delete";
+                            });
+                            assert.ok(del);
+                            assert.isObject(del.generator);
+                            assert.equal(del.generator.displayName, "Generator Test");
+                        }
+                    }
                 }
             }
         }

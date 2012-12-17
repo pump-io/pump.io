@@ -364,6 +364,7 @@ var deleteObject = function(req, res, next) {
         act = new Activity({
             actor: req.remoteUser.profile,
             verb: "delete",
+            generator: req.generator,
             object: obj
         });
 
