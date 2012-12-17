@@ -44,6 +44,7 @@ var databank = require("databank"),
     api = require("./api"),
     HTTPError = he.HTTPError,
     reqUser = mw.reqUser,
+    reqGenerator = mw.reqGenerator,
     principal = sa.principal,
     setPrincipal = sa.setPrincipal,
     clearPrincipal = sa.clearPrincipal,
@@ -65,7 +66,7 @@ var addRoutes = function(app) {
     app.get("/", app.session, principal, showMain);
 
     app.get("/main/register", app.session, principal, showRegister);
-    app.post("/main/register", app.session, principal, clientAuth, createUser);
+    app.post("/main/register", app.session, principal, clientAuth, reqGenerator, createUser);
 
     app.get("/main/login", app.session, principal, showLogin);
     app.post("/main/login", app.session, clientAuth, handleLogin);
