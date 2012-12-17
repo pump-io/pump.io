@@ -334,6 +334,7 @@ var putObject = function(req, res, next) {
         updates = Scrubber.scrubObject(req.body),
         act = new Activity({
             actor: req.remoteUser.profile,
+            generator: req.generator,
             verb: "update",
             object: _(obj).extend(updates)
         });

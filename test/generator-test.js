@@ -288,6 +288,65 @@ suite.addBatch({
                             assert.equal(favorite.generator.displayName, "Generator Test");
                         }
                     }
+                },
+                "and we update a note by PUT": {
+                    topic: function(pair, cl) {
+                        var cb = this.callback,
+                            cred = makeCred(cl, pair),
+                            url = "http://localhost:4815/api/user/george/feed";
+
+                        Step(
+                            function() {
+                                var act = {
+                                    verb: "post",
+                                    object: {
+                                        objectType: "note",
+                                        content: "Stop this crazy thing."
+                                    }
+                                };
+                        
+                                httputil.postJSON(url, cred, act, this);
+                            },
+                            function(err, doc, resp) {
+                                var url, obj;
+                                if (err) throw err;
+                                obj = doc.object;
+                                url = obj.links.self.href;
+                                obj.content = "Stop this crazy thing!!!!!!!!!";
+                                httputil.putJSON(url, cred, obj, this);
+                            },
+                            function(err, doc, resp) {
+                                cb(err);
+                            }
+                        );
+                    },
+                    "it works": function(err) {
+                        assert.ifError(err);
+                    },
+                    "and we check the user's feed": {
+                        topic: function(pair, cl) {
+                            var cb = this.callback,
+                                cred = makeCred(cl, pair),
+                                url = "http://localhost:4815/api/user/george/feed";
+                            
+                            httputil.getJSON(url, cred, function(err, doc, resp) {
+                                cb(err, doc);
+                            });
+                        },
+                        "update activity has our generator": function(err, doc) {
+                            var update;
+                            assert.ifError(err);
+                            assert.isObject(doc);
+                            assert.isArray(doc.items);
+                            update = _.find(doc.items, function(activity) {
+                                return activity.verb == "update" &&
+                                    activity.object.content == "Stop this crazy thing!!!!!!!!!";
+                            });
+                            assert.ok(update);
+                            assert.isObject(update.generator);
+                            assert.equal(update.generator.displayName, "Generator Test");
+                        }
+                    }
                 }
             }
         }
