@@ -100,7 +100,7 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.isObject(obj);
                     assert.include(obj, "id");
-                    assert.equal(obj.id, "photo.example");
+                    assert.equal(obj.id, "http://photo.example/");
                 }
             }
         },
