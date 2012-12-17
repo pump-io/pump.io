@@ -338,7 +338,9 @@ The feeds are at `/api/user/<nickname>/inbox/major`,
 `/api/user/<nickname>/inbox/minor`, `/api/user/<nickname>/feed/major`,
 and `/api/user/<nickname>/feed/minor`.
 
-The major and minor feeds don't respond to POST requests.
+The major and minor feeds will respond to POST requests. You can only
+post major activities to the major feed and minor activities to the
+minor feed.
 
 ### Direct inbox
 
