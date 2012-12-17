@@ -733,7 +733,8 @@ var createUser = function(req, res, next) {
             var act = new Activity({
                 actor: user.profile,
                 verb: Activity.JOIN,
-                object: svc
+                object: svc,
+                generator: req.generator
             });
             newActivity(act, user, callback);
         },
