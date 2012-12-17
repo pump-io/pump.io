@@ -818,8 +818,8 @@ var Pump = (function(_, $, Backbone) {
                 lists = profile.lists,
                 following = profile.following;
 
-            lists.fetch({success: function() {
-                following.fetch({success: function() {
+            lists.fetch({update: true, remove: false, success: function() {
+                following.fetch({update: true, remove: false, success: function() {
                     Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.currentUser}});
                 }});
             }});
@@ -830,8 +830,8 @@ var Pump = (function(_, $, Backbone) {
                 lists = profile.lists,
                 following = profile.following;
 
-            lists.fetch({success: function() {
-                following.fetch({success: function() {
+            lists.fetch({update: true, remove: false, success: function() {
+                following.fetch({update: true, remove: false, success: function() {
                     Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.currentUser}});
                 }});
             }});
@@ -2328,8 +2328,8 @@ var Pump = (function(_, $, Backbone) {
 
                 // XXX: parallelize
 
-                major.fetch({success: function(major, response) {
-                    minor.fetch({success: function(minor, response) {
+                major.fetch({update: true, remove: false, success: function(major, response) {
+                    minor.fetch({update: true, remove: false, success: function(minor, response) {
                         Pump.body.setContent({contentView: Pump.InboxContent,
                                               data: {major: major,
                                                      minor: minor},
@@ -2351,8 +2351,8 @@ var Pump = (function(_, $, Backbone) {
             // XXX: parallelize this?
 
             user.fetch({success: function(user, response) {
-                major.fetch({success: function(major, response) {
-                    minor.fetch({success: function(minor, response) {
+                major.fetch({update: true, remove: false, success: function(major, response) {
+                    minor.fetch({update: true, remove: false, success: function(minor, response) {
                         var profile = user.profile;
                         Pump.body.setContent({contentView: Pump.UserPageContent,
                                               userContentView: Pump.ActivitiesUserContent,
@@ -2374,7 +2374,7 @@ var Pump = (function(_, $, Backbone) {
             user.fetch({success: function(user, response) {
                 var profile = user.profile,
                     favorites = profile.favorites;
-                favorites.fetch({success: function(favorites, response) {
+                favorites.fetch({update: true, remove: false, success: function(favorites, response) {
                     Pump.body.setContent({
                         contentView: Pump.FavoritesContent,
                         userContentView: Pump.FavoritesUserContent,
@@ -2393,7 +2393,7 @@ var Pump = (function(_, $, Backbone) {
 
             user.fetch({success: function(user, response) {
                 var followers = user.profile.followers;
-                followers.fetch({success: function(followers, response) {
+                followers.fetch({update: true, remove: false, success: function(followers, response) {
                     var profile = user.profile;
 
                     Pump.body.setContent({contentView: Pump.FollowersContent,
@@ -2414,7 +2414,7 @@ var Pump = (function(_, $, Backbone) {
 
             user.fetch({success: function(user, response) {
                 var following = user.profile.following;
-                following.fetch({success: function(following, response) {
+                following.fetch({update: true, remove: false, success: function(following, response) {
                     var profile = user.profile;
 
                     Pump.body.setContent({contentView: Pump.FollowingContent,
@@ -2435,7 +2435,7 @@ var Pump = (function(_, $, Backbone) {
 
             user.fetch({success: function(user, response) {
                 var lists = user.profile.lists;
-                lists.fetch({success: function(lists, response) {
+                lists.fetch({update: true, remove: false, success: function(lists, response) {
                     var profile = user.profile;
 
                     Pump.body.setContent({contentView: Pump.ListsContent,
@@ -2458,7 +2458,7 @@ var Pump = (function(_, $, Backbone) {
 
             user.fetch({success: function(user, response) {
                 var lists = user.profile.lists;
-                lists.fetch({success: function(lists, response) {
+                lists.fetch({update: true, remove: false, success: function(lists, response) {
                     list.fetch({success: function(list, response) {
                         var profile = user.profile,
                             options = {contentView: Pump.ListContent,
