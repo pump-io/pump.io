@@ -583,6 +583,9 @@ var Pump = (function(_, $, Backbone) {
                     if (!id) {
                         return;
                     }
+                    if (!view.collection) {
+                        return;
+                    }
                     options.model = view.collection.get(id);
                     if (!options.model) {
                         return;
@@ -1220,7 +1223,6 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.InboxContent = Pump.ContentView.extend({
         templateName: 'inbox',
-        modelName: "user",
         parts: ["major-stream",
                 "sidebar",
                 "major-activity",
@@ -1490,7 +1492,6 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.FavoritesContent = Pump.ContentView.extend({
         templateName: 'favorites',
-        modelName: "profile",
         parts: ["profile-block",
                 "user-content-favorites",
                 "object-stream",
@@ -1512,7 +1513,7 @@ var Pump = (function(_, $, Backbone) {
                 attr: "userContent",
                 subView: "FavoritesUserContent",
                 subOptions: {
-                    collection: "major",
+                    collection: "objects",
                     data: ["profile"]
                 }
             }
@@ -1565,7 +1566,7 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.FollowersUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-followers',
-        modelName: "profile",
+        modelName: "people",
         parts: ["people-stream",
                 "major-person",
                 "profile-responses"],
@@ -1580,7 +1581,6 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.FollowingContent = Pump.ContentView.extend({
         templateName: 'following',
-        modelName: "profile",
         parts: ["profile-block",
                 'user-content-following',
                 "people-stream",
@@ -1606,15 +1606,8 @@ var Pump = (function(_, $, Backbone) {
     });
 
     Pump.FollowingUserContent = Pump.TemplateView.extend({
-        initialize: function(options) {
-            Pump.TemplateView.prototype.initialize.apply(this, arguments);
-            if (!_.has(options, "collection") &&
-                _.has(options, "data") &&
-                _.has(options.data, "people")) {
-                this.collection = options.data.people;
-            }
-        },
         templateName: 'user-content-following',
+        modelName: "people",
         parts: ["people-stream",
                 "major-person",
                 "profile-responses"],
@@ -1629,7 +1622,6 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.ListsContent = Pump.ContentView.extend({
         templateName: 'lists',
-        modelName: "profile",
         parts: ["profile-block",
                 'user-content-lists',
                 "list-menu",
@@ -1655,7 +1647,6 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.ListsUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-lists',
-        modelName: "profile",
         parts: ["list-menu",
                 "list-menu-item",
                 "list-content-lists"],
@@ -1761,6 +1752,7 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.ListListContent = Pump.TemplateView.extend({
         templateName: 'list-content-list',
+        modelName: "list",
         parts: ["people-stream",
                 "major-person"],
         setupSubs: function() {
@@ -1779,11 +1771,6 @@ var Pump = (function(_, $, Backbone) {
                 });
             }
         }
-    });
-
-    Pump.ActivityContent = Pump.ContentView.extend({
-        templateName: 'activity-content',
-        modelName: "activity"
     });
 
     Pump.SettingsContent = Pump.ContentView.extend({
