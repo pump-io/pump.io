@@ -18,7 +18,7 @@
    </a>
    <% } %>
 <% }); %>
-<% if (!_.has(coll, "items") || coll.items.length === 0) { %>
+<% if (!_.has(coll, "items") || !coll.items || coll.items.length === 0) { %>
 <%- coll.totalItems %> people
 <% } else if (coll.totalItems > coll.items.length) { %>
 and <%- coll.totalItems - coll.items.length %> others
