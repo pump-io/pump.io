@@ -1709,7 +1709,8 @@ var newFollow = function(req, res, next) {
         act = new Activity({
             actor: req.user.profile,
             verb: "follow",
-            object: obj
+            object: obj,
+            generator: req.generator
         });
 
     Step(

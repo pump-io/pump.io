@@ -152,6 +152,49 @@ suite.addBatch({
                         assert.isObject(act.generator);
                         assert.equal(act.generator.displayName, "Generator Test");
                     }
+                },
+                "and we follow someone by posting to the following list": {
+                    topic: function(pair, cl) {
+                        var cb = this.callback,
+                            cred = makeCred(cl, pair),
+                            url = "http://localhost:4815/api/user/george/following",
+                            person = {
+                                objectType: "person",
+                                id: "urn:uuid:b7144562-486f-11e2-b1c7-2c8158efb9e9",
+                                displayName: "Cosmo G. Spacely"
+                            };
+                        
+                        httputil.postJSON(url, cred, person, function(err, doc, resp) {
+                            cb(err);
+                        });
+                    },
+                    "it works": function(err) {
+                        assert.ifError(err);
+                    },
+                    "and we check the user's feed": {
+                        topic: function(pair, cl) {
+                            var cb = this.callback,
+                                cred = makeCred(cl, pair),
+                                url = "http://localhost:4815/api/user/george/feed";
+                            
+                            httputil.getJSON(url, cred, function(err, doc, resp) {
+                                cb(err, doc);
+                            });
+                        },
+                        "follow activity has our generator": function(err, doc) {
+                            var follow;
+                            assert.ifError(err);
+                            assert.isObject(doc);
+                            assert.isArray(doc.items);
+                            follow = _.find(doc.items, function(activity) {
+                                return activity.verb == "follow" &&
+                                    activity.object.id == "urn:uuid:b7144562-486f-11e2-b1c7-2c8158efb9e9";
+                            });
+                            assert.ok(follow);
+                            assert.isObject(follow.generator);
+                            assert.equal(follow.generator.displayName, "Generator Test");
+                        }
+                    }
                 }
             }
         }
