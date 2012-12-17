@@ -67,6 +67,8 @@
     <script src="/javascript/bootstrap-wysihtml5.js"></script>
     <script src="/javascript/select2.min.js"></script>
     <script src="/javascript/pump.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
     <script>
       if (!Pump) {
           Pump = {};
