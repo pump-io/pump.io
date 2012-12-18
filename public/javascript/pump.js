@@ -2658,9 +2658,15 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.socket = null;
 
-    $(document).ready(function() {
-
+    Pump.setupSocket = function() {
         var here = window.location;
+        Pump.socket = io.connect(here.protocol + "//" + here.host);
+        Pump.socket.on("challenge", function(data) {
+            console.log(data);
+        });
+    };
+
+    $(document).ready(function() {
 
         // XXX: set up initial models
         
@@ -2698,7 +2704,7 @@ var Pump = (function(_, $, Backbone) {
         // Connect to current server
 
         if (Pump.config.socket_io) {
-            Pump.socket = io.connect(here.protocol + "//" + here.host);
+            Pump.setupSocket();
         }
 
         Pump.ensureCred(function(err, cred) {
