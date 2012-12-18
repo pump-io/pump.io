@@ -33,7 +33,7 @@
                       "emailjs": "0.3.x",
                       "mkdirp": "0.3.x",
 		      "connect-databank": "0.4.x",
-                      "socket.io": "0.9.x"
+                      "sockjs": "0.3.x"
 		    },
     "bin": {
         "pump": "./bin/pump",
