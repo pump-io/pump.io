@@ -2674,6 +2674,9 @@ var Pump = (function(_, $, Backbone) {
         Pump.socket.on("challenge", function(data) {
             console.log(data);
         });
+        Pump.socket.on("update", function(data) {
+            console.log(data);
+        });
         Pump.socket.on("connect", function () {
             console.log("Reconnect");
             Pump.followStreams();
