@@ -2621,11 +2621,10 @@ var Pump = (function(_, $, Backbone) {
         $.fn.wysihtml5.defaultOptions["customTemplates"] = Pump.wysihtml5Tmpl;
     };
 
-    Pump.refreshStreams = function() {
+    Pump.getStreams = function() {
 
-        var major,
-            minor,
-            content;
+        var content,
+            streams = {};
 
         if (Pump.body && Pump.body.content) {
             if (Pump.body.content.userContent) {
@@ -2641,17 +2640,25 @@ var Pump = (function(_, $, Backbone) {
 
         if (content) {
             if (content.majorStreamView) {
-                major = content.majorStreamView.collection;
-                major.fetch({update: true, remove: false});
+                streams.major = content.majorStreamView.collection;
             }
 
             if (content.minorStreamView) {
-                minor = content.minorStreamView.collection;
-                minor.fetch({update: true, remove: false});
+                streams.minor = content.minorStreamView.collection;
             }
         }
 
-        return true;
+        return streams;
+    };
+
+    // Refreshes the current visible streams
+
+    Pump.refreshStreams = function() {
+        var streams = Pump.getStreams();
+        
+        _.each(streams, function(stream, name) {
+            stream.fetch({update: true, remove: false});
+        });
     };
 
     // Our socket.io socket
