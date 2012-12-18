@@ -2691,7 +2691,7 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.followStreams = function() {
 
-        if (!Pump.config.socket_io) {
+        if (!Pump.config.sockjs) {
             return;
         }
 
@@ -2704,7 +2704,7 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.unfollowStreams = function() {
 
-        if (!Pump.config.socket_io) {
+        if (!Pump.config.sockjs) {
             return;
         }
 
@@ -2752,7 +2752,7 @@ var Pump = (function(_, $, Backbone) {
 
         // Connect to current server
 
-        if (Pump.config.socket_io) {
+        if (Pump.config.sockjs) {
             Pump.setupSocket();
         }
 

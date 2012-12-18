@@ -67,8 +67,8 @@
     <script src="/javascript/bootstrap-wysihtml5.js"></script>
     <script src="/javascript/select2.min.js"></script>
     <script src="/javascript/pump.js"></script>
-    <% if (config.socket_io) { %>
-    <script src="/socket.io/socket.io.js"></script>
+    <% if (config.sockjs) { %>
+    <script src="/javascript/sockjs.min.js"></script>
     <% } %>
     <script>
       if (!Pump) {
@@ -81,7 +81,7 @@
           site: "<%- config.site %>",
           requireEmail: "<%- config.requireEmail %>",
           canUpload: "<%- config.canUpload %>",
-          socket_io: <%- config.socket_io %>
+          sockjs: <%- config.sockjs %>
       });
     </script>
   </body>
