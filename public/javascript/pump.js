@@ -2675,10 +2675,16 @@ var Pump = (function(_, $, Backbone) {
             console.log(data);
         });
         Pump.socket.on("update", function(data) {
-            console.log(data);
+            var streams = Pump.getStreams(),
+                target = _.find(streams, function(stream) { return stream.url == data.url; }),
+                act;
+
+            if (target) {
+                act = Pump.Activity.unique(data.activity);
+                target.unshift(act);
+            }
         });
         Pump.socket.on("connect", function () {
-            console.log("Reconnect");
             Pump.followStreams();
         });
     };
