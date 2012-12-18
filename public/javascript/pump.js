@@ -2172,6 +2172,8 @@ var Pump = (function(_, $, Backbone) {
                 profile = options.data.profile;
             }
 
+            Pump.unfollowStreams();
+
             // XXX: double-check this
 
             body.content = new View(options);
@@ -2219,6 +2221,7 @@ var Pump = (function(_, $, Backbone) {
             newView.once("ready", function() {
                 body.setTitle(title);
                 body.$(parent).children().replaceWith(newView.$el);
+                Pump.followStreams();
                 if (callback) {
                     callback();
                 }
@@ -2670,6 +2673,32 @@ var Pump = (function(_, $, Backbone) {
         Pump.socket = io.connect(here.protocol + "//" + here.host);
         Pump.socket.on("challenge", function(data) {
             console.log(data);
+        });
+    };
+
+    Pump.followStreams = function() {
+
+        if (!Pump.config.socket_io) {
+            return;
+        }
+
+        var streams = Pump.getStreams();
+        
+        _.each(streams, function(stream, name) {
+            Pump.socket.emit("follow", {url: stream.url});
+        });
+    };
+
+    Pump.unfollowStreams = function() {
+
+        if (!Pump.config.socket_io) {
+            return;
+        }
+
+        var streams = Pump.getStreams();
+        
+        _.each(streams, function(stream, name) {
+            Pump.socket.emit("unfollow", {url: stream.url});
         });
     };
 
