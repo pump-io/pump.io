@@ -2664,29 +2664,51 @@ var Pump = (function(_, $, Backbone) {
         });
     };
 
+    Pump.updateStream = function(url, activity) {
+        var streams = Pump.getStreams(),
+            target = _.find(streams, function(stream) { return stream.url == url; }),
+            act;
+
+        if (target) {
+            act = Pump.Activity.unique(activity);
+            target.unshift(act);
+        }
+    };
+
     // Our socket.io socket
 
     Pump.socket = null;
 
     Pump.setupSocket = function() {
-        var here = window.location;
-        Pump.socket = io.connect(here.protocol + "//" + here.host);
-        Pump.socket.on("challenge", function(data) {
-            console.log(data);
-        });
-        Pump.socket.on("update", function(data) {
-            var streams = Pump.getStreams(),
-                target = _.find(streams, function(stream) { return stream.url == data.url; }),
-                act;
 
-            if (target) {
-                act = Pump.Activity.unique(data.activity);
-                target.unshift(act);
-            }
-        });
-        Pump.socket.on("connect", function () {
+        var here = window.location;
+
+        if (Pump.socket) {
+            Pump.socket.close();
+            Pump.socket = null;
+        }
+
+        Pump.socket = new SockJS(here.protocol + "//" + here.host);
+
+        Pump.socket.onopen = function() {
+            Pump.socket = sock;
             Pump.followStreams();
-        });
+        };
+
+        Pump.socket.onmessage = function(e) {
+            var data = JSON.parse(e.data);
+
+            switch (data.cmd) {
+            case "update":
+                Pump.updateStream(data.url, data.activity);
+                break;
+            }
+        };
+
+        Pump.socket.onclose = function() {
+            // XXX: reconnect?
+            Pump.socket = null;
+        };
     };
 
     Pump.followStreams = function() {
@@ -2695,10 +2717,14 @@ var Pump = (function(_, $, Backbone) {
             return;
         }
 
+        if (!Pump.socket) {
+            return;
+        }
+
         var streams = Pump.getStreams();
         
         _.each(streams, function(stream, name) {
-            Pump.socket.emit("follow", {url: stream.url});
+            Pump.socket.send(JSON.stringify({cmd: "follow", url: stream.url}));
         });
     };
 
@@ -2708,10 +2734,14 @@ var Pump = (function(_, $, Backbone) {
             return;
         }
 
+        if (!Pump.socket) {
+            return;
+        }
+
         var streams = Pump.getStreams();
         
         _.each(streams, function(stream, name) {
-            Pump.socket.emit("unfollow", {url: stream.url});
+            Pump.socket.send(JSON.stringify({cmd: "unfollow", url: stream.url}));
         });
     };
 
