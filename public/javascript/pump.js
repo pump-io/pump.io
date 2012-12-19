@@ -873,6 +873,11 @@ var Pump = (function(_, $, Backbone) {
                     an = new Pump.AnonymousNav({el: ".navbar-inner .container"});
                     an.render();
 
+                    if (Pump.config.sockjs) {
+                        // Request a new challenge
+                        Pump.setupSocket();
+                    }
+
                     // Reload to clear authenticated stuff
 
                     Pump.router.navigate(window.location.pathname+"?logout=true", true);
@@ -947,6 +952,10 @@ var Pump = (function(_, $, Backbone) {
                     Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
                                                       model: Pump.currentUser});
                     Pump.body.nav.render();
+                    if (Pump.config.sockjs) {
+                        // Request a new challenge
+                        Pump.setupSocket();
+                    }
                     // XXX: reload current data
                     view.stopSpin();
                     Pump.router.navigate(continueTo, true);
@@ -1007,6 +1016,10 @@ var Pump = (function(_, $, Backbone) {
                     Pump.setNickname(data.nickname);
                     Pump.setUserCred(data.token, data.secret);
                     Pump.currentUser = Pump.User.unique(data);
+                    if (Pump.config.sockjs) {
+                        // Request a new challenge
+                        Pump.setupSocket();
+                    }
                     Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
                                                       model: Pump.currentUser});
                     Pump.body.nav.render();
@@ -2675,6 +2688,44 @@ var Pump = (function(_, $, Backbone) {
         }
     };
 
+    // When we get a challenge from the socket server,
+    // We prepare an OAuth request and send it
+
+    Pump.riseToChallenge = function(url, method) {
+
+        var message = {action: url,
+                       method: method,
+                       parameters: [["oauth_version", "1.0"]]};
+
+        Pump.ensureCred(function(err, cred) {
+
+            var pair, secrets;
+
+            if (err) {
+                Pump.error("Error getting OAuth credentials.");
+                return;
+            }
+
+            message.parameters.push(["oauth_consumer_key", cred.clientID]);
+            secrets = {consumerSecret: cred.clientSecret};
+
+            pair = Pump.getUserCred();
+
+            if (pair) {
+                message.parameters.push(["oauth_token", pair.token]);
+                secrets.tokenSecret = pair.secret;
+            }
+
+            OAuth.setTimestampAndNonce(message);
+
+            OAuth.SignatureMethod.sign(message, secrets);
+
+            console.log(message);
+
+            Pump.socket.send(JSON.stringify({cmd: "rise", message: message}));
+        });
+    };
+
     // Our socket.io socket
 
     Pump.socket = null;
@@ -2699,12 +2750,12 @@ var Pump = (function(_, $, Backbone) {
         sock.onmessage = function(e) {
             var data = JSON.parse(e.data);
 
-            console.log(e);
-            console.log(data);
-
             switch (data.cmd) {
             case "update":
                 Pump.updateStream(data.url, data.activity);
+                break;
+            case "challenge":
+                Pump.riseToChallenge(data.url, data.method);
                 break;
             }
         };
