@@ -2681,22 +2681,26 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.setupSocket = function() {
 
-        var here = window.location;
+        var here = window.location,
+            sock;
 
         if (Pump.socket) {
             Pump.socket.close();
             Pump.socket = null;
         }
 
-        Pump.socket = new SockJS(here.protocol + "//" + here.host);
+        sock = new SockJS(here.protocol + "//" + here.host + "/main/realtime/sockjs");
 
-        Pump.socket.onopen = function() {
+        sock.onopen = function() {
             Pump.socket = sock;
             Pump.followStreams();
         };
 
-        Pump.socket.onmessage = function(e) {
+        sock.onmessage = function(e) {
             var data = JSON.parse(e.data);
+
+            console.log(e);
+            console.log(data);
 
             switch (data.cmd) {
             case "update":
@@ -2705,7 +2709,7 @@ var Pump = (function(_, $, Backbone) {
             }
         };
 
-        Pump.socket.onclose = function() {
+        sock.onclose = function() {
             // XXX: reconnect?
             Pump.socket = null;
         };
