@@ -4,7 +4,7 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu">
-    <% if (_.isArray(data.messages)) {%>
+    <% if (_.isObject(data) && _.isArray(data.messages)) {%>
     <% _.each(data.messages, function(activity) { %>
     <% if (_.isObject(activity)) { %>
     <li>

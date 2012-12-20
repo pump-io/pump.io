@@ -95,6 +95,8 @@ if (!window.Pump) {
                 Pump.fetchObjects([user, major, minor], function(objs) {
                     var sp, continueTo;
 
+                    Pump.currentUser = user;
+
                     Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
                                                       model: user,
                                                       data: {
