@@ -70,6 +70,11 @@
     <script src="/javascript/libs/sockjs.min.js"></script>
     <% } %>
     <script src="/javascript/pump.js"></script>
+    <script src="/javascript/pump/auth.js"></script>
+    <script src="/javascript/pump/model.js"></script>
+    <script src="/javascript/pump/router.js"></script>
+    <script src="/javascript/pump/socket.js"></script>
+    <script src="/javascript/pump/view.js"></script>
     <script>
       if (!Pump) {
           Pump = {};
