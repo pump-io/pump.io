@@ -1,0 +1,17 @@
+<div class="btn-group" id="messages">
+  <a class="btn dropdown-toggle btn-mini btn-success" data-toggle="dropdown" href="#">
+    <i class="icon-envelope icon-white"></i> 3 
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu">
+    <% if (_.isArray(data.messages)) {%>
+    <% _.each(data.messages, function(activity) { %>
+    <% if (_.isObject(activity)) { %>
+    <li>
+      <p>hi</p>
+    </li>
+    <% } %>
+    <% }); %>
+    <% } %>
+  </ul>
+</div>

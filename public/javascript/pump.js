@@ -885,6 +885,22 @@ var Pump = (function(_, $, Backbone) {
         className: "container",
         modelName: "user",
         templateName: 'nav-loggedin',
+        subs: {
+            "#messages": {
+                attr: "majorStreamView",
+                subView: "MessagesView",
+                subOptions: {
+                    collection: "messages"
+                }
+            },
+            "#notifications": {
+                attr: "minorStreamView",
+                subView: "NotificationsView",
+                subOptions: {
+                    collection: "notifications"
+                }
+            }
+        },
         events: {
             "click #logout": "logout",
             "click #post-note-button": "postNoteModal",
@@ -975,6 +991,16 @@ var Pump = (function(_, $, Backbone) {
         }
     });
 
+    Pump.MessagesView = Pump.TemplateView.extend({
+        templateName: "messages",
+        modelName: "messages"
+    });
+
+    Pump.NotificationsView = Pump.TemplateView.extend({
+        templateName: "notifications",
+        modelName: "notifications"
+    });
+
     Pump.ContentView = Pump.TemplateView.extend({
         addMajorActivity: function(act) {
             // By default, do nothing
@@ -1012,8 +1038,8 @@ var Pump = (function(_, $, Backbone) {
                         Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
                                                           model: Pump.currentUser,
                                                           data: {
-                                                              directMajor: Pump.currentUser.majorDirectInbox,
-                                                              directMinor: Pump.currentUser.minorDirectInbox
+                                                              messages: Pump.currentUser.majorDirectInbox,
+                                                              notifications: Pump.currentUser.minorDirectInbox
                                                           }});
                         Pump.body.nav.render();
                     });
@@ -1093,13 +1119,11 @@ var Pump = (function(_, $, Backbone) {
                         Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
                                                           model: Pump.currentUser,
                                                           data: {
-                                                              directMajor: Pump.currentUser.majorDirectInbox,
-                                                              directMinor: Pump.currentUser.minorDirectInbox
+                                                              messages: Pump.currentUser.majorDirectInbox,
+                                                              notifications: Pump.currentUser.minorDirectInbox
                                                           }});
                         Pump.body.nav.render();
                     });
-                    Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
-                                                      model: Pump.currentUser});
                     Pump.body.nav.render();
                     // Leave disabled
                     view.stopSpin();
@@ -2694,17 +2718,23 @@ var Pump = (function(_, $, Backbone) {
     Pump.getStreams = function() {
 
         var content,
+            nav,
             streams = {};
 
-        if (Pump.body && Pump.body.content) {
-            if (Pump.body.content.userContent) {
-                if (Pump.body.content.userContent.listContent) {
-                    content = Pump.body.content.userContent.listContent;
+        if (Pump.body) {
+            if (Pump.body.content) {
+                if (Pump.body.content.userContent) {
+                    if (Pump.body.content.userContent.listContent) {
+                        content = Pump.body.content.userContent.listContent;
+                    } else {
+                        content = Pump.body.content.userContent;
+                    }
                 } else {
-                    content = Pump.body.content.userContent;
+                    content = Pump.body.content;
                 }
-            } else {
-                content = Pump.body.content;
+            }
+            if (Pump.body.nav) {
+                nav = Pump.body.nav;
             }
         }
 
@@ -2715,6 +2745,16 @@ var Pump = (function(_, $, Backbone) {
 
             if (content.minorStreamView) {
                 streams.minor = content.minorStreamView.collection;
+            }
+        }
+
+        if (nav) {
+            if (nav.majorStreamView) {
+                streams.messages = nav.majorStreamView.collection;
+            }
+
+            if (nav.minorStreamView) {
+                streams.notifications = nav.minorStreamView.collection;
             }
         }
 
@@ -2897,7 +2937,7 @@ var Pump = (function(_, $, Backbone) {
 
         Pump.ensureCred(function(err, cred) {
 
-            var user, nickname, pair;
+            var user, nickname, pair, major, minor;
 
             if (err) {
                 Pump.error(err.message);
@@ -2909,17 +2949,20 @@ var Pump = (function(_, $, Backbone) {
             if (nickname) {
 
                 user = new Pump.User({nickname: nickname});
+                major = user.majorDirectInbox;
+                minor = user.minorDirectInbox;
 
                 // FIXME: this only has client auth; get something with user auth (direct?)
 
-                user.fetch({success: function(user, response) {
-
+                Pump.fetchObjects([user, major, minor], function(objs) {
                     var sp, continueTo;
 
-                    Pump.currentUser = user;
                     Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
-                                                      model: Pump.currentUser});
-
+                                                      model: user,
+                                                      data: {
+                                                          messages: major,
+                                                          notifications: minor
+                                                      }});
                     Pump.body.nav.render();
 
                     // If we're on the login page, and there's a current
@@ -2935,7 +2978,7 @@ var Pump = (function(_, $, Backbone) {
                         Pump.router.home();
                         break;
                     }
-                }});
+                });
             }
         });
     });
