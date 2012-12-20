@@ -173,6 +173,38 @@
             _.each(obj.people, jsoner);
 
             return json;
+        },
+        merge: function(props) {
+            var model = this,
+                complicated = model.complicated();
+
+            _.each(props, function(value, key) {
+                if (!model.has(key)) {
+                    model.set(key, value);
+                } else if (_.contains(complicated, key)) {
+                    model[key].merge(value);
+                } else {
+                    // XXX: resolve non-complicated stuff
+                }
+            });
+        },
+        complicated: function() {
+            var attrs = ["activityObjects", 
+                         "activityObjectBags",
+                         "activityObjectStreams",
+                         "activityStreams",
+                         "peopleStreams",
+                         "people"],
+                names = [],
+                model = this;
+
+            _.each(attrs, function(attr) {
+                if (_.has(model, attr) && _.isArray(model[attr])) {
+                    names.append(model[attr]);
+                }
+            });
+
+            return names;
         }
     },
     {
@@ -187,10 +219,12 @@
             if (key && _.has(cls.cache, key)) {
                 cached = cls.cache[key];
                 // Check the updated flag
-                if (_.has(props, "updated") &&
-                    cached.has("updated") &&
-                    cached.get("updated") >= props.updated) {
-                    return cached;
+                if (_.has(props, "updated") && cached.has("updated")) {
+                    // Latest received, so maybe the most recent...?
+                    cached.merge(props);
+                } else {
+                    // Latest received, so maybe the most recent...?
+                    cached.merge(props);
                 }
             }
 
@@ -209,6 +243,9 @@
             });
 
             return inst;
+        },
+        clearCache: function() {
+            this.cache = {};
         }
     });
 
@@ -264,6 +301,42 @@
             }
             // Don't JSONize models; too much likelihood of a loop
             return rep;
+        },
+        merge: function(models, options) {
+
+            var coll = this,
+                props = {};
+
+            if (_.isArray(models)) {
+                props.items = models;
+                if (_.isObject(options)) {
+                    props = _.extend(props, options);
+                }
+            } else if (_.isObject(models) && !_.isArray(models)) {
+                props = _.extend(models, options);
+            }
+
+            if (_.has(props, "url") && !_.has(coll, "url")) {
+                coll.url = props.url;
+            }
+            if (_.has(props, "totalItems") && !_.has(coll, "totalItems")) {
+                coll.totalItems = props.totalItems;
+            }
+            if (_.has(props, "links")) {
+                if (_.has(props.links, "next") && !_.has(coll, "nextLink")) {
+                    coll.nextLink = props.links.next.href;
+                }
+                if (_.has(props.links, "prev") && !_.has(coll, "prevLink")) {
+                    coll.prevLink = props.links.prev.href;
+                }
+                if (_.has(props.links, "self") && !_.has(coll, "url")) {
+                    coll.url = props.links.self.href;
+                }
+            }
+
+            if (_.has(props, "items")) {
+                coll.add(props.items);
+            }
         }
     },
     {
@@ -284,7 +357,7 @@
 
             if (key && _.has(cls.cache, key)) {
                 cached = cls.cache[key];
-                return cached;
+                cached.merge(models, options);
             }
 
             inst = new cls(models, options);
@@ -302,6 +375,9 @@
             });
 
             return inst;
+        },
+        clearCache: function() {
+            this.cache = {};
         }
     });
 
@@ -326,7 +402,10 @@
     Pump.ActivityStream = Pump.Collection.extend({
         model: Pump.Activity,
         add: function(models, options) {
-            // Always add at the beginning of the list
+            // Usually add at the beginning of the list
+            if (!options) {
+                options = {};
+            }
             if (!_.has(options, 'at')) {
                 options.at = 0;
             }
@@ -428,7 +507,10 @@
     },
     {
         cache: {}, // separate cache
-        keyAttr: "nickname" // cache by nickname
+        keyAttr: "nickname", // cache by nickname
+        clearCache: function() {
+            this.cache = {};
+        }
     });
 
 })(window._, window.$, window.Backbone, window.Pump);

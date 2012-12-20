@@ -270,4 +270,12 @@ if (!window.Pump) {
         }
     };
 
+    // We clear out cached stuff when login state changes
+
+    Pump.clearCaches = function() {
+        Pump.Model.clearCache();
+        Pump.Collection.clearCache();
+        Pump.User.clearCache();
+    };
+
 })(window._, window.$, window.Backbone, window.Pump);

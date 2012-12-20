@@ -406,6 +406,8 @@
                     Pump.setNickname(null);
                     Pump.setUserCred(null, null);
 
+                    Pump.clearCaches();
+
                     an = new Pump.AnonymousNav({el: ".navbar-inner .container"});
                     an.render();
 
@@ -495,6 +497,7 @@
                     var objs;
                     Pump.setNickname(data.nickname);
                     Pump.setUserCred(data.token, data.secret);
+                    Pump.clearCaches();
                     Pump.currentUser = Pump.User.unique(data);
                     objs = [Pump.currentUser,
                             Pump.currentUser.majorDirectInbox,
@@ -572,6 +575,7 @@
                     var objs;
                     Pump.setNickname(data.nickname);
                     Pump.setUserCred(data.token, data.secret);
+                    Pump.clearCaches();
                     Pump.currentUser = Pump.User.unique(data);
                     if (Pump.config.sockjs) {
                         // Request a new challenge
