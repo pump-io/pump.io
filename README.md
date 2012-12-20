@@ -147,6 +147,10 @@ Here are the main configuration keys.
 * *uploaddir* If you want to enable file uploads, set this to the
   full path of a local directory. It should be writeable and readable by the 
   'serverUser'.
+* *debugClient* For developers, if you're debugging the Web interface
+  and you want to use the non-minified version of the JavaScript libraries,
+  set this to `true`. Defaults to `false`, which is what people should
+  use in production.
 
 ## Bugs
 

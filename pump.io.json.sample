@@ -13,5 +13,6 @@
     "serverUser":  "pumpio",
     "key":  "/etc/my/keyfile.key",
     "cert":  "/etc/my/server.crt",
-    "uploaddir": "/var/local/pump.io/uploads"
+    "uploaddir": "/var/local/pump.io/uploads",
+    "debugClient": false
 }
