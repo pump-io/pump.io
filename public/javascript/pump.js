@@ -896,11 +896,10 @@ var Pump = (function(_, $, Backbone) {
                 lists = profile.lists,
                 following = profile.following;
 
-            lists.fetch({update: true, remove: false, success: function() {
-                following.fetch({update: true, remove: false, success: function() {
-                    Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.currentUser}});
-                }});
-            }});
+            Pump.fetchObjects([lists, following], function(objs) {
+                Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.currentUser}});
+            });
+
             return false;
         },
         postPictureModal: function() {
@@ -908,11 +907,9 @@ var Pump = (function(_, $, Backbone) {
                 lists = profile.lists,
                 following = profile.following;
 
-            lists.fetch({update: true, remove: false, success: function() {
-                following.fetch({update: true, remove: false, success: function() {
-                    Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.currentUser}});
-                }});
-            }});
+            Pump.fetchObjects([lists, following], function(objs) {
+                Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.currentUser}});
+            });
             return false;
         },
         profileDropdown: function() {
@@ -2480,105 +2477,95 @@ var Pump = (function(_, $, Backbone) {
 
         followers: function(nickname) {
             var router = this,
-                user = Pump.User.unique({nickname: nickname});
+                user = Pump.User.unique({nickname: nickname}),
+                followers = Pump.PeopleStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/followers")});
 
-            user.fetch({success: function(user, response) {
-                var followers = user.profile.followers;
-                followers.fetch({update: true, remove: false, success: function(followers, response) {
-                    var profile = user.profile;
-
-                    Pump.body.setContent({contentView: Pump.FollowersContent,
-                                          userContentView: Pump.FollowersUserContent,
-                                          userContentCollection: followers,
-                                          title: nickname + " followers",
-                                          data: {people: followers,
-                                                 profile: profile}});
-                }});
-            }});
+            Pump.fetchObjects([user, followers], function(objs) {
+                var profile = user.profile;
+                Pump.body.setContent({contentView: Pump.FollowersContent,
+                                      userContentView: Pump.FollowersUserContent,
+                                      userContentCollection: followers,
+                                      title: nickname + " followers",
+                                      data: {people: followers,
+                                             profile: profile}});
+            });
         },
 
         following: function(nickname) {
             var router = this,
-                user = Pump.User.unique({nickname: nickname});
+                user = Pump.User.unique({nickname: nickname}),
+                following = Pump.PeopleStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/following")});
 
             // XXX: parallelize this?
 
-            user.fetch({success: function(user, response) {
-                var following = user.profile.following;
-                following.fetch({update: true, remove: false, success: function(following, response) {
-                    var profile = user.profile;
+            Pump.fetchObjects([user, following], function(objs) {
+                var profile = user.profile;
 
-                    Pump.body.setContent({contentView: Pump.FollowingContent,
-                                          userContentView: Pump.FollowingUserContent,
-                                          userContentCollection: following,
-                                          title: nickname + " following",
-                                          data: {people: following,
-                                                 profile: profile}});
-                }});
-            }});
+                Pump.body.setContent({contentView: Pump.FollowingContent,
+                                      userContentView: Pump.FollowingUserContent,
+                                      userContentCollection: following,
+                                      title: nickname + " following",
+                                      data: {people: following,
+                                             profile: profile}});
+            });
         },
 
         lists: function(nickname) {
             var router = this,
-                user = Pump.User.unique({nickname: nickname});
+                user = Pump.User.unique({nickname: nickname}),
+                lists = Pump.ActivityObjectStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/lists/person")});
 
             // XXX: parallelize this?
 
-            user.fetch({success: function(user, response) {
-                var lists = user.profile.lists;
-                lists.fetch({update: true, remove: false, success: function(lists, response) {
-                    var profile = user.profile;
+            Pump.fetchObjects([user, lists], function(objs) {
+                var profile = user.profile;
 
-                    Pump.body.setContent({contentView: Pump.ListsContent,
-                                          userContentView: Pump.ListsUserContent,
-                                          listContentView: Pump.ListsListContent,
-                                          title: nickname + " lists",
-                                          data: {lists: lists,
-                                                 profile: profile}});
-                }});
-            }});
+                Pump.body.setContent({contentView: Pump.ListsContent,
+                                      userContentView: Pump.ListsUserContent,
+                                      listContentView: Pump.ListsListContent,
+                                      title: nickname + " lists",
+                                      data: {lists: lists,
+                                             profile: profile}});
+            });
         },
 
         list: function(nickname, uuid) {
 
             var router = this,
                 user = Pump.User.unique({nickname: nickname}),
+                lists = Pump.ActivityObjectStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/lists/person")}),
                 list = Pump.ActivityObject.unique({links: {self: {href: "/api/collection/"+uuid}}});
 
             // XXX: parallelize this?
 
-            user.fetch({success: function(user, response) {
-                var lists = user.profile.lists;
-                lists.fetch({update: true, remove: false, success: function(lists, response) {
-                    list.fetch({success: function(list, response) {
-                        var profile = user.profile,
-                            options = {contentView: Pump.ListContent,
-                                       userContentView: Pump.ListUserContent,
-                                       listContentView: Pump.ListListContent,
-                                       title: nickname + " - list -" + list.get("displayName"),
-                                       listContentModel: list,
-                                       data: {lists: lists,
-                                              list: list,
-                                              profile: profile}};
+            Pump.fetchObjects([user, lists, list], function(objs) {
+                var profile = user.profile,
+                    options = {contentView: Pump.ListContent,
+                               userContentView: Pump.ListUserContent,
+                               listContentView: Pump.ListListContent,
+                               title: nickname + " - list -" + list.get("displayName"),
+                               listContentModel: list,
+                               data: {lists: lists,
+                                      list: list,
+                                      profile: profile}};
 
-                        Pump.body.setContent(options, function(view) {
-                            Pump.body.content.userContent.listMenu.$(".active").removeClass("active");
-                            Pump.body.content.userContent.listMenu.$("li[data-list-id='"+list.id+"']").addClass("active");
-                        });
-                    }});
-                }});
-            }});
+                Pump.body.setContent(options, function(view) {
+                    Pump.body.content.userContent.listMenu.$(".active").removeClass("active");
+                    Pump.body.content.userContent.listMenu.$("li[data-list-id='"+list.id+"']").addClass("active");
+                });
+            });
         },
 
         object: function(nickname, type, uuid) {
             var router = this,
+                user = Pump.User.unique({nickname: nickname}),
                 obj = Pump.ActivityObject.unique({uuid: uuid, objectType: type, userNickname: nickname});
 
-            obj.fetch({success: function(obj, response) {
+            Pump.fetchObjects([user, obj], function(objs) {
                 Pump.body.setContent({contentView: Pump.ObjectContent,
                                       model: obj,
                                       title: obj.displayName || obj.objectType + "by" + nickname});
-            }});
+            });
         }
     });
 
