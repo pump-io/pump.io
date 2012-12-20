@@ -143,15 +143,24 @@ var Pump = (function(_, $, Backbone) {
         console.log(err);
     };
 
-    Pump.oauthify = function(options) {
+    Pump.fullURL = function(url) {
 
-        if (options.url.indexOf(':') == -1) {
-            if (options.url.substr(0, 1) == '/') {
-                options.url = window.location.protocol + '//' + window.location.host + options.url;
+        var here = window.location;
+
+        if (url.indexOf(':') == -1) {
+            if (url.substr(0, 1) == '/') {
+                url = here.protocol + '//' + here.host + url;
             } else {
-                options.url = window.location.href.substr(0, window.location.href.lastIndexOf('/') + 1) + options.url;
+                url = here.href.substr(0, here.href.lastIndexOf('/') + 1) + url;
             }
         }
+
+        return url;
+    };
+
+    Pump.oauthify = function(options) {
+
+        options.url = Pump.fullURL(options.url);
 
         var message = {action: options.url,
                        method: options.type,
@@ -292,6 +301,10 @@ var Pump = (function(_, $, Backbone) {
             return inst;
         }
     });
+
+    // Our own collection. It's a little screwy; there are
+    // a few ways to represent a collection in ActivityStreams JSON and
+    // the "infinite stream" thing throws things off a bit too.
 
     Pump.Collection = Backbone.Collection.extend({
         constructor: function(models, options) {
@@ -434,6 +447,38 @@ var Pump = (function(_, $, Backbone) {
         }
     });
 
+    Pump.fetchObjects = function(orig, callback) {
+        var fetched = 0,
+            objs = (orig.length) > 0 ? orig.slice(0) : [], // make a dupe in case arg is changed
+            count = objs.length,
+            done = false,
+            onSuccess = function() {
+                if (!done) {
+                    fetched++;
+                    if (fetched >= count) {
+                        done = true;
+                        callback(objs);
+                    }
+                }
+            },
+            onError = function() {
+                if (!done) {
+                    done = true;
+                    callback(null);
+                }
+            };
+
+        _.each(objs, function(obj) {
+            try {
+                obj.fetch({success: onSuccess,
+                           error: onError});
+            } catch (e) {
+                Pump.error(e.message);
+                onError();
+            }
+        });
+    };
+
     Pump.Person = Pump.ActivityObject.extend({
         objectType: "person",
         activityObjectStreams: ['favorites', 'lists'],
@@ -461,25 +506,38 @@ var Pump = (function(_, $, Backbone) {
         idAttribute: "nickname",
         people: ['profile'],
         initialize: function() {
-            var user = this;
+            var user = this,
+                streamUrl = function(rel) {
+                    return "/api/user/" + user.get("nickname") + rel;
+                },
+                userStream = function(rel) {
+                    return Pump.ActivityStream.unique([], {url: streamUrl(rel)});
+                };
 
             Pump.Model.prototype.initialize.apply(this, arguments);
 
             // XXX: maybe move some of these to Person...?
-            user.inbox =       Pump.ActivityStream.unique([], {url: "/api/user/" + user.get("nickname") + "/inbox"});
-            user.majorInbox =  Pump.ActivityStream.unique([], {url: "/api/user/" + user.get("nickname") + "/inbox/major"});
-            user.minorInbox =  Pump.ActivityStream.unique([], {url: "/api/user/" + user.get("nickname") + "/inbox/minor"});
-            user.stream =      Pump.ActivityStream.unique([], {url: "/api/user/" + user.get("nickname") + "/feed"});
-            user.majorStream = Pump.ActivityStream.unique([], {url: "/api/user/" + user.get("nickname") + "/feed/major"});
-            user.minorStream = Pump.ActivityStream.unique([], {url: "/api/user/" + user.get("nickname") + "/feed/minor"});
+
+            user.inbox =            userStream("/inbox");
+            user.majorInbox =       userStream("/inbox/major");
+            user.minorInbox =       userStream("/inbox/minor");
+            user.directInbox =      userStream("/inbox/direct");
+            user.majorDirectInbox = userStream("/inbox/direct/major");
+            user.minorDirectInbox = userStream("/inbox/direct/minor");
+            user.stream =           userStream("/feed");
+            user.majorStream =      userStream("/feed/major");
+            user.minorStream =      userStream("/feed/minor");
 
             user.on("change:nickname", function() {
-                user.inbox.url       = "/api/user/" + user.get("nickname") + "/inbox";
-                user.majorInbox.url  = "/api/user/" + user.get("nickname") + "/inbox/major";
-                user.minorInbox.url  = "/api/user/" + user.get("nickname") + "/inbox/minor";
-                user.stream.url      = "/api/user/" + user.get("nickname") + "/feed";
-                user.majorStream.url = "/api/user/" + user.get("nickname") + "/feed/major";
-                user.minorStream.url = "/api/user/" + user.get("nickname") + "/feed/minor";
+                user.inbox.url            = streamUrl("/inbox");
+                user.majorInbox.url       = streamUrl("/inbox/major");
+                user.minorInbox.url       = streamUrl("/inbox/minor");
+                user.directInbox.url      = streamUrl("/inbox/direct");
+                user.majorDirectInbox.url = streamUrl("/inbox/direct/major");
+                user.minorDirectInbox.url = streamUrl("/inbox/direct/minor");
+                user.stream.url           = streamUrl("/feed");
+                user.majorStream.url      = streamUrl("/feed/major");
+                user.minorStream.url      = streamUrl("/feed/minor");
             });
         },
         isNew: function() {
@@ -946,12 +1004,22 @@ var Pump = (function(_, $, Backbone) {
                 continueTo = getContinueTo(),
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
                 onSuccess = function(data, textStatus, jqXHR) {
+                    var objs;
                     Pump.setNickname(data.nickname);
                     Pump.setUserCred(data.token, data.secret);
                     Pump.currentUser = Pump.User.unique(data);
-                    Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
-                                                      model: Pump.currentUser});
-                    Pump.body.nav.render();
+                    objs = [Pump.currentUser,
+                            Pump.currentUser.majorDirectInbox,
+                            Pump.currentUser.minorDirectInbox];
+                    Pump.fetchObjects(objs, function(objs) {
+                        Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
+                                                          model: Pump.currentUser,
+                                                          data: {
+                                                              directMajor: Pump.currentUser.majorDirectInbox,
+                                                              directMinor: Pump.currentUser.minorDirectInbox
+                                                          }});
+                        Pump.body.nav.render();
+                    });
                     if (Pump.config.sockjs) {
                         // Request a new challenge
                         Pump.setupSocket();
@@ -1013,6 +1081,7 @@ var Pump = (function(_, $, Backbone) {
                 options,
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
                 onSuccess = function(data, textStatus, jqXHR) {
+                    var objs;
                     Pump.setNickname(data.nickname);
                     Pump.setUserCred(data.token, data.secret);
                     Pump.currentUser = Pump.User.unique(data);
@@ -1020,6 +1089,18 @@ var Pump = (function(_, $, Backbone) {
                         // Request a new challenge
                         Pump.setupSocket();
                     }
+                    objs = [Pump.currentUser,
+                            Pump.currentUser.majorDirectInbox,
+                            Pump.currentUser.minorDirectInbox];
+                    Pump.fetchObjects(objs, function(objs) {
+                        Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
+                                                          model: Pump.currentUser,
+                                                          data: {
+                                                              directMajor: Pump.currentUser.majorDirectInbox,
+                                                              directMinor: Pump.currentUser.minorDirectInbox
+                                                          }});
+                        Pump.body.nav.render();
+                    });
                     Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
                                                       model: Pump.currentUser});
                     Pump.body.nav.render();
@@ -2350,16 +2431,12 @@ var Pump = (function(_, $, Backbone) {
                     major = user.majorInbox,
                     minor = user.minorInbox;
 
-                // XXX: parallelize
-
-                major.fetch({update: true, remove: false, success: function(major, response) {
-                    minor.fetch({update: true, remove: false, success: function(minor, response) {
-                        Pump.body.setContent({contentView: Pump.InboxContent,
-                                              data: {major: major,
-                                                     minor: minor},
-                                              title: "Home"});
-                    }});
-                }});
+                Pump.fetchObjects([user, major, minor], function(objs) {
+                    Pump.body.setContent({contentView: Pump.InboxContent,
+                                          data: {major: major,
+                                                 minor: minor},
+                                          title: "Home"});
+                });
             } else {
                 Pump.body.setContent({contentView: Pump.MainContent,
                                       title: "Welcome"});
@@ -2372,43 +2449,33 @@ var Pump = (function(_, $, Backbone) {
                 major = user.majorStream,
                 minor = user.minorStream;
 
-            // XXX: parallelize this?
-
-            user.fetch({success: function(user, response) {
-                major.fetch({update: true, remove: false, success: function(major, response) {
-                    minor.fetch({update: true, remove: false, success: function(minor, response) {
-                        var profile = user.profile;
-                        Pump.body.setContent({contentView: Pump.UserPageContent,
-                                              userContentView: Pump.ActivitiesUserContent,
-                                              title: profile.get("displayName"),
-                                              data: { major: major,
-                                                      minor: minor,
-                                                      profile: profile }});
-                    }});
-                }});
-            }});
+            Pump.fetchObjects([user, major, minor], function(objs) {
+                var profile = user.profile;
+                Pump.body.setContent({contentView: Pump.UserPageContent,
+                                      userContentView: Pump.ActivitiesUserContent,
+                                      title: profile.get("displayName"),
+                                      data: { major: major,
+                                              minor: minor,
+                                              profile: profile }});
+            });
         },
 
         favorites: function(nickname) {
             var router = this,
-                user = Pump.User.unique({nickname: nickname});
+                user = Pump.User.unique({nickname: nickname}),
+                favorites = Pump.ActivityStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/favorites")});
 
-            // XXX: parallelize this?
-
-            user.fetch({success: function(user, response) {
-                var profile = user.profile,
-                    favorites = profile.favorites;
-                favorites.fetch({update: true, remove: false, success: function(favorites, response) {
-                    Pump.body.setContent({
-                        contentView: Pump.FavoritesContent,
-                        userContentView: Pump.FavoritesUserContent,
-                        userContentCollection: favorites,
-                        title: nickname + " favorites",
-                        data: { objects: favorites,
-                                profile: profile }
-                    });
-                }});
-            }});
+            Pump.fetchObjects([user, favorites], function() {
+                var profile = user.profile;
+                Pump.body.setContent({
+                    contentView: Pump.FavoritesContent,
+                    userContentView: Pump.FavoritesUserContent,
+                    userContentCollection: favorites,
+                    title: nickname + " favorites",
+                    data: { objects: favorites,
+                            profile: profile }
+                });
+            });
         },
 
         followers: function(nickname) {
