@@ -52,24 +52,24 @@
 
     </div> <!-- /container -->
 
-    <script src="/javascript/jquery-1.8.2.min.js"></script>
-    <script src="/javascript/jquery.easydate-0.2.4.min.js"></script>
-    <script src="/javascript/json2.min.js"></script>
-    <script src="/javascript/bootstrap.min.js"></script>
+    <script src="/javascript/libs/jquery-1.8.2.min.js"></script>
+    <script src="/javascript/libs/jquery.easydate-0.2.4.min.js"></script>
+    <script src="/javascript/libs/json2.min.js"></script>
+    <script src="/javascript/libs/bootstrap.min.js"></script>
     <script src="/shared/underscore-min.js"></script>
-    <script src="/javascript/backbone-min.js"></script>
-    <script src="/javascript/oauth.min.js"></script>
-    <script src="/javascript/sha1.min.js"></script>
-    <script src="/javascript/spin.min.js"></script>
-    <script src="/javascript/jquery-spin.js"></script>
-    <script src="/javascript/jquery.fineuploader-3.0.min.js"></script>
-    <script src="/javascript/wysihtml5-0.3.0.min.js"></script>
-    <script src="/javascript/bootstrap-wysihtml5.js"></script>
-    <script src="/javascript/select2.min.js"></script>
-    <script src="/javascript/pump.js"></script>
+    <script src="/javascript/libs/backbone-min.js"></script>
+    <script src="/javascript/libs/oauth.min.js"></script>
+    <script src="/javascript/libs/sha1.min.js"></script>
+    <script src="/javascript/libs/spin.min.js"></script>
+    <script src="/javascript/libs/jquery-spin.js"></script>
+    <script src="/javascript/libs/jquery.fineuploader-3.0.min.js"></script>
+    <script src="/javascript/libs/wysihtml5-0.3.0.min.js"></script>
+    <script src="/javascript/libs/bootstrap-wysihtml5.js"></script>
+    <script src="/javascript/libs/select2.min.js"></script>
     <% if (config.sockjs) { %>
-    <script src="/javascript/sockjs.min.js"></script>
+    <script src="/javascript/libs/sockjs.min.js"></script>
     <% } %>
+    <script src="/javascript/pump.js"></script>
     <script>
       if (!Pump) {
           Pump = {};
