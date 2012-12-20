@@ -16,6 +16,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// XXX: this module has grown bit by bit, and needs to be broken up
+// or I'm going to go crazy. Maybe models, views, and router + setup?
+// Also consider requireJS and AMD
+
 var Pump = (function(_, $, Backbone) {
 
     var searchParams = function(str) {
@@ -79,7 +83,15 @@ var Pump = (function(_, $, Backbone) {
         // Ensure that we have a URL.
 
         if (!options.url) {
-            params.url = (type == 'POST') ? getValue(model.collection, 'url') : getValue(model, 'url');
+
+            if (type == 'POST') {
+                params.url = getValue(model.collection, 'url');
+            } else if (type == 'GET' && options.update && model.prevLink) {
+                params.url = model.prevLink;
+            } else {
+                params.url = getValue(model, 'url');
+            }
+
             if (!params.url || !_.isString(params.url)) { 
                 throw new Error("No URL");
             }
@@ -188,7 +200,12 @@ var Pump = (function(_, $, Backbone) {
                     return function(name) {
                         var raw = obj.get(name);
                         if (raw) {
-                            obj[name] = new model(raw);
+                            // use unique for cached stuff
+                            if (model.unique) {
+                                obj[name] = model.unique(raw);
+                            } else {
+                                obj[name] = new model(raw);
+                            }
                             obj[name].isNew = neverNew;
                         }
                         obj.on("change:"+name, function(changed) {
@@ -196,7 +213,11 @@ var Pump = (function(_, $, Backbone) {
                             if (obj[name] && obj[name].set) {
                                 obj[name].set(raw);
                             } else if (raw) {
-                                obj[name] = new model(raw);
+                                if (model.unique) {
+                                    obj[name] = model.unique(raw);
+                                } else {
+                                    obj[name] = new model(raw);
+                                }
                                 obj[name].isNew = neverNew;
                             }
                         });
@@ -234,6 +255,42 @@ var Pump = (function(_, $, Backbone) {
 
             return json;
         }
+    },
+    {
+        cache: {},
+        keyAttr: "id", // works for activities and activityobjects
+        unique: function(props) {
+            var inst,
+                cls = this,
+                key = props[cls.keyAttr],
+                cached;
+
+            if (key && _.has(cls.cache, key)) {
+                cached = cls.cache[key];
+                // Check the updated flag
+                if (_.has(props, "updated") &&
+                    cached.has("updated") &&
+                    cached.get("updated") >= props.updated) {
+                    return cached;
+                }
+            }
+
+            inst = new cls(props);
+
+            if (key) {
+                cls.cache[key] = inst;
+            }
+
+            inst.on("change:"+cls.keyAttr, function(model, key) {
+                var oldKey = model.previous(cls.keyAttr);
+                if (oldKey && _.has(cls.cache, oldKey)) {
+                    delete cls.cache[oldKey];
+                }
+                cls.cache[key] = inst;
+            });
+
+            return inst;
+        }
     });
 
     Pump.Collection = Backbone.Collection.extend({
@@ -247,6 +304,10 @@ var Pump = (function(_, $, Backbone) {
                 coll.url = options.url;
                 delete options.url;
             }
+            // Use unique() to get unique items
+            models = _.map(models, function(raw) {
+                return coll.model.unique(raw);
+            });
             Backbone.Collection.apply(this, [models, options]);
         },
         parse: function(response) {
@@ -278,17 +339,46 @@ var Pump = (function(_, $, Backbone) {
             if (_.has(this, "url")) {
                 rep.url = this.url;
             }
-            if (_.has(this, "models")) {
-                rep.items = [];
-                _.each(this.models, function(model) {
-                    if (model.toJSON) {
-                        rep.items.push(model.toJSON());
-                    } else {
-                        rep.items.push(model);
-                    }
-                });
-            }
+            // Don't JSONize models; too much likelihood of a loop
             return rep;
+        }
+    },
+    {
+        cache: {},
+        keyAttr: "url", // works for in-model collections
+        unique: function(models, options) {
+            var inst,
+                cls = this,
+                key,
+                cached;
+
+            // If we're being initialized with a JSON Collection, parse it.
+            if (_.isObject(models) && !_.isArray(models)) {
+                key = models[cls.keyAttr];
+            } else if (_.isObject(options) && _.has(options, cls.keyAttr)) {
+                key = options[cls.keyAttr];
+            }
+
+            if (key && _.has(cls.cache, key)) {
+                cached = cls.cache[key];
+                return cached;
+            }
+
+            inst = new cls(models, options);
+
+            if (key) {
+                cls.cache[key] = inst;
+            }
+
+            inst.on("change:"+cls.keyAttr, function(model, key) {
+                var oldKey = model.previous(cls.keyAttr);
+                if (oldKey && _.has(cls.cache, oldKey)) {
+                    delete cls.cache[oldKey];
+                }
+                cls.cache[key] = inst;
+            });
+
+            return inst;
         }
     });
 
@@ -311,7 +401,14 @@ var Pump = (function(_, $, Backbone) {
     });
 
     Pump.ActivityStream = Pump.Collection.extend({
-        model: Pump.Activity
+        model: Pump.Activity,
+        add: function(models, options) {
+            // Always add at the beginning of the list
+            if (!_.has(options, 'at')) {
+                options.at = 0;
+            }
+            Backbone.Collection.prototype.add.apply(this, [models, options]);
+        }
     });
 
     Pump.ActivityObject = Pump.Model.extend({
@@ -368,17 +465,13 @@ var Pump = (function(_, $, Backbone) {
 
             Pump.Model.prototype.initialize.apply(this, arguments);
 
-            if (this.profile) {
-                this.profile.isNew = function() { return false; };
-            }
-
             // XXX: maybe move some of these to Person...?
-            user.inbox =       new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/inbox"});
-            user.majorInbox =  new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/inbox/major"});
-            user.minorInbox =  new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/inbox/minor"});
-            user.stream =      new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/feed"});
-            user.majorStream = new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/feed/major"});
-            user.minorStream = new Pump.ActivityStream([], {url: "/api/user/" + user.get("nickname") + "/feed/minor"});
+            user.inbox =       Pump.ActivityStream.unique([], {url: "/api/user/" + user.get("nickname") + "/inbox"});
+            user.majorInbox =  Pump.ActivityStream.unique([], {url: "/api/user/" + user.get("nickname") + "/inbox/major"});
+            user.minorInbox =  Pump.ActivityStream.unique([], {url: "/api/user/" + user.get("nickname") + "/inbox/minor"});
+            user.stream =      Pump.ActivityStream.unique([], {url: "/api/user/" + user.get("nickname") + "/feed"});
+            user.majorStream = Pump.ActivityStream.unique([], {url: "/api/user/" + user.get("nickname") + "/feed/major"});
+            user.minorStream = Pump.ActivityStream.unique([], {url: "/api/user/" + user.get("nickname") + "/feed/minor"});
 
             user.on("change:nickname", function() {
                 user.inbox.url       = "/api/user/" + user.get("nickname") + "/inbox";
@@ -396,6 +489,10 @@ var Pump = (function(_, $, Backbone) {
         url: function() {
             return "/api/user/" + this.get("nickname");
         }
+    },
+    {
+        cache: {}, // separate cache
+        keyAttr: "nickname" // cache by nickname
     });
 
     Pump.currentUser = null; // XXX: load from server...?
@@ -415,8 +512,130 @@ var Pump = (function(_, $, Backbone) {
     Pump.TemplateError.prototype.constructor = Pump.TemplateError;
 
     Pump.TemplateView = Backbone.View.extend({
+        initialize: function(options) {
+            var view = this;
+
+            if (_.has(view, "model") && _.isObject(view.model)) {
+                view.listenTo(view.model, "change", function(options) {
+                    // When a change has happened, re-render
+                    view.render();
+                });
+                view.listenTo(view.model, "destroy", function(options) {
+                    // When a change has happened, re-render
+                    view.remove();
+                });
+            } else if (_.has(view, "collection") && _.isObject(view.collection)) {
+                view.listenTo(view.collection, "add", function(model, collection, options) {
+                    // When a change has happened, re-render
+                    view.render();
+                });
+                view.listenTo(view.collection, "remove", function(model, collection, options) {
+                    // When a change has happened, re-render
+                    view.render();
+                });
+                view.listenTo(view.collection, "reset", function(collection, options) {
+                    // When a change has happened, re-render
+                    view.render();
+                });
+                view.listenTo(view.collection, "sort", function(collection, options) {
+                    // When a change has happened, re-render
+                    view.render();
+                });
+            }
+        },
+        setElement: function(element, delegate) {
+            Backbone.View.prototype.setElement.apply(this, arguments);
+            if (element) {
+                this.ready();
+                this.trigger("ready");
+            }
+        },
         templateName: null,
         parts: null,
+        subs: {},
+        ready: function() {
+            // setup subViews
+            this.setupSubs();
+        },
+        setupSubs: function() {
+
+            var view = this,
+                data = view.options.data,
+                subs = view.subs;
+
+            if (!subs) {
+                return;
+            }
+
+            _.each(subs, function(def, selector) {
+
+                var $el = view.$(selector),
+                    options,
+                    sub,
+                    id;
+
+                if (def.attr && view[def.attr]) {
+                    view[def.attr].setElement($el);
+                    return;
+                }
+
+                if (def.idAttr && view.collection) {
+
+                    if (def.map) {
+                        if (!view[def.map]) {
+                            view[def.map] = {};
+                        }
+                    }
+
+                    $el.each(function(i, el) {
+
+                        var id = $(el).attr(def.idAttr),
+                            options = {el: el};
+
+                        if (!id) {
+                            return;
+                        }
+
+                        options.model = view.collection.get(id);
+
+                        if (!options.model) {
+                            return;
+                        }
+
+                        sub = new Pump[def.subView](options);
+
+                        if (def.map) {
+                            view[def.map][id] = sub;
+                        }
+                    });
+
+                    return;
+                }
+
+                options = {el: $el};
+
+                if (def.subOptions) {
+                    if (def.subOptions.model) {
+                        options.model = data[def.subOptions.model];
+                    }
+                    if (def.subOptions.collection) {
+                        options.collection = data[def.subOptions.collection];
+                    }
+                    if (def.subOptions.data) {
+                        options.data = {};
+                        _.each(def.subOptions.data, function(item) {
+                            options.data[item] = data[item];
+                        });
+                    }
+                }
+                
+                sub = new Pump[def.subView](options);
+                   
+                if (def.attr) {
+                    view[def.attr] = sub;
+                }
+            });
+        },
         render: function() {
             var view = this,
                 getTemplate = function(name, cb) {
@@ -469,8 +688,8 @@ var Pump = (function(_, $, Backbone) {
                     if (err) {
                         Pump.error(err);
                     } else {
-                        view.$el.html(html);
-                        view.$el.trigger("pump.rendered", view);
+                        // Triggers "ready"
+                        view.setHTML(html);
                         // Update relative to the new code view
                         view.$("abbr.easydate").easydate();
                     }
@@ -486,7 +705,11 @@ var Pump = (function(_, $, Backbone) {
                 partials,
                 cnt;
 
-            main.data[modelName] = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model);
+            if (view.collection) {
+                main.data[modelName] = view.collection.toJSON();
+            } else if (view.model) {
+                main.data[modelName] = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model);
+            }
 
             if (_.has(view.options, "data")) {
                 _.each(view.options.data, function(obj, name) {
@@ -581,18 +804,27 @@ var Pump = (function(_, $, Backbone) {
         },
         showSuccess: function(msg) {
             this.showAlert(msg, "success");
+        },
+        setHTML: function(html) {
+            var view = this,
+                $old = view.$el,
+                $new = $(html).first();
+
+            $old.replaceWith($new);
+            view.setElement($new);
+            $old = null;
         }
     });
 
     Pump.AnonymousNav = Pump.TemplateView.extend({
         tagName: "div",
-        className: "nav",
+        className: "container",
         templateName: 'nav-anonymous'
     });
 
     Pump.UserNav = Pump.TemplateView.extend({
         tagName: "div",
-        className: "nav",
+        className: "container",
         modelName: "user",
         templateName: 'nav-loggedin',
         events: {
@@ -606,16 +838,9 @@ var Pump = (function(_, $, Backbone) {
                 lists = profile.lists,
                 following = profile.following;
 
-            lists.fetch({success: function() {
-                following.fetch({success: function() {
-                    Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.currentUser}}, function(view) {
-                        view.$('#note-content').wysihtml5({
-                            customTemplates: Pump.wysihtml5Tmpl
-                        });
-                        view.$("#note-to").select2();
-                        view.$("#note-cc").select2();
-                        view.$(".pump-modal").modal('show');
-                    });
+            lists.fetch({update: true, remove: false, success: function() {
+                following.fetch({update: true, remove: false, success: function() {
+                    Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.currentUser}});
                 }});
             }});
             return false;
@@ -625,82 +850,9 @@ var Pump = (function(_, $, Backbone) {
                 lists = profile.lists,
                 following = profile.following;
 
-            lists.fetch({success: function() {
-                following.fetch({success: function() {
-
-                    Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.currentUser}}, function(view) {
-
-                        view.$("#picture-to").select2();
-                        view.$("#picture-cc").select2();
-
-                        view.$('#picture-description').wysihtml5({
-                            customTemplates: Pump.wysihtml5Tmpl
-                        });
-
-                        view.$("#picture-fineupload").fineUploader({
-                            request: {
-                                endpoint: "/main/upload"
-                            },
-                            text: {
-                                uploadButton: '<i class="icon-upload icon-white"></i> Picture file'
-                            },
-                            template: '<div class="qq-uploader">' +
-                                '<pre class="qq-upload-drop-area"><span>{dragZoneText}</span></pre>' +
-                                '<div class="qq-upload-button btn btn-success">{uploadButtonText}</div>' +
-                                '<ul class="qq-upload-list"></ul>' +
-                                '</div>',
-                            classes: {
-                                success: 'alert alert-success',
-                                fail: 'alert alert-error'
-                            },
-                            autoUpload: false,
-                            multiple: false,
-                            validation: {
-                                allowedExtensions: ["jpeg", "jpg", "png", "gif", "svg", "svgz"],
-                                acceptFiles: "image/*"
-                            }
-                        }).on("complete", function(event, id, fileName, responseJSON) {
-
-                            var stream = Pump.currentUser.stream,
-                                to = view.$('#post-picture #picture-to').val(),
-                                cc = view.$('#post-picture #picture-cc').val(),
-                                strToObj = function(str) {
-                                    var colon = str.indexOf(":"),
-                                        type = str.substr(0, colon),
-                                        id = str.substr(colon+1);
-                                    return new Pump.ActivityObject({
-                                        id: id,
-                                        objectType: type
-                                    });
-                                },
-                                act = new Pump.Activity({
-                                    verb: "post",
-                                    object: responseJSON.obj
-                                });
-
-                            if (to && to.length > 0) {
-                                act.to = new Pump.ActivityObjectBag(_.map(to, strToObj));
-                            }
-
-                            if (cc && cc.length > 0) {
-                                act.cc = new Pump.ActivityObjectBag(_.map(cc, strToObj));
-                            }
-
-                            stream.create(act, {success: function(act) {
-                                view.$("#modal-picture").modal('hide');
-                                view.stopSpin();
-                                view.$("#picture-fineupload").fineUploader('reset');
-                                Pump.resetWysihtml5(view.$('#picture-description'));
-                                view.$('#picture-title').val("");
-                                // Reload the current content
-                                Pump.addMajorActivity(act);
-                            }});
-                        }).on("error", function(event, id, fileName, reason) {
-                            view.showError(reason);
-                        });
-
-                        view.$(".pump-modal").modal('show');
-                    });
+            lists.fetch({update: true, remove: false, success: function() {
+                following.fetch({update: true, remove: false, success: function() {
+                    Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.currentUser}});
                 }});
             }});
             return false;
@@ -720,6 +872,11 @@ var Pump = (function(_, $, Backbone) {
 
                     an = new Pump.AnonymousNav({el: ".navbar-inner .container"});
                     an.render();
+
+                    if (Pump.config.sockjs) {
+                        // Request a new challenge
+                        Pump.setupSocket();
+                    }
 
                     // Reload to clear authenticated stuff
 
@@ -773,13 +930,11 @@ var Pump = (function(_, $, Backbone) {
     });
 
     Pump.MainContent = Pump.ContentView.extend({
-        templateName: 'main',
-        el: '#content'
+        templateName: 'main'
     });
 
     Pump.LoginContent = Pump.ContentView.extend({
         templateName: 'login',
-        el: '#content',
         events: {
             "submit #login": "doLogin"
         },
@@ -793,10 +948,14 @@ var Pump = (function(_, $, Backbone) {
                 onSuccess = function(data, textStatus, jqXHR) {
                     Pump.setNickname(data.nickname);
                     Pump.setUserCred(data.token, data.secret);
-                    Pump.currentUser = new Pump.User(data);
-                    Pump.nav = new Pump.UserNav({el: ".navbar-inner .container",
-                                                 model: Pump.currentUser});
-                    Pump.nav.render();
+                    Pump.currentUser = Pump.User.unique(data);
+                    Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
+                                                      model: Pump.currentUser});
+                    Pump.body.nav.render();
+                    if (Pump.config.sockjs) {
+                        // Request a new challenge
+                        Pump.setupSocket();
+                    }
                     // XXX: reload current data
                     view.stopSpin();
                     Pump.router.navigate(continueTo, true);
@@ -842,7 +1001,6 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.RegisterContent = Pump.ContentView.extend({
         templateName: 'register',
-        el: '#content',
         events: {
             "submit #registration": "register"
         },
@@ -857,10 +1015,14 @@ var Pump = (function(_, $, Backbone) {
                 onSuccess = function(data, textStatus, jqXHR) {
                     Pump.setNickname(data.nickname);
                     Pump.setUserCred(data.token, data.secret);
-                    Pump.currentUser = new Pump.User(data);
-                    Pump.nav = new Pump.UserNav({el: ".navbar-inner .container",
-                                                 model: Pump.currentUser});
-                    Pump.nav.render();
+                    Pump.currentUser = Pump.User.unique(data);
+                    if (Pump.config.sockjs) {
+                        // Request a new challenge
+                        Pump.setupSocket();
+                    }
+                    Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
+                                                      model: Pump.currentUser});
+                    Pump.body.nav.render();
                     // Leave disabled
                     view.stopSpin();
                     // XXX: one-time on-boarding page
@@ -935,7 +1097,6 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.UserPageContent = Pump.ContentView.extend({
         templateName: 'user',
-        modelName: "profile",
         parts: ["profile-block",
                 "user-content-activities",
                 "major-stream-headless",
@@ -948,18 +1109,17 @@ var Pump = (function(_, $, Backbone) {
                 "activity-object-list",
                 "activity-object-collection"
                ],
-        el: '#content',
         addMajorActivity: function(act) {
             var view = this,
-                model = this.model,
+                profile = this.options.data.profile,
                 aview;
 
-            if (act.actor.id != model.get("id")) {
+            if (!profile || act.actor.id != profile.get("id")) {
                 return;
             }
 
             aview = new Pump.MajorActivityHeadlessView({model: act});
-            aview.$el.on("pump.rendered", function() {
+            aview.on("ready", function() {
                 aview.$el.hide();
                 view.$("#major-stream").prepend(aview.$el);
                 aview.$el.slideDown('slow');
@@ -968,28 +1128,42 @@ var Pump = (function(_, $, Backbone) {
         },
         addMinorActivity: function(act) {
             var view = this,
-                model = this.model,
+                profile = this.options.data.profile,
                 aview;
 
-            if (act.actor.id != model.get("id")) {
+            if (!profile || act.actor.id != profile.get("id")) {
                 return;
             }
 
             aview = new Pump.MinorActivityHeadlessView({model: act});
 
-            aview.$el.on("pump.rendered", function() {
+            aview.on("ready", function() {
                 aview.$el.hide();
                 view.$("#minor-stream").prepend(aview.$el);
                 aview.$el.slideDown('slow');
             });
             aview.render();
+        },
+        subs: {
+            "#profile-block": {
+                attr: "profileBlock",
+                subView: "ProfileBlock",
+                subOptions: {
+                    model: "profile"
+                }
+            },
+            "#user-content-activities": {
+                attr: "userContent",
+                subView: "ActivitiesUserContent",
+                subOptions: {
+                    data: ["major", "minor"]
+                }
+            }
         }
-
     });
 
     Pump.ActivitiesUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-activities',
-        modelName: 'profile',
         parts: ["major-stream-headless",
                 "sidebar-headless",
                 "major-activity-headless",
@@ -999,12 +1173,86 @@ var Pump = (function(_, $, Backbone) {
                 "profile-responses",
                 "activity-object-list",
                 "activity-object-collection"],
-        el: '#user-content'
+        subs: {
+            "#major-stream": {
+                attr: "majorStreamView",
+                subView: "MajorStreamHeadlessView",
+                subOptions: {
+                    collection: "major"
+                }
+            },
+            "#sidebar": {
+                attr: "minorStreamView",
+                subView: "MinorStreamHeadlessView",
+                subOptions: {
+                    collection: "minor"
+                }
+            }
+        }
+    });
+
+    Pump.MajorStreamHeadlessView = Pump.TemplateView.extend({
+        templateName: 'major-stream-headless',
+        modelName: 'major',
+        parts: ["major-activity-headless",
+                "responses",
+                "reply",
+                "activity-object-list",
+                "activity-object-collection"],
+        subs: {
+            ".activity.major": {
+                map: "activities",
+                subView: "MajorActivityHeadlessView",
+                idAttr: "data-activity-id"
+            }
+        }
+    });
+
+    Pump.MinorStreamHeadlessView = Pump.TemplateView.extend({
+        templateName: 'sidebar',
+        modelName: 'minor',
+        parts: ["minor-activity-headless"],
+        subs: {
+            ".activity.minor": {
+                map: "activities",
+                subView: "MinorActivityHeadlessView",
+                idAttr: "data-activity-id"
+            }
+        }
+    });
+
+    Pump.MajorStreamView = Pump.TemplateView.extend({
+        templateName: 'major-stream',
+        modelName: 'major',
+        parts: ["major-activity",
+                "responses",
+                "reply",
+                "activity-object-list",
+                "activity-object-collection"],
+        subs: {
+            ".activity.major": {
+                map: "activities",
+                subView: "MajorActivityView",
+                idAttr: "data-activity-id"
+            }
+        }
+    });
+
+    Pump.MinorStreamView = Pump.TemplateView.extend({
+        templateName: 'sidebar',
+        modelName: 'minor',
+        parts: ["minor-activity"],
+        subs: {
+            ".activity.minor": {
+                map: "activities",
+                subView: "MinorActivityView",
+                idAttr: "data-activity-id"
+            }
+        }
     });
 
     Pump.InboxContent = Pump.ContentView.extend({
         templateName: 'inbox',
-        modelName: "user",
         parts: ["major-stream",
                 "sidebar",
                 "major-activity",
@@ -1013,13 +1261,12 @@ var Pump = (function(_, $, Backbone) {
                 "reply",
                 "activity-object-list",
                 "activity-object-collection"],
-        el: '#content',
         addMajorActivity: function(act) {
             var view = this,
                 aview;
             if (view && view.$(".activity.major")) {
                 aview = new Pump.MajorActivityView({model: act});
-                aview.$el.on("pump.rendered", function() {
+                aview.on("ready", function() {
                     aview.$el.hide();
                     view.$("#major-stream").prepend(aview.$el);
                     aview.$el.slideDown('slow');
@@ -1032,12 +1279,28 @@ var Pump = (function(_, $, Backbone) {
                 aview;
             aview = new Pump.MinorActivityView({model: act});
 
-            aview.$el.on("pump.rendered", function() {
+            aview.on("ready", function() {
                 aview.$el.hide();
                 view.$("#minor-stream").prepend(aview.$el);
                 aview.$el.slideDown('slow');
             });
             aview.render();
+        },
+        subs: {
+            "#major-stream": {
+                attr: "majorStreamView",
+                subView: "MajorStreamView",
+                subOptions: {
+                    collection: "major"
+                }
+            },
+            "#sidebar": {
+                attr: "minorStreamView",
+                subView: "MinorStreamView",
+                subOptions: {
+                    collection: "minor"
+                }
+            }
         }
     });
 
@@ -1045,7 +1308,6 @@ var Pump = (function(_, $, Backbone) {
         templateName: 'major-activity',
         parts: ["responses",
                 "reply"],
-        model: Pump.Activity,
         modelName: "activity",
         events: {
             "click .favorite": "favoriteObject",
@@ -1060,7 +1322,7 @@ var Pump = (function(_, $, Backbone) {
                     verb: "favorite",
                     object: view.model.object.toJSON()
                 }),
-                stream = Pump.currentUser.stream;
+                stream = Pump.currentUser.minorStream;
 
             stream.create(act, {success: function(act) {
                 view.$(".favorite")
@@ -1076,7 +1338,7 @@ var Pump = (function(_, $, Backbone) {
                     verb: "unfavorite",
                     object: view.model.object.toJSON()
                 }),
-                stream = Pump.currentUser.stream;
+                stream = Pump.currentUser.minorStream;
 
             stream.create(act, {success: function(act) {
                 view.$(".unfavorite")
@@ -1092,7 +1354,7 @@ var Pump = (function(_, $, Backbone) {
                     verb: "share",
                     object: view.model.object.toJSON()
                 }),
-                stream = Pump.currentUser.stream;
+                stream = Pump.currentUser.majorStream;
 
             stream.create(act, {success: function(act) {
                 view.$(".share")
@@ -1108,7 +1370,7 @@ var Pump = (function(_, $, Backbone) {
                     verb: "unshare",
                     object: view.model.object.toJSON()
                 }),
-                stream = Pump.currentUser.stream;
+                stream = Pump.currentUser.minorStream;
 
             stream.create(act, {success: function(act) {
                 view.$(".unshare")
@@ -1120,13 +1382,17 @@ var Pump = (function(_, $, Backbone) {
         },
         openComment: function() {
             var view = this,
-                form = new Pump.CommentForm({model: view.model});
+                form;
 
-            form.$el.on("pump.rendered", function() {
-                view.$(".replies").append(form.el);
-            });
-
-            form.render();
+            if (view.$("form.post-comment").length > 0) {
+                view.$("form.post-comment textarea").focus();
+            } else {
+                form = new Pump.CommentForm({original: view.model.object});
+                form.on("ready", function() {
+                    view.$(".replies").append(form.$el);
+                });
+                form.render();
+            }
         }
     });
 
@@ -1140,26 +1406,25 @@ var Pump = (function(_, $, Backbone) {
         templateName: 'comment-form',
         tagName: "div",
         className: "row comment-form",
-        model: Pump.Activity,
         events: {
             "submit .post-comment": "saveComment"
         },
         saveComment: function() {
             var view = this,
                 text = view.$('textarea[name="content"]').val(),
-                orig = view.model.object.toJSON(),
+                orig = view.options.original,
                 act = new Pump.Activity({
                     verb: "post",
                     object: {
                         objectType: "comment",
                         content: text,
                         inReplyTo: {
-                            objectType: orig.objectType,
-                            id: orig.id
+                            objectType: orig.get("objectType"),
+                            id: orig.get("id")
                         }
                     }
                 }),
-                stream = Pump.currentUser.stream;
+                stream = Pump.currentUser.minorStream;
 
             view.startSpin();
 
@@ -1174,7 +1439,7 @@ var Pump = (function(_, $, Backbone) {
 
                 // These get stripped for "posts"; re-add it
 
-                repl.$el.on("pump.rendered", function() {
+                repl.on("ready", function() {
 
                     view.stopSpin();
 
@@ -1193,19 +1458,16 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.MajorObjectView = Pump.TemplateView.extend({
         templateName: 'major-object',
-        parts: ["responses", "reply"],
-        model: Pump.ActivityObject
+        parts: ["responses", "reply"]
     });
 
     Pump.ReplyView = Pump.TemplateView.extend({
         templateName: 'reply',
-        model: Pump.ActivityObject,
         modelName: 'reply'
     });
 
     Pump.MinorActivityView = Pump.TemplateView.extend({
         templateName: 'minor-activity',
-        model: Pump.Activity,
         modelName: "activity"
     });
 
@@ -1254,19 +1516,16 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.MajorPersonView = Pump.PersonView.extend({
         templateName: 'major-person',
-        model: Pump.Person,
         modelName: 'person'
     });
 
     Pump.ProfileBlock = Pump.PersonView.extend({
         templateName: 'profile-block',
-        model: Pump.Person,
         modelName: 'profile'
     });
 
     Pump.FavoritesContent = Pump.ContentView.extend({
         templateName: 'favorites',
-        modelName: "profile",
         parts: ["profile-block",
                 "user-content-favorites",
                 "object-stream",
@@ -1276,125 +1535,280 @@ var Pump = (function(_, $, Backbone) {
                 "profile-responses",
                 "activity-object-list",
                 "activity-object-collection"],
-        el: '#content'
+        subs: {
+            "#profile-block": {
+                attr: "profileBlock",
+                subView: "ProfileBlock",
+                subOptions: {
+                    model: "profile"
+                }
+            },
+            "#user-content-favorites": {
+                attr: "userContent",
+                subView: "FavoritesUserContent",
+                subOptions: {
+                    collection: "objects",
+                    data: ["profile"]
+                }
+            }
+        }
     });
 
     Pump.FavoritesUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-favorites',
-        modelName: "profile",
+        modelName: "objects",
         parts: ["object-stream",
                 "major-object",
                 "responses",
                 "reply",
                 "profile-responses",
                 "activity-object-collection"],
-        el: '#user-content'
+        subs: {
+            ".object.major": {
+                map: "objects",
+                subView: "MajorObjectView",
+                idAttr: "data-object-id"
+            }
+        }
     });
 
     Pump.FollowersContent = Pump.ContentView.extend({
         templateName: 'followers',
-        modelName: "profile",
         parts: ["profile-block",
                 "user-content-followers",
                 "people-stream",
                 "major-person",
                 "profile-responses"],
-        el: '#content'
+        subs: {
+            "#profile-block": {
+                attr: "profileBlock",
+                subView: "ProfileBlock",
+                subOptions: {
+                    model: "profile"
+                }
+            },
+            "#user-content-followers": {
+                attr: "userContent",
+                subView: "FollowersUserContent",
+                subOptions: {
+                    collection: "people",
+                    data: ["profile"]
+                }
+            }
+        }
     });
 
     Pump.FollowersUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-followers',
-        modelName: "profile",
+        modelName: "people",
         parts: ["people-stream",
                 "major-person",
                 "profile-responses"],
-        el: '#user-content'
+        subs: {
+            ".person.major": {
+                map: "people",
+                subView: "MajorPersonView",
+                idAttr: "data-person-id"
+            }
+        }
     });
 
     Pump.FollowingContent = Pump.ContentView.extend({
         templateName: 'following',
-        modelName: "profile",
         parts: ["profile-block",
                 'user-content-following',
                 "people-stream",
                 "major-person",
                 "profile-responses"],
-        el: '#content'
+        subs: {
+            "#profile-block": {
+                attr: "profileBlock",
+                subView: "ProfileBlock",
+                subOptions: {
+                    model: "profile"
+                }
+            },
+            "#user-content-following": {
+                attr: "userContent",
+                subView: "FollowingUserContent",
+                subOptions: {
+                    collection: "people",
+                    data: ["profile"]
+                }
+            }
+        }
     });
 
     Pump.FollowingUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-following',
-        modelName: "profile",
+        modelName: "people",
         parts: ["people-stream",
                 "major-person",
                 "profile-responses"],
-        el: '#user-content'
+        subs: {
+            ".person.major": {
+                map: "people",
+                subView: "MajorPersonView",
+                idAttr: "data-person-id"
+            }
+        }
     });
 
     Pump.ListsContent = Pump.ContentView.extend({
         templateName: 'lists',
-        modelName: "profile",
         parts: ["profile-block",
                 'user-content-lists',
                 "list-menu",
+                "list-menu-item",
                 "profile-responses"],
-        el: '#content'
+        subs: {
+            "#profile-block": {
+                attr: "profileBlock",
+                subView: "ProfileBlock",
+                subOptions: {
+                    model: "profile"
+                }
+            },
+            "#user-content-lists": {
+                attr: "userContent",
+                subView: "ListsUserContent",
+                subOptions: {
+                    data: ["profile", "lists"]
+                }
+            }
+        }
     });
 
     Pump.ListsUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-lists',
-        modelName: "profile",
         parts: ["list-menu",
+                "list-menu-item",
                 "list-content-lists"],
-        el: '#user-content'
+        subs: {
+            "#list-menu-inner": {
+                attr: "listMenu",
+                subView: "ListMenu",
+                subOptions: {
+                    collection: "lists",
+                    data: ["profile"]
+                }
+            }
+        }
+    });
+
+    Pump.ListMenu = Pump.TemplateView.extend({
+        templateName: "list-menu",
+        modelName: "profile",
+        parts: ["list-menu-item"],
+        el: '.list-menu-block',
+        events: {
+            "click .new-list": "newList"
+        },
+        newList: function() {
+            Pump.showModal(Pump.NewListModal, {data: {user: Pump.currentUser}});
+        },
+        subs: {
+            ".list": {
+                map: "lists",
+                subView: "ListMenuItem",
+                idAttr: "data-list-id"
+            }
+        }
+    });
+
+    Pump.ListMenuItem = Pump.TemplateView.extend({
+        templateName: "list-menu-item",
+        modelName: "listItem",
+        tagName: "ul",
+        className: "list-menu-wrapper"
     });
 
     Pump.ListsListContent = Pump.TemplateView.extend({
-        templateName: 'list-content-lists',
-        modelName: "profile",
-        el: '#list-content'
+        templateName: 'list-content-lists'
     });
 
     Pump.ListContent = Pump.ContentView.extend({
         templateName: 'list',
-        modelName: "profile",
         parts: ["profile-block",
                 "profile-responses",
                 'user-content-list',
                 "list-content-list",
                 "people-stream",
                 "major-person",
-                "list-menu"],
-        el: '#content'
+                "list-menu",
+                "list-menu-item"
+               ],
+        subs: {
+            "#profile-block": {
+                attr: "profileBlock",
+                subView: "ProfileBlock",
+                subOptions: {
+                    model: "profile"
+                }
+            },
+            "#user-content-list": {
+                attr: "userContent",
+                subView: "ListUserContent",
+                subOptions: {
+                    data: ["profile", "lists", "list"]
+                }
+            }
+        }
     });
 
     Pump.ListUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-list',
-        modelName: "profile",
         parts: ["people-stream",
                 "list-content-list",
                 "major-person",
-                "list-menu"],
-        el: '#user-content'
+                "list-menu-item",
+                "list-menu"
+               ],
+        subs: {
+            "#list-menu-inner": {
+                attr: "listMenu",
+                subView: "ListMenu",
+                subOptions: {
+                    collection: "lists",
+                    data: ["profile"]
+                }
+            },
+            "#list-content-list": {
+                attr: "listContent",
+                subView: "ListListContent",
+                subOptions: {
+                    model: "list",
+                    data: ["profile"]
+                }
+            }
+        }
     });
 
     Pump.ListListContent = Pump.TemplateView.extend({
         templateName: 'list-content-list',
-        modelName: "profile",
+        modelName: "list",
         parts: ["people-stream",
                 "major-person"],
-        el: '#list-content'
-    });
+        setupSubs: function() {
+            var view = this,
+                model = view.model;
 
-    Pump.ActivityContent = Pump.ContentView.extend({
-        templateName: 'activity-content',
-        modelName: "activity",
-        el: '#content'
+            if (model && model.members) {
+                model.members.each(function(person) {
+                    var $el = view.$("div[data-person-id='"+person.id+"']"),
+                        aview;
+
+                    if ($el.length > 0) {
+                        aview = new Pump.MajorPersonView({el: $el,
+                                                          model: person});
+                    }
+                });
+            }
+        }
     });
 
     Pump.SettingsContent = Pump.ContentView.extend({
         templateName: 'settings',
-        el: '#content',
         modelName: "profile",
         events: {
             "submit #settings": "saveSettings"
@@ -1429,7 +1843,6 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.AccountContent = Pump.ContentView.extend({
         templateName: 'account',
-        el: '#content',
         modelName: "user",
         events: {
             "submit #account": "saveAccount"
@@ -1478,7 +1891,6 @@ var Pump = (function(_, $, Backbone) {
 
     Pump.AvatarContent = Pump.ContentView.extend({
         templateName: 'avatar',
-        el: '#content',
         modelName: "profile"
     });
 
@@ -1487,8 +1899,7 @@ var Pump = (function(_, $, Backbone) {
         modelName: "object",
         parts: ["responses",
                 "reply",
-                "activity-object-collection"],
-        el: '#content'
+                "activity-object-collection"]
     });
 
     Pump.PostNoteModal = Pump.TemplateView.extend({
@@ -1496,6 +1907,14 @@ var Pump = (function(_, $, Backbone) {
         tagName: "div",
         className: "modal-holder",
         templateName: 'post-note',
+        ready: function() {
+            var view = this;
+            view.$('#note-content').wysihtml5({
+                customTemplates: Pump.wysihtml5Tmpl
+            });
+            view.$("#note-to").select2();
+            view.$("#note-cc").select2();
+        },
         events: {
             "click #send-note": "postNote"
         },
@@ -1511,7 +1930,7 @@ var Pump = (function(_, $, Backbone) {
                         content: text
                     }
                 }),
-                stream = Pump.currentUser.stream,
+                stream = Pump.currentUser.majorStream,
                 strToObj = function(str) {
                     var colon = str.indexOf(":"),
                         type = str.substr(0, colon),
@@ -1533,7 +1952,7 @@ var Pump = (function(_, $, Backbone) {
             view.startSpin();
             
             stream.create(act, {success: function(act) {
-                view.$("#modal-note").modal('hide');
+                view.$el.modal('hide');
                 view.stopSpin();
                 Pump.resetWysihtml5(view.$('#note-content'));
                 // Reload the current page
@@ -1543,12 +1962,85 @@ var Pump = (function(_, $, Backbone) {
     });
 
     Pump.PostPictureModal = Pump.TemplateView.extend({
-
         tagName: "div",
         className: "modal-holder",
         templateName: 'post-picture',
         events: {
             "click #send-picture": "postPicture"
+        },
+        ready: function() {
+            var view = this;
+
+            view.$("#picture-to").select2();
+            view.$("#picture-cc").select2();
+
+            view.$('#picture-description').wysihtml5({
+                customTemplates: Pump.wysihtml5Tmpl
+            });
+
+            if (view.$("#picture-fineupload").length > 0) {
+                view.$("#picture-fineupload").fineUploader({
+                    request: {
+                        endpoint: "/main/upload"
+                    },
+                    text: {
+                        uploadButton: '<i class="icon-upload icon-white"></i> Picture file'
+                    },
+                    template: '<div class="qq-uploader">' +
+                        '<pre class="qq-upload-drop-area"><span>{dragZoneText}</span></pre>' +
+                        '<div class="qq-upload-button btn btn-success">{uploadButtonText}</div>' +
+                        '<ul class="qq-upload-list"></ul>' +
+                        '</div>',
+                    classes: {
+                        success: 'alert alert-success',
+                        fail: 'alert alert-error'
+                    },
+                    autoUpload: false,
+                    multiple: false,
+                    validation: {
+                        allowedExtensions: ["jpeg", "jpg", "png", "gif", "svg", "svgz"],
+                        acceptFiles: "image/*"
+                    }
+                }).on("complete", function(event, id, fileName, responseJSON) {
+
+                    var stream = Pump.currentUser.majorStream,
+                        to = view.$('#post-picture #picture-to').val(),
+                        cc = view.$('#post-picture #picture-cc').val(),
+                        strToObj = function(str) {
+                            var colon = str.indexOf(":"),
+                                type = str.substr(0, colon),
+                                id = str.substr(colon+1);
+                            return new Pump.ActivityObject({
+                                id: id,
+                                objectType: type
+                            });
+                        },
+                        act = new Pump.Activity({
+                            verb: "post",
+                            object: responseJSON.obj
+                        });
+
+                    if (to && to.length > 0) {
+                        act.to = new Pump.ActivityObjectBag(_.map(to, strToObj));
+                    }
+
+                    if (cc && cc.length > 0) {
+                        act.cc = new Pump.ActivityObjectBag(_.map(cc, strToObj));
+                    }
+
+                    stream.create(act, {success: function(act) {
+                        view.$el.modal('hide');
+                        view.stopSpin();
+                        view.$("#picture-fineupload").fineUploader('reset');
+                        Pump.resetWysihtml5(view.$('#picture-description'));
+                        view.$('#picture-title').val("");
+                        // Reload the current content
+                        Pump.addMajorActivity(act);
+                    }});
+                }).on("error", function(event, id, fileName, reason) {
+                    view.showError(reason);
+                });
+            }
         },
         postPicture: function(ev) {
             var view = this,
@@ -1575,9 +2067,80 @@ var Pump = (function(_, $, Backbone) {
         }
     });
 
+    Pump.NewListModal = Pump.TemplateView.extend({
+
+        tagName: "div",
+        className: "modal-holder",
+        templateName: 'new-list',
+        ready: function() {
+            var view = this;
+            view.$('#list-description').wysihtml5({
+                customTemplates: Pump.wysihtml5Tmpl
+            });
+        },
+        events: {
+            "click #save-new-list": "saveNewList"
+        },
+        saveNewList: function() {
+            var view = this,
+                description = view.$('#new-list #list-description').val(),
+                name = view.$('#new-list #list-name').val(),
+                act,
+                stream = Pump.currentUser.minorStream;
+
+            if (!name) {
+                view.showError("Your list must have a name.");
+            } else {
+
+                // XXX: any other validation? Check uniqueness here?
+
+                // XXX: to/cc ?
+
+                act = new Pump.Activity({
+                    verb: "create",
+                    object: new Pump.ActivityObject({
+                        objectType: "collection",
+                        objectTypes: ["person"],
+                        displayName: name,
+                        content: description
+                    })
+                });
+                
+                view.startSpin();
+
+                stream.create(act, {success: function(act) {
+                    var aview;
+
+                    view.$el.modal('hide');
+                    view.stopSpin();
+                    Pump.resetWysihtml5(view.$('#list-description'));
+                    view.$('#list-name').val("");
+
+                    // it's minor
+
+                    Pump.addMinorActivity(act);
+
+                    if ($("#list-menu-inner").length > 0) {
+                        aview = new Pump.ListMenuItem({model: act.object});
+                        aview.on("ready", function() {
+                            var el = aview.$("li");
+                            el.hide();
+                            $("#list-menu-inner").prepend(el);
+                            el.slideDown('fast');
+                            // Go to the new list page
+                            Pump.router.navigate(act.object.get("url"), true);
+                        });
+                        aview.render();
+                    }
+                }});
+            }
+
+            return false;
+        }
+    });
+
     Pump.BodyView = Backbone.View.extend({
         initialize: function(options) {
-            this.router = options.router;
             _.bindAll(this, "navigateToHref");
         },
         el: "body",
@@ -1590,11 +2153,94 @@ var Pump = (function(_, $, Backbone) {
                 here = window.location;
 
             if (!el.host || el.host === here.host) {
-                this.router.navigate(pathname, true);
+                try {
+                    Pump.router.navigate(pathname, true);
+                } catch (e) {
+                    Pump.error(e);
+                }
+                // Always return false
                 return false;
             } else {
                 return true;
             }
+        },
+        setTitle: function(title) {
+            this.$("title").html(title + " - " + Pump.config.site);
+        },
+        setContent: function(options, callback) {
+
+            var View = options.contentView,
+                title = options.title,
+                body = this,
+                oldContent = body.content,
+                userContentOptions,
+                listContentOptions,
+                newView,
+                parent,
+                profile;
+
+            if (options.model) {
+                profile = options.model;
+            } else if (options.data) {
+                profile = options.data.profile;
+            }
+
+            Pump.unfollowStreams();
+
+            // XXX: double-check this
+
+            body.content = new View(options);
+
+            // We try and only update the parts that have changed
+
+            if (oldContent &&
+                options.userContentView &&
+                oldContent.profileBlock &&
+                oldContent.profileBlock.model.get("id") == profile.get("id")) {
+
+                body.content.profileBlock = oldContent.profileBlock;
+
+                if (options.userContentCollection) {
+                    userContentOptions = _.extend({collection: options.userContentCollection}, options);
+                } else {
+                    userContentOptions = options;
+                }
+
+                body.content.userContent = new options.userContentView(userContentOptions);
+
+                if (options.listContentView &&
+                    oldContent.userContent.listMenu) {
+
+                    body.content.userContent.listMenu = oldContent.userContent.listMenu;
+                    if (options.listContentModel) {
+                        listContentOptions = _.extend({model: options.listContentModel}, options);
+                    } else {
+                        listContentOptions = options;
+                    }
+
+                    body.content.userContent.listContent = new options.listContentView(listContentOptions);
+                    parent = "#list-content";
+                    newView = body.content.userContent.listContent;
+
+                } else {
+                    parent = "#user-content";
+                    newView = body.content.userContent;
+                }
+            } else {
+                parent = "#content";
+                newView = body.content;
+            }
+
+            newView.once("ready", function() {
+                body.setTitle(title);
+                body.$(parent).children().replaceWith(newView.$el);
+                Pump.followStreams();
+                if (callback) {
+                    callback();
+                }
+            });
+
+            newView.render();
         }
     });
 
@@ -1610,17 +2256,20 @@ var Pump = (function(_, $, Backbone) {
             options = {};
         }
 
+        // If we've got it attached already, just show it
         if (_.has(Pump.modals, templateName)) {
             modalView = Pump.modals[templateName];
-            modalView.$(".pump-modal").modal('show');
+            modalView.$el.modal('show');
         } else {
+            // Otherwise, create a view
             modalView = new Cls(options);
-            $("body").append(modalView.el);
             Pump.modals[templateName] = modalView;
-            modalView.$el.one("pump.rendered", function() {
-                callback(modalView);
+            // When it's ready, show immediately
+            modalView.on("ready", function() {
+                $("body").append(modalView.el);
+                modalView.$el.modal('show');
             });
-            // Once it's rendered, show the modal
+            // render it (will fire "ready")
             modalView.render();
         }
     };
@@ -1635,95 +2284,16 @@ var Pump = (function(_, $, Backbone) {
     };
 
     Pump.addMajorActivity = function(act) {
-        if (Pump.content) {
-            Pump.content.addMajorActivity(act);
+        if (Pump.body.content) {
+            Pump.body.content.addMajorActivity(act);
         }
     };
 
     Pump.addMinorActivity = function(act) {
-        if (Pump.content) {
-            Pump.content.addMinorActivity(act);
+        if (Pump.body.content) {
+            Pump.body.content.addMinorActivity(act);
         }
     };
-
-    Pump.setUserContent = function(options, callback) {
-
-        var view,
-            contentView = options.contentView,
-            userContentView = options.userContentView,
-            title = options.title,
-            id = options.model.get("id");
-
-        delete options.contentView;
-        delete options.userContentView;
-        delete options.title;
-        
-        Pump.content = new contentView(options);
-        Pump.router.setTitle(Pump.content, title);
-
-        if ($("#user-content").length > 0 && $("#profile-block").attr("data-profile-id") == id) {
-
-            Pump.userContent = new userContentView(options);
-
-            view = Pump.userContent;
-            
-        } else {
-            
-            view = Pump.content;
-
-            view.$el.one("pump.rendered", function() {
-
-                // Helper view for the profile block
-
-                var block = new Pump.ProfileBlock({el: Pump.content.$("#profile-block"),
-                                                   model: options.model});
-
-                Pump.userContent = new userContentView(_.extend({el: Pump.content.$("#user-content")}, options));
-            });
-        }
-
-        view.$el.one("pump.rendered", function() {
-            callback(view);
-        });
-
-        view.render();
-    };
-
-    Pump.setListContent = function(options, callback) {
-
-        var view,
-            contentView = options.contentView,
-            userContentView = options.userContentView,
-            listContentView = options.listContentView,
-            title = options.title,
-            id = options.model.get("id");
-
-        if ($("#list-content").length > 0 && $("#list-menu").attr("data-profile-id") == id) {
-
-            Pump.content = new contentView(options);
-            Pump.userContent = new userContentView(options);
-            Pump.listContent = new listContentView(options);
-            Pump.router.setTitle(Pump.content, title);
-
-            view = Pump.listContent;
-            
-            view.$el.one("pump.rendered", function() {
-                callback(view);
-            });
-
-            view.render();
-
-        } else {
-            Pump.setUserContent(options, function(view) {
-                Pump.listContent = new listContentView(_.extend({el: view.$("#list-content")}, options));
-                callback(Pump.listContent);
-            });
-        }
-    };
-
-    Pump.content = null;
-    Pump.userContent = null;
-    Pump.listContent = null;
 
     Pump.Router = Backbone.Router.extend({
 
@@ -1744,55 +2314,36 @@ var Pump = (function(_, $, Backbone) {
             "main/login":             "login"
         },
 
-        setTitle: function(view, title) {
-            view.$el.one("pump.rendered", function() {
-                $("title").html(title + " - " + Pump.config.site);
-            });
-        },
-
         register: function() {
-            Pump.content = new Pump.RegisterContent();
-
-            this.setTitle(Pump.content, "Register");
-
-            Pump.content.render();
+            Pump.body.setContent({contentView: Pump.RegisterContent,
+                                  title: "Register"});
         },
 
         login: function() {
-            Pump.content = new Pump.LoginContent();
-
-            this.setTitle(Pump.content, "Login");
-
-            Pump.content.render();
+            Pump.body.setContent({contentView: Pump.LoginContent,
+                                  title: "Login"});
         },
 
         settings: function() {
-            Pump.content = new Pump.SettingsContent({model: Pump.currentUser.profile });
-
-            this.setTitle(Pump.content, "Settings");
-
-            Pump.content.render();
+            Pump.body.setContent({contentView: Pump.SettingsContent,
+                                  model: Pump.currentUser.profile,
+                                  title: "Settings"});
         },
 
         account: function() {
-            Pump.content = new Pump.AccountContent({model: Pump.currentUser});
-
-            this.setTitle(Pump.content, "Account");
-
-            Pump.content.render();
+            Pump.body.setContent({contentView: Pump.AccountContent,
+                                  model: Pump.currentUser,
+                                  title: "Account"});
         },
 
         avatar: function() {
-            Pump.content = new Pump.AvatarContent({model: Pump.currentUser.profile});
-
-            this.setTitle(Pump.content, "Avatar");
-
-            Pump.content.render();
+            Pump.body.setContent({contentView: Pump.AvatarContent,
+                                  model: Pump.currentUser.profile,
+                                  title: "Avatar"});
         },
 
         "home": function() {
-            var router = this,
-                pair = Pump.getUserCred();
+            var pair = Pump.getUserCred();
 
             if (pair) {
                 var user = Pump.currentUser,
@@ -1801,74 +2352,38 @@ var Pump = (function(_, $, Backbone) {
 
                 // XXX: parallelize
 
-                user.fetch({success: function(user, response) {
-                    major.fetch({success: function(major, response) {
-                        minor.fetch({success: function(minor, response) {
-                            Pump.content = new Pump.InboxContent({model: user,
-                                                                  data: {major: major,
-                                                                         minor: minor}
-                                                                 });
-                            router.setTitle(Pump.content, "Home");
-                            Pump.content.$el.one("pump.rendered", function() {
-                                Pump.content.$(".activity.major").each(function(i) {
-                                    var id = $(this).attr("id"),
-                                        act = major.get(id);
-                                    var aview = new Pump.MajorActivityView({el: this, model: act});
-                                });
-                                Pump.content.$(".activity.minor").each(function(i) {
-                                    var id = $(this).attr("id"),
-                                        act = minor.get(id);
-                                    var aview = new Pump.MinorActivityView({el: this, model: act});
-                                });
-                            });
-                            Pump.content.render();
-                        }});
+                major.fetch({update: true, remove: false, success: function(major, response) {
+                    minor.fetch({update: true, remove: false, success: function(minor, response) {
+                        Pump.body.setContent({contentView: Pump.InboxContent,
+                                              data: {major: major,
+                                                     minor: minor},
+                                              title: "Home"});
                     }});
                 }});
             } else {
-                Pump.content = new Pump.MainContent();
-                router.setTitle(Pump.content, "Welcome");
-                Pump.content.render();
+                Pump.body.setContent({contentView: Pump.MainContent,
+                                      title: "Welcome"});
             }
         },
 
         profile: function(nickname) {
             var router = this,
-                user = new Pump.User({nickname: nickname}),
+                user = Pump.User.unique({nickname: nickname}),
                 major = user.majorStream,
                 minor = user.minorStream;
 
             // XXX: parallelize this?
 
             user.fetch({success: function(user, response) {
-                major.fetch({success: function(major, response) {
-                    minor.fetch({success: function(minor, response) {
-                        var profile = user.profile,
-                            options = {contentView: Pump.UserPageContent,
-                                       userContentView: Pump.ActivitiesUserContent,
-                                       title: profile.get("displayName"),
-                                       model: profile,
-                                       data: { major: major,
-                                               minor: minor }};
-
-                        Pump.setUserContent(options, function(view) {
-
-                            // Helper view for each major activity
-
-                            view.$(".activity.major").each(function(i) {
-                                var id = $(this).attr("id"),
-                                    act = major.get(id);
-                                var aview = new Pump.MajorActivityHeadlessView({el: this, model: act});
-                            });
-
-                            // Helper view for each minor activity
-
-                            view.$(".activity.minor").each(function(i) {
-                                var id = $(this).attr("id"),
-                                    act = minor.get(id);
-                                var aview = new Pump.MinorActivityHeadlessView({el: this, model: act});
-                            });
-                        });
+                major.fetch({update: true, remove: false, success: function(major, response) {
+                    minor.fetch({update: true, remove: false, success: function(minor, response) {
+                        var profile = user.profile;
+                        Pump.body.setContent({contentView: Pump.UserPageContent,
+                                              userContentView: Pump.ActivitiesUserContent,
+                                              title: profile.get("displayName"),
+                                              data: { major: major,
+                                                      minor: minor,
+                                                      profile: profile }});
                     }});
                 }});
             }});
@@ -1876,28 +2391,21 @@ var Pump = (function(_, $, Backbone) {
 
         favorites: function(nickname) {
             var router = this,
-                user = new Pump.User({nickname: nickname});
+                user = Pump.User.unique({nickname: nickname});
 
             // XXX: parallelize this?
 
             user.fetch({success: function(user, response) {
                 var profile = user.profile,
                     favorites = profile.favorites;
-                favorites.fetch({success: function(major, response) {
-                    var options = {
+                favorites.fetch({update: true, remove: false, success: function(favorites, response) {
+                    Pump.body.setContent({
                         contentView: Pump.FavoritesContent,
                         userContentView: Pump.FavoritesUserContent,
+                        userContentCollection: favorites,
                         title: nickname + " favorites",
-                        model: profile,
-                        data: { objects: favorites }
-                    };
-                    Pump.setUserContent(options, function(view) {
-                        view.$(".object.major").each(function(i) {
-                            var id = $(this).attr("id"),
-                                obj = favorites.get(id);
-
-                            var aview = new Pump.MajorObjectView({el: this, model: obj});
-                        });
+                        data: { objects: favorites,
+                                profile: profile }
                     });
                 }});
             }});
@@ -1905,78 +2413,61 @@ var Pump = (function(_, $, Backbone) {
 
         followers: function(nickname) {
             var router = this,
-                user = new Pump.User({nickname: nickname});
+                user = Pump.User.unique({nickname: nickname});
 
             user.fetch({success: function(user, response) {
                 var followers = user.profile.followers;
-                followers.fetch({success: function(followers, response) {
-                    var profile = user.profile,
-                        options = {contentView: Pump.FollowersContent,
-                                   userContentView: Pump.FollowersUserContent,
-                                   title: nickname + " followers",
-                                   model: profile,
-                                   data: {people: followers }};
+                followers.fetch({update: true, remove: false, success: function(followers, response) {
+                    var profile = user.profile;
 
-                    Pump.setUserContent(options, function(view) {
-                        view.$(".person.major").each(function(i) {
-                            var id = $(this).attr("id"),
-                                person = followers.get(id);
-
-                            var aview = new Pump.MajorPersonView({el: this, model: person});
-                        });
-                    });
+                    Pump.body.setContent({contentView: Pump.FollowersContent,
+                                          userContentView: Pump.FollowersUserContent,
+                                          userContentCollection: followers,
+                                          title: nickname + " followers",
+                                          data: {people: followers,
+                                                 profile: profile}});
                 }});
             }});
         },
 
         following: function(nickname) {
             var router = this,
-                user = new Pump.User({nickname: nickname});
+                user = Pump.User.unique({nickname: nickname});
 
             // XXX: parallelize this?
 
             user.fetch({success: function(user, response) {
                 var following = user.profile.following;
-                following.fetch({success: function(following, response) {
-                    var profile = user.profile,
-                        options = {contentView: Pump.FollowingContent,
-                                   userContentView: Pump.FollowingUserContent,
-                                   title: nickname + " following",
-                                   model: profile,
-                                   data: {people: following }};
+                following.fetch({update: true, remove: false, success: function(following, response) {
+                    var profile = user.profile;
 
-                    Pump.setUserContent(options, function(view) {
-                        view.$(".person.major").each(function(i) {
-                            var id = $(this).attr("id"),
-                                person = following.get(id);
-
-                            var aview = new Pump.MajorPersonView({el: this, model: person});
-                        });
-                    });
+                    Pump.body.setContent({contentView: Pump.FollowingContent,
+                                          userContentView: Pump.FollowingUserContent,
+                                          userContentCollection: following,
+                                          title: nickname + " following",
+                                          data: {people: following,
+                                                 profile: profile}});
                 }});
             }});
         },
 
         lists: function(nickname) {
             var router = this,
-                user = new Pump.User({nickname: nickname});
+                user = Pump.User.unique({nickname: nickname});
 
             // XXX: parallelize this?
 
             user.fetch({success: function(user, response) {
                 var lists = user.profile.lists;
-                lists.fetch({success: function(lists, response) {
-                    var profile = user.profile,
-                        options = {contentView: Pump.ListsContent,
-                                   userContentView: Pump.ListsUserContent,
-                                   listContentView: Pump.ListsListContent,
-                                   title: nickname + " lists",
-                                   model: profile,
-                                   data: {lists: lists}};
+                lists.fetch({update: true, remove: false, success: function(lists, response) {
+                    var profile = user.profile;
 
-                    Pump.setListContent(options, function(view) {
-                        // Nothing to do!
-                    });
+                    Pump.body.setContent({contentView: Pump.ListsContent,
+                                          userContentView: Pump.ListsUserContent,
+                                          listContentView: Pump.ListsListContent,
+                                          title: nickname + " lists",
+                                          data: {lists: lists,
+                                                 profile: profile}});
                 }});
             }});
         },
@@ -1984,61 +2475,45 @@ var Pump = (function(_, $, Backbone) {
         list: function(nickname, uuid) {
 
             var router = this,
-                user = new Pump.User({nickname: nickname}),
-                list = new Pump.ActivityObject({links: {self: {href: "/api/collection/"+uuid}}});
+                user = Pump.User.unique({nickname: nickname}),
+                list = Pump.ActivityObject.unique({links: {self: {href: "/api/collection/"+uuid}}});
 
             // XXX: parallelize this?
 
             user.fetch({success: function(user, response) {
                 var lists = user.profile.lists;
-                lists.fetch({success: function(lists, response) {
+                lists.fetch({update: true, remove: false, success: function(lists, response) {
                     list.fetch({success: function(list, response) {
                         var profile = user.profile,
                             options = {contentView: Pump.ListContent,
                                        userContentView: Pump.ListUserContent,
                                        listContentView: Pump.ListListContent,
                                        title: nickname + " - list -" + list.get("displayName"),
-                                       model: profile,
+                                       listContentModel: list,
                                        data: {lists: lists,
-                                              list: list}};
+                                              list: list,
+                                              profile: profile}};
 
-                        Pump.setListContent(options, function(view) {
-                            Pump.userContent.$("#list-menu .active").removeClass("active");
-                            Pump.userContent.$("#list-menu li[data-list-id='"+list.id+"']").addClass("active");
+                        Pump.body.setContent(options, function(view) {
+                            Pump.body.content.userContent.listMenu.$(".active").removeClass("active");
+                            Pump.body.content.userContent.listMenu.$("li[data-list-id='"+list.id+"']").addClass("active");
                         });
                     }});
                 }});
             }});
         },
 
-        activity: function(nickname, id) {
-            var router = this,
-                act = new Pump.Activity({uuid: id, userNickname: nickname});
-
-            act.fetch({success: function(act, response) {
-                Pump.content = new Pump.ActivityContent({model: act});
-
-                router.setTitle(Pump.content, act.content);
-                Pump.content.render();
-            }});
-        },
-        
         object: function(nickname, type, uuid) {
             var router = this,
-                obj = new Pump.ActivityObject({uuid: uuid, objectType: type, userNickname: nickname});
+                obj = Pump.ActivityObject.unique({uuid: uuid, objectType: type, userNickname: nickname});
 
             obj.fetch({success: function(obj, response) {
-
-                Pump.content = new Pump.ObjectContent({model: obj});
-                
-                router.setTitle(Pump.content, obj.displayName || obj.objectType + "by" + nickname);
-
-                Pump.content.render();
+                Pump.body.setContent({contentView: Pump.ObjectContent,
+                                      model: obj,
+                                      title: obj.displayName || obj.objectType + "by" + nickname});
             }});
         }
     });
-
-    Pump.router = new Pump.Router();
 
     Pump.clientID = null;
     Pump.clientSecret = null;
@@ -2162,21 +2637,192 @@ var Pump = (function(_, $, Backbone) {
         $.fn.wysihtml5.defaultOptions["customTemplates"] = Pump.wysihtml5Tmpl;
     };
 
+    Pump.getStreams = function() {
+
+        var content,
+            streams = {};
+
+        if (Pump.body && Pump.body.content) {
+            if (Pump.body.content.userContent) {
+                if (Pump.body.content.userContent.listContent) {
+                    content = Pump.body.content.userContent.listContent;
+                } else {
+                    content = Pump.body.content.userContent;
+                }
+            } else {
+                content = Pump.body.content;
+            }
+        }
+
+        if (content) {
+            if (content.majorStreamView) {
+                streams.major = content.majorStreamView.collection;
+            }
+
+            if (content.minorStreamView) {
+                streams.minor = content.minorStreamView.collection;
+            }
+        }
+
+        return streams;
+    };
+
+    // Refreshes the current visible streams
+
+    Pump.refreshStreams = function() {
+        var streams = Pump.getStreams();
+        
+        _.each(streams, function(stream, name) {
+            stream.fetch({update: true, remove: false});
+        });
+    };
+
+    Pump.updateStream = function(url, activity) {
+        var streams = Pump.getStreams(),
+            target = _.find(streams, function(stream) { return stream.url == url; }),
+            act;
+
+        if (target) {
+            act = Pump.Activity.unique(activity);
+            target.unshift(act);
+        }
+    };
+
+    // When we get a challenge from the socket server,
+    // We prepare an OAuth request and send it
+
+    Pump.riseToChallenge = function(url, method) {
+
+        var message = {action: url,
+                       method: method,
+                       parameters: [["oauth_version", "1.0"]]};
+
+        Pump.ensureCred(function(err, cred) {
+
+            var pair, secrets;
+
+            if (err) {
+                Pump.error("Error getting OAuth credentials.");
+                return;
+            }
+
+            message.parameters.push(["oauth_consumer_key", cred.clientID]);
+            secrets = {consumerSecret: cred.clientSecret};
+
+            pair = Pump.getUserCred();
+
+            if (pair) {
+                message.parameters.push(["oauth_token", pair.token]);
+                secrets.tokenSecret = pair.secret;
+            }
+
+            OAuth.setTimestampAndNonce(message);
+
+            OAuth.SignatureMethod.sign(message, secrets);
+
+            console.log(message);
+
+            Pump.socket.send(JSON.stringify({cmd: "rise", message: message}));
+        });
+    };
+
+    // Our socket.io socket
+
+    Pump.socket = null;
+
+    Pump.setupSocket = function() {
+
+        var here = window.location,
+            sock;
+
+        if (Pump.socket) {
+            Pump.socket.close();
+            Pump.socket = null;
+        }
+
+        sock = new SockJS(here.protocol + "//" + here.host + "/main/realtime/sockjs");
+
+        sock.onopen = function() {
+            Pump.socket = sock;
+            Pump.followStreams();
+        };
+
+        sock.onmessage = function(e) {
+            var data = JSON.parse(e.data);
+
+            switch (data.cmd) {
+            case "update":
+                Pump.updateStream(data.url, data.activity);
+                break;
+            case "challenge":
+                Pump.riseToChallenge(data.url, data.method);
+                break;
+            }
+        };
+
+        sock.onclose = function() {
+            // XXX: reconnect?
+            Pump.socket = null;
+        };
+    };
+
+    Pump.followStreams = function() {
+
+        if (!Pump.config.sockjs) {
+            return;
+        }
+
+        if (!Pump.socket) {
+            return;
+        }
+
+        var streams = Pump.getStreams();
+        
+        _.each(streams, function(stream, name) {
+            Pump.socket.send(JSON.stringify({cmd: "follow", url: stream.url}));
+        });
+    };
+
+    Pump.unfollowStreams = function() {
+
+        if (!Pump.config.sockjs) {
+            return;
+        }
+
+        if (!Pump.socket) {
+            return;
+        }
+
+        var streams = Pump.getStreams();
+        
+        _.each(streams, function(stream, name) {
+            Pump.socket.send(JSON.stringify({cmd: "unfollow", url: stream.url}));
+        });
+    };
+
     $(document).ready(function() {
 
-        Pump.bodyView = new Pump.BodyView({router: Pump.router});
-        Pump.nav = new Pump.AnonymousNav({el: ".navbar-inner .container"});
+        // XXX: set up initial models
+        
+        // Set up router
 
-        // Initialize a view for the current content. Not crazy about this.
+        Pump.router   = new Pump.Router();
+
+        // Set up initial view
+
+        Pump.body     = new Pump.BodyView({el: $("body")});
+        Pump.body.nav = new Pump.AnonymousNav({el: ".navbar-inner .container"});
+
+        // XXX: Make this more complete
 
         if ($("#content #login").length > 0) {
-            Pump.content = new Pump.LoginContent();
+            Pump.body.content = new Pump.LoginContent();
         } else if ($("#content #registration").length > 0) {
-            Pump.content = new Pump.RegisterContent();
+            Pump.body.content = new Pump.RegisterContent();
         } else if ($("#content #user").length > 0) {
-            Pump.content = new Pump.UserPageContent({});
+            Pump.body.content = new Pump.UserPageContent({});
         } else if ($("#content #inbox").length > 0) {
-            Pump.content = new Pump.InboxContent({});
+            Pump.body.content = new Pump.InboxContent({});
         }
 
         $("abbr.easydate").easydate();
@@ -2184,6 +2830,16 @@ var Pump = (function(_, $, Backbone) {
         Backbone.history.start({pushState: true, silent: true});
 
         Pump.setupWysiHTML5();
+
+        // Refresh the streams every 60 seconds
+
+        Pump.refreshStreamsID = setInterval(Pump.refreshStreams, 60000);
+
+        // Connect to current server
+
+        if (Pump.config.sockjs) {
+            Pump.setupSocket();
+        }
 
         Pump.ensureCred(function(err, cred) {
 
@@ -2207,17 +2863,17 @@ var Pump = (function(_, $, Backbone) {
                     var sp, continueTo;
 
                     Pump.currentUser = user;
-                    Pump.nav = new Pump.UserNav({el: ".navbar-inner .container",
-                                                 model: Pump.currentUser});
+                    Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
+                                                      model: Pump.currentUser});
 
-                    Pump.nav.render();
+                    Pump.body.nav.render();
 
                     // If we're on the login page, and there's a current
                     // user, redirect to the actual page
 
                     switch (window.location.pathname) {
                     case "/main/login":
-                        Pump.content = new Pump.LoginContent();
+                        Pump.body.content = new Pump.LoginContent();
                         continueTo = getContinueTo();
                         Pump.router.navigate(continueTo, true);
                         break;

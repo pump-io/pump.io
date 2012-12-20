@@ -28,7 +28,6 @@
 
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
-        <div class="container">
           <% if (_.has(data, "user") && data.user) { %>
           <%= partial('nav-loggedin') %>
           <% } else if (page.nologin) { %>
@@ -36,7 +35,6 @@
           <% } else { %>
           <%= partial('nav-anonymous') %>
           <% } %>
-        </div> <!-- /container -->
       </div> <!-- /navbar-inner -->
     </div> <!-- /navbar -->
 
@@ -69,6 +67,9 @@
     <script src="/javascript/bootstrap-wysihtml5.js"></script>
     <script src="/javascript/select2.min.js"></script>
     <script src="/javascript/pump.js"></script>
+    <% if (config.sockjs) { %>
+    <script src="/javascript/sockjs.min.js"></script>
+    <% } %>
     <script>
       if (!Pump) {
           Pump = {};
@@ -79,7 +80,8 @@
       _.extend(Pump.config, {
           site: "<%- config.site %>",
           requireEmail: "<%- config.requireEmail %>",
-          canUpload: "<%- config.canUpload %>"
+          canUpload: "<%- config.canUpload %>",
+          sockjs: <%- config.sockjs %>
       });
     </script>
   </body>

@@ -222,12 +222,16 @@ suite.addBatch({
                     assert.isFalse(_(user.profile).has("replies"));
                     assert.isObject(user.profile.followers);
                     assert.isString(user.profile.followers.url);
+                    assert.isNumber(user.profile.followers.totalItems);
                     assert.isObject(user.profile.following);
                     assert.isString(user.profile.following.url);
+                    assert.isNumber(user.profile.following.totalItems);
                     assert.isObject(user.profile.lists);
                     assert.isString(user.profile.lists.url);
+                    assert.isNumber(user.profile.lists.totalItems);
                     assert.isObject(user.profile.favorites);
                     assert.isString(user.profile.favorites.url);
+                    assert.isNumber(user.profile.lists.totalItems);
                 }
             }
         }

@@ -24,12 +24,14 @@ var cluster = require("cluster"),
     os = require("os"),
     fs = require("fs"),
     path = require("path"),
+    Logger = require("bunyan"),
     _ = require("underscore"),
     argv = require("optimist")
         .usage("Usage: $0 -c <configfile>")
         .alias("c", "config")
         .describe("c", "Configuration file (default: /etc/pump.io.json and ~/.pump.io.json)")
         .argv,
+    Dispatch = require("../lib/dispatch"),
     makeApp = require("../lib/app").makeApp;
 
 // Gets the configuration vars for this server from config files
@@ -66,7 +68,10 @@ var getConfig = function(filename) {
 };
 
 var launchApps = function(config) {
-    var cnt, i, unclustered = ["memory", "disk", "leveldb"];
+    var cnt,
+        i,
+        unclustered = ["memory", "disk", "leveldb"],
+        log = setupLog(config);
 
     if (cluster.isMaster) {
         if (_(config).has("children")) {
@@ -79,6 +84,7 @@ var launchApps = function(config) {
         for (i = 0; i < cnt; i++) {
             cluster.fork();
         }
+        Dispatch.start(log);
     } else { 
         makeApp(config, function(err, app) {
             if (err) {
@@ -88,6 +94,24 @@ var launchApps = function(config) {
             }
         });
     }
+};
+
+var setupLog = function(config) {
+
+    var log,
+        logParams = {
+            name: "pump.io"
+        };
+
+    if (config.logfile) {
+        logParams.streams = [{path: config.logfile}];
+    } else if (config.nologger) {
+        logParams.streams = [{path: "/dev/null"}];
+    } else {
+        logParams.streams = [{stream: process.stderr}];
+    }
+
+    return new Logger(logParams);
 };
 
 var main = function() {

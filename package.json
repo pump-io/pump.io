@@ -32,7 +32,8 @@
                       "bunyan": "0.16.x",
                       "emailjs": "0.3.x",
                       "mkdirp": "0.3.x",
-		      "connect-databank": "0.4.x"
+		      "connect-databank": "0.4.x",
+                      "sockjs": "0.3.x"
 		    },
     "bin": {
         "pump": "./bin/pump",

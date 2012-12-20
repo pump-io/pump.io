@@ -1,0 +1,19 @@
+<div id="modal-list" class="modal pump-modal hide fade" tabindex="-1" role="dialog" aria-labelledby="post-label" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 id="post-label">New list</h3>
+  </div>
+  <div class="modal-body">
+    <form id="new-list" class="form-horizontal">
+      <fieldset>
+        <label for="name">Name</label>
+        <input type="text" id="list-name" placeholder="Unique name for this list" name="list-name"></input>
+        <label for="description">Description</label>
+        <textarea id="list-description" class="span5" name="list-description" rows="6"></textarea>
+      </fieldset>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" id="save-new-list">Save</button>
+  </div>
+</div>

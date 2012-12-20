@@ -55,6 +55,7 @@ var databank = require("databank"),
     mm = require("../lib/mimemap"),
     saveUpload = require("../lib/saveupload").saveUpload,
     reqUser = mw.reqUser,
+    reqGenerator = mw.reqGenerator,
     sameUser = mw.sameUser,
     clientAuth = mw.clientAuth,
     userAuth = mw.userAuth,
@@ -120,15 +121,18 @@ var addRoutes = function(app) {
     app.del("/api/user/:nickname", userAuth, reqUser, sameUser, delUser);
 
     app.get("/api/user/:nickname/profile", clientAuth, reqUser, personType, getObject);
-    app.put("/api/user/:nickname/profile", userAuth, reqUser, sameUser, personType, putObject);
+    app.put("/api/user/:nickname/profile", userAuth, reqUser, sameUser, personType, reqGenerator, putObject);
 
     // Feeds
 
     app.get("/api/user/:nickname/feed", clientAuth, reqUser, userStream);
-    app.post("/api/user/:nickname/feed", userAuth, reqUser, sameUser, postActivity);
+    app.post("/api/user/:nickname/feed", userAuth, reqUser, sameUser, reqGenerator, postActivity);
 
     app.get("/api/user/:nickname/feed/major", clientAuth, reqUser, userMajorStream);
     app.get("/api/user/:nickname/feed/minor", clientAuth, reqUser, userMinorStream);
+
+    app.post("/api/user/:nickname/feed/major", userAuth, reqUser, sameUser, isMajor, reqGenerator, postActivity);
+    app.post("/api/user/:nickname/feed/minor", userAuth, reqUser, sameUser, isMinor, reqGenerator, postActivity);
 
     // Inboxen
 
@@ -148,12 +152,12 @@ var addRoutes = function(app) {
     // Following
 
     app.get("/api/user/:nickname/following", clientAuth, reqUser, userFollowing);
-    app.post("/api/user/:nickname/following", clientAuth, reqUser, sameUser, newFollow);
+    app.post("/api/user/:nickname/following", clientAuth, reqUser, sameUser, reqGenerator, newFollow);
 
     // Favorites
 
     app.get("/api/user/:nickname/favorites", clientAuth, reqUser, userFavorites);
-    app.post("/api/user/:nickname/favorites", clientAuth, reqUser, sameUser, newFavorite);
+    app.post("/api/user/:nickname/favorites", clientAuth, reqUser, sameUser, reqGenerator, newFavorite);
 
     // Lists
 
@@ -176,8 +180,8 @@ var addRoutes = function(app) {
     // Other objects
 
     app.get("/api/:type/:uuid", clientAuth, requestObject, authorOrRecipient, getObject);
-    app.put("/api/:type/:uuid", userAuth, requestObject, authorOnly, putObject);
-    app.del("/api/:type/:uuid", userAuth, requestObject, authorOnly, deleteObject);
+    app.put("/api/:type/:uuid", userAuth, requestObject, authorOnly, reqGenerator, putObject);
+    app.del("/api/:type/:uuid", userAuth, requestObject, authorOnly, reqGenerator, deleteObject);
 
     app.get("/api/:type/:uuid/likes", clientAuth, requestObject, authorOrRecipient, objectLikes);
     app.get("/api/:type/:uuid/replies", clientAuth, requestObject, authorOrRecipient, objectReplies);
@@ -186,12 +190,12 @@ var addRoutes = function(app) {
     // Global user list
 
     app.get("/api/users", clientAuth, listUsers);
-    app.post("/api/users", clientAuth, createUser);
+    app.post("/api/users", clientAuth, reqGenerator, createUser);
 
     // Collection members
 
     app.get("/api/collection/:uuid/members", clientAuth, requestCollection, authorOrRecipient, collectionMembers);
-    app.post("/api/collection/:uuid/members", userAuth, requestCollection, authorOnly, newMember);
+    app.post("/api/collection/:uuid/members", userAuth, requestCollection, authorOnly, reqGenerator, newMember);
 };
 
 // XXX: use a common function instead of faking up params
@@ -204,6 +208,28 @@ var requestCollection = function(req, res, next) {
 var personType = function(req, res, next) {
     req.type = "person";
     next();
+};
+
+var isMajor = function(req, res, next) {
+    var props = Scrubber.scrubActivity(req.body),
+        activity = new Activity(props);
+
+    if (activity.isMajor()) {
+        next();
+    } else {
+        next(new HTTPError("Only major activities to this feed.", 400));
+    }
+};
+
+var isMinor = function(req, res, next) {
+    var props = Scrubber.scrubActivity(req.body),
+        activity = new Activity(props);
+
+    if (!activity.isMajor()) {
+        next();
+    } else {
+        next(new HTTPError("Only minor activities to this feed.", 400));
+    }
 };
 
 var userOnly = function(req, res, next) {
@@ -286,6 +312,7 @@ var putObject = function(req, res, next) {
         updates = Scrubber.scrubObject(req.body),
         act = new Activity({
             actor: req.remoteUser.profile,
+            generator: req.generator,
             verb: "update",
             object: _(obj).extend(updates)
         });
@@ -315,6 +342,7 @@ var deleteObject = function(req, res, next) {
         act = new Activity({
             actor: req.remoteUser.profile,
             verb: "delete",
+            generator: req.generator,
             object: obj
         });
 
@@ -685,7 +713,8 @@ var createUser = function(req, res, next) {
             var act = new Activity({
                 actor: user.profile,
                 verb: Activity.JOIN,
-                object: svc
+                object: svc,
+                generator: req.generator
             });
             newActivity(act, user, callback);
         },
@@ -945,6 +974,10 @@ var postActivity = function(req, res, next) {
         next(new HTTPError("Invalid actor", 400));
         return;
     }
+
+    // XXX: we overwrite anything here
+
+    activity.generator = req.generator;
 
     // Default verb
 
@@ -1656,7 +1689,8 @@ var newFollow = function(req, res, next) {
         act = new Activity({
             actor: req.user.profile,
             verb: "follow",
-            object: obj
+            object: obj,
+            generator: req.generator
         });
 
     Step(
@@ -1808,7 +1842,8 @@ var newFavorite = function(req, res, next) {
         act = new Activity({
             actor: req.user.profile,
             verb: "favorite",
-            object: obj
+            object: obj,
+            generator: req.generator
         });
 
     Step(
@@ -2214,7 +2249,8 @@ var newMember = function(req, res, next) {
         act = new Activity({
             verb: "add",
             object: obj,
-            target: coll
+            target: coll,
+            generator: req.generator
         });
 
 

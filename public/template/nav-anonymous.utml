@@ -1,17 +1,19 @@
-<button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-  <span class="icon-bar">Register</span>
-  <span class="icon-bar">Login</span>
-</button>
+<div class="container">
+  <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+    <span class="icon-bar">Register</span>
+    <span class="icon-bar">Login</span>
+  </button>
 
-<a class="brand" href="/"><%- config.site %></a>
+  <a class="brand" href="/"><%- config.site %></a>
 
-<div class="nav-collapse collapse pull-right">
-  <ul class="nav">
-    <li>
-      <a id="register" href="/main/register">Register</a>
-    </li>
-    <li>
-      <a id="login" href="/main/login">Login</a>
-    </li>
-  </ul>
-</div>
+  <div class="nav-collapse collapse pull-right">
+    <ul class="nav">
+      <li>
+        <a id="register" href="/main/register">Register</a>
+      </li>
+      <li>
+        <a id="login" href="/main/login">Login</a>
+      </li>
+    </ul>
+  </div>
+</div> <!-- /container -->

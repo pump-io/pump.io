@@ -1,6 +1,8 @@
-<div class="span3 list-menu">
-<%= partial("list-menu") %>
-</div>
-<div class="span9" id="list-content">
-<%= partial("list-content-lists") %>
+<div class="user-content" id="user-content-lists">
+  <div class="span2" id="list-menu">
+    <%= partial("list-menu") %>
+  </div>
+  <div class="span10" id="list-content">
+    <%= partial("list-content-lists") %>
+  </div>
 </div>

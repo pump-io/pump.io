@@ -1,4 +1,4 @@
-<div class="row activity major" id="<%- data.activity.id %>">
+<div class="row activity major" data-activity-id="<%- data.activity.id %>">
   <div class="row">
     <div class="span1">
       <% if (data.activity.actor.image && data.activity.actor.image.url) { %>
@@ -14,6 +14,14 @@
       <%= data.activity.object.content %>
       <% } %>
       <p><small><a href="<%- data.activity.actor.url %>"><%- data.activity.actor.displayName %></a> at <a href="<%- data.activity.object.url || data.activity.url %>"><abbr title="<%- data.activity.published %>" class="easydate"><%- data.activity.published %></abbr></a><% if (data.activity.location) { %> in <a href="<%- data.activity.location.url %>"><%- data.activity.location.displayName %></a><% } %>
+        <% if (data.activity.generator && data.activity.generator.displayName) { %>
+            via 
+            <% if (data.activity.generator.url) { %>
+                <a href="<%- data.activity.generator.url %>"><%- data.activity.generator.displayName %></a>
+            <% } else { %>
+                <span><%- data.activity.generator.displayName %></span>
+            <% } %>
+        <% } %>
         <% if (data.activity.to && data.activity.to.length > 0) { %>
         To: <%= partial("activity-object-list", {objects: data.activity.to}) %>
         <% } %>
@@ -52,9 +60,9 @@
   </div>
   <div class="row">
     <div class="span8 offset1 replies">
-      <% if (data.activity.object.replies.totalItems > 0) { %>
+      <% if (data.activity.object.replies && data.activity.object.replies.totalItems > 0) { %>
       <h3>Replies</h3>
-      <% if (data.activity.object.replies.totalItems > data.activity.object.replies.items.length) { %>
+      <% if (data.activity.object.items && data.activity.object.replies.totalItems > data.activity.object.replies.items.length) { %>
       <a class="show-all" href="#">Show all <%= data.activity.object.replies.totalItems %> replies</a>
       <% } %>
       <% _.each(data.activity.object.replies.items, function(reply) { 
