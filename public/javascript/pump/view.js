@@ -349,6 +349,8 @@
         className: "container",
         modelName: "user",
         templateName: 'nav-loggedin',
+        parts: ["messages",
+                "notifications"],
         subs: {
             "#messages": {
                 attr: "majorStreamView",
