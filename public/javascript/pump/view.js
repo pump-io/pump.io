@@ -225,7 +225,7 @@
                 },
                 pc,
                 modelName = view.modelName || view.options.modelName || "model",
-                partials,
+                partials = {},
                 cnt;
 
             if (view.collection) {
@@ -277,7 +277,6 @@
             if (view.parts) {
                 pc = 0;
                 cnt = _.keys(view.parts).length;
-                partials = {};
                 _.each(view.parts, function(templateName) {
                     getTemplate(templateName, function(err, template) {
                         if (err) {
