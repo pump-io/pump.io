@@ -7,7 +7,7 @@
    You
    <% } else if (object.id == "http://activityschema.org/collection/public") { %>
    Public
-   <% } else if (data.activity.actor && data.activity.actor.followers && object.id == data.activity.actor.followers.url) { %>
+   <% } else if (data.activity && data.activity.actor && data.activity.actor.followers && object.id == data.activity.actor.followers.url) { %>
    Followers
    <% } else if (object.displayName) { %>
    <%- object.displayName %>
