@@ -2,7 +2,7 @@
   <% if (data.objects && data.objects.length) { %>
   <% _.each(data.objects, function(object) { 
      data.object = object; %>
-  <%= partial('major-object') %>
+  <%= partial("major-object") %>
   <% delete data.object;
      }); %>
   <% } else { %>
