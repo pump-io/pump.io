@@ -1,15 +1,16 @@
-<div class="btn-group" id="messages">
-  <a class="btn dropdown-toggle btn-mini btn-success" data-toggle="dropdown" href="#">
-    <i class="icon-envelope icon-white"></i> 3 
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu">
+<div class="btn-group dropdown" id="messages">
+  <button class="btn dropdown-toggle btn-mini btn-success
+                 <% if (data.messages && data.messages.totalItems <= 0) { %>
+                 disabled
+                 <% } %>"
+                 data-toggle="dropdown" href="#">
+    <i class="icon-envelope icon-white"></i>  
+  </button>
+  <ul class="dropdown-menu" role="menu">
     <% if (_.isObject(data) && _.isArray(data.messages)) {%>
     <% _.each(data.messages, function(activity) { %>
     <% if (_.isObject(activity)) { %>
-    <li>
-      <p>hi</p>
-    </li>
+    <li><a href="#">hi</a></li>
     <% } %>
     <% }); %>
     <% } %>
