@@ -4,13 +4,15 @@
                  disabled
                  <% } %>"
                  data-toggle="dropdown" href="#">
-    <i class="icon-envelope icon-white"></i>  
+    <i class="icon-envelope icon-white"> <%- (data.messages) ? data.messages.totalItems : 0 %></i>  
   </button>
   <ul class="dropdown-menu" role="menu">
     <% if (_.isObject(data) && _.isArray(data.messages)) {%>
     <% _.each(data.messages, function(activity) { %>
     <% if (_.isObject(activity)) { %>
-    <li><a href="#">hi</a></li>
+    <li>
+      <small><%= activity.content %></small>
+    </li>
     <% } %>
     <% }); %>
     <% } %>
