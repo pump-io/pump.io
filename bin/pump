@@ -74,6 +74,8 @@ var getConfig = function(filename) {
     return config;
 };
 
+// Launch apps
+
 var launchApps = function(config) {
     var cnt,
         i,
@@ -88,12 +90,13 @@ var launchApps = function(config) {
         } else {
             cnt = Math.max(os.cpus().length - 1, 1);
         }
+
+        Dispatch.start(log);
+
         for (i = 0; i < cnt; i++) {
             cluster.fork();
         }
-        Dispatch.start(log);
     } else { 
-        
         makeApp(config, function(err, app) {
             if (err) {
                 console.log(err);
@@ -103,6 +106,8 @@ var launchApps = function(config) {
         });
     }
 };
+
+// Set up a Bunyan logger that the dispatch code can send to
 
 var setupLog = function(config) {
 
