@@ -353,9 +353,9 @@ var setupAppConfig = function(config, callback) {
     };
 
     child.on("message", function(msg) {
-        if (msg.tag == "listening") {
+        if (msg.cmd == "listening") {
             callback(null, dummy);
-        } else if (msg.tag == "error") {
+        } else if (msg.cmd == "error") {
             callback(msg.value, null);
         }
     });
