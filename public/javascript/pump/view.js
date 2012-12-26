@@ -1509,13 +1509,21 @@
                             object: responseJSON.obj
                         });
 
+                    view.startSpin();
+
                     stream.create(act, {success: function(act) {
                         var profile = Pump.currentUser.profile;
-                        profile.set("image", 
-                                    {url: act.object.fullImage.url});
-                        profile.update({success: function() {
-                            view.showSuccess("Avatar saved");
-                        }});
+                        profile.save({"image": act.object.get("fullImage")},
+                                     {
+                                         success: function(resp, status, xhr) {
+                                             view.showSuccess("Saved avatar.");
+                                             view.stopSpin();
+                                         },
+                                         error: function(model, error, options) {
+                                             view.showError(error.message);
+                                             view.stopSpin();
+                                         }
+                                     });
                     }});
                 }).on("error", function(event, id, fileName, reason) {
                     view.showError(reason);

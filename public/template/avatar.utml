@@ -2,46 +2,11 @@
 
   <form id="avatar">
 
+    <% if (data.user.profile.image && data.user.profile.image.url) { %>
+    <img src="<%- data.user.profile.image.url %>" width="96" height="96" />
+    <% } %>
+
     <div id="avatar-fineupload"></div>
-
-    <ul class="thumbnails">
-    <li class="span4">
-    <a href="#" class="thumbnail">
-    <img src="http://placehold.it/300x200" alt="">
-    </a>
-    </li>
-    <li class="span4">
-    <a href="#" class="thumbnail">
-    <img src="http://placehold.it/300x200" alt="">
-    </a>
-    </li>
-    <li class="span4">
-    <a href="#" class="thumbnail">
-    <img src="http://placehold.it/300x200" alt="">
-    </a>
-    </li>
-    <li class="span4">
-    <a href="#" class="thumbnail">
-    <img src="http://placehold.it/300x200" alt="">
-    </a>
-    </li>
-    <li class="span4">
-    <a href="#" class="thumbnail">
-    <img src="http://placehold.it/300x200" alt="">
-    </a>
-    </li>
-    <li class="span4">
-    <a href="#" class="thumbnail">
-    <img src="http://placehold.it/300x200" alt="">
-    </a>
-    </li>
-    </ul>
-
-    <fieldset>
-      <div class="actions">
-	<input type="submit" class="btn btn-primary" value="Set avatar">
-      </div>
-    </fieldset>  
 
   </form>
 
