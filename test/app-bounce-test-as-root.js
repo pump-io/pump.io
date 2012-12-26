@@ -43,7 +43,8 @@ suite.addBatch({
                           driver: tc.driver,
                           params: tc.params,
                           nologger: true,
-                          bounce: true
+                          bounce: true,
+                          sockjs: false
                          },
                 makeApp = require("../lib/app").makeApp;
 
