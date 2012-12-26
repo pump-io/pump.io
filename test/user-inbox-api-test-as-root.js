@@ -353,7 +353,7 @@ suite.addBatch({
                         assert.isObject(feed);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 3);
+                        assert.greater(feed.items.length, 0);
                         assert.isObject(feed.items[0]);
                         assert.equal(feed.items[0].id, act.id);
                     }
