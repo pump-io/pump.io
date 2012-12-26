@@ -117,8 +117,6 @@
 
             OAuth.SignatureMethod.sign(message, secrets);
 
-            console.log(message);
-
             Pump.socket.send(JSON.stringify({cmd: "rise", message: message}));
         });
     };
