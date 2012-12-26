@@ -1462,8 +1462,67 @@
     });
 
     Pump.AvatarContent = Pump.ContentView.extend({
-        templateName: 'avatar',
-        modelName: "profile"
+        templateName: "avatar",
+        modelName: "profile",
+        ready: function() {
+            var view = this;
+            view.setupSubs();
+
+            if (view.$("#avatar-fineupload").length > 0) {
+                view.$("#avatar-fineupload").fineUploader({
+                    request: {
+                        endpoint: "/main/upload"
+                    },
+                    text: {
+                        uploadButton: '<i class="icon-upload icon-white"></i> Avatar file'
+                    },
+                    template: '<div class="qq-uploader">' +
+                        '<pre class="qq-upload-drop-area"><span>{dragZoneText}</span></pre>' +
+                        '<div class="qq-upload-button btn btn-success">{uploadButtonText}</div>' +
+                        '<ul class="qq-upload-list"></ul>' +
+                        '</div>',
+                    classes: {
+                        success: 'alert alert-success',
+                        fail: 'alert alert-error'
+                    },
+                    multiple: false,
+                    validation: {
+                        allowedExtensions: ["jpeg", "jpg", "png", "gif", "svg", "svgz"],
+                        acceptFiles: "image/*"
+                    }
+                }).on("complete", function(event, id, fileName, responseJSON) {
+
+                    var stream = Pump.currentUser.majorStream,
+                        strToObj = function(str) {
+                            var colon = str.indexOf(":"),
+                                type = str.substr(0, colon),
+                                id = str.substr(colon+1);
+                            return new Pump.ActivityObject({
+                                id: id,
+                                objectType: type
+                            });
+                        },
+                        act = new Pump.Activity({
+                            verb: "post",
+                            cc: [{id: "http://activityschema.org/collection/public",
+                                  objectType: "collection"}],
+                            object: responseJSON.obj
+                        });
+
+                    stream.create(act, {success: function(act) {
+                        var profile = Pump.currentUser.profile;
+                        profile.set("image", 
+                                    {url: act.object.fullImage.url});
+                        profile.update({success: function() {
+                            view.showSuccess("Avatar saved");
+                        }});
+                    }});
+                }).on("error", function(event, id, fileName, reason) {
+                    view.showError(reason);
+                });
+            }
+            
+        }
     });
 
     Pump.ObjectContent = Pump.ContentView.extend({
