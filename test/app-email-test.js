@@ -67,6 +67,7 @@ suite.addBatch({
                           params: tc.params,
                           smtpserver: "localhost",
                           smtpport: 1623,
+                          sockjs: false,
                           nologger: true
                          },
                 smtp = simplesmtp.createServer({disableDNSValidation: true}),
