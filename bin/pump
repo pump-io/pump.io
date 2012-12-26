@@ -34,6 +34,13 @@ var cluster = require("cluster"),
     Dispatch = require("../lib/dispatch"),
     makeApp = require("../lib/app").makeApp;
 
+// We first get config files, then launch some cluster apps
+
+var main = function() {
+    var config = getConfig(argv.c);
+    launchApps(config);
+};
+
 // Gets the configuration vars for this server from config files
 
 var getConfig = function(filename) {
@@ -86,6 +93,7 @@ var launchApps = function(config) {
         }
         Dispatch.start(log);
     } else { 
+        
         makeApp(config, function(err, app) {
             if (err) {
                 console.log(err);
@@ -112,11 +120,6 @@ var setupLog = function(config) {
     }
 
     return new Logger(logParams);
-};
-
-var main = function() {
-    var config = getConfig(argv.c);
-    launchApps(config);
 };
 
 main();
