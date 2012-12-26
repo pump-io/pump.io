@@ -278,4 +278,24 @@ if (!window.Pump) {
         Pump.User.clearCache();
     };
 
+    Pump.ajax = function(options) {
+        Pump.ensureCred(function(err, cred) {
+            var pair;
+            if (err) {
+                Pump.error("Couldn't get OAuth credentials. :(");
+            } else {
+                options.consumerKey = cred.clientID;
+                options.consumerSecret = cred.clientSecret;
+                pair = Pump.getUserCred();
+
+                if (pair) {
+                    options.token = pair.token;
+                    options.tokenSecret = pair.secret;
+                }
+
+                options = Pump.oauthify(options);
+                $.ajax(options);
+            }
+        });
+    };
 })(window._, window.$, window.Backbone, window.Pump);

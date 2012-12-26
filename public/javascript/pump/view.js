@@ -438,24 +438,7 @@
                 error: onError
             };
 
-            Pump.ensureCred(function(err, cred) {
-                var pair;
-                if (err) {
-                    showError("Couldn't get OAuth credentials. :(");
-                } else {
-                    options.consumerKey = cred.clientID;
-                    options.consumerSecret = cred.clientSecret;
-                    pair = Pump.getUserCred();
-
-                    if (pair) {
-                        options.token = pair.token;
-                        options.tokenSecret = pair.secret;
-                    }
-
-                    options = Pump.oauthify(options);
-                    $.ajax(options);
-                }
-            });
+            Pump.ajax(options);
         }
     });
 
@@ -544,16 +527,7 @@
                 error: onError
             };
 
-            Pump.ensureCred(function(err, cred) {
-                if (err) {
-                    view.showError("Couldn't get OAuth credentials. :(");
-                } else {
-                    options.consumerKey = cred.clientID;
-                    options.consumerSecret = cred.clientSecret;
-                    options = Pump.oauthify(options);
-                    $.ajax(options);
-                }
-            });
+            Pump.ajax(options);
 
             return false;
         }
