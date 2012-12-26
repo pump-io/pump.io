@@ -29,8 +29,7 @@ config.port = parseInt(config.port, 10);
 if (cluster.isMaster) {
     worker = cluster.fork();
     worker.on("message", function(msg) {
-        console.dir(msg);
-        switch (msg.cmd) {
+         switch (msg.cmd) {
         case "error":
         case "listening":
             process.send(msg);
