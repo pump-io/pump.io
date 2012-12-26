@@ -71,28 +71,9 @@
             params.processData = false;
         }
 
-        Pump.ensureCred(function(err, cred) {
-            var pair;
-            if (err) {
-                Pump.error("Error getting OAuth credentials.");
-            } else {
-                params = _.extend(params, options);
+        params = _.extend(params, options);
 
-                params.consumerKey = cred.clientID;
-                params.consumerSecret = cred.clientSecret;
-
-                pair = Pump.getUserCred();
-
-                if (pair) {
-                    params.token = pair.token;
-                    params.tokenSecret = pair.secret;
-                }
-
-                params = Pump.oauthify(params);
-
-                $.ajax(params);
-            }
-        });
+        Pump.ajax(params);
 
         return null;
     };
