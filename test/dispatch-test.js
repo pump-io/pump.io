@@ -17,7 +17,8 @@
 // limitations under the License.
 
 var assert = require("assert"),
-    vows = require("vows");
+    vows = require("vows"),
+    cluster = require("cluster");
 
 var suite = vows.describe("dispatch module interface");
 
@@ -35,6 +36,18 @@ suite.addBatch({
             },
             "it has a start method": function(Dispatch) {
                 assert.isFunction(Dispatch.start);
+            },
+            "and we start the dispatcher": {
+                topic: function(Dispatch) {
+                    var callback = this.callback;
+
+                    Dispatch.start();
+                    callback(null, "parent");
+                },
+                "it works": function(err, name) {
+                    assert.ifError(err);
+                    assert.isTrue(name == "parent" || name == "child");
+                }
             }
         }
     }
