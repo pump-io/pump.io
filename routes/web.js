@@ -210,11 +210,7 @@ var showRegister = function(req, res, next) {
 };
 
 var showLogin = function(req, res, next) {
-    if (req.principal) {
-        res.redirect("/");
-    } else {
-        res.render("login", {page: {title: "Login"}});
-    }
+    res.render("login", {page: {title: "Login"}});
 };
 
 var handleLogout = function(req, res, next) {
