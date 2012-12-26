@@ -70,7 +70,7 @@
         var streams = Pump.getStreams();
         
         _.each(streams, function(stream, name) {
-            stream.fetch({update: true, remove: false});
+            stream.getPrev();
         });
     };
 

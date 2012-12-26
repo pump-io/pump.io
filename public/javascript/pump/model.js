@@ -49,8 +49,6 @@
 
             if (type == 'POST') {
                 params.url = getValue(model.collection, 'url');
-            } else if (type == 'GET' && options.update && model.prevLink) {
-                params.url = model.prevLink;
             } else {
                 params.url = getValue(model, 'url');
             }
@@ -318,6 +316,61 @@
             if (_.has(props, "items")) {
                 coll.add(props.items);
             }
+        },
+        getPrev: function() { // Get stuff later than the current group
+            var coll = this,
+                options;
+
+            if (!coll.prevLink) {
+                throw new Error("No prevLink.");
+            }
+
+            options = {
+                type: "GET",
+                dataType: "json",
+                url: coll.prevLink,
+                success: function(data) {
+                    if (data.items) {
+                        coll.unshift(data.items);
+                    }
+                    if (data.links && data.links.prev && data.links.prev.href) {
+                        coll.prevLink = data.links.prev.href;
+                    }
+                },
+                error: function(jqxhr) {
+                    Pump.error("Failed getting more items.");
+                }
+            };
+
+            Pump.ajax(options);
+
+        },
+        getNext: function() { // Get stuff later than the current group
+            var coll = this,
+                options;
+
+            if (!coll.nextLink) {
+                throw new Error("No nextLink.");
+            }
+
+            options = {
+                type: "GET",
+                dataType: "json",
+                url: coll.nextLink,
+                success: function(data) {
+                    if (data.items) {
+                        coll.push(data.items);
+                    }
+                    if (data.links && data.links.next && data.links.next.href) {
+                        coll.nextLink = data.links.next.href;
+                    }
+                },
+                error: function(jqxhr) {
+                    Pump.error("Failed getting more items.");
+                }
+            };
+
+            Pump.ajax(options);
         }
     },
     {
