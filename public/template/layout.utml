@@ -94,6 +94,7 @@
     <script src="/shared/underscore-min.js"></script>
     <script src="/javascript/libs/spin.min.js"></script>
     <script src="/javascript/libs/jquery.fineuploader-3.0.min.js"></script>
+    <script src="/javascript/libs/wysihtml5-0.3.0.min.js"></script>
     <% if (config.sockjs) { %>
     <script src="/javascript/libs/sockjs.min.js"></script>
     <% } %>
@@ -104,6 +105,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.3/underscore-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/spin.js/1.2.7/spin.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.1.1/jquery.fineuploader.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/wysihtml5/0.3.0/wysihtml5.min.js"></script>
     <% if (config.sockjs) { %>
     <script src="//cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.2/sockjs-min.js"></script>
     <% } %>
@@ -113,7 +115,6 @@
     <script src="/javascript/libs/oauth.min.js"></script>
     <script src="/javascript/libs/sha1.min.js"></script>
     <script src="/javascript/libs/jquery-spin.js"></script>
-    <script src="/javascript/libs/wysihtml5-0.3.0.min.js"></script>
     <script src="/javascript/libs/bootstrap-wysihtml5.js"></script>
     <script src="/javascript/libs/select2.min.js"></script>
     <% } %>
