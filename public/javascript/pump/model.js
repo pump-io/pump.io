@@ -331,7 +331,7 @@
                 url: coll.prevLink,
                 success: function(data) {
                     if (data.items) {
-                        coll.unshift(data.items);
+                        coll.add(data.items, {at: 0});
                     }
                     if (data.links && data.links.prev && data.links.prev.href) {
                         coll.prevLink = data.links.prev.href;
@@ -350,7 +350,8 @@
                 options;
 
             if (!coll.nextLink) {
-                throw new Error("No nextLink.");
+                // No next link
+                return;
             }
 
             options = {
@@ -359,10 +360,13 @@
                 url: coll.nextLink,
                 success: function(data) {
                     if (data.items) {
-                        coll.push(data.items);
+                        coll.add(data.items, {at: coll.length});
                     }
                     if (data.links && data.links.next && data.links.next.href) {
                         coll.nextLink = data.links.next.href;
+                    } else {
+                        // XXX: end-of-collection indicator?
+                        delete coll.nextLink;
                     }
                 },
                 error: function(jqxhr) {
