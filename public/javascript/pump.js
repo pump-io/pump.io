@@ -73,6 +73,8 @@ if (!window.Pump) {
             Pump.setupSocket();
         }
 
+        Pump.setupInfiniteScroll();
+
         // Check if we have stored OAuth credentials
 
         Pump.ensureCred(function(err, cred) {
@@ -298,4 +300,32 @@ if (!window.Pump) {
             }
         });
     };
+
+    Pump.setupInfiniteScroll = function() {
+
+        var didScroll = false;
+
+        // scroll fires too fast, so just use the handler
+        // to set a flag, and check that flag with an interval
+
+        // From http://ejohn.org/blog/learning-from-twitter/
+
+        $(window).scroll(function() {
+            didScroll = true;
+        });
+
+        setInterval(function() {
+            var streams;
+            if (didScroll) {
+                didScroll = false;
+                if ($(window).scrollTop() >= $(document).height() - $(window).height() - 10) {
+                    streams = Pump.getStreams();
+                    if (streams.major && streams.major.nextLink) {
+                        streams.major.getNext();
+                    }
+                }
+            }
+        }, 250);
+    };
+
 })(window._, window.$, window.Backbone, window.Pump);
