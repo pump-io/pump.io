@@ -49,12 +49,10 @@
                 });
             } else if (_.has(view, "collection") && _.isObject(view.collection)) {
                 view.listenTo(view.collection, "add", function(model, collection, options) {
-                    // When a change has happened, re-render
-                    view.render();
+                    view.showAdded(model);
                 });
                 view.listenTo(view.collection, "remove", function(model, collection, options) {
-                    // When a change has happened, re-render
-                    view.render();
+                    view.showRemoved(model);
                 });
                 view.listenTo(view.collection, "reset", function(collection, options) {
                     // When a change has happened, re-render
@@ -335,6 +333,126 @@
             $old.replaceWith($new);
             view.setElement($new);
             $old = null;
+        },
+        showAdded: function(model) {
+
+            var view = this,
+                id = model.get("id"),
+                subs = view.subs,
+                aview,
+                def,
+                selector;
+
+            // Strange!
+
+            if (!subs) {
+                return;
+            }
+
+            if (!view.collection) {
+                return;
+            }
+
+            // Find the first def and selector with a map
+
+            _.each(subs, function(subDef, subSelector) {
+                if (subDef.map) {
+                    def = subDef;
+                    selector = subSelector;
+                }
+            });
+
+            if (!def) {
+                return;
+            }
+
+            if (!view[def.map]) {
+                view[def.map] = {};
+            }
+
+            // If we already have it, skip
+
+            if (_.has(view[def.map], id)) {
+                return;
+            }
+
+            // Show the new item
+
+            aview = new Pump[def.subView]({model: model});
+
+            // Stash the view
+
+            view[def.map][model.id] = aview;
+
+            // When it's rendered, stick it where it goes
+
+            aview.on("ready", function() {
+
+                var idx, $el = view.$(selector);
+                
+                aview.$el.hide();
+
+                idx = view.collection.indexOf(model);
+
+                if (idx <= 0) {
+                    view.$el.prepend(aview.$el);
+                } else if (idx >= $el.length) {
+                    view.$el.append(aview.$el);
+                } else {
+                    aview.$el.insertBefore($el[idx]);
+                }
+
+                aview.$el.fadeIn('slow');
+            });
+
+            aview.render();
+        },
+        showRemoved: function(model) {
+            var view = this,
+                id = model.get("id"),
+                aview,
+                def,
+                selector,
+                subs = view.subs;
+
+            // Possible but not likely
+
+            if (!subs) {
+                return;
+            }
+
+            if (!view.collection) {
+                return;
+            }
+
+            // Find the first def and selector with a map
+
+            _.each(subs, function(subDef, subSelector) {
+                if (subDef.map) {
+                    def = subDef;
+                    selector = subSelector;
+                }
+            });
+
+            if (!def) {
+                return;
+            }
+
+            if (!view[def.map]) {
+                view[def.map] = {};
+            }
+
+            if (!_.has(view[def.map], id)) {
+                return;
+            }
+
+            // Remove it from the DOM
+
+            view[def.map][id].remove();
+
+            // delete that view from our map
+
+            delete view[def.map][id];
         }
     });
 
@@ -657,38 +775,23 @@
                ],
         addMajorActivity: function(act) {
             var view = this,
-                profile = this.options.data.profile,
-                aview;
+                profile = this.options.data.profile;
 
             if (!profile || act.actor.id != profile.get("id")) {
                 return;
             }
 
-            aview = new Pump.MajorActivityHeadlessView({model: act});
-            aview.on("ready", function() {
-                aview.$el.hide();
-                view.$("#major-stream").prepend(aview.$el);
-                aview.$el.slideDown('slow');
-            });
-            aview.render();
+            view.userContent.majorStreamView.showAdded(act);
         },
         addMinorActivity: function(act) {
             var view = this,
-                profile = this.options.data.profile,
-                aview;
+                profile = this.options.data.profile;
 
             if (!profile || act.actor.id != profile.get("id")) {
                 return;
             }
 
-            aview = new Pump.MinorActivityHeadlessView({model: act});
-
-            aview.on("ready", function() {
-                aview.$el.hide();
-                view.$("#minor-stream").prepend(aview.$el);
-                aview.$el.slideDown('slow');
-            });
-            aview.render();
+            view.userContent.minorStreamView.showAdded(act);
         },
         subs: {
             "#profile-block": {
@@ -808,29 +911,13 @@
                 "activity-object-list",
                 "activity-object-collection"],
         addMajorActivity: function(act) {
-            var view = this,
-                aview;
-            if (view && view.$(".activity.major")) {
-                aview = new Pump.MajorActivityView({model: act});
-                aview.on("ready", function() {
-                    aview.$el.hide();
-                    view.$("#major-stream").prepend(aview.$el);
-                    aview.$el.slideDown('slow');
-                });
-                aview.render();
-            }
+            var view = this;
+            view.majorStreamView.showAdded(act);
         },
         addMinorActivity: function(act) {
             var view = this,
                 aview;
-            aview = new Pump.MinorActivityView({model: act});
-
-            aview.on("ready", function() {
-                aview.$el.hide();
-                view.$("#minor-stream").prepend(aview.$el);
-                aview.$el.slideDown('slow');
-            });
-            aview.render();
+            view.minorStreamView.showAdded(act);
         },
         subs: {
             "#major-stream": {
@@ -1907,7 +1994,5 @@
             Pump.body.content.addMinorActivity(act);
         }
     };
-
-
 
 })(window._, window.$, window.Backbone, window.Pump);
