@@ -1539,6 +1539,7 @@
                     },
                     template: '<div class="qq-uploader">' +
                         '<pre class="qq-upload-drop-area"><span>{dragZoneText}</span></pre>' +
+                        '<div class="qq-drop-processing"></div>' +
                         '<div class="qq-upload-button btn btn-success">{uploadButtonText}</div>' +
                         '<ul class="qq-upload-list"></ul>' +
                         '</div>',
@@ -1688,6 +1689,7 @@
                     },
                     template: '<div class="qq-uploader">' +
                         '<pre class="qq-upload-drop-area"><span>{dragZoneText}</span></pre>' +
+                        '<div class="qq-drop-processing"></div>' +
                         '<div class="qq-upload-button btn btn-success">{uploadButtonText}</div>' +
                         '<ul class="qq-upload-list"></ul>' +
                         '</div>',
