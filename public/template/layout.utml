@@ -79,7 +79,7 @@
     <script src="/javascript/libs/sha1.js"></script>
     <script src="/javascript/libs/spin.js"></script>
     <script src="/javascript/libs/jquery-spin.js"></script>
-    <script src="/javascript/libs/jquery.fineuploader-3.0.js"></script>
+    <script src="/javascript/libs/jquery.fineuploader.js"></script>
     <script src="/javascript/libs/wysihtml5-0.3.0.js"></script>
     <script src="/javascript/libs/bootstrap-wysihtml5.js"></script>
     <script src="/javascript/libs/select2.js"></script>
@@ -93,7 +93,7 @@
     <script src="/javascript/libs/bootstrap.min.js"></script>
     <script src="/shared/underscore-min.js"></script>
     <script src="/javascript/libs/spin.min.js"></script>
-    <script src="/javascript/libs/jquery.fineuploader-3.0.min.js"></script>
+    <script src="/javascript/libs/jquery.fineuploader.min.js"></script>
     <script src="/javascript/libs/wysihtml5-0.3.0.min.js"></script>
     <script src="/javascript/libs/select2.min.js"></script>
     <% if (config.sockjs) { %>

@@ -8,8 +8,7 @@
  *
  * Licensed under MIT license, GNU GPL 2 or later, GNU LGPL 2 or later, see license.txt.
  */
-
-var qq = qq || {};
+/*globals window, navigator, document, FormData, File, HTMLInputElement, XMLHttpRequest*/
 var qq = function(element) {
     "use strict";
 
@@ -42,13 +41,14 @@ var qq = function(element) {
 
         contains: function(descendant) {
             // compareposition returns false in this case
-            if (element == descendant) {
+            if (element === descendant) {
                 return true;
             }
 
             if (element.contains){
                 return element.contains(descendant);
             } else {
+                /*jslint bitwise: true*/
                 return !!(descendant.compareDocumentPosition(element) & 8);
             }
         },
@@ -71,8 +71,8 @@ var qq = function(element) {
          * Fixes opacity in IE6-8.
          */
         css: function(styles) {
-            if (styles.opacity != null){
-                if (typeof element.style.opacity != 'string' && typeof(element.filters) != 'undefined'){
+            if (styles.opacity !== null){
+                if (typeof element.style.opacity !== 'string' && typeof(element.filters) !== 'undefined'){
                     styles.filter = 'alpha(opacity=' + Math.round(100 * styles.opacity) + ')';
                 }
             }
@@ -100,19 +100,20 @@ var qq = function(element) {
         },
 
         getByClass: function(className) {
+            var candidates,
+                result = [];
+
             if (element.querySelectorAll){
                 return element.querySelectorAll('.' + className);
             }
 
-            var result = [];
-            var candidates = element.getElementsByTagName("*");
-            var len = candidates.length;
+            candidates = element.getElementsByTagName("*");
 
-            for (var i = 0; i < len; i++){
-                if (qq(candidates[i]).hasClass(className)){
-                    result.push(candidates[i]);
+            qq.each(candidates, function(idx, val) {
+                if (qq(val).hasClass(className)){
+                    result.push(val);
                 }
-            }
+            });
             return result;
         },
 
@@ -121,7 +122,7 @@ var qq = function(element) {
                 child = element.firstChild;
 
             while (child){
-                if (child.nodeType == 1){
+                if (child.nodeType === 1){
                     children.push(child);
                 }
                 child = child.nextSibling;
@@ -143,6 +144,8 @@ var qq = function(element) {
 };
 
 qq.log = function(message, level) {
+    "use strict";
+
     if (window.console) {
         if (!level || level === 'info') {
             window.console.log(message);
@@ -164,22 +167,64 @@ qq.isObject = function(variable) {
     return variable !== null && variable && typeof(variable) === "object" && variable.constructor === Object;
 };
 
-qq.extend = function (first, second, extendNested) {
+qq.isFunction = function(variable) {
     "use strict";
-    var prop;
-    for (prop in second) {
-        if (second.hasOwnProperty(prop)) {
-            if (extendNested && qq.isObject(second[prop])) {
-                if (first[prop] === undefined) {
-                    first[prop] = {};
-                }
-                qq.extend(first[prop], second[prop], true);
-            }
-            else {
-                first[prop] = second[prop];
+    return typeof(variable) === "function";
+};
+
+qq.isFileOrInput = function(maybeFileOrInput) {
+    "use strict";
+    if (window.File && maybeFileOrInput instanceof File) {
+        return true;
+    }
+    else if (window.HTMLInputElement) {
+        if (maybeFileOrInput instanceof HTMLInputElement) {
+            if (maybeFileOrInput.type && maybeFileOrInput.type.toLowerCase() === 'file') {
+                return true;
             }
         }
     }
+    else if (maybeFileOrInput.tagName) {
+        if (maybeFileOrInput.tagName.toLowerCase() === 'input') {
+            if (maybeFileOrInput.type && maybeFileOrInput.type.toLowerCase() === 'file') {
+                return true;
+            }
+        }
+    }
+
+    return false;
+};
+
+qq.isXhrUploadSupported = function() {
+    "use strict";
+    var input = document.createElement('input');
+    input.type = 'file';
+
+    return (
+        input.multiple !== undefined &&
+            typeof File !== "undefined" &&
+            typeof FormData !== "undefined" &&
+            typeof (new XMLHttpRequest()).upload !== "undefined" );
+};
+
+qq.isFolderDropSupported = function(dataTransfer) {
+    "use strict";
+    return (dataTransfer.items && dataTransfer.items[0].webkitGetAsEntry);
+};
+
+qq.extend = function (first, second, extendNested) {
+    "use strict";
+    qq.each(second, function(prop, val) {
+        if (extendNested && qq.isObject(val)) {
+            if (first[prop] === undefined) {
+                first[prop] = {};
+            }
+            qq.extend(first[prop], val, true);
+        }
+        else {
+            first[prop] = val;
+        }
+    });
 };
 
 /**
@@ -187,15 +232,21 @@ qq.extend = function (first, second, extendNested) {
  * @param {Number} [from] The index at which to begin the search
  */
 qq.indexOf = function(arr, elt, from){
-    if (arr.indexOf) return arr.indexOf(elt, from);
+    "use strict";
+
+    if (arr.indexOf) {
+        return arr.indexOf(elt, from);
+    }
 
     from = from || 0;
     var len = arr.length;
 
-    if (from < 0) from += len;
+    if (from < 0) {
+        from += len;
+    }
 
-    for (; from < len; from++){
-        if (from in arr && arr[from] === elt){
+    for (null; from < len; from+=1){
+        if (arr.hasOwnProperty(from) && arr[from] === elt){
             return from;
         }
     }
@@ -203,24 +254,48 @@ qq.indexOf = function(arr, elt, from){
 };
 
 qq.getUniqueId = (function(){
-    var id = 0;
-    return function(){ return id++; };
-})();
+    "use strict";
+
+    var id = -1;
+    return function(){
+        id += 1;
+        return id;
+    };
+}());
 
 //
 // Browsers and platforms detection
 
-qq.ie       = function(){ return navigator.userAgent.indexOf('MSIE') != -1; }
-qq.ie10     = function(){ return navigator.userAgent.indexOf('MSIE 10') != -1; }
-qq.safari   = function(){ return navigator.vendor != undefined && navigator.vendor.indexOf("Apple") != -1; }
-qq.chrome   = function(){ return navigator.vendor != undefined && navigator.vendor.indexOf('Google') != -1; }
-qq.firefox  = function(){ return (navigator.userAgent.indexOf('Mozilla') != -1 && navigator.vendor != undefined && navigator.vendor == ''); }
-qq.windows  = function(){ return navigator.platform == "Win32"; }
+qq.ie       = function(){
+    "use strict";
+    return navigator.userAgent.indexOf('MSIE') !== -1;
+};
+qq.ie10     = function(){
+    "use strict";
+    return navigator.userAgent.indexOf('MSIE 10') !== -1;
+};
+qq.safari   = function(){
+    "use strict";
+    return navigator.vendor !== undefined && navigator.vendor.indexOf("Apple") !== -1;
+};
+qq.chrome   = function(){
+    "use strict";
+    return navigator.vendor !== undefined && navigator.vendor.indexOf('Google') !== -1;
+};
+qq.firefox  = function(){
+    "use strict";
+    return (navigator.userAgent.indexOf('Mozilla') !== -1 && navigator.vendor !== undefined && navigator.vendor === '');
+};
+qq.windows  = function(){
+    "use strict";
+    return navigator.platform === "Win32";
+};
 
 //
 // Events
 
 qq.preventDefault = function(e){
+    "use strict";
     if (e.preventDefault){
         e.preventDefault();
     } else{
@@ -233,6 +308,7 @@ qq.preventDefault = function(e){
  * Uses innerHTML to create an element
  */
 qq.toElement = (function(){
+    "use strict";
     var div = document.createElement('div');
     return function(html){
         div.innerHTML = html;
@@ -240,7 +316,23 @@ qq.toElement = (function(){
         div.removeChild(element);
         return element;
     };
-})();
+}());
+
+//key and value are passed to callback for each item in the object or array
+qq.each = function(obj, callback) {
+    "use strict";
+    var key, retVal;
+    if (obj) {
+        for (key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                retVal = callback(key, obj[key]);
+                if (retVal === false) {
+                    break;
+                }
+            }
+        }
+    }
+};
 
 /**
  * obj2url() takes a json-object as argument and generates
@@ -259,15 +351,17 @@ qq.toElement = (function(){
  * @return String encoded querystring
  */
 qq.obj2url = function(obj, temp, prefixDone){
-    var uristrings = [],
-        prefix = '&',
-        add = function(nextObj, i){
+    "use strict";
+     var i, len,
+         uristrings = [],
+         prefix = '&',
+         add = function(nextObj, i){
             var nextTemp = temp
                 ? (/\[\]$/.test(temp)) // prevent double-encoding
                 ? temp
                 : temp+'['+i+']'
                 : i;
-            if ((nextTemp != 'undefined') && (i != 'undefined')) {
+            if ((nextTemp !== 'undefined') && (i !== 'undefined')) {
                 uristrings.push(
                     (typeof nextObj === 'object')
                         ? qq.obj2url(nextObj, nextTemp, true)
@@ -282,15 +376,17 @@ qq.obj2url = function(obj, temp, prefixDone){
         prefix = (/\?/.test(temp)) ? (/\?$/.test(temp)) ? '' : '&' : '?';
         uristrings.push(temp);
         uristrings.push(qq.obj2url(obj));
-    } else if ((Object.prototype.toString.call(obj) === '[object Array]') && (typeof obj != 'undefined') ) {
+    } else if ((Object.prototype.toString.call(obj) === '[object Array]') && (typeof obj !== 'undefined') ) {
         // we wont use a for-in-loop on an array (performance)
-        for (var i = 0, len = obj.length; i < len; ++i){
+        for (i = -1, len = obj.length; i < len; i+=1){
             add(obj[i], i);
         }
-    } else if ((typeof obj != 'undefined') && (obj !== null) && (typeof obj === "object")){
+    } else if ((typeof obj !== 'undefined') && (obj !== null) && (typeof obj === "object")){
         // for anything else but a scalar, we will use for-in-loop
-        for (var i in obj){
-            add(obj[i], i);
+        for (i in obj){
+            if (obj.hasOwnProperty(i)) {
+                add(obj[i], i);
+            }
         }
     } else {
         uristrings.push(encodeURIComponent(temp) + '=' + encodeURIComponent(obj));
@@ -305,29 +401,81 @@ qq.obj2url = function(obj, temp, prefixDone){
     }
 };
 
+qq.obj2FormData = function(obj, formData, arrayKeyName) {
+    "use strict";
+    if (!formData) {
+        formData = new FormData();
+    }
+
+    qq.each(obj, function(key, val) {
+        key = arrayKeyName ? arrayKeyName + '[' + key + ']' : key;
+
+        if (qq.isObject(val)) {
+            qq.obj2FormData(val, formData, key);
+        }
+        else if (qq.isFunction(val)) {
+            formData.append(encodeURIComponent(key), encodeURIComponent(val()));
+        }
+        else {
+            formData.append(encodeURIComponent(key), encodeURIComponent(val));
+        }
+    });
+
+    return formData;
+};
+
+qq.obj2Inputs = function(obj, form) {
+    "use strict";
+    var input;
+
+    if (!form) {
+        form = document.createElement('form');
+    }
+
+    qq.obj2FormData(obj, {
+        append: function(key, val) {
+            input = document.createElement('input');
+            input.setAttribute('name', key);
+            input.setAttribute('value', val);
+            form.appendChild(input);
+        }
+    });
+
+    return form;
+};
+
 /**
  * A generic module which supports object disposing in dispose() method.
  * */
-qq.DisposeSupport = {
-    _disposers: [],
+qq.DisposeSupport = function() {
+    "use strict";
+    var disposers = [];
 
-    /** Run all registered disposers */
-    dispose: function() {
-        var disposer;
-        while (disposer = this._disposers.shift()) {
-            disposer();
+    return {
+        /** Run all registered disposers */
+        dispose: function() {
+            var disposer;
+            do {
+                disposer = disposers.shift();
+                if (disposer) {
+                    disposer();
+                }
+            }
+            while (disposer);
+        },
+
+        /** Attach event handler and register de-attacher as a disposer */
+        attach: function() {
+            var args = arguments;
+            /*jslint undef:true*/
+            this.addDisposer(qq(args[0]).attach.apply(this, Array.prototype.slice.call(arguments, 1)));
+        },
+
+        /** Add disposer to the collection */
+        addDisposer: function(disposeFunction) {
+            disposers.push(disposeFunction);
         }
-    },
-
-    /** Add disposer to the collection */
-    addDisposer: function(disposeFunction) {
-        this._disposers.push(disposeFunction);
-    },
-
-    /** Attach event handler and register de-attacher as a disposer */
-    _attach: function() {
-        this.addDisposer(qq(arguments[0]).attach.apply(this, Array.prototype.slice.call(arguments, 1)));
-    }
+    };
 };
 qq.UploadButton = function(o){
     this._options = {
@@ -343,7 +491,7 @@ qq.UploadButton = function(o){
     };
 
     qq.extend(this._options, o);
-    qq.extend(this, qq.DisposeSupport);
+    this._disposeSupport = new qq.DisposeSupport();
 
     this._element = this._options.element;
 
@@ -404,20 +552,20 @@ qq.UploadButton.prototype = {
         this._element.appendChild(input);
 
         var self = this;
-        this._attach(input, 'change', function(){
+        this._disposeSupport.attach(input, 'change', function(){
             self._options.onChange(input);
         });
 
-        this._attach(input, 'mouseover', function(){
+        this._disposeSupport.attach(input, 'mouseover', function(){
             qq(self._element).addClass(self._options.hoverClass);
         });
-        this._attach(input, 'mouseout', function(){
+        this._disposeSupport.attach(input, 'mouseout', function(){
             qq(self._element).removeClass(self._options.hoverClass);
         });
-        this._attach(input, 'focus', function(){
+        this._disposeSupport.attach(input, 'focus', function(){
             qq(self._element).addClass(self._options.focusClass);
         });
-        this._attach(input, 'blur', function(){
+        this._disposeSupport.attach(input, 'blur', function(){
             qq(self._element).removeClass(self._options.focusClass);
         });
 
@@ -443,6 +591,7 @@ qq.FineUploaderBasic = function(o){
         request: {
             endpoint: '/server/upload',
             params: {},
+            paramsInBody: false,
             customHeaders: {},
             forceMultipart: false,
             inputName: 'qqfile'
@@ -477,12 +626,16 @@ qq.FineUploaderBasic = function(o){
             maxAutoAttempts: 3,
             autoAttemptDelay: 5,
             preventRetryResponseProperty: 'preventRetry'
+        },
+        classes: {
+            buttonHover: 'qq-upload-button-hover',
+            buttonFocus: 'qq-upload-button-focus'
         }
     };
 
     qq.extend(this._options, o, true);
     this._wrapCallbacks();
-    qq.extend(this, qq.DisposeSupport);
+    this._disposeSupport =  new qq.DisposeSupport();
 
     // number of files being uploaded
     this._filesInProgress = 0;
@@ -492,6 +645,8 @@ qq.FineUploaderBasic = function(o){
     this._autoRetries = [];
     this._retryTimeouts = [];
     this._preventRetries = [];
+
+    this._paramsStore = this._createParamsStore();
 
     this._handler = this._createUploadHandler();
 
@@ -512,8 +667,13 @@ qq.FineUploaderBasic.prototype = {
 
         }
     },
-    setParams: function(params){
-        this._options.request.params = params;
+    setParams: function(params, fileId){
+        if (fileId === undefined) {
+            this._options.request.params = params;
+        }
+        else {
+            this._paramsStore.setParams(params, fileId);
+        }
     },
     getInProgress: function(){
         return this._filesInProgress;
@@ -522,7 +682,7 @@ qq.FineUploaderBasic.prototype = {
         "use strict";
         while(this._storedFileIds.length) {
             this._filesInProgress++;
-            this._handler.upload(this._storedFileIds.shift(), this._options.request.params);
+            this._handler.upload(this._storedFileIds.shift());
         }
     },
     clearStoredFiles: function(){
@@ -549,27 +709,55 @@ qq.FineUploaderBasic.prototype = {
         this._retryTimeouts = [];
         this._preventRetries = [];
         this._button.reset();
+        this._paramsStore.reset();
+    },
+    addFiles: function(filesOrInputs) {
+        var self = this,
+            verifiedFilesOrInputs = [],
+            index, fileOrInput;
+
+        if (filesOrInputs) {
+            if (!window.FileList || !(filesOrInputs instanceof FileList)) {
+                filesOrInputs = [].concat(filesOrInputs);
+            }
+
+            for (index = 0; index < filesOrInputs.length; index+=1) {
+                fileOrInput = filesOrInputs[index];
+
+                if (qq.isFileOrInput(fileOrInput)) {
+                    verifiedFilesOrInputs.push(fileOrInput);
+                }
+                else {
+                    self.log(fileOrInput + ' is not a File or INPUT element!  Ignoring!', 'warn');
+                }
+            }
+
+            this.log('Processing ' + verifiedFilesOrInputs.length + ' files or inputs...');
+            this._uploadFileList(verifiedFilesOrInputs);
+        }
     },
     _createUploadButton: function(element){
         var self = this;
 
         var button = new qq.UploadButton({
             element: element,
-            multiple: this._options.multiple && qq.UploadHandlerXhr.isSupported(),
+            multiple: this._options.multiple && qq.isXhrUploadSupported(),
             acceptFiles: this._options.validation.acceptFiles,
             onChange: function(input){
                 self._onInputChange(input);
-            }
+            },
+            hoverClass: this._options.classes.buttonHover,
+            focusClass: this._options.classes.buttonFocus
         });
 
-        this.addDisposer(function() { button.dispose(); });
+        this._disposeSupport.addDisposer(function() { button.dispose(); });
         return button;
     },
     _createUploadHandler: function(){
         var self = this,
             handlerClass;
 
-        if(qq.UploadHandlerXhr.isSupported()){
+        if(qq.isXhrUploadSupported()){
             handlerClass = 'UploadHandlerXhr';
         } else {
             handlerClass = 'UploadHandlerForm';
@@ -584,6 +772,8 @@ qq.FineUploaderBasic.prototype = {
             inputName: this._options.request.inputName,
             demoMode: this._options.demoMode,
             log: this.log,
+            paramsInBody: this._options.request.paramsInBody,
+            paramsStore: this._paramsStore,
             onProgress: function(id, fileName, loaded, total){
                 self._onProgress(id, fileName, loaded, total);
                 self._options.callbacks.onProgress(id, fileName, loaded, total);
@@ -625,7 +815,7 @@ qq.FineUploaderBasic.prototype = {
     _preventLeaveInProgress: function(){
         var self = this;
 
-        this._attach(window, 'beforeunload', function(e){
+        this._disposeSupport.attach(window, 'beforeunload', function(e){
             if (!self._filesInProgress){return;}
 
             var e = e || window.event;
@@ -661,10 +851,10 @@ qq.FineUploaderBasic.prototype = {
     },
     _onInputChange: function(input){
         if (this._handler instanceof qq.UploadHandlerXhr){
-            this._uploadFileList(input.files);
+            this.addFiles(input.files);
         } else {
             if (this._validateFile(input)){
-                this._uploadFile(input);
+                this.addFiles(input);
             }
         }
         this._button.reset();
@@ -726,9 +916,7 @@ qq.FineUploaderBasic.prototype = {
         var validationDescriptors, index, batchInvalid;
 
         validationDescriptors = this._getValidationDescriptors(files);
-        if (validationDescriptors.length > 1) {
-            batchInvalid = this._options.callbacks.onValidate(validationDescriptors) === false;
-        }
+        batchInvalid = this._options.callbacks.onValidate(validationDescriptors) === false;
 
         if (!batchInvalid) {
             if (files.length > 0) {
@@ -754,7 +942,7 @@ qq.FineUploaderBasic.prototype = {
         if (this._options.callbacks.onSubmit(id, fileName) !== false){
             this._onSubmit(id, fileName);
             if (this._options.autoUpload) {
-                this._handler.upload(id, this._options.request.params);
+                this._handler.upload(id);
             }
             else {
                 this._storeFileForLater(id);
@@ -857,9 +1045,11 @@ qq.FineUploaderBasic.prototype = {
 
         for (var prop in this._options.callbacks) {
             (function() {
-                var oldCallback = self._options.callbacks[prop];
-                self._options.callbacks[prop] = function() {
-                    return safeCallback(prop, oldCallback, arguments);
+                var callbackName, callbackFunc;
+                callbackName = prop;
+                callbackFunc = self._options.callbacks[callbackName];
+                self._options.callbacks[callbackName] = function() {
+                    return safeCallback(callbackName, callbackFunc, arguments);
                 }
             }());
         }
@@ -912,7 +1102,395 @@ qq.FineUploaderBasic.prototype = {
         }
 
         return fileDescriptors;
+    },
+    _createParamsStore: function() {
+        var paramsStore = {},
+            self = this;
+
+        return {
+            setParams: function(params, fileId) {
+                var paramsCopy = {};
+                qq.extend(paramsCopy, params);
+                paramsStore[fileId] = paramsCopy;
+            },
+
+            getParams: function(fileId) {
+                var paramsCopy = {};
+
+                if (fileId !== undefined && paramsStore[fileId]) {
+                    qq.extend(paramsCopy, paramsStore[fileId]);
+                }
+                else {
+                    qq.extend(paramsCopy, self._options.request.params);
+                }
+
+                return paramsCopy;
+            },
+
+            remove: function(fileId) {
+                return delete paramsStore[fileId];
+            },
+
+            reset: function() {
+                paramsStore = {};
+            }
+        }
     }
+};
+/*globals qq, document*/
+qq.DragAndDrop = function(o) {
+    "use strict";
+
+    var options, dz, dirPending,
+        droppedFiles = [],
+        droppedEntriesCount = 0,
+        droppedEntriesParsedCount = 0,
+        disposeSupport = new qq.DisposeSupport();
+
+     options = {
+        dropArea: null,
+        extraDropzones: [],
+        hideDropzones: true,
+        multiple: true,
+        classes: {
+            dropActive: null
+        },
+        callbacks: {
+            dropProcessing: function(isProcessing, files) {},
+            error: function(code, filename) {},
+            log: function(message, level) {}
+        }
+    };
+
+    qq.extend(options, o);
+
+    function maybeUploadDroppedFiles() {
+        if (droppedEntriesCount === droppedEntriesParsedCount && !dirPending) {
+            options.callbacks.log('Grabbed ' + droppedFiles.length + " files after tree traversal.");
+            dz.dropDisabled(false);
+            options.callbacks.dropProcessing(false, droppedFiles);
+        }
+    }
+    function addDroppedFile(file) {
+        droppedFiles.push(file);
+        droppedEntriesParsedCount+=1;
+        maybeUploadDroppedFiles();
+    }
+
+    function traverseFileTree(entry) {
+        var dirReader, i;
+
+        droppedEntriesCount+=1;
+
+        if (entry.isFile) {
+            entry.file(function(file) {
+                addDroppedFile(file);
+            });
+        }
+        else if (entry.isDirectory) {
+            dirPending = true;
+            dirReader = entry.createReader();
+            dirReader.readEntries(function(entries) {
+                droppedEntriesParsedCount+=1;
+                for (i = 0; i < entries.length; i+=1) {
+                    traverseFileTree(entries[i]);
+                }
+
+                dirPending = false;
+
+                if (!entries.length) {
+                    maybeUploadDroppedFiles();
+                }
+            });
+        }
+    }
+
+    function handleDataTransfer(dataTransfer) {
+        var i, items, entry;
+
+        options.callbacks.dropProcessing(true);
+        dz.dropDisabled(true);
+
+        if (dataTransfer.files.length > 1 && !options.multiple) {
+            options.callbacks.error('tooManyFilesError', "");
+        }
+        else {
+            droppedFiles = [];
+            droppedEntriesCount = 0;
+            droppedEntriesParsedCount = 0;
+
+            if (qq.isFolderDropSupported(dataTransfer)) {
+                items = dataTransfer.items;
+
+                for (i = 0; i < items.length; i+=1) {
+                    entry = items[i].webkitGetAsEntry();
+                    if (entry) {
+                        //due to a bug in Chrome's File System API impl - #149735
+                        if (entry.isFile) {
+                            droppedFiles.push(items[i].getAsFile());
+                            if (i === items.length-1) {
+                                maybeUploadDroppedFiles();
+                            }
+                        }
+
+                        else {
+                            traverseFileTree(entry);
+                        }
+                    }
+                }
+            }
+            else {
+                options.callbacks.dropProcessing(false, dataTransfer.files);
+                dz.dropDisabled(false);
+            }
+        }
+    }
+
+    function setupDropzone(dropArea){
+        dz = new qq.UploadDropZone({
+            element: dropArea,
+            onEnter: function(e){
+                qq(dropArea).addClass(options.classes.dropActive);
+                e.stopPropagation();
+            },
+            onLeaveNotDescendants: function(e){
+                qq(dropArea).removeClass(options.classes.dropActive);
+            },
+            onDrop: function(e){
+                if (options.hideDropzones) {
+                    qq(dropArea).hide();
+                }
+                qq(dropArea).removeClass(options.classes.dropActive);
+
+                handleDataTransfer(e.dataTransfer);
+            }
+        });
+
+        disposeSupport.addDisposer(function() {
+            dz.dispose();
+        });
+
+        if (options.hideDropzones) {
+            qq(dropArea).hide();
+        }
+    }
+
+    function isFileDrag(dragEvent) {
+        var fileDrag;
+
+        qq.each(dragEvent.dataTransfer.types, function(key, val) {
+            if (val === 'Files') {
+                fileDrag = true;
+                return false;
+            }
+        });
+
+        return fileDrag;
+    }
+
+    function setupDragDrop(){
+        if (options.dropArea) {
+            options.extraDropzones.push(options.dropArea);
+        }
+
+        var i, dropzones = options.extraDropzones;
+
+        for (i=0; i < dropzones.length; i+=1){
+            setupDropzone(dropzones[i]);
+        }
+
+        // IE <= 9 does not support the File API used for drag+drop uploads
+        if (options.dropArea && (!qq.ie() || qq.ie10())) {
+            disposeSupport.attach(document, 'dragenter', function(e) {
+                if (!dz.dropDisabled() && isFileDrag(e)) {
+                    if (qq(options.dropArea).hasClass(options.classes.dropDisabled)) {
+                        return;
+                    }
+
+                    options.dropArea.style.display = 'block';
+                    for (i=0; i < dropzones.length; i+=1) {
+                        dropzones[i].style.display = 'block';
+                    }
+                }
+            });
+        }
+        disposeSupport.attach(document, 'dragleave', function(e){
+            if (options.hideDropzones && qq.FineUploader.prototype._leaving_document_out(e)) {
+                for (i=0; i < dropzones.length; i+=1) {
+                    qq(dropzones[i]).hide();
+                }
+            }
+        });
+        disposeSupport.attach(document, 'drop', function(e){
+            if (options.hideDropzones) {
+                for (i=0; i < dropzones.length; i+=1) {
+                    qq(dropzones[i]).hide();
+                }
+            }
+            e.preventDefault();
+        });
+    }
+
+    return {
+        setup: function() {
+            setupDragDrop();
+        },
+
+        setupExtraDropzone: function(element) {
+            options.extraDropzones.push(element);
+            setupDropzone(element);
+        },
+
+        removeExtraDropzone: function(element) {
+            var i, dzs = options.extraDropzones;
+            for(i in dzs) {
+                if (dzs[i] === element) {
+                    return dzs.splice(i, 1);
+                }
+            }
+        },
+
+        dispose: function() {
+            disposeSupport.dispose();
+            dz.dispose();
+        }
+    };
+};
+
+
+qq.UploadDropZone = function(o){
+    "use strict";
+
+    var options, element, preventDrop, dropOutsideDisabled, disposeSupport = new qq.DisposeSupport();
+
+    options = {
+        element: null,
+        onEnter: function(e){},
+        onLeave: function(e){},
+        // is not fired when leaving element by hovering descendants
+        onLeaveNotDescendants: function(e){},
+        onDrop: function(e){}
+    };
+
+    qq.extend(options, o);
+    element = options.element;
+
+    function dragover_should_be_canceled(){
+        return qq.safari() || (qq.firefox() && qq.windows());
+    }
+
+    function disableDropOutside(e){
+        // run only once for all instances
+        if (!dropOutsideDisabled ){
+
+            // for these cases we need to catch onDrop to reset dropArea
+            if (dragover_should_be_canceled){
+               disposeSupport.attach(document, 'dragover', function(e){
+                    e.preventDefault();
+                });
+            } else {
+                disposeSupport.attach(document, 'dragover', function(e){
+                    if (e.dataTransfer){
+                        e.dataTransfer.dropEffect = 'none';
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            dropOutsideDisabled = true;
+        }
+    }
+
+    function isValidFileDrag(e){
+        // e.dataTransfer currently causing IE errors
+        // IE9 does NOT support file API, so drag-and-drop is not possible
+        if (qq.ie() && !qq.ie10()) {
+            return false;
+        }
+
+        var effectTest, dt = e.dataTransfer,
+        // do not check dt.types.contains in webkit, because it crashes safari 4
+        isSafari = qq.safari();
+
+        // dt.effectAllowed is none in Safari 5
+        // dt.types.contains check is for firefox
+        effectTest = qq.ie10() ? true : dt.effectAllowed !== 'none';
+        return dt && effectTest && (dt.files || (!isSafari && dt.types.contains && dt.types.contains('Files')));
+    }
+
+    function isOrSetDropDisabled(isDisabled) {
+        if (isDisabled !== undefined) {
+            preventDrop = isDisabled;
+        }
+        return preventDrop;
+    }
+
+    function attachEvents(){
+        disposeSupport.attach(element, 'dragover', function(e){
+            if (!isValidFileDrag(e)) {
+                return;
+            }
+
+            var effect = qq.ie() ? null : e.dataTransfer.effectAllowed;
+            if (effect === 'move' || effect === 'linkMove'){
+                e.dataTransfer.dropEffect = 'move'; // for FF (only move allowed)
+            } else {
+                e.dataTransfer.dropEffect = 'copy'; // for Chrome
+            }
+
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
+        disposeSupport.attach(element, 'dragenter', function(e){
+            if (!isOrSetDropDisabled()) {
+                if (!isValidFileDrag(e)) {
+                    return;
+                }
+                options.onEnter(e);
+            }
+        });
+
+        disposeSupport.attach(element, 'dragleave', function(e){
+            if (!isValidFileDrag(e)) {
+                return;
+            }
+
+            options.onLeave(e);
+
+            var relatedTarget = document.elementFromPoint(e.clientX, e.clientY);
+            // do not fire when moving a mouse over a descendant
+            if (qq(this).contains(relatedTarget)) {
+                return;
+            }
+
+            options.onLeaveNotDescendants(e);
+        });
+
+        disposeSupport.attach(element, 'drop', function(e){
+            if (!isOrSetDropDisabled()) {
+                if (!isValidFileDrag(e)) {
+                    return;
+                }
+
+                e.preventDefault();
+                options.onDrop(e);
+            }
+        });
+    }
+
+    disableDropOutside();
+    attachEvents();
+
+    return {
+        dropDisabled: function(isDisabled) {
+            return isOrSetDropDisabled(isDisabled);
+        },
+
+        dispose: function() {
+            disposeSupport.dispose();
+        }
+    };
 };
 /**
  * Class that creates upload widget with drag-and-drop and file list
@@ -937,12 +1515,14 @@ qq.FineUploader = function(o){
             retryButton: 'Retry',
             failUpload: 'Upload failed',
             dragZone: 'Drop files here to upload',
+            dropProcessing: 'Processing dropped files...',
             formatProgress: "{percent}% of {total_size}",
             waitingForResponse: "Processing..."
         },
         template: '<div class="qq-uploader">' +
             ((!this._options.dragAndDrop || !this._options.dragAndDrop.disableDefaultDropzone) ? '<div class="qq-upload-drop-area"><span>{dragZoneText}</span></div>' : '') +
             (!this._options.button ? '<div class="qq-upload-button"><div>{uploadButtonText}</div></div>' : '') +
+            '<span class="qq-drop-processing"><span>{dropProcessingText}</span><span class="qq-drop-processing-spinner"></span></span>' +
             (!this._options.listElement ? '<ul class="qq-upload-list"></ul>' : '') +
             '</div>',
 
@@ -958,7 +1538,6 @@ qq.FineUploader = function(o){
             '<span class="qq-upload-status-text">{statusText}</span>' +
             '</li>',
         classes: {
-            // used to get elements from templates
             button: 'qq-upload-button',
             drop: 'qq-upload-drop-area',
             dropActive: 'qq-upload-drop-area-active',
@@ -975,13 +1554,14 @@ qq.FineUploader = function(o){
             retry: 'qq-upload-retry',
             statusText: 'qq-upload-status-text',
 
-            // added to list item <li> when upload completes
-            // used in css to hide progress spinner
             success: 'qq-upload-success',
             fail: 'qq-upload-fail',
 
             successIcon: null,
-            failIcon: null
+            failIcon: null,
+
+            dropProcessing: 'qq-drop-processing',
+            dropProcessingSpinner: 'qq-drop-processing-spinner'
         },
         failedUploadTextDisplay: {
             mode: 'default', //default, custom, or none
@@ -1010,6 +1590,7 @@ qq.FineUploader = function(o){
     // same for the Cancel button and Fail message text
     this._options.template     = this._options.template.replace(/\{dragZoneText\}/g, this._options.text.dragZone);
     this._options.template     = this._options.template.replace(/\{uploadButtonText\}/g, this._options.text.uploadButton);
+    this._options.template     = this._options.template.replace(/\{dropProcessingText\}/g, this._options.text.dropProcessing);
     this._options.fileTemplate = this._options.fileTemplate.replace(/\{cancelButtonText\}/g, this._options.text.cancelButton);
     this._options.fileTemplate = this._options.fileTemplate.replace(/\{retryButtonText\}/g, this._options.text.retryButton);
     this._options.fileTemplate = this._options.fileTemplate.replace(/\{statusText\}/g, "");
@@ -1025,7 +1606,8 @@ qq.FineUploader = function(o){
     }
 
     this._bindCancelAndRetryEvents();
-    this._setupDragDrop();
+
+    this._dnd = this._setupDragAndDrop();
 };
 
 // inherit from Basic Uploader
@@ -1037,11 +1619,10 @@ qq.extend(qq.FineUploader.prototype, {
         this._listElement.innerHTML = "";
     },
     addExtraDropzone: function(element){
-        this._setupExtraDropzone(element);
+        this._dnd.setupExtraDropzone(element);
     },
     removeExtraDropzone: function(element){
-        var dzs = this._options.dragAndDrop.extraDropzones;
-        for(var i in dzs) if (dzs[i] === element) return this._options.dragAndDrop.extraDropzones.splice(i,1);
+        return this._dnd.removeExtraDropzone(element);
     },
     getItemByFileId: function(id){
         var item = this._listElement.firstChild;
@@ -1053,6 +1634,11 @@ qq.extend(qq.FineUploader.prototype, {
             item = item.nextSibling;
         }
     },
+    cancel: function(fileId) {
+        qq.FineUploaderBasic.prototype.cancel.apply(this, arguments);
+        var item = this.getItemByFileId(fileId);
+        qq(item).remove();
+    },
     reset: function() {
         qq.FineUploaderBasic.prototype.reset.apply(this, arguments);
         this._element.innerHTML = this._options.template;
@@ -1061,7 +1647,59 @@ qq.extend(qq.FineUploader.prototype, {
             this._button = this._createUploadButton(this._find(this._element, 'button'));
         }
         this._bindCancelAndRetryEvents();
-        this._setupDragDrop();
+        this._dnd.dispose();
+        this._dnd = this._setupDragAndDrop();
+    },
+    _setupDragAndDrop: function() {
+        var self = this,
+            dropProcessingEl = this._find(this._element, 'dropProcessing'),
+            dnd, preventSelectFiles, defaultDropAreaEl;
+
+        preventSelectFiles = function(event) {
+            event.preventDefault();
+        };
+
+        if (!this._options.dragAndDrop.disableDefaultDropzone) {
+            defaultDropAreaEl = this._find(this._options.element, 'drop');
+        }
+
+        dnd = new qq.DragAndDrop({
+            dropArea: defaultDropAreaEl,
+            extraDropzones: this._options.dragAndDrop.extraDropzones,
+            hideDropzones: this._options.dragAndDrop.hideDropzones,
+            multiple: this._options.multiple,
+            classes: {
+                dropActive: this._options.classes.dropActive
+            },
+            callbacks: {
+                dropProcessing: function(isProcessing, files) {
+                    var input = self._button.getInput();
+
+                    if (isProcessing) {
+                        qq(dropProcessingEl).css({display: 'block'});
+                        qq(input).attach('click', preventSelectFiles);
+                    }
+                    else {
+                        qq(dropProcessingEl).hide();
+                        qq(input).detach('click', preventSelectFiles);
+                    }
+
+                    if (files) {
+                        self.addFiles(files);
+                    }
+                },
+                error: function(code, filename) {
+                    self._error(code, filename);
+                },
+                log: function(message, level) {
+                    self.log(message, level);
+                }
+            }
+        });
+
+        dnd.setup();
+
+        return dnd;
     },
     _leaving_document_out: function(e){
         return ((qq.chrome() || (qq.safari() && qq.windows())) && e.clientX == 0 && e.clientY == 0) // null coords for Chrome and Safari Windows
@@ -1082,88 +1720,6 @@ qq.extend(qq.FineUploader.prototype, {
         }
 
         return element;
-    },
-    _setupExtraDropzone: function(element){
-        this._options.dragAndDrop.extraDropzones.push(element);
-        this._setupDropzone(element);
-    },
-    _setupDropzone: function(dropArea){
-        var self = this;
-
-        var dz = new qq.UploadDropZone({
-            element: dropArea,
-            onEnter: function(e){
-                qq(dropArea).addClass(self._classes.dropActive);
-                e.stopPropagation();
-            },
-            onLeave: function(e){
-                //e.stopPropagation();
-            },
-            onLeaveNotDescendants: function(e){
-                qq(dropArea).removeClass(self._classes.dropActive);
-            },
-            onDrop: function(e){
-                if (self._options.dragAndDrop.hideDropzones) {
-                    qq(dropArea).hide();
-                }
-
-                qq(dropArea).removeClass(self._classes.dropActive);
-                if (e.dataTransfer.files.length > 1 && !self._options.multiple) {
-                    self._error('tooManyFilesError', "");
-                }
-                else {
-                    self._uploadFileList(e.dataTransfer.files);
-                }
-            }
-        });
-
-        this.addDisposer(function() { dz.dispose(); });
-
-        if (this._options.dragAndDrop.hideDropzones) {
-            qq(dropArea).hide();
-        }
-    },
-    _setupDragDrop: function(){
-        var self, dropArea;
-
-        self = this;
-
-        if (!this._options.dragAndDrop.disableDefaultDropzone) {
-            dropArea = this._find(this._element, 'drop');
-            this._options.dragAndDrop.extraDropzones.push(dropArea);
-        }
-
-        var dropzones = this._options.dragAndDrop.extraDropzones;
-        var i;
-        for (i=0; i < dropzones.length; i++){
-            this._setupDropzone(dropzones[i]);
-        }
-
-        // IE <= 9 does not support the File API used for drag+drop uploads
-        if (!this._options.dragAndDrop.disableDefaultDropzone && (!qq.ie() || qq.ie10())) {
-            this._attach(document, 'dragenter', function(e){
-                if (qq(dropArea).hasClass(self._classes.dropDisabled)) return;
-
-                dropArea.style.display = 'block';
-                for (i=0; i < dropzones.length; i++){ dropzones[i].style.display = 'block'; }
-
-            });
-        }
-        this._attach(document, 'dragleave', function(e){
-            if (self._options.dragAndDrop.hideDropzones && qq.FineUploader.prototype._leaving_document_out(e)) {
-                for (i=0; i < dropzones.length; i++) {
-                    qq(dropzones[i]).hide();
-                }
-            }
-        });
-        qq(document).attach('drop', function(e){
-            if (self._options.dragAndDrop.hideDropzones) {
-                for (i=0; i < dropzones.length; i++) {
-                    qq(dropzones[i]).hide();
-                }
-            }
-            e.preventDefault();
-        });
     },
     _onSubmit: function(id, fileName){
         qq.FineUploaderBasic.prototype._onSubmit.apply(this, arguments);
@@ -1213,7 +1769,7 @@ qq.extend(qq.FineUploader.prototype, {
         qq(item).removeClass(this._classes.retrying);
         qq(this._find(item, 'progressBar')).hide();
 
-        if (!this._options.disableCancelForFormUploads || qq.UploadHandlerXhr.isSupported()) {
+        if (!this._options.disableCancelForFormUploads || qq.isXhrUploadSupported()) {
             qq(this._find(item, 'cancel')).hide();
         }
         qq(this._find(item, 'spinner')).hide();
@@ -1282,7 +1838,7 @@ qq.extend(qq.FineUploader.prototype, {
     },
     _addToList: function(id, fileName){
         var item = qq.toElement(this._options.fileTemplate);
-        if (this._options.disableCancelForFormUploads && !qq.UploadHandlerXhr.isSupported()) {
+        if (this._options.disableCancelForFormUploads && !qq.isXhrUploadSupported()) {
             var cancelLink = this._find(item, 'cancel');
             qq(cancelLink).remove();
         }
@@ -1306,7 +1862,7 @@ qq.extend(qq.FineUploader.prototype, {
         var self = this,
             list = this._listElement;
 
-        this._attach(list, 'click', function(e){
+        this._disposeSupport.attach(list, 'click', function(e){
             e = e || window.event;
             var target = e.target || e.srcElement;
 
@@ -1320,7 +1876,6 @@ qq.extend(qq.FineUploader.prototype, {
 
                 if (qq(target).hasClass(self._classes.cancel)) {
                     self.cancel(item.qqFileId);
-                    qq(item).remove();
                 }
                 else {
                     qq(item).removeClass(self._classes.retryable);
@@ -1378,7 +1933,7 @@ qq.extend(qq.FineUploader.prototype, {
         spinnerEl.style.display = "inline-block";
     },
     _showCancelLink: function(item) {
-        if (!this._options.disableCancelForFormUploads || qq.UploadHandlerXhr.isSupported()) {
+        if (!this._options.disableCancelForFormUploads || qq.isXhrUploadSupported()) {
             var cancelLink = this._find(item, 'cancel');
             cancelLink.style.display = 'inline';
         }
@@ -1388,107 +1943,6 @@ qq.extend(qq.FineUploader.prototype, {
         this._options.showMessage(message);
     }
 });
-
-qq.UploadDropZone = function(o){
-    this._options = {
-        element: null,
-        onEnter: function(e){},
-        onLeave: function(e){},
-        // is not fired when leaving element by hovering descendants
-        onLeaveNotDescendants: function(e){},
-        onDrop: function(e){}
-    };
-    qq.extend(this._options, o);
-    qq.extend(this, qq.DisposeSupport);
-
-    this._element = this._options.element;
-
-    this._disableDropOutside();
-    this._attachEvents();
-};
-
-qq.UploadDropZone.prototype = {
-    _dragover_should_be_canceled: function(){
-        return qq.safari() || (qq.firefox() && qq.windows());
-    },
-    _disableDropOutside: function(e){
-        // run only once for all instances
-        if (!qq.UploadDropZone.dropOutsideDisabled ){
-
-            // for these cases we need to catch onDrop to reset dropArea
-            if (this._dragover_should_be_canceled){
-                qq(document).attach('dragover', function(e){
-                    e.preventDefault();
-                });
-            } else {
-                qq(document).attach('dragover', function(e){
-                    if (e.dataTransfer){
-                        e.dataTransfer.dropEffect = 'none';
-                        e.preventDefault();
-                    }
-                });
-            }
-
-            qq.UploadDropZone.dropOutsideDisabled = true;
-        }
-    },
-    _attachEvents: function(){
-        var self = this;
-
-        self._attach(self._element, 'dragover', function(e){
-            if (!self._isValidFileDrag(e)) return;
-
-            var effect = qq.ie() ? null : e.dataTransfer.effectAllowed;
-            if (effect == 'move' || effect == 'linkMove'){
-                e.dataTransfer.dropEffect = 'move'; // for FF (only move allowed)
-            } else {
-                e.dataTransfer.dropEffect = 'copy'; // for Chrome
-            }
-
-            e.stopPropagation();
-            e.preventDefault();
-        });
-
-        self._attach(self._element, 'dragenter', function(e){
-            if (!self._isValidFileDrag(e)) return;
-
-            self._options.onEnter(e);
-        });
-
-        self._attach(self._element, 'dragleave', function(e){
-            if (!self._isValidFileDrag(e)) return;
-
-            self._options.onLeave(e);
-
-            var relatedTarget = document.elementFromPoint(e.clientX, e.clientY);
-            // do not fire when moving a mouse over a descendant
-            if (qq(this).contains(relatedTarget)) return;
-
-            self._options.onLeaveNotDescendants(e);
-        });
-
-        self._attach(self._element, 'drop', function(e){
-            if (!self._isValidFileDrag(e)) return;
-
-            e.preventDefault();
-            self._options.onDrop(e);
-        });
-    },
-    _isValidFileDrag: function(e){
-        // e.dataTransfer currently causing IE errors
-        // IE9 does NOT support file API, so drag-and-drop is not possible
-        if (qq.ie() && !qq.ie10()) return false;
-
-        var dt = e.dataTransfer,
-        // do not check dt.types.contains in webkit, because it crashes safari 4
-            isSafari = qq.safari();
-
-        // dt.effectAllowed is none in Safari 5
-        // dt.types.contains check is for firefox
-        var effectTest = qq.ie10() ? true : dt.effectAllowed != 'none';
-        return dt && effectTest && (dt.files || (!isSafari && dt.types.contains && dt.types.contains('Files')));
-    }
-};
 /**
  * Class for uploading files, uploading itself is handled by child classes
  */
@@ -1497,6 +1951,7 @@ qq.UploadHandlerAbstract = function(o){
     this._options = {
         debug: false,
         endpoint: '/upload.php',
+        paramsInBody: false,
         // maximum number of concurrent uploads
         maxConnections: 999,
         log: function(str, level) {},
@@ -1510,8 +1965,6 @@ qq.UploadHandlerAbstract = function(o){
     qq.extend(this._options, o);
 
     this._queue = [];
-    // params for files in queue
-    this._params = [];
 
     this.log = this._options.log;
 };
@@ -1522,27 +1975,23 @@ qq.UploadHandlerAbstract.prototype = {
      **/
     add: function(file){},
     /**
-     * Sends the file identified by id and additional query params to the server
+     * Sends the file identified by id
      */
-    upload: function(id, params){
+    upload: function(id){
         var len = this._queue.push(id);
-
-        var copy = {};
-        qq.extend(copy, params);
-        this._params[id] = copy;
 
         // if too many active uploads, wait...
         if (len <= this._options.maxConnections){
-            this._upload(id, this._params[id]);
+            this._upload(id);
         }
     },
     retry: function(id) {
         var i = qq.indexOf(this._queue, id);
         if (i >= 0) {
-            this._upload(id, this._params[id]);
+            this._upload(id);
         }
         else {
-            this.upload(id, this._params[id]);
+            this.upload(id);
         }
     },
     /**
@@ -1550,6 +1999,7 @@ qq.UploadHandlerAbstract.prototype = {
      */
     cancel: function(id){
         this.log('Cancelling ' + id);
+        this._options.paramsStore.remove(id);
         this._cancel(id);
         this._dequeue(id);
     },
@@ -1580,7 +2030,6 @@ qq.UploadHandlerAbstract.prototype = {
     reset: function() {
         this.log('Resetting upload handler');
         this._queue = [];
-        this._params = [];
     },
     /**
      * Actual upload method
@@ -1601,7 +2050,7 @@ qq.UploadHandlerAbstract.prototype = {
 
         if (this._queue.length >= max && i < max){
             var nextId = this._queue[max-1];
-            this._upload(nextId, this._params[nextId]);
+            this._upload(nextId);
         }
     },
     /**
@@ -1625,7 +2074,7 @@ qq.extend(qq.UploadHandlerForm.prototype, qq.UploadHandlerAbstract.prototype);
 qq.extend(qq.UploadHandlerForm.prototype, {
     add: function(fileInput){
         fileInput.setAttribute('name', this._options.inputName);
-        var id = 'qq-upload-handler-iframe' + qq.getUniqueId();
+        var id = qq.getUniqueId();
 
         this._inputs[id] = fileInput;
 
@@ -1664,7 +2113,7 @@ qq.extend(qq.UploadHandlerForm.prototype, {
             qq(iframe).remove();
         }
     },
-    _upload: function(id, params){
+    _upload: function(id){
         this._options.onUpload(id, this.getName(id), false);
         var input = this._inputs[id];
 
@@ -1673,10 +2122,9 @@ qq.extend(qq.UploadHandlerForm.prototype, {
         }
 
         var fileName = this.getName(id);
-        params[this._options.inputName] = fileName;
 
         var iframe = this._createIframe(id);
-        var form = this._createForm(iframe, params);
+        var form = this._createForm(iframe, this._options.paramsStore.getParams(id));
         form.appendChild(input);
 
         var self = this;
@@ -1793,12 +2241,18 @@ qq.extend(qq.UploadHandlerForm.prototype, {
         // form.setAttribute('method', 'post');
         // form.setAttribute('enctype', 'multipart/form-data');
         // Because in this case file won't be attached to request
-        var protocol = this._options.demoMode ? "GET" : "POST"
-        var form = qq.toElement('<form method="' + protocol + '" enctype="multipart/form-data"></form>');
+        var protocol = this._options.demoMode ? "GET" : "POST",
+            form = qq.toElement('<form method="' + protocol + '" enctype="multipart/form-data"></form>'),
+            url = this._options.endpoint;
 
-        var queryString = qq.obj2url(params, this._options.endpoint);
+        if (!this._options.paramsInBody) {
+            url = qq.obj2url(params, this._options.endpoint);
+        }
+        else {
+            qq.obj2Inputs(params, form);
+        }
 
-        form.setAttribute('action', queryString);
+        form.setAttribute('action', url);
         form.setAttribute('target', iframe.name);
         form.style.display = 'none';
         document.body.appendChild(form);
@@ -1818,18 +2272,6 @@ qq.UploadHandlerXhr = function(o){
 
     // current loaded size in bytes for each file
     this._loaded = [];
-};
-
-// static method
-qq.UploadHandlerXhr.isSupported = function(){
-    var input = document.createElement('input');
-    input.type = 'file';
-
-    return (
-        'multiple' in input &&
-            typeof File != "undefined" &&
-            typeof FormData != "undefined" &&
-            typeof (new XMLHttpRequest()).upload != "undefined" );
 };
 
 // @inherits qq.UploadHandlerAbstract
@@ -1873,20 +2315,22 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
         this._loaded = [];
     },
     /**
-     * Sends the file identified by id and additional query params to the server
-     * @param {Object} params name-value string pairs
+     * Sends the file identified by id to the server
      */
-    _upload: function(id, params){
-        this._options.onUpload(id, this.getName(id), true);
-
+    _upload: function(id){
         var file = this._files[id],
             name = this.getName(id),
-            size = this.getSize(id);
+            size = this.getSize(id),
+            self = this,
+            url = this._options.endpoint,
+            protocol = this._options.demoMode ? "GET" : "POST",
+            xhr, formData, paramName, key, params;
+
+        this._options.onUpload(id, this.getName(id), true);
 
         this._loaded[id] = 0;
 
-        var xhr = this._xhrs[id] = new XMLHttpRequest();
-        var self = this;
+        xhr = this._xhrs[id] = new XMLHttpRequest();
 
         xhr.upload.onprogress = function(e){
             if (e.lengthComputable){
@@ -1896,33 +2340,43 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
         };
 
         xhr.onreadystatechange = function(){
-            if (xhr.readyState == 4){
+            if (xhr.readyState === 4){
                 self._onComplete(id, xhr);
             }
         };
 
-        // build query string
-        params = params || {};
-        params[this._options.inputName] = name;
-        var queryString = qq.obj2url(params, this._options.endpoint);
+        params = this._options.paramsStore.getParams(id);
 
-        var protocol = this._options.demoMode ? "GET" : "POST";
-        xhr.open(protocol, queryString, true);
+        //build query string
+        if (!this._options.paramsInBody) {
+            params[this._options.inputName] = name;
+            url = qq.obj2url(params, this._options.endpoint);
+        }
+
+        xhr.open(protocol, url, true);
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.setRequestHeader("X-File-Name", encodeURIComponent(name));
         xhr.setRequestHeader("Cache-Control", "no-cache");
-        if (this._options.forceMultipart) {
-            var formData = new FormData();
+        if (this._options.forceMultipart || this._options.paramsInBody) {
+            formData = new FormData();
+
+            if (this._options.paramsInBody) {
+                qq.obj2FormData(params, formData);
+            }
+
             formData.append(this._options.inputName, file);
             file = formData;
         } else {
             xhr.setRequestHeader("Content-Type", "application/octet-stream");
             //NOTE: return mime type in xhr works on chrome 16.0.9 firefox 11.0a2
-            xhr.setRequestHeader("X-Mime-Type",file.type );
+            xhr.setRequestHeader("X-Mime-Type", file.type);
         }
+
         for (key in this._options.customHeaders){
-            xhr.setRequestHeader(key, this._options.customHeaders[key]);
-        };
+            if (this._options.customHeaders.hasOwnProperty(key)) {
+                xhr.setRequestHeader(key, this._options.customHeaders[key]);
+            }
+        }
 
         this.log('Sending upload request for ' + id);
         xhr.send(file);
@@ -1974,16 +2428,17 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
         }
     }
 });
+/*globals jQuery, qq*/
 (function($) {
     "use strict";
-    var uploader, $el, init, dataStore, pluginOption, pluginOptions, addCallbacks, transformOptions, isValidCommand,
+    var uploader, $el, init, dataStore, pluginOption, pluginOptions, addCallbacks, transformVariables, isValidCommand,
         delegateCommand;
 
     pluginOptions = ['uploaderType'];
 
     init = function (options) {
         if (options) {
-            var xformedOpts = transformOptions(options);
+            var xformedOpts = transformVariables(options);
             addCallbacks(xformedOpts);
 
             if (pluginOption('uploaderType') === 'basic') {
@@ -2045,7 +2500,7 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
     };
 
     //transform jQuery objects into HTMLElements, and pass along all other option properties
-    transformOptions = function(source, dest) {
+    transformVariables = function(source, dest) {
         var xformed, arrayVals;
 
         if (dest === undefined) {
@@ -2069,7 +2524,7 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
             }
             else if ($.isPlainObject(val)) {
                 xformed[prop] = {};
-                transformOptions(val, xformed[prop]);
+                transformVariables(val, xformed[prop]);
             }
             else if ($.isArray(val)) {
                 arrayVals = [];
@@ -2102,20 +2557,39 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
     //assuming we have already verified that this is a valid command, call the associated function in the underlying
     // Fine Uploader instance (passing along the arguments from the caller) and return the result of the call back to the caller
     delegateCommand = function(command) {
-        return uploader()[command].apply(uploader(), Array.prototype.slice.call(arguments, 1));
+        var xformedArgs = [], origArgs = Array.prototype.slice.call(arguments, 1);
+
+        transformVariables(origArgs, xformedArgs);
+
+        return uploader()[command].apply(uploader(), xformedArgs);
     };
 
     $.fn.fineUploader = function(optionsOrCommand) {
-        $el = this;
+        var self = this, selfArgs = arguments, retVals = [];
 
-        if (uploader() && isValidCommand(optionsOrCommand)) {
-            return delegateCommand.apply(this, arguments);
+        this.each(function(index, el) {
+            $el = $(el);
+
+            if (uploader() && isValidCommand(optionsOrCommand)) {
+                retVals.push(delegateCommand.apply(self, selfArgs));
+
+                if (self.length === 1) {
+                    return false;
+                }
+            }
+            else if (typeof optionsOrCommand === 'object' || !optionsOrCommand) {
+                init.apply(self, selfArgs);
+            }
+            else {
+                $.error('Method ' +  optionsOrCommand + ' does not exist on jQuery.fineUploader');
+            }
+        });
+
+        if (retVals.length === 1) {
+            return retVals[0];
         }
-        else if (typeof optionsOrCommand === 'object' || !optionsOrCommand) {
-            return init.apply(this, arguments);
-        }
-        else {
-            $.error('Method ' +  optionsOrCommand + ' does not exist on jQuery.fineUploader');
+        else if (retVals.length > 1) {
+            return retVals;
         }
 
         return this;
