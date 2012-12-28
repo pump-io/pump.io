@@ -109,7 +109,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/wysihtml5/0.3.0/wysihtml5.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.2/select2.min.js"></script>
     <% if (config.sockjs) { %>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.4/sockjs-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.2/sockjs-min.js"></script>
     <% } %>
     <% } %>
     <script src="/javascript/libs/jquery.easydate-0.2.4.min.js"></script>
