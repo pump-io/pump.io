@@ -939,7 +939,8 @@
 
     Pump.MajorActivityView = Pump.TemplateView.extend({
         templateName: 'major-activity',
-        parts: ["responses",
+        parts: ["activity-object-list",
+                "responses",
                 "reply"],
         modelName: "activity",
         events: {
