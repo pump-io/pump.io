@@ -764,7 +764,7 @@
         parts: ["profile-block",
                 "user-content-activities",
                 "major-stream-headless",
-                "sidebar-headless",
+                "minor-stream-headless",
                 "major-activity-headless",
                 "minor-activity-headless",
                 "responses",
@@ -814,7 +814,7 @@
     Pump.ActivitiesUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-activities',
         parts: ["major-stream-headless",
-                "sidebar-headless",
+                "minor-stream-headless",
                 "major-activity-headless",
                 "minor-activity-headless",
                 "responses",
@@ -830,7 +830,7 @@
                     collection: "major"
                 }
             },
-            "#sidebar": {
+            "#minor-stream": {
                 attr: "minorStreamView",
                 subView: "MinorStreamHeadlessView",
                 subOptions: {
@@ -858,7 +858,7 @@
     });
 
     Pump.MinorStreamHeadlessView = Pump.TemplateView.extend({
-        templateName: 'sidebar',
+        templateName: 'minor-stream-headless',
         modelName: 'minor',
         parts: ["minor-activity-headless"],
         subs: {
@@ -888,7 +888,7 @@
     });
 
     Pump.MinorStreamView = Pump.TemplateView.extend({
-        templateName: 'sidebar',
+        templateName: 'minor-stream',
         modelName: 'minor',
         parts: ["minor-activity"],
         subs: {
@@ -903,7 +903,7 @@
     Pump.InboxContent = Pump.ContentView.extend({
         templateName: 'inbox',
         parts: ["major-stream",
-                "sidebar",
+                "minor-stream",
                 "major-activity",
                 "minor-activity",
                 "responses",
@@ -927,7 +927,7 @@
                     collection: "major"
                 }
             },
-            "#sidebar": {
+            "#minor-stream": {
                 attr: "minorStreamView",
                 subView: "MinorStreamView",
                 subOptions: {

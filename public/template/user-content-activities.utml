@@ -1,4 +1,7 @@
 <div class="activities user-content" id="user-content-activities">
   <%= partial("major-stream-headless") %>
-  <%= partial("sidebar-headless") %>
+  <div class="span3" id="sidebar">
+    <h3>Meanwhile...</h3>
+    <%= partial("minor-stream-headless") %>
+  </div>
 </div>
