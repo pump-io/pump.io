@@ -44,6 +44,13 @@
         }
     };
 
+    Pump.clearNickname = function() {
+        Pump.nickname = null;
+        if (localStorage) {
+            delete localStorage['cred:nickname'];
+        }
+    };
+
     Pump.getCred = function() {
         if (Pump.clientID) {
             return {clientID: Pump.clientID, clientSecret: Pump.clientSecret};
@@ -82,6 +89,16 @@
         if (localStorage) {
             localStorage['cred:token'] = userToken;
             localStorage['cred:secret'] = userSecret;
+        }
+        return;
+    };
+
+    Pump.clearUserCred = function() {
+        Pump.token  = null;
+        Pump.secret = null;
+        if (localStorage) {
+            delete localStorage['cred:token'];
+            delete localStorage['cred:secret'];
         }
         return;
     };

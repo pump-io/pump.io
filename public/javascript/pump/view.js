@@ -522,8 +522,8 @@
                     var an;
                     Pump.currentUser = null;
 
-                    Pump.setNickname(null);
-                    Pump.setUserCred(null, null);
+                    Pump.clearNickname();
+                    Pump.clearUserCred();
 
                     Pump.clearCaches();
 
