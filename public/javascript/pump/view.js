@@ -497,7 +497,9 @@
                 following = profile.following;
 
             Pump.fetchObjects([lists, following], function(err, objs) {
-                Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.currentUser}});
+                Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.currentUser,
+                                                           lists: lists,
+                                                           following: following}});
             });
 
             return false;
@@ -508,7 +510,9 @@
                 following = profile.following;
 
             Pump.fetchObjects([lists, following], function(err, objs) {
-                Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.currentUser}});
+                Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.currentUser,
+                                                              lists: lists,
+                                                              following: following}});
             });
             return false;
         },
@@ -1669,6 +1673,7 @@
                 Pump.resetWysihtml5(view.$('#note-content'));
                 // Reload the current page
                 Pump.addMajorActivity(act);
+                view.remove();
             }});
         }
     });
@@ -1749,6 +1754,7 @@
                         view.$('#picture-title').val("");
                         // Reload the current content
                         Pump.addMajorActivity(act);
+                        view.remove();
                     }});
                 }).on("error", function(event, id, fileName, reason) {
                     view.showError(reason);
@@ -1827,6 +1833,8 @@
                     view.stopSpin();
                     Pump.resetWysihtml5(view.$('#list-description'));
                     view.$('#list-name').val("");
+
+                    view.remove();
 
                     // it's minor
 
@@ -1956,34 +1964,24 @@
         }
     });
 
-    Pump.modals = {};
+    Pump.showModal = function(Cls, options) {
 
-    Pump.showModal = function(Cls, options, callback) {
-
-        var modalView,
-            templateName = Cls.prototype.templateName;
-
-        if (!callback) {
-            callback = options;
-            options = {};
-        }
+        var modalView;
 
         // If we've got it attached already, just show it
-        if (_.has(Pump.modals, templateName)) {
-            modalView = Pump.modals[templateName];
+
+        modalView = new Cls(options);
+
+        // When it's ready, show immediately
+
+        modalView.on("ready", function() {
+            $("body").append(modalView.el);
             modalView.$el.modal('show');
-        } else {
-            // Otherwise, create a view
-            modalView = new Cls(options);
-            Pump.modals[templateName] = modalView;
-            // When it's ready, show immediately
-            modalView.on("ready", function() {
-                $("body").append(modalView.el);
-                modalView.$el.modal('show');
-            });
-            // render it (will fire "ready")
-            modalView.render();
-        }
+        });
+
+        // render it (will fire "ready")
+
+        modalView.render();
     };
 
     Pump.resetWysihtml5 = function(el) {

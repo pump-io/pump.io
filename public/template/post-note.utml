@@ -12,16 +12,16 @@
           <select name="to" id="note-to" multiple="" style="width: 80%">
             <option value="collection:http://activityschema.org/collection/public">Public</option>
             <option value="collection:<%- data.user.profile.followers.url %>">Followers</option>
-            <% if (data.user.profile.lists.totalItems > 0) { %>
+            <% if (data.lists && data.lists.length > 0) { %>
             <optgroup label="Lists">
-              <% _.each(data.user.profile.lists.items, function(list) { %>
+              <% _.each(data.lists, function(list) { %>
               <option value="collection:<%- list.id %>"><%- list.displayName %></option>
               <% }); %>
             </optgroup>
             <% } %>
-            <% if (data.user.profile.following.totalItems > 0) { %>x
+            <% if (data.following && data.following.length > 0) { %>
             <optgroup label="People">
-              <% _.each(data.user.profile.following.items, function(contact) { %>
+              <% _.each(data.following, function(contact) { %>
               <option value="<%- contact.objectType %>:<%- contact.id %>"><%- contact.displayName %></option>
               <% }); %>
             </optgroup>
@@ -33,16 +33,17 @@
           <select name="cc" id="note-cc" multiple="" style="width: 80%">
             <option value="collection:http://activityschema.org/collection/public">Public</option>
             <option selected="selected" value="collection:<%- data.user.profile.followers.url %>">Followers</option>
-            <% if (data.user.profile.lists.totalItems > 0) { %>
+            <!-- <%- JSON.stringify(data.lists) %> -->
+            <% if (data.lists && data.lists.length > 0) { %>
             <optgroup label="Lists">
-              <% _.each(data.user.profile.lists.items, function(list) { %>
+              <% _.each(data.lists, function(list) { %>
               <option value="collection:<%- list.id %>"><%- list.displayName %></option>
               <% }); %>
             </optgroup>
             <% } %>
-            <% if (data.user.profile.following.totalItems > 0) { %>x
+            <% if (data.following && data.following.length > 0) { %>
             <optgroup label="People">
-              <% _.each(data.user.profile.following.items, function(contact) { %>
+              <% _.each(data.following, function(contact) { %>
               <option value="<%- contact.objectType %>:<%- contact.id %>"><%- contact.displayName %></option>
               <% }); %>
             </optgroup>
