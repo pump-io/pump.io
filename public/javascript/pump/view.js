@@ -1447,6 +1447,7 @@
         events: {
             "submit #settings": "saveSettings"
         },
+        fileCount: 0,
         ready: function() {
             var view = this;
             view.setupSubs();
@@ -1469,23 +1470,20 @@
                         success: 'alert alert-success',
                         fail: 'alert alert-error'
                     },
+                    autoUpload: false,
                     multiple: false,
                     validation: {
                         allowedExtensions: ["jpeg", "jpg", "png", "gif", "svg", "svgz"],
                         acceptFiles: "image/*"
                     }
+                }).on("submit", function(id, fileName) {
+                    view.fileCount++;
+                    return true;
+                }).on("cancel", function(id, fileName) {
+                    view.fileCount--;
+                    return true;
                 }).on("complete", function(event, id, fileName, responseJSON) {
-
                     var stream = Pump.currentUser.majorStream,
-                        strToObj = function(str) {
-                            var colon = str.indexOf(":"),
-                                type = str.substr(0, colon),
-                                id = str.substr(colon+1);
-                            return new Pump.ActivityObject({
-                                id: id,
-                                objectType: type
-                            });
-                        },
                         act = new Pump.Activity({
                             verb: "post",
                             cc: [{id: "http://activityschema.org/collection/public",
@@ -1493,43 +1491,38 @@
                             object: responseJSON.obj
                         });
 
-                    view.startSpin();
-
-                    stream.create(act, {success: function(act) {
-                        var profile = Pump.currentUser.profile;
-                        profile.save({"image": act.object.get("fullImage")},
-                                     {
-                                         success: function(resp, status, xhr) {
-                                             view.showSuccess("Saved avatar.");
-                                             view.stopSpin();
-                                         },
-                                         error: function(model, error, options) {
-                                             view.showError(error.message);
-                                             view.stopSpin();
-                                         }
-                                     });
-                    }});
+                    stream.create(act, 
+                                  {
+                                      success: function(act) {
+                                          view.saveProfile(act.object.get("fullImage"));
+                                      },
+                                      error: function() {
+                                          view.showError("Couldn't create");
+                                          view.stopSpin();
+                                      }
+                                  });
                 }).on("error", function(event, id, fileName, reason) {
                     view.showError(reason);
+                    view.stopSpin();
                 });
             }
         },
-        saveSettings: function() {
-
+        saveProfile: function(img) {
             var view = this,
-                user = Pump.currentUser,
-                profile = user.profile;
-
-            view.startSpin();
-
-            profile.save({"displayName": this.$('#realname').val(),
+                profile = Pump.currentUser.profile,
+                props = {"displayName": view.$('#realname').val(),
                           "location": { objectType: "place", 
-                                        displayName: this.$('#location').val() },
-                          "summary": this.$('#bio').val()},
+                                        displayName: view.$('#location').val() },
+                          "summary": view.$('#bio').val()};
+
+            if (img) {
+                props.image = img;
+            }
+
+            profile.save(props,
                          {
                              success: function(resp, status, xhr) {
-                                 user.set("profile", profile);
-                                 view.showSuccess("Saved settings.");
+                                 view.showSuccess("Saved avatar.");
                                  view.stopSpin();
                              },
                              error: function(model, error, options) {
@@ -1537,6 +1530,25 @@
                                  view.stopSpin();
                              }
                          });
+        },
+        saveSettings: function() {
+
+            var view = this,
+                user = Pump.currentUser,
+                profile = user.profile,
+                haveNewAvatar = (view.fileCount > 0);
+
+            view.startSpin();
+
+            // XXX: Validation?
+
+            if (haveNewAvatar) {
+                // This will save the profile afterwards
+                view.$("#avatar-fineupload").fineUploader('uploadStoredFiles');
+            } else {
+                // No new image
+                view.saveProfile(null);
+            }
 
             return false;
         }
@@ -1760,7 +1772,6 @@
             view.startSpin();
 
             view.$("#picture-fineupload").fineUploader('uploadStoredFiles');
-
         }
     });
 
