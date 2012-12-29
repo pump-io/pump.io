@@ -304,6 +304,18 @@ suite.addBatch({
                         "removed ID is missing": function(err, ids) {
                             assert.equal(ids.indexOf("http://example.net/api/object/2500"), -1);
                         }
+                    },
+                    "and we get the count": {
+                        topic: function(stream, Stream) {
+                            stream.count(this.callback);
+                        },
+                        "it works": function(err, count) {
+                            assert.ifError(err);
+                            assert.isNumber(count);
+                        },
+                        "it is the right size": function(err, count) {
+                            assert.equal(count, 4999); // 5000 - 1
+                        }
                     }
                 }
             }
