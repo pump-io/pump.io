@@ -1713,7 +1713,7 @@
                             var colon = str.indexOf(":"),
                                 type = str.substr(0, colon),
                                 id = str.substr(colon+1);
-                            return new Pump.ActivityObject({
+                            return Pump.ActivityObject.unique({
                                 id: id,
                                 objectType: type
                             });
