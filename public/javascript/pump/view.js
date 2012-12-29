@@ -1522,7 +1522,7 @@
             profile.save(props,
                          {
                              success: function(resp, status, xhr) {
-                                 view.showSuccess("Saved avatar.");
+                                 view.showSuccess("Saved settings.");
                                  view.stopSpin();
                              },
                              error: function(model, error, options) {
