@@ -73,7 +73,11 @@
                     major = user.majorInbox,
                     minor = user.minorInbox;
 
-                Pump.fetchObjects([user, major, minor], function(objs) {
+                Pump.fetchObjects([user, major, minor], function(err, objs) {
+                    if (err) {
+                        Pump.error(err);
+                        return;
+                    }
                     Pump.body.setContent({contentView: Pump.InboxContent,
                                           data: {major: major,
                                                  minor: minor},
@@ -91,8 +95,12 @@
                 major = user.majorStream,
                 minor = user.minorStream;
 
-            Pump.fetchObjects([user, major, minor], function(objs) {
+            Pump.fetchObjects([user, major, minor], function(err, objs) {
                 var profile = user.profile;
+                if (err) {
+                    Pump.error(err);
+                    return;
+                }
                 Pump.body.setContent({contentView: Pump.UserPageContent,
                                       userContentView: Pump.ActivitiesUserContent,
                                       title: profile.get("displayName"),
@@ -107,8 +115,12 @@
                 user = Pump.User.unique({nickname: nickname}),
                 favorites = Pump.ActivityStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/favorites")});
 
-            Pump.fetchObjects([user, favorites], function() {
+            Pump.fetchObjects([user, favorites], function(err, objs) {
                 var profile = user.profile;
+                if (err) {
+                    Pump.error(err);
+                    return;
+                }
                 Pump.body.setContent({
                     contentView: Pump.FavoritesContent,
                     userContentView: Pump.FavoritesUserContent,
@@ -125,8 +137,12 @@
                 user = Pump.User.unique({nickname: nickname}),
                 followers = Pump.PeopleStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/followers")});
 
-            Pump.fetchObjects([user, followers], function(objs) {
+            Pump.fetchObjects([user, followers], function(err, objs) {
                 var profile = user.profile;
+                if (err) {
+                    Pump.error(err);
+                    return;
+                }
                 Pump.body.setContent({contentView: Pump.FollowersContent,
                                       userContentView: Pump.FollowersUserContent,
                                       userContentCollection: followers,
@@ -143,9 +159,12 @@
 
             // XXX: parallelize this?
 
-            Pump.fetchObjects([user, following], function(objs) {
+            Pump.fetchObjects([user, following], function(err, objs) {
                 var profile = user.profile;
-
+                if (err) {
+                    Pump.error(err);
+                    return;
+                }
                 Pump.body.setContent({contentView: Pump.FollowingContent,
                                       userContentView: Pump.FollowingUserContent,
                                       userContentCollection: following,
@@ -162,9 +181,12 @@
 
             // XXX: parallelize this?
 
-            Pump.fetchObjects([user, lists], function(objs) {
+            Pump.fetchObjects([user, lists], function(err, objs) {
                 var profile = user.profile;
-
+                if (err) {
+                    Pump.error(err);
+                    return;
+                }
                 Pump.body.setContent({contentView: Pump.ListsContent,
                                       userContentView: Pump.ListsUserContent,
                                       listContentView: Pump.ListsListContent,
@@ -183,7 +205,7 @@
 
             // XXX: parallelize this?
 
-            Pump.fetchObjects([user, lists, list], function(objs) {
+            Pump.fetchObjects([user, lists, list], function(err, objs) {
                 var profile = user.profile,
                     options = {contentView: Pump.ListContent,
                                userContentView: Pump.ListUserContent,
@@ -193,6 +215,10 @@
                                data: {lists: lists,
                                       list: list,
                                       profile: profile}};
+                if (err) {
+                    Pump.error(err);
+                    return;
+                }
 
                 Pump.body.setContent(options, function(view) {
                     Pump.body.content.userContent.listMenu.$(".active").removeClass("active");
@@ -206,7 +232,11 @@
                 user = Pump.User.unique({nickname: nickname}),
                 obj = Pump.ActivityObject.unique({uuid: uuid, objectType: type, userNickname: nickname});
 
-            Pump.fetchObjects([user, obj], function(objs) {
+            Pump.fetchObjects([user, obj], function(err, objs) {
+                if (err) {
+                    Pump.error(err);
+                    return;
+                }
                 Pump.body.setContent({contentView: Pump.ObjectContent,
                                       model: obj,
                                       title: obj.displayName || obj.objectType + "by" + nickname});

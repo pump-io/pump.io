@@ -496,7 +496,7 @@
                 lists = profile.lists,
                 following = profile.following;
 
-            Pump.fetchObjects([lists, following], function(objs) {
+            Pump.fetchObjects([lists, following], function(err, objs) {
                 Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.currentUser}});
             });
 
@@ -507,7 +507,7 @@
                 lists = profile.lists,
                 following = profile.following;
 
-            Pump.fetchObjects([lists, following], function(objs) {
+            Pump.fetchObjects([lists, following], function(err, objs) {
                 Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.currentUser}});
             });
             return false;
@@ -604,7 +604,7 @@
                     objs = [Pump.currentUser,
                             Pump.currentUser.majorDirectInbox,
                             Pump.currentUser.minorDirectInbox];
-                    Pump.fetchObjects(objs, function(objs) {
+                    Pump.fetchObjects(objs, function(err, objs) {
                         Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
                                                           model: Pump.currentUser,
                                                           data: {
@@ -677,7 +677,7 @@
                     objs = [Pump.currentUser,
                             Pump.currentUser.majorDirectInbox,
                             Pump.currentUser.minorDirectInbox];
-                    Pump.fetchObjects(objs, function(objs) {
+                    Pump.fetchObjects(objs, function(err, objs) {
                         Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
                                                           model: Pump.currentUser,
                                                           data: {

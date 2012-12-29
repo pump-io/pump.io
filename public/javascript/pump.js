@@ -94,8 +94,13 @@ if (!window.Pump) {
                 major = user.majorDirectInbox;
                 minor = user.minorDirectInbox;
 
-                Pump.fetchObjects([user, major, minor], function(objs) {
+                Pump.fetchObjects([user, major, minor], function(err, objs) {
                     var sp, continueTo;
+
+                    if (err) {
+                        Pump.error(err);
+                        return;
+                    }
 
                     Pump.currentUser = user;
 
@@ -187,14 +192,18 @@ if (!window.Pump) {
                     fetched++;
                     if (fetched >= count) {
                         done = true;
-                        callback(objs);
+                        callback(null, objs);
                     }
                 }
             },
-            onError = function() {
+            onError = function(xhr, status, thrown) {
                 if (!done) {
                     done = true;
-                    callback(null);
+                    if (thrown) {
+                        callback(thrown, null);
+                    } else {
+                        callback(new Error(status), null);
+                    }
                 }
             };
 
@@ -203,8 +212,7 @@ if (!window.Pump) {
                 obj.fetch({success: onSuccess,
                            error: onError});
             } catch (e) {
-                Pump.error(e.message);
-                onError();
+                onError(null, null, e);
             }
         });
     };
