@@ -535,9 +535,13 @@
                         Pump.setupSocket();
                     }
 
-                    // Reload to clear authenticated stuff
-
-                    Pump.router.navigate(window.location.pathname+"?logout=true", true);
+                    if (window.location.pathname == "/") {
+                        // If already home, reload to show main page
+                        Pump.router.home();
+                    } else {
+                        // Go home
+                        Pump.router.navigate("/", true);
+                    }
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     showError(errorThrown);
