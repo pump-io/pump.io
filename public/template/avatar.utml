@@ -2,11 +2,6 @@
 
   <form id="avatar">
 
-    <% if (data.user.profile.image && data.user.profile.image.url) { %>
-    <img src="<%- data.user.profile.image.url %>" width="96" height="96" />
-    <% } %>
-
-    <div id="avatar-fineupload"></div>
 
   </form>
 

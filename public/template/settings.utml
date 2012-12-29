@@ -1,4 +1,4 @@
-<div class="span12" id="form">
+<div class="span12" id="settings">
 
   <form id="settings">
 
@@ -6,32 +6,24 @@
 
       <legend>About you</legend>
 
-      <div class="clearfix">
-	<label for="realname">Real name</label>
-	<div class="input">
-          <input class="span6" id="realname" name="realname" size="30" type="text" value="<%- (data.profile.displayName || "") %>" />
-	  <span class="help-block">The name you want us to show</span>
-	</div>
-      </div>
+      <label for="realname">Real name</label>
+      <input class="span6" id="realname" name="realname" size="30" type="text" value="<%- (data.profile.displayName || "") %>" />
+      <span class="help-block">The name you want us to show</span>
 
-      <div class="clearfix">
-	<label for="location">Hometown</label>
-	<div class="input">
-          <input class="span6" id="location" name="location" size="30" type="text" value="<%- ((data.profile.location) ? (data.profile.location.displayName || "") : "") %>" />
-	  <span class="help-block">Where you usually are</span>
-	</div>
-      </div>
+      <label for="location">Hometown</label>
+      <input class="span6" id="location" name="location" size="30" type="text" value="<%- ((data.profile.location) ? (data.profile.location.displayName || "") : "") %>" />
+      <span class="help-block">Where you usually are</span>
 
-      <div class="clearfix">
-	<label for="bio">Bio</label>
-	
-	<div class="input">
-          <textarea class="span6" id="bio" name="bio" rows="5"><%- (data.profile.summary || "") %></textarea>
-          <span class="help-block">
-	    All about you.
-          </span>
-	</div>
-      </div><!-- /clearfix -->
+      <label for="bio">Bio</label>
+      <textarea class="span6" id="bio" name="bio" rows="5"><%- (data.profile.summary || "") %></textarea>
+      <span class="help-block">All about you.</span>
+
+      <label>Avatar</label>
+      <% if (data.user.profile.image && data.user.profile.image.url) { %>
+      <img src="<%- data.user.profile.image.url %>" width="96" height="96" />
+      <% } %>
+
+      <div id="avatar-fineupload"></div>
 
     </fieldset>
 

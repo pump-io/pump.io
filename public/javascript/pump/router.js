@@ -32,7 +32,6 @@
             ":nickname/:type/:uuid":  "object",
             "main/settings":          "settings",
             "main/account":           "account",
-            "main/avatar":            "avatar",
             "main/register":          "register",
             "main/login":             "login"
         },
@@ -57,12 +56,6 @@
             Pump.body.setContent({contentView: Pump.AccountContent,
                                   model: Pump.currentUser,
                                   title: "Account"});
-        },
-
-        avatar: function() {
-            Pump.body.setContent({contentView: Pump.AvatarContent,
-                                  model: Pump.currentUser.profile,
-                                  title: "Avatar"});
         },
 
         "home": function() {
