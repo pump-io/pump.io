@@ -130,27 +130,37 @@
             _.each(obj.people, initer(obj, Pump.Person));
 
         },
-        toJSON: function() {
+        toJSON: function(seen) {
 
             var obj = this,
+                id = obj.get(obj.idAttribute),
                 json = _.clone(obj.attributes),
                 jsoner = function(name) {
                     if (_.has(obj, name)) {
-                        if (obj[name].toCollectionJSON) {
-                            json[name] = obj[name].toCollectionJSON();
-                        } else {
-                            json[name] = obj[name].toJSON();
-                        }
+                        json[name] = obj[name].toJSON(seenNow);
                     }
+                },
+                seenNow;
+
+            if (seen && _.contains(seen, id)) {
+                json = {
+                    id: obj.id,
+                    objectType: obj.get("objectType")
                 };
-
-            _.each(obj.activityObjects, jsoner);
-            _.each(obj.activityObjectBags, jsoner);
-            _.each(obj.activityObjectStreams, jsoner);
-            _.each(obj.activityStreams, jsoner);
-            _.each(obj.peopleStreams, jsoner);
-            _.each(obj.people, jsoner);
-
+            } else {
+                if (seen) {
+                    seenNow = seen.slice(0);
+                    seenNow.push(id);
+                } else {
+                    seenNow = [id];
+                }
+                _.each(obj.activityObjects, jsoner);
+                _.each(obj.activityObjectBags, jsoner);
+                _.each(obj.activityObjectStreams, jsoner);
+                _.each(obj.activityStreams, jsoner);
+                _.each(obj.peopleStreams, jsoner);
+                _.each(obj.people, jsoner);
+            }
             return json;
         },
         merge: function(props) {
@@ -270,16 +280,35 @@
                 return [];
             }
         },
-        toCollectionJSON: function() {
-            var rep = {};
-            if (_.has(this, "totalItems")) {
-                rep.totalItems = this.totalItems;
+        toJSON: function(seen) {
+            var coll = this,
+                seenNow,
+                items;
+
+            if (!seen) { // Top-level; return as array
+                seenNow = [coll.url];
+                items = coll.models.map(function(item) {
+                    return item.toJSON(seenNow);
+                });
+                return items;
+            } else if (_.contains(seen, coll.url)) {
+                // Already seen; return as reference
+                return {
+                    url: coll.url,
+                    totalItems: coll.totalItems
+                };
+            } else {
+                seenNow = seen.slice(0);
+                seenNow.push(coll.url);
+                items = coll.models.slice(0, 4).map(function(item) {
+                    return item.toJSON(seenNow);
+                });
+                return {
+                    url: coll.url,
+                    totalItems: coll.totalItems,
+                    items: items
+                };
             }
-            if (_.has(this, "url")) {
-                rep.url = this.url;
-            }
-            // Don't JSONize models; too much likelihood of a loop
-            return rep;
         },
         merge: function(models, options) {
 
