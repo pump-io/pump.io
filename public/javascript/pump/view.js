@@ -1059,14 +1059,12 @@
                     verb: "post",
                     object: {
                         objectType: "comment",
-                        content: text,
-                        inReplyTo: {
-                            objectType: orig.get("objectType"),
-                            id: orig.get("id")
-                        }
+                        content: text
                     }
                 }),
                 stream = Pump.currentUser.minorStream;
+
+            act.object.inReplyTo = orig;
 
             view.startSpin();
 
@@ -1075,11 +1073,11 @@
                 var object = act.object,
                     repl;
 
+                // These get stripped for "posts"; re-add it
+
                 object.set("author", act.actor); 
 
                 repl = new Pump.ReplyView({model: object});
-
-                // These get stripped for "posts"; re-add it
 
                 repl.on("ready", function() {
 
