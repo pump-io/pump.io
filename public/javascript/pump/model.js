@@ -142,18 +142,25 @@
                 },
                 seenNow;
 
-            if (seen && _.contains(seen, id)) {
+            if (seen && id && _.contains(seen, id)) {
+
                 json = {
                     id: obj.id,
                     objectType: obj.get("objectType")
                 };
+
             } else {
+
                 if (seen) {
                     seenNow = seen.slice(0);
-                    seenNow.push(id);
                 } else {
-                    seenNow = [id];
+                    seenNow = [];
                 }
+
+                if (id) {
+                    seenNow.push(id);
+                }
+
                 _.each(obj.activityObjects, jsoner);
                 _.each(obj.activityObjectBags, jsoner);
                 _.each(obj.activityObjectStreams, jsoner);
@@ -161,6 +168,7 @@
                 _.each(obj.peopleStreams, jsoner);
                 _.each(obj.people, jsoner);
             }
+
             return json;
         },
         merge: function(props) {
@@ -188,8 +196,8 @@
                 model = this;
 
             _.each(attrs, function(attr) {
-                if (_.has(model, attr) && _.isArray(model[attr])) {
-                    names.append(model[attr]);
+                if (_.isArray(model[attr])) {
+                    names = names.concat(model[attr]);
                 }
             });
 
@@ -313,6 +321,7 @@
         merge: function(models, options) {
 
             var coll = this,
+                mapped,
                 props = {};
 
             if (_.isArray(models)) {
@@ -343,7 +352,10 @@
             }
 
             if (_.has(props, "items")) {
-                coll.add(props.items);
+                mapped = props.items.map(function(item) {
+                    return coll.model.unique(item);
+                });
+                coll.add(mapped);
             }
         },
         getPrev: function() { // Get stuff later than the current group
