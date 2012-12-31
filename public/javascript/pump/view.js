@@ -1910,6 +1910,13 @@
                 pathname = el.pathname, // XXX: HTML5
                 here = window.location;
 
+            // Bootstrap components; let these through
+
+            if ($(el).hasClass('dropdown-toggle') ||
+                $(el).attr('data-toggle') == 'collapse') {
+                return true;
+            }
+            
             if (!el.host || el.host === here.host) {
                 try {
                     Pump.router.navigate(pathname, true);
