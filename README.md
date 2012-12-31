@@ -151,6 +151,12 @@ Here are the main configuration keys.
   and you want to use the non-minified version of the JavaScript libraries,
   set this to `true`. Defaults to `false`, which is what people should
   use in production.
+* *firehose* Firehose host running the
+   [ofirehose](https://github.com/e14n/ofirehose) software. Defaults
+   to "ofirehose.com". Public notices will be ping this firehose
+   server and from there go out to search engines and the world. If
+   you want to disconnect from the public web, set this to something
+   falsy.
 
 ## Bugs
 
