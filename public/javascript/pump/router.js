@@ -30,6 +30,7 @@
             ":nickname/lists":        "lists",
             ":nickname/list/:uuid":   "list",
             ":nickname/:type/:uuid":  "object",
+            "main/messages":          "messages",
             "main/settings":          "settings",
             "main/account":           "account",
             "main/register":          "register",
@@ -56,6 +57,23 @@
             Pump.body.setContent({contentView: Pump.AccountContent,
                                   model: Pump.currentUser,
                                   title: "Account"});
+        },
+
+        messages: function() {
+            var user = Pump.currentUser,
+                major = user.majorDirectInbox,
+                minor = user.minorDirectInbox;
+
+            Pump.fetchObjects([user, major, minor], function(err, objs) {
+                if (err) {
+                    Pump.error(err);
+                    return;
+                }
+                Pump.body.setContent({contentView: Pump.MessagesContent,
+                                      data: {major: major,
+                                             minor: minor},
+                                      title: "Messages"});
+            });
         },
 
         "home": function() {

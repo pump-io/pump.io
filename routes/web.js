@@ -90,6 +90,7 @@ var addRoutes = function(app) {
 
     app.get("/main/settings", loginRedirect("/main/settings"));
     app.get("/main/account", loginRedirect("/main/account"));
+    app.get("/main/messages", loginRedirect("/main/messages"));
 
     app.get("/:nickname/:type/:uuid", app.session, principal, requestObject, reqUser, userIsAuthor, principalAuthorOrRecipient, showObject);
 
@@ -120,6 +121,83 @@ var showMain = function(req, res, next) {
         req.log.info({msg: "Showing welcome page"});
         res.render("main", {page: {title: "Welcome"}});
     }
+};
+
+var showDirect = function(req, res, next) {
+
+    var pump = this,
+        user = req.principalUser,
+        profile = req.principal,
+        getMajor = function(callback) {
+            var activities;
+            Step(
+                function() {
+                    user.getMajorDirectInboxStream(this);
+                },
+                function(err, str) {
+                    if (err) throw err;
+                    str.getIDs(0, 20, this);
+                },
+                function(err, ids) {
+                    if (err) throw err;
+                    Activity.readArray(ids, this);
+                },
+                function(err, results) {
+                    var objects;
+                    if (err) throw err;
+                    activities = results;
+                    objects = _.pluck(activities, "object");
+                    addLiked(profile, objects, this.parallel());
+                    addShared(profile, objects, this.parallel());
+                    addLikers(profile, objects, this.parallel());
+                    firstFewReplies(profile, objects, this.parallel());
+                    firstFewShares(profile, objects, this.parallel());
+                },
+                function(err) {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        callback(null, activities);
+                    }
+                }
+            );
+        },
+        getMinor = function(callback) {
+            Step(
+                function() {
+                    user.getMinorDirectInboxStream(this);
+                },
+                function(err, str) {
+                    if (err) throw err;
+                    str.getIDs(0, 20, this);
+                },
+                function(err, ids) {
+                    if (err) throw err;
+                    Activity.readArray(ids, this);
+                },
+                callback
+            );
+        };
+
+    Step(
+        function() {
+            getMajor(this.parallel());
+            getMinor(this.parallel());
+        },
+        function(err, major, minor) {
+            var data;
+            if (err) {
+                next(err);
+            } else {
+                data = {major: major,
+                        minor: minor,
+                        user: user};
+
+                res.render("direct", {page: { title: "Direct" },
+                                      data: data});
+            }
+        }
+    );
 };
 
 var showInbox = function(req, res, next) {
@@ -164,7 +242,7 @@ var showInbox = function(req, res, next) {
         getMinor = function(callback) {
             Step(
                 function() {
-                    user.getMajorInboxStream(this);
+                    user.getMinorInboxStream(this);
                 },
                 function(err, str) {
                     if (err) throw err;

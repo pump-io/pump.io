@@ -945,6 +945,46 @@
         }
     });
 
+    // Note: Not the same as the messages indicator on the navbar
+    // This is the full-page view
+
+    Pump.MessagesContent = Pump.ContentView.extend({
+        templateName: "messages-content",
+        parts: ["major-stream",
+                "minor-stream",
+                "major-activity",
+                "minor-activity",
+                "responses",
+                "reply",
+                "activity-object-list",
+                "activity-object-collection"],
+        addMajorActivity: function(act) {
+            var view = this;
+            view.majorStreamView.showAdded(act);
+        },
+        addMinorActivity: function(act) {
+            var view = this,
+                aview;
+            view.minorStreamView.showAdded(act);
+        },
+        subs: {
+            "#major-stream": {
+                attr: "majorStreamView",
+                subView: "MajorStreamView",
+                subOptions: {
+                    collection: "major"
+                }
+            },
+            "#minor-stream": {
+                attr: "minorStreamView",
+                subView: "MinorStreamView",
+                subOptions: {
+                    collection: "minor"
+                }
+            }
+        }
+    });
+
     Pump.MajorActivityView = Pump.TemplateView.extend({
         templateName: 'major-activity',
         parts: ["activity-object-list",

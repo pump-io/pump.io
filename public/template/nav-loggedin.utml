@@ -29,6 +29,8 @@
         <li><a tabindex="-1" href="/<%- data.user.nickname %>/following">Following</a></li>
         <li><a tabindex="-1" href="/<%- data.user.nickname %>/lists">Lists</a></li>
         <li class="divider"></li>
+        <li><a tabindex="-1" href="/main/messages">Messages</a></li>
+        <li class="divider"></li>
         <li><a tabindex="-1" href="/main/settings">Settings</a></li>
         <li><a tabindex="-1" href="/main/account">Account</a></li>
         <li class="divider"></li>
