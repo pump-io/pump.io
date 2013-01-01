@@ -165,3 +165,24 @@ If you find bugs, you can report them here:
 https://github.com/e14n/pump.io/issues
 
 You can also email me at evan@e14n.com.
+
+## Colophon
+
+This software includes the following great packages of client-side software.
+
+* Twitter Bootstrap
+* Backbone
+* JQuery
+* Fine Uploader
+* WysiHTML5
+* Spin.js
+* SockJS
+* Select2
+* JQuery Easydate
+* OAuth.js
+
+It also uses these icon sets:
+
+* Fancy Avatars, © 2009 Brandon Mathis, http://brandonmathis.com/projects/fancy-avatars/ (CC-By)
+* Glyphicons, http://glyphicons.com/ (CC-By)
+
