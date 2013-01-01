@@ -1,56 +1,47 @@
 <div class="container">
 
-  <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse" href="#">
-    <span class="icon-bar"></span>
-    <span class="icon-bar"></span>
-  </a>
-
   <a class="brand" href="/"><%- config.site %></a>
 
-  <div class="nav-collapse collapse">
+  <div class="btn-group">
+    <button type="button" class="btn primary" id="post-note-button">
+      Note <i class="icon-pencil"></i>
+    </button>
+    <% if (config.canUpload) { %>
+    <button type="button" class="btn primary" id="post-picture-button">
+      Picture <i class="icon-picture"></i>
+    </button>
+    <% } %>
+  </div>
 
-    <div class="btn-group">
-      <button type="button" class="btn primary" id="post-note-button">
-        Note <i class="icon-pencil"></i>
-      </button>
-      <% if (config.canUpload) { %>
-      <button type="button" class="btn primary" id="post-picture-button">
-        Picture <i class="icon-picture"></i>
-      </button>
-      <% } %>
-    </div>
+  <ul class="nav pull-right">
+    <li id="fat-menu" class="dropdown">
+      <a href="#" id="profile-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown"> 
+        <% if (_.has(data.user, "profile") && _.isObject(data.user.profile) && _(data.user.profile).has("image")) { %>
+        <img class="pull-left" src="<%- data.user.profile.image.url %>" width="24" height="24" />&nbsp;
+        <% } %>
+        <%- data.user.profile.displayName %>
+        <b class="caret"></b>
+      </a>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="profile-dropdown">
+        <li><a tabindex="-1" href="/<%- data.user.nickname %>">Activity</a></li>
+        <li><a tabindex="-1" href="/<%- data.user.nickname %>/favorites">Favorites</a></li>
+        <li><a tabindex="-1" href="/<%- data.user.nickname %>/followers">Followers</a></li>
+        <li><a tabindex="-1" href="/<%- data.user.nickname %>/following">Following</a></li>
+        <li><a tabindex="-1" href="/<%- data.user.nickname %>/lists">Lists</a></li>
+        <li class="divider"></li>
+        <li><a tabindex="-1" href="/main/messages">Messages</a></li>
+        <li class="divider"></li>
+        <li><a tabindex="-1" href="/main/settings">Settings</a></li>
+        <li><a tabindex="-1" href="/main/account">Account</a></li>
+        <li class="divider"></li>
+        <li><a tabindex="-1" id="logout" href="#">Log out</a></li>
+      </ul>
+    </li>
+  </ul>
 
-    <ul class="nav pull-right">
-      <li id="fat-menu" class="dropdown">
-        <a href="#" id="profile-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown"> 
-          <% if (_.has(data.user, "profile") && _.isObject(data.user.profile) && _(data.user.profile).has("image")) { %>
-          <img class="pull-left" src="<%- data.user.profile.image.url %>" width="24" height="24" />&nbsp;
-          <% } %>
-          <%- data.user.profile.displayName %>
-          <b class="caret"></b>
-        </a>
-        <ul class="dropdown-menu" role="menu" aria-labelledby="profile-dropdown">
-          <li><a tabindex="-1" href="/<%- data.user.nickname %>">Activity</a></li>
-          <li><a tabindex="-1" href="/<%- data.user.nickname %>/favorites">Favorites</a></li>
-          <li><a tabindex="-1" href="/<%- data.user.nickname %>/followers">Followers</a></li>
-          <li><a tabindex="-1" href="/<%- data.user.nickname %>/following">Following</a></li>
-          <li><a tabindex="-1" href="/<%- data.user.nickname %>/lists">Lists</a></li>
-          <li class="divider"></li>
-          <li><a tabindex="-1" href="/main/messages">Messages</a></li>
-          <li class="divider"></li>
-          <li><a tabindex="-1" href="/main/settings">Settings</a></li>
-          <li><a tabindex="-1" href="/main/account">Account</a></li>
-          <li class="divider"></li>
-          <li><a tabindex="-1" id="logout" href="#">Log out</a></li>
-        </ul>
-      </li>
-    </ul>
-
-    <div class="pull-right">
-      <%= partial("messages") %>
-      <%= partial("notifications") %>
-    </div>
-
+  <div class="pull-right">
+    <%= partial("messages") %>
+    <%= partial("notifications") %>
   </div>
 
 </div>
