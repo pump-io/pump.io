@@ -3,7 +3,7 @@
     <% if (data.profile.image && data.profile.image.url) { %>
     <img src="<%- data.profile.image.url %>" width="128" height="128" />
     <% } else { %>
-    <img src="/images/default.jpg" width="128" height="128" />
+    <img src="/images/default.png" width="128" height="128" />
     <% } %>
   </div>
   <div class="span8">
