@@ -66,6 +66,15 @@ var hostmeta = {
             {rel: "registration_endpoint",
              href: "https://secure.localhost/api/client/register"
             },
+            {rel: "http://apinamespace.org/oauth/request_token",
+             href: "https://secure.localhost/oauth/request_token"
+            },
+            {rel: "http://apinamespace.org/oauth/authorize",
+             href: "https://secure.localhost/oauth/authorize"
+            },
+            {rel: "http://apinamespace.org/oauth/access_token",
+             href: "https://secure.localhost/oauth/access_token"
+            },
             {rel: "dialback",
              href: "https://secure.localhost/api/dialback"}]
 };
