@@ -44,6 +44,15 @@ var hostmeta = {
             {rel: "registration_endpoint",
              href: "http://social.localhost/api/client/register"
             },
+            {rel: "http://apinamespace.org/oauth/request_token",
+             href: "http://social.localhost/oauth/request_token"
+            },
+            {rel: "http://apinamespace.org/oauth/authorize",
+             href: "http://social.localhost/oauth/authorize"
+            },
+            {rel: "http://apinamespace.org/oauth/access_token",
+             href: "http://social.localhost/oauth/access_token"
+            },
             {rel: "dialback",
              href: "http://social.localhost/api/dialback"}]
 };

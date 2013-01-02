@@ -66,6 +66,18 @@ var hostMetaLinks = function() {
             href: URLMaker.makeURL("/api/client/register")
         },
         {
+            rel: "http://apinamespace.org/oauth/request_token",
+            href: URLMaker.makeURL("/oauth/request_token")
+        },
+        {
+            rel: "http://apinamespace.org/oauth/authorize",
+            href: URLMaker.makeURL("/oauth/authorize")
+        },
+        {
+            rel: "http://apinamespace.org/oauth/access_token",
+            href: URLMaker.makeURL("/oauth/access_token")
+        },
+        {
             rel: "dialback",
             href: URLMaker.makeURL("/api/dialback")
         }
