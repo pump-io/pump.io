@@ -32,7 +32,8 @@
                       "emailjs": "0.3.x",
                       "mkdirp": "0.3.x",
 		      "connect-databank": "0.4.x",
-                      "sockjs": "0.3.x"
+                      "sockjs": "0.3.x",
+                      "dialback-client": "0.1.x"
 		    },
     "bin": {
         "pump": "./bin/pump",
