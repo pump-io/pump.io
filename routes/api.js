@@ -196,6 +196,10 @@ var addRoutes = function(app) {
 
     app.get("/api/collection/:uuid/members", clientAuth, requestCollection, authorOrRecipient, collectionMembers);
     app.post("/api/collection/:uuid/members", userAuth, requestCollection, authorOnly, reqGenerator, newMember);
+
+    // Info about yourself
+
+    app.get("/api/whoami", userAuth, whoami);
 };
 
 // XXX: use a common function instead of faking up params
@@ -2330,6 +2334,10 @@ var streamArgs = function(req, defaultCount, maxCount) {
     } catch (e) {
         throw new HTTPError(e.message, 400);
     }
+};
+
+var whoami = function(req, res, next) {
+    res.redirect("/api/user/"+req.remoteUser.nickname+"/profile", 302);
 };
 
 exports.addRoutes = addRoutes;
