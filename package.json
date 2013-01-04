@@ -33,7 +33,7 @@
                       "mkdirp": "0.3.x",
 		      "connect-databank": "0.4.x",
                       "sockjs": "0.3.x",
-                      "dialback-client": "0.1.x"
+                      "dialback-client": ">=0.1.1"
 		    },
     "bin": {
         "pump": "./bin/pump",

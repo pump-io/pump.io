@@ -67,6 +67,7 @@ var types = [
     "credentials",
     "other",
     "dialbackrequest",
+    "recentdialbackrequests",
     "session",
     "sessionlist",
     "share"
