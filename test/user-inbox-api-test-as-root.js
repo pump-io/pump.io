@@ -243,7 +243,7 @@ suite.addBatch({
                 "it works": function(err, act, resp) {
                     assert.ifError(err);
                     assert.isObject(act);
-                },
+                }
             },
             "and we post to the inbox with OAuth credentials for an unrelated webfinger": {
                 topic: function() {
