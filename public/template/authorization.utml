@@ -2,11 +2,15 @@
 
 <p>You are logged in as <strong id="username"><%- data.user.nickname %></strong>.</p>
 
-<p>Do you want to authorize this application to access your account?</p>
+<p>Do you want to authorize <em><%- data.application.title %></em> to access your account?</p>
 
-<table>            
-  <tr><td>Title</td><td id="application-title"><%- data.application.title %></td></tr>    
-</table>
+<p>Applications with access to your account can:
+  <ul>
+    <li>Post new activities as you</li>
+    <li>Read your social graph (followers, following, list)</li>
+    <li>Change your profile</li>
+  </ul>
+</p>
 
 <form id="authorize" method="post"> 
   <input type="hidden" id="oauth_token" name="oauth_token" value="<%- data.token %>"/> 
