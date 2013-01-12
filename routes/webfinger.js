@@ -80,6 +80,10 @@ var hostMetaLinks = function() {
         {
             rel: "dialback",
             href: URLMaker.makeURL("/api/dialback")
+        },
+        {
+            rel: "http://apinamespace.org/activitypub/whoami",
+            href: URLMaker.makeURL("/api/whoami")
         }
     ];
 };

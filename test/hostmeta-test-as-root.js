@@ -54,7 +54,10 @@ var hostmeta = {
              href: "http://social.localhost/oauth/access_token"
             },
             {rel: "dialback",
-             href: "http://social.localhost/api/dialback"}]
+             href: "http://social.localhost/api/dialback"},
+            {rel: "http://apinamespace.org/activitypub/whoami",
+             href: "http://social.localhost/api/whoami"}
+           ]
 };
 
 // A batch to test hostmeta functions

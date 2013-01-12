@@ -76,7 +76,10 @@ var hostmeta = {
              href: "https://secure.localhost/oauth/access_token"
             },
             {rel: "dialback",
-             href: "https://secure.localhost/api/dialback"}]
+             href: "https://secure.localhost/api/dialback"},
+            {rel: "http://apinamespace.org/activitypub/whoami",
+             href: "https://secure.localhost/api/whoami"}
+]
 };
 
 var webfinger = {
