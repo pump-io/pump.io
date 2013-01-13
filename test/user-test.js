@@ -64,6 +64,21 @@ mb["When we require the user module"]
     assert.isString(created.updated);
 };
 
+mb["When we require the user module"]
+["and we get its User class export"]
+["and we create an user instance"]
+["passed-in fields are there"] = function(err, created) {
+    _.each(testData.create, function(value, key) {
+        if (key == "profile") {
+            _.each(testData.create.profile, function(value, key) {
+                assert.deepEqual(created.profile[key], value);
+            });
+        } else {
+            assert.deepEqual(created[key], value); 
+        }
+    });
+};
+
 suite.addBatch(mb);
 
 suite.addBatch({
@@ -202,6 +217,7 @@ suite.addBatch({
             "it has a profile attribute": function(user) {
                 assert.isObject(user.profile);
                 assert.instanceOf(user.profile, require("../lib/model/person").Person);
+                assert.isString(user.profile.id);
             },
             "and we check the credentials with the right password": {
                 topic: function(user, User) {
