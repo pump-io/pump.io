@@ -23,6 +23,7 @@ var assert = require("assert"),
     Step = require("step"),
     fs = require("fs"),
     path = require("path"),
+    Queue = require("jankyqueue"),
     schema = require("../lib/schema").schema,
     URLMaker = require("../lib/urlmaker").URLMaker,
     Stream = require("../lib/model/stream").Stream,
@@ -95,7 +96,21 @@ suite.addBatch({
                             moods = ["happy", "sad", "frightened", "mad", "excited", "glad", "bored"],
                             tags = ["ggi", "winning", "justsayin", "ows", "sep17", "jan25",
                                     "egypt", "fail", "tigerblood", "bitcoin", "fsw"],
-                            total;
+                            total,
+                            createAndDeliver = function(act, callback) {
+                                Step(
+                                    function() {
+                                        Activity.create(act, this);
+                                    },
+                                    function(err, act) {
+                                        if (err) throw err;
+                                        str.deliver(act.id, this);
+                                    },
+                                    function(err) {
+                                        callback(err);
+                                    }
+                                );
+                            };
                         
                         total = places.length * sentences.length * actorIds.length * moods.length * tags.length;
 
@@ -104,9 +119,10 @@ suite.addBatch({
                                 Stream.create({name: "test"}, this);
                             },
                             function(err, result) {
-                                var i, act, group = this.group();
+                                var i, act, q, group = this.group();
                                 if (err) throw err;
                                 str = result;
+                                q = new Queue(25);
                                 for (i = 0; i < total; i++) {
                                     act = {
                                         actor: {
@@ -128,14 +144,9 @@ suite.addBatch({
                                             displayName: moods[i % moods.length]
                                         }
                                     };
-                                    Activity.create(act, group());
-                                }
-                            },
-                            function(err, acts) {
-                                var i, group = this.group();
-                                if (err) throw err;
-                                for (i = 0; i < acts.length; i++) {
-                                    str.deliver(acts[i].id, group());
+                                    q.enqueue(createAndDeliver, 
+                                              [act],
+                                              group());
                                 }
                             },
                             function(err) {
