@@ -349,8 +349,9 @@ suite.addBatch({
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
                         assert.greater(feed.items.length, 0);
-                        assert.isObject(feed.items[0]);
-                        assert.equal(feed.items[0].id, act.id);
+                        assert.isTrue(_.some(feed.items, function(item) {
+                            return (_.isObject(item) && item.id == act.id);
+                        }));
                     }
                 }
             }
