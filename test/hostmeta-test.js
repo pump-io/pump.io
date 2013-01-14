@@ -53,7 +53,10 @@ var hostmeta = {
              href: "http://localhost:4815/oauth/access_token"
             },
             {rel: "dialback",
-             href: "http://localhost:4815/api/dialback"}]
+             href: "http://localhost:4815/api/dialback"},
+            {rel: "http://apinamespace.org/activitypub/whoami",
+             href: "http://localhost:4815/api/whoami"}
+           ]
 };
 
 // A batch to test hostmeta functions
