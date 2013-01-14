@@ -23,6 +23,7 @@ var assert = require("assert"),
     _ = require("underscore"),
     fs = require("fs"),
     path = require("path"),
+    DialbackClient = require("dialback-client"),
     databank = require("databank"),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
@@ -58,9 +59,16 @@ suite.addBatch({
                     dialbackApp(80, "dialback.localhost", this);
                 },
                 function(err, dbapp) {
+                    var dialbackClient;
                     if (err) {
                         callback(err, null, null);
                     } else {
+                        Credentials.dialbackClient = new DialbackClient({
+                            hostname: "dialback.localhost",
+                            bank: db,
+                            app: dbapp,
+                            url: "/api/dialback"
+                        });
                         callback(err, app, dbapp);
                     }
                 }
