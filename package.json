@@ -5,7 +5,7 @@
     "version": "0.2.0-alpha.1",
     "author": "Evan Prodromou <evan@e14n.com>",
     "devDependencies": {
-        "vows": "0.6.x",
+        "vows": "0.7.x",
         "node-mocks-http": "0.0.x",
         "zombie": "0.12.x",
         "xml2js": "0.1.x",
