@@ -73,7 +73,7 @@ var tinyApp = function(port, hostname, callback) {
             links: [
                 {
                     rel: "dialback",
-                    href: "http://"+hostname+"/dialback"
+                    href: "http://"+hostname+"/api/dialback"
                 }
             ]
         });
