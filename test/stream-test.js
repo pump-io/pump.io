@@ -671,7 +671,6 @@ suite.addBatch({
                     var i;
                     assert.ifError(err);
                     assert.isArray(indices);
-                    console.log(indices.slice(0, 10));
                     assert.lengthOf(indices, 10000);
                     for (i = 0; i < indices.length; i++) {
                         assert.equal(indices[i], i);
