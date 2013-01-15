@@ -33,6 +33,7 @@ var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 var suite = vows.describe("stream index tests");
 
 var MAX = 10000;
+var SOME = 3000;
 
 suite.addBatch({
     "When we create a new stream": {
@@ -125,6 +126,39 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.isArray(indices);
                         assert.lengthOf(indices, MAX);
+                        for (i = 0; i < indices.length; i++) {
+                            assert.equal(indices[i], i);
+                        }
+                    }
+                }
+            },
+            "and we get SOME out": {
+                topic: function(stream) {
+                    stream.getItems(0, SOME, this.callback);
+                },
+                "it works": function(err, items) {
+                    assert.ifError(err);
+                    assert.isArray(items);
+                    assert.equal(items.length, SOME);
+                },
+                "and we get each one's index": {
+                    topic: function(items, stream) {
+                        var cb = this.callback;
+                        Step(
+                            function() {
+                                var i, group = this.group();
+                                for (i = 0; i < SOME; i++) {
+                                    stream.indexOf(items[i], group());
+                                }
+                            },
+                            cb
+                        );
+                    },
+                    "it works": function(err, indices) {
+                        var i;
+                        assert.ifError(err);
+                        assert.isArray(indices);
+                        assert.lengthOf(indices, SOME);
                         for (i = 0; i < indices.length; i++) {
                             assert.equal(indices[i], i);
                         }
