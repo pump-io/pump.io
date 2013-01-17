@@ -138,38 +138,75 @@ suite.addBatch({
                     app.close();
                 }
             },
-            "and we post an activity from a local user": {
+            "and we get new credentials": {
                 topic: function(social, spam) {
-                    var cred,
-                        callback = this.callback;
-
-                    Step(
-                        function() {
-                            newCredentials("ann", "1day@atime", "social.localhost", 80, this);
-                        },
-                        function(err, results) {
-                            if (err) throw err;
-                            cred = results;
-                            spam.isSpam   = false;
-                            spam.callback = this.parallel();
-                            httputil.postJSON("http://social.localhost/api/user/ann/feed",
-                                              cred,
-                                              {
-                                                  verb: "post",
-                                                  object: {
-                                                      objectType: "note",
-                                                      content: "This is it."
-                                                  }
-                                              },
-                                              this.parallel());
-                        },
-                        callback
-                    );
+                    newCredentials("ann", "1day@atime", "social.localhost", 80, this.callback);
                 },
-                "it works": function(err, tested, result) {
+                "it works": function(err, cred) {
                     assert.ifError(err);
-                    assert.isObject(tested);
-                    assert.isObject(result);
+                    assert.isObject(cred);
+                },
+                "and we post a non-spam activity from a local user": {
+                    topic: function(cred, social, spam) {
+                        var callback = this.callback;
+
+                        Step(
+                            function() {
+                                spam.isSpam   = false;
+                                spam.callback = this.parallel();
+                                httputil.postJSON("http://social.localhost/api/user/ann/feed",
+                                                  cred,
+                                                  {
+                                                      verb: "post",
+                                                      object: {
+                                                          objectType: "note",
+                                                          content: "This is it."
+                                                      }
+                                                  },
+                                                  this.parallel());
+                            },
+                            callback
+                        );
+                    },
+                    "it works": function(err, tested, result) {
+                        assert.ifError(err);
+                        assert.isObject(tested);
+                        assert.isObject(result);
+                    },
+                    "and we post a spam activity from a local user": {
+                        topic: function(tested, result, cred, social, spam) {
+                            var callback = this.callback;
+
+                            Step(
+                                function() {
+                                    spam.isSpam   = true;
+                                    spam.callback = this.parallel();
+                                    httputil.postJSON("http://social.localhost/api/user/ann/feed",
+                                                      cred,
+                                                      {
+                                                          verb: "post",
+                                                          object: {
+                                                              objectType: "note",
+                                                              content: "Just keep doing what you do."
+                                                          }
+                                                      },
+                                                      this.parallel());
+                                },
+                                function(err, body, resp) {
+                                    if (err && err.statusCode == 400) {
+                                        callback(null);
+                                    } else if (err) {
+                                        callback(err);
+                                    } else {
+                                        callback(new Error("Unexpected success"));
+                                    }
+                                }
+                            );
+                        },
+                        "it fails correctly": function(err) {
+                            assert.ifError(err);
+                        }
+                    }
                 }
             }
         }
