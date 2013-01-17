@@ -323,7 +323,7 @@ var putObject = function(req, res, next) {
 
     Step(
         function() {
-            newActivity(act, req.remoteUser, this);
+            newActivity(act, req.remoteUser, req.app.spam, this);
         },
         function(err, act) {
             var d;
@@ -352,7 +352,7 @@ var deleteObject = function(req, res, next) {
 
     Step(
         function() {
-            newActivity(act, req.remoteUser, this);
+            newActivity(act, req.remoteUser, req.app.spam, this);
         },
         function(err, act) {
             var d;
@@ -720,7 +720,7 @@ var createUser = function(req, res, next) {
                 object: svc,
                 generator: req.generator
             });
-            newActivity(act, user, callback);
+            newActivity(act, user, req.app.spam, callback);
         },
         welcomeActivity = function(user, svc, callback) {
             Step(
@@ -744,7 +744,7 @@ var createUser = function(req, res, next) {
                             content: text
                         }
                     });
-                    initActivity(act, this);
+                    initActivity(act, req.app.spam, this);
                 },
                 function(err, act) {
                     if (err) {
@@ -774,7 +774,7 @@ var createUser = function(req, res, next) {
                                 objectTypes: ["person"]
                             }
                         });
-                        newActivity(act, user, group());
+                        newActivity(act, user, req.app.spam, group());
                     });
                 },
                 callback
@@ -991,7 +991,7 @@ var postActivity = function(req, res, next) {
     
     Step(
         function() {
-            newActivity(activity, req.user, this);
+            newActivity(activity, req.user, req.app.spam, this);
         },
         function(err, activity) {
             var d;
@@ -1095,7 +1095,7 @@ var postToInbox = function(req, res, next) {
     );
 };
 
-var initActivity = function(activity, callback) {
+var initActivity = function(activity, spam, callback) {
 
     Step(
         function() {
@@ -1104,7 +1104,19 @@ var initActivity = function(activity, callback) {
         },
         function(err) {
             if (err) throw err;
-            // First, apply the activity
+            if (spam) {
+                spam.test(activity, this);
+            } else {
+                this(null, false, 0.0);
+            }
+        },
+        function(err, isSpam, probability) {
+            if (err) throw err;
+            if (isSpam) {
+                // XXX: do some social trust metrics
+                throw new HTTPError("Looks like spam", 400);
+            }
+            // apply the activity
             activity.apply(null, this);
         },
         function(err) {
@@ -1136,7 +1148,7 @@ var initActivity = function(activity, callback) {
     );
 };
 
-var newActivity = function(activity, user, callback) {
+var newActivity = function(activity, user, spam, callback) {
 
     if (!_(activity).has("actor")) {
         activity.actor = user.profile;
@@ -1144,7 +1156,7 @@ var newActivity = function(activity, user, callback) {
 
     Step(
         function() {
-            initActivity(activity, this);
+            initActivity(activity, spam, this);
         },
         function(err, saved) {
             if (err) throw err;
@@ -1707,7 +1719,7 @@ var newFollow = function(req, res, next) {
 
     Step(
         function() {
-            newActivity(act, req.user, this);
+            newActivity(act, req.user, req.app.spam, this);
         },
         function(err, act) {
             var d;
@@ -1860,7 +1872,7 @@ var newFavorite = function(req, res, next) {
 
     Step(
         function() {
-            newActivity(act, req.user, this);
+            newActivity(act, req.user, req.app.spam, this);
         },
         function(err, act) {
             var d;
@@ -2268,7 +2280,7 @@ var newMember = function(req, res, next) {
 
     Step(
         function() {
-            newActivity(act, req.remoteUser, this);
+            newActivity(act, req.remoteUser, req.app.spam, this);
         },
         function(err, act) {
             var d;
