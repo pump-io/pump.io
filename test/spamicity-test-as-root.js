@@ -209,6 +209,53 @@ suite.addBatch({
                     }
                 }
             }
+        },
+        "and we start a pump app with no spam server configured": {
+            topic: function(spam) {
+                setupAppConfig({port: 80, 
+                                hostname: "photo.localhost", 
+                                driver: tc.driver,
+                                params: tc.params},
+                               this.callback);
+            },
+            "it works": function(err, app) {
+                assert.ifError(err);
+            },
+            teardown: function(app) {
+                if (app && app.close) {
+                    app.close();
+                }
+            },
+            "and we get new credentials": {
+                topic: function(photo, spam) {
+                    newCredentials("julie", "1day@atime", "photo.localhost", 80, this.callback);
+                },
+                "it works": function(err, cred) {
+                    assert.ifError(err);
+                    assert.isObject(cred);
+                },
+                "and we post a non-spam activity from a local user": {
+                    topic: function(cred, photo, spam) {
+                        var callback = this.callback;
+
+                        httputil.postJSON("http://photo.localhost/api/user/julie/feed",
+                                          cred,
+                                          {
+                                              verb: "post",
+                                              object: {
+                                                  objectType: "note",
+                                                  content: "This is it."
+                                              }
+                                          },
+                                          callback);
+                    },
+                    "it works": function(err, body, result) {
+                        assert.ifError(err);
+                        assert.isObject(body);
+                        assert.isObject(result);
+                    }
+                }
+            }
         }
     }
 });
