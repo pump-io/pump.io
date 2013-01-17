@@ -120,7 +120,7 @@ suite.addBatch({
             }
         },
         "and we start a pump app with the spam server configured": {
-            topic: function() {
+            topic: function(spam) {
                 setupAppConfig({port: 80, 
                                 hostname: "social.localhost", 
                                 driver: tc.driver,
@@ -142,9 +142,10 @@ suite.addBatch({
                 topic: function(social, spam) {
                     var cred,
                         callback = this.callback;
+
                     Step(
                         function() {
-                            newCredentials("annromano", "1day@atime", "social.localhost", 80, this);
+                            newCredentials("ann", "1day@atime", "social.localhost", 80, this);
                         },
                         function(err, results) {
                             if (err) throw err;
