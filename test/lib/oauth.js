@@ -289,17 +289,19 @@ var newPair = function(cl, nickname, password, hostname, port, cb) {
             register(cl, nickname, password, hostname, port, this);
         },
         function(err, res) {
-            if (err) throw err;
-            regd = res;
-            user = {nickname: nickname, password: password};
-            accessToken(cl, user, hostname, port, this);
-        },
-        function(err, res) {
+            var pair;
             if (err) {
                 cb(err, null);
             } else {
-                _.extend(res, {user: regd});
-                cb(null, res);
+                user = res;
+                pair = {
+                    token: user.token,
+                    token_secret: user.secret,
+                    user: user
+                };
+                delete user.token;
+                delete user.secret;
+                cb(null, pair);
             }
         }
     );
