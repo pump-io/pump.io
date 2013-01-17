@@ -68,16 +68,25 @@ suite.addBatch({
                 topic: function(cl) {
                     var callback = this.callback;
                     
-                    newPair(cl, "fry", "1-jan-2000", callback);
+                    Step(
+                        function() {
+                            var group = this.group();
+                            newPair(cl, "fry", "1-jan-2000", group());
+                            newPair(cl, "leela", "6undergr0und", group());
+                            newPair(cl, "bender", "shiny|metal", group());
+                            newPair(cl, "amy", "k|k|wong", group());
+                        },
+                        callback
+                    );
                 },
-                "it works": function(err, pair) {
+                "it works": function(err, pairs) {
                     assert.ifError(err);
-                    assert.isObject(pair);
+                    assert.isArray(pairs);
                 },
                 "and they create a list": {
-                    topic: function(pair, cl) {
+                    topic: function(pairs, cl) {
                         var callback = this.callback,
-                            cred = makeCred(cl, pair);
+                            cred = makeCred(cl, pairs[0]);
 
                         Step(
                             function() {
@@ -105,21 +114,14 @@ suite.addBatch({
                         assert.isObject(list);
                     },
                     "and they add some other users": {
-                        topic: function(list, pair, cl) {
+                        topic: function(list, pairs, cl) {
                             var callback = this.callback,
-                                cred = makeCred(cl, pair);
+                                cred = makeCred(cl, pairs[0]);
 
                             Step(
                                 function() {
                                     var group = this.group();
-                                    register(cl, "leela", "6undergr0und", group());
-                                    register(cl, "bender", "shiny|metal", group());
-                                    register(cl, "amy", "k|k|wong", group());
-                                },
-                                function(err, users) {
-                                    var group = this.group();
-                                    if (err) throw err;
-                                    _.each(users, function(user) {
+                                    _.each(_.pluck(pairs.slice(1), "user"), function(user) {
                                         httputil.postJSON("http://localhost:4815/api/user/fry/feed",
                                                           cred,
                                                           {
@@ -144,9 +146,9 @@ suite.addBatch({
                             assert.ifError(err);
                         },
                         "and they post a note to the list": {
-                            topic: function(list, pair, cl) {
+                            topic: function(list, pairs, cl) {
                                 var callback = this.callback,
-                                    cred = makeCred(cl, pair);
+                                    cred = makeCred(cl, pairs[0]);
                                 
                                 httputil.postJSON("http://localhost:4815/api/user/fry/feed",
                                                   cred,
@@ -158,11 +160,52 @@ suite.addBatch({
                                                           content: "Hi everybody."
                                                       }
                                                   },
-                                                  callback);
+                                                  function(err, body, resp) {
+                                                      callback(err, body);
+                                                  }
+                                                 );
                             },
-                            "it works": function(err, body, resp) {
+                            "it works": function(err, body) {
                                 assert.ifError(err);
                                 assert.isObject(body);
+                            },
+                            "and we check the inboxes of the other users": {
+                                topic: function(act, list, pairs, cl) {
+                                    var callback = this.callback;
+
+                                    Step(
+                                        function() {
+                                            var group = this.group();
+                                            _.each(pairs.slice(1), function(pair) {
+                                                var user = pair.user,
+                                                    cred = makeCred(cl, pair);
+                                                
+                                                httputil.getJSON("http://localhost:4815/api/user/"+user.nickname+"/inbox",
+                                                                 cred,
+                                                                 group());
+                                            });
+                                        },
+                                        function(err, feeds) {
+                                            callback(err, feeds, act);
+                                        }
+                                    );
+                                },
+                                "it works": function(err, feeds, act) {
+                                    assert.ifError(err);
+                                    assert.isArray(feeds);
+                                    assert.isObject(act);
+                                },
+                                "the activity is in there": function(err, feeds, act) {
+                                    _.each(feeds, function(feed) {
+                                        assert.isObject(feed);
+                                        assert.include(feed, "items");
+                                        assert.isArray(feed.items);
+                                        assert.greater(feed.items.length, 0);
+                                        assert.isTrue(_.some(feed.items, function(item) {
+                                            return (item.id == act.id);
+                                        }));
+                                    });
+                                }
                             }
                         }
                     }
