@@ -20,6 +20,7 @@ var assert = require("assert"),
     vows = require("vows"),
     Step = require("step"),
     _ = require("underscore"),
+    Queue = require("jankyqueue"),
     OAuth = require("oauth").OAuth,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
@@ -209,6 +210,115 @@ suite.addBatch({
                             }
                         }
                     }
+                }
+            },
+            "and a user posts to a very big list": {
+
+                topic: function(cl) {
+                    var callback = this.callback,
+                        pairs,
+                        list,
+                        act,
+                        q = new Queue(25);
+                    
+                    Step(
+                        function() {
+                            var i, group = this.group();
+                            for (i = 0; i < 150; i++) {
+                                q.enqueue(newPair, [cl, "robot"+i, "bad*password*"+i], group());
+                            }
+                        },
+                        function(err, results) {
+                            var cred;
+                            if (err) throw err;
+                            pairs = results;
+                            cred = makeCred(cl, pairs[0]);
+                            httputil.postJSON("http://localhost:4815/api/user/robot0/feed",
+                                              cred,
+                                              {
+                                                  verb: "create",
+                                                  object: {
+                                                      objectType: "collection",
+                                                      objectTypes: ["person"], // robots are people, too
+                                                      displayName: "Robots"
+                                                  }
+                                              },
+                                              this);
+                        },
+                        function(err, act) {
+                            var group = this.group(),
+                                cred;
+                            if (err) throw err;
+                            list = act.object;
+                            cred = makeCred(cl, pairs[0]);
+                            _.each(_.pluck(pairs.slice(1), "user"), function(user) {
+                                q.enqueue(httputil.postJSON,
+                                          ["http://localhost:4815/api/user/robot0/feed",
+                                           cred,
+                                           {
+                                               verb: "add",
+                                               object: user.profile,
+                                               target: list
+                                           }
+                                          ],
+                                          group());
+                                
+                            });
+                        },
+                        function(err, responses) {
+                            var cred = makeCred(cl, pairs[0]);
+                            if (err) throw err;
+                            httputil.postJSON("http://localhost:4815/api/user/robot0/feed",
+                                              cred,
+                                              {
+                                                  verb: "post",
+                                                  to: [list],
+                                                  object: {
+                                                      objectType: "note",
+                                                      content: "Cigars are evil; you won't miss 'em."
+                                                  }
+                                              },
+                                              this
+                                             );
+                        },
+                        function(err, body, resp) {
+                            var cb = this;
+                            if (err) throw err;
+                            act = body;
+                            setTimeout(function() { cb(null); }, 5000);
+                        },
+                        function(err) {
+                            var group = this.group();
+                            _.each(pairs.slice(1), function(pair) {
+                                var user = pair.user,
+                                    cred = makeCred(cl, pair);
+
+                                q.enqueue(httputil.getJSON,
+                                          ["http://localhost:4815/api/user/"+user.nickname+"/inbox",
+                                           cred],
+                                          group());
+                            });
+                        },
+                        function(err, feeds) {
+                            callback(err, feeds, act);
+                        }
+                    );
+                },
+                "it works": function(err, feeds, act) {
+                    assert.ifError(err);
+                    assert.isArray(feeds);
+                    assert.isObject(act);
+                },
+                "the activity is in there": function(err, feeds, act) {
+                    _.each(feeds, function(feed) {
+                        assert.isObject(feed);
+                        assert.include(feed, "items");
+                        assert.isArray(feed.items);
+                        assert.greater(feed.items.length, 0);
+                        assert.isTrue(_.some(feed.items, function(item) {
+                            return (item.id == act.id);
+                        }));
+                    });
                 }
             }
         }
