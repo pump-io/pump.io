@@ -21,7 +21,9 @@ var fs = require("fs"),
     assert = require("assert"),
     express = require("express"),
     vows = require("vows"),
-    Step = require("step");
+    Step = require("step"),
+    oauthutil = require("./lib/oauth"),
+    setupAppConfig = oauthutil.setupAppConfig;
 
 var suite = vows.describe("spamicity module interface");
 
@@ -88,6 +90,19 @@ suite.addBatch({
         teardown: function(app) {
             if (app && app.close) {
                 app.close();
+            }
+        },
+        "and we start a pump app with the spam server configured": {
+            topic: function() {
+                setupAppConfig({port: 80, hostname: "social.localhost", driver: "memory", params: {}}, this.callback);
+            },
+            "it works": function(err, app) {
+                assert.ifError(err);
+            },
+            teardown: function(app) {
+                if (app && app.close) {
+                    app.close();
+                }
             }
         }
     }
