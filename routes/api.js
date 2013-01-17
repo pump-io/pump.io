@@ -36,6 +36,7 @@ var databank = require("databank"),
     HTTPError = require("../lib/httperror").HTTPError,
     Stamper = require("../lib/stamper").Stamper,
     Scrubber = require("../lib/scrubber"),
+    ActivitySpam = require("../lib/activityspam"),
     Activity = require("../lib/model/activity").Activity,
     AppError = require("../lib/model/activity").AppError,
     Collection = require("../lib/model/collection").Collection,
@@ -323,7 +324,7 @@ var putObject = function(req, res, next) {
 
     Step(
         function() {
-            newActivity(act, req.remoteUser, req.app.spam, this);
+            newActivity(act, req.remoteUser, this);
         },
         function(err, act) {
             var d;
@@ -352,7 +353,7 @@ var deleteObject = function(req, res, next) {
 
     Step(
         function() {
-            newActivity(act, req.remoteUser, req.app.spam, this);
+            newActivity(act, req.remoteUser, this);
         },
         function(err, act) {
             var d;
@@ -720,7 +721,7 @@ var createUser = function(req, res, next) {
                 object: svc,
                 generator: req.generator
             });
-            newActivity(act, user, req.app.spam, callback);
+            newActivity(act, user, callback);
         },
         welcomeActivity = function(user, svc, callback) {
             Step(
@@ -744,7 +745,7 @@ var createUser = function(req, res, next) {
                             content: text
                         }
                     });
-                    initActivity(act, req.app.spam, this);
+                    initActivity(act, this);
                 },
                 function(err, act) {
                     if (err) {
@@ -774,7 +775,7 @@ var createUser = function(req, res, next) {
                                 objectTypes: ["person"]
                             }
                         });
-                        newActivity(act, user, req.app.spam, group());
+                        newActivity(act, user, group());
                     });
                 },
                 callback
@@ -991,7 +992,7 @@ var postActivity = function(req, res, next) {
     
     Step(
         function() {
-            newActivity(activity, req.user, req.app.spam, this);
+            newActivity(activity, req.user, this);
         },
         function(err, activity) {
             var d;
@@ -1095,7 +1096,7 @@ var postToInbox = function(req, res, next) {
     );
 };
 
-var initActivity = function(activity, spam, callback) {
+var initActivity = function(activity, callback) {
 
     Step(
         function() {
@@ -1104,11 +1105,7 @@ var initActivity = function(activity, spam, callback) {
         },
         function(err) {
             if (err) throw err;
-            if (spam) {
-                spam.test(activity, this);
-            } else {
-                this(null, false, 0.0);
-            }
+            ActivitySpam.test(activity, this);
         },
         function(err, isSpam, probability) {
             if (err) throw err;
@@ -1148,7 +1145,7 @@ var initActivity = function(activity, spam, callback) {
     );
 };
 
-var newActivity = function(activity, user, spam, callback) {
+var newActivity = function(activity, user, callback) {
 
     if (!_(activity).has("actor")) {
         activity.actor = user.profile;
@@ -1156,7 +1153,7 @@ var newActivity = function(activity, user, spam, callback) {
 
     Step(
         function() {
-            initActivity(activity, spam, this);
+            initActivity(activity, this);
         },
         function(err, saved) {
             if (err) throw err;
@@ -1719,7 +1716,7 @@ var newFollow = function(req, res, next) {
 
     Step(
         function() {
-            newActivity(act, req.user, req.app.spam, this);
+            newActivity(act, req.user, this);
         },
         function(err, act) {
             var d;
@@ -1872,7 +1869,7 @@ var newFavorite = function(req, res, next) {
 
     Step(
         function() {
-            newActivity(act, req.user, req.app.spam, this);
+            newActivity(act, req.user, this);
         },
         function(err, act) {
             var d;
@@ -2280,7 +2277,7 @@ var newMember = function(req, res, next) {
 
     Step(
         function() {
-            newActivity(act, req.remoteUser, req.app.spam, this);
+            newActivity(act, req.remoteUser, this);
         },
         function(err, act) {
             var d;
