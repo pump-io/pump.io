@@ -157,6 +157,9 @@ Here are the main configuration keys.
    server and from there go out to search engines and the world. If
    you want to disconnect from the public web, set this to something
    falsy.
+* *spamhost* Host running activityspam software to use to test updates for spam.
+* *spamclientid* oauth pair for spam server.
+* *spamclientsecret* oauth pair for spam server.
 
 ## Bugs
 
