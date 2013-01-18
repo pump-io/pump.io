@@ -1,4 +1,4 @@
-<div class="row activity major" data-activity-id="<%- data.activity.id %>">
+<div class="activity major" data-activity-id="<%- data.activity.id %>">
   <div class="row">
     <div class="span1">
       <% if (data.activity.actor.image && data.activity.actor.image.url) { %>

@@ -2,7 +2,7 @@
 //
 // Views for the pump.io client UI
 //
-// Copyright 2011-2012, StatusNet Inc.
+// Copyright 2011-2013, StatusNet Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -1005,6 +1005,18 @@
             "click .unshare": "unshareObject",
             "click .comment": "openComment"
         },
+        setupSubs: function() {
+            var view = this,
+                model = view.model,
+	        $el = view.$(".replies");
+
+	    if (view.replyStream) {
+                view.replyStream.setElement($el);
+		return;
+	    }
+
+	    view.replyStream = new Pump.ReplyStreamView({el: $el, collection: model.replies});
+	},
         favoriteObject: function() {
             var view = this,
                 act = new Pump.Activity({
@@ -1089,6 +1101,19 @@
 
     Pump.MajorActivityHeadlessView = Pump.MajorActivityView.extend({
         template: "major-activity-headless"
+    });
+
+    Pump.ReplyStreamView = Pump.TemplateView.extend({
+        templateName: "replies",
+        parts: ["reply"],
+        modelName: "stream",
+        subs: {
+            ".reply": {
+                map: "replies",
+                subView: "ReplyView",
+                idAttr: "data-activity-id"
+            }
+        }
     });
 
     Pump.CommentForm = Pump.TemplateView.extend({

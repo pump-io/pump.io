@@ -4,10 +4,12 @@
   <% if (data.activity.object.items && data.activity.object.replies.totalItems > data.activity.object.replies.items.length) { %>
   <a class="show-all" href="#">Show all <%= data.activity.object.replies.totalItems %> replies</a>
   <% } %>
+  <div class="reply-objects">
   <% _.each(data.activity.object.replies.items, function(reply) { 
      data.reply = reply; %>
   <%= partial("reply") %>
   <% delete data.reply;
      }); %>
+  </div>
   <% } %>
 </div>
