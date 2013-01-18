@@ -777,6 +777,7 @@
                 "minor-activity-headless",
                 "responses",
                 "reply",
+                "replies",
                 "profile-responses",
                 "activity-object-list",
                 "activity-object-collection"
@@ -827,6 +828,7 @@
                 "minor-activity-headless",
                 "responses",
                 "reply",
+                "replies",
                 "profile-responses",
                 "activity-object-list",
                 "activity-object-collection"],
@@ -854,6 +856,7 @@
         parts: ["major-activity-headless",
                 "responses",
                 "reply",
+                "replies",
                 "activity-object-list",
                 "activity-object-collection"],
         subs: {
@@ -884,6 +887,7 @@
         parts: ["major-activity",
                 "responses",
                 "reply",
+                "replies",
                 "activity-object-list",
                 "activity-object-collection"],
         subs: {
@@ -916,6 +920,7 @@
                 "minor-activity",
                 "responses",
                 "reply",
+                "replies",
                 "activity-object-list",
                 "activity-object-collection"],
         addMajorActivity: function(act) {
@@ -956,6 +961,7 @@
                 "minor-activity",
                 "responses",
                 "reply",
+                "replies",
                 "activity-object-list",
                 "activity-object-collection"],
         addMajorActivity: function(act) {
@@ -989,6 +995,7 @@
         templateName: 'major-activity',
         parts: ["activity-object-list",
                 "responses",
+                "replies",
                 "reply"],
         modelName: "activity",
         events: {
