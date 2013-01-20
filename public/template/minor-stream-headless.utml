@@ -1,9 +1,7 @@
 <div id="minor-stream">
   <% if (minor && minor.length > 0) { %>
-  <% _.each(minor, function(activity) {
-     activity = activity; %>
-  <%= partial("minor-activity-headless") %>
-  <% delete activity;
-     }); %>
+  <% _.each(minor, function(activity) { %>
+  <%= partial("minor-activity-headless", {activity: activity}) %>
+  <% }); %>
   <% } %>
 </div>

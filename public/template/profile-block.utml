@@ -26,12 +26,7 @@
   </div>
   <div class="span1">
     <div class="pull-right">
-      <% /* :( */ 
-         oldPerson = person; 
-         person = profile; %>
-      <%= partial("profile-responses") %>
-      <% person = oldPerson;
-         delete oldPerson; %>
+      <%= partial("profile-responses", {person: profile}) %>
     </div>
   </div>
 </div>

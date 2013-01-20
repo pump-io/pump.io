@@ -5,7 +5,7 @@
   </div>
   <div class="modal-body">
     <div id="picture-fineupload"></div>
-    <form id="post-picture" action="/main/upload" enctype="multipart/form->
+    <form id="post-picture" action="/main/upload" enctype="multipart/form-data">
       <fieldset>
         <label for="title">Title</label>
         <input type="text" id="picture-title" placeholder="(optional)" name="title"></input>
