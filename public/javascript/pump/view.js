@@ -996,7 +996,7 @@
                 return;
             }
 
-            view.replyStream = new Pump.ReplyStreamView({el: $el, collection: model.replies});
+            view.replyStream = new Pump.ReplyStreamView({el: $el, collection: model.object.replies});
         },
         favoriteObject: function() {
             var view = this,
@@ -1094,7 +1094,7 @@
         },
         showAllReplies: function() {
             var view = this,
-                replies = view.model,
+                replies = view.collection,
                 full = new Pump.FullReplyStreamView({collection: replies});
 
             full.on("ready", function() {
