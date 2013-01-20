@@ -134,8 +134,9 @@
       }
       _.extend(Pump.config, {
           site: "<%- config.site %>",
-          requireEmail: "<%- config.requireEmail %>",
-          canUpload: "<%- config.canUpload %>",
+          requireEmail: <%- config.requireEmail %>,
+          disableRegistration: <%- config.disableRegistration %>,
+          canUpload: <%- config.canUpload %>,
           sockjs: <%- config.sockjs %>
       });
     </script>

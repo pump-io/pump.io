@@ -275,6 +275,8 @@ var showInbox = function(req, res, next) {
 var showRegister = function(req, res, next) {
     if (req.principal) {
         res.redirect("/");
+    } else if (req.app.config.disableRegistration) {
+        next(new HTTPError("No registration allowed.", 403));
     } else {
         res.render("register", {page: {title: "Register"}});
     }

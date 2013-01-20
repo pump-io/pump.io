@@ -782,6 +782,11 @@ var createUser = function(req, res, next) {
             );
         };
 
+    if (req.app.config.disableRegistration) {
+        next(new HTTPError("No registration allowed.", 403));
+        return;
+    }
+
     // Email validation
 
     if (_.has(req.app.config, "requireEmail") &&

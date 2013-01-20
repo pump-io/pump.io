@@ -160,6 +160,8 @@ Here are the main configuration keys.
 * *spamhost* Host running activityspam software to use to test updates for spam.
 * *spamclientid* oauth pair for spam server.
 * *spamclientsecret* oauth pair for spam server.
+* *disableRegistration* default false. Disables registering new users on the
+  site through the Web or the API.
 
 ## Bugs
 

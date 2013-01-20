@@ -9,9 +9,11 @@
   
   <div class="nav-collapse collapse">
     <ul class="nav pull-right">
+      <% if (!config.disableRegistration) { %>
       <li>
         <a id="register" href="/main/register">Register</a>
       </li>
+      <% } %>
       <li>
         <a id="login" href="/main/login">Login</a>
       </li>
