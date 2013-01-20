@@ -1,4 +1,4 @@
-<div class="row activity minor <% if (headless) { %>headless<% } %>" activity-id="<%- activity.id %>">
+<div class="row activity minor <% if (headless) { %>headless<% } %>" data-activity-id="<%- activity.id %>">
   <% if (!headless) { %>
   <div class="span1">
     <% if (activity.actor.image && activity.actor.image.url) { %>

@@ -1,5 +1,5 @@
 <li class="<%- ((list && list.id == listItem.id) ? 'list active' : 'list') %>"
-    list-id="<%- listItem.id %>">
+    data-list-id="<%- listItem.id %>">
   <a href="<%- listItem.url %>">
     <%- listItem.displayName %>
     <% if (listItem.members && _.has(listItem.members, "totalItems")) { %>

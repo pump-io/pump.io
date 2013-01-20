@@ -1,4 +1,4 @@
-<div class="row person major" person-id="<%- person.id %>">
+<div class="row person major" data-person-id="<%- person.id %>">
   <div class="span1">
     <% if (person.image && person.image.url) { %>
     <img src="<%- person.image.url %>" width="40" height="40" />

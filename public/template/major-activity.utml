@@ -1,4 +1,4 @@
-<div class="activity major<% if (headless) { %> headless<% } %>" activity-id="<%- activity.id %>">
+<div class="activity major<% if (headless) { %> headless<% } %>" data-activity-id="<%- activity.id %>">
   <div class="row">
     <% if (!headless) { %>
     <div class="span1">
