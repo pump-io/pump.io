@@ -783,10 +783,10 @@
         templateName: 'user',
         parts: ["profile-block",
                 "user-content-activities",
-                "major-stream-headless",
-                "minor-stream-headless",
-                "major-activity-headless",
-                "minor-activity-headless",
+                "major-stream",
+                "minor-stream",
+                "major-activity",
+                "minor-activity",
                 "responses",
                 "reply",
                 "replies",
@@ -834,10 +834,10 @@
 
     Pump.ActivitiesUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-activities',
-        parts: ["major-stream-headless",
-                "minor-stream-headless",
-                "major-activity-headless",
-                "minor-activity-headless",
+        parts: ["major-stream",
+                "minor-stream",
+                "major-activity",
+                "minor-activity",
                 "responses",
                 "reply",
                 "replies",
@@ -847,48 +847,17 @@
         subs: {
             "#major-stream": {
                 attr: "majorStreamView",
-                subView: "MajorStreamHeadlessView",
+                subView: "MajorStreamView",
                 subOptions: {
                     collection: "major"
                 }
             },
             "#minor-stream": {
                 attr: "minorStreamView",
-                subView: "MinorStreamHeadlessView",
+                subView: "MinorStreamView",
                 subOptions: {
                     collection: "minor"
                 }
-            }
-        }
-    });
-
-    Pump.MajorStreamHeadlessView = Pump.TemplateView.extend({
-        templateName: 'major-stream-headless',
-        modelName: 'major',
-        parts: ["major-activity-headless",
-                "responses",
-                "reply",
-                "replies",
-                "activity-object-list",
-                "activity-object-collection"],
-        subs: {
-            ".activity.major": {
-                map: "activities",
-                subView: "MajorActivityHeadlessView",
-                idAttr: "data-activity-id"
-            }
-        }
-    });
-
-    Pump.MinorStreamHeadlessView = Pump.TemplateView.extend({
-        templateName: 'minor-stream-headless',
-        modelName: 'minor',
-        parts: ["minor-activity-headless"],
-        subs: {
-            ".activity.minor": {
-                map: "activities",
-                subView: "MinorActivityHeadlessView",
-                idAttr: "data-activity-id"
             }
         }
     });
@@ -1109,12 +1078,6 @@
         }
     });
 
-    // For the user page
-
-    Pump.MajorActivityHeadlessView = Pump.MajorActivityView.extend({
-        template: "major-activity-headless"
-    });
-
     Pump.ReplyStreamView = Pump.TemplateView.extend({
         templateName: "replies",
         parts: ["reply"],
@@ -1223,10 +1186,6 @@
     Pump.MinorActivityView = Pump.TemplateView.extend({
         templateName: 'minor-activity',
         modelName: "activity"
-    });
-
-    Pump.MinorActivityHeadlessView = Pump.MinorActivityView.extend({
-        templateName: 'minor-activity-headless'
     });
 
     Pump.PersonView = Pump.TemplateView.extend({

@@ -1,9 +1,0 @@
-<div class="span9" id="major-stream">
-  <% if (major && major.length > 0) { %>
-  <% _.each(major, function(activity) { %>
-  <%= partial("major-activity-headless", {activity: activity}) %>
-  <% }); %>
-  <% } else { %>
-  <p>No content!</p>
-  <% } %>
-</div>
