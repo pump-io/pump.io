@@ -200,7 +200,11 @@
                     try {
                         html = template(data);
                     } catch (err) {
-                        cb(new Pump.TemplateError(template, data, err), null);
+                        if (err instanceof Pump.TemplateError) {
+                            cb(err, null);
+                        } else {
+                            cb(new Pump.TemplateError(template, data, err), null);
+                        }
                         return;
                     }
                     cb(null, html);
@@ -233,7 +237,7 @@
 
             if (_.has(view.options, "data")) {
                 _.each(view.options.data, function(obj, name) {
-                    if (obj.toJSON) {
+                    if (_.isObject(obj) && obj.toJSON) {
                         main[name] = obj.toJSON();
                     } else {
                         main[name] = obj;
@@ -246,7 +250,7 @@
             }
 
             main.partial = function(name, locals) {
-                var template, scoped;
+                var template, scoped, html;
                 if (locals) {
                     scoped = _.clone(locals);
                     _.extend(scoped, main);
@@ -263,7 +267,16 @@
                 if (!template) {
                     throw new Error("No template for " + name);
                 }
-                return template(scoped);
+                try {
+                    html = template(scoped);
+                    return html;
+                } catch (e) {
+                    if (e instanceof Pump.TemplateError) {
+                        throw e;
+                    } else {
+                        throw new Pump.TemplateError(template, scoped, e);
+                    }
+                }
             };
 
             // XXX: set main.page.title
