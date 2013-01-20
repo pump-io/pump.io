@@ -7,7 +7,7 @@
     <i class="icon-exclamation-sign icon-white"> <%- (notifications) ? notifications.totalItems : 0 %></i>  
   </button>
   <ul class="dropdown-menu">
-    <% if (_.isObject( && _.isArray(notifications)) {%>
+    <% if (_.isArray(notifications)) {%>
     <% _.each(notifications, function(activity) { %>
     <li>
       <small><%= activity.content %></small>
