@@ -135,6 +135,9 @@ if (!window.Pump) {
 
     Pump.error = function(err) {
         console.log(err);
+        if (err.stack) {
+            console.log(err.stack);
+        }
     };
 
     // Given a relative URL like /main/register, make a fully-qualified
