@@ -217,7 +217,6 @@
                 },
                 main = {
                     config: Pump.config,
-                    data: {},
                     template: {},
                     page: {}
                 },
@@ -227,23 +226,23 @@
                 cnt;
 
             if (view.collection) {
-                main.data[modelName] = view.collection.toJSON();
+                main[modelName] = view.collection.toJSON();
             } else if (view.model) {
-                main.data[modelName] = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model);
+                main[modelName] = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model);
             }
 
             if (_.has(view.options, "data")) {
                 _.each(view.options.data, function(obj, name) {
                     if (obj.toJSON) {
-                        main.data[name] = obj.toJSON();
+                        main[name] = obj.toJSON();
                     } else {
-                        main.data[name] = obj;
+                        main[name] = obj;
                     }
                 });
             }
 
-            if (Pump.currentUser && !_.has(main.data, "user")) {
-                main.data.user = Pump.currentUser.toJSON();
+            if (Pump.currentUser && !_.has(main, "user")) {
+                main.user = Pump.currentUser.toJSON();
             }
 
             main.partial = function(name, locals) {

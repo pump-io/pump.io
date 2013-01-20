@@ -189,12 +189,10 @@ var showDirect = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                data = {major: major,
-                        minor: minor,
-                        user: user};
-
                 res.render("direct", {page: { title: "Direct" },
-                                      data: data});
+                                      major: major,
+                                      minor: minor,
+                                      user: user});
             }
         }
     );
@@ -262,17 +260,13 @@ var showInbox = function(req, res, next) {
             getMinor(this.parallel());
         },
         function(err, major, minor) {
-            var data;
             if (err) {
                 next(err);
             } else {
-                data = {major: major,
-                        minor: minor};
-                if (user) {
-                    data.user = user;
-                }
                 res.render("inbox", {page: { title: "Home" },
-                                     data: data});
+                                     major: major,
+                                     minor: minor,
+                                     user: user});
             }
         }
     );
@@ -343,8 +337,8 @@ var showActivity = function(req, res, next) {
                 next(err);
             } else {
                 res.render("activity", {page: {title: "Welcome"},
-                                        data: {user: req.remoteUser,
-                                               activity: activity}});
+                                        user: req.remoteUser,
+                                        activity: activity});
             }
         }
     );
@@ -412,10 +406,10 @@ var showStream = function(req, res, next) {
                 next(err);
             } else {
                 res.render("user", {page: {title: req.user.profile.displayName},
-                                    data: {major: major,
-                                           minor: minor,
-                                           profile: req.user.profile,
-                                           user: req.principalUser}});
+                                    major: major,
+                                    minor: minor,
+                                    profile: req.user.profile,
+                                    user: req.principalUser});
             }
         }
     );
@@ -465,9 +459,9 @@ var showFavorites = function(req, res, next) {
                 next(err);
             } else {
                 res.render("favorites", {page: {title: req.user.nickname + " favorites"},
-                                         data: {objects: objects,
-                                                user: req.principalUser,
-                                                profile: req.user.profile}});
+                                         objects: objects,
+                                         user: req.principalUser,
+                                         profile: req.user.profile});
             }
         }
     );
@@ -508,9 +502,9 @@ var showFollowers = function(req, res, next) {
                 next(err);
             } else {
                 res.render("followers", {page: {title: req.user.nickname + " followers"},
-                                         data: {people: followers,
-                                                user: req.principalUser,
-                                                profile: req.user.profile}});
+                                         people: followers,
+                                         user: req.principalUser,
+                                         profile: req.user.profile});
             }
         }
     );
@@ -551,9 +545,9 @@ var showFollowing = function(req, res, next) {
                 next(err);
             } else {
                 res.render("following", {page: {title: req.user.nickname + " following"},
-                                         data: {people: following,
-                                                user: req.principalUser,
-                                                profile: req.user.profile}});
+                                         people: following,
+                                         user: req.principalUser,
+                                         profile: req.user.profile});
             }
         }
     );
@@ -651,9 +645,9 @@ var showLists = function(req, res, next) {
                 next(err);
             } else {
                 res.render("lists", {page: {title: req.user.profile.displayName + " - Lists"},
-                                     data: {user: req.principalUser,
-                                            profile: req.user.profile,
-                                            lists: lists}});
+                                     user: req.principalUser,
+                                     profile: req.user.profile,
+                                     lists: lists});
             }
         }
     );
@@ -714,10 +708,10 @@ var showList = function(req, res, next) {
                 next(err);
             } else {
                 res.render("list", {page: {title: req.user.profile.displayName + " - Lists"},
-                                    data: {user: req.principalUser,
-                                           profile: req.user.profile,
-                                           lists: lists,
-                                           list: list}});
+                                    user: req.principalUser,
+                                    profile: req.user.profile,
+                                    lists: lists,
+                                    list: list});
             }
         }
     );
@@ -853,8 +847,8 @@ var showObject = function(req, res, next) {
                     title = type + " by " + person.displayName;
                 }
                 res.render("object", {page: {title: title},
-                                      data: {user: req.principalUser,
-                                             object: obj}});
+                                      user: req.principalUser,
+                                      object: obj});
             }
         }
     );

@@ -728,8 +728,8 @@ var createUser = function(req, res, next) {
                 function() {
                     res.render("welcome",
                                {page: {title: "Welcome"},
-                                data: {profile: user.profile,
-                                       service: svc},
+                                profile: user.profile,
+                                service: svc,
                                 layout: false},
                                this);
                 },
