@@ -1,4 +1,4 @@
-<div class="reply" activity-id="<%- reply.id %>">
+<div class="reply" data-activity-id="<%- reply.id %>">
   <div class="row">
     <div class="span1">
       <% if (reply.author.image && reply.author.image.url) { %>
