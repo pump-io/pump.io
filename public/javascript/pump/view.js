@@ -241,8 +241,8 @@
                 });
             }
 
-            if (Pump.currentUser && !_.has(main, "user")) {
-                main.user = Pump.currentUser.toJSON();
+            if (!_.has(main, "user")) {
+                main.user = (Pump.currentUser) ? Pump.currentUser.toJSON() : null;
             }
 
             main.partial = function(name, locals) {
