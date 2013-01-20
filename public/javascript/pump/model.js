@@ -401,7 +401,7 @@
                 url: coll.nextLink,
                 success: function(data) {
                     if (data.items) {
-                        coll.add(data.items, {at: coll.length});
+                        coll.add(data.items);
                     }
                     if (data.links && data.links.next && data.links.next.href) {
                         coll.nextLink = data.links.next.href;
@@ -506,6 +506,9 @@
             } else {
                 return null;
             }
+        },
+        pubDate: function() {
+            return new Date.parse(this.published);
         }
     });
 
@@ -520,6 +523,17 @@
                 options.at = 0;
             }
             Backbone.Collection.prototype.add.apply(this, [models, options]);
+        },
+        comparator: function(first, second) {
+            var d1 = first.pubDate(),
+                d2 = second.pubDate();
+            if (d1 > d2) {
+                return -1;
+            } else if (d2 > d1) {
+                return 1;
+            } else {
+                return 0;
+            }
         }
     });
 
