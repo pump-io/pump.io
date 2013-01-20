@@ -1,10 +1,8 @@
 <div class="span8 offset1 replies">
-  <% if (replies && replies.totalItems > 0) { %>
   <h3>Replies</h3>
   <div class="reply-objects">
-    <% _.each(replies.items.reverse(), function(reply) { %>
-    <%= partial("reply", {replies: replies, reply: reply}) %>
+    <% _.each(replies.reverse(), function(reply) { %>
+    <%= partial("reply", {reply: reply}) %>
     <% }); %>
   </div>
-  <% } %>
 </div>

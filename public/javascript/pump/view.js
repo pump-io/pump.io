@@ -296,6 +296,10 @@
                             partials[templateName] = template;
                             if (pc >= cnt) {
                                 getTemplate(view.templateName, function(err, template) {
+                                    if (err) {
+                                        Pump.error(err);
+                                        return;
+                                    }
                                     runTemplate(template, main, setOutput);
                                 });
                             }
@@ -304,6 +308,10 @@
                 });
             } else {
                 getTemplate(view.templateName, function(err, template) {
+                    if (err) {
+                        Pump.error(err);
+                        return;
+                    }
                     runTemplate(template, main, setOutput);
                 });
             }
@@ -417,20 +425,25 @@
                 
                 aview.$el.hide();
 
-                idx = view.collection.indexOf(model);
-
-                if (idx <= 0) {
-                    view.$el.prepend(aview.$el);
-                } else if (idx >= $el.length) {
-                    view.$el.append(aview.$el);
-                } else {
-                    aview.$el.insertBefore($el[idx]);
-                }
+                view.placeSub(aview, $el);
 
                 aview.$el.fadeIn('slow');
             });
 
             aview.render();
+        },
+        placeSub: function(aview, $el) {
+            var view = this,
+                model = aview.model,
+                idx = view.collection.indexOf(model);
+
+            if (idx <= 0) {
+                view.$el.prepend(aview.$el);
+            } else if (idx >= $el.length) {
+                view.$el.append(aview.$el);
+            } else {
+                aview.$el.insertBefore($el[idx]);
+            }
         },
         showRemoved: function(model) {
             var view = this,
@@ -1122,17 +1135,36 @@
 
             full.on("ready", function() {
 
+                full.$el.hide();
+
                 view.$el.replaceWith(full.$el);
 
+                full.$el.fadeIn('slow');
+
                 replies.getAll();
+
             });
 
             full.render();
+        },
+        placeSub: function(aview, $el) {
+            var view = this,
+                model = aview.model,
+                idx = view.collection.indexOf(model);
+
+            // Invert direction
+            if (idx <= 0) {
+                view.$el.append(aview.$el);
+            } else if (idx >= $el.length) {
+                view.$el.prepend(aview.$el);
+            } else {
+                aview.$el.insertBefore($el[view.collection.length - 1 - idx]);
+            }
         }
     });
 
     Pump.FullReplyStreamView = Pump.TemplateView.extend({
-        templateName: "replies",
+        templateName: "full-replies",
         parts: ["reply"],
         modelName: "replies",
         subs: {
@@ -1140,6 +1172,20 @@
                 map: "activities",
                 subView: "ReplyView",
                 idAttr: "data-activity-id"
+            }
+        },
+        placeSub: function(aview, $el) {
+            var view = this,
+                model = aview.model,
+                idx = view.collection.indexOf(model);
+
+            // Invert direction
+            if (idx <= 0) {
+                view.$el.append(aview.$el);
+            } else if (idx >= $el.length) {
+                view.$el.prepend(aview.$el);
+            } else {
+                aview.$el.insertBefore($el[view.collection.length - 1 - idx]);
             }
         }
     });

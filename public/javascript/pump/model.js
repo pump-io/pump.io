@@ -440,6 +440,7 @@
                         // XXX: end-of-collection indicator?
                         delete coll.nextLink;
                     }
+                    coll.trigger("getall");
                 },
                 error: function(jqxhr) {
                     Pump.error("Failed getting more items.");
