@@ -1118,10 +1118,40 @@
     Pump.ReplyStreamView = Pump.TemplateView.extend({
         templateName: "replies",
         parts: ["reply"],
-        modelName: "stream",
+        modelName: "replies",
         subs: {
             ".reply": {
-                map: "replies",
+                map: "activities",
+                subView: "ReplyView",
+                idAttr: "data-activity-id"
+            }
+        },
+        events: {
+            "click .show-all-replies": "showAllReplies"
+        },
+        showAllReplies: function() {
+            var view = this,
+                replies = view.model,
+                full = new Pump.FullReplyStreamView({collection: replies});
+
+            full.on("ready", function() {
+
+                view.$el.replaceWith(full.$el);
+
+                replies.getAll();
+            });
+
+            full.render();
+        }
+    });
+
+    Pump.FullReplyStreamView = Pump.TemplateView.extend({
+        templateName: "replies",
+        parts: ["reply"],
+        modelName: "replies",
+        subs: {
+            ".reply": {
+                map: "activities",
                 subView: "ReplyView",
                 idAttr: "data-activity-id"
             }

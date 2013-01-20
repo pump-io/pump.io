@@ -416,6 +416,37 @@
             };
 
             Pump.ajax(options);
+        },
+        getAll: function() { // Get stuff later than the current group
+            var coll = this,
+                options;
+
+            if (!coll.url) {
+                // No URL
+                return;
+            }
+
+            options = {
+                type: "GET",
+                dataType: "json",
+                url: coll.url + "?count=" + Math.min(coll.totalItems, 200),
+                success: function(data) {
+                    if (data.items) {
+                        coll.add(data.items, {at: coll.length});
+                    }
+                    if (data.links && data.links.next && data.links.next.href) {
+                        coll.nextLink = data.links.next.href;
+                    } else {
+                        // XXX: end-of-collection indicator?
+                        delete coll.nextLink;
+                    }
+                },
+                error: function(jqxhr) {
+                    Pump.error("Failed getting more items.");
+                }
+            };
+
+            Pump.ajax(options);
         }
     },
     {
