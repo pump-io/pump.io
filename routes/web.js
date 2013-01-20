@@ -647,6 +647,7 @@ var showLists = function(req, res, next) {
                 res.render("lists", {page: {title: req.user.profile.displayName + " - Lists"},
                                      user: req.principalUser,
                                      profile: req.user.profile,
+                                     list: null,
                                      lists: lists});
             }
         }

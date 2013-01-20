@@ -203,6 +203,7 @@
                                       listContentView: Pump.ListsListContent,
                                       title: nickname + " lists",
                                       data: {lists: lists,
+                                             list: null,
                                              profile: profile}});
             });
         },
