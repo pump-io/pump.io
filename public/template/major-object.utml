@@ -25,7 +25,7 @@
       <p><%= object.content %></p>
       <% } %>
       <% if (user) { %>
-      <%= partial("responses", {object: object}) %>
+      <%= partial("responses", {obj: object}) %>
       <% } %>
       <% if (object.likes.totalItems === 0) { %>
       <% } else if (object.likes.totalItems === 1) { %>

@@ -42,7 +42,7 @@
       <p><%= activity.object.content %></p>
       <% } %>
       <% if (user) { %>
-        <%= partial("responses", {object: activity.object}) %>
+        <%= partial("responses", {obj: activity.object}) %>
       <% } %>
     <% if (!activity.object.likes || activity.object.likes.totalItems === 0) { %>
     <% } else if (activity.object.likes.totalItems === 1) { %>
