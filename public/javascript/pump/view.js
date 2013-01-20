@@ -839,7 +839,7 @@
                 attr: "userContent",
                 subView: "ActivitiesUserContent",
                 subOptions: {
-                    data: ["major", "minor"]
+                    data: ["major", "minor", "headless"]
                 }
             }
         }
@@ -863,7 +863,7 @@
                 subView: "MajorStreamView",
                 subOptions: {
                     collection: "major",
-                    data: "headless"
+                    data: ["headless"]
                 }
             },
             "#minor-stream": {
@@ -871,7 +871,7 @@
                 subView: "MinorStreamView",
                 subOptions: {
                     collection: "minor",
-                    data: "headless"
+                    data: ["headless"]
                 }
             }
         }
@@ -892,7 +892,7 @@
                 subView: "MajorActivityView",
                 idAttr: "data-activity-id",
                 subOptions: {
-                    data: "headless"
+                    data: ["headless"]
                 }
             }
         }
@@ -908,7 +908,7 @@
                 subView: "MinorActivityView",
                 idAttr: "data-activity-id",
                 subOptions: {
-                    data: "headless"
+                    data: ["headless"]
                 }
             }
         }
@@ -940,7 +940,7 @@
                 subView: "MajorStreamView",
                 subOptions: {
                     collection: "major",
-                    data: "headless"
+                    data: ["headless"]
                 }
             },
             "#minor-stream": {
@@ -948,7 +948,7 @@
                 subView: "MinorStreamView",
                 subOptions: {
                     collection: "minor",
-                    data: "headless"
+                    data: ["headless"]
                 }
             }
         }

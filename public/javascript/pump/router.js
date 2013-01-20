@@ -117,6 +117,7 @@
                                       title: profile.get("displayName"),
                                       data: { major: major,
                                               minor: minor,
+                                              headless: true,
                                               profile: profile }});
             });
         },
