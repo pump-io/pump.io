@@ -1,5 +1,5 @@
-<div class="row activity minor headless" data-activity-id="<%- data.activity.id %>">
+<div class="row activity minor headless" activity-id="<%- activity.id %>">
   <div class="span3">
-    <p><small><%= data.activity.content %></small></p>
+    <p><small><%= activity.content %></small></p>
   </div>
 </div>

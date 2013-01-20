@@ -1,9 +1,9 @@
 <div class="span9" id="major-stream">
-  <% if (data.major && data.major.length > 0) { %>
-  <% _.each(data.major, function(activity) {
-     data.activity = activity; %>
+  <% if (major && major.length > 0) { %>
+  <% _.each(major, function(activity) {
+     activity = activity; %>
   <%= partial("major-activity") %>
-  <% delete data.activity; 
+  <% delete activity; 
      }); %>
   <% } else { %>
   <p>No content!</p>

@@ -3,11 +3,11 @@
    <% if (_.has(object, "url")) { %>
    <a href="<%- object.url %>">
    <% } %>
-   <% if (data.user && data.user.profile && data.user.profile.id == object.id) { %>
+   <% if (user && user.profile && user.profile.id == object.id) { %>
    You
    <% } else if (object.id == "http://activityschema.org/collection/public") { %>
    Public
-   <% } else if (data.activity.actor && data.activity.actor.followers && object.id == data.activity.actor.followers.url) { %>
+   <% } else if (activity.actor && activity.actor.followers && object.id == activity.actor.followers.url) { %>
    Followers
    <% } else if (object.displayName) { %>
    <%- object.displayName %>

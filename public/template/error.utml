@@ -1,5 +1,5 @@
 <div class="content error">
-  <h1>Error <%- data.error.code %></h1>
+  <h1>Error <%- error.code %></h1>
 
-  <p id="error"><%- data.error.message %></p>
+  <p id="error"><%- error.message %></p>
 </div>

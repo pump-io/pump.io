@@ -1,14 +1,14 @@
 <div class="span8 offset1 replies">
-  <% if (data.activity.object.replies && data.activity.object.replies.totalItems > 0) { %>
+  <% if (activity.object.replies && activity.object.replies.totalItems > 0) { %>
   <h3>Replies</h3>
-  <% if (data.activity.object.replies.totalItems > 4) { %>
-  <a class="show-all-replies" href="#">Show all <%= data.activity.object.replies.totalItems %> replies</a>
+  <% if (activity.object.replies.totalItems > 4) { %>
+  <a class="show-all-replies" href="#">Show all <%= activity.object.replies.totalItems %> replies</a>
   <% } %>
   <div class="reply-objects">
-  <% _.each(data.activity.object.replies.items.slice(Math.max(0, data.activity.object.replies.items.length - 4), data.activity.object.replies.items.length).reverse(), function(reply) { 
-     data.reply = reply; %>
+  <% _.each(activity.object.replies.items.slice(Math.max(0, activity.object.replies.items.length - 4), activity.object.replies.items.length).reverse(), function(reply) { 
+     reply = reply; %>
   <%= partial("reply") %>
-  <% delete data.reply;
+  <% delete reply;
      }); %>
   </div>
   <% } %>

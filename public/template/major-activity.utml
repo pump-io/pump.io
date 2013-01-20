@@ -1,60 +1,60 @@
-<div class="activity major" data-activity-id="<%- data.activity.id %>">
+<div class="activity major" activity-id="<%- activity.id %>">
   <div class="row">
     <div class="span1">
-      <% if (data.activity.actor.image && data.activity.actor.image.url) { %>
-      <img src="<%- data.activity.actor.image.url %>" width="40" height="40" />
+      <% if (activity.actor.image && activity.actor.image.url) { %>
+      <img src="<%- activity.actor.image.url %>" width="40" height="40" />
       <% } else { %>
       <img src="/images/default.png" width="40" height="40" />
       <% } %>
     </div>
     <div class="span8">
-      <% if (data.activity.object.displayName) { %>
-      <h2><%- data.activity.object.displayName %></h2>
+      <% if (activity.object.displayName) { %>
+      <h2><%- activity.object.displayName %></h2>
       <% } else { %>
-      <%= data.activity.object.content %>
+      <%= activity.object.content %>
       <% } %>
-      <p><small><a href="<%- data.activity.actor.url %>"><%- data.activity.actor.displayName %></a> at <a href="<%- data.activity.object.url || data.activity.url %>"><abbr title="<%- data.activity.published %>" class="easydate"><%- data.activity.published %></abbr></a><% if (data.activity.location) { %> in <a href="<%- data.activity.location.url %>"><%- data.activity.location.displayName %></a><% } %>
-        <% if (data.activity.generator && data.activity.generator.displayName) { %>
+      <p><small><a href="<%- activity.actor.url %>"><%- activity.actor.displayName %></a> at <a href="<%- activity.object.url || activity.url %>"><abbr title="<%- activity.published %>" class="easydate"><%- activity.published %></abbr></a><% if (activity.location) { %> in <a href="<%- activity.location.url %>"><%- activity.location.displayName %></a><% } %>
+        <% if (activity.generator && activity.generator.displayName) { %>
             via 
-            <% if (data.activity.generator.url) { %>
-                <a href="<%- data.activity.generator.url %>"><%- data.activity.generator.displayName %></a>
+            <% if (activity.generator.url) { %>
+                <a href="<%- activity.generator.url %>"><%- activity.generator.displayName %></a>
             <% } else { %>
-                <span><%- data.activity.generator.displayName %></span>
+                <span><%- activity.generator.displayName %></span>
             <% } %>
         <% } %>
-        <% if (data.activity.to && data.activity.to.length > 0) { %>
-        To: <%= partial("activity-object-list", {objects: data.activity.to}) %>
+        <% if (activity.to && activity.to.length > 0) { %>
+        To: <%= partial("activity-object-list", {objects: activity.to}) %>
         <% } %>
-        <% if (data.activity.cc && data.activity.cc.length > 0) { %>
-        CC: <%= partial("activity-object-list", {objects: data.activity.cc}) %>
+        <% if (activity.cc && activity.cc.length > 0) { %>
+        CC: <%= partial("activity-object-list", {objects: activity.cc}) %>
         <% } %>
       </small></p>
     </div>
   </div>
   <div class="row">
     <div class="span8 offset1">
-      <% if (data.activity.object.image && data.activity.object.image.url) { %>
-      <p><img src="<%- data.activity.object.image.url %>"></img></p>
+      <% if (activity.object.image && activity.object.image.url) { %>
+      <p><img src="<%- activity.object.image.url %>"></img></p>
       <% } %>
-      <% if (data.activity.object.displayName) { %>
-      <p><%= data.activity.object.content %></p>
+      <% if (activity.object.displayName) { %>
+      <p><%= activity.object.content %></p>
       <% } %>
-      <% if (data.user) {
-        data.object = data.activity.object; %>
+      <% if (user) {
+        object = activity.object; %>
         <%= partial("responses") %>
-      <% delete data.object;
+      <% delete object;
         } %>
-    <% if (!data.activity.object.likes || data.activity.object.likes.totalItems === 0) { %>
-    <% } else if (data.activity.object.likes.totalItems === 1) { %>
-    <p><small><%= partial("activity-object-collection", {coll: data.activity.object.likes}) %> likes this.</small></p>
+    <% if (!activity.object.likes || activity.object.likes.totalItems === 0) { %>
+    <% } else if (activity.object.likes.totalItems === 1) { %>
+    <p><small><%= partial("activity-object-collection", {coll: activity.object.likes}) %> likes this.</small></p>
     <% } else { %>
-    <p><small><%= partial("activity-object-collection", {coll: data.activity.object.likes}) %> like this.</small></p>
+    <p><small><%= partial("activity-object-collection", {coll: activity.object.likes}) %> like this.</small></p>
     <% } %>
-    <% if (!data.activity.object.shares || data.activity.object.shares.totalItems === 0) { %>
-    <% } else if (data.activity.object.shares.totalItems === 1) { %>
-    <p><small><%= partial("activity-object-collection", {coll: data.activity.object.shares}) %> shared this.</small></p>
+    <% if (!activity.object.shares || activity.object.shares.totalItems === 0) { %>
+    <% } else if (activity.object.shares.totalItems === 1) { %>
+    <p><small><%= partial("activity-object-collection", {coll: activity.object.shares}) %> shared this.</small></p>
     <% } else { %>
-    <p><small><%= partial("activity-object-collection", {coll: data.activity.object.shares}) %> shared this.</small></p>
+    <p><small><%= partial("activity-object-collection", {coll: activity.object.shares}) %> shared this.</small></p>
     <% } %>
     </div>
   </div>

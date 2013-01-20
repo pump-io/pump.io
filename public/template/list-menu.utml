@@ -1,10 +1,10 @@
-<ul class="nav nav-tabs nav-stacked" id="list-menu-inner" data-profile-id="<%- data.profile.id %>">
-  <% _.each(data.lists, function(list) { %>
-  <% data.listItem = list; %>
+<ul class="nav nav-tabs nav-stacked" id="list-menu-inner" profile-id="<%- profile.id %>">
+  <% _.each(lists, function(list) { %>
+  <% listItem = list; %>
   <%= partial("list-menu-item") %>
-  <% delete data.listItem; %>
+  <% delete listItem; %>
   <% }); %>
-  <% if (data.user && data.user.profile.id == data.profile.id) { %>
+  <% if (user && user.profile.id == profile.id) { %>
   <li class="add-a-list">
     <a href="#" class="new-list">New list...</a>
   </li>

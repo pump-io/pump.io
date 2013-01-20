@@ -1,65 +1,65 @@
-<div class="row" id="profile-block" data-profile-id="<%- data.profile.id %>">
+<div class="row" id="profile-block" profile-id="<%- profile.id %>">
   <div class="span3">
-    <% if (data.profile.image && data.profile.image.url) { %>
-    <img src="<%- data.profile.image.url %>" width="128" height="128" />
+    <% if (profile.image && profile.image.url) { %>
+    <img src="<%- profile.image.url %>" width="128" height="128" />
     <% } else { %>
     <img src="/images/default.png" width="128" height="128" />
     <% } %>
   </div>
   <div class="span8">
-    <h1><%- data.profile.displayName %> 
+    <h1><%- profile.displayName %> 
       <small>
-      <% if (data.profile.id && data.profile.id.substr(0, 5) == 'acct:') { %>
-      <%- data.profile.id.substr(5) %>
+      <% if (profile.id && profile.id.substr(0, 5) == 'acct:') { %>
+      <%- profile.id.substr(5) %>
       <% } else { %>
-      <%- data.profile.preferredUsername %>
+      <%- profile.preferredUsername %>
       <% } %>
       </small>
     </h1>
-    <% if (data.profile.location) { %>
-    <p class="location"><%- data.profile.location.displayName %></p>
+    <% if (profile.location) { %>
+    <p class="location"><%- profile.location.displayName %></p>
     <% } %>
-    <% if (data.profile.summary) { %>
-    <p class="summary"><%- data.profile.summary %></p>
+    <% if (profile.summary) { %>
+    <p class="summary"><%- profile.summary %></p>
     <% } %>
     <% /* TODO: HOME PAGE HERE */ %>
   </div>
   <div class="span1">
     <div class="pull-right">
       <% /* :( */ 
-         data.oldPerson = data.person; 
-         data.person = data.profile; %>
+         oldPerson = person; 
+         person = profile; %>
       <%= partial("profile-responses") %>
-      <% data.person = data.oldPerson;
-         delete data.oldPerson; %>
+      <% person = oldPerson;
+         delete oldPerson; %>
     </div>
   </div>
 </div>
 <div class="row">
   <div class="span12">
     <ul class="nav nav-tabs">
-      <li><a href="/<%- data.profile.preferredUsername %>">Activity</a></li>
-      <li><a href="/<%- data.profile.preferredUsername %>/favorites">Favorites
-        <% if (data.profile.favorites && _.has(data.profile.favorites, "totalItems")) { %>
-        <span class="label"><%- data.profile.favorites.totalItems %></span>
+      <li><a href="/<%- profile.preferredUsername %>">Activity</a></li>
+      <li><a href="/<%- profile.preferredUsername %>/favorites">Favorites
+        <% if (profile.favorites && _.has(profile.favorites, "totalItems")) { %>
+        <span class="label"><%- profile.favorites.totalItems %></span>
         <% } %>
         </a>
       </li>
-      <li><a href="/<%- data.profile.preferredUsername %>/followers">Followers
-        <% if (data.profile.followers && _.has(data.profile.followers, "totalItems")) { %>
-        <span class="label"><%- data.profile.followers.totalItems %></span>
+      <li><a href="/<%- profile.preferredUsername %>/followers">Followers
+        <% if (profile.followers && _.has(profile.followers, "totalItems")) { %>
+        <span class="label"><%- profile.followers.totalItems %></span>
         <% } %>
         </a>
       </li>
-      <li><a href="/<%- data.profile.preferredUsername %>/following">Following
-        <% if (data.profile.following && _.has(data.profile.following, "totalItems")) { %>
-        <span class="label"><%- data.profile.following.totalItems %></span>
+      <li><a href="/<%- profile.preferredUsername %>/following">Following
+        <% if (profile.following && _.has(profile.following, "totalItems")) { %>
+        <span class="label"><%- profile.following.totalItems %></span>
         <% } %>
         </a>
       </li>
-      <li><a href="/<%- data.profile.preferredUsername %>/lists">Lists
-        <% if (data.profile.lists && _.has(data.profile.lists, "totalItems")) { %>
-        <span class="label"><%- data.profile.lists.totalItems %></span>
+      <li><a href="/<%- profile.preferredUsername %>/lists">Lists
+        <% if (profile.lists && _.has(profile.lists, "totalItems")) { %>
+        <span class="label"><%- profile.lists.totalItems %></span>
         <% } %>
         </a>
       </li>

@@ -1,9 +1,9 @@
 <div class="span9" id="object-stream">
-  <% if (data.objects && data.objects.length) { %>
-  <% _.each(data.objects, function(object) { 
-     data.object = object; %>
+  <% if (objects && objects.length) { %>
+  <% _.each(objects, function(object) { 
+     object = object; %>
   <%= partial("major-object") %>
-  <% delete data.object;
+  <% delete object;
      }); %>
   <% } else { %>
   <p>No content!</p>

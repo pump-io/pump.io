@@ -1,9 +1,9 @@
 <div id="people-stream">
-  <% if (data.people && data.people.length) { %>
-  <% _.each(data.people, function(person) { 
-     data.person = person; %>
+  <% if (people && people.length) { %>
+  <% _.each(people, function(person) { 
+     person = person; %>
   <%= partial("major-person") %>
-  <% delete data.person;
+  <% delete person;
      }); %>
   <% } else { %>
   <p>No content!</p>
