@@ -23,10 +23,10 @@
             <% } %>
         <% } %>
         <% if (activity.to && activity.to.length > 0) { %>
-        To: <%= partial("activity-object-list", {activity: activity, objects: activity.to}) %>
+        To: <%= partial("activity-object-list", {author: activity.actor, activity: activity, objects: activity.to}) %>
         <% } %>
         <% if (activity.cc && activity.cc.length > 0) { %>
-        CC: <%= partial("activity-object-list", {activity: activity, objects: activity.cc}) %>
+        CC: <%= partial("activity-object-list", {author: activity.actor, activity: activity, objects: activity.cc}) %>
         <% } %>
       </small></p>
     </div>
@@ -44,15 +44,15 @@
       <% } %>
     <% if (!activity.object.likes || activity.object.likes.totalItems === 0) { %>
     <% } else if (activity.object.likes.totalItems === 1) { %>
-    <p><small><%= partial("activity-object-collection", {activity: activity, coll: activity.object.likes}) %> likes this.</small></p>
+    <p><small><%= partial("activity-object-collection", {author: activity.actor, coll: activity.object.likes}) %> likes this.</small></p>
     <% } else { %>
-    <p><small><%= partial("activity-object-collection", {activity: activity, coll: activity.object.likes}) %> like this.</small></p>
+    <p><small><%= partial("activity-object-collection", {author: activity.actor, coll: activity.object.likes}) %> like this.</small></p>
     <% } %>
     <% if (!activity.object.shares || activity.object.shares.totalItems === 0) { %>
     <% } else if (activity.object.shares.totalItems === 1) { %>
-    <p><small><%= partial("activity-object-collection", {activity: activity, coll: activity.object.shares}) %> shared this.</small></p>
+    <p><small><%= partial("activity-object-collection", {author: activity.actor, coll: activity.object.shares}) %> shared this.</small></p>
     <% } else { %>
-    <p><small><%= partial("activity-object-collection", {activity: activity, coll: activity.object.shares}) %> shared this.</small></p>
+    <p><small><%= partial("activity-object-collection", {author: activity.actor, coll: activity.object.shares}) %> shared this.</small></p>
     <% } %>
     </div>
   </div>

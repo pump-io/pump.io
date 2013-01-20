@@ -25,19 +25,19 @@
       <p><%= object.content %></p>
       <% } %>
       <% if (user) { %>
-      <%= partial("responses") %>
+      <%= partial("responses", {object: object}) %>
       <% } %>
       <% if (object.likes.totalItems === 0) { %>
       <% } else if (object.likes.totalItems === 1) { %>
-      <p><small><%= partial("activity-object-collection", {coll: object.likes}) %> likes this.</small></p>
+      <p><small><%= partial("activity-object-collection", {author: object.author, object: object, coll: object.likes}) %> likes this.</small></p>
       <% } else { %>
-      <p><small><%= partial("activity-object-collection", {coll: object.likes}) %> like this.</small></p>
+      <p><small><%= partial("activity-object-collection", {author: object.author, object: object, coll: object.likes}) %> like this.</small></p>
       <% } %>
       <% if (object.shares.totalItems === 0) { %>
       <% } else if (object.shares.totalItems === 1) { %>
-      <p><small><%= partial("activity-object-collection", {coll: object.shares}) %> shared this.</small></p>
+      <p><small><%= partial("activity-object-collection", {author: object.author, object: object, coll: object.shares}) %> shared this.</small></p>
       <% } else { %>
-      <p><small><%= partial("activity-object-collection", {coll: object.shares}) %> shared this.</small></p>
+      <p><small><%= partial("activity-object-collection", {author: object.author, object: object, coll: object.shares}) %> shared this.</small></p>
       <% } %>
     </div>
   </div>
