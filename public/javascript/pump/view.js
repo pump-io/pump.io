@@ -989,15 +989,15 @@
         setupSubs: function() {
             var view = this,
                 model = view.model,
-	        $el = view.$(".replies");
+                $el = view.$(".replies");
 
-	    if (view.replyStream) {
+            if (view.replyStream) {
                 view.replyStream.setElement($el);
-		return;
-	    }
+                return;
+            }
 
-	    view.replyStream = new Pump.ReplyStreamView({el: $el, collection: model.replies});
-	},
+            view.replyStream = new Pump.ReplyStreamView({el: $el, collection: model.replies});
+        },
         favoriteObject: function() {
             var view = this,
                 act = new Pump.Activity({
@@ -1590,9 +1590,9 @@
             var view = this,
                 profile = Pump.currentUser.profile,
                 props = {"displayName": view.$('#realname').val(),
-                          "location": { objectType: "place", 
-                                        displayName: view.$('#location').val() },
-                          "summary": view.$('#bio').val()};
+                         "location": { objectType: "place", 
+                                       displayName: view.$('#location').val() },
+                         "summary": view.$('#bio').val()};
 
             if (img) {
                 props.image = img;
