@@ -2,10 +2,10 @@
   <% if (data.activity.object.replies && data.activity.object.replies.totalItems > 0) { %>
   <h3>Replies</h3>
   <% if (data.activity.object.replies.totalItems > 4) { %>
-  <a class="show-all" href="#">Show all <%= data.activity.object.replies.totalItems %> replies</a>
+  <a class="show-all-replies" href="#">Show all <%= data.activity.object.replies.totalItems %> replies</a>
   <% } %>
   <div class="reply-objects">
-  <% _.each(data.activity.object.replies.items.slice(0, 4).reverse(), function(reply) { 
+  <% _.each(data.activity.object.replies.items.slice(Math.max(0, data.activity.object.replies.items.length - 4), data.activity.object.replies.items.length).reverse(), function(reply) { 
      data.reply = reply; %>
   <%= partial("reply") %>
   <% delete data.reply;
