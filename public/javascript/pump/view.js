@@ -351,6 +351,8 @@
             var view = this,
                 id = model.get("id"),
                 subs = view.subs,
+                data = view.options.data,
+                options,
                 aview,
                 def,
                 selector;
@@ -388,9 +390,20 @@
                 return;
             }
 
+            options = {model: model};
+
+            if (def.subOptions) {
+                if (def.subOptions.data) {
+                    options.data = {};
+                    _.each(def.subOptions.data, function(item) {
+                        options.data[item] = data[item];
+                    });
+                }
+            }
+
             // Show the new item
 
-            aview = new Pump[def.subView]({model: model});
+            aview = new Pump[def.subView](options);
 
             // Stash the view
 
@@ -849,14 +862,16 @@
                 attr: "majorStreamView",
                 subView: "MajorStreamView",
                 subOptions: {
-                    collection: "major"
+                    collection: "major",
+                    data: "headless"
                 }
             },
             "#minor-stream": {
                 attr: "minorStreamView",
                 subView: "MinorStreamView",
                 subOptions: {
-                    collection: "minor"
+                    collection: "minor",
+                    data: "headless"
                 }
             }
         }
@@ -875,7 +890,10 @@
             ".activity.major": {
                 map: "activities",
                 subView: "MajorActivityView",
-                idAttr: "data-activity-id"
+                idAttr: "data-activity-id",
+                subOptions: {
+                    data: "headless"
+                }
             }
         }
     });
@@ -888,7 +906,10 @@
             ".activity.minor": {
                 map: "activities",
                 subView: "MinorActivityView",
-                idAttr: "data-activity-id"
+                idAttr: "data-activity-id",
+                subOptions: {
+                    data: "headless"
+                }
             }
         }
     });
@@ -918,14 +939,16 @@
                 attr: "majorStreamView",
                 subView: "MajorStreamView",
                 subOptions: {
-                    collection: "major"
+                    collection: "major",
+                    data: "headless"
                 }
             },
             "#minor-stream": {
                 attr: "minorStreamView",
                 subView: "MinorStreamView",
                 subOptions: {
-                    collection: "minor"
+                    collection: "minor",
+                    data: "headless"
                 }
             }
         }
