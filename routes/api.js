@@ -41,6 +41,7 @@ var databank = require("databank"),
     AppError = require("../lib/model/activity").AppError,
     Collection = require("../lib/model/collection").Collection,
     ActivityObject = require("../lib/model/activityobject").ActivityObject,
+    Confirmation = require("../lib/model/confirmation").Confirmation,
     User = require("../lib/model/user").User,
     Edge = require("../lib/model/edge").Edge,
     Favorite = require("../lib/model/favorite").Favorite,
@@ -764,21 +765,34 @@ var createUser = function(req, res, next) {
                                         this);
                 },
                 function(err, confirmation) {
+                    var confirmationURL;
                     if (err) throw err;
-                    res.render("confirmation-email",
+                    confirmationURL = URLMaker.makeURL("/main/confirm/" + confirmation.code);
+                    res.render("confirmation-email-html",
                                {user: user,
-                                confirmation: confirmation},
-                               this);
+                                confirmation: confirmation,
+                                confirmationURL: confirmationURL,
+                                layout: false},
+                               this.parallel());
+                    res.render("confirmation-email-text",
+                               {user: user,
+                                confirmation: confirmation,
+                                confirmationURL: confirmationURL,
+                                layout: false},
+                               this.parallel());
                 },
-                function(err, html) {
+                function(err, html, text) {
                     if (err) throw err;
                     req.app.sendEmail({to: user.email,
-                                       subject: "Confirm your email address",
+                                       subject: "Confirm your email address for " + req.app.config.site,
+                                       text: text,
                                        attachment: {data: html,
+                                                    type: "text/html",
                                                     alternative: true}},
                                       this);
                 },
                 function(err, message) {
+                    callback(err);
                 }
             );
         },
@@ -803,7 +817,8 @@ var createUser = function(req, res, next) {
                         });
                         newActivity(act, user, group());
                     });
-                }
+                },
+                callback
             );
         };
 
@@ -814,8 +829,7 @@ var createUser = function(req, res, next) {
 
     // Email validation
 
-    if (_.has(req.app.config, "requireEmail") &&
-        req.app.config.requireEmail) {
+    if (req.app.config.requireEmail) {
         if (!_.has(props, "email") ||
             !_.isString(props.email) ||
             props.email.length === 0) {
@@ -863,6 +877,7 @@ var createUser = function(req, res, next) {
             if (req.app.config.requireEmail) {
                 sendConfirmationEmail(user, this);
             } else {
+                // skip if we don't require email
                 this(null);
             }
         },

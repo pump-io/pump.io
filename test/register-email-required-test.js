@@ -43,10 +43,9 @@ var makeCred = function(cl, pair) {
 var oneEmail = function(smtp, addr, callback) {
     var data,
         isOurs = function(envelope) {
-            return _.has(envelope.to, addr);
+            return _.contains(envelope.to, addr);
         },
         starter = function(envelope) {
-            console.dir(envelope);
             if (isOurs(envelope)) {
                 data = "";
                 smtp.on("data", accumulator);
@@ -58,10 +57,13 @@ var oneEmail = function(smtp, addr, callback) {
                 data = data + chunk.toString();
             }
         },
-        ender = function(envelope, callback) {
+        ender = function(envelope, cb) {
             if (isOurs(envelope)) {
                 smtp.removeListener("data", accumulator);
                 callback(null, data);
+                process.nextTick(function() {
+                    cb(null);
+                });
             }
         };
 
@@ -76,7 +78,7 @@ suite.addBatch({
     "When we set up the app": {
         topic: function() {
             var callback = this.callback,
-                smtp = simplesmtp.createServer();
+                smtp = simplesmtp.createServer({disableDNSValidation: true});
             Step(
                 function() {
                     smtp.listen(1623, this); 
