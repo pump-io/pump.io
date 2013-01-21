@@ -1221,7 +1221,7 @@
 
                 // These get stripped for "posts"; re-add it
 
-                object.set("author", act.actor); 
+                object.author = Pump.currentUser.profile; 
 
                 repl = new Pump.ReplyView({model: object});
 
