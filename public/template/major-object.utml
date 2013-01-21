@@ -2,9 +2,9 @@
   <div class="row">
     <div class="span1">
       <% if (object.author && object.author.image && object.author.image.url) { %>
-      <img src="<%- object.author.image.url %>" width="40" height="40" />
+      <img src="<%- object.author.image.url %>" width="40" height="40" class="img-rounded" />
       <% } else { %>
-      <img src="/images/default.png" width="40" height="40" />
+      <img src="/images/default.png" width="40" height="40" class="img-rounded" />
       <% } %>
     </div>
     <div class="span8">
@@ -19,7 +19,7 @@
   <div class="row">
     <div class="span8 offset1">
       <% if (object.image && object.image.url) { %>
-      <p><img src="<%- object.image.url %>"></img></p>
+      <p><img src="<%- object.image.url %>" class="img-polaroid"></img></p>
       <% } %>
       <% if (object.displayName) { %>
       <p><%= object.content %></p>

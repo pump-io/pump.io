@@ -2,9 +2,9 @@
   <div class="row">
     <div class="span1">
       <% if (reply.author.image && reply.author.image.url) { %>
-      <img src="<%- reply.author.image.url %>" width="40" height="40" />
+      <img src="<%- reply.author.image.url %>" width="40" height="40" class="img-rounded" />
       <% } else { %>
-      <img src="/images/default.png" width="40" height="40" />
+      <img src="/images/default.png" width="40" height="40" class="img-rounded" />
       <% } %>
     </div>
     <div class="span7">

@@ -17,7 +17,7 @@
     <li id="fat-menu" class="dropdown">
       <a href="#" id="profile-dropdown" role="button" class="dropdown-toggle" toggle="dropdown"> 
         <% if (_.has(user, "profile") && _.isObject(user.profile) && _(user.profile).has("image")) { %>
-        <img class="pull-left" src="<%- user.profile.image.url %>" width="24" height="24" />&nbsp;
+        <img class="pull-left" src="<%- user.profile.image.url %>" width="24" height="24" class="img-rounded" />&nbsp;
         <% } %>
         <%- user.profile.displayName %>
         <b class="caret"></b>

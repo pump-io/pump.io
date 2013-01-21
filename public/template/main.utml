@@ -16,7 +16,7 @@
       </div>
 
       <div class="span4">
-        <img src="images/somefriends.jpg" width="340" height="235" />
+        <img src="images/somefriends.jpg" width="340" height="235" class="img-rounded" />
       </div>
 
     </div>

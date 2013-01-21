@@ -1,9 +1,9 @@
 <div class="row" id="profile-block" data-profile-id="<%- profile.id %>">
   <div class="span3">
     <% if (profile.image && profile.image.url) { %>
-    <img src="<%- profile.image.url %>" width="128" height="128" />
+    <img src="<%- profile.image.url %>" width="128" height="128" class="img-rounded" />
     <% } else { %>
-    <img src="/images/default.png" width="128" height="128" />
+    <img src="/images/default.png" width="128" height="128" class="img-rounded" />
     <% } %>
   </div>
   <div class="span8">

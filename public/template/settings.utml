@@ -20,7 +20,7 @@
 
       <label>Avatar</label>
       <% if (user.profile.image && user.profile.image.url) { %>
-      <img src="<%- user.profile.image.url %>" width="96" height="96" />
+      <img src="<%- user.profile.image.url %>" width="96" height="96" class="img-rounded" />
       <% } %>
 
       <div id="avatar-fineupload"></div>

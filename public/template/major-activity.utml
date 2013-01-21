@@ -3,9 +3,9 @@
     <% if (!headless) { %>
     <div class="span1">
       <% if (activity.actor.image && activity.actor.image.url) { %>
-      <img src="<%- activity.actor.image.url %>" width="40" height="40" />
+      <img src="<%- activity.actor.image.url %>" width="40" height="40" class="img-rounded" />
       <% } else { %>
-      <img src="/images/default.png" width="40" height="40" />
+      <img src="/images/default.png" width="40" height="40" class="img-rounded" />
       <% } %>
     </div>
     <% } %>
@@ -36,7 +36,7 @@
   <div class="row">
     <div class="span8 offset1">
       <% if (activity.object.image && activity.object.image.url) { %>
-      <p><img src="<%- activity.object.image.url %>"></img></p>
+      <p><img src="<%- activity.object.image.url %>" class="img-polaroid"></img></p>
       <% } %>
       <% if (activity.object.displayName) { %>
       <p><%= activity.object.content %></p>
