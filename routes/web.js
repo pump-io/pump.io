@@ -346,15 +346,18 @@ var showActivity = function(req, res, next) {
     );
 };
 
-var getFiltered = function(stream, filter, start, end, callback) {
+var getFiltered = function(stream, filter, profile, start, end, callback) {
     var filtered = new FilteredStream(stream, filter);
+
+    filtered = new FilteredStream(stream, filter),
+
     Step(
         function() {
-            filtered.getIDs(0, 20, this);
+            filtered.getIDs(start, end, this);
         },
         function(err, ids) {
             if (err) throw err;
-            Activity.readAll(ids, this);
+            Activity.readArray(ids, this);
         },
         function(err, activities) {
             if (err) {
@@ -369,18 +372,34 @@ var getFiltered = function(stream, filter, start, end, callback) {
 var showStream = function(req, res, next) {
     var pump = this,
         principal = req.principal,
-        filter = (principal) ? 
-            ((principal.id == req.user.id) ? always : recipientsOnly(principal)) : publicOnly,
+        filter,
         getMajor = function(callback) {
+            var activities;
             Step(
                 function() {
                     req.user.getMajorOutboxStream(this);
                 },
                 function(err, str) {
                     if (err) throw err;
-                    getFiltered(str, filter, 0, 20, this.parallel());
+                    getFiltered(str, filter, principal, 0, 20, this);
                 },
-                callback
+                function(err, results) {
+                    var objects;
+                    activities = results;
+                    objects = _.pluck(activities, "object");
+                    addLiked(principal, objects, this.parallel());
+                    addShared(principal, objects, this.parallel());
+                    addLikers(principal, objects, this.parallel());
+                    firstFewReplies(principal, objects, this.parallel());
+                    firstFewShares(principal, objects, this.parallel());
+                },
+                function(err) {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        callback(null, activities);
+                    }
+                }
             );
         },
         getMinor = function(callback) {
@@ -390,11 +409,19 @@ var showStream = function(req, res, next) {
                 },
                 function(err, str) {
                     if (err) throw err;
-                    getFiltered(str, filter, 0, 20, this.parallel());
+                    getFiltered(str, filter, principal, 0, 20, this);
                 },
                 callback
             );
         };
+
+    if (principal && (principal.id == req.user.profile.id)) {
+        filter = always;
+    } else if (principal) {
+        filter = recipientsOnly(principal);
+    } else {
+        filter = publicOnly;
+    }
 
     Step(
         function() {
