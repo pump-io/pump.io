@@ -111,7 +111,7 @@ suite.addBatch({
                         function(err, pair) {
                             if (err) throw err;
                             var cred = makeCred(cl, pair),
-                                url = "http://localhost:4815/api/user/eekamouse/lists";
+                                url = "http://localhost:4815/api/user/eekamouse/lists/person";
 
                             httputil.getJSON(url, cred, this);
                         },
@@ -125,7 +125,7 @@ suite.addBatch({
                 },
                 "it is valid": function(err, lists) {
                     assert.ifError(err);
-                    assertValidList(lists, 5);
+                    assertValidList(lists, 4);
                 }
             },
             "and a user creates a list": {
@@ -173,13 +173,21 @@ suite.addBatch({
                     assert.include(act.object, "members");
                     assert.isObject(act.object.members);
                     assert.include(act.object.members, "totalItems");
+                    assert.include(act.object.members, "url");
+                    assert.equal(act.object.members.url, act.object.id + "/members");
                     assert.equal(act.object.members.totalItems, 0);
+                    assert.include(act.object, "links");
+                    assert.isObject(act.object.links);
+                    assert.include(act.object.links, "self");
+                    assert.isObject(act.object.links.self);
+                    assert.include(act.object.links.self, "href");
+                    assert.equal(act.object.links.self.href, act.object.id);
                 },
                 "and we get the list of lists owned by the user": {
                     topic: function(act, pair, cl) {
                         var cb = this.callback,
                             cred = makeCred(cl, pair),
-                            url = "http://localhost:4815/api/user/yellowman/lists";
+                            url = "http://localhost:4815/api/user/yellowman/lists/person";
 
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc, act.object);
@@ -191,7 +199,7 @@ suite.addBatch({
                     },
                     "it looks correct": function(err, lists, collection) {
                         assert.ifError(err);
-                        assertValidList(lists, 6);
+                        assertValidList(lists, 5);
                         assert.include(lists, "objectTypes");
                         assert.isArray(lists.objectTypes);
                         assert.include(lists.objectTypes, "collection");
@@ -200,7 +208,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(lists, "items");
                         assert.isArray(lists.items);
-                        assert.lengthOf(lists.items, 6);
+                        assert.greater(lists.items.length, 0);
                         assert.equal(lists.items[0].id, collection.id);
                     }
                 }
@@ -262,7 +270,7 @@ suite.addBatch({
                     topic: function(acts, pair, cl) {
                         var cb = this.callback,
                             cred = makeCred(cl, pair),
-                            url = "http://localhost:4815/api/user/dekker/lists";
+                            url = "http://localhost:4815/api/user/dekker/lists/person";
 
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc);
@@ -274,7 +282,7 @@ suite.addBatch({
                     },
                     "it looks correct": function(err, lists, acts) {
                         assert.ifError(err);
-                        assertValidList(lists, 105, 20);
+                        assertValidList(lists, 104, 20);
                         assert.include(lists, "objectTypes");
                         assert.isArray(lists.objectTypes);
                         assert.include(lists.objectTypes, "collection");
@@ -329,7 +337,7 @@ suite.addBatch({
                     topic: function(act, pair, cl) {
                         var cb = this.callback,
                             cred = makeCred(cl, pair),
-                            url = "http://localhost:4815/api/user/maxromeo/lists";
+                            url = "http://localhost:4815/api/user/maxromeo/lists/person";
 
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc);
@@ -341,7 +349,7 @@ suite.addBatch({
                     },
                     "it looks correct": function(err, lists, acts) {
                         assert.ifError(err);
-                        assertValidList(lists, 5);
+                        assertValidList(lists, 4);
                         assert.include(lists, "objectTypes");
                         assert.isArray(lists.objectTypes);
                         assert.include(lists.objectTypes, "collection");
@@ -495,7 +503,7 @@ suite.addBatch({
                     topic: function(act, pair, cl) {
                         var cb = this.callback,
                             cred = makeCred(cl, pair),
-                            url = act.target.id;
+                            url = act.target.id + "/members"; // XXX
 
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc, act.object);
@@ -508,8 +516,10 @@ suite.addBatch({
                     },
                     "it includes that user": function(err, list, person) {
                         assert.ifError(err);
-                        assert.lengthOf(list.members.items, 1);
-                        assert.equal(list.members.items[0].id, person.id);
+                        assert.include(list, "items");
+                        assert.isArray(list.items);
+                        assert.lengthOf(list.items, 1);
+                        assert.equal(list.items[0].id, person.id);
                     },
                     "and the user removes the other user from the list": {
                         topic: function(list, person, act, pair, cl) {
@@ -519,7 +529,7 @@ suite.addBatch({
                                 ract = {
                                     verb: "remove",
                                     object: person,
-                                    target: list
+                                    target: act.target
                                 };
                             httputil.postJSON(url, cred, ract, cb);
                         },
@@ -531,7 +541,7 @@ suite.addBatch({
                             topic: function(doc, response, list, person, act, pair, cl) {
                                 var cb = this.callback,
                                     cred = makeCred(cl, pair),
-                                    url = act.target.id;
+                                    url = act.target.id + "/members"; // XXX
 
                                 httputil.getJSON(url, cred, function(err, doc, response) {
                                     cb(err, doc, act.object);
@@ -544,7 +554,10 @@ suite.addBatch({
                             },
                             "it does not include that user": function(err, list, person) {
                                 assert.ifError(err);
-                                assert.equal(list.members.totalItems, 0);
+                                assert.equal(list.totalItems, 0);
+                                assert.include(list, "items");
+                                assert.isArray(list.items);
+                                assert.lengthOf(list.items, 0);
                             }
                         }
                     }
@@ -873,6 +886,68 @@ suite.addBatch({
                 },
                 "it fails correctly": function(err) {
                     assert.ifError(err);
+                }
+            },
+            "and a user adds someone to a list by posting to the members feed": {
+                topic: function(cl) {
+                    var cb = this.callback,
+                        pair1 = null,
+                        pair2 = null,
+                        cred1 = null,
+                        cred2 = null,
+                        url1 = "http://localhost:4815/api/user/keith/feed",
+                        url2 = "http://localhost:4815/api/user/lloyd/feed",
+                        list;
+
+                    Step(
+                        function() {
+                            newPair(cl, "keith", "Moow0eec", this.parallel());
+                            newPair(cl, "lloyd", "nohkoo8I", this.parallel());
+                        },
+                        function(err, results1, results2) {
+                            if (err) throw err;
+                            pair1 = results1;
+                            pair2 = results2;
+                            cred1 = makeCred(cl, pair1);
+                            cred2 = makeCred(cl, pair2);
+                            var act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "collection",
+                                    displayName: "Itals",
+                                    objectTypes: ["person"]
+                                }
+                            };
+                            httputil.postJSON(url1, cred1, act, this);
+                        },
+                        function(err, doc, response) {
+                            if (err) throw err;
+                            list = doc.object;
+                            httputil.postJSON(list.members.url, cred1, pair2.user.profile, this);
+                        },
+                        function(err, doc, response) {
+                            cb(err, cred1, doc, list);
+                        }
+                    );
+                },
+                "it works": function(err, cred, person, list) {
+                    assert.ifError(err);
+                    assert.isObject(list);
+                },
+                "and we check the list members": {
+                    topic: function(cred, person, list) {
+                        httputil.getJSON(list.id + "/members", cred, this.callback);
+                    },
+                    "it works": function(err, doc, result) {
+                        assert.ifError(err);
+                        assert.isObject(doc);
+                    },
+                    "it includes that user": function(err, doc, result) {
+                        assert.ifError(err);
+                        assert.include(doc, "items");
+                        assert.isArray(doc.items);
+                        assert.lengthOf(doc.items, 1);
+                    }
                 }
             }
         }

@@ -23,18 +23,70 @@ var assert = require("assert"),
     _ = require("underscore"),
     fs = require("fs"),
     path = require("path"),
+    express = require("express"),
+    DialbackClient = require("dialback-client"),
     databank = require("databank"),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
     Credentials = require("../lib/model/credentials").Credentials,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
-    dialbackApp = require("./lib/dialback").dialbackApp,
-    setupApp = oauthutil.setupApp;
+    setupAppConfig = oauthutil.setupAppConfig;
 
 var suite = vows.describe("credentials module interface");
 
 var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
+
+var tinyApp = function(port, hostname, callback) {
+
+    var app = express.createServer();
+
+    app.configure(function(){
+        app.set("port", port);
+        app.use(express.bodyParser());
+        app.use(app.router);
+    });
+
+    app.get("/.well-known/host-meta.json", function(req, res) {
+        res.json({
+            links: [
+                {
+                    rel: "lrdd",
+                    type: "application/json",
+                    template: "http://"+hostname+"/lrdd.json?uri={uri}"
+                },
+                {
+                    rel: "dialback",
+                    href: "http://"+hostname+"/api/dialback"
+                }
+            ]
+        });
+    });
+
+    app.get("/lrdd.json", function(req, res) {
+        var uri = req.query.uri,
+            parts = uri.split("@"),
+            username = parts[0],
+            hostname = parts[1];
+
+        res.json({
+            links: [
+                {
+                    rel: "dialback",
+                    href: "http://"+hostname+"/api/dialback"
+                }
+            ]
+        });
+    });
+
+    app.on("error", function(err) {
+        callback(err, null);
+    });
+
+    app.listen(port, hostname, function() {
+        callback(null, app);
+    });
+};
 
 suite.addBatch({
     "When we set up the app": {
@@ -50,17 +102,24 @@ suite.addBatch({
                 function(err) {
                     if (err) throw err;
                     DatabankObject.bank = db;
-                    setupApp(80, "social.localhost", this);
+                    setupAppConfig({port: 80, hostname: "social.localhost", driver: "memory", params: {}}, this);
                 },
                 function(err, result) {
                     if (err) throw err;
                     app = result;
-                    dialbackApp(80, "dialback.localhost", this);
+                    tinyApp(80, "dialback.localhost", this);
                 },
                 function(err, dbapp) {
+                    var dialbackClient;
                     if (err) {
                         callback(err, null, null);
                     } else {
+                        Credentials.dialbackClient = new DialbackClient({
+                            hostname: "dialback.localhost",
+                            bank: db,
+                            app: dbapp,
+                            url: "/api/dialback"
+                        });
                         callback(err, app, dbapp);
                     }
                 }

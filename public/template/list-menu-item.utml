@@ -1,0 +1,9 @@
+<li class="<%- ((list && list.id == listItem.id) ? 'list active' : 'list') %>"
+    data-list-id="<%- listItem.id %>">
+  <a href="<%- listItem.url %>">
+    <%- listItem.displayName %>
+    <% if (listItem.members && _.has(listItem.members, "totalItems")) { %>
+    <span class="label"><%- listItem.members.totalItems %></span>
+    <% } %>
+  </a>
+</li>

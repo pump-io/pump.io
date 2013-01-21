@@ -1,12 +1,14 @@
-<div class="row activity" id="<%- id %>">
+<div class="row activity minor <% if (headless) { %>headless<% } %>" data-activity-id="<%- activity.id %>">
+  <% if (!headless) { %>
   <div class="span1">
-    <% if (actor.image && actor.image.url) { %>
-    <img src="<%- actor.image.url %>" width="40" height="40" />
+    <% if (activity.actor.image && activity.actor.image.url) { %>
+    <img src="<%- activity.actor.image.url %>" width="40" height="40" class="img-rounded" />
     <% } else { %>
-    <img src="/images/default.jpg" width="40" height="40" />
+    <img src="/images/default.png" width="40" height="40" class="img-rounded" />
     <% } %>
   </div>
-  <div class="span2">
-    <p><small><%= content %></small></p>
+  <% } %>
+  <div class="<% if (headless) { %>span3<% } else { %>span2<% } %>">
+    <p><small><%= activity.content %></small></p>
   </div>
 </div>

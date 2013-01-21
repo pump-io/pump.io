@@ -1,0 +1,39 @@
+<div class="object">
+  <div class="row">
+    <div class="span3">
+      <% if (object.author && object.author.image && object.author.image.url) { %>
+      <img src="<%- object.author.image.url %>" width="40" height="40" class="img-rounded" />
+      <% } else { %>
+      <img src="/images/default.png" width="40" height="40" class="img-rounded" />
+      <% } %>
+      <% if (object.author) { %><a href="<%- object.author.url %>"><%- object.author.displayName %></a><% } %>
+    </div>
+    <div class="span8">
+      <% if (object.title) { %>
+      <h2><%- object.title %></h2>
+      <% } else { %>
+      <%= object.content %>
+      <% } %>
+      <p><small> at <a href="<%- object.url %>"><%- object.published %></a><% if (object.location) { %> in <a href="<%- object.location.url %>"><%- object.location.displayName %></a><% } %></small></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="span8 offset3">
+      <% if (object.image && object.image.url) { %>
+      <p><img src="<%- object.image.url %>" class="img-polaroid"></img></p>
+      <% } %>
+      <% if (object.displayName) { %>
+      <p><%= object.content %></p>
+      <% } %>
+      <% if (user) { %>
+      <%= partial("responses") %>
+      <% } %>
+      <% if (!_.has(object, "likes") || object.likes.totalItems === 0) { %>
+      <% } else if (object.likes.totalItems === 1) { %>
+      <p><small><%= partial("activity-object-collection", {coll: object.likes}) %> likes this.</small></p>
+      <% } else { %>
+      <p><small><%= partial("activity-object-collection", {coll: object.likes}) %> like this.</small></p>
+      <% } %>
+    </div>
+  </div>
+</div>

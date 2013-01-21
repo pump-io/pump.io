@@ -1,9 +1,8 @@
 <div class="user">
   <div class="row">
-    <%= profileBlock(obj, _) %>
+    <%= partial("profile-block") %>
   </div>
-  <div class="row">
-    <%= majorStream(obj, _) %>
-    <%= sidebar(obj, _) %>
+  <div class="row" id="user-content">
+    <%= partial("user-content-activities") %>
   </div>
 </div>

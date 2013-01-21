@@ -41,14 +41,14 @@ var testSchema = {
              "updated",
              "upstreamDuplicates",
              "url",
-             "uuid",
+             "_uuid",
              "compression",
              "data",
              "fileUrl",
              "length",
              "md5",
              "mimeType"],
-    indices: ["uuid"]
+    indices: ["_uuid"]
 };
 
 var testData = {

@@ -1,9 +1,8 @@
 <div class="user">
   <div class="row">
-    <%= profileBlock(obj, _) %>
+    <%= partial("profile-block") %>
   </div>
-  <div class="row">
-    <h2>Following</h2>
-    <%= peopleStream(obj, _) %>
+  <div class="row" id="user-content">
+    <%= partial("user-content-following") %>
   </div>
 </div>

@@ -1,0 +1,4 @@
+<div id="user-content-favorites">
+  <%= partial("object-stream") %>
+</div>
+

@@ -43,8 +43,20 @@ var hostmeta = {
             {rel: "registration_endpoint",
              href: "http://localhost:4815/api/client/register"
             },
+            {rel: "http://apinamespace.org/oauth/request_token",
+             href: "http://localhost:4815/oauth/request_token"
+            },
+            {rel: "http://apinamespace.org/oauth/authorize",
+             href: "http://localhost:4815/oauth/authorize"
+            },
+            {rel: "http://apinamespace.org/oauth/access_token",
+             href: "http://localhost:4815/oauth/access_token"
+            },
             {rel: "dialback",
-             href: "http://localhost:4815/api/dialback"}]
+             href: "http://localhost:4815/api/dialback"},
+            {rel: "http://apinamespace.org/activitypub/whoami",
+             href: "http://localhost:4815/api/whoami"}
+           ]
 };
 
 // A batch to test hostmeta functions

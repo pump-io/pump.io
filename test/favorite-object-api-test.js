@@ -169,6 +169,7 @@ suite.addBatch({
                             var url = "http://localhost:4815/api/user/cindy/feed",
                                 act = {
                                     verb: "post",
+                                    to: [pairs.bobby.user.profile],
                                     object: {
                                         objectType: "note",
                                         content: "Let's play dress-up."
@@ -218,6 +219,26 @@ suite.addBatch({
                     "it includes the object": function(err, doc, act) {
                         assert.ifError(err);
                         assert.equal(doc.items[0].id, act.object.id);
+                    }
+                },
+                "and we get the object with the liker's credentials": {
+                    topic: function(act, pairs, cl) {
+                        var cred = makeCred(cl, pairs.bobby),
+                            url = act.object.links.self.href,
+                            cb = this.callback;
+
+                            httputil.getJSON(url, cred, function(err, doc) {
+                                cb(err, doc);
+                            });
+                    },
+                    "it works": function(err, doc) {
+                        assert.ifError(err);
+                        assert.isObject(doc);
+                    },
+                    "it includes the 'liked' flag": function(err, doc) {
+                        assert.ifError(err);
+                        assert.include(doc, 'liked');
+                        assert.isTrue(doc.liked);
                     }
                 },
                 "and we get the list of likes of the object": {
@@ -580,7 +601,7 @@ suite.addBatch({
                         assert.isObject(feed);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 1);
+                        assert.greater(feed.items.length, 0);
                         assert.isObject(feed.items[0]);
                         assert.include(feed.items[0], "id");
                         assert.equal("urn:uuid:ab70a4c0-ed3a-11e1-965f-0024beb67924", feed.items[0].id); 
@@ -604,7 +625,7 @@ suite.addBatch({
                         assert.isObject(feed);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 2);
+                        assert.greater(feed.items.length, 0);
                         assert.isObject(feed.items[0]);
                         assert.include(feed.items[0], "verb");
                         assert.equal("favorite", feed.items[0].verb);

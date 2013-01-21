@@ -1,6 +1,9 @@
 <div class="inbox">
   <div class="row">
-    <%= majorStream(obj, _) %>
-    <%= sidebar(obj, _) %>
+    <%= partial("major-stream", {headless: false}) %>
+    <div class="span3" id="sidebar">
+      <h3>Meanwhile...</h3>
+      <%= partial("minor-stream", {headless: false}) %>
+    </div>
   </div>
 </div>

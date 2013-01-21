@@ -17,6 +17,7 @@
 // limitations under the License.
 
 var assert = require("assert"),
+    _ = require("underscore"),
     vows = require("vows"),
     databank = require("databank"),
     Step = require("step"),
@@ -167,10 +168,10 @@ var modelBatch = function(typeName, className, testSchema, testData) {
             var prop, aprop;
             for (prop in testData.create) {
                 // Author may have auto-created properties
-                if (prop === "author") {
-                    for (aprop in testData.create.author) {
-                        assert.deepEqual(created.author[aprop], testData.create.author[aprop]);
-                    }
+                if (_.contains(["author", "inReplyTo"], prop)) {
+                    _.each(testData.create[prop], function(value, key) {
+                        assert.deepEqual(created[prop][key], value);
+                    });
                 } else {
                     assert.deepEqual(created[prop], testData.create[prop]); 
                 }

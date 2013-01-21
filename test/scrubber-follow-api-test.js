@@ -87,6 +87,19 @@ var badFollow = function(obj, property) {
     return context;
 };
 
+var privateFollow = function(obj, property) {
+
+    var context = postFollow(obj);
+
+    context["The private property is ignored"] = function(err, result, response) {
+        assert.ifError(err);
+        assert.isObject(result);
+        assert.isFalse(_.has(result, property));
+    };
+
+    return context;
+};
+
 var suite = vows.describe("Scrubber follow API test");
 
 // A batch to test posting to the regular feed endpoint
@@ -135,7 +148,14 @@ suite.addBatch({
                        id: "urn:uuid:3199f00e-3293-11e2-a5ac-0024beb67924",
                        summary: DANGEROUS
                       },
-                      "summary")
+                      "summary"),
+            "and we follow an object with a private member": 
+            privateFollow({objectType: "person",
+                           id: "urn:uuid:75f81018-36ae-11e2-ad19-70f1a154e1aa",
+                           _user: true,
+                           summary: HARMLESS
+                          },
+                          "_user")
         }
     }
 });

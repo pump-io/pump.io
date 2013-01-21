@@ -1,0 +1,18 @@
+<div class="container span9" id="list-content-list">
+  <div class="row">
+    <div class="pull-right">
+      <% if (user && user.profile && user.profile.id == profile.id) { %>
+      <a class="btn" class="add-list-member">Add a member</a>
+      <% } %>
+    </div>
+    <h3><%- list.displayName %></h3>
+    <% if (list.content) { %>
+    <p><%- list.content %></p>    
+    <% } %>
+  </div>
+  <div class="row" id="list-members">
+    <% people = list.members.items; %>
+    <%= partial("people-stream") %>
+    <% delete people; %>
+  </div>
+</div>

@@ -1,0 +1,9 @@
+<div class="person-responses">
+  <% if (user && user.profile && (user.profile.id != person.id)) {
+         if (person.pump_io && person.pump_io.followed) { %>
+  <p><a href="#" class="btn stop-following">Stop following</a></p>
+  <%     } else { %>
+  <p><a href="#" class="btn btn-primary follow">Follow</a></p>
+  <%     }
+     } %>
+</div>

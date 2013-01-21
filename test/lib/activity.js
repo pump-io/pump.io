@@ -16,11 +16,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require("assert"),
+var _ = require("underscore"),
+    assert = require("assert"),
     vows = require("vows");
 
 var validActivity = function(act) {
     assert.isObject(act);
+    assert.isFalse(_.has(act, "_uuid"));
     assert.include(act, "id");
     assert.isString(act.id);
     assert.include(act, "actor");
@@ -31,6 +33,7 @@ var validActivity = function(act) {
     assert.isString(act.actor.objectType);
     assert.include(act.actor, "displayName");
     assert.isString(act.actor.displayName);
+    assert.isFalse(_.has(act.actor, "_uuid"));
     assert.include(act, "verb");
     assert.isString(act.verb);
     assert.include(act, "object");
@@ -39,6 +42,7 @@ var validActivity = function(act) {
     assert.isString(act.object.id);
     assert.include(act.object, "objectType");
     assert.isString(act.object.objectType);
+    assert.isFalse(_.has(act.object, "_uuid"));
     assert.include(act, "published");
     assert.isString(act.published);
     assert.include(act, "updated");

@@ -46,10 +46,10 @@ var testSchema = {
              "target",
              "title",
              "url",
-             "uuid",
+             "_uuid",
              "updated",
              "verb"],
-    indices: ["actor.id", "object.id", "uuid"]
+    indices: ["actor.id", "object.id", "_uuid"]
 };
 
 var testData = {
@@ -169,7 +169,7 @@ mb["When we require the activity module"]
 ["and we create an activity instance"]
 ["auto-generated fields are there"] = function(err, created) {
     assert.isString(created.id);
-    assert.isString(created.uuid);
+    assert.isString(created._uuid);
     assert.isString(created.published);
     assert.isString(created.updated);
     assert.isObject(created.links);
@@ -580,7 +580,7 @@ suite.addBatch({
             "uuid is invisible": function(err, act) {
                 assert.ifError(err);
                 assert.isObject(act);
-                assert.isFalse(act.hasOwnProperty("uuid"));
+                assert.isFalse(act.hasOwnProperty("_uuid"));
             },
             "bcc is visible": function(err, act) {
                 assert.ifError(err);
@@ -648,7 +648,7 @@ suite.addBatch({
             "uuid is invisible": function(err, act) {
                 assert.ifError(err);
                 assert.isObject(act);
-                assert.isFalse(act.hasOwnProperty("uuid"));
+                assert.isFalse(act.hasOwnProperty("_uuid"));
             },
             "bcc is invisible": function(err, act) {
                 assert.ifError(err);
@@ -712,7 +712,7 @@ suite.addBatch({
             "uuid is invisible": function(err, act) {
                 assert.ifError(err);
                 assert.isObject(act);
-                assert.isFalse(act.hasOwnProperty("uuid"));
+                assert.isFalse(act.hasOwnProperty("_uuid"));
             },
             "bcc is invisible": function(err, act) {
                 assert.ifError(err);
@@ -1371,6 +1371,72 @@ suite.addBatch({
             },
             "it is not major": function(isMajor) {
                 assert.isFalse(isMajor);
+            }
+        },
+        "and we check if creating a list is major": {
+            topic: function(Activity) {
+                var act = new Activity({
+                    id: "urn:uuid:385507e8-43dd-11e2-8e9b-2c8158efb9e9",
+                    actor: {
+                        objectType: "person",
+                        displayName: "A. Nother Person",
+                        id: "urn:uuid:79768f4e-43dd-11e2-8cbf-2c8158efb9e9"
+                    },
+                    verb: "create",
+                    object: {
+                        id: "urn:uuid:87cf740c-43dd-11e2-ae8a-2c8158efb9e9",
+                        objectType: "collection",
+                        objectTypes: ["person"]
+                    }
+                });
+                return act.isMajor();
+            },
+            "it is not major": function(isMajor) {
+                assert.isFalse(isMajor);
+            }
+        },
+        "and we check if posting a list is major": {
+            topic: function(Activity) {
+                var act = new Activity({
+                    id: "urn:uuid:8f45a5a8-43dd-11e2-a389-2c8158efb9e9",
+                    actor: {
+                        objectType: "person",
+                        displayName: "A. Nother Person",
+                        id: "urn:uuid:9444f0c2-43dd-11e2-ac26-2c8158efb9e9"
+                    },
+                    verb: "post",
+                    object: {
+                        id: "urn:uuid:9a6c6886-43dd-11e2-bd09-2c8158efb9e9",
+                        objectType: "collection",
+                        objectTypes: ["person"]
+                    }
+                });
+                return act.isMajor();
+            },
+            "it is not major": function(isMajor) {
+                assert.isFalse(isMajor);
+            }
+        },
+        "and we check if creating an image is major": {
+            topic: function(Activity) {
+                var act = new Activity({
+                    id: "urn:uuid:a5a0b220-43dd-11e2-9480-2c8158efb9e9",
+                    actor: {
+                        objectType: "person",
+                        displayName: "A. Nother Person",
+                        id: "urn:uuid:aa9a9e76-43dd-11e2-8974-2c8158efb9e9"
+                    },
+                    verb: "create",
+                    object: {
+                        id: "urn:uuid:b779f4a2-43dd-11e2-8714-2c8158efb9e9",
+                        objectType: "image",
+                        displayName: "My dog"
+                    }
+                });
+                return act.isMajor();
+            },
+            "it is major": function(isMajor) {
+                assert.isTrue(isMajor);
             }
         }
     }

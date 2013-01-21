@@ -1,0 +1,15 @@
+<div class="reply" data-activity-id="<%- reply.id %>">
+  <div class="row">
+    <div class="span1">
+      <% if (reply.author.image && reply.author.image.url) { %>
+      <img src="<%- reply.author.image.url %>" width="40" height="40" class="img-rounded" />
+      <% } else { %>
+      <img src="/images/default.png" width="40" height="40" class="img-rounded" />
+      <% } %>
+    </div>
+    <div class="span7">
+      <%= reply.content %>
+      <p><small><a href="<%- reply.author.url %>"><%- reply.author.displayName %></a> at <a href="<%- reply.url %>"><abbr title="<%- reply.published %>" class="easydate"><%- reply.published %></abbr></a><% if (reply.location) { %> in <a href="<%- reply.location.url %>"><%- reply.location.displayName %></a><% } %></small></p>
+    </div>
+  </div>
+</div>

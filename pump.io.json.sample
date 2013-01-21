@@ -12,5 +12,8 @@
     "nologger":  false,
     "serverUser":  "pumpio",
     "key":  "/etc/my/keyfile.key",
-    "cert":  "/etc/my/server.crt"
+    "cert":  "/etc/my/server.crt",
+    "uploaddir": "/var/local/pump.io/uploads",
+    "debugClient": false,
+    "firehose": "ofirehose.example"
 }

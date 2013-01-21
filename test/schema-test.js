@@ -66,7 +66,11 @@ var types = [
     "video",
     "credentials",
     "other",
-    "dialbackrequest"
+    "dialbackrequest",
+    "recentdialbackrequests",
+    "session",
+    "sessionlist",
+    "share"
 ];
 
 vows.describe("schema module interface").addBatch({

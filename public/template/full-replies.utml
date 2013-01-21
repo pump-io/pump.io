@@ -1,0 +1,8 @@
+<div class="span8 offset1 replies">
+  <h3>Replies</h3>
+  <div class="reply-objects">
+    <% _.each(replies.reverse(), function(reply) { %>
+    <%= partial("reply", {reply: reply}) %>
+    <% }); %>
+  </div>
+</div>

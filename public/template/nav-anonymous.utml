@@ -1,17 +1,23 @@
-<button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-  <span class="icon-bar">Register</span>
-  <span class="icon-bar">Login</span>
-</button>
+<div class="container">
 
-<a class="brand" href="/"><%- site %></a>
+  <a class="btn btn-navbar" toggle="collapse" target=".nav-collapse" href="#">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </a>
+  
+  <a class="brand" href="/"><%- config.site %></a>
+  
+  <div class="nav-collapse collapse">
+    <ul class="nav pull-right">
+      <% if (!config.disableRegistration) { %>
+      <li>
+        <a id="register" href="/main/register">Register</a>
+      </li>
+      <% } %>
+      <li>
+        <a id="login" href="/main/login">Login</a>
+      </li>
+    </ul>
+  </div>
 
-<div class="nav-collapse collapse pull-right">
-  <ul class="nav">
-    <li>
-      <a id="register" href="/main/register">Register</a>
-    </li>
-    <li>
-      <a id="login" href="/main/login">Login</a>
-    </li>
-  </ul>
 </div>

@@ -29,17 +29,20 @@ var authenticate = function(req, res) {
         token = parsedUrl.query.oauth_token;
 
     if (!token) {
-        res.render("error", {status: 400,
-                             error: new HTTPError("Must provide an oauth_token", 400),
-                             title: "Error"});
+        res.render("error", {page: {title: "Error",
+                                    nologin: true},
+                             status: 400,
+                             error: new HTTPError("Must provide an oauth_token", 400)});
     } else {
         RequestToken.get(token, function(err, rt) {
             if (err) {
                 res.render("error", {status: 400,
-                                     error: err,
-                                     title: "Error"});
+                                     page: {title: "Error",
+                                            nologin: true},
+                                     error: err});
             } else {
-                res.render("authentication", {title: "Authentication",
+                res.render("authentication", {page: {title: "Authentication",
+                                                     nologin: true},
                                               token: token,
                                               error: false});
             }
@@ -52,18 +55,21 @@ var authorize = function(err, req, res, authorized, authResults, application, rt
     var self = this;
     
     if (err) {
-        res.render("authentication", {title: "Authentication",
+        res.render("authentication", {status: 400,
+                                      page: {title: "Authentication",
+                                             nologin: true},
                                       token: authResults.token,
-                                      status: 400,
-                                      error: err.message});
+                                      error: err});
     } else {
         User.get(rt.username, function(err, user) {
             if (err) {
                 res.render("error", {status: 400,
-                                     error: err,
-                                     title: "Error"});
+                                     page: {title: "Error",
+                                            nologin: true},
+                                     error: err});
             } else {
-                res.render("authorization", {title: "Authorization",
+                res.render("authorization", {page: {title: "Authorization",
+                                                    nologin: true},
                                              token: authResults.token,
                                              verifier: authResults.verifier,
                                              user: user,
@@ -74,7 +80,8 @@ var authorize = function(err, req, res, authorized, authResults, application, rt
 };  
 
 var authorizationFinished = function(err, req, res, result) {
-    res.render("authorization-finished", {title: "Authorization Finished",
+    res.render("authorization-finished", {page: {title: "Authorization Finished",
+                                                 nologin: true},
                                           token: result.token,
                                           verifier: result.verifier});
 };

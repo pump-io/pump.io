@@ -1,0 +1,20 @@
+<div class="btn-group dropdown" id="messages">
+  <button class="btn dropdown-toggle btn-mini btn-success
+                 <% if (messages && messages.totalItems <= 0) { %>
+                 disabled
+                 <% } %>"
+                 toggle="dropdown" href="#">
+    <i class="icon-envelope icon-white"> <%- (messages) ? messages.totalItems : 0 %></i>  
+  </button>
+  <ul class="dropdown-menu" role="menu">
+    <% if (_.isArray(messages)) {%>
+    <% _.each(messages, function(activity) { %>
+    <% if (_.isObject(activity)) { %>
+    <li>
+      <small><%= activity.content %></small>
+    </li>
+    <% } %>
+    <% }); %>
+    <% } %>
+  </ul>
+</div>

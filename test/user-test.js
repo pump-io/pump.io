@@ -30,7 +30,7 @@ var suite = vows.describe("user module interface");
 
 var testSchema = {
     "pkey": "nickname",
-    "fields": ["passwordHash",
+    "fields": ["_passwordHash",
                "published",
                "updated",
                "profile"],
@@ -59,9 +59,24 @@ mb["When we require the user module"]
 ["and we get its User class export"]
 ["and we create an user instance"]
 ["auto-generated fields are there"] = function(err, created) {
-    assert.isString(created.passwordHash);
+    assert.isString(created._passwordHash);
     assert.isString(created.published);
     assert.isString(created.updated);
+};
+
+mb["When we require the user module"]
+["and we get its User class export"]
+["and we create an user instance"]
+["passed-in fields are there"] = function(err, created) {
+    _.each(testData.create, function(value, key) {
+        if (key == "profile") {
+            _.each(testData.create.profile, function(value, key) {
+                assert.deepEqual(created.profile[key], value);
+            });
+        } else {
+            assert.deepEqual(created[key], value); 
+        }
+    });
 };
 
 suite.addBatch(mb);
@@ -196,9 +211,13 @@ suite.addBatch({
             "it has the favoritesStream() method": function(user) {
                 assert.isFunction(user.favoritesStream);
             },
+            "it has the uploadsStream() method": function(user) {
+                assert.isFunction(user.uploadsStream);
+            },
             "it has a profile attribute": function(user) {
                 assert.isObject(user.profile);
                 assert.instanceOf(user.profile, require("../lib/model/person").Person);
+                assert.isString(user.profile.id);
             },
             "and we check the credentials with the right password": {
                 topic: function(user, User) {
@@ -269,7 +288,7 @@ suite.addBatch({
             },
             "it is sanitized": function(err, user) {
                 assert.isFalse(_(user).has("password"));
-                assert.isFalse(_(user).has("passwordHash"));
+                assert.isFalse(_(user).has("_passwordHash"));
             }
         },
         "and we create a new user and get its stream": {
@@ -420,7 +439,48 @@ suite.addBatch({
                     },
                     function(err, user) {
                         if (err) throw err;
-                        user.getLists(this);
+                        user.getLists("person", this);
+                    },
+                    this.callback
+                );
+            },
+            "it works": function(err, stream) {
+                assert.ifError(err);
+                assert.isObject(stream);
+            },
+            "and we get the count of lists": {
+                topic: function(stream) {
+                    stream.count(this.callback);
+                },
+                "it is zero": function(err, count) {
+                    assert.ifError(err);
+                    assert.equal(count, 0);
+                }
+            },
+            "and we get the first few lists": {
+                topic: function(stream) {
+                    stream.getItems(0, 20, this.callback);
+                },
+                "it is an empty list": function(err, ids) {
+                    assert.ifError(err);
+                    assert.isArray(ids);
+                    assert.lengthOf(ids, 0);
+                }
+            }
+        },
+        "and we create a new user and get its galleries stream": {
+            topic: function(User) {
+                var props = {
+                        nickname: "chumwick",
+                        password: "eiFoT2Va"
+                    };
+                Step(
+                    function() {
+                        User.create(props, this);
+                    },
+                    function(err, user) {
+                        if (err) throw err;
+                        user.getLists("image", this);
                     },
                     this.callback
                 );
@@ -435,17 +495,17 @@ suite.addBatch({
                 },
                 "it is five": function(err, count) {
                     assert.ifError(err);
-                    assert.equal(count, 5);
+                    assert.equal(count, 1);
                 }
             },
             "and we get the first few lists": {
                 topic: function(stream) {
                     stream.getItems(0, 20, this.callback);
                 },
-                "it is a five-element list": function(err, ids) {
+                "it is a single-element list": function(err, ids) {
                     assert.ifError(err);
                     assert.isArray(ids);
-                    assert.lengthOf(ids, 5);
+                    assert.lengthOf(ids, 1);
                 }
             }
         },
@@ -1533,6 +1593,33 @@ suite.addBatch({
                     })
                 }
             )
+        }
+    }
+});
+
+suite.addBatch({
+    "When we get the User class": {
+        topic: function() {
+            return require("../lib/model/user").User;
+        },
+        "it works": function(User) {
+            assert.isFunction(User);
+        },
+        "and we create a new user": {
+            topic: function(User) {
+                var props = {
+                    nickname: "whatever",
+                    password: "no-energy"
+                };
+                User.create(props, this.callback);
+            },
+            "it works": function(err, user) {
+                assert.ifError(err);
+            },
+            "and we check their direct inbox": 
+            emptyStreamContext(function(user, callback) {
+                user.uploadsStream(callback);
+            })
         }
     }
 });

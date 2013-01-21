@@ -1,8 +1,7 @@
-<div class="span9" id="people-stream">
+<div id="people-stream">
   <% if (people && people.length) { %>
-  <% _.each(people, function(person) { 
-     obj.person = person; %>
-  <%= majorPerson(obj, _) %>
+  <% _.each(people, function(person) { %>
+  <%= partial("major-person", {person: person}) %>
   <% }); %>
   <% } else { %>
   <p>No content!</p>

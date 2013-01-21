@@ -1,0 +1,10 @@
+<ul class="nav nav-tabs nav-stacked" id="list-menu-inner" profile-id="<%- profile.id %>">
+  <% _.each(lists, function(list) { %>
+  <%= partial("list-menu-item", {listItem: list}) %>
+  <% }); %>
+  <% if (user && user.profile.id == profile.id) { %>
+  <li class="add-a-list">
+    <a href="#" class="new-list">New list...</a>
+  </li>
+  <% } %>
+</ul>

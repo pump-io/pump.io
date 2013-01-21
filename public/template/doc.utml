@@ -1,1 +1,3 @@
-<%= html %>
+<div class="doc content">
+  <%= html %>
+</div>

@@ -1,13 +1,21 @@
-<div class="row">
+<div class="row person major" data-person-id="<%- person.id %>">
   <div class="span1">
     <% if (person.image && person.image.url) { %>
-    <img src="<%- person.image.url %>" width="40" height="40" />
+    <img src="<%- person.image.url %>" width="40" height="40" class="img-rounded" />
     <% } else { %>
-    <img src="/images/default.jpg" width="40" height="40" />
+    <img src="/images/default.png" width="40" height="40" class="img-rounded" />
     <% } %>
   </div>
-  <div class="span6">
-    <h3><a href="<%- person.url %>"><%- person.displayName %></a> <small><%- person.preferredUsername %></small></h3>
+  <div class="span7">
+    <h3><a href="<%- person.url %>"><%- person.displayName %></a> 
+      <small>
+      <% if (person.id && person.id.substr(0, 5) == 'acct:') { %>
+      <%- person.id.substr(5) %>
+      <% } else { %>
+      <%- person.preferredUsername %>
+      <% } %>
+      </small>
+    </h3>
     <% if (person.location) { %>
     <p class="location"><%- person.location.displayName %></p>
     <% } %>
@@ -15,10 +23,9 @@
     <p class="summary"><%- person.summary %></p>
     <% } %>
   </div>
-  <div class="span2">
+  <div class="span1">
     <div class="pull-right">
-      <p><button class="btn">Follow</button></p>
-      <p><button class="btn">Block</button></p>
+      <%= partial("profile-responses") %>
     </div>
   </div>
 </div>

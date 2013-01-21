@@ -109,6 +109,17 @@ var badUpdate = function(orig, update, property) {
     return context;
 };
 
+var privateUpdate = function(orig, update, property) {
+    var context = updateObject(orig, update);
+    context["it is ignored"] = function(err, result, response) {
+        assert.ifError(err);
+        assert.isObject(result);
+        assert.isFalse(_.has(result, "_uuid"));
+    };
+
+    return context;
+};
+
 var suite = vows.describe("Scrubber Object API test");
 
 // A batch to test posting to the regular feed endpoint
@@ -153,7 +164,12 @@ suite.addBatch({
             badUpdate({objectType: "note",
                        summary: "Hello, World!"},
                       {summary: DANGEROUS},
-                      "summary")
+                      "summary"),
+            "and we update an object with private member": 
+            privateUpdate({objectType: "note",
+                           summary: "Hello, World!"},
+                          {_uuid: "0xDEADBEEF"},
+                          "_uuid")
         }
     }
 });

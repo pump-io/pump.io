@@ -1,0 +1,25 @@
+<div class="row comment-form">
+  <div class="span1">
+    <% if (user.profile.image && user.profile.image.url) { %>
+    <img src="<%- user.profile.image.url %>" width="40" height="40" class="img-rounded" />
+    <% } else { %>
+    <img src="/images/default.png" width="40" height="40" class="img-rounded" />
+    <% } %>
+  </div>
+  <div class="span7">
+    <form class="post-comment">
+      <fieldset>
+        <div class="control-group">
+          <div class="controls">
+            <textarea class="span5" name="content" rows="6"></textarea>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="controls">
+            <button type="submit" class="btn btn-primary">Comment</button>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</div>

@@ -144,6 +144,17 @@ var badUpdate = function(orig, update, property) {
     return context;
 };
 
+var privateUpdate = function(orig, update, property) {
+    var context = updateActivity(orig, update);
+    context["private property is ignored"] = function(err, result, response) {
+        assert.ifError(err);
+        assert.isObject(result);
+        assert.isFalse(_.has(result, property));
+    };
+
+    return context;
+};
+
 var suite = vows.describe("Scrubber activity API test");
 
 // A batch to test posting to the regular feed endpoint
@@ -227,30 +238,36 @@ suite.addBatch({
                           }
                          },
                          "target.summary"),
-            "and we post an activity with good generator summary": 
-            goodActivity({verb: "post",
-                          object: {
-                              objectType: "note",
-                              content: "Hello, world."
-                          },
-                          generator: {
-                              objectType: "application",
-                              summary: HARMLESS
-                          }
-                         },
-                         "generator.summary"),
-            "and we post an activity with bad generator summary": 
-            badActivity({verb: "post",
-                          object: {
-                              objectType: "note",
-                              content: "Hello, world."
-                          },
-                          generator: {
-                              objectType: "application",
-                              summary: DANGEROUS
-                          }
-                         },
-                         "generator.summary"),
+            "and we post an activity with bad generator summary": {
+                topic: function(cred) {
+                    var url = "http://localhost:4815/api/user/mickey/feed",
+                        act = {verb: "post",
+                               object: {
+                                   objectType: "note",
+                                   content: "Hello, world."
+                               },
+                               generator: {
+                                   objectType: "application",
+                                   id: "urn:uuid:64ace17c-4f85-11e2-9e1e-70f1a154e1aa",
+                                   summary: DANGEROUS
+                               }
+                              };
+                    httputil.postJSON(url, cred, act, this.callback);
+                },
+                "it works": function(err, result, response) {
+                    assert.ifError(err);
+                    assert.isObject(result);
+                },
+                "and we examine the result": {
+                    topic: function(result) {
+                        return result;
+                    },
+                    "the generator is overwritten": function(result) {
+                        assert.isObject(result.generator);
+                        assert.notEqual(result.generator.summary, DANGEROUS);
+                    }
+                }
+            },
             "and we post an activity with good provider summary": 
             goodActivity({verb: "post",
                           object: {
@@ -340,7 +357,16 @@ suite.addBatch({
                        }
                       },
                       {content: DANGEROUS},
-                      "content")
+                      "content"),
+            "and we update an activity with a private member": 
+            privateUpdate({verb: "post",
+                           object: {
+                               objectType: "note",
+                               content: "Hello, world."
+                           }
+                          },
+                          {_uuid: "EHLO endofline <BR><BR>"},
+                          "_uuid")
         }
     }
 });

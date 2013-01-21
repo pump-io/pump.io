@@ -41,7 +41,7 @@ var testSchema = {
              "updated",
              "upstreamDuplicates",
              "url",
-             "uuid",
+             "_uuid",
              "actor",
              "by",
              "object",
@@ -50,7 +50,7 @@ var testSchema = {
              "supersedes",
              "verb"
     ],
-    indices: ["uuid"]
+    indices: ["_uuid"]
 };
 
 var testData = {

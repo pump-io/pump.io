@@ -1,0 +1,8 @@
+Templates
+---------
+
+Templates get the following top-level variables:
+
+* config - site config
+* page - stuff about the current page (like title)
+* data - the data objects (data.user, data.activities)

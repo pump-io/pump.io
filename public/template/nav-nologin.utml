@@ -1,2 +1,3 @@
-<a class="brand" href="/"><%- site %></a>
-
+<div class="container">
+  <a class="brand" href="/"><%- config.site %></a>
+</div> <!-- /container -->

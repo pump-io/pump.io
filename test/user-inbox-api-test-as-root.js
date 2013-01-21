@@ -220,34 +220,29 @@ suite.addBatch({
                             var url = "http://localhost:4815/api/user/louisck/inbox",
                                 act = {
                                     actor: {
-                                        id: "acct:user1@social.localhost",
-                                        objectType: "person"
+                                        id: "http://social.localhost/",
+                                        objectType: "service"
                                     },
                                     id: "http://social.localhost/activity/3",
                                     verb: "post",
+                                    to: [{objectType: "person",
+                                          id: "http://localhost:4815/api/user/louisck"}],
                                     object: {
                                         id: "http://social.localhost/note/2",
                                         objectType: "note",
-                                        content: "Hello again, world!"
+                                        content: "Hello from the service!"
                                     }
                                 },
                                 cred = clientCred(cl);
 
                             httputil.postJSON(url, cred, act, this);
                         },
-                        function(err, body, res) {
-                            if (err && err.statusCode === 401) {
-                                callback(null);
-                            } else if (err) {
-                                callback(err);
-                            } else {
-                                callback(new Error("Unexpected success"));
-                            }
-                        }
+                        callback
                     );
                 },
-                "and it fails correctly": function(err) {
+                "it works": function(err, act, resp) {
                     assert.ifError(err);
+                    assert.isObject(act);
                 }
             },
             "and we post to the inbox with OAuth credentials for an unrelated webfinger": {
@@ -353,9 +348,10 @@ suite.addBatch({
                         assert.isObject(feed);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.lengthOf(feed.items, 3);
-                        assert.isObject(feed.items[0]);
-                        assert.equal(feed.items[0].id, act.id);
+                        assert.greater(feed.items.length, 0);
+                        assert.isTrue(_.some(feed.items, function(item) {
+                            return (_.isObject(item) && item.id == act.id);
+                        }));
                     }
                 }
             }

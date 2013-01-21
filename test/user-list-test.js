@@ -83,7 +83,7 @@ suite.addBatch({
             },
             "and we get their list stream": {
                 topic: function(user) {
-                    user.getLists(this.callback);
+                    user.getLists("person", this.callback);
                 },
                 "it works": function(err, stream) {
                     assert.ifError(err);
@@ -97,8 +97,8 @@ suite.addBatch({
                     "it works": function(err, count) {
                         assert.ifError(err);
                     },
-                    "it is five": function(err, count) {
-                        assert.equal(count, 5);
+                    "it is zero": function(err, count) {
+                        assert.equal(count, 0);
                     }
                 },
                 "and we get the latest lists": {
@@ -108,9 +108,9 @@ suite.addBatch({
                     "it works": function(err, ids) {
                         assert.ifError(err);
                     },
-                    "it is an array with default items": function(err, ids) {
+                    "it is an array with zero items": function(err, ids) {
                         assert.isArray(ids);
-                        assert.lengthOf(ids, 5);
+                        assert.lengthOf(ids, 0);
                     }
                 }
             }

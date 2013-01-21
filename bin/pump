@@ -24,18 +24,38 @@ var cluster = require("cluster"),
     os = require("os"),
     fs = require("fs"),
     path = require("path"),
+    Logger = require("bunyan"),
     _ = require("underscore"),
+    argv = require("optimist")
+        .usage("Usage: $0 -c <configfile>")
+        .alias("c", "config")
+        .describe("c", "Configuration file (default: /etc/pump.io.json and ~/.pump.io.json)")
+        .argv,
+    Dispatch = require("../lib/dispatch"),
     makeApp = require("../lib/app").makeApp;
+
+// We first get config files, then launch some cluster apps
+
+var main = function() {
+    var config = getConfig(argv.c);
+    launchApps(config);
+};
 
 // Gets the configuration vars for this server from config files
 
-var getConfig = function() {
-    var files = ['/etc/pump.io.json',
-                 path.join(process.env.HOME, ".pump.io.json")],
+var getConfig = function(filename) {
+    var files,
         config = {},
         i,
         raw,
         parsed;
+
+    if (filename) {
+        files = [filename];
+    } else {
+        files = ['/etc/pump.io.json',
+                 path.join(process.env.HOME, ".pump.io.json")];
+    }   
 
     // This is all sync
     for (i = 0; i < files.length; i++) {
@@ -54,8 +74,13 @@ var getConfig = function() {
     return config;
 };
 
+// Launch apps
+
 var launchApps = function(config) {
-    var cnt, i, unclustered = ["memory", "disk", "leveldb"];
+    var cnt,
+        i,
+        unclustered = ["memory", "disk", "leveldb"],
+        log = setupLog(config);
 
     if (cluster.isMaster) {
         if (_(config).has("children")) {
@@ -65,6 +90,9 @@ var launchApps = function(config) {
         } else {
             cnt = Math.max(os.cpus().length - 1, 1);
         }
+
+        Dispatch.start(log);
+
         for (i = 0; i < cnt; i++) {
             cluster.fork();
         }
@@ -79,9 +107,24 @@ var launchApps = function(config) {
     }
 };
 
-var main = function() {
-    var config = getConfig();
-    launchApps(config);
+// Set up a Bunyan logger that the dispatch code can send to
+
+var setupLog = function(config) {
+
+    var log,
+        logParams = {
+            name: "pump.io"
+        };
+
+    if (config.logfile) {
+        logParams.streams = [{path: config.logfile}];
+    } else if (config.nologger) {
+        logParams.streams = [{path: "/dev/null"}];
+    } else {
+        logParams.streams = [{stream: process.stderr}];
+    }
+
+    return new Logger(logParams);
 };
 
 main();

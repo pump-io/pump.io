@@ -144,6 +144,24 @@ Here are the main configuration keys.
    "/etc/ssl/private/myserver.key".
 * *cert* If you're using SSL, the path to the server cert, like
    "/etc/ssl/private/myserver.crt".
+* *uploaddir* If you want to enable file uploads, set this to the
+  full path of a local directory. It should be writeable and readable by the 
+  'serverUser'.
+* *debugClient* For developers, if you're debugging the Web interface
+  and you want to use the non-minified version of the JavaScript libraries,
+  set this to `true`. Defaults to `false`, which is what people should
+  use in production.
+* *firehose* Firehose host running the
+   [ofirehose](https://github.com/e14n/ofirehose) software. Defaults
+   to "ofirehose.com". Public notices will be ping this firehose
+   server and from there go out to search engines and the world. If
+   you want to disconnect from the public web, set this to something
+   falsy.
+* *spamhost* Host running activityspam software to use to test updates for spam.
+* *spamclientid* oauth pair for spam server.
+* *spamclientsecret* oauth pair for spam server.
+* *disableRegistration* default false. Disables registering new users on the
+  site through the Web or the API.
 
 ## Bugs
 
@@ -152,3 +170,24 @@ If you find bugs, you can report them here:
 https://github.com/e14n/pump.io/issues
 
 You can also email me at evan@e14n.com.
+
+## Colophon
+
+This software includes the following great packages of client-side software.
+
+* Twitter Bootstrap
+* Backbone
+* JQuery
+* Fine Uploader
+* WysiHTML5
+* Spin.js
+* SockJS
+* Select2
+* JQuery Easydate
+* OAuth.js
+
+It also uses these icon sets:
+
+* Fancy Avatars, © 2009 Brandon Mathis, http://brandonmathis.com/projects/fancy-avatars/ (CC-By)
+* Glyphicons, http://glyphicons.com/ (CC-By)
+

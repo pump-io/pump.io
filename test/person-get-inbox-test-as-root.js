@@ -33,7 +33,7 @@ var assert = require("assert"),
     pj = httputil.postJSON,
     gj = httputil.getJSON,
     dialbackApp = require("./lib/dialback").dialbackApp,
-    setupApp = oauthutil.setupApp,
+    setupAppConfig = oauthutil.setupAppConfig,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
@@ -52,7 +52,7 @@ suite.addBatch({
                 function(err) {
                     if (err) throw err;
                     DatabankObject.bank = db;
-                    setupApp(80, "social.localhost", this);
+                    setupAppConfig({port: 80, hostname: "social.localhost", driver: "memory", params: {}}, this);
                 },
                 this.callback
             );

@@ -29,6 +29,7 @@ var assert = require("assert"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     setupApp = oauthutil.setupApp,
+    setupAppConfig = oauthutil.setupAppConfig,
     requestToken = oauthutil.requestToken,
     newClient = oauthutil.newClient,
     register = oauthutil.register,
@@ -42,33 +43,12 @@ var suite = vows.describe("OAuth authorization");
 suite.addBatch({
     "When we set up the app": {
         topic: function() {
-            var cb = this.callback,
-                config = {port: 4815,
-                          hostname: "localhost",
-                          driver: tc.driver,
-                          params: tc.params,
-                          nologger: true
-                         },
-                makeApp = require("../lib/app").makeApp;
-
-            process.env.NODE_ENV = "test";
-
-            makeApp(config, function(err, app) {
-                if (err) {
-                    cb(err, null);
-                } else {
-                    app.run(function(err) {
-                        if (err) {
-                            cb(err, null);
-                        } else {
-                            cb(null, app);
-                        }
-                    });
-                }
-            });
+            setupApp(this.callback);
         },
         teardown: function(app) {
-            app.close();
+            if (app) {
+                app.close();
+            }
         },
         "it works": function(err, app) {
             assert.ifError(err);

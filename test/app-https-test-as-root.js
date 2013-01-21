@@ -66,8 +66,20 @@ var hostmeta = {
             {rel: "registration_endpoint",
              href: "https://secure.localhost/api/client/register"
             },
+            {rel: "http://apinamespace.org/oauth/request_token",
+             href: "https://secure.localhost/oauth/request_token"
+            },
+            {rel: "http://apinamespace.org/oauth/authorize",
+             href: "https://secure.localhost/oauth/authorize"
+            },
+            {rel: "http://apinamespace.org/oauth/access_token",
+             href: "https://secure.localhost/oauth/access_token"
+            },
             {rel: "dialback",
-             href: "https://secure.localhost/api/dialback"}]
+             href: "https://secure.localhost/api/dialback"},
+            {rel: "http://apinamespace.org/activitypub/whoami",
+             href: "https://secure.localhost/api/whoami"}
+]
 };
 
 var webfinger = {
@@ -101,7 +113,8 @@ suite.addBatch({
                           cert: path.join(__dirname, "data", "secure.localhost.crt"),
                           driver: tc.driver,
                           params: tc.params,
-                          nologger: true
+                          nologger: true,
+                          sockjs: false
                          },
                 makeApp = require("../lib/app").makeApp;
 

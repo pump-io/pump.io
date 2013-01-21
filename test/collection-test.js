@@ -125,7 +125,7 @@ suite.addBatch({
                         var callback = this.callback;
                         Step(
                             function() {
-                                user.getLists(this);
+                                user.getLists("person", this);
                             },
                             function(err, stream) {
                                 if (err) throw err;
@@ -149,7 +149,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.isArray(ids);
                         assert.isObject(coll);
-                        assert.lengthOf(ids, 6);
+                        assert.greater(ids.length, 0);
                         assert.equal(ids[0], coll.id);
                     }
                 }

@@ -16,7 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require("assert"),
+var _ = require("underscore"),
+    assert = require("assert"),
     vows = require("vows"),
     databank = require("databank"),
     Step = require("step"),
@@ -303,6 +304,18 @@ suite.addBatch({
                         },
                         "removed ID is missing": function(err, ids) {
                             assert.equal(ids.indexOf("http://example.net/api/object/2500"), -1);
+                        }
+                    },
+                    "and we get the count": {
+                        topic: function(stream, Stream) {
+                            stream.count(this.callback);
+                        },
+                        "it works": function(err, count) {
+                            assert.ifError(err);
+                            assert.isNumber(count);
+                        },
+                        "it is the right size": function(err, count) {
+                            assert.equal(count, 4999); // 5000 - 1
                         }
                     }
                 }
@@ -635,6 +648,33 @@ suite.addBatch({
                 },
                 "it has the right values": function(err, ids, all) {
                     assert.deepEqual(ids, all.slice(8403, 8423));
+                }
+            },
+            "and we get the indices of items in the stream": {
+                topic: function(all, stream) {
+                    var cb = this.callback;
+
+                    Step(
+                        function() {
+                            var i, group = this.group();
+                            for (i = 0; i < all.length; i++) {
+                                stream.indexOf(all[i], group());
+                            }
+                        },
+                        cb
+                    );
+                },
+                "it works": function(err, indices) {
+                    assert.ifError(err);
+                },
+                "they have the right values": function(err, indices) {
+                    var i;
+                    assert.ifError(err);
+                    assert.isArray(indices);
+                    assert.lengthOf(indices, 10000);
+                    for (i = 0; i < indices.length; i++) {
+                        assert.equal(indices[i], i);
+                    }
                 }
             },
             "and we get too many IDs greater than some ID at the end": {

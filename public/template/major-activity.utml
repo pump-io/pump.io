@@ -1,29 +1,64 @@
-<div class="row activity" id="<%- id %>">
+<div class="activity major<% if (headless) { %> headless<% } %>" data-activity-id="<%- activity.id %>">
   <div class="row">
+    <% if (!headless) { %>
     <div class="span1">
-      <% if (actor.image && actor.image.url) { %>
-      <img src="<%- actor.image.url %>" width="40" height="40" />
+      <% if (activity.actor.image && activity.actor.image.url) { %>
+      <img src="<%- activity.actor.image.url %>" width="40" height="40" class="img-rounded" />
       <% } else { %>
-      <img src="/images/default.jpg" width="40" height="40" />
+      <img src="/images/default.png" width="40" height="40" class="img-rounded" />
       <% } %>
     </div>
-    <div class="span8">
-      <% if (object.displayName) { %>
-      <h2><%- object.displayName %></h2>
+    <% } %>
+    <div class="span8 <% if (headless) { %> offset1<% } %>">
+      <% if (activity.object.displayName) { %>
+      <h2><%- activity.object.displayName %></h2>
       <% } else { %>
-      <%= object.content %>
+      <%= activity.object.content %>
       <% } %>
-      <p><small><a href="<%- actor.url %>"><%- actor.displayName %></a> at <a href="<%- url %>"><abbr title="<%- published %>" class="easydate"><%- published %></abbr></a><% if (location) { %> in <a href="<%- location.url %>"><%- location.displayName %></a><% } %></small></p>
+      <p><small><% if (!headless) { %><a href="<%- activity.actor.url %>"><%- activity.actor.displayName %></a> at <% } %><a href="<%- activity.object.url || activity.url %>"><abbr title="<%- activity.published %>" class="easydate"><%- activity.published %></abbr></a><% if (activity.location) { %> in <a href="<%- activity.location.url %>"><%- activity.location.displayName %></a><% } %>
+        <% if (activity.generator && activity.generator.displayName) { %>
+            via 
+            <% if (activity.generator.url) { %>
+                <a href="<%- activity.generator.url %>"><%- activity.generator.displayName %></a>
+            <% } else { %>
+                <span><%- activity.generator.displayName %></span>
+            <% } %>
+        <% } %>
+        <% if (activity.to && activity.to.length > 0) { %>
+        To: <%= partial("activity-object-list", {author: activity.actor, activity: activity, objects: activity.to}) %>
+        <% } %>
+        <% if (activity.cc && activity.cc.length > 0) { %>
+        CC: <%= partial("activity-object-list", {author: activity.actor, activity: activity, objects: activity.cc}) %>
+        <% } %>
+      </small></p>
     </div>
   </div>
   <div class="row">
     <div class="span8 offset1">
-      <% if (object.displayName) { %>
-      <%= object.content %>
+      <% if (activity.object.image && activity.object.image.url) { %>
+      <p><img src="<%- activity.object.image.url %>" class="img-polaroid"></img></p>
       <% } %>
-      <div>
-	<p><a href="#">Like</a> • <a href="#">Comment</a> • <a href="#">Share</a></p>
-      </div>
+      <% if (activity.object.displayName) { %>
+      <p><%= activity.object.content %></p>
+      <% } %>
+      <% if (user) { %>
+        <%= partial("responses", {obj: activity.object}) %>
+      <% } %>
+    <% if (!activity.object.likes || activity.object.likes.totalItems === 0) { %>
+    <% } else if (activity.object.likes.totalItems === 1) { %>
+    <p><small><%= partial("activity-object-collection", {author: activity.actor, coll: activity.object.likes}) %> likes this.</small></p>
+    <% } else { %>
+    <p><small><%= partial("activity-object-collection", {author: activity.actor, coll: activity.object.likes}) %> like this.</small></p>
+    <% } %>
+    <% if (!activity.object.shares || activity.object.shares.totalItems === 0) { %>
+    <% } else if (activity.object.shares.totalItems === 1) { %>
+    <p><small><%= partial("activity-object-collection", {author: activity.actor, coll: activity.object.shares}) %> shared this.</small></p>
+    <% } else { %>
+    <p><small><%= partial("activity-object-collection", {author: activity.actor, coll: activity.object.shares}) %> shared this.</small></p>
+    <% } %>
     </div>
+  </div>
+  <div class="row">
+    <%= partial("replies", {replies: activity.object.replies}) %>
   </div>
 </div>

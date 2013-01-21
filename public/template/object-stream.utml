@@ -1,7 +1,7 @@
 <div class="span9" id="object-stream">
   <% if (objects && objects.length) { %>
   <% _.each(objects, function(object) { %>
-  <%= majorObject(object, _) %>
+  <%= partial("major-object", {object: object}) %>
   <% }); %>
   <% } else { %>
   <p>No content!</p>
