@@ -715,6 +715,7 @@ var createUser = function(req, res, next) {
 
     var user,
         props = req.body,
+        email,
         registrationActivity = function(user, svc, callback) {
             var act = new Activity({
                 actor: user.profile,
@@ -757,11 +758,11 @@ var createUser = function(req, res, next) {
                 }
             );
         },
-        sendConfirmationEmail = function(user, callback) {
+        sendConfirmationEmail = function(user, email, callback) {
             Step(
                 function() {
                     Confirmation.create({nickname: user.nickname,
-                                         email: user.email},
+                                         email: email},
                                         this);
                 },
                 function(err, confirmation) {
@@ -783,7 +784,7 @@ var createUser = function(req, res, next) {
                 },
                 function(err, html, text) {
                     if (err) throw err;
-                    req.app.sendEmail({to: user.email,
+                    req.app.sendEmail({to: email,
                                        subject: "Confirm your email address for " + req.app.config.site,
                                        text: text,
                                        attachment: {data: html,
@@ -838,6 +839,8 @@ var createUser = function(req, res, next) {
         } else {
             try {
                 check(props.email).isEmail();
+                email = props.email;
+                delete props.email;
             } catch(e) {
                 next(new HTTPError(e.message, 400));
                 return;
@@ -875,7 +878,7 @@ var createUser = function(req, res, next) {
         },
         function(err) {
             if (req.app.config.requireEmail) {
-                sendConfirmationEmail(user, this);
+                sendConfirmationEmail(user, email, this);
             } else {
                 // skip if we don't require email
                 this(null);
