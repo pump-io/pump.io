@@ -24,6 +24,7 @@ var assert = require("assert"),
     httputil = require("./lib/http"),
     Browser = require("zombie"),
     Step = require("step"),
+    http = require("http"),
     newClient = oauthutil.newClient,
     accessToken = oauthutil.accessToken,
     register = oauthutil.register,
@@ -58,9 +59,12 @@ var oneEmail = function(smtp, addr, callback) {
             }
         },
         ender = function(envelope, cb) {
+            var msg;
             if (isOurs(envelope)) {
                 smtp.removeListener("data", accumulator);
-                callback(null, data);
+                msg = _.clone(envelope);
+                msg.data = data;
+                callback(null, msg);
                 process.nextTick(function() {
                     cb(null);
                 });
@@ -144,190 +148,209 @@ suite.addBatch({
                             oneEmail(smtp, "jamesjr@pump.test", this.parallel());
                             registerEmail(cl, "jj", "dyn|o|mite!", "jamesjr@pump.test", this.parallel());
                         },
-                        function(err, message, user) {
-                            callback(err, user);
-                        }
+                        callback
                     );
                         
                 },
-                "it works correctly": function(err, user) {
+                "it works correctly": function(err, message, user) {
                     assert.ifError(err);
                     assert.isObject(user);
+                    assert.isObject(message);
                 },
-                "the email is included": function(err, user) {
+                "the email is not included": function(err, message, user) {
                     assert.ifError(err);
                     assert.isObject(user);
-                    assert.include(user, "email");
-                    assert.equal(user.email, "jamesjr@pump.test");
+                    assert.isFalse(_.include(user, "email"));
                 },
-                "and we fetch the user with client credentials": {
-                    topic: function(user, cl) {
-                        var cred = {
-                            consumer_key: cl.client_id,
-                            consumer_secret: cl.client_secret
-                        };
-                        httputil.getJSON("http://localhost:4815/api/user/jj", cred, this.callback);
-                    },
-                    "it works": function(err, user, response) {
-                        assert.ifError(err);
-                        assert.isObject(user);
-                    },
-                    "the email address is not included": function(err, user, response) {
-                        assert.ifError(err);
-                        assert.isObject(user);
-                        assert.isFalse(_.has(user, "email"));
-                    }
-                },
-                "and we fetch the user with user credentials for a different user": {
-                    topic: function(jj, cl) {
-                        var callback = this.callback;
+                "and we confirm the email address": {
+                    topic: function(message, user, cl) {
+                        var urlre = /http:\/\/localhost:4815\/main\/confirm\/[a-zA-Z0-9_\-]+/,
+                            match = urlre.exec(message.data),
+                            url = (match.length > 0) ? match[0] : null,
+                            callback = this.callback;
 
-                        Step(
-                            function() {
-                                registerEmail(cl, "james", "work|hard", "jamessr@pump.test", this);
-                            },
-                            function(err, james) {
-                                if (err) throw err;
-                                var cred = {
-                                    consumer_key: cl.client_id,
-                                    consumer_secret: cl.client_secret,
-                                    token: james.token,
-                                    token_secret: james.secret
-                                };
-                                httputil.getJSON("http://localhost:4815/api/user/jj", cred, this);
-                            },
-                            function(err, doc, response) {
-                                if (err) {
-                                    callback(err, null);
-                                } else {
-                                    callback(null, doc);
-                                }
+                        http.get(url, function(res) {
+                            if (res.statusCode < 200 || res.statusCode >= 300) {
+                                callback(new Error("Bad status code: " + res.statusCode));
+                            } else {
+                                callback(null);
                             }
-                        );
-                    },
-                    "it works": function(err, doc) {
-                        assert.ifError(err);
-                        assert.isObject(doc);
-                    },
-                    "the email address is not included": function(err, doc) {
-                        assert.ifError(err);
-                        assert.isObject(doc);
-                        assert.isFalse(_.has(doc, "email"));
-                    }
-                },
-                "and we fetch the user with user credentials for the same user": {
-                    topic: function(user, cl) {
-                        var cred = {
-                            consumer_key: cl.client_id,
-                            consumer_secret: cl.client_secret,
-                            token: user.token,
-                            token_secret: user.secret
-                        };
-
-                        httputil.getJSON("http://localhost:4815/api/user/jj", cred, this.callback);
-                    },
-                    "it works": function(err, user) {
-                        assert.ifError(err);
-                        assert.isObject(user);
-                    },
-                    "the email address is included": function(err, user) {
-                        assert.ifError(err);
-                        assert.isObject(user);
-                        assert.include(user, "email");
-                    }
-                },
-                "and we fetch the user feed with client credentials": {
-                    topic: function(user, cl) {
-                        var cred = {
-                            consumer_key: cl.client_id,
-                            consumer_secret: cl.client_secret
-                        };
-                        httputil.getJSON("http://localhost:4815/api/users", cred, this.callback);
-                    },
-                    "it works": function(err, feed, response) {
-                        assert.ifError(err);
-                        assert.isObject(feed);
-                    },
-                    "the email address is not included": function(err, feed, response) {
-                        var target;
-                        assert.ifError(err);
-                        assert.isObject(feed);
-                        target = _.filter(feed.items, function(user) {
-                            return (user.nickname == "jj");
+                        }).on('error', function(err) {
+                            callback(err);
                         });
-                        assert.lengthOf(target, 1);
-                        assert.isObject(target[0]);
-                        assert.isFalse(_.has(target[0], "email"));
-                    }
-                },
-                "and we fetch the user feed with user credentials for a different user": {
-                    topic: function(jj, cl) {
-                        var callback = this.callback;
+                    },
+                    "it works": function(err) {
+                        assert.ifError(err);
+                    },
+                    "and we fetch the user with client credentials": {
+                        topic: function(message, user, cl) {
+                            var cred = {
+                                consumer_key: cl.client_id,
+                                consumer_secret: cl.client_secret
+                            };
+                            httputil.getJSON("http://localhost:4815/api/user/jj", cred, this.callback);
+                        },
+                        "it works": function(err, user, response) {
+                            assert.ifError(err);
+                            assert.isObject(user);
+                        },
+                        "the email address is not included": function(err, user, response) {
+                            assert.ifError(err);
+                            assert.isObject(user);
+                            assert.isFalse(_.has(user, "email"));
+                        }
+                    },
+                    "and we fetch the user with user credentials for a different user": {
+                        topic: function(message, jj, cl) {
+                            var callback = this.callback;
 
-                        Step(
-                            function() {
-                                registerEmail(cl, "thelma", "dance4fun", "thelma@pump.test", this);
-                            },
-                            function(err, thelma) {
-                                if (err) throw err;
-                                var cred = {
-                                    consumer_key: cl.client_id,
-                                    consumer_secret: cl.client_secret,
-                                    token: thelma.token,
-                                    token_secret: thelma.secret
-                                };
-                                httputil.getJSON("http://localhost:4815/api/users", cred, this);
-                            },
-                            function(err, doc, response) {
-                                if (err) {
-                                    callback(err, null);
-                                } else {
-                                    callback(null, doc);
+                            Step(
+                                function() {
+                                    registerEmail(cl, "james", "work|hard", "jamessr@pump.test", this);
+                                },
+                                function(err, james) {
+                                    if (err) throw err;
+                                    var cred = {
+                                        consumer_key: cl.client_id,
+                                        consumer_secret: cl.client_secret,
+                                        token: james.token,
+                                        token_secret: james.secret
+                                    };
+                                    httputil.getJSON("http://localhost:4815/api/user/jj", cred, this);
+                                },
+                                function(err, doc, response) {
+                                    if (err) {
+                                        callback(err, null);
+                                    } else {
+                                        callback(null, doc);
+                                    }
                                 }
-                            }
-                        );
+                            );
+                        },
+                        "it works": function(err, doc) {
+                            assert.ifError(err);
+                            assert.isObject(doc);
+                        },
+                        "the email address is not included": function(err, doc) {
+                            assert.ifError(err);
+                            assert.isObject(doc);
+                            assert.isFalse(_.has(doc, "email"));
+                        }
                     },
-                    "it works": function(err, feed) {
-                        assert.ifError(err);
-                        assert.isObject(feed);
-                    },
-                    "the email address is not included": function(err, feed) {
-                        var target;
-                        assert.ifError(err);
-                        assert.isObject(feed);
-                        target = _.filter(feed.items, function(user) {
-                            return (user.nickname == "jj");
-                        });
-                        assert.lengthOf(target, 1);
-                        assert.isObject(target[0]);
-                        assert.isFalse(_.has(target[0], "email"));
-                    }
-                },
-                "and we fetch the user feed with user credentials for the same user": {
-                    topic: function(user, cl) {
-                        var cred = {
-                            consumer_key: cl.client_id,
-                            consumer_secret: cl.client_secret,
-                            token: user.token,
-                            token_secret: user.secret
-                        };
+                    "and we fetch the user with user credentials for the same user": {
+                        topic: function(message, user, cl) {
+                            var cred = {
+                                consumer_key: cl.client_id,
+                                consumer_secret: cl.client_secret,
+                                token: user.token,
+                                token_secret: user.secret
+                            };
 
-                        httputil.getJSON("http://localhost:4815/api/users", cred, this.callback);
+                            httputil.getJSON("http://localhost:4815/api/user/jj", cred, this.callback);
+                        },
+                        "it works": function(err, user) {
+                            assert.ifError(err);
+                            assert.isObject(user);
+                        },
+                        "the email address is included": function(err, user) {
+                            assert.ifError(err);
+                            assert.isObject(user);
+                            assert.include(user, "email");
+                        }
                     },
-                    "it works": function(err, feed) {
-                        assert.ifError(err);
-                        assert.isObject(feed);
+                    "and we fetch the user feed with client credentials": {
+                        topic: function(message, user, cl) {
+                            var cred = {
+                                consumer_key: cl.client_id,
+                                consumer_secret: cl.client_secret
+                            };
+                            httputil.getJSON("http://localhost:4815/api/users", cred, this.callback);
+                        },
+                        "it works": function(err, feed, response) {
+                            assert.ifError(err);
+                            assert.isObject(feed);
+                        },
+                        "the email address is not included": function(err, feed, response) {
+                            var target;
+                            assert.ifError(err);
+                            assert.isObject(feed);
+                            target = _.filter(feed.items, function(user) {
+                                return (user.nickname == "jj");
+                            });
+                            assert.lengthOf(target, 1);
+                            assert.isObject(target[0]);
+                            assert.isFalse(_.has(target[0], "email"));
+                        }
                     },
-                    "the email address is included": function(err, feed) {
-                        var target;
-                        assert.ifError(err);
-                        assert.isObject(feed);
-                        target = _.filter(feed.items, function(user) {
-                            return (user.nickname == "jj");
-                        });
-                        assert.lengthOf(target, 1);
-                        assert.isObject(target[0]);
-                        assert.isTrue(_.has(target[0], "email"));
+                    "and we fetch the user feed with user credentials for a different user": {
+                        topic: function(message, jj, cl) {
+                            var callback = this.callback;
+
+                            Step(
+                                function() {
+                                    registerEmail(cl, "thelma", "dance4fun", "thelma@pump.test", this);
+                                },
+                                function(err, thelma) {
+                                    if (err) throw err;
+                                    var cred = {
+                                        consumer_key: cl.client_id,
+                                        consumer_secret: cl.client_secret,
+                                        token: thelma.token,
+                                        token_secret: thelma.secret
+                                    };
+                                    httputil.getJSON("http://localhost:4815/api/users", cred, this);
+                                },
+                                function(err, doc, response) {
+                                    if (err) {
+                                        callback(err, null);
+                                    } else {
+                                        callback(null, doc);
+                                    }
+                                }
+                            );
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                            assert.isObject(feed);
+                        },
+                        "the email address is not included": function(err, feed) {
+                            var target;
+                            assert.ifError(err);
+                            assert.isObject(feed);
+                            target = _.filter(feed.items, function(user) {
+                                return (user.nickname == "jj");
+                            });
+                            assert.lengthOf(target, 1);
+                            assert.isObject(target[0]);
+                            assert.isFalse(_.has(target[0], "email"));
+                        }
+                    },
+                    "and we fetch the user feed with user credentials for the same user": {
+                        topic: function(message, user, cl) {
+                            var cred = {
+                                consumer_key: cl.client_id,
+                                consumer_secret: cl.client_secret,
+                                token: user.token,
+                                token_secret: user.secret
+                            };
+
+                            httputil.getJSON("http://localhost:4815/api/users", cred, this.callback);
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                            assert.isObject(feed);
+                        },
+                        "the email address is included": function(err, feed) {
+                            var target;
+                            assert.ifError(err);
+                            assert.isObject(feed);
+                            target = _.filter(feed.items, function(user) {
+                                return (user.nickname == "jj");
+                            });
+                            assert.lengthOf(target, 1);
+                            assert.isObject(target[0]);
+                            assert.isTrue(_.has(target[0], "email"));
+                        }
                     }
                 }
             }
