@@ -712,6 +712,11 @@
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
                 onSuccess = function(data, textStatus, jqXHR) {
                     var objs;
+                    if (Pump.config.requireEmail) {
+                        Pump.body.setContent({contentView: Pump.ConfirmEmailInstructionsContent,
+                                              title: "Confirm email"});
+                        return;
+                    }
                     Pump.setNickname(data.nickname);
                     Pump.setUserCred(data.token, data.secret);
                     Pump.clearCaches();
@@ -803,6 +808,10 @@
 
             return false;
         }
+    });
+
+    Pump.ConfirmEmailInstructionsContent = Pump.ContentView.extend({
+        templateName: 'confirm-email-instructions'
     });
 
     Pump.UserPageContent = Pump.ContentView.extend({
