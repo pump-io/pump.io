@@ -877,6 +877,7 @@ var createUser = function(req, res, next) {
             user.expand(this);
         },
         function(err) {
+            if (err) throw err;
             if (req.app.config.requireEmail) {
                 sendConfirmationEmail(user, email, this);
             } else {
