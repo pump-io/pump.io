@@ -74,6 +74,22 @@ var oneEmail = function(smtp, addr, callback) {
     smtp.on("startData", starter);
 };
 
+var confirmEmail = function(message, callback) {
+    var urlre = /http:\/\/localhost:4815\/main\/confirm\/[a-zA-Z0-9_\-]+/,
+        match = urlre.exec(message.data),
+        url = (match.length > 0) ? match[0] : null;
+
+    http.get(url, function(res) {
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+            callback(new Error("Bad status code: " + res.statusCode));
+        } else {
+            callback(null);
+        }
+    }).on('error', function(err) {
+        callback(err);
+    });
+};
+
 var suite = vows.describe("registration with email");
 
 // A batch to test some of the layout basics
@@ -164,20 +180,7 @@ suite.addBatch({
                 },
                 "and we confirm the email address": {
                     topic: function(message, user, cl) {
-                        var urlre = /http:\/\/localhost:4815\/main\/confirm\/[a-zA-Z0-9_\-]+/,
-                            match = urlre.exec(message.data),
-                            url = (match.length > 0) ? match[0] : null,
-                            callback = this.callback;
-
-                        http.get(url, function(res) {
-                            if (res.statusCode < 200 || res.statusCode >= 300) {
-                                callback(new Error("Bad status code: " + res.statusCode));
-                            } else {
-                                callback(null);
-                            }
-                        }).on('error', function(err) {
-                            callback(err);
-                        });
+                        confirmEmail(message, this.callback);
                     },
                     "it works": function(err) {
                         assert.ifError(err);
@@ -201,14 +204,21 @@ suite.addBatch({
                         }
                     },
                     "and we fetch the user with user credentials for a different user": {
-                        topic: function(message, jj, cl) {
-                            var callback = this.callback;
+                        topic: function(message, jj, cl, app, smtp) {
+                            var callback = this.callback,
+                                james;
 
                             Step(
                                 function() {
-                                    registerEmail(cl, "james", "work|hard", "jamessr@pump.test", this);
+                                    oneEmail(smtp, "jamessr@pump.test", this.parallel());
+                                    registerEmail(cl, "james", "work|hard", "jamessr@pump.test", this.parallel());
                                 },
-                                function(err, james) {
+                                function(err, message, results) {
+                                    if (err) throw err;
+                                    james = results;
+                                    confirmEmail(message, this);
+                                },
+                                function(err) {
                                     if (err) throw err;
                                     var cred = {
                                         consumer_key: cl.client_id,
@@ -283,14 +293,21 @@ suite.addBatch({
                         }
                     },
                     "and we fetch the user feed with user credentials for a different user": {
-                        topic: function(message, jj, cl) {
-                            var callback = this.callback;
+                        topic: function(message, jj, cl, app, smtp) {
+                            var callback = this.callback,
+                                thelma;
 
                             Step(
                                 function() {
-                                    registerEmail(cl, "thelma", "dance4fun", "thelma@pump.test", this);
+                                    oneEmail(smtp, "thelma@pump.test", this.parallel());
+                                    registerEmail(cl, "thelma", "dance4fun", "thelma@pump.test", this.parallel());
                                 },
-                                function(err, thelma) {
+                                function(err, message, results) {
+                                    if (err) throw err;
+                                    thelma = results;
+                                    confirmEmail(message, this);
+                                },
+                                function(err) {
                                     if (err) throw err;
                                     var cred = {
                                         consumer_key: cl.client_id,
@@ -351,6 +368,58 @@ suite.addBatch({
                             assert.isObject(target[0]);
                             assert.isTrue(_.has(target[0], "email"));
                         }
+                    }
+                }
+            },
+            "and we register another user with an email address": {
+                topic: function(cl, app, smtp) {
+                    var callback = this.callback;
+                    Step(
+                        function() {
+                            oneEmail(smtp, "bookman@pump.test", this.parallel());
+                            registerEmail(cl, "bookman", "i*am*super.", "bookman@pump.test", this.parallel());
+                        },
+                        callback
+                    );
+                        
+                },
+                "it works correctly": function(err, message, user) {
+                    assert.ifError(err);
+                    assert.isObject(user);
+                    assert.isObject(message);
+                },
+                "the email is not included": function(err, message, user) {
+                    assert.ifError(err);
+                    assert.isObject(user);
+                    assert.isFalse(_.include(user, "email"));
+                },
+                "and we fetch the user with user credentials without confirmation": {
+                    topic: function(message, user, cl) {
+                        var callback = this.callback,
+                            cred = {
+                                consumer_key: cl.client_id,
+                                consumer_secret: cl.client_secret,
+                                token: user.token,
+                                token_secret: user.secret
+                            };
+
+                        Step(
+                            function() {
+                                httputil.getJSON("http://localhost:4815/api/user/bookman", cred, this);
+                            },
+                            function(err, body, resp) {
+                                if (err && err.statusCode && err.statusCode == 403) {
+                                    callback(null);
+                                } else if (err) {
+                                    callback(err);
+                                } else {
+                                    callback(new Error("Unexpected success"));
+                                }
+                            }
+                        );
+                    },
+                    "it works": function(err) {
+                        assert.ifError(err);
                     }
                 }
             }
