@@ -33,6 +33,7 @@ var assert = require("assert"),
 
 var oneEmail = function(smtp, addr, callback) {
     var data,
+        timeoutID,
         isOurs = function(envelope) {
             return _.contains(envelope.to, addr);
         },
@@ -51,6 +52,7 @@ var oneEmail = function(smtp, addr, callback) {
         ender = function(envelope, cb) {
             var msg;
             if (isOurs(envelope)) {
+                clearTimeout(timeoutID);
                 smtp.removeListener("data", accumulator);
                 msg = _.clone(envelope);
                 msg.data = data;
@@ -60,6 +62,10 @@ var oneEmail = function(smtp, addr, callback) {
                 });
             }
         };
+
+    timeoutID = setTimeout(function() {
+        callback(new Error("Timeout waiting for email"), null);
+    }, 5000);
 
     smtp.on("startData", starter);
 };
