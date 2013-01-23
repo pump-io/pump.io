@@ -22,6 +22,7 @@ var assert = require("assert"),
     simplesmtp = require("simplesmtp"),
     oauthutil = require("./lib/oauth"),
     httputil = require("./lib/http"),
+    emailutil = require("./lib/email"),
     Browser = require("zombie"),
     Step = require("step"),
     http = require("http"),
@@ -30,7 +31,9 @@ var assert = require("assert"),
     register = oauthutil.register,
     registerEmail = oauthutil.registerEmail,
     setupApp = oauthutil.setupApp,
-    setupAppConfig = oauthutil.setupAppConfig;
+    setupAppConfig = oauthutil.setupAppConfig,
+    oneEmail = emailutil.oneEmail,
+    confirmEmail = emailutil.confirmEmail;
 
 var makeCred = function(cl, pair) {
     return {
@@ -39,55 +42,6 @@ var makeCred = function(cl, pair) {
         token: pair.token,
         token_secret: pair.token_secret
     };
-};
-
-var oneEmail = function(smtp, addr, callback) {
-    var data,
-        isOurs = function(envelope) {
-            return _.contains(envelope.to, addr);
-        },
-        starter = function(envelope) {
-            if (isOurs(envelope)) {
-                data = "";
-                smtp.on("data", accumulator);
-                smtp.once("dataReady", ender);    
-            }
-        },
-        accumulator = function(envelope, chunk) {
-            if (isOurs(envelope)) {
-                data = data + chunk.toString();
-            }
-        },
-        ender = function(envelope, cb) {
-            var msg;
-            if (isOurs(envelope)) {
-                smtp.removeListener("data", accumulator);
-                msg = _.clone(envelope);
-                msg.data = data;
-                callback(null, msg);
-                process.nextTick(function() {
-                    cb(null);
-                });
-            }
-        };
-
-    smtp.on("startData", starter);
-};
-
-var confirmEmail = function(message, callback) {
-    var urlre = /http:\/\/localhost:4815\/main\/confirm\/[a-zA-Z0-9_\-]+/,
-        match = urlre.exec(message.data),
-        url = (match.length > 0) ? match[0] : null;
-
-    http.get(url, function(res) {
-        if (res.statusCode < 200 || res.statusCode >= 300) {
-            callback(new Error("Bad status code: " + res.statusCode));
-        } else {
-            callback(null);
-        }
-    }).on('error', function(err) {
-        callback(err);
-    });
 };
 
 var suite = vows.describe("registration with email");
