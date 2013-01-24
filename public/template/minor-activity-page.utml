@@ -1,0 +1,3 @@
+<div id="minor-activity-page">
+  <%= partial("minor-activity", {headless: false}) %>
+</div>

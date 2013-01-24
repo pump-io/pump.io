@@ -92,6 +92,8 @@ var addRoutes = function(app) {
     app.get("/main/account", loginRedirect("/main/account"));
     app.get("/main/messages", loginRedirect("/main/messages"));
 
+    app.get("/:nickname/activity/:uuid", app.session, principal, requestActivity, reqUser, userIsActor, principalActorOrRecipient, showActivity);
+
     app.get("/:nickname/:type/:uuid", app.session, principal, requestObject, reqUser, userIsAuthor, principalAuthorOrRecipient, showObject);
 
     // expose this one file over the web
@@ -316,9 +318,9 @@ var handleLogout = function(req, res, next) {
     );
 };
 
-var showActivity = function(req, res, next) {
-    var uuid = req.params.uuid,
-        user = req.user;
+var requestActivity = function(req, res, next) {
+
+    var uuid = req.params.uuid;
 
     Step(
         function() {
@@ -327,10 +329,10 @@ var showActivity = function(req, res, next) {
         function(err, activities) {
             if (err) throw err;
             if (activities.length === 0) {
-                next(new NoSuchThingError("activity", uuid));
+                throw new NoSuchThingError("activity", uuid);
             }
             if (activities.length > 1) {
-                next(new Error("Too many activities with ID = " + req.params.uuid));
+                throw new Error("Too many activities with ID = " + req.params.uuid);
             }
             activities[0].expand(this);
         },
@@ -338,12 +340,69 @@ var showActivity = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("activity", {page: {title: "Welcome"},
-                                        user: req.remoteUser,
-                                        activity: activity});
+                req.activity = activity;
+                next();
             }
         }
     );
+};
+
+var userIsActor = function(req, res, next) {
+
+    var user = req.user,
+        person = req.person,
+        activity = req.activity,
+        actor = activity.actor;
+
+    if (person && actor && person.id == actor.id) {
+        next();
+    } else {
+        next(new HTTPError("No " + type + " by " + user.nickname + " with uuid " + obj._uuid, 404));
+        return;
+    }
+};
+
+var principalActorOrRecipient = function(req, res, next) {
+
+    var user = req.principalUser,
+        person = req.principal,
+        activity = req.activity;
+
+    if (activity && activity.actor && person && activity.actor.id == person.id) {
+        next();
+    } else {
+        Step(
+            function() {
+                activity.checkRecipient(person, this);
+            },
+            function(err, isRecipient) {
+                if (err) {
+                    next(err);
+                } else if (isRecipient) {
+                    next();
+                } else {
+                    next(new HTTPError("Only the author and recipients can view this activity.", 403));
+                }
+            }
+        );
+    }
+};
+
+var showActivity = function(req, res, next) {
+
+    var activity = req.activity,
+        user = req.principalUser,
+        principal = req.principal;
+
+    if (activity.isMajor()) {
+        res.render("major-activity-page", {page: {title: activity.content},
+                                           user: user,
+                                           activity: activity});
+    } else {
+        res.render("minor-activity-page", {page: {title: activity.content},
+                                           user: user,
+                                           activity: activity});
+    }
 };
 
 var getFiltered = function(stream, filter, profile, start, end, callback) {

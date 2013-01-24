@@ -29,6 +29,7 @@
             ":nickname/activity/:id": "activity",
             ":nickname/lists":        "lists",
             ":nickname/list/:uuid":   "list",
+            ":nickname/activity/:uuid": "activity",
             ":nickname/:type/:uuid":  "object",
             "main/messages":          "messages",
             "main/settings":          "settings",
@@ -253,6 +254,22 @@
                 Pump.body.setContent({contentView: Pump.ObjectContent,
                                       model: obj,
                                       title: obj.displayName || obj.objectType + "by" + nickname});
+            });
+        },
+
+        activity: function(nickname, uuid) {
+            var router = this,
+                user = Pump.User.unique({nickname: nickname}),
+                activity = Pump.Activity.unique({uuid: uuid});
+
+            Pump.fetchObjects([user, activity], function(err, objs) {
+                if (err) {
+                    Pump.error(err);
+                    return;
+                }
+                Pump.body.setContent({contentView: Pump.ActivityContent,
+                                      model: activity,
+                                      title: activity.content});
             });
         }
     });

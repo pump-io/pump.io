@@ -1,0 +1,3 @@
+<div class="span9" id="major-activity-page">
+  <%= partial("major-activity", headless: false}) %>
+</div>
