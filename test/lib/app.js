@@ -10,6 +10,7 @@ var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "config.json")
 
 var config = {driver: tc.driver,
               params: tc.params,
+              firehose: false,
               sockjs: false,
               nologger: true},
     app = null,
