@@ -148,7 +148,7 @@ suite.addBatch({
 
                         Step(
                             function() {
-                                oneEmail(smtp, stephanie.email, this.parallel());
+                                oneEmail(smtp, "stephanie@pump.test", this.parallel());
                                 httputil.postJSON(url, cred, act, this.parallel());
                             },
                             function(err, message, body, response) {
