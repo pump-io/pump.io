@@ -43,6 +43,11 @@ var suite = vows.describe("mailer module interface").addBatch({
             assert.ifError(err);
             assert.isObject(smtp);
         },
+        "teardown": function(smtp) {
+            if (smtp) {
+                smtp.end(function(err) {});
+            }
+        },
         "and we require the mailer module": {
             topic: function() {
                 return require("../lib/mailer");
