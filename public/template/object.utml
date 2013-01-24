@@ -30,9 +30,9 @@
       <% } %>
       <% if (!_.has(object, "likes") || object.likes.totalItems === 0) { %>
       <% } else if (object.likes.totalItems === 1) { %>
-      <p><small><%= partial("activity-object-collection", {coll: object.likes}) %> likes this.</small></p>
+      <p><small><%= partial("activity-object-collection", {author: object.author, coll: object.likes}) %> likes this.</small></p>
       <% } else { %>
-      <p><small><%= partial("activity-object-collection", {coll: object.likes}) %> like this.</small></p>
+      <p><small><%= partial("activity-object-collection", {author: object.author, coll: object.likes}) %> like this.</small></p>
       <% } %>
     </div>
   </div>
