@@ -35,6 +35,7 @@ var databank = require("databank"),
     idPublicOnly = filters.idPublicOnly,
     HTTPError = require("../lib/httperror").HTTPError,
     Stamper = require("../lib/stamper").Stamper,
+    Mailer = require("../lib/mailer"),
     Scrubber = require("../lib/scrubber"),
     ActivitySpam = require("../lib/activityspam"),
     Activity = require("../lib/model/activity").Activity,
@@ -784,13 +785,13 @@ var createUser = function(req, res, next) {
                 },
                 function(err, html, text) {
                     if (err) throw err;
-                    req.app.sendEmail({to: email,
-                                       subject: "Confirm your email address for " + req.app.config.site,
-                                       text: text,
-                                       attachment: {data: html,
-                                                    type: "text/html",
-                                                    alternative: true}},
-                                      this);
+                    Mailer.sendEmail({to: email,
+                                      subject: "Confirm your email address for " + req.app.config.site,
+                                      text: text,
+                                      attachment: {data: html,
+                                                   type: "text/html",
+                                                   alternative: true}},
+                                     this);
                 },
                 function(err, message) {
                     callback(err);
