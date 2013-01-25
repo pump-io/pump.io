@@ -561,7 +561,12 @@ var showFavorites = function(req, res, next) {
                 res.render("favorites", {page: {title: req.user.nickname + " favorites"},
                                          objects: objects,
                                          user: req.principalUser,
-                                         profile: req.user.profile});
+                                         profile: req.user.profile,
+                                         data: {
+                                             objects: objects,
+                                             profile: req.user.profile
+                                         }
+                                        });
             }
         }
     );
@@ -604,7 +609,12 @@ var showFollowers = function(req, res, next) {
                 res.render("followers", {page: {title: req.user.nickname + " followers"},
                                          people: followers,
                                          user: req.principalUser,
-                                         profile: req.user.profile});
+                                         profile: req.user.profile,
+                                         data: {
+                                             profile: req.user.profile,
+                                             people: followers
+                                         }
+                                        });
             }
         }
     );
@@ -647,7 +657,11 @@ var showFollowing = function(req, res, next) {
                 res.render("following", {page: {title: req.user.nickname + " following"},
                                          people: following,
                                          user: req.principalUser,
-                                         profile: req.user.profile});
+                                         profile: req.user.profile,
+                                         data: {
+                                             profile: req.user.profile,
+                                             people: following
+                                         }});
             }
         }
     );
@@ -748,7 +762,13 @@ var showLists = function(req, res, next) {
                                      user: req.principalUser,
                                      profile: req.user.profile,
                                      list: null,
-                                     lists: lists});
+                                     lists: lists,
+                                     data: {
+                                         profile: req.user.profile,
+                                         list: null,
+                                         lists: lists
+                                     }
+                                    });
             }
         }
     );
@@ -812,7 +832,12 @@ var showList = function(req, res, next) {
                                     user: req.principalUser,
                                     profile: req.user.profile,
                                     lists: lists,
-                                    list: list});
+                                    list: list,
+                                    data: {
+                                        profile: req.user.profile,
+                                        lists: lists,
+                                        list: list}
+                                   });
             }
         }
     );

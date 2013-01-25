@@ -358,7 +358,18 @@ if (!window.Pump) {
                 ".major-activity-page": {View: Pump.ActivityContent, models: {activity: Pump.Activity}},
                 ".user-activities": {View: Pump.UserPageContent, models: {profile: Pump.Person,
                                                                           major: Pump.ActivityStream,
-                                                                          minor: Pump.ActivityStream}}
+                                                                          minor: Pump.ActivityStream}},
+                ".user-favorites": {View: Pump.FavoritesContent, models: {profile: Pump.Person,
+                                                                          objects: Pump.ActivityObjectStream}},
+                ".user-followers": {View: Pump.FollowersContent, models: {profile: Pump.Person,
+                                                                          people: Pump.PeopleStream}},
+                ".user-following": {View: Pump.FollowingContent, models: {profile: Pump.Person,
+                                                                          people: Pump.PeopleStream}},
+                ".user-lists": {View: Pump.ListsContent, models: {profile: Pump.Person,
+                                                                  lists: Pump.ActivityObjectStream}},
+                ".user-list": {View: Pump.ListContent, models: {profile: Pump.Person,
+                                                                lists: Pump.ActivityObjectStream,
+                                                                list: Pump.ActivityObject}}
             },
             selector,
             $el,
@@ -380,9 +391,11 @@ if (!window.Pump) {
                     data = Pump.initialData;
                     _.each(data, function(value, name) {
                         if (name == View.modelName) {
-                            options.model = new def.models[name](value);
+                            options.model = def.models[name].unique(value);
                         } else if (def.models[name]) {
-                            options.data[name] = new def.models[name](value);
+                            options.data[name] = def.models[name].unique(value);
+                        } else {
+                            options.data[name] = value;
                         }
                     });
                     Pump.body.content = new View(options);
