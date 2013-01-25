@@ -1,4 +1,4 @@
-<div class="user-followers">
+<div class="user user-followers">
   <div class="row">
     <%= partial("profile-block") %>
   </div>
