@@ -127,7 +127,7 @@
         favorites: function(nickname) {
             var router = this,
                 user = Pump.User.unique({nickname: nickname}),
-                favorites = Pump.ActivityStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/favorites")});
+                favorites = Pump.ActivityObjectStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/favorites")});
 
             Pump.fetchObjects([user, favorites], function(err, objs) {
                 var profile = user.profile;
