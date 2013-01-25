@@ -502,7 +502,14 @@ var showStream = function(req, res, next) {
                                     major: major,
                                     minor: minor,
                                     profile: req.user.profile,
-                                    user: req.principalUser});
+                                    user: req.principalUser,
+                                    data: {
+                                        major: major,
+                                        minor: minor,
+                                        profile: req.user.profile,
+                                        headless: true
+                                    }
+                                   });
             }
         }
     );
