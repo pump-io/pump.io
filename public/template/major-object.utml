@@ -1,43 +1,43 @@
-<div class="row object major" data-object-id="<%- object.id %>">
+<div class="row object major" data-object-id="<%- obj.id %>">
   <div class="row">
     <div class="span1">
-      <% if (object.author && object.author.image && object.author.image.url) { %>
-      <img src="<%- object.author.image.url %>" width="40" height="40" class="img-rounded" />
+      <% if (obj.author && obj.author.image && obj.author.image.url) { %>
+      <img src="<%- obj.author.image.url %>" width="40" height="40" class="img-rounded" />
       <% } else { %>
       <img src="/images/default.png" width="40" height="40" class="img-rounded" />
       <% } %>
     </div>
     <div class="span8">
-      <% if (object.title) { %>
-      <h2><%- object.title %></h2>
+      <% if (obj.title) { %>
+      <h2><%- obj.title %></h2>
       <% } else { %>
-      <%= object.content %>
+      <%= obj.content %>
       <% } %>
-      <p><% if (object.author) { %><small><a href="<%- object.author.url %>"><%- object.author.displayName %></a><% } %> at <a href="<%- object.url %>"><%- object.published %></a><% if (object.location) { %> in <a href="<%- object.location.url %>"><%- object.location.displayName %></a><% } %></small></p>
+      <p><% if (obj.author) { %><small><a href="<%- obj.author.url %>"><%- obj.author.displayName %></a><% } %> at <a href="<%- obj.url %>"><%- obj.published %></a><% if (obj.location) { %> in <a href="<%- obj.location.url %>"><%- obj.location.displayName %></a><% } %></small></p>
     </div>
   </div>
   <div class="row">
     <div class="span8 offset1">
-      <% if (object.image && object.image.url) { %>
-      <p><img src="<%- object.image.url %>" class="img-polaroid"></img></p>
+      <% if (obj.image && obj.image.url) { %>
+      <p><img src="<%- obj.image.url %>" class="img-polaroid"></img></p>
       <% } %>
-      <% if (object.displayName) { %>
-      <p><%= object.content %></p>
+      <% if (obj.displayName) { %>
+      <p><%= obj.content %></p>
       <% } %>
       <% if (user) { %>
-      <%= partial("responses", {obj: object}) %>
+      <%= partial("responses", {obj: obj}) %>
       <% } %>
-      <% if (object.likes.totalItems === 0) { %>
-      <% } else if (object.likes.totalItems === 1) { %>
-      <p><small><%= partial("activity-object-collection", {author: object.author, object: object, coll: object.likes}) %> likes this.</small></p>
+      <% if (obj.likes.totalItems === 0) { %>
+      <% } else if (obj.likes.totalItems === 1) { %>
+      <p><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.likes}) %> likes this.</small></p>
       <% } else { %>
-      <p><small><%= partial("activity-object-collection", {author: object.author, object: object, coll: object.likes}) %> like this.</small></p>
+      <p><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.likes}) %> like this.</small></p>
       <% } %>
-      <% if (object.shares.totalItems === 0) { %>
-      <% } else if (object.shares.totalItems === 1) { %>
-      <p><small><%= partial("activity-object-collection", {author: object.author, object: object, coll: object.shares}) %> shared this.</small></p>
+      <% if (obj.shares.totalItems === 0) { %>
+      <% } else if (obj.shares.totalItems === 1) { %>
+      <p><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.shares}) %> shared this.</small></p>
       <% } else { %>
-      <p><small><%= partial("activity-object-collection", {author: object.author, object: object, coll: object.shares}) %> shared this.</small></p>
+      <p><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.shares}) %> shared this.</small></p>
       <% } %>
     </div>
   </div>
