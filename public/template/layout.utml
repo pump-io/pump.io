@@ -139,6 +139,8 @@
           canUpload: <%- config.canUpload %>,
           sockjs: <%- config.sockjs %>
       });
+
+      Pump.initialData = <%= JSON.stringify(data) %>;
     </script>
   </body>
 

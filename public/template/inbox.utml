@@ -1,4 +1,4 @@
-<div class="inbox">
+<div id="inbox">
   <div class="row">
     <%= partial("major-stream", {headless: false}) %>
     <div class="span3" id="sidebar">

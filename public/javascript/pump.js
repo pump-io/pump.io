@@ -45,15 +45,7 @@ if (!window.Pump) {
 
         // XXX: Make this more complete
 
-        if ($("#content #login").length > 0) {
-            Pump.body.content = new Pump.LoginContent();
-        } else if ($("#content #registration").length > 0) {
-            Pump.body.content = new Pump.RegisterContent();
-        } else if ($("#content #user").length > 0) {
-            Pump.body.content = new Pump.UserPageContent({});
-        } else if ($("#content #inbox").length > 0) {
-            Pump.body.content = new Pump.InboxContent({});
-        }
+        Pump.initialContentView();
 
         $("abbr.easydate").easydate();
 
@@ -350,6 +342,52 @@ if (!window.Pump) {
         pathname = a.pathname;
 
         return pathname;
+    };
+
+    // Sets up the initial view and sub-views
+
+    Pump.initialContentView = function() {
+
+        var $content = $("#content"),
+            selectorToView = {
+                "#main": {View: Pump.MainContent},
+                "#login": {View: Pump.LoginContent},
+                "#registration": {View: Pump.RegisterContent},
+                "#inbox": {View: Pump.InboxContent, models: {major: Pump.ActivityStream, minor: Pump.ActivityStream}},
+                ".object": {View: Pump.ObjectContent, models: {object: Pump.ActivityObject}},
+                ".major-activity-page": {View: Pump.ActivityContent, models: {activity: Pump.Activity}}
+            },
+            selector,
+            $el,
+            model,
+            options,
+            def,
+            View;
+
+        // When I say "view" the crowd say "selector"
+
+        for (selector in selectorToView) {
+            if (_.has(selectorToView, selector)) {
+                $el = $content.find(selector);
+                if ($el.length > 0) {
+                    def = selectorToView[selector];
+                    View = def.View;
+                    options = {el: $el, data: {}};
+                    _.each(Pump.initialData, function(value, name) {
+                        if (name == View.modelName) {
+                            options.model = new def.models[name](value);
+                        } else {
+                            options.data[name] = new def.models[name](value);
+                        }
+                    });
+                    Pump.body.content = new View(options);
+                    Pump.initialData = null;
+                    break;
+                }
+            }
+        }
+
+        // XXX: set up initial data
     };
 
 })(window._, window.$, window.Backbone, window.Pump);

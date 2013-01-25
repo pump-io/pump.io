@@ -268,7 +268,12 @@ var showInbox = function(req, res, next) {
                 res.render("inbox", {page: { title: "Home" },
                                      major: major,
                                      minor: minor,
-                                     user: user});
+                                     user: user,
+                                     data: {
+                                         major: major,
+                                         minor: minor
+                                     }
+                                    });
             }
         }
     );
@@ -937,7 +942,11 @@ var showObject = function(req, res, next) {
                 }
                 res.render("object", {page: {title: title},
                                       user: req.principalUser,
-                                      object: obj});
+                                      object: obj,
+                                      data: {
+                                          object: obj
+                                      }
+                                     });
             }
         }
     );
