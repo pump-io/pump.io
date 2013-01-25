@@ -4,4 +4,4 @@
     <%= partial("people-stream") %>
   </div>
 </div>
-o
+
