@@ -1990,14 +1990,15 @@
                     Pump.addMinorActivity(act);
 
                     if ($("#list-menu-inner").length > 0) {
-                        aview = new Pump.ListMenuItem({model: act.object});
+                        aview = new Pump.ListMenuItem({model: act.object, data: {list: act.object}});
                         aview.on("ready", function() {
-                            var el = aview.$("li");
-                            el.hide();
-                            $("#list-menu-inner").prepend(el);
-                            el.slideDown('fast');
+                            var rel;
+                            aview.$el.hide();
+                            $("#list-menu-inner").prepend(aview.$el);
+                            aview.$el.slideDown('fast');
                             // Go to the new list page
-                            Pump.router.navigate(act.object.get("url"), true);
+                            rel = Pump.rel(act.object.get("url"));
+                            Pump.router.navigate(rel, true);
                         });
                         aview.render();
                     }

@@ -339,4 +339,17 @@ if (!window.Pump) {
         }, 250);
     };
 
+    // XXX: this is cheeseball.
+
+    Pump.rel = function(url) {
+
+        var a = document.createElement('a'),
+            pathname;
+
+        a.href = url;
+        pathname = a.pathname;
+
+        return pathname;
+    };
+
 })(window._, window.$, window.Backbone, window.Pump);
