@@ -401,7 +401,7 @@
                 url: coll.nextLink,
                 success: function(data) {
                     if (data.items) {
-                        coll.add(data.items);
+                        coll.add(data.items, {at: coll.length});
                     }
                     if (data.links && data.links.next && data.links.next.href) {
                         coll.nextLink = data.links.next.href;
@@ -432,7 +432,7 @@
                 url: coll.url + "?count=" + Math.min(coll.totalItems, 200),
                 success: function(data) {
                     if (data.items) {
-                        coll.add(data.items, {at: coll.length});
+                        coll.add(data.items);
                     }
                     if (data.links && data.links.next && data.links.next.href) {
                         coll.nextLink = data.links.next.href;
