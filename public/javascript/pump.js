@@ -354,7 +354,7 @@ if (!window.Pump) {
                 "#login": {View: Pump.LoginContent},
                 "#registration": {View: Pump.RegisterContent},
                 "#inbox": {View: Pump.InboxContent, models: {major: Pump.ActivityStream, minor: Pump.ActivityStream}},
-                ".object": {View: Pump.ObjectContent, models: {object: Pump.ActivityObject}},
+                ".object-page": {View: Pump.ObjectContent, models: {object: Pump.ActivityObject}},
                 ".major-activity-page": {View: Pump.ActivityContent, models: {activity: Pump.Activity}},
                 ".user-activities": {View: Pump.UserPageContent, models: {profile: Pump.Person,
                                                                           major: Pump.ActivityStream,

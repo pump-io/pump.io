@@ -1,4 +1,4 @@
-<div class="object">
+<div class="object-page">
   <div class="row">
     <div class="span3">
       <% if (object.author && object.author.image && object.author.image.url) { %>
