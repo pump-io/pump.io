@@ -355,13 +355,17 @@ if (!window.Pump) {
                 "#registration": {View: Pump.RegisterContent},
                 "#inbox": {View: Pump.InboxContent, models: {major: Pump.ActivityStream, minor: Pump.ActivityStream}},
                 ".object": {View: Pump.ObjectContent, models: {object: Pump.ActivityObject}},
-                ".major-activity-page": {View: Pump.ActivityContent, models: {activity: Pump.Activity}}
+                ".major-activity-page": {View: Pump.ActivityContent, models: {activity: Pump.Activity}},
+                ".user-activities": {View: Pump.UserPageContent, models: {profile: Pump.Person,
+                                                                          major: Pump.ActivityStream,
+                                                                          minor: Pump.ActivityStream}}
             },
             selector,
             $el,
             model,
             options,
             def,
+            data,
             View;
 
         // When I say "view" the crowd say "selector"
@@ -373,10 +377,11 @@ if (!window.Pump) {
                     def = selectorToView[selector];
                     View = def.View;
                     options = {el: $el, data: {}};
-                    _.each(Pump.initialData, function(value, name) {
+                    data = Pump.initialData;
+                    _.each(data, function(value, name) {
                         if (name == View.modelName) {
                             options.model = new def.models[name](value);
-                        } else {
+                        } else if (def.models[name]) {
                             options.data[name] = new def.models[name](value);
                         }
                     });

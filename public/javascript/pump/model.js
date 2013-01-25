@@ -178,7 +178,7 @@
             _.each(props, function(value, key) {
                 if (!model.has(key)) {
                     model.set(key, value);
-                } else if (_.contains(complicated, key)) {
+                } else if (_.contains(complicated, key) && model[key] && _.isFunction(model[key].merge)) {
                     model[key].merge(value);
                 } else {
                     // XXX: resolve non-complicated stuff
@@ -577,7 +577,16 @@
     // Unordered, doesn't have an URL
 
     Pump.ActivityObjectBag = Backbone.Collection.extend({
-        model: Pump.ActivityObject
+        model: Pump.ActivityObject,
+        merge: function(models, options) {
+            var bag = this,
+                Model = bag.model,
+                mapped;
+            mapped = models.map(function(item) {
+                return Model.unique(item);
+            });
+            bag.add(mapped);
+        }
     });
 
     Pump.PeopleStream = Pump.ActivityObjectStream.extend({
