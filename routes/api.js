@@ -1568,7 +1568,7 @@ var userFollowers = function(req, res, next) {
         items: []
     };
 
-    var args;
+    var args, str;
 
     try {
         args = streamArgs(req, DEFAULT_FOLLOWERS, MAX_FOLLOWERS);
@@ -1579,7 +1579,12 @@ var userFollowers = function(req, res, next) {
 
     Step(
         function() {
-            req.user.followerCount(this);
+            req.user.followersStream(this);
+        },
+        function(err, results) {
+            if (err) throw err;
+            str = results;
+            str.count(this);
         },
         function(err, count) {
             if (err) {
@@ -1594,8 +1599,19 @@ var userFollowers = function(req, res, next) {
                 }
             } else {
                 collection.totalItems = count;
-                req.user.getFollowers(args.start, args.end, this);
+                // XXX: short-circuit for empty followers stream
+                if (_(args).has("before")) {
+                    str.getIDsGreaterThan(args.before, args.count, this);
+                } else if (_(args).has("since")) {
+                    str.getIDsLessThan(args.since, args.count, this);
+                } else {
+                    str.getIDs(args.start, args.end, this);
+                }
             }
+        },
+        function(err, ids) {
+            if (err) throw err;
+            Person.readArray(ids, this);
         },
         function(err, people) {
             if (err) throw err;
@@ -1622,9 +1638,6 @@ var userFollowers = function(req, res, next) {
                     person.sanitize();
                 });
 
-                collection.startIndex = args.start;
-                collection.itemsPerPage = args.count;
-
                 collection.links = {
                     self: {
                         href: URLMaker.makeURL(base, {offset: args.start, count: args.count})
@@ -1634,23 +1647,21 @@ var userFollowers = function(req, res, next) {
                     }
                 };
 
-                if (args.start > 0) {
+                if (collection.items.length > 0)  {
                     collection.links.prev = {
                         href: URLMaker.makeURL(base, 
-                                               {offset: Math.max(args.start-args.count, 0), 
-                                                count: Math.min(args.count, args.start)})
+                                               {since: collection.items[0].id})
+                    };
+                    collection.links.next = {
+                        href: URLMaker.makeURL(base, 
+                                               {before: collection.items[collection.items.length - 1].id})
                     };
                 }
 
-                if (args.start + collection.items.length < collection.totalItems) {
-                    collection.links.next = {
-                        href: URLMaker.makeURL("api/user/" + req.user.nickname + "/followers", 
-                                               {offset: args.start+collection.items.length, count: args.count})
-                    };
-                }
                 if (_.has(collection, "author")) {
                     collection.author.sanitize();
                 }
+
                 res.json(collection);
             }
         }

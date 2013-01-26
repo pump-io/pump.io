@@ -61,8 +61,6 @@ var assertValidList = function(doc, total, count) {
     assert.include(doc, "items");
     assert.include(doc, "displayName");
     assert.include(doc, "id");
-    assert.include(doc, "itemsPerPage");
-    assert.include(doc, "startIndex");
     assert.include(doc, "links");
     assert.include(doc.links, "current");
     assert.include(doc.links.current, "href");
@@ -618,11 +616,15 @@ suite.addBatch({
                         assert.ifError(err);
                         assertValidList(feed, 100, 20);
                     },
-                    "it has next but no prev": function(err, feed) {
+                    "it has a next link": function(err, feed) {
                         assert.ifError(err);
                         assert.include(feed.links, "next");
                         assert.include(feed.links.next, "href");
-                        assert.isFalse(feed.links.hasOwnProperty("prev"));
+                    },
+                    "it has a prev link": function(err, feed) {
+                        assert.ifError(err);
+                        assert.include(feed.links, "prev");
+                        assert.include(feed.links.prev, "href");
                     }
                 },
                 "and we get a non-default count from the feed": {
@@ -642,11 +644,15 @@ suite.addBatch({
                         assert.ifError(err);
                         assertValidList(feed, 100, 40);
                     },
-                    "it has next but no prev": function(err, feed) {
+                    "it has a next link": function(err, feed) {
                         assert.ifError(err);
                         assert.include(feed.links, "next");
                         assert.include(feed.links.next, "href");
-                        assert.isFalse(feed.links.hasOwnProperty("prev"));
+                    },
+                    "it has a prev link": function(err, feed) {
+                        assert.ifError(err);
+                        assert.include(feed.links, "prev");
+                        assert.include(feed.links.prev, "href");
                     }
                 },
                 "and we get a very large count from the feed": {
@@ -666,10 +672,15 @@ suite.addBatch({
                         assert.ifError(err);
                         assertValidList(feed, 100, 100);
                     },
-                    "it has no next and no prev": function(err, feed) {
+                    "it has a next link": function(err, feed) {
                         assert.ifError(err);
-                        assert.isFalse(feed.links.hasOwnProperty("prev"));
-                        assert.isFalse(feed.links.hasOwnProperty("next"));
+                        assert.include(feed.links, "next");
+                        assert.include(feed.links.next, "href");
+                    },
+                    "it has a prev link": function(err, feed) {
+                        assert.ifError(err);
+                        assert.include(feed.links, "prev");
+                        assert.include(feed.links.prev, "href");
                     }
                 },
                 "and we get an offset subset from the feed": {
@@ -689,10 +700,15 @@ suite.addBatch({
                         assert.ifError(err);
                         assertValidList(feed, 100, 20);
                     },
-                    "it has next and prev": function(err, feed) {
+                    "it has a next link": function(err, feed) {
                         assert.ifError(err);
-                        assert.isTrue(feed.links.hasOwnProperty("prev"));
-                        assert.isTrue(feed.links.hasOwnProperty("next"));
+                        assert.include(feed.links, "next");
+                        assert.include(feed.links.next, "href");
+                    },
+                    "it has a prev link": function(err, feed) {
+                        assert.ifError(err);
+                        assert.include(feed.links, "prev");
+                        assert.include(feed.links.prev, "href");
                     }
                 }
             },
