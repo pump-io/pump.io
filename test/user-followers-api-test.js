@@ -625,6 +625,36 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed.links, "prev");
                         assert.include(feed.links.prev, "href");
+                    },
+                    "and we get the prev link": {
+                        topic: function(feed, pair, cl) {
+                            var callback = this.callback,
+                                url = feed.links.prev.href,
+                                cred = makeCred(cl, pair);
+                            
+                            httputil.getJSON(url, cred, function(err, doc, resp) {
+                                callback(err, doc);
+                            });
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                            assertValidList(feed, 100, 0);
+                        }
+                    },
+                    "and we get the next link": {
+                        topic: function(feed, pair, cl) {
+                            var callback = this.callback,
+                                url = feed.links.next.href,
+                                cred = makeCred(cl, pair);
+                            
+                            httputil.getJSON(url, cred, function(err, doc, resp) {
+                                callback(err, doc);
+                            });
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                            assertValidList(feed, 100, 20);
+                        }
                     }
                 },
                 "and we get a non-default count from the feed": {
@@ -709,6 +739,36 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed.links, "prev");
                         assert.include(feed.links.prev, "href");
+                    },
+                    "and we get the prev link": {
+                        topic: function(feed, pair, cl) {
+                            var callback = this.callback,
+                                url = feed.links.prev.href,
+                                cred = makeCred(cl, pair);
+                            
+                            httputil.getJSON(url, cred, function(err, doc, resp) {
+                                callback(err, doc);
+                            });
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                            assertValidList(feed, 100, 20);
+                        }
+                    },
+                    "and we get the next link": {
+                        topic: function(feed, pair, cl) {
+                            var callback = this.callback,
+                                url = feed.links.next.href,
+                                cred = makeCred(cl, pair);
+                            
+                            httputil.getJSON(url, cred, function(err, doc, resp) {
+                                callback(err, doc);
+                            });
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                            assertValidList(feed, 100, 20);
+                        }
                     }
                 }
             },
@@ -787,6 +847,36 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed.links, "prev");
                         assert.include(feed.links.prev, "href");
+                    },
+                    "and we get the prev link": {
+                        topic: function(feed, pair, cl) {
+                            var callback = this.callback,
+                                url = feed.links.prev.href,
+                                cred = makeCred(cl, pair);
+                            
+                            httputil.getJSON(url, cred, function(err, doc, resp) {
+                                callback(err, doc);
+                            });
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                            assertValidList(feed, 50, 0);
+                        }
+                    },
+                    "and we get the next link": {
+                        topic: function(feed, pair, cl) {
+                            var callback = this.callback,
+                                url = feed.links.next.href,
+                                cred = makeCred(cl, pair);
+                            
+                            httputil.getJSON(url, cred, function(err, doc, resp) {
+                                callback(err, doc);
+                            });
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                            assertValidList(feed, 50, 20);
+                        }
                     }
                 },
                 "and we get a non-default count from the feed": {
@@ -820,7 +910,7 @@ suite.addBatch({
                 "and we get a very large count from the feed": {
                     topic: function(pair, cl) {
                         var callback = this.callback,
-                            url = "http://localhost:4815/api/user/varys/following?count=100",
+                            url = "http://localhost:4815/api/user/varys/following?count=50",
                             cred = makeCred(cl, pair);
                         
                         httputil.getJSON(url, cred, function(err, doc, resp) {
@@ -871,6 +961,36 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed.links, "prev");
                         assert.include(feed.links.prev, "href");
+                    },
+                    "and we get the prev link": {
+                        topic: function(feed, pair, cl) {
+                            var callback = this.callback,
+                                url = feed.links.prev.href,
+                                cred = makeCred(cl, pair);
+                            
+                            httputil.getJSON(url, cred, function(err, doc, resp) {
+                                callback(err, doc);
+                            });
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                            assertValidList(feed, 50, 20);
+                        }
+                    },
+                    "and we get the next link": {
+                        topic: function(feed, pair, cl) {
+                            var callback = this.callback,
+                                url = feed.links.next.href,
+                                cred = makeCred(cl, pair);
+                            
+                            httputil.getJSON(url, cred, function(err, doc, resp) {
+                                callback(err, doc);
+                            });
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                            assertValidList(feed, 50, 10);
+                        }
                     }
                 }
             }
