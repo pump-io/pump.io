@@ -1163,9 +1163,9 @@
 
             // Invert direction
             if (idx <= 0) {
-                view.$el.append(aview.$el);
+                view.$(".reply-objects").append(aview.$el);
             } else if (idx >= $el.length) {
-                view.$el.prepend(aview.$el);
+                view.$(".reply-objects").prepend(aview.$el);
             } else {
                 aview.$el.insertBefore($el[view.collection.length - 1 - idx]);
             }
@@ -1190,9 +1190,9 @@
 
             // Invert direction
             if (idx <= 0) {
-                view.$el.append(aview.$el);
+                view.$(".reply-objects").append(aview.$el);
             } else if (idx >= $el.length) {
-                view.$el.prepend(aview.$el);
+                view.$(".reply-objects").prepend(aview.$el);
             } else {
                 aview.$el.insertBefore($el[view.collection.length - 1 - idx]);
             }
