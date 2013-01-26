@@ -20,44 +20,15 @@
 
     Pump.getStreams = function() {
 
-        var content,
-            nav,
-            streams = {};
+        var streams = {};
 
         if (Pump.body) {
             if (Pump.body.content) {
-                if (Pump.body.content.userContent) {
-                    if (Pump.body.content.userContent.listContent) {
-                        content = Pump.body.content.userContent.listContent;
-                    } else {
-                        content = Pump.body.content.userContent;
-                    }
-                } else {
-                    content = Pump.body.content;
-                }
+                _.extend(streams, Pump.body.content.getStreams());
             }
+
             if (Pump.body.nav) {
-                nav = Pump.body.nav;
-            }
-        }
-
-        if (content) {
-            if (content.majorStreamView) {
-                streams.major = content.majorStreamView.collection;
-            }
-
-            if (content.minorStreamView) {
-                streams.minor = content.minorStreamView.collection;
-            }
-        }
-
-        if (nav) {
-            if (nav.majorStreamView) {
-                streams.messages = nav.majorStreamView.collection;
-            }
-
-            if (nav.minorStreamView) {
-                streams.notifications = nav.minorStreamView.collection;
+                _.extend(streams, Pump.body.nav.getStreams());
             }
         }
 

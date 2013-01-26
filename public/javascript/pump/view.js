@@ -497,7 +497,10 @@
     Pump.AnonymousNav = Pump.TemplateView.extend({
         tagName: "div",
         className: "container",
-        templateName: 'nav-anonymous'
+        templateName: 'nav-anonymous',
+        getStreams: function() {
+            return {};
+        }
     });
 
     Pump.UserNav = Pump.TemplateView.extend({
@@ -603,6 +606,17 @@
             };
 
             Pump.ajax(options);
+        },
+        getStreams: function() {
+            var view = this,
+                streams = {};
+            if (view.majorStreamView && view.majorStreamView.collection) {
+                streams.messages = view.majorStreamView.collection;
+            }
+            if (view.minorStreamView && view.minorStreamView.collection) {
+                streams.notifications = view.minorStreamView.collection;
+            }
+            return streams;
         }
     });
 
@@ -622,6 +636,9 @@
         },
         addMinorActivity: function(act) {
             // By default, do nothing
+        },
+        getStreams: function() {
+            return {};
         }
     });
 
@@ -849,6 +866,21 @@
 
             view.userContent.minorStreamView.showAdded(act);
         },
+        getStreams: function() {
+            var view = this,
+                uc,
+                streams = {};
+            if (view.userContent) {
+                uc = view.userContent;
+                if (uc.majorStreamView && uc.majorStreamView.collection) {
+                    streams.major = uc.majorStreamView.collection;
+                }
+                if (uc.minorStreamView && uc.minorStreamView.collection) {
+                    streams.minor = uc.minorStreamView.collection;
+                }
+            }
+            return streams;
+        },
         subs: {
             "#profile-block": {
                 attr: "profileBlock",
@@ -955,6 +987,17 @@
             var view = this,
                 aview;
             view.minorStreamView.showAdded(act);
+        },
+        getStreams: function() {
+            var view = this,
+                streams = {};
+            if (view.majorStreamView && view.majorStreamView.collection) {
+                streams.major = view.majorStreamView.collection;
+            }
+            if (view.minorStreamView && view.minorStreamView.collection) {
+                streams.minor = view.minorStreamView.collection;
+            }
+            return streams;
         },
         subs: {
             "#major-stream": {
