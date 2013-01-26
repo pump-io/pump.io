@@ -214,6 +214,12 @@ suite.addBatch({
             "it has the uploadsStream() method": function(user) {
                 assert.isFunction(user.uploadsStream);
             },
+            "it has the followingStream() method": function(user) {
+                assert.isFunction(user.followingStream);
+            },
+            "it has the followersStream() method": function(user) {
+                assert.isFunction(user.followersStream);
+            },
             "it has a profile attribute": function(user) {
                 assert.isObject(user.profile);
                 assert.instanceOf(user.profile, require("../lib/model/person").Person);
@@ -1619,6 +1625,39 @@ suite.addBatch({
             "and we check their direct inbox": 
             emptyStreamContext(function(user, callback) {
                 user.uploadsStream(callback);
+            })
+        }
+    }
+});
+
+// Test followersStream, followingStream
+
+suite.addBatch({
+    "When we get the User class": {
+        topic: function() {
+            return require("../lib/model/user").User;
+        },
+        "it works": function(User) {
+            assert.isFunction(User);
+        },
+        "and we create a new user": {
+            topic: function(User) {
+                var props = {
+                    nickname: "booboo",
+                    password: "my-daughters-furbie"
+                };
+                User.create(props, this.callback);
+            },
+            "it works": function(err, user) {
+                assert.ifError(err);
+            },
+            "and we check their following stream": 
+            emptyStreamContext(function(user, callback) {
+                user.followingStream(callback);
+            }),
+            "and we check their followers stream": 
+            emptyStreamContext(function(user, callback) {
+                user.followersStream(callback);
             })
         }
     }
