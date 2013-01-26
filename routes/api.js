@@ -44,6 +44,7 @@ var databank = require("databank"),
     ActivityObject = require("../lib/model/activityobject").ActivityObject,
     Confirmation = require("../lib/model/confirmation").Confirmation,
     User = require("../lib/model/user").User,
+    Person = require("../lib/model/person").Person,
     Edge = require("../lib/model/edge").Edge,
     Favorite = require("../lib/model/favorite").Favorite,
     stream = require("../lib/model/stream"),
@@ -1692,8 +1693,22 @@ var userFollowing = function(req, res, next) {
                 }
             } else {
                 collection.totalItems = count;
-                req.user.getFollowing(args.start, args.end, this);
+                req.user.followingStream(this);
             }
+        },
+        function(err, str) {
+            if (err) throw err;
+            if (_(args).has("before")) {
+                str.getIDsGreaterThan(args.before, args.count, this);
+            } else if (_(args).has("since")) {
+                str.getIDsLessThan(args.since, args.count, this);
+            } else {
+                str.getIDs(args.start, args.end, this);
+            }
+        },
+        function(err, ids) {
+            if (err) throw err;
+            Person.readArray(ids, this);
         },
         function(err, people) {
             if (err) throw err;
@@ -1738,21 +1753,17 @@ var userFollowing = function(req, res, next) {
                     }
                 };
 
-                if (args.start > 0) {
+                if (collection.items.length > 0)  {
                     collection.links.prev = {
                         href: URLMaker.makeURL(base, 
-                                               {offset: Math.max(args.start-args.count, 0), 
-                                                count: Math.min(args.count, args.start)})
+                                               {since: collection.items[0].id})
+                    };
+                    collection.links.next = {
+                        href: URLMaker.makeURL(base, 
+                                               {before: collection.items[collection.items.length - 1].id})
                     };
                 }
 
-                if (args.start + collection.items.length < collection.totalItems) {
-                    collection.links.next = {
-                        href: URLMaker.makeURL("api/user/" + req.user.nickname + "/following", 
-                                               {offset: args.start+collection.items.length, count: args.count})
-                    };
-                }
-                
                 if (_.has(collection, "author")) {
                     collection.author.sanitize();
                 }

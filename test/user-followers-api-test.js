@@ -762,11 +762,15 @@ suite.addBatch({
                         assert.ifError(err);
                         assertValidList(feed, 50, 20);
                     },
-                    "it has next but no prev": function(err, feed) {
+                    "it has a next link": function(err, feed) {
                         assert.ifError(err);
                         assert.include(feed.links, "next");
                         assert.include(feed.links.next, "href");
-                        assert.isFalse(feed.links.hasOwnProperty("prev"));
+                    },
+                    "it has a prev link": function(err, feed) {
+                        assert.ifError(err);
+                        assert.include(feed.links, "prev");
+                        assert.include(feed.links.prev, "href");
                     }
                 },
                 "and we get a non-default count from the feed": {
@@ -786,11 +790,15 @@ suite.addBatch({
                         assert.ifError(err);
                         assertValidList(feed, 50, 40);
                     },
-                    "it has next but no prev": function(err, feed) {
+                    "it has a next link": function(err, feed) {
                         assert.ifError(err);
                         assert.include(feed.links, "next");
                         assert.include(feed.links.next, "href");
-                        assert.isFalse(feed.links.hasOwnProperty("prev"));
+                    },
+                    "it has a prev link": function(err, feed) {
+                        assert.ifError(err);
+                        assert.include(feed.links, "prev");
+                        assert.include(feed.links.prev, "href");
                     }
                 },
                 "and we get a very large count from the feed": {
@@ -810,10 +818,15 @@ suite.addBatch({
                         assert.ifError(err);
                         assertValidList(feed, 50, 50);
                     },
-                    "it has no next and no prev": function(err, feed) {
+                    "it has a next link": function(err, feed) {
                         assert.ifError(err);
-                        assert.isFalse(feed.links.hasOwnProperty("prev"));
-                        assert.isFalse(feed.links.hasOwnProperty("next"));
+                        assert.include(feed.links, "next");
+                        assert.include(feed.links.next, "href");
+                    },
+                    "it has a prev link": function(err, feed) {
+                        assert.ifError(err);
+                        assert.include(feed.links, "prev");
+                        assert.include(feed.links.prev, "href");
                     }
                 },
                 "and we get an offset subset from the feed": {
@@ -833,10 +846,15 @@ suite.addBatch({
                         assert.ifError(err);
                         assertValidList(feed, 50, 20);
                     },
-                    "it has next and prev": function(err, feed) {
+                    "it has a next link": function(err, feed) {
                         assert.ifError(err);
-                        assert.isTrue(feed.links.hasOwnProperty("prev"));
-                        assert.isTrue(feed.links.hasOwnProperty("next"));
+                        assert.include(feed.links, "next");
+                        assert.include(feed.links.next, "href");
+                    },
+                    "it has a prev link": function(err, feed) {
+                        assert.ifError(err);
+                        assert.include(feed.links, "prev");
+                        assert.include(feed.links.prev, "href");
                     }
                 }
             }
