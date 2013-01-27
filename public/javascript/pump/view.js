@@ -1429,15 +1429,36 @@
                     data: ["profile"]
                 }
             }
+        },
+        getStreams: function() {
+            var view = this,
+                streams = {};
+            if (view.userContent && view.userContent.peopleStreamView && view.userContent.peopleStreamView.collection) {
+                streams.major = view.userContent.collection;
+            }
+            return streams;
         }
     });
 
     Pump.FollowersUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-followers',
-        modelName: "people",
         parts: ["people-stream",
                 "major-person",
                 "profile-responses"],
+        subs: {
+            "#people-stream": {
+                attr: "peopleStreamView",
+                subView: "PeopleStreamView",
+                subOptions: {
+                    collection: "people"
+                }
+            }
+        }
+    });
+
+    Pump.PeopleStreamView = Pump.TemplateView.extend({
+        templateName: 'people-stream',
+        modelName: "people",
         subs: {
             ".person.major": {
                 map: "people",
@@ -1470,20 +1491,29 @@
                     data: ["profile"]
                 }
             }
+        },
+        getStreams: function() {
+            var view = this,
+                streams = {};
+            if (view.userContent && view.userContent.peopleStreamView && view.userContent.peopleStreamView.collection) {
+                streams.major = view.userContent.collection;
+            }
+            return streams;
         }
     });
 
     Pump.FollowingUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-following',
-        modelName: "people",
         parts: ["people-stream",
                 "major-person",
                 "profile-responses"],
         subs: {
-            ".person.major": {
-                map: "people",
-                subView: "MajorPersonView",
-                idAttr: "data-person-id"
+            "#people-stream": {
+                attr: "peopleStreamView",
+                subView: "PeopleStreamView",
+                subOptions: {
+                    collection: "people"
+                }
             }
         }
     });
