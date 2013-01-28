@@ -3,7 +3,7 @@
                  <% if (messages && messages.totalItems <= 0) { %>
                  disabled
                  <% } %>"
-                 toggle="dropdown" href="#">
+                 data-toggle="dropdown" href="#">
     <i class="icon-envelope icon-white"> <%- (messages) ? messages.totalItems : 0 %></i>  
   </button>
   <ul class="dropdown-menu" role="menu">
