@@ -529,8 +529,7 @@
         events: {
             "click #logout": "logout",
             "click #post-note-button": "postNoteModal",
-            "click #post-picture-button": "postPictureModal",
-            "click #profile-dropdown": "profileDropdown"
+            "click #post-picture-button": "postPictureModal"
         },
         postNoteModal: function() {
             var profile = Pump.currentUser.profile,
@@ -556,9 +555,6 @@
                                                               following: following}});
             });
             return false;
-        },
-        profileDropdown: function() {
-            $('#profile-dropdown').dropdown();
         },
         logout: function() {
             var view = this,
