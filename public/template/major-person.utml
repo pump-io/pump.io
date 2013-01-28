@@ -1,9 +1,9 @@
 <li class="media person major" data-person-id="<%- person.id %>">
   <a class="pull-left" href="<%- person.url %>">
     <% if (person.image && person.image.url) { %>
-    <img src="<%- person.image.url %>" width="40" height="40" class="img-rounded" />
+    <img src="<%- person.image.url %>" width="64" height="64" class="img-rounded media-object" />
     <% } else { %>
-    <img src="/images/default.png" width="40" height="40" class="img-rounded" />
+    <img src="/images/default.png" width="64" height="64" class="img-rounded media-object" />
     <% } %>
   </a>
   <div class="media-body">
