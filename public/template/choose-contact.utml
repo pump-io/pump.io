@@ -1,0 +1,32 @@
+<div id="modal-contact"
+     class="modal pump-modal hide fade"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="post-label"
+     aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 id="post-label">Choose a contact</h3>
+  </div>
+  <div class="modal-body">
+    <form id="choose-contact" class="form-horizontal">
+      <ul class="thumbnails">
+        <% _.each(people, function(person) { %>
+        <li>
+          <div class="thumbnail">
+            <% if (person.image && person.image.url) { %>
+            <img src="<%- person.image.url %>" width="32" height="32" class="img-rounded" />
+            <% } else { %>
+            <img src="/images/default.png" width="32" height="32" class="img-rounded" />
+            <% } %>
+            <p><%- person.displayName %></p>
+          </div>
+        </li>
+        <% }); %>
+      </ul>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" id="send-contact">Send</button>
+  </div>
+</div>

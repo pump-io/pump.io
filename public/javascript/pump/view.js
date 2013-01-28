@@ -1670,6 +1670,22 @@
                     }
                 });
             }
+        },
+        events: {
+            "click #add-list-member": "addListMember"
+        },
+        addListMember: function() {
+            var view = this,
+                profile = Pump.currentUser.profile,
+                list = view.model,
+                following = profile.following;
+
+            Pump.fetchObjects([profile, list, following], function(err, objs) {
+                Pump.showModal(Pump.ChooseContactModal, {data: {list: list,
+                                                                people: following}});
+            });
+
+            return false;
         }
     });
 
@@ -1840,6 +1856,12 @@
         parts: ["responses",
                 "reply",
                 "activity-object-collection"]
+    });
+
+    Pump.ChooseContactModal = Pump.TemplateView.extend({
+        tagName: "div",
+        className: "modal-holder",
+        templateName: 'choose-contact'
     });
 
     Pump.PostNoteModal = Pump.TemplateView.extend({
