@@ -15,11 +15,11 @@
         <li>
           <div class="thumbnail">
             <% if (person.image && person.image.url) { %>
-            <img src="<%- person.image.url %>" width="32" height="32" class="img-rounded" />
+            <img src="<%- person.image.url %>" width="48" height="48" class="img-rounded" />
             <% } else { %>
-            <img src="/images/default.png" width="32" height="32" class="img-rounded" />
+            <img src="/images/default.png" width="48" height="48" class="img-rounded" />
             <% } %>
-            <p><%- person.displayName %></p>
+            <p><small><%- person.displayName %></small></p>
           </div>
         </li>
         <% }); %>
