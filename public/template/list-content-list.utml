@@ -11,8 +11,6 @@
     <% } %>
   </div>
   <div class="row" id="list-members">
-    <% people = list.members.items; %>
-    <%= partial("people-stream") %>
-    <% delete people; %>
+    <%= partial("people-stream", {people: list.members.items}) %>
   </div>
 </div>
