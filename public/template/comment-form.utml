@@ -1,12 +1,12 @@
-<div class="row comment-form">
-  <div class="span1">
+<div class="media comment-form">
+  <span class="pull-left">
     <% if (user.profile.image && user.profile.image.url) { %>
-    <img src="<%- user.profile.image.url %>" width="40" height="40" class="img-rounded" />
+    <img src="<%- user.profile.image.url %>" width="32" height="32" class="img-rounded" />
     <% } else { %>
-    <img src="/images/default.png" width="40" height="40" class="img-rounded" />
+    <img src="/images/default.png" width="32" height="32" class="img-rounded" />
     <% } %>
-  </div>
-  <div class="span7">
+  </span>
+  <div class="media-body">
     <form class="post-comment">
       <fieldset>
         <div class="control-group">
