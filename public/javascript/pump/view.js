@@ -834,6 +834,7 @@
     Pump.UserPageContent = Pump.ContentView.extend({
         templateName: 'user',
         parts: ["profile-block",
+                "profile-nav",
                 "user-content-activities",
                 "major-stream",
                 "minor-stream",
@@ -1361,6 +1362,7 @@
     Pump.FavoritesContent = Pump.ContentView.extend({
         templateName: 'favorites',
         parts: ["profile-block",
+                "profile-nav",
                 "user-content-favorites",
                 "object-stream",
                 "major-object",
@@ -1409,6 +1411,7 @@
     Pump.FollowersContent = Pump.ContentView.extend({
         templateName: 'followers',
         parts: ["profile-block",
+                "profile-nav",
                 "user-content-followers",
                 "people-stream",
                 "major-person",
@@ -1471,6 +1474,7 @@
     Pump.FollowingContent = Pump.ContentView.extend({
         templateName: 'following',
         parts: ["profile-block",
+                "profile-nav",
                 'user-content-following',
                 "people-stream",
                 "major-person",
@@ -1521,6 +1525,7 @@
     Pump.ListsContent = Pump.ContentView.extend({
         templateName: 'lists',
         parts: ["profile-block",
+                "profile-nav",
                 'user-content-lists',
                 "list-menu",
                 "list-menu-item",
@@ -1594,6 +1599,7 @@
     Pump.ListContent = Pump.ContentView.extend({
         templateName: 'list',
         parts: ["profile-block",
+                "profile-nav",
                 "profile-responses",
                 'user-content-list',
                 "list-content-list",

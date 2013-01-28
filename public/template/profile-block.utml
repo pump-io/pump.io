@@ -1,19 +1,19 @@
-<div class="row" id="profile-block" data-profile-id="<%- profile.id %>">
-  <div class="span3">
+<div class="media" id="profile-block" data-profile-id="<%- profile.id %>">
+  <span class="pull-left">
     <% if (profile.image && profile.image.url) { %>
-    <img src="<%- profile.image.url %>" width="128" height="128" class="img-rounded" />
+    <img src="<%- profile.image.url %>" width="128" height="128" class="img-rounded media-object" />
     <% } else { %>
-    <img src="/images/default.png" width="128" height="128" class="img-rounded" />
+    <img src="/images/default.png" width="128" height="128" class="img-rounded media-object" />
     <% } %>
-  </div>
-  <div class="span8">
-    <h1><%- profile.displayName %> 
+  </span>
+  <div class="media-body">
+    <h1 class="media-header"><%- profile.displayName %> 
       <small>
-      <% if (profile.id && profile.id.substr(0, 5) == 'acct:') { %>
-      <%- profile.id.substr(5) %>
-      <% } else { %>
-      <%- profile.preferredUsername %>
-      <% } %>
+        <% if (profile.id && profile.id.substr(0, 5) == 'acct:') { %>
+        <%- profile.id.substr(5) %>
+        <% } else { %>
+        <%- profile.preferredUsername %>
+        <% } %>
       </small>
     </h1>
     <% if (profile.location) { %>
@@ -24,40 +24,8 @@
     <% } %>
     <% /* TODO: HOME PAGE HERE */ %>
   </div>
-  <div class="span1">
-    <div class="pull-right">
-      <%= partial("profile-responses", {person: profile}) %>
-    </div>
+  <div class="pull-right">
+    <%= partial("profile-responses", {person: profile}) %>
   </div>
 </div>
-<div class="row">
-  <div class="span12">
-    <ul class="nav nav-tabs">
-      <li><a href="/<%- profile.preferredUsername %>">Activity</a></li>
-      <li><a href="/<%- profile.preferredUsername %>/favorites">Favorites
-        <% if (profile.favorites && _.has(profile.favorites, "totalItems")) { %>
-        <span class="label"><%- profile.favorites.totalItems %></span>
-        <% } %>
-        </a>
-      </li>
-      <li><a href="/<%- profile.preferredUsername %>/followers">Followers
-        <% if (profile.followers && _.has(profile.followers, "totalItems")) { %>
-        <span class="label"><%- profile.followers.totalItems %></span>
-        <% } %>
-        </a>
-      </li>
-      <li><a href="/<%- profile.preferredUsername %>/following">Following
-        <% if (profile.following && _.has(profile.following, "totalItems")) { %>
-        <span class="label"><%- profile.following.totalItems %></span>
-        <% } %>
-        </a>
-      </li>
-      <li><a href="/<%- profile.preferredUsername %>/lists">Lists
-        <% if (profile.lists && _.has(profile.lists, "totalItems")) { %>
-        <span class="label"><%- profile.lists.totalItems %></span>
-        <% } %>
-        </a>
-      </li>
-    </ul>
-  </div>
-</div>
+

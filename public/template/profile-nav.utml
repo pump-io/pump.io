@@ -1,0 +1,27 @@
+<ul class="nav nav-tabs">
+  <li><a href="/<%- profile.preferredUsername %>">Activity</a></li>
+  <li><a href="/<%- profile.preferredUsername %>/favorites">Favorites
+      <% if (profile.favorites && _.has(profile.favorites, "totalItems")) { %>
+      <span class="label"><%- profile.favorites.totalItems %></span>
+      <% } %>
+    </a>
+  </li>
+  <li><a href="/<%- profile.preferredUsername %>/followers">Followers
+      <% if (profile.followers && _.has(profile.followers, "totalItems")) { %>
+      <span class="label"><%- profile.followers.totalItems %></span>
+      <% } %>
+    </a>
+  </li>
+  <li><a href="/<%- profile.preferredUsername %>/following">Following
+      <% if (profile.following && _.has(profile.following, "totalItems")) { %>
+      <span class="label"><%- profile.following.totalItems %></span>
+      <% } %>
+    </a>
+  </li>
+  <li><a href="/<%- profile.preferredUsername %>/lists">Lists
+      <% if (profile.lists && _.has(profile.lists, "totalItems")) { %>
+      <span class="label"><%- profile.lists.totalItems %></span>
+      <% } %>
+    </a>
+  </li>
+</ul>

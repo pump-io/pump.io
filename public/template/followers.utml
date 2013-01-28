@@ -2,6 +2,9 @@
   <div class="row">
     <%= partial("profile-block") %>
   </div>
+  <div class="row">
+    <%= partial("profile-nav") %>
+  </div>
   <div class="row" id="user-content">
     <%= partial("user-content-followers") %>
   </div>
