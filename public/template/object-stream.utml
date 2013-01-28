@@ -1,10 +1,7 @@
-<div class="span9" id="object-stream">
-  <% if (objects && objects.length) { %>
+<ul class="media-list" id="object-stream">
+  <% if (objects) { %>
   <% _.each(objects, function(object) { %>
   <%= partial("major-object", {obj: object}) %>
   <% }); %>
-  <% } else { %>
-  <p>No content!</p>
   <% } %>
-</div>
-
+</ul>
