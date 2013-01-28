@@ -12,7 +12,7 @@
     <% if (activity.object.displayName) { %>
     <h4 class="media-heading"><%- activity.object.displayName %></h4>
     <% } %>
-    <p>
+    <p class="muted">
       <small>
         <% if (!headless) { %><a href="<%- activity.actor.url %>"><%- activity.actor.displayName %></a> at <% } %>
         <a href="<%- activity.object.url || activity.url %>"><abbr title="<%- activity.published %>" class="easydate"><%- activity.published %></abbr></a>

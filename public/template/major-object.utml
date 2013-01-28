@@ -10,7 +10,7 @@
     <% if (obj.displayName) { %>
     <h4 class="media-heading"><%- obj.displayName %></h4>
     <% } %>
-    <p><small>
+    <p class="muted"><small>
         <% if (obj.author) { %><a href="<%- obj.author.url %>"><%- obj.author.displayName %></a><% } %>
         at <a href="<%- obj.url %>"><%- obj.published %></a>
         <% if (obj.location) { %> in <a href="<%- obj.location.url %>"><%- obj.location.displayName %></a><% } %>
