@@ -1,9 +1,7 @@
-<div id="people-stream">
-  <% if (people && people.length) { %>
+<ul class="media-list" id="people-stream">
+  <% if (people) { %>
   <% _.each(people, function(person) { %>
   <%= partial("major-person", {person: person}) %>
   <% }); %>
-  <% } else { %>
-  <p>No content!</p>
   <% } %>
-</div>
+</ul>
