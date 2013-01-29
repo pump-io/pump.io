@@ -6,27 +6,25 @@
      aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 id="post-label">Choose a contact</h3>
+    <h3 id="post-label">Choose contacts</h3>
   </div>
   <div class="modal-body">
     <form id="choose-contact" class="form-horizontal">
       <ul class="thumbnails">
-        <% _.each(people, function(person) { %>
-        <li>
-          <div class="thumbnail">
-            <% if (person.image && person.image.url) { %>
-            <img src="<%- person.image.url %>" width="48" height="48" class="img-rounded" />
-            <% } else { %>
-            <img src="/images/default.png" width="48" height="48" class="img-rounded" />
-            <% } %>
-            <p><small><%- person.displayName %></small></p>
-          </div>
+        <% _.each(people, function(person) {
+           var abbrev = (person.id && person.id.substr(0, 5) == 'acct:') ?
+           person.id.substr(5) : person.preferredUsername,
+           imgUrl = (person.image && person.image.url) ? person.image.url : "/images/default.png";
+           %>
+        <li class="thumbnail span1" data-person-id="<%- person.id %>" data-title="<%- abbrev %>">
+          <img src="<%- imgUrl %>" width="64" height="64" alt="<%- abbrev %>" class="img-rounded" />
+          <span><%- person.displayName %></span>
         </li>
         <% }); %>
       </ul>
     </form>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-primary" id="send-contact">Send</button>
+    <button type="button" class="btn btn-primary" id="add-contact">Add</button>
   </div>
 </div>

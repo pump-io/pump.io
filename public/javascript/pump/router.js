@@ -191,7 +191,7 @@
         lists: function(nickname) {
             var router = this,
                 user = Pump.User.unique({nickname: nickname}),
-                lists = Pump.ActivityObjectStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/lists/person")});
+                lists = Pump.ListStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/lists/person")});
 
             // XXX: parallelize this?
 
@@ -215,8 +215,8 @@
 
             var router = this,
                 user = Pump.User.unique({nickname: nickname}),
-                lists = Pump.ActivityObjectStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/lists/person")}),
-                list = Pump.ActivityObject.unique({links: {self: {href: "/api/collection/"+uuid}}});
+                lists = Pump.ListStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/lists/person")}),
+                list = Pump.List.unique({links: {self: {href: "/api/collection/"+uuid}}});
 
             // XXX: parallelize this?
 

@@ -204,7 +204,8 @@ if (!window.Pump) {
 
         _.each(objs, function(obj) {
             try {
-                obj.fetch({success: onSuccess,
+                obj.fetch({update: true,
+                           success: onSuccess,
                            error: onError});
             } catch (e) {
                 onError(null, null, e);

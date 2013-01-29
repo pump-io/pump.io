@@ -1861,7 +1861,90 @@
     Pump.ChooseContactModal = Pump.TemplateView.extend({
         tagName: "div",
         className: "modal-holder",
-        templateName: 'choose-contact'
+        templateName: 'choose-contact',
+        ready: function() {
+            var view = this;
+            view.$('.thumbnail').tooltip();
+            view.$('#add-contact').prop('disabled', true);
+            view.$('#add-contact').attr('disabled', 'disabled');
+        },
+        events: {
+            "click .thumbnail": "toggleSelection",
+            "click #add-contact": "addContact"
+        },
+        toggled: 0,
+        toggleSelection: function(ev) {
+            var view = this,
+                el = ev.currentTarget,
+                $el = $(el);
+
+            // XXX: Bootstrap-dependency
+
+            if ($el.hasClass("alert")) {
+                $el.removeClass("alert").removeClass("alert-info");
+                view.toggled--;
+            } else {
+                $el.addClass("alert").addClass("alert-info");
+                view.toggled++;
+            }
+
+            if (view.toggled === 0) {
+                view.$('#add-contact').prop('disabled', true);
+                view.$('#add-contact').attr('disabled', 'disabled');
+            } else {
+                view.$('#add-contact').prop('disabled', false);
+                view.$('#add-contact').removeAttr('disabled');
+            }
+        },
+        addContact: function() {
+            var view = this,
+                list = view.options.data.list,
+                people = view.options.data.people,
+                ids = [],
+                stream = Pump.currentUser.minorStream,
+                done;
+
+            // Extract the IDs from the data- attributes of toggled thumbnails
+
+            view.$(".thumbnail.alert-info").each(function(i, el) {
+                var personID = $(el).attr("data-person-id");
+                ids.push(personID);
+            });
+
+            done = 0;
+
+            // Hide the modal
+
+            view.$el.modal('hide');
+            view.remove();
+
+            // Add each person
+
+            _.each(ids, function(id) {
+
+                // We could do this by posting to the minor stream,
+                // but this way we automatically update the list view,
+                // and the minor stream view gets updated by socksjs, which this
+                // does not (yet)
+
+                var person = people.get(id),
+                    act = {
+                        verb: "add",
+                        object: {
+                            objectType: "person",
+                            id: id
+                        },
+                        target: {
+                            objectType: "collection",
+                            id: list.id
+                        }
+                    };
+
+                stream.create(act, {success: function(activity) {
+                    list.members.add(person, {at: 0});
+                }});
+            });
+        }
     });
 
     Pump.PostNoteModal = Pump.TemplateView.extend({

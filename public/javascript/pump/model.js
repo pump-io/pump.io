@@ -86,6 +86,7 @@
         activityObjectStreams: [],
         activityStreams: [],
         peopleStreams: [],
+        listStreams: [],
         people: [],
 
         initialize: function() {
@@ -127,6 +128,7 @@
             _.each(obj.activityObjectStreams, initer(obj, Pump.ActivityObjectStream));
             _.each(obj.activityStreams, initer(obj, Pump.ActivityStream));
             _.each(obj.peopleStreams, initer(obj, Pump.PeopleStream));
+            _.each(obj.listStreams, initer(obj, Pump.ListStream));
             _.each(obj.people, initer(obj, Pump.Person));
 
         },
@@ -166,6 +168,7 @@
                 _.each(obj.activityObjectStreams, jsoner);
                 _.each(obj.activityStreams, jsoner);
                 _.each(obj.peopleStreams, jsoner);
+                _.each(obj.listStreams, jsoner);
                 _.each(obj.people, jsoner);
             }
 
@@ -191,6 +194,7 @@
                          "activityObjectStreams",
                          "activityStreams",
                          "peopleStreams",
+                         "listStreams",
                          "people"],
                 names = [],
                 model = this;
@@ -561,9 +565,18 @@
         }
     });
 
+    Pump.List = Pump.ActivityObject.extend({
+        objectType: "collection",
+        peopleStreams: ['members'],
+        initialize: function() {
+            Pump.Model.prototype.initialize.apply(this, arguments);
+        }
+    });
+
     Pump.Person = Pump.ActivityObject.extend({
         objectType: "person",
-        activityObjectStreams: ['favorites', 'lists'],
+        activityObjectStreams: ['favorites'],
+        listStreams: ['lists'],
         peopleStreams: ['followers', 'following'],
         initialize: function() {
             Pump.Model.prototype.initialize.apply(this, arguments);
@@ -572,6 +585,10 @@
 
     Pump.ActivityObjectStream = Pump.Collection.extend({
         model: Pump.ActivityObject
+    });
+
+    Pump.ListStream = Pump.Collection.extend({
+        model: Pump.List
     });
 
     // Unordered, doesn't have an URL
