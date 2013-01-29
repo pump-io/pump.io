@@ -123,6 +123,15 @@
                             return;
                         }
 
+                        if (def.subOptions) {
+                            if (def.subOptions.data) {
+                                options.data = {};
+                                _.each(def.subOptions.data, function(item) {
+                                    options.data[item] = data[item];
+                                });
+                            }
+                        }
+
                         sub = new Pump[def.subView](options);
 
                         if (def.map) {
@@ -1044,14 +1053,16 @@
                 attr: "majorStreamView",
                 subView: "MajorStreamView",
                 subOptions: {
-                    collection: "major"
+                    collection: "major",
+                    data: ["headless"]
                 }
             },
             "#minor-stream": {
                 attr: "minorStreamView",
                 subView: "MinorStreamView",
                 subOptions: {
-                    collection: "minor"
+                    collection: "minor",
+                    data: ["headless"]
                 }
             }
         }
