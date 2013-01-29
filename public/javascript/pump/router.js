@@ -93,7 +93,8 @@
                     }
                     Pump.body.setContent({contentView: Pump.InboxContent,
                                           data: {major: major,
-                                                 minor: minor},
+                                                 minor: minor,
+                                                 headless: false},
                                           title: "Home"});
                 });
             } else {
