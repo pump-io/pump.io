@@ -219,26 +219,34 @@
                 lists = Pump.ListStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/lists/person")}),
                 list = Pump.List.unique({links: {self: {href: "/api/collection/"+uuid}}});
 
-            // XXX: parallelize this?
-
             Pump.fetchObjects([user, lists, list], function(err, objs) {
-                var profile = user.profile,
-                    options = {contentView: Pump.ListContent,
-                               userContentView: Pump.ListUserContent,
-                               listContentView: Pump.ListListContent,
-                               title: nickname + " - list -" + list.get("displayName"),
-                               listContentModel: list,
-                               data: {lists: lists,
-                                      list: list,
-                                      profile: profile}};
+                
                 if (err) {
                     Pump.error(err);
                     return;
                 }
 
-                Pump.body.setContent(options, function(view) {
-                    Pump.body.content.userContent.listMenu.$(".active").removeClass("active");
-                    Pump.body.content.userContent.listMenu.$("li[data-list-id='"+list.id+"']").addClass("active");
+                Pump.fetchObjects([list.members], function(err, objs) {
+
+                    var profile = user.profile,
+                        options = {contentView: Pump.ListContent,
+                                   userContentView: Pump.ListUserContent,
+                                   listContentView: Pump.ListListContent,
+                                   title: nickname + " - list -" + list.get("displayName"),
+                                   listContentModel: list,
+                                   data: {lists: lists,
+                                          list: list,
+                                          profile: profile}};
+
+                    if (err) {
+                        Pump.error(err);
+                        return;
+                    }
+
+                    Pump.body.setContent(options, function(view) {
+                        Pump.body.content.userContent.listMenu.$(".active").removeClass("active");
+                        Pump.body.content.userContent.listMenu.$("li[data-list-id='"+list.id+"']").addClass("active");
+                    });
                 });
             });
         },

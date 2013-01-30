@@ -1686,10 +1686,14 @@
                 list = view.model,
                 following = profile.following;
 
-            Pump.fetchObjects([profile, list, following], function(err, objs) {
-                Pump.showModal(Pump.ChooseContactModal, {data: {list: list,
-                                                                people: following}});
+            following.once("getall", function() {
+                Pump.fetchObjects([profile, list], function(err, objs) {
+                    Pump.showModal(Pump.ChooseContactModal, {data: {list: list,
+                                                                    people: following}});
+                });
             });
+
+            following.getAll();
 
             return false;
         }
