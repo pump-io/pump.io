@@ -73,6 +73,8 @@ var addRoutes = function(app) {
 
     app.post("/main/logout", app.session, userAuth, principal, handleLogout);
 
+    app.post("/main/renew", app.session, userAuth, principal, renewSession);
+
     if (app.config.uploaddir) {
         app.post("/main/upload", app.session, principal, principalUserOnly, uploadFile);
     }
@@ -982,6 +984,22 @@ var showObject = function(req, res, next) {
             }
         }
     );
+};
+
+var renewSession = function(req, res, next) {
+
+    var user = req.remoteUser,
+        principalUser = req.principalUser;
+
+    // We only need to set this if it's not already set
+
+    if (!principalUser || principalUser.nickname != user.nickname) {
+        setPrincipal(req.session, user.profile, this);
+    }
+
+    user.sanitize();
+
+    res.json(user);
 };
 
 exports.addRoutes = addRoutes;

@@ -71,56 +71,88 @@ if (!window.Pump) {
 
         Pump.ensureCred(function(err, cred) {
 
-            var user, nickname, pair, major, minor;
+            var nickname, pair;
 
             if (err) {
                 Pump.error(err.message);
                 return;
             }
 
-            nickname = Pump.getNickname();
+            pair = Pump.getUserCred();
 
-            if (nickname) {
+            if (pair) {
+                
+                // We need to renew the session, for images and objects and so on.
 
-                user = new Pump.User({nickname: nickname});
-                major = user.majorDirectInbox;
-                minor = user.minorDirectInbox;
+                Pump.renewSession(function(err, data) {
 
-                Pump.fetchObjects([user, major, minor], function(err, objs) {
-                    var sp, continueTo;
+                    var user, major, minor;
 
                     if (err) {
                         Pump.error(err);
                         return;
                     }
 
-                    Pump.currentUser = user;
+                    user = Pump.currentUser = Pump.User.unique(data);
 
-                    Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
-                                                      model: user,
-                                                      data: {
-                                                          messages: major,
-                                                          notifications: minor
-                                                      }});
-                    Pump.body.nav.render();
+                    major = user.majorDirectInbox;
+                    minor = user.minorDirectInbox;
 
-                    // If we're on the login page, and there's a current
-                    // user, redirect to the actual page
+                    Pump.fetchObjects([major, minor], function(err, objs) {
+                        var sp, continueTo;
 
-                    switch (window.location.pathname) {
-                    case "/main/login":
-                        Pump.body.content = new Pump.LoginContent();
-                        continueTo = Pump.getContinueTo();
-                        Pump.router.navigate(continueTo, true);
-                        break;
-                    case "/":
-                        Pump.router.home();
-                        break;
-                    }
+                        if (err) {
+                            Pump.error(err);
+                            return;
+                        }
+
+                        Pump.currentUser = user;
+
+                        Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
+                                                          model: user,
+                                                          data: {
+                                                              messages: major,
+                                                              notifications: minor
+                                                          }});
+                        Pump.body.nav.render();
+
+                        // If we're on the login page, and there's a current
+                        // user, redirect to the actual page
+
+                        switch (window.location.pathname) {
+                        case "/main/login":
+                            Pump.body.content = new Pump.LoginContent();
+                            continueTo = Pump.getContinueTo();
+                            Pump.router.navigate(continueTo, true);
+                            break;
+                        case "/":
+                            Pump.router.home();
+                            break;
+                        }
+                    });
                 });
             }
         });
     });
+
+    // Renew the cookie session
+
+    Pump.renewSession = function(callback) {
+
+        var options = {
+            dataType: "json",
+            type: "POST",
+            url: "/main/renew",
+            success: function(data, textStatus, jqXHR) {
+                callback(null, data);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                callback(new Error("Failed to renew"), null);
+            }
+        };
+
+        Pump.ajax(options);
+    };
 
     // When errors happen, and you don't know what to do with them,
     // send them here and I'll figure it out.
