@@ -545,11 +545,15 @@
                 lists = profile.lists,
                 following = profile.following;
 
-            Pump.fetchObjects([lists, following], function(err, objs) {
-                Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.currentUser,
-                                                           lists: lists,
-                                                           following: following}});
+            following.once("getall", function() {
+                Pump.fetchObjects([lists], function(err, objs) {
+                    Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.currentUser,
+                                                               lists: lists,
+                                                               following: following}});
+                });
             });
+
+            following.getAll();
 
             return false;
         },
@@ -558,11 +562,14 @@
                 lists = profile.lists,
                 following = profile.following;
 
-            Pump.fetchObjects([lists, following], function(err, objs) {
-                Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.currentUser,
-                                                              lists: lists,
-                                                              following: following}});
+            following.once("getall", function() {
+                Pump.fetchObjects([lists], function(err, objs) {
+                    Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.currentUser,
+                                                                  lists: lists,
+                                                                  following: following}});
+                });
             });
+
             return false;
         },
         logout: function() {
