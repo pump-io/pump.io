@@ -1681,7 +1681,7 @@
                 $el = view.$("#member-stream");
 
             if ($el && list && list.members) {
-                view.memberStreamView = new Pump.MemberStreamView({el: $el, collection: people});
+                view.memberStreamView = new Pump.MemberStreamView({el: $el, collection: people, data: {list: list}});
             }
         },
         events: {
@@ -1713,14 +1713,49 @@
             ".person.major": {
                 map: "people",
                 subView: "MemberView",
-                idAttr: "data-person-id"
+                idAttr: "data-person-id",
+                subOptions: {
+                    data: ["list"]
+                }
             }
         }
     });
 
     Pump.MemberView = Pump.TemplateView.extend({
         templateName: 'member',
-        modelName: 'person'
+        modelName: 'person',
+        ready: function() {
+            var view = this;
+            // XXX: Bootstrap dependency
+            view.$("#remove-person").tooltip();
+        },
+        "events": {
+            "click #remove-person": "removePerson"
+        },
+        removePerson: function() {
+            var view = this,
+                person = view.model,
+                list = view.options.data.list,
+                user = Pump.currentUser,
+                stream = user.minorStream,
+                act = {
+                    verb: "remove",
+                    object: {
+                        objectType: "person",
+                        id: person.id
+                    },
+                    target: {
+                        objectType: "collection",
+                        id: list.id
+                    }
+                };
+
+            stream.create(act, {success: function(activity) {
+                list.members.remove(person);
+                list.totalItems--;
+                list.trigger("change");
+            }});
+        }
     });
 
     Pump.SettingsContent = Pump.ContentView.extend({

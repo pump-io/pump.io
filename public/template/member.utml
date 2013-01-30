@@ -8,7 +8,7 @@
   </a>
   <div class="media-body">
     <% if (user && user.profile.id == list.author.id) { %>
-    <button type="button" class="close" data-title="Remove <%- person.displayName %> from <%- list.displayName %>">&times;</button>
+    <button type="button" class="close" id="remove-person" data-title="Remove <%- person.displayName %> from <%- list.displayName %>">&times;</button>
     <% } %>
     <h4 class="media-heading"><a href="<%- person.url %>"><%- person.displayName %></a>
       <small>
