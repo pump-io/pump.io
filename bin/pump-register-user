@@ -25,6 +25,7 @@ var _ = require("underscore"),
     Step = require("step"),
     common = require("../lib/pumpclient"),
     clientCred = common.clientCred,
+    setUserCred = common.setUserCred,
     postJSON = common.postJSON,
     argv = require("optimist")
         .usage("Usage: $0 -u <nickname> -p <password>")
@@ -64,6 +65,7 @@ Step(
         if (err) {
             console.error(err);
         } else {
+            setUserCred(body.nickname, server, {token: body.token, token_secret: body.secret}, this);
             console.log(body);
         }
     }

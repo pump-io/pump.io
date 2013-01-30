@@ -1668,18 +1668,12 @@
                 "major-person"],
         setupSubs: function() {
             var view = this,
-                model = view.model;
+                list = view.model,
+                people = list.members,
+                $el = view.$("#people-stream");
 
-            if (model && model.members) {
-                model.members.each(function(person) {
-                    var $el = view.$("div[data-person-id='"+person.id+"']"),
-                        aview;
-
-                    if ($el.length > 0) {
-                        aview = new Pump.MajorPersonView({el: $el,
-                                                          model: person});
-                    }
-                });
+            if ($el && list && list.members) {
+                view.peopleStreamView = new Pump.PeopleStreamView({el: $el, collection: people});
             }
         },
         events: {
@@ -1953,6 +1947,8 @@
 
                 stream.create(act, {success: function(activity) {
                     list.members.add(person, {at: 0});
+                    list.totalItems++;
+                    list.trigger("change");
                 }});
             });
         }
