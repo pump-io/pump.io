@@ -1478,6 +1478,7 @@
         }
     });
 
+
     Pump.FollowingContent = Pump.ContentView.extend({
         templateName: 'following',
         parts: ["profile-block",
@@ -1664,16 +1665,16 @@
     Pump.ListListContent = Pump.TemplateView.extend({
         templateName: 'list-content-list',
         modelName: "list",
-        parts: ["people-stream",
-                "major-person"],
+        parts: ["member-stream",
+                "member"],
         setupSubs: function() {
             var view = this,
                 list = view.model,
                 people = list.members,
-                $el = view.$("#people-stream");
+                $el = view.$("#member-stream");
 
             if ($el && list && list.members) {
-                view.peopleStreamView = new Pump.PeopleStreamView({el: $el, collection: people});
+                view.memberStreamView = new Pump.MemberStreamView({el: $el, collection: people});
             }
         },
         events: {
@@ -1692,6 +1693,23 @@
 
             return false;
         }
+    });
+
+    Pump.MemberStreamView = Pump.TemplateView.extend({
+        templateName: 'member-stream',
+        modelName: "people",
+        subs: {
+            ".person.major": {
+                map: "people",
+                subView: "MemberView",
+                idAttr: "data-person-id"
+            }
+        }
+    });
+
+    Pump.MemberView = Pump.TemplateView.extend({
+        templateName: 'member',
+        modelName: 'person'
     });
 
     Pump.SettingsContent = Pump.ContentView.extend({
