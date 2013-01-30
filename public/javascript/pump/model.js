@@ -423,6 +423,7 @@
         },
         getAll: function() { // Get stuff later than the current group
             var coll = this,
+                count,
                 options;
 
             if (!coll.url) {
@@ -430,10 +431,16 @@
                 return;
             }
 
+            if (_.isNumber(coll.totalItems)) {
+                count = Math.min(coll.totalItems, 200);
+            } else {
+                count = 200;
+            }
+
             options = {
                 type: "GET",
                 dataType: "json",
-                url: coll.url + "?count=" + Math.min(coll.totalItems, 200),
+                url: coll.url + "?count=" + count,
                 success: function(data) {
                     if (data.items) {
                         coll.add(data.items);
