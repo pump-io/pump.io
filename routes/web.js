@@ -799,7 +799,7 @@ var showList = function(req, res, next) {
                 },
                 function(err, str) {
                     if (err) throw err;
-                    str.getObjects(0, 100, this);
+                    str.getObjects(0, 20, this);
                 },
                 function(err, refs) {
                     var group = this.group();
@@ -835,9 +835,11 @@ var showList = function(req, res, next) {
                                     profile: req.user.profile,
                                     lists: lists,
                                     list: list,
+                                    members: list.members.items,
                                     data: {
                                         profile: req.user.profile,
                                         lists: lists,
+                                        members: list.members.items,
                                         list: list}
                                    });
             }

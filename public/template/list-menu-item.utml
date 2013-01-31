@@ -1,5 +1,8 @@
 <li class="<%- ((list && list.id == listItem.id) ? 'list active' : 'list') %>"
     data-list-id="<%- listItem.id %>">
+  <% if (user && user.profile.id == listItem.author.id) { %>
+  <button type="button" class="close" id="delete-list" data-title="Delete <%- listItem.displayName %>">&times;</button>
+  <% } %>
   <a href="<%- listItem.url %>">
     <%- listItem.displayName %>
     <% if (listItem.members && _.has(listItem.members, "totalItems")) { %>

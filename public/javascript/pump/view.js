@@ -1635,7 +1635,7 @@
                 attr: "userContent",
                 subView: "ListUserContent",
                 subOptions: {
-                    data: ["profile", "lists", "list"]
+                    data: ["profile", "lists", "list", "members"]
                 }
             }
         }
@@ -1663,7 +1663,7 @@
                 subView: "ListListContent",
                 subOptions: {
                     model: "list",
-                    data: ["profile"]
+                    data: ["profile", "members"]
                 }
             }
         }
@@ -1677,7 +1677,7 @@
         setupSubs: function() {
             var view = this,
                 list = view.model,
-                people = list.members,
+                people = view.options.data.members,
                 $el = view.$("#member-stream");
 
             if ($el && list && list.members) {
