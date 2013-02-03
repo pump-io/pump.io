@@ -3,6 +3,7 @@
     <div class="pull-right">
       <% if (user && user.profile && user.profile.id == profile.id) { %>
       <button class="btn" id="add-list-member">Add a member</button>
+      <button class="btn" id="delete-list">Delete list</button>
       <% } %>
     </div>
     <h3><%- list.displayName %></h3>
