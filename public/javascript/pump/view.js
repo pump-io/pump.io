@@ -271,7 +271,7 @@
                     scoped = main;
                 }
                 if (!_.has(partials, name)) {
-                    console.log("Didn't preload template " + name + " so fetching sync");
+                    console.log("Didn't preload template " + name + " for " + view.templateName + " so fetching sync");
                     // XXX: Put partials in the parts array of the
                     // view to avoid this shameful sync call
                     partials[name] = getTemplateSync(name);
@@ -1084,7 +1084,8 @@
         parts: ["activity-object-list",
                 "responses",
                 "replies",
-                "reply"],
+                "reply",
+                "activity-object-collection"],
         modelName: "activity",
         events: {
             "click .favorite": "favoriteObject",
@@ -1545,7 +1546,8 @@
         templateName: 'lists',
         parts: ["profile-block",
                 "profile-nav",
-                'user-content-lists',
+                "user-content-lists",
+                "list-content-lists",
                 "list-menu",
                 "list-menu-item",
                 "profile-responses"],
@@ -1578,7 +1580,7 @@
                 subView: "ListMenu",
                 subOptions: {
                     collection: "lists",
-                    data: ["profile"]
+                    data: ["profile", "list"]
                 }
             }
         }
@@ -1586,7 +1588,7 @@
 
     Pump.ListMenu = Pump.TemplateView.extend({
         templateName: "list-menu",
-        modelName: "profile",
+        modelName: "lists",
         parts: ["list-menu-item"],
         el: '.list-menu-block',
         events: {
@@ -1720,9 +1722,11 @@
 
             Pump.areYouSure("Delete the list '"+list.get("displayName")+"'?", function(err, sure) {
                 if (sure) {
+                    Pump.router.navigate("/"+user.get("nickname")+"/lists", true);
                     list.destroy({success: function() {
                         lists.remove(list.id);
-                        Pump.router.navigate("/"+user.get("nickname")+"/lists", true);
+                        // Reload the menu
+                        Pump.body.content.userContent.listMenu.render();
                     }});
                 }
             });
