@@ -993,15 +993,25 @@ var renewSession = function(req, res, next) {
     var user = req.remoteUser,
         principalUser = req.principalUser;
 
-    // We only need to set this if it's not already set
+    Step(
+        function() {
+            // We only need to set this if it's not already set
 
-    if (!principalUser || principalUser.nickname != user.nickname) {
-        setPrincipal(req.session, user.profile, this);
-    }
-
-    user.sanitize();
-
-    res.json(user);
+            if (!principalUser || principalUser.nickname != user.nickname) {
+                setPrincipal(req.session, user.profile, this);
+            } else {
+                this(null);
+            }
+        },
+        function(err) {
+            if (err) {
+                next(err);
+            } else {
+                user.sanitize();
+                res.json(user);
+            }
+        }
+    );
 };
 
 exports.addRoutes = addRoutes;
