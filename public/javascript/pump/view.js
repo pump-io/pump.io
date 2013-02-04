@@ -1667,7 +1667,7 @@
                 subView: "ListListContent",
                 subOptions: {
                     model: "list",
-                    data: ["profile", "members"]
+                    data: ["profile", "members", "lists"]
                 }
             }
         }
@@ -1689,7 +1689,8 @@
             }
         },
         events: {
-            "click #add-list-member": "addListMember"
+            "click #add-list-member": "addListMember",
+            "click #delete-list": "deleteList"
         },
         addListMember: function() {
             var view = this,
@@ -1709,6 +1710,22 @@
             following.getAll();
 
             return false;
+        },
+        deleteList: function() {
+            var view = this,
+                list = view.model,
+                lists = view.options.data.lists,
+                user = Pump.currentUser,
+                person = Pump.currentUser.profile;
+
+            Pump.areYouSure("Delete the list '"+list.get("displayName")+"'?", function(err, sure) {
+                if (sure) {
+                    list.destroy({success: function() {
+                        lists.remove(list.id);
+                        Pump.router.navigate("/"+user.get("nickname")+"/lists", true);
+                    }});
+                }
+            });
         }
     });
 
@@ -2268,6 +2285,34 @@
         }
     });
 
+    Pump.AreYouSureModal = Pump.TemplateView.extend({
+        tagName: "div",
+        className: "modal-holder",
+        templateName: 'are-you-sure',
+        events: {
+            "click #yes": "yes",
+            "click #no": "no"
+        },
+        yes: function() {
+            var view = this,
+                callback = view.options.callback;
+
+            view.$el.modal('hide');
+            view.remove();
+            
+            callback(null, true);
+        },
+        no: function() {
+            var view = this,
+                callback = view.options.callback;
+            
+            view.$el.modal('hide');
+            view.remove();
+
+            callback(null, false);
+        }
+    });
+
     Pump.BodyView = Backbone.View.extend({
         initialize: function(options) {
             _.bindAll(this, "navigateToHref");
@@ -2419,6 +2464,12 @@
         if (Pump.body.content) {
             Pump.body.content.addMinorActivity(act);
         }
+    };
+
+    Pump.areYouSure = function(question, callback) {
+        Pump.showModal(Pump.AreYouSureModal,
+                       {data: {question: question},
+                        callback: callback});
     };
 
 })(window._, window.$, window.Backbone, window.Pump);

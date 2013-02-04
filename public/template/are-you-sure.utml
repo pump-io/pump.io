@@ -1,0 +1,14 @@
+<div id="modal-are-you-sure"
+     class="modal pump-modal hide fade"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="post-label"
+     aria-hidden="true">
+  <div class="modal-body">
+    <p><%- question %></p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" id="yes">Yes</button>
+    <button type="button" class="btn" id="no">No</button>
+  </div>
+</div>
