@@ -217,30 +217,41 @@
             var router = this,
                 user = Pump.User.unique({nickname: nickname}),
                 lists = Pump.ListStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/lists/person")}),
-                list = Pump.List.unique({links: {self: {href: "/api/collection/"+uuid}}}),
-                members = Pump.PeopleStream.unique({url: Pump.fullURL("/api/collection/"+uuid+"/members")});
+                list = Pump.List.unique({links: {self: {href: "/api/collection/"+uuid}}});
 
-            Pump.fetchObjects([user, lists, list, members], function(err, objs) {
+            Pump.fetchObjects([user, lists, list], function(err, objs) {
 
-                var profile = user.profile,
-                    options = {contentView: Pump.ListContent,
-                               userContentView: Pump.ListUserContent,
-                               listContentView: Pump.ListListContent,
-                               title: nickname + " - list -" + list.get("displayName"),
-                               listContentModel: list,
-                               data: {lists: lists,
-                                      list: list,
-                                      profile: profile,
-                                      members: members}};
+                var members;
 
                 if (err) {
                     Pump.error(err);
                     return;
                 }
 
-                Pump.body.setContent(options, function(view) {
-                    Pump.body.content.userContent.listMenu.$(".active").removeClass("active");
-                    Pump.body.content.userContent.listMenu.$("li[data-list-id='"+list.id+"']").addClass("active");
+                members = list.members;
+
+                Pump.fetchObjects([members], function(err, objs) {
+
+                    var profile = user.profile,
+                        options = {contentView: Pump.ListContent,
+                                   userContentView: Pump.ListUserContent,
+                                   listContentView: Pump.ListListContent,
+                                   title: nickname + " - list -" + list.get("displayName"),
+                                   listContentModel: list,
+                                   data: {lists: lists,
+                                          list: list,
+                                          profile: profile,
+                                          members: members}};
+
+                    if (err) {
+                        Pump.error(err);
+                        return;
+                    }
+
+                    Pump.body.setContent(options, function(view) {
+                        Pump.body.content.userContent.listMenu.$(".active").removeClass("active");
+                        Pump.body.content.userContent.listMenu.$("li[data-list-id='"+list.id+"']").addClass("active");
+                    });
                 });
             });
         },

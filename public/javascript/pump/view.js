@@ -127,7 +127,11 @@
                             if (def.subOptions.data) {
                                 options.data = {};
                                 _.each(def.subOptions.data, function(item) {
-                                    options.data[item] = data[item];
+                                    if (item == view.modelName) {
+                                        options.data[item] = view.collection || view.model;
+                                    } else {
+                                        options.data[item] = data[item];
+                                    }
                                 });
                             }
                         }
@@ -1691,11 +1695,13 @@
             var view = this,
                 profile = Pump.currentUser.profile,
                 list = view.model,
+                members = view.options.data.members,
                 following = profile.following;
 
             following.once("getall", function() {
                 Pump.fetchObjects([profile, list], function(err, objs) {
                     Pump.showModal(Pump.ChooseContactModal, {data: {list: list,
+                                                                    members: members,
                                                                     people: following}});
                 });
             });
@@ -1715,7 +1721,7 @@
                 subView: "MemberView",
                 idAttr: "data-person-id",
                 subOptions: {
-                    data: ["list"]
+                    data: ["list", "people"]
                 }
             }
         }
@@ -1736,6 +1742,7 @@
             var view = this,
                 person = view.model,
                 list = view.options.data.list,
+                members = view.options.data.people,
                 user = Pump.currentUser,
                 stream = user.minorStream,
                 act = {
@@ -1751,7 +1758,7 @@
                 };
 
             stream.create(act, {success: function(activity) {
-                list.members.remove(person);
+                members.remove(person.id);
                 list.totalItems--;
                 list.trigger("change");
             }});
@@ -1968,6 +1975,7 @@
         addContact: function() {
             var view = this,
                 list = view.options.data.list,
+                members = view.options.data.members,
                 people = view.options.data.people,
                 ids = [],
                 stream = Pump.currentUser.minorStream,
@@ -2010,7 +2018,7 @@
                     };
 
                 stream.create(act, {success: function(activity) {
-                    list.members.add(person, {at: 0});
+                    members.add(person, {at: 0});
                     list.totalItems++;
                     list.trigger("change");
                 }});
