@@ -32,7 +32,7 @@ var addRoutes = function(app) {
     app.get("/.well-known/host-meta", hostMeta);
     app.get("/.well-known/host-meta.json", hostMetaJSON);
     app.get("/api/lrdd", lrddUser, lrdd);
-    app.get("/api/lrdd.json", lrddUser, lrddJSON);
+    app.get("/.well-known/webfinger", lrddUser, webfinger);
 };
 
 var xmlEscape = function(text) {
@@ -54,12 +54,12 @@ var hostMetaLinks = function() {
         {
             rel: "lrdd",
             type: "application/xrd+xml",
-            template: URLMaker.makeURL("/api/lrdd") + "?uri={uri}"
+            template: URLMaker.makeURL("/api/lrdd") + "?resource={uri}"
         },
         {
             rel: "lrdd",
             type: "application/json",
-            template: URLMaker.makeURL("/api/lrdd.json") + "?uri={uri}"
+            template: URLMaker.makeURL("/.well-known/webfinger") + "?resource={uri}"
         },
         {
             rel: "registration_endpoint",
@@ -121,19 +121,19 @@ var hostMetaJSON = function(req, res, next) {
 };
 
 var lrddUser = function(req, res, next) {
-    var uri;
+    var resource;
 
-    if (!_(req).has("query") || !_(req.query).has("uri")) {
-        next(new HTTPError("No uri parameter", 400));
+    if (!_(req).has("query") || !_(req.query).has("resource")) {
+        next(new HTTPError("No resource parameter", 400));
         return;
     }
 
-    uri = req.query.uri;
+    resource = req.query.resource;
 
-    var parts = uri.match(/^(.*)@(.*)$/);
+    var parts = resource.match(/^(.*)@(.*)$/);
     
     if (!parts) {
-        next(new HTTPError("Unrecognized uri parameter", 404));
+        next(new HTTPError("Unrecognized resource parameter", 404));
         return;
     }
 
@@ -181,7 +181,7 @@ var lrdd = function(req, res, next) {
     var i, links;
 
     if (_(req.headers).has("accept") && req.accepts("application/json")) {
-        lrddJSON(req, res, next);
+        webfinger(req, res, next);
         return;
     }
 
@@ -198,7 +198,7 @@ var lrdd = function(req, res, next) {
     res.end("</XRD>\n");
 };
 
-var lrddJSON = function(req, res, next) {
+var webfinger = function(req, res, next) {
     res.json({
         links: lrddLinks(req.user)
     });

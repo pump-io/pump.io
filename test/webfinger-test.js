@@ -70,28 +70,28 @@ suite.addBatch({
         },
         "and we check the lrdd endpoint": 
         httputil.endpoint("/api/lrdd", ["GET"]),
-        "and we check the lrdd.json endpoint": 
-        httputil.endpoint("/api/lrdd.json", ["GET"]),
+        "and we check the webfinger endpoint": 
+        httputil.endpoint("/.well-known/webfinger", ["GET"]),
         "and we get the lrdd endpoint with no uri":
         httputil.getfail("/api/lrdd", 400),
         "and we get the lrdd endpoint with an empty uri":
-        httputil.getfail("/api/lrdd?uri=", 404),
+        httputil.getfail("/api/lrdd?resource=", 404),
         "and we get the lrdd endpoint with an HTTP URI at some other domain":
-        httputil.getfail("/api/lrdd?uri=http://photo.example/evan", 404),
+        httputil.getfail("/api/lrdd?resource=http://photo.example/evan", 404),
         "and we get the lrdd endpoint with a Webfinger at some other domain":
-        httputil.getfail("/api/lrdd?uri=evan@photo.example", 404),
+        httputil.getfail("/api/lrdd?resource=evan@photo.example", 404),
         "and we get the lrdd endpoint with a Webfinger of a non-existent user":
-        httputil.getfail("/api/lrdd.json?uri=evan@localhost", 404),
-        "and we get the lrdd.json endpoint with no uri":
-        httputil.getfail("/api/lrdd.json", 400),
-        "and we get the lrdd.json endpoint with an empty uri":
-        httputil.getfail("/api/lrdd.json?uri=", 404),
-        "and we get the lrdd.json endpoint with an HTTP URI at some other domain":
-        httputil.getfail("/api/lrdd.json?uri=http://photo.example/evan", 404),
-        "and we get the lrdd.json endpoint with a Webfinger at some other domain":
-        httputil.getfail("/api/lrdd.json?uri=evan@photo.example", 404),
-        "and we get the lrdd.json endpoint with a Webfinger of a non-existent user":
-        httputil.getfail("/api/lrdd.json?uri=evan@localhost", 404),
+        httputil.getfail("/.well-known/webfinger?resource=evan@localhost", 404),
+        "and we get the webfinger endpoint with no uri":
+        httputil.getfail("/.well-known/webfinger", 400),
+        "and we get the webfinger endpoint with an empty uri":
+        httputil.getfail("/.well-known/webfinger?resource=", 404),
+        "and we get the webfinger endpoint with an HTTP URI at some other domain":
+        httputil.getfail("/.well-known/webfinger?resource=http://photo.example/evan", 404),
+        "and we get the webfinger endpoint with a Webfinger at some other domain":
+        httputil.getfail("/.well-known/webfinger?resource=evan@photo.example", 404),
+        "and we get the webfinger endpoint with a Webfinger of a non-existent user":
+        httputil.getfail("/.well-known/webfinger?resource=evan@localhost", 404),
         "and we register a client and user": {
             topic: function() {
                 oauthutil.newCredentials("alice", "test+pass", this.callback);
@@ -100,10 +100,10 @@ suite.addBatch({
                 assert.ifError(err);
             },
             "and we test the lrdd endpoint":
-            xrdutil.xrdContext("http://localhost:4815/api/lrdd?uri=alice@localhost",
+            xrdutil.xrdContext("http://localhost:4815/api/lrdd?resource=alice@localhost",
                                webfinger),
-            "and we test the lrdd.json endpoint":
-            xrdutil.jrdContext("http://localhost:4815/api/lrdd.json?uri=alice@localhost",
+            "and we test the webfinger endpoint":
+            xrdutil.jrdContext("http://localhost:4815/.well-known/webfinger?resource=alice@localhost",
                                webfinger)
         }
     }
