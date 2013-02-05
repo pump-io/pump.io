@@ -1644,6 +1644,18 @@
                     data: ["profile", "lists", "list", "members"]
                 }
             }
+        },
+        getStreams: function() {
+            var view = this,
+                streams = {};
+
+            if (view.userContent &&
+                view.userContent.listContent &&
+                view.userContent.listContent.memberStreamView) {
+                streams.major = view.userContent.listContent.memberStreamView.collection;
+            }
+
+            return streams;
         }
     });
 
