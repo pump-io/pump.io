@@ -2219,39 +2219,34 @@ var collectionMembers = function(req, res, next) {
             coll.getStream(this);
         },
         function(err, result) {
+            var filtered, type;
             if (err) throw err;
             str = result;
-            str.count(this);
-        },
-        function(err, count) {
-            var filtered;
-            if (err) {
-                if (err.name == "NoSuchThingError") {
-                    feed.totalItems = 0;
-                    if (_.has(feed, "author")) {
-                        feed.author.sanitize();
-                    }
-                    res.json(feed);
-                    return;
-                } else {
-                    throw err;
-                }
+            if (!profile) {
+                filtered = new FilteredStream(str, objectPublicOnly);
+            } else if (profile.id == coll.author.id) {
+                // no filter
+                filtered = str;
             } else {
-                feed.totalItems = count;
-                if (!profile) {
-                    filtered = new FilteredStream(str, objectPublicOnly);
-                } else if (profile.id == coll.author.id) {
-                    // no filter
-                    filtered = str;
-                } else {
-                    filtered = new FilteredStream(str, objectRecipientsOnly(profile));
-                }
-                filtered.getObjects(args.start, args.end, this);
+                filtered = new FilteredStream(str, objectRecipientsOnly(profile));
+            }
+            filtered.count(this.parallel());
+            type = (req.query.type) ? req.query.type :
+                   (coll.objectTypes.length > 0) ? coll.objectTypes[0] :
+                Person.type;
+            if (_(args).has("before")) {
+                filtered.getObjectsGreaterThan({id: args.before, objectType: type}, args.count, this.parallel());
+            } else if (_(args).has("since")) {
+                filtered.getObjectsLessThan({id: args.since, objectType: type}, args.count, this.parallel());
+            } else {
+                filtered.getObjects(args.start, args.end, this.parallel());
             }
         },
-        function(err, refs) {
+        function(err, count, refs) {
             var group;
             if (err) throw err;
+            feed.totalItems = count;
+            // XXX: short-circuit here if count === 0
             group = this.group();
             _.each(refs, function(ref) {
                 ActivityObject.getObject(ref.objectType, ref.id, group());
@@ -2295,49 +2290,61 @@ var collectionMembers = function(req, res, next) {
         },
         function(err) {
 
+            var nextParams, prevParams;
+
             if (err) {
-
                 next(err);
+                return;
+            }
 
-            } else {
+            _.each(feed.items, function(obj) {
+                obj.sanitize();
+            });
 
-                _.each(feed.items, function(obj) {
-                    obj.sanitize();
-                });
+            feed.startIndex = args.start;
+            feed.itemsPerPage = args.count;
 
-                feed.startIndex = args.start;
-                feed.itemsPerPage = args.count;
+            feed.links = {
+                self: {
+                    href: URLMaker.makeURL(base, {offset: args.start, count: args.count})
+                },
+                current: {
+                    href: URLMaker.makeURL(base)
+                }
+            };
 
-                feed.links = {
-                    self: {
-                        href: URLMaker.makeURL(base, {offset: args.start, count: args.count})
-                    },
-                    current: {
-                        href: URLMaker.makeURL(base)
-                    }
+            if (feed.items.length > 0) {
+
+                prevParams = {since: feed.items[0].id};
+
+                if (!feed.objectTypes ||
+                    feed.objectTypes.length != 1 ||
+                    feed.items[0].objectType != feed.objectTypes[0]) {
+                    prevParams.type = feed.items[0].objectType;
+                }
+                
+                feed.links.prev = {
+                    href: URLMaker.makeURL(base, prevParams)
                 };
 
-                if (args.start > 0) {
-                    feed.links.prev = {
-                        href: URLMaker.makeURL(base, 
-                                               {offset: Math.max(args.start-args.count, 0), 
-                                                count: Math.min(args.count, args.start)})
-                    };
-                }
+                nextParams = {before: feed.items[feed.items.length - 1].id};
 
-                if (args.start + feed.items.length < feed.totalItems) {
-                    feed.links.next = {
-                        href: URLMaker.makeURL(base, 
-                                               {offset: args.start+feed.items.length, count: args.count})
-                    };
+                if (!feed.objectTypes ||
+                    feed.objectTypes.length != 1 ||
+                    feed.items[feed.items.length - 1].objectType != feed.objectTypes[0]) {
+                    nextParams.type = feed.items[feed.items.length - 1].objectType;
                 }
-
-                if (_.has(feed, "author")) {
-                    feed.author.sanitize();
-                }
-
-                res.json(feed);
+                
+                feed.links.next = {
+                    href: URLMaker.makeURL(base, nextParams)
+                };
             }
+
+            if (_.has(feed, "author")) {
+                feed.author.sanitize();
+            }
+
+            res.json(feed);
         }
     );
 };
