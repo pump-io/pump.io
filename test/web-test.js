@@ -74,13 +74,12 @@ suite.addBatch({
                 },
                 "and we make an http request": {
                     topic: function(app, web) {
-                        var callback = this.callback;
-
-                        var options = {
-                            host: "localhost",
-                            port: 1623,
-                            path: "/foo"
-                        };
+                        var callback = this.callback,
+                            options = {
+                                host: "localhost",
+                                port: 1623,
+                                path: "/foo"
+                            };
 
                         web.http(options, function(err, res) {
                             if (err) {
@@ -142,13 +141,12 @@ suite.addBatch({
                 },
                 "and we make an https request": {
                     topic: function(app, web) {
-                        var callback = this.callback
-;
-                        var options = {
-                            host: "secure.localhost",
-                            port: 2315,
-                            path: "/foo"
-                        };
+                        var callback = this.callback,
+                            options = {
+                                host: "secure.localhost",
+                                port: 2315,
+                                path: "/foo"
+                            };
 
                         web.https(options, function(err, res) {
                             if (err) {
