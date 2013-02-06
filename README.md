@@ -191,3 +191,6 @@ It also uses these icon sets:
 * Fancy Avatars, © 2009 Brandon Mathis, http://brandonmathis.com/projects/fancy-avatars/ (CC-By)
 * Glyphicons, http://glyphicons.com/ (CC-By)
 
+This sample photo is used for the main page:
+
+* http://www.flickr.com/photos/makelessnoise/240072395/ (CC-by)
