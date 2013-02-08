@@ -574,6 +574,8 @@
                 });
             });
 
+            following.getAll();
+
             return false;
         },
         logout: function() {
