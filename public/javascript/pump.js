@@ -357,7 +357,10 @@ if (!window.Pump) {
                 if ($(window).scrollTop() >= $(document).height() - $(window).height() - 10) {
                     streams = Pump.getStreams();
                     if (streams.major && streams.major.nextLink) {
-                        streams.major.getNext();
+                        Pump.body.startLoad();
+                        streams.major.getNext(function() {
+                            Pump.body.endLoad();
+                        });
                     }
                 }
             }

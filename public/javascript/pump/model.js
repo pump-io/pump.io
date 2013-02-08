@@ -390,7 +390,7 @@
             Pump.ajax(options);
 
         },
-        getNext: function() { // Get stuff later than the current group
+        getNext: function(callback) { // Get stuff later than the current group
             var coll = this,
                 options;
 
@@ -413,9 +413,15 @@
                         // XXX: end-of-collection indicator?
                         delete coll.nextLink;
                     }
+                    if (_.isFunction(callback)) {
+                        callback(null);
+                    }
                 },
                 error: function(jqxhr) {
                     Pump.error("Failed getting more items.");
+                    if (_.isFunction(callback)) {
+                        callback(new Error("Failed getting more items"));
+                    }
                 }
             };
 
