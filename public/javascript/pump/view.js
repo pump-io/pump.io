@@ -2435,9 +2435,18 @@
                 if (callback) {
                     callback();
                 }
+                // Stop spinning
             });
 
             newView.render();
+        },
+        startLoad: function() {
+            var view = this;
+            view.$("a.brand").spin(true);
+        },
+        endLoad: function() {
+            var view = this;
+            view.$("a.brand").spin(false);
         }
     });
 

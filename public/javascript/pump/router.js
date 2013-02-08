@@ -39,25 +39,42 @@
         },
 
         register: function() {
+            Pump.body.startLoad();
             Pump.body.setContent({contentView: Pump.RegisterContent,
-                                  title: "Register"});
+                                  title: "Register"},
+                                 function() {
+                                     Pump.body.endLoad();
+                                 }
+                                );
         },
 
         login: function() {
+            Pump.body.startLoad();
             Pump.body.setContent({contentView: Pump.LoginContent,
-                                  title: "Login"});
+                                  title: "Login"},
+                                 function() {
+                                     Pump.body.endLoad();
+                                 });
         },
 
         settings: function() {
+            Pump.body.startLoad();
             Pump.body.setContent({contentView: Pump.SettingsContent,
                                   model: Pump.currentUser.profile,
-                                  title: "Settings"});
+                                  title: "Settings"},
+                                 function() {
+                                     Pump.body.endLoad();
+                                 });
         },
 
         account: function() {
+            Pump.body.startLoad();
             Pump.body.setContent({contentView: Pump.AccountContent,
                                   model: Pump.currentUser,
-                                  title: "Account"});
+                                  title: "Account"},
+                                 function() {
+                                     Pump.body.endLoad();
+                                 });
         },
 
         messages: function() {
@@ -65,6 +82,7 @@
                 major = user.majorDirectInbox,
                 minor = user.minorDirectInbox;
 
+            Pump.body.startLoad();
             Pump.fetchObjects([user, major, minor], function(err, objs) {
                 if (err) {
                     Pump.error(err);
@@ -74,13 +92,17 @@
                                       data: {major: major,
                                              minor: minor,
                                              headless: false},
-                                      title: "Messages"});
+                                      title: "Messages"},
+                                     function() {
+                                         Pump.body.endLoad();
+                                     });
             });
         },
 
         "home": function() {
             var pair = Pump.getUserCred();
 
+            Pump.body.startLoad();
             if (pair) {
                 var user = Pump.currentUser,
                     major = user.majorInbox,
@@ -95,11 +117,17 @@
                                           data: {major: major,
                                                  minor: minor,
                                                  headless: false},
-                                          title: "Home"});
+                                          title: "Home"},
+                                         function() {
+                                             Pump.body.endLoad();
+                                         });
                 });
             } else {
                 Pump.body.setContent({contentView: Pump.MainContent,
-                                      title: "Welcome"});
+                                      title: "Welcome"},
+                                     function() {
+                                         Pump.body.endLoad();
+                                     });
             }
         },
 
@@ -109,6 +137,7 @@
                 major = user.majorStream,
                 minor = user.minorStream;
 
+            Pump.body.startLoad();
             Pump.fetchObjects([user, major, minor], function(err, objs) {
                 var profile = user.profile;
                 if (err) {
@@ -121,7 +150,10 @@
                                       data: { major: major,
                                               minor: minor,
                                               headless: true,
-                                              profile: profile }});
+                                              profile: profile }},
+                                     function() {
+                                         Pump.body.endLoad();
+                                     });
             });
         },
 
@@ -129,6 +161,8 @@
             var router = this,
                 user = Pump.User.unique({nickname: nickname}),
                 favorites = Pump.ActivityObjectStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/favorites")});
+
+            Pump.body.startLoad();
 
             Pump.fetchObjects([user, favorites], function(err, objs) {
                 var profile = user.profile;
@@ -143,7 +177,10 @@
                     title: nickname + " favorites",
                     data: { objects: favorites,
                             profile: profile }
-                });
+                },
+                                     function() {
+                                         Pump.body.endLoad();
+                                     });
             });
         },
 
@@ -151,6 +188,8 @@
             var router = this,
                 user = Pump.User.unique({nickname: nickname}),
                 followers = Pump.PeopleStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/followers")});
+
+            Pump.body.startLoad();
 
             Pump.fetchObjects([user, followers], function(err, objs) {
                 var profile = user.profile;
@@ -163,7 +202,10 @@
                                       userContentCollection: followers,
                                       title: nickname + " followers",
                                       data: {people: followers,
-                                             profile: profile}});
+                                             profile: profile}},
+                                     function() {
+                                         Pump.body.endLoad();
+                                     });
             });
         },
 
@@ -173,6 +215,8 @@
                 following = Pump.PeopleStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/following")});
 
             // XXX: parallelize this?
+
+            Pump.body.startLoad();
 
             Pump.fetchObjects([user, following], function(err, objs) {
                 var profile = user.profile;
@@ -185,7 +229,10 @@
                                       userContentCollection: following,
                                       title: nickname + " following",
                                       data: {people: following,
-                                             profile: profile}});
+                                             profile: profile}},
+                                     function() {
+                                         Pump.body.endLoad();
+                                     });
             });
         },
 
@@ -194,7 +241,7 @@
                 user = Pump.User.unique({nickname: nickname}),
                 lists = Pump.ListStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/lists/person")});
 
-            // XXX: parallelize this?
+            Pump.body.startLoad();
 
             Pump.fetchObjects([user, lists], function(err, objs) {
                 var profile = user.profile;
@@ -208,7 +255,10 @@
                                       title: nickname + " lists",
                                       data: {lists: lists,
                                              list: null,
-                                             profile: profile}});
+                                             profile: profile}},
+                                     function() {
+                                         Pump.body.endLoad();
+                                     });
             });
         },
 
@@ -218,6 +268,8 @@
                 user = Pump.User.unique({nickname: nickname}),
                 lists = Pump.ListStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/lists/person")}),
                 list = Pump.List.unique({links: {self: {href: "/api/collection/"+uuid}}});
+
+            Pump.body.startLoad();
 
             Pump.fetchObjects([user, lists, list], function(err, objs) {
 
@@ -251,6 +303,7 @@
                     Pump.body.setContent(options, function(view) {
                         Pump.body.content.userContent.listMenu.$(".active").removeClass("active");
                         Pump.body.content.userContent.listMenu.$("li[data-list-id='"+list.id+"']").addClass("active");
+                        Pump.body.endLoad();
                     });
                 });
             });
@@ -261,6 +314,8 @@
                 user = Pump.User.unique({nickname: nickname}),
                 obj = Pump.ActivityObject.unique({uuid: uuid, objectType: type, userNickname: nickname});
 
+            Pump.body.startLoad();
+
             Pump.fetchObjects([user, obj], function(err, objs) {
                 if (err) {
                     Pump.error(err);
@@ -268,7 +323,10 @@
                 }
                 Pump.body.setContent({contentView: Pump.ObjectContent,
                                       model: obj,
-                                      title: obj.displayName || obj.objectType + "by" + nickname});
+                                      title: obj.displayName || obj.objectType + "by" + nickname},
+                                     function() {
+                                         Pump.body.endLoad();
+                                     });
             });
         },
 
@@ -277,6 +335,8 @@
                 user = Pump.User.unique({nickname: nickname}),
                 activity = Pump.Activity.unique({uuid: uuid});
 
+            Pump.body.startLoad();
+
             Pump.fetchObjects([user, activity], function(err, objs) {
                 if (err) {
                     Pump.error(err);
@@ -284,7 +344,10 @@
                 }
                 Pump.body.setContent({contentView: Pump.ActivityContent,
                                       model: activity,
-                                      title: activity.content});
+                                      title: activity.content},
+                                     function() {
+                                         Pump.body.endLoad();
+                                     });
             });
         }
     });
