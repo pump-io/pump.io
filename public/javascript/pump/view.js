@@ -2444,7 +2444,7 @@
         },
         startLoad: function() {
             var view = this;
-            view.$("a.brand").spin(true);
+            view.$("a.brand").spin({color: "white"});
         },
         endLoad: function() {
             var view = this;
