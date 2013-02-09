@@ -75,6 +75,8 @@ var addRoutes = function(app) {
 
     app.post("/main/renew", app.session, userAuth, principal, renewSession);
 
+    app.get("/main/remote", app.session, principal, showRemote);
+
     if (app.config.uploaddir) {
         app.post("/main/upload", app.session, principal, principalUserOnly, uploadFile);
     }
@@ -293,6 +295,10 @@ var showRegister = function(req, res, next) {
 
 var showLogin = function(req, res, next) {
     res.render("login", {page: {title: "Login"}});
+};
+
+var showRemote = function(req, res, next) {
+    res.render("remote", {page: {title: "Remote login"}});
 };
 
 var handleLogout = function(req, res, next) {

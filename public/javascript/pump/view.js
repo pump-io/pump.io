@@ -845,6 +845,10 @@
         }
     });
 
+    Pump.RemoteContent = Pump.ContentView.extend({
+        templateName: 'remote'
+    });
+
     Pump.ConfirmEmailInstructionsContent = Pump.ContentView.extend({
         templateName: 'confirm-email-instructions'
     });

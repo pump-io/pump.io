@@ -37,4 +37,6 @@
       </div>
     </div>
   </form>
+  <p><a href="/main/login">Already have an account?</a></p>
+  <p><a href="/main/remote">Account on another server?</a></p>
 </div>

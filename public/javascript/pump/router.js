@@ -35,7 +35,8 @@
             "main/settings":          "settings",
             "main/account":           "account",
             "main/register":          "register",
-            "main/login":             "login"
+            "main/login":             "login",
+            "main/remote":            "remote"
         },
 
         register: function() {
@@ -52,6 +53,15 @@
             Pump.body.startLoad();
             Pump.body.setContent({contentView: Pump.LoginContent,
                                   title: "Login"},
+                                 function() {
+                                     Pump.body.endLoad();
+                                 });
+        },
+
+        remote: function() {
+            Pump.body.startLoad();
+            Pump.body.setContent({contentView: Pump.RemoteContent,
+                                  title: "Remote login"},
                                  function() {
                                      Pump.body.endLoad();
                                  });
