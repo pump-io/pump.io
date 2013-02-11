@@ -30,6 +30,7 @@ var assert = require("assert"),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
     Host = require("../lib/model/host").Host,
+    Credentials = require("../lib/model/credentials").Credentials,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     setupAppConfig = oauthutil.setupAppConfig;
@@ -116,6 +117,12 @@ suite.addBatch({
                         callback(err, null, null);
                     } else {
                         URLMaker.hostname = "dialback.localhost";
+                        Credentials.dialbackClient = new DialbackClient({
+                            hostname: "dialback.localhost",
+                            bank: db,
+                            app: dbapp,
+                            url: "/api/dialback"
+                        });
                         callback(err, app, dbapp);
                     }
                 }
@@ -185,6 +192,16 @@ suite.addBatch({
                     assert.isObject(host);
                     assert.isObject(dupe);
                     assert.deepEqual(dupe, host);
+                }
+            },
+            "and we get a request token": {
+                topic: function(host) {
+                    host.getRequestToken(this.callback);
+                },
+                "it works": function(err, rt) {
+                    console.dir(err);
+                    assert.ifError(err);
+                    assert.isObject(rt);
                 }
             }
         }
