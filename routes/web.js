@@ -22,6 +22,9 @@ var databank = require("databank"),
     fs = require("fs"),
     Step = require("step"),
     _ = require("underscore"),
+    validator = require("validator"),
+    check = validator.check,
+    sanitize = validator.sanitize,
     FilteredStream = require("../lib/filteredstream").FilteredStream,
     filters = require("../lib/filters"),
     publicOnly = filters.publicOnly,
@@ -76,6 +79,7 @@ var addRoutes = function(app) {
     app.post("/main/renew", app.session, userAuth, principal, renewSession);
 
     app.get("/main/remote", app.session, principal, showRemote);
+    app.post("/main/remote", app.session, clientAuth, handleRemote);
 
     if (app.config.uploaddir) {
         app.post("/main/upload", app.session, principal, principalUserOnly, uploadFile);
@@ -297,10 +301,6 @@ var showLogin = function(req, res, next) {
     res.render("login", {page: {title: "Login"}});
 };
 
-var showRemote = function(req, res, next) {
-    res.render("remote", {page: {title: "Remote login"}});
-};
-
 var handleLogout = function(req, res, next) {
     Step(
         function() {
@@ -326,6 +326,52 @@ var handleLogout = function(req, res, next) {
             } else {
                 req.remoteUser = null;
                 res.json("OK");
+            }
+        }
+    );
+};
+
+var showRemote = function(req, res, next) {
+    res.render("remote", {page: {title: "Remote login"}});
+};
+
+var handleRemote = function(req, res, next) {
+
+    var webfinger = req.body.webfinger,
+        hostname,
+        parts,
+        host;
+
+    try {
+        check(webfinger).isEmail();
+    } catch(e) {
+        next(new HTTPError(e.message, 400));
+        return;
+    }
+
+    parts = webfinger.split("@", 2);
+
+    if (parts.length < 2) {
+        next(new HTTPError("Bad format for webfinger", 400));
+        return;
+    }
+
+    hostname = parts[1];
+
+    Step(
+        function() {
+            Host.ensureHost(hostname, this);
+        },
+        function(err, result) {
+            if (err) throw err;
+            host = result;
+            host.getRequestToken(this);
+        },
+        function(err, rt) {
+            if (err) {
+                next(err);
+            } else {
+                res.redirect(host.authorizeURL(rt));
             }
         }
     );

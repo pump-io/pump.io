@@ -846,7 +846,50 @@
     });
 
     Pump.RemoteContent = Pump.ContentView.extend({
-        templateName: 'remote'
+        templateName: 'remote',
+        "events": {
+            "submit #remote": "remoteLogin"
+        },
+        remoteLogin: function() {
+
+            var view = this,
+                params = {webfinger: view.$('input[name="webfinger"]').val().trim()},
+                options,
+                continueTo = Pump.getContinueTo(),
+                WEBFINGER_RE = /^[\w!#$%&'*+/=?`{|}~^.-]+@[A-Z0-9.-]+$/i; // Thanks http://ur1.ca/crka1
+
+            if (!WEBFINGER_RE.match(params.webfinger)) {
+                view.showError("Webfinger should look like 'username@example.com'.");
+                return false;
+            }
+
+            view.startSpin();
+
+            options = {
+                contentType: "application/json",
+                data: JSON.stringify(params),
+                dataType: "json",
+                type: "POST",
+                url: "/main/remote",
+                success: function(data, textStatus, jqXHR) {
+                    // Set info here
+                    view.stopSpin();
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    var type, response;
+                    type = jqXHR.getResponseHeader("Content-Type");
+                    if (type && type.indexOf("application/json") !== -1) {
+                        response = JSON.parse(jqXHR.responseText);
+                        view.showError(response.error);
+                    } else {
+                        view.showError(errorThrown);
+                    }
+                    view.stopSpin();
+                }
+            };
+
+            return false;
+        }
     });
 
     Pump.ConfirmEmailInstructionsContent = Pump.ContentView.extend({
