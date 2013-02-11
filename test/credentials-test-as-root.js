@@ -154,9 +154,9 @@ suite.addBatch({
             topic: function() {
                 var callback = this.callback;
 
-                Credentials.getForHost("acct:user2@dialback.localhost",
-                                       "social.localhost",
-                                       callback);
+                Credentials.getForHostname("acct:user2@dialback.localhost",
+                                           "social.localhost",
+                                           callback);
             },
             "it works": function(err, cred) {
                 assert.ifError(err);
@@ -173,9 +173,9 @@ suite.addBatch({
             topic: function() {
                 var callback = this.callback;
 
-                Credentials.getForHost("dialback.localhost",
-                                       "social.localhost",
-                                       callback);
+                Credentials.getForHostname("dialback.localhost",
+                                           "social.localhost",
+                                           callback);
             },
             "it works": function(err, cred) {
                 assert.ifError(err);
