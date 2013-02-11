@@ -54,12 +54,12 @@ var testData = {
 var mb = modelBatch("host", "Host", testSchema, testData);
 
 mb["When we require the host module"]
-  ["and we get its Host class export"]
-  ["and we create a host instance"]
-  ["auto-generated fields are there"] = function(err, created) {
-      assert.ifError(err);
-      assert.include(created, "created");
-      assert.include(created, "modified");
+["and we get its Host class export"]
+["and we create a host instance"]
+["auto-generated fields are there"] = function(err, created) {
+    assert.ifError(err);
+    assert.include(created, "created");
+    assert.include(created, "modified");
 };
 
 mb["When we require the host module"]
@@ -74,5 +74,49 @@ mb["When we require the host module"]
 };
 
 suite.addBatch(mb);
+
+suite.addBatch({
+    "When we get the Host class": {
+        topic: function() {
+            return require("../lib/model/host").Host;
+        },
+        "it works": function(Host) {
+            assert.isFunction(Host);
+        },
+        "and we check its class methods": {
+            topic: function(Host) {
+                return Host;
+            },
+            "it has an ensureHost method": function(Host) {
+                assert.isFunction(Host.ensureHost);
+            }
+        },
+        "and we make an instance": {
+            topic: function(Host) {
+                return new Host({hostname: "simple.example"});
+            },
+            "it works": function(host) {
+                assert.isObject(host);
+            },
+            "and we check its methods": {
+                topic: function(host) {
+                    return host;
+                },
+                "it has a getRequestToken() method": function(host) {
+                    assert.isFunction(host.getRequestToken);
+                },
+                "it has an authorizeURL() method": function(host) {
+                    assert.isFunction(host.authorizeURL);
+                },
+                "it has a getAccessToken() method": function(host) {
+                    assert.isFunction(host.getAccessToken);
+                },
+                "it has a whoami() method": function(host) {
+                    assert.isFunction(host.whoami);
+                }
+            }
+        }
+    }
+});
 
 suite["export"](module);
