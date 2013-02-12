@@ -37,6 +37,9 @@ var databank = require("databank"),
     AccessToken = require("../lib/model/accesstoken").AccessToken,
     User = require("../lib/model/user").User,
     Collection = require("../lib/model/collection").Collection,
+    RemoteRequestToken = require("../lib/model/remoterequesttoken").RemoteRequestToken,
+    RemoteAccessToken = require("../lib/model/remoteaccesstoken").RemoteAccessToken,
+    Host = require("../lib/model/host").Host,
     mw = require("../lib/middleware"),
     omw = require("../lib/objectmiddleware"),
     sa = require("../lib/sessionauth"),
@@ -79,8 +82,10 @@ var addRoutes = function(app) {
     app.post("/main/renew", app.session, userAuth, principal, renewSession);
 
     app.get("/main/remote", app.session, principal, showRemote);
-    app.post("/main/remote", app.session, clientAuth, handleRemote);
+    app.post("/main/remote", app.session, handleRemote);
 
+    app.get("/main/authorized/:hostname", app.session, reqHost, reqToken, authorized);
+    
     if (app.config.uploaddir) {
         app.post("/main/upload", app.session, principal, principalUserOnly, uploadFile);
     }
@@ -1061,6 +1066,91 @@ var renewSession = function(req, res, next) {
             } else {
                 user.sanitize();
                 res.json(user);
+            }
+        }
+    );
+};
+
+var reqHost = function(req, res, next) {
+    var hostname = req.params.hostname;
+
+    Step(
+        function() {
+            Host.get(hostname, this);
+        },
+        function(err, host) {
+            if (err) {
+                next(err);
+            } else {
+                req.host = host;
+                next();
+            }
+        }
+    );
+};
+
+var reqToken = function(req, res, next) {
+    var token = req.query.oauth_token,
+        host = req.host;
+
+    Step(
+        function() {
+            RemoteRequestToken.get(RemoteRequestToken.key(host.hostname, token), this);
+        },
+        function(err, rt) {
+            if (err) {
+                next(err);
+            } else {
+                req.rt = rt;
+                next();
+            }
+        }
+    );
+};
+
+var authorized = function(req, res, next) {
+
+    var rt = req.rt,
+        host = req.host,
+        verifier = req.query.oauth_verifier,
+        principal,
+        pair;
+
+    Step(
+        function() {
+            host.getAccessToken(rt, verifier, this);
+        },
+        function(err, pair) {
+            if (err) throw err;
+            host.whoami(pair.token, pair.secret, this);
+        },
+        function(err, obj) {
+            if (err) throw err;
+            // XXX: test id and url for hostname
+            ActivityObject.ensureObject(obj, this);
+        },
+        function(err, results) {
+            var props;
+            if (err) throw err;
+            principal = results;
+            props = {
+                id: principal.id,
+                type: principal.objectType,
+                token: pair.token,
+                secret: pair.secret,
+                hostname: host.hostname
+            };
+            RemoteAccessToken.create(props, this);
+        },
+        function(err, at) {
+            if (err) throw err;
+            setPrincipal(req.session, principal, this);
+        },
+        function(err) {
+            if (err) {
+                next(err);
+            } else {
+                res.redirect("/");
             }
         }
     );
