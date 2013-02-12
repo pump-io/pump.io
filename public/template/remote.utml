@@ -1,5 +1,5 @@
 <div class="remote">
-  <form id="remote" class="form-horizontal">
+  <form id="remote" class="form-horizontal" action="/main/remote" method="post">
     <legend>Login to a remote account</legend>
     <div class="control-group" id="nickname-group">
       <label class="control-label" for="webfinger">Webfinger</label>
