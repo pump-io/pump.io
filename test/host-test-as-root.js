@@ -24,6 +24,7 @@ var assert = require("assert"),
     fs = require("fs"),
     path = require("path"),
     express = require("express"),
+    Browser = require("zombie"),
     URLMaker = require("../lib/urlmaker").URLMaker,
     DialbackClient = require("dialback-client"),
     databank = require("databank"),
@@ -33,7 +34,9 @@ var assert = require("assert"),
     Credentials = require("../lib/model/credentials").Credentials,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
-    setupAppConfig = oauthutil.setupAppConfig;
+    setupAppConfig = oauthutil.setupAppConfig,
+    register = oauthutil.register,
+    authorize = oauthutil.authorize;
 
 var suite = vows.describe("host module interface");
 
@@ -41,13 +44,19 @@ var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 
 var tinyApp = function(port, hostname, callback) {
 
-    var app = express.createServer();
+    var app = express.createServer(),
+        authcb = null;
 
     app.configure(function(){
         app.set("port", port);
         app.use(express.bodyParser());
+        app.use(express.query());
         app.use(app.router);
     });
+
+    app.setAuthCB = function(cb) {
+        authcb = cb;
+    };
 
     app.get("/.well-known/host-meta.json", function(req, res) {
         res.json({
@@ -79,6 +88,30 @@ var tinyApp = function(port, hostname, callback) {
                 }
             ]
         });
+    });
+
+    app.get("/lrdd.json", function(req, res) {
+        var uri = req.query.uri,
+            parts = uri.split("@"),
+            username = parts[0],
+            hostname = parts[1];
+
+        res.json({
+            links: [
+                {
+                    rel: "dialback",
+                    href: "http://"+hostname+"/api/dialback"
+                }
+            ]
+        });
+    });
+
+    app.get("/main/authorized/:hostname", function(req, res) {
+        if (authcb) {
+            authcb(null, req.query.oauth_verifier);
+            authcb = null;
+        }
+        res.send("OK");
     });
 
     app.on("error", function(err) {
@@ -208,6 +241,68 @@ suite.addBatch({
                     },
                     "it works": function(url) {
                         assert.isString(url);
+                    }
+                },
+                "and we authorize the request token": {
+                    topic: function(rt, host, app, dbapp) {
+                        var callback = this.callback,
+                            cl;
+
+                        Step(
+                            function() {
+                                Credentials.getForHost("social.localhost", host, this);
+                            },
+                            function(err, results) {
+                                if (err) throw err;
+                                cl = results;
+                                register(cl, "seth", "Aegh0eex", "social.localhost", 80, this);
+                            },
+                            function(err, user) {
+                                if (err) throw err;
+                                var browser, proto;
+                                browser = new Browser({runScripts: false, waitFor: 60000});
+                                browser.visit(host.authorizeURL(rt), this);
+                            },
+                            function(err, br) {
+                                if (err) throw err;
+                                if (!br.success) throw new Error("Browser fail");
+                                br.fill("username", "seth", this);
+                            },
+                            function(err, br) {
+                                if (err) throw err;
+                                if (!br.success) throw new Error("Browser fail");
+                                br.fill("password", "Aegh0eex", this);
+                            },
+                            function(err, br) {
+                                if (err) throw err;
+                                if (!br.success) throw new Error("Browser fail");
+                                br.pressButton("#authenticate", this);
+                            },
+                            function(err, br) {
+                                if (err) throw err;
+                                if (!br.success) throw new Error("Browser fail");
+                                dbapp.setAuthCB(this.parallel());
+                                br.pressButton("Authorize", this.parallel());
+                            },
+                            function(err, verifier, br) {
+                                callback(err, verifier);
+                            }
+                        );
+                    },
+                    "it works": function(err, verifier) {
+                        assert.ifError(err);
+                        assert.isString(verifier);
+                    },
+                    "and we get the access token": {
+                        topic: function(verifier, rt, host) {
+                            host.getAccessToken(rt, verifier, this.callback);
+                        },
+                        "it works": function(err, pair) {
+                            assert.ifError(err);
+                            assert.isObject(pair);
+                            assert.isString(pair.token);
+                            assert.isString(pair.secret);
+                        }
                     }
                 }
             }
