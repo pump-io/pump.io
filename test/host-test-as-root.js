@@ -199,9 +199,16 @@ suite.addBatch({
                     host.getRequestToken(this.callback);
                 },
                 "it works": function(err, rt) {
-                    console.dir(err);
                     assert.ifError(err);
                     assert.isObject(rt);
+                },
+                "and we get the authorization url": {
+                    topic: function(rt, host) {
+                        return host.authorizeURL(rt);
+                    },
+                    "it works": function(url) {
+                        assert.isString(url);
+                    }
                 }
             }
         }
