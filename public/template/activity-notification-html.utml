@@ -1,4 +1,4 @@
-<p><%- user.profile.displayName %>,</p>
+<p><%- principal.displayName %>,</p>
 
 <p><%= activity.content %></p>
 

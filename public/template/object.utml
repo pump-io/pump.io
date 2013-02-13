@@ -21,7 +21,7 @@
         <%= object.content %>
       </div>
 
-      <% if (user) { %>
+      <% if (principal) { %>
       <%= partial("responses") %>
       <% } %>
 

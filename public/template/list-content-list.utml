@@ -1,7 +1,7 @@
 <div class="container span9" id="list-content-list">
   <div class="row">
     <div class="pull-right">
-      <% if (user && user.profile && user.profile.id == profile.id) { %>
+      <% if (principal && principal.id == profile.id) { %>
       <p><button class="btn" id="add-list-member">Add a member</button></p>
       <p><button class="btn" id="delete-list">Delete list</button></p>
       <% } %>

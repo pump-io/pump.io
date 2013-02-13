@@ -1,7 +1,7 @@
 <div class="media comment-form">
   <span class="pull-left">
-    <% if (user.profile.image && user.profile.image.url) { %>
-    <img src="<%- user.profile.image.url %>" width="32" height="32" class="img-rounded" />
+    <% if (principal.image && principal.image.url) { %>
+    <img src="<%- principal.image.url %>" width="32" height="32" class="img-rounded" />
     <% } else { %>
     <img src="/images/default.png" width="32" height="32" class="img-rounded" />
     <% } %>

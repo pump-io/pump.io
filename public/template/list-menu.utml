@@ -2,7 +2,7 @@
   <% _.each(lists, function(list) { %>
   <%= partial("list-menu-item", {listItem: list}) %>
   <% }); %>
-  <% if (user && user.profile.id == profile.id) { %>
+  <% if (principal && principal.id == profile.id) { %>
   <li class="add-a-list">
     <a href="#" class="new-list">New list...</a>
   </li>

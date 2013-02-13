@@ -19,8 +19,8 @@
       <span class="help-block">All about you.</span>
 
       <label>Avatar</label>
-      <% if (user.profile.image && user.profile.image.url) { %>
-      <img src="<%- user.profile.image.url %>" width="96" height="96" class="img-rounded" />
+      <% if (principal.image && principal.image.url) { %>
+      <img src="<%- principal.image.url %>" width="96" height="96" class="img-rounded" />
       <% } %>
 
       <div id="avatar-fineupload"></div>

@@ -1,4 +1,4 @@
-<h1>Welcome to <%- config.site %>, <%- user.profile.displayName %>!</h1>
+<h1>Welcome to <%- config.site %>, <%- principal.displayName %>!</h1>
 
 <p>You have signed up for <%- config.site %>. To confirm this email address, click on the link below:</p>
 

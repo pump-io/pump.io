@@ -1,4 +1,4 @@
-<%= user.profile.displayName %>,
+<%= principal.displayName %>,
 
 You were addressed in an activity.
 
