@@ -635,10 +635,10 @@ var reqActivity = function(req, res, next) {
 };
 
 var getActivity = function(req, res, next) {
-    var user = req.principalUser,
+    var principal = req.principal,
         act = req.activity;
 
-    act.sanitize(user);
+    act.sanitize(principal);
 
     res.json(act);
 };
@@ -650,7 +650,7 @@ var putActivity = function(req, res, next) {
         if (err) {
             next(err);
         } else {
-            result.sanitize(req.principalUser);
+            result.sanitize(req.principal);
             res.json(result);
         }
     });
@@ -1057,7 +1057,7 @@ var postActivity = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                activity.sanitize();
+                activity.sanitize(req.principal);
                 // ...then show (possibly modified) results.
                 res.json(activity);
                 // ...then distribute.
@@ -1145,7 +1145,7 @@ var postToInbox = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                activity.sanitize();
+                activity.sanitize(req.principal);
                 // ...then show (possibly modified) results.
                 // XXX: don't distribute
                 res.json(activity);
@@ -1283,7 +1283,7 @@ var filteredFeedRoute = function(urlmaker, titlemaker, streammaker, finisher) {
                         str = new FilteredStream(outbox, recipientsOnly(req.principal));
                     }
 
-                    getStream(str, args, collection, req.principalUser, this);
+                    getStream(str, args, collection, req.principal, this);
                 }
             },
             function(err) {
@@ -1402,7 +1402,7 @@ var feedRoute = function(urlmaker, titlemaker, streamgetter, finisher) {
                         throw err;
                     }
                 } else {
-                    getStream(inbox, args, collection, req.principalUser, this);
+                    getStream(inbox, args, collection, req.principal, this);
                 }
             },
             function(err) {
@@ -1501,7 +1501,7 @@ var userMinorDirectInbox = feedRoute(
     }
 );
 
-var getStream = function(str, args, collection, user, callback) {
+var getStream = function(str, args, collection, principal, callback) {
 
     Step(
         function() {
@@ -1537,7 +1537,7 @@ var getStream = function(str, args, collection, user, callback) {
                 callback(err);
             } else {
                 activities.forEach(function(act) {
-                    act.sanitize(user);
+                    act.sanitize(principal);
                 });
                 collection.items = activities;
                 if (activities.length > 0) {

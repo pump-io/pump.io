@@ -567,7 +567,7 @@ suite.addBatch({
                         if (err) {
                             cb(err, null);
                         } else {
-                            act.sanitize(user);
+                            act.sanitize(user.profile);
                             cb(err, act);
                         }
                     }
@@ -635,7 +635,7 @@ suite.addBatch({
                         if (err) {
                             cb(err, null);
                         } else {
-                            act.sanitize(user2);
+                            act.sanitize(user2.profile);
                             cb(err, act);
                         }
                     }
