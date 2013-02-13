@@ -1082,17 +1082,9 @@ var postToInbox = function(req, res, next) {
 
     // Must be either a host or a webfinger
 
-    if (req.host) {
-        if (!ActivityObject.sameID(activity.actor.id, "http://" + req.host + "/") &&
-            !ActivityObject.sameID(activity.actor.id, "https://" + req.host + "/")) {
-            next(new HTTPError("Invalid actor", 400));
-            return;
-        }
-    } else if (req.webfinger) {
-        if (!ActivityObject.sameID(activity.actor.id, req.webfinger)) {
-            next(new HTTPError("Invalid actor", 400));
-            return;
-        }
+    if (req.principal.id != activity.actor.id) {
+        next(new HTTPError("Invalid actor", 400));
+        return;
     }
 
     // Default verb
