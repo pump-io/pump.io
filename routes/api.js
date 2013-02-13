@@ -242,9 +242,9 @@ var isMinor = function(req, res, next) {
 
 var userOnly = function(req, res, next) {
     var person = req.person,
-        user = req.remoteUser;
+        principal = req.principal;
 
-    if (person && user && user.profile && person.id === user.profile.id && user.profile.objectType === "person") { 
+    if (person && principal && person.id === principal.id && principal.objectType === "person") { 
         next();
     } else {
         next(new HTTPError("Only the user can modify this profile.", 403));
@@ -254,7 +254,7 @@ var userOnly = function(req, res, next) {
 var actorOnly = function(req, res, next) {
     var act = req.activity;
 
-    if (act && act.actor && act.actor.id == req.remoteUser.profile.id) {
+    if (act && act.actor && act.actor.id == req.principal.id) {
         next();
     } else {
         next(new HTTPError("Only the actor can modify this object.", 403));
@@ -264,7 +264,7 @@ var actorOnly = function(req, res, next) {
 var actorOrRecipient = function(req, res, next) {
 
     var act = req.activity,
-        person = (req.remoteUser) ? req.remoteUser.profile : null;
+        person = req.principal;
 
     if (act && act.actor && person && act.actor.id == person.id) {
         next();
@@ -285,7 +285,7 @@ var getObject = function(req, res, next) {
     
     var type = req.type,
         obj = req[type],
-        profile = (req.remoteUser) ? req.remoteUser.profile : null;
+        profile = req.principal;
 
     Step(
         function() {
@@ -319,7 +319,7 @@ var putObject = function(req, res, next) {
         obj = req[type],
         updates = Scrubber.scrubObject(req.body),
         act = new Activity({
-            actor: req.remoteUser.profile,
+            actor: req.principal,
             generator: req.generator,
             verb: "update",
             object: _(obj).extend(updates)
@@ -327,7 +327,7 @@ var putObject = function(req, res, next) {
 
     Step(
         function() {
-            newActivity(act, req.remoteUser, this);
+            newActivity(act, req.principalUser, this);
         },
         function(err, act) {
             var d;
@@ -348,7 +348,7 @@ var deleteObject = function(req, res, next) {
     var type = req.type,
         obj = req[type],
         act = new Activity({
-            actor: req.remoteUser.profile,
+            actor: req.principal,
             verb: "delete",
             generator: req.generator,
             object: obj
@@ -356,7 +356,7 @@ var deleteObject = function(req, res, next) {
 
     Step(
         function() {
-            newActivity(act, req.remoteUser, this);
+            newActivity(act, req.principalUser, this);
         },
         function(err, act) {
             var d;
@@ -445,11 +445,11 @@ var objectReplies = function(req, res, next) {
         function(err, str) {
             var filtered;
             if (err) throw err;
-            if (!req.remoteUser) {
+            if (!req.principal) {
                 // XXX: keep a separate stream instead of filtering
                 filtered = new FilteredStream(str, objectPublicOnly);
             } else {
-                filtered = new FilteredStream(str, objectRecipientsOnly(req.remoteUser.profile));
+                filtered = new FilteredStream(str, objectRecipientsOnly(req.principal));
             }
             filtered.count(this.parallel());
             filtered.getObjects(args.start, args.end, this.parallel());
@@ -540,10 +540,10 @@ var getUser = function(req, res, next) {
         },
         function(err) {
             if (err) throw err;
-            if (!req.remoteUser) {
+            if (!req.principal) {
                 // skip
                 this(null);
-            } else if (req.remoteUser.nickname == req.user.nickname) {
+            } else if (req.principal.id == req.user.profile.id) {
                 // same user
                 req.user.profile.pump_io = {
                     followed: false
@@ -551,13 +551,13 @@ var getUser = function(req, res, next) {
                 // skip
                 this(null);
             } else {
-                addFollowed(req.remoteUser.profile, [req.user.profile], this);
+                addFollowed(req.principal, [req.user.profile], this);
             }
         },
         function(err) {
             if (err) next(err);
             // If no user, or different user, hide email
-            if (!req.remoteUser || (req.remoteUser.nickname != req.user.nickname)) {
+            if (!req.principal || (req.principal.id != req.user.profile.id)) {
                 delete req.user.email;
             }
             req.user.sanitize();
@@ -635,7 +635,7 @@ var reqActivity = function(req, res, next) {
 };
 
 var getActivity = function(req, res, next) {
-    var user = req.remoteUser,
+    var user = req.principalUser,
         act = req.activity;
 
     act.sanitize(user);
@@ -650,7 +650,7 @@ var putActivity = function(req, res, next) {
         if (err) {
             next(err);
         } else {
-            result.sanitize(req.remoteUser);
+            result.sanitize(req.principalUser);
             res.json(result);
         }
     });
@@ -995,7 +995,7 @@ var listUsers = function(req, res, next) {
 
             _.each(users, function(user) {
                 user.sanitize();
-                if (!req.remoteUser || req.remoteUser.nickname != user.nickname) {
+                if (!req.principal || req.principal.id != user.profile.id) {
                     delete user.email;
                 }
             });
@@ -1274,16 +1274,16 @@ var filteredFeedRoute = function(urlmaker, titlemaker, streammaker, finisher) {
                     }
                 } else {
                     // Skip filtering if remote user == author
-                    if (req.remoteUser && req.remoteUser.profile.id == req.user.profile.id) {
+                    if (req.principal && req.principal.id == req.user.profile.id) {
                         str = outbox;
-                    } else if (!req.remoteUser) {
+                    } else if (!req.principal) {
                         // XXX: keep a separate stream instead of filtering
                         str = new FilteredStream(outbox, publicOnly);
                     } else {
-                        str = new FilteredStream(outbox, recipientsOnly(req.remoteUser.profile));
+                        str = new FilteredStream(outbox, recipientsOnly(req.principal));
                     }
 
-                    getStream(str, args, collection, req.remoteUser, this);
+                    getStream(str, args, collection, req.principalUser, this);
                 }
             },
             function(err) {
@@ -1402,7 +1402,7 @@ var feedRoute = function(urlmaker, titlemaker, streamgetter, finisher) {
                         throw err;
                     }
                 } else {
-                    getStream(inbox, args, collection, req.remoteUser, this);
+                    getStream(inbox, args, collection, req.principalUser, this);
                 }
             },
             function(err) {
@@ -1618,10 +1618,10 @@ var userFollowers = function(req, res, next) {
 
             collection.items = people;
 
-            if (!req.remoteUser) {
+            if (!req.principal) {
                 this(null);
             } else {
-                addFollowed(req.remoteUser.profile, people, this);
+                addFollowed(req.principal, people, this);
             }
         },
         function(err) {
@@ -1726,10 +1726,10 @@ var userFollowing = function(req, res, next) {
 
             collection.items = people;
 
-            if (!req.remoteUser) {
+            if (!req.principal) {
                 // Same user; by definition, all are followed
                 this(null);
-            } else if (req.remoteUser.nickname == req.user.nickname) {
+            } else if (req.principal.id == req.user.profile.id) {
                 // Same user; by definition, all are followed
                 _.each(people, function(person) {
                     if (!_.has(person, "pump_io")) {
@@ -1739,7 +1739,7 @@ var userFollowing = function(req, res, next) {
                 });
                 this(null);
             } else {
-                addFollowed(req.remoteUser.profile, people, this);
+                addFollowed(req.principal, people, this);
             }
         },
         function(err) {
@@ -1849,15 +1849,15 @@ var userFavorites = function(req, res, next) {
                 res.json(collection);
                 return;
             }
-            if (req.remoteUser && req.remoteUser.profile.id == req.user.profile.id) {
+            if (req.principal && req.principal.id == req.user.profile.id) {
                 // Same user, don't filter
                 str = stream;
-            } else if (!req.remoteUser) {
+            } else if (!req.principal) {
                 // Public user, filter
                 str = new FilteredStream(stream, objectPublicOnly);
             } else {
                 // Registered user, filter
-                str = new FilteredStream(stream, objectRecipientsOnly(req.remoteUser.profile));
+                str = new FilteredStream(stream, objectRecipientsOnly(req.principal));
             }
             str.getObjects(args.start, args.end, this);
         },
@@ -1885,7 +1885,7 @@ var userFavorites = function(req, res, next) {
         function(err) {
 
             var third,
-                profile = (req.remoteUser) ? req.remoteUser.profile : null;
+                profile = req.principal;
 
             if (err) throw err;
 
@@ -1907,10 +1907,10 @@ var userFavorites = function(req, res, next) {
 
             third = this.parallel();
 
-            if (!req.remoteUser) { 
+            if (!req.principal) { 
                 // No user, no liked
                 third(null);
-            } else if (req.remoteUser.profile.id == req.user.profile.id) {
+            } else if (req.principal.id == req.user.profile.id) {
                 // Same user, all liked (by definition!)
                 _.each(collection.items, function(object) {
                     object.liked = true;
@@ -1918,7 +1918,7 @@ var userFavorites = function(req, res, next) {
                 third(null);
             } else {
                 // Different user; check for likes
-                addLiked(req.remoteUser.profile, collection.items, third);
+                addLiked(req.principal, collection.items, third);
             }
         },
         function(err) {
@@ -1966,7 +1966,7 @@ var newFavorite = function(req, res, next) {
 
 var userLists = function(req, res, next) {
     var type = req.params.type,
-        profile = (req.remoteUser) ? req.remoteUser.profile : null,
+        profile = req.principal,
         url = URLMaker.makeURL("api/user/" + req.user.nickname + "/lists/" + type),
         collection = {
             author: req.user.profile,
@@ -2166,7 +2166,7 @@ var userUploads = function(req, res, next) {
 
 var newUpload = function(req, res, next) {
 
-    var user = req.remoteUser,
+    var user = req.principalUser,
         mimeType = req.uploadMimeType,
         fileName = req.uploadFile,
         uploadDir = req.app.config.uploaddir;
@@ -2189,7 +2189,7 @@ var newUpload = function(req, res, next) {
 var collectionMembers = function(req, res, next) {
 
     var coll = req.collection,
-        profile = (req.remoteUser) ? req.remoteUser.profile : null, 
+        profile = req.principal, 
         base = "/api/collection/"+coll._uuid+"/members",
         url = URLMaker.makeURL(base),
         feed = {
@@ -2363,7 +2363,7 @@ var newMember = function(req, res, next) {
 
     Step(
         function() {
-            newActivity(act, req.remoteUser, this);
+            newActivity(act, req.principalUser, this);
         },
         function(err, act) {
             var d;
@@ -2440,7 +2440,7 @@ var streamArgs = function(req, defaultCount, maxCount) {
 };
 
 var whoami = function(req, res, next) {
-    res.redirect("/api/user/"+req.remoteUser.nickname+"/profile", 302);
+    res.redirect("/api/user/"+req.principalUser.nickname+"/profile", 302);
 };
 
 exports.addRoutes = addRoutes;
