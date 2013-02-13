@@ -138,81 +138,6 @@ var showMain = function(req, res, next) {
     }
 };
 
-var showDirect = function(req, res, next) {
-
-    var pump = this,
-        user = req.principalUser,
-        profile = req.principal,
-        getMajor = function(callback) {
-            var activities;
-            Step(
-                function() {
-                    user.getMajorDirectInboxStream(this);
-                },
-                function(err, str) {
-                    if (err) throw err;
-                    str.getIDs(0, 20, this);
-                },
-                function(err, ids) {
-                    if (err) throw err;
-                    Activity.readArray(ids, this);
-                },
-                function(err, results) {
-                    var objects;
-                    if (err) throw err;
-                    activities = results;
-                    objects = _.pluck(activities, "object");
-                    addLiked(profile, objects, this.parallel());
-                    addShared(profile, objects, this.parallel());
-                    addLikers(profile, objects, this.parallel());
-                    firstFewReplies(profile, objects, this.parallel());
-                    firstFewShares(profile, objects, this.parallel());
-                },
-                function(err) {
-                    if (err) {
-                        callback(err, null);
-                    } else {
-                        callback(null, activities);
-                    }
-                }
-            );
-        },
-        getMinor = function(callback) {
-            Step(
-                function() {
-                    user.getMinorDirectInboxStream(this);
-                },
-                function(err, str) {
-                    if (err) throw err;
-                    str.getIDs(0, 20, this);
-                },
-                function(err, ids) {
-                    if (err) throw err;
-                    Activity.readArray(ids, this);
-                },
-                callback
-            );
-        };
-
-    Step(
-        function() {
-            getMajor(this.parallel());
-            getMinor(this.parallel());
-        },
-        function(err, major, minor) {
-            var data;
-            if (err) {
-                next(err);
-            } else {
-                res.render("direct", {page: { title: "Direct" },
-                                      major: major,
-                                      minor: minor,
-                                      user: user});
-            }
-        }
-    );
-};
-
 var showInbox = function(req, res, next) {
 
     var pump = this,
@@ -314,7 +239,7 @@ var handleLogout = function(req, res, next) {
         function(err) {
             if (err) throw err;
             AccessToken.search({"consumer_key": req.client.consumer_key,
-                                "username": req.remoteUser.nickname},
+                                "username": req.principalUser.nickname},
                                this);
         },
         function(err, tokens) {
@@ -329,7 +254,7 @@ var handleLogout = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                req.remoteUser = null;
+                req.principalUser = null;
                 res.json("OK");
             }
         }
@@ -428,8 +353,7 @@ var userIsActor = function(req, res, next) {
 
 var principalActorOrRecipient = function(req, res, next) {
 
-    var user = req.principalUser,
-        person = req.principal,
+    var person = req.principal,
         activity = req.activity;
 
     if (activity && activity.actor && person && activity.actor.id == person.id) {
@@ -454,17 +378,15 @@ var principalActorOrRecipient = function(req, res, next) {
 
 var showActivity = function(req, res, next) {
 
-    var activity = req.activity,
-        user = req.principalUser,
-        principal = req.principal;
+    var activity = req.activity;
 
     if (activity.isMajor()) {
         res.render("major-activity-page", {page: {title: activity.content},
-                                           user: user,
+                                           principal: principal,
                                            activity: activity});
     } else {
         res.render("minor-activity-page", {page: {title: activity.content},
-                                           user: user,
+                                           principal: principal,
                                            activity: activity});
     }
 };
@@ -561,7 +483,6 @@ var showStream = function(req, res, next) {
                                     major: major,
                                     minor: minor,
                                     profile: req.user.profile,
-                                    user: req.principalUser,
                                     data: {
                                         major: major,
                                         minor: minor,
@@ -619,7 +540,6 @@ var showFavorites = function(req, res, next) {
             } else {
                 res.render("favorites", {page: {title: req.user.nickname + " favorites"},
                                          objects: objects,
-                                         user: req.principalUser,
                                          profile: req.user.profile,
                                          data: {
                                              objects: objects,
@@ -667,7 +587,6 @@ var showFollowers = function(req, res, next) {
             } else {
                 res.render("followers", {page: {title: req.user.nickname + " followers"},
                                          people: followers,
-                                         user: req.principalUser,
                                          profile: req.user.profile,
                                          data: {
                                              profile: req.user.profile,
@@ -715,7 +634,6 @@ var showFollowing = function(req, res, next) {
             } else {
                 res.render("following", {page: {title: req.user.nickname + " following"},
                                          people: following,
-                                         user: req.principalUser,
                                          profile: req.user.profile,
                                          data: {
                                              profile: req.user.profile,
@@ -818,7 +736,6 @@ var showLists = function(req, res, next) {
                 next(err);
             } else {
                 res.render("lists", {page: {title: req.user.profile.displayName + " - Lists"},
-                                     user: req.principalUser,
                                      profile: req.user.profile,
                                      list: null,
                                      lists: lists,
@@ -888,7 +805,6 @@ var showList = function(req, res, next) {
                 next(err);
             } else {
                 res.render("list", {page: {title: req.user.profile.displayName + " - Lists"},
-                                    user: req.principalUser,
                                     profile: req.user.profile,
                                     lists: lists,
                                     list: list,
@@ -974,7 +890,6 @@ var principalAuthorOrRecipient = function(req, res, next) {
 
     var type = req.type,
         obj = req[type],
-        user = req.principalUser,
         person = req.principal;
 
     if (obj && obj.author && person && obj.author.id == person.id) {
@@ -1034,7 +949,6 @@ var showObject = function(req, res, next) {
                     title = type + " by " + person.displayName;
                 }
                 res.render("object", {page: {title: title},
-                                      user: req.principalUser,
                                       object: obj,
                                       data: {
                                           object: obj
@@ -1047,25 +961,19 @@ var showObject = function(req, res, next) {
 
 var renewSession = function(req, res, next) {
 
-    var user = req.remoteUser,
-        principalUser = req.principalUser;
+    var principal = req.principal;
 
     Step(
         function() {
             // We only need to set this if it's not already set
-
-            if (!principalUser || principalUser.nickname != user.nickname) {
-                setPrincipal(req.session, user.profile, this);
-            } else {
-                this(null);
-            }
+            setPrincipal(req.session, principal, this);
         },
         function(err) {
             if (err) {
                 next(err);
             } else {
-                user.sanitize();
-                res.json(user);
+                principal.sanitize();
+                res.json(principal);
             }
         }
     );
