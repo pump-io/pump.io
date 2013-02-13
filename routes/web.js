@@ -1120,8 +1120,9 @@ var authorized = function(req, res, next) {
         function() {
             host.getAccessToken(rt, verifier, this);
         },
-        function(err, pair) {
+        function(err, results) {
             if (err) throw err;
+            pair = results;
             host.whoami(pair.token, pair.secret, this);
         },
         function(err, obj) {
