@@ -18,20 +18,19 @@
 
 var _ = require("underscore"),
     Step = require("step"),
-    sa = require("../lib/sessionauth"),
+    authc = require("../lib/authc"),
     HTTPError = require("../lib/httperror").HTTPError,
     URLMaker = require("../lib/urlmaker").URLMaker,
     Confirmation = require("../lib/model/confirmation").Confirmation,
     User = require("../lib/model/user").User,
-    setPrincipal = sa.setPrincipal,
-    principal = sa.principal;
+    setPrincipal = authc.setPrincipal,
+    principal = authc.principal;
 
 var addRoutes = function(app) {
 
     app.get("/main/confirm/:code", app.session, principal, confirm);
 
 };
-
 
 var confirm = function(req, res, next) {
 

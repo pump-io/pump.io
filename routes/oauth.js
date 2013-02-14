@@ -72,7 +72,7 @@ var authorize = function(err, req, res, authorized, authResults, application, rt
                                                     nologin: true},
                                              token: authResults.token,
                                              verifier: authResults.verifier,
-                                             user: user,
+                                             principalUser: user,
                                              application: application});
             }
         });
@@ -80,6 +80,7 @@ var authorize = function(err, req, res, authorized, authResults, application, rt
 };  
 
 var authorizationFinished = function(err, req, res, result) {
+
     res.render("authorization-finished", {page: {title: "Authorization Finished",
                                                  nologin: true},
                                           token: result.token,

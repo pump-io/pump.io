@@ -2,7 +2,7 @@
 //
 // The beating heart of a pumpin' good time
 //
-// Copyright 2011-2012, StatusNet Inc.
+// Copyright 2011-2013, StatusNet Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ var databank = require("databank"),
     URLMaker = require("../lib/urlmaker").URLMaker,
     Distributor = require("../lib/distributor"),
     mw = require("../lib/middleware"),
+    authc = require("../lib/authc"),
     omw = require("../lib/objectmiddleware"),
     randomString = require("../lib/randomstring").randomString,
     finishers = require("../lib/finishers"),
@@ -61,10 +62,14 @@ var databank = require("databank"),
     reqUser = mw.reqUser,
     reqGenerator = mw.reqGenerator,
     sameUser = mw.sameUser,
-    clientAuth = mw.clientAuth,
-    userAuth = mw.userAuth,
-    remoteUserAuth = mw.remoteUserAuth,
-    maybeAuth = mw.maybeAuth,
+    clientAuth = authc.clientAuth,
+    userAuth = authc.userAuth,
+    remoteUserAuth = authc.remoteUserAuth,
+    remoteWriteOAuth = authc.remoteWriteOAuth,
+    noneWriteOAuth = authc.noneWriteOAuth,
+    userWriteOAuth = authc.userWriteOAuth,
+    userReadAuth = authc.userReadAuth,
+    anyReadAuth = authc.anyReadAuth,
     fileContent = mw.fileContent,
     requestObject = omw.requestObject,
     authorOnly = omw.authorOnly,
@@ -117,93 +122,93 @@ var databank = require("databank"),
 
 var addRoutes = function(app) {
 
-    var i = 0, url, type, authz;
+    var smw = (app.session) ? [app.session] : [];
 
     // Users
-    app.get("/api/user/:nickname", clientAuth, reqUser, getUser);
-    app.put("/api/user/:nickname", userAuth, reqUser, sameUser, putUser);
-    app.del("/api/user/:nickname", userAuth, reqUser, sameUser, delUser);
+    app.get("/api/user/:nickname", smw, anyReadAuth, reqUser, getUser);
+    app.put("/api/user/:nickname", userWriteOAuth, reqUser, sameUser, putUser);
+    app.del("/api/user/:nickname", userWriteOAuth, reqUser, sameUser, delUser);
 
-    app.get("/api/user/:nickname/profile", clientAuth, reqUser, personType, getObject);
-    app.put("/api/user/:nickname/profile", userAuth, reqUser, sameUser, personType, reqGenerator, putObject);
+    app.get("/api/user/:nickname/profile", smw, anyReadAuth, reqUser, personType, getObject);
+    app.put("/api/user/:nickname/profile", userWriteOAuth, reqUser, sameUser, personType, reqGenerator, putObject);
 
     // Feeds
 
-    app.get("/api/user/:nickname/feed", clientAuth, reqUser, userStream);
-    app.post("/api/user/:nickname/feed", userAuth, reqUser, sameUser, reqGenerator, postActivity);
+    app.get("/api/user/:nickname/feed", smw, anyReadAuth, reqUser, userStream);
+    app.post("/api/user/:nickname/feed", userWriteOAuth, reqUser, sameUser, reqGenerator, postActivity);
 
-    app.get("/api/user/:nickname/feed/major", clientAuth, reqUser, userMajorStream);
-    app.get("/api/user/:nickname/feed/minor", clientAuth, reqUser, userMinorStream);
+    app.get("/api/user/:nickname/feed/major", smw, anyReadAuth, reqUser, userMajorStream);
+    app.get("/api/user/:nickname/feed/minor", smw, anyReadAuth, reqUser, userMinorStream);
 
-    app.post("/api/user/:nickname/feed/major", userAuth, reqUser, sameUser, isMajor, reqGenerator, postActivity);
-    app.post("/api/user/:nickname/feed/minor", userAuth, reqUser, sameUser, isMinor, reqGenerator, postActivity);
+    app.post("/api/user/:nickname/feed/major", userWriteOAuth, reqUser, sameUser, isMajor, reqGenerator, postActivity);
+    app.post("/api/user/:nickname/feed/minor", userWriteOAuth, reqUser, sameUser, isMinor, reqGenerator, postActivity);
 
     // Inboxen
 
-    app.get("/api/user/:nickname/inbox", userAuth, reqUser, sameUser, userInbox);
-    app.post("/api/user/:nickname/inbox", remoteUserAuth, reqUser, postToInbox);
+    app.get("/api/user/:nickname/inbox", smw, userReadAuth, reqUser, sameUser, userInbox);
+    app.post("/api/user/:nickname/inbox", remoteWriteOAuth, reqUser, postToInbox);
 
-    app.get("/api/user/:nickname/inbox/major", userAuth, reqUser, sameUser, userMajorInbox);
-    app.get("/api/user/:nickname/inbox/minor", userAuth, reqUser, sameUser, userMinorInbox);
-    app.get("/api/user/:nickname/inbox/direct", userAuth, reqUser, sameUser, userDirectInbox);
-    app.get("/api/user/:nickname/inbox/direct/major", userAuth, reqUser, sameUser, userMajorDirectInbox);
-    app.get("/api/user/:nickname/inbox/direct/minor", userAuth, reqUser, sameUser, userMinorDirectInbox);
+    app.get("/api/user/:nickname/inbox/major", smw, userReadAuth, reqUser, sameUser, userMajorInbox);
+    app.get("/api/user/:nickname/inbox/minor", smw, userReadAuth, reqUser, sameUser, userMinorInbox);
+    app.get("/api/user/:nickname/inbox/direct", smw, userReadAuth, reqUser, sameUser, userDirectInbox);
+    app.get("/api/user/:nickname/inbox/direct/major", smw, userReadAuth, reqUser, sameUser, userMajorDirectInbox);
+    app.get("/api/user/:nickname/inbox/direct/minor", smw, userReadAuth, reqUser, sameUser, userMinorDirectInbox);
 
     // Followers
 
-    app.get("/api/user/:nickname/followers", clientAuth, reqUser, userFollowers);
+    app.get("/api/user/:nickname/followers", smw, anyReadAuth, reqUser, userFollowers);
 
     // Following
 
-    app.get("/api/user/:nickname/following", clientAuth, reqUser, userFollowing);
-    app.post("/api/user/:nickname/following", clientAuth, reqUser, sameUser, reqGenerator, newFollow);
+    app.get("/api/user/:nickname/following", smw, anyReadAuth, reqUser, userFollowing);
+    app.post("/api/user/:nickname/following", userWriteOAuth, reqUser, sameUser, reqGenerator, newFollow);
 
     // Favorites
 
-    app.get("/api/user/:nickname/favorites", clientAuth, reqUser, userFavorites);
-    app.post("/api/user/:nickname/favorites", clientAuth, reqUser, sameUser, reqGenerator, newFavorite);
+    app.get("/api/user/:nickname/favorites", smw, anyReadAuth, reqUser, userFavorites);
+    app.post("/api/user/:nickname/favorites", userWriteOAuth, reqUser, sameUser, reqGenerator, newFavorite);
 
     // Lists
 
-    app.get("/api/user/:nickname/lists/:type", clientAuth, reqUser, userLists);
+    app.get("/api/user/:nickname/lists/:type", smw, anyReadAuth, reqUser, userLists);
 
     if (app.config.uploaddir) {
 
         // Uploads
 
-        app.get("/api/user/:nickname/uploads", userAuth, reqUser, sameUser, userUploads);
-        app.post("/api/user/:nickname/uploads", userAuth, reqUser, sameUser, fileContent, newUpload);
+        app.get("/api/user/:nickname/uploads", smw, userReadAuth, reqUser, sameUser, userUploads);
+        app.post("/api/user/:nickname/uploads", userWriteOAuth, reqUser, sameUser, fileContent, newUpload);
     }
     
     // Activities
 
-    app.get("/api/activity/:uuid", clientAuth, reqActivity, actorOrRecipient, getActivity);
-    app.put("/api/activity/:uuid", userAuth, reqActivity, actorOnly, putActivity);
-    app.del("/api/activity/:uuid", userAuth, reqActivity, actorOnly, delActivity);
+    app.get("/api/activity/:uuid", smw, anyReadAuth, reqActivity, actorOrRecipient, getActivity);
+    app.put("/api/activity/:uuid", userWriteOAuth, reqActivity, actorOnly, putActivity);
+    app.del("/api/activity/:uuid", userWriteOAuth, reqActivity, actorOnly, delActivity);
 
     // Other objects
 
-    app.get("/api/:type/:uuid", clientAuth, requestObject, authorOrRecipient, getObject);
-    app.put("/api/:type/:uuid", userAuth, requestObject, authorOnly, reqGenerator, putObject);
-    app.del("/api/:type/:uuid", userAuth, requestObject, authorOnly, reqGenerator, deleteObject);
+    app.get("/api/:type/:uuid", smw, anyReadAuth, requestObject, authorOrRecipient, getObject);
+    app.put("/api/:type/:uuid", userWriteOAuth, requestObject, authorOnly, reqGenerator, putObject);
+    app.del("/api/:type/:uuid", userWriteOAuth, requestObject, authorOnly, reqGenerator, deleteObject);
 
-    app.get("/api/:type/:uuid/likes", clientAuth, requestObject, authorOrRecipient, objectLikes);
-    app.get("/api/:type/:uuid/replies", clientAuth, requestObject, authorOrRecipient, objectReplies);
-    app.get("/api/:type/:uuid/shares", clientAuth, requestObject, authorOrRecipient, objectShares);
+    app.get("/api/:type/:uuid/likes", smw, anyReadAuth, requestObject, authorOrRecipient, objectLikes);
+    app.get("/api/:type/:uuid/replies", smw, anyReadAuth, requestObject, authorOrRecipient, objectReplies);
+    app.get("/api/:type/:uuid/shares", smw, anyReadAuth, requestObject, authorOrRecipient, objectShares);
 
     // Global user list
 
-    app.get("/api/users", clientAuth, listUsers);
-    app.post("/api/users", clientAuth, reqGenerator, createUser);
+    app.get("/api/users", smw, anyReadAuth, listUsers);
+    app.post("/api/users", noneWriteOAuth, reqGenerator, createUser);
 
     // Collection members
 
-    app.get("/api/collection/:uuid/members", clientAuth, requestCollection, authorOrRecipient, collectionMembers);
-    app.post("/api/collection/:uuid/members", userAuth, requestCollection, authorOnly, reqGenerator, newMember);
+    app.get("/api/collection/:uuid/members", smw, anyReadAuth, requestCollection, authorOrRecipient, collectionMembers);
+    app.post("/api/collection/:uuid/members", userWriteOAuth, requestCollection, authorOnly, reqGenerator, newMember);
 
     // Info about yourself
 
-    app.get("/api/whoami", userAuth, whoami);
+    app.get("/api/whoami", smw, userReadAuth, whoami);
 };
 
 // XXX: use a common function instead of faking up params
