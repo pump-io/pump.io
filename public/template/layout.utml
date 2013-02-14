@@ -44,10 +44,10 @@
 
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
-          <% if (principalUser) { %>
-          <%= partial('nav-loggedin') %>
-          <% } else if (page.nologin) { %>
+          <% if (page.nologin) { %>
           <%= partial('nav-nologin') %>
+          <% } else if (principalUser) { %>
+          <%= partial('nav-loggedin') %>
           <% } else { %>
           <%= partial('nav-anonymous') %>
           <% } %>

@@ -73,6 +73,7 @@ var authorize = function(err, req, res, authorized, authResults, application, rt
                                              token: authResults.token,
                                              verifier: authResults.verifier,
                                              principalUser: user,
+                                             principal: user.profile,
                                              application: application});
             }
         });
