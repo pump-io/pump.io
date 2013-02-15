@@ -7,8 +7,8 @@
     <i class="icon-envelope icon-white"> <%- (messages) ? messages.totalItems : 0 %></i>  
   </button>
   <ul class="dropdown-menu" role="menu">
-    <% if (_.isArray(messages)) {%>
-    <% _.each(messages, function(activity) { %>
+    <% if (_.isObject(messages) && _.isArray(messages.items)) {%>
+    <% _.each(messages.items, function(activity) { %>
     <% if (_.isObject(activity)) { %>
     <li>
       <small><%= activity.content %></small>
