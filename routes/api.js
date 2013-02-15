@@ -778,13 +778,15 @@ var createUser = function(req, res, next) {
                     if (err) throw err;
                     confirmationURL = URLMaker.makeURL("/main/confirm/" + confirmation.code);
                     res.render("confirmation-email-html",
-                               {user: user,
+                               {principal: user.profile,
+                                principalUser: user,
                                 confirmation: confirmation,
                                 confirmationURL: confirmationURL,
                                 layout: false},
                                this.parallel());
                     res.render("confirmation-email-text",
-                               {user: user,
+                               {principal: user.profile,
+                                principalUser: user,
                                 confirmation: confirmation,
                                 confirmationURL: confirmationURL,
                                 layout: false},
