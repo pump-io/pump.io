@@ -70,6 +70,7 @@ var databank = require("databank"),
     userWriteOAuth = authc.userWriteOAuth,
     userReadAuth = authc.userReadAuth,
     anyReadAuth = authc.anyReadAuth,
+    setPrincipal = authc.setPrincipal,
     fileContent = mw.fileContent,
     requestObject = omw.requestObject,
     authorOnly = omw.authorOnly,
@@ -927,12 +928,16 @@ var createUser = function(req, res, next) {
                 // If called as /main/register; see ./web.js
                 // XXX: Bad hack
                 if (req.session) {
-                    req.session.principal = {
-                        id: user.profile.id,
-                        objectType: user.profile.objectType
-                    };
-                }
-                res.json(user);
+		    setPrincipal(req.session, user.profile, function(err) {
+				     if (err) {
+					 next(err);
+				     } else {
+					 res.json(user);
+				     }
+				 });
+                } else {
+                    res.json(user);
+		}
             }
         }
     );
