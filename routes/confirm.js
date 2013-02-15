@@ -68,11 +68,16 @@ var confirm = function(req, res, next) {
             confirm.save(this.parallel());
         },
         function(err, res1, res2) {
+            if (err) throw err;
+            setPrincipal(req.session, user.profile, this);
+        },
+        function(err) {
             if (err) {
                 next(err);
             } else {
-                setPrincipal(req.session, user.profile, this);
-                res.render("confirmed", {page: {title: "Email address confirmed"}});
+                res.render("confirmed", {page: {title: "Email address confirmed"},
+                                         principalUser: user,
+                                         principal: user.profile});
             }
         }
     );
