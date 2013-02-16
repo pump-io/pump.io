@@ -258,8 +258,8 @@
                 });
             }
 
-            main.principalUser = (Pump.currentUser) ? Pump.currentUser.toJSON() : null;
-            main.principal = (Pump.currentUser) ? Pump.currentUser.profile.toJSON() : null;
+            main.principalUser = (Pump.principalUser) ? Pump.principalUser.toJSON() : null;
+            main.principal = (Pump.principal) ? Pump.principal.toJSON() : null;
 
             main.partial = function(name, locals) {
                 var template, scoped, html;
@@ -544,13 +544,13 @@
             "click #post-picture-button": "postPictureModal"
         },
         postNoteModal: function() {
-            var profile = Pump.currentUser.profile,
+            var profile = Pump.principal,
                 lists = profile.lists,
                 following = profile.following;
 
             following.once("getall", function() {
                 Pump.fetchObjects([lists], function(err, objs) {
-                    Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.currentUser,
+                    Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.principalUser,
                                                                lists: lists,
                                                                following: following}});
                 });
@@ -561,13 +561,13 @@
             return false;
         },
         postPictureModal: function() {
-            var profile = Pump.currentUser.profile,
+            var profile = Pump.principal,
                 lists = profile.lists,
                 following = profile.following;
 
             following.once("getall", function() {
                 Pump.fetchObjects([lists], function(err, objs) {
-                    Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.currentUser,
+                    Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.principalUser,
                                                                   lists: lists,
                                                                   following: following}});
                 });
@@ -582,7 +582,8 @@
                 options,
                 onSuccess = function(data, textStatus, jqXHR) {
                     var an;
-                    Pump.currentUser = null;
+                    Pump.principalUser = null;
+                    Pump.principal = null;
 
                     Pump.clearNickname();
                     Pump.clearUserCred();
@@ -680,16 +681,17 @@
                     Pump.setNickname(data.nickname);
                     Pump.setUserCred(data.token, data.secret);
                     Pump.clearCaches();
-                    Pump.currentUser = Pump.User.unique(data);
-                    objs = [Pump.currentUser,
-                            Pump.currentUser.majorDirectInbox,
-                            Pump.currentUser.minorDirectInbox];
+                    Pump.principalUser = Pump.User.unique(data);
+                    Pump.principal = Pump.principalUser.profile;
+                    objs = [Pump.principalUser,
+                            Pump.principalUser.majorDirectInbox,
+                            Pump.principalUser.minorDirectInbox];
                     Pump.fetchObjects(objs, function(err, objs) {
                         Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
-                                                          model: Pump.currentUser,
+                                                          model: Pump.principalUser,
                                                           data: {
-                                                              messages: Pump.currentUser.majorDirectInbox,
-                                                              notifications: Pump.currentUser.minorDirectInbox
+                                                              messages: Pump.principalUser.majorDirectInbox,
+                                                              notifications: Pump.principalUser.minorDirectInbox
                                                           }});
                         Pump.body.nav.render();
                     });
@@ -754,20 +756,21 @@
                     Pump.setNickname(data.nickname);
                     Pump.setUserCred(data.token, data.secret);
                     Pump.clearCaches();
-                    Pump.currentUser = Pump.User.unique(data);
+                    Pump.principalUser = Pump.User.unique(data);
+                    Pump.principal = Pump.principalUser.profile;
                     if (Pump.config.sockjs) {
                         // Request a new challenge
                         Pump.setupSocket();
                     }
-                    objs = [Pump.currentUser,
-                            Pump.currentUser.majorDirectInbox,
-                            Pump.currentUser.minorDirectInbox];
+                    objs = [Pump.principalUser,
+                            Pump.principalUser.majorDirectInbox,
+                            Pump.principalUser.minorDirectInbox];
                     Pump.fetchObjects(objs, function(err, objs) {
                         Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
-                                                          model: Pump.currentUser,
+                                                          model: Pump.principalUser,
                                                           data: {
-                                                              messages: Pump.currentUser.majorDirectInbox,
-                                                              notifications: Pump.currentUser.minorDirectInbox
+                                                              messages: Pump.principalUser.majorDirectInbox,
+                                                              notifications: Pump.principalUser.minorDirectInbox
                                                           }});
                         Pump.body.nav.render();
                     });
@@ -1117,7 +1120,7 @@
                     verb: "favorite",
                     object: view.model.object.toJSON()
                 }),
-                stream = Pump.currentUser.minorStream;
+                stream = Pump.principalUser.minorStream;
 
             stream.create(act, {success: function(act) {
                 view.$(".favorite")
@@ -1133,7 +1136,7 @@
                     verb: "unfavorite",
                     object: view.model.object.toJSON()
                 }),
-                stream = Pump.currentUser.minorStream;
+                stream = Pump.principalUser.minorStream;
 
             stream.create(act, {success: function(act) {
                 view.$(".unfavorite")
@@ -1149,7 +1152,7 @@
                     verb: "share",
                     object: view.model.object.toJSON()
                 }),
-                stream = Pump.currentUser.majorStream;
+                stream = Pump.principalUser.majorStream;
 
             stream.create(act, {success: function(act) {
                 view.$(".share")
@@ -1165,7 +1168,7 @@
                     verb: "unshare",
                     object: view.model.object.toJSON()
                 }),
-                stream = Pump.currentUser.minorStream;
+                stream = Pump.principalUser.minorStream;
 
             stream.create(act, {success: function(act) {
                 view.$(".unshare")
@@ -1285,7 +1288,7 @@
                         content: text
                     }
                 }),
-                stream = Pump.currentUser.minorStream;
+                stream = Pump.principalUser.minorStream;
 
             act.object.inReplyTo = orig;
 
@@ -1298,7 +1301,7 @@
 
                 // These get stripped for "posts"; re-add it
 
-                object.author = Pump.currentUser.profile; 
+                object.author = Pump.principal; 
 
                 repl = new Pump.ReplyView({model: object});
 
@@ -1345,7 +1348,7 @@
                     verb: "follow",
                     object: view.model.toJSON()
                 },
-                stream = Pump.currentUser.stream;
+                stream = Pump.principalUser.stream;
 
             stream.create(act, {success: function(act) {
                 view.$(".follow")
@@ -1361,7 +1364,7 @@
                     verb: "stop-following",
                     object: view.model.toJSON()
                 },
-                stream = Pump.currentUser.stream;
+                stream = Pump.principalUser.stream;
 
             stream.create(act, {success: function(act) {
                 view.$(".stop-following")
@@ -1600,7 +1603,7 @@
             "click .new-list": "newList"
         },
         newList: function() {
-            Pump.showModal(Pump.NewListModal, {data: {user: Pump.currentUser}});
+            Pump.showModal(Pump.NewListModal, {data: {user: Pump.principalUser}});
         },
         subs: {
             ".list": {
@@ -1713,7 +1716,7 @@
         },
         addListMember: function() {
             var view = this,
-                profile = Pump.currentUser.profile,
+                profile = Pump.principal,
                 list = view.model,
                 members = view.options.data.members,
                 following = profile.following;
@@ -1734,8 +1737,8 @@
             var view = this,
                 list = view.model,
                 lists = view.options.data.lists,
-                user = Pump.currentUser,
-                person = Pump.currentUser.profile;
+                user = Pump.principalUser,
+                person = Pump.principal;
 
             Pump.areYouSure("Delete the list '"+list.get("displayName")+"'?", function(err, sure) {
                 if (sure) {
@@ -1781,7 +1784,7 @@
                 person = view.model,
                 list = view.options.data.list,
                 members = view.options.data.people,
-                user = Pump.currentUser,
+                user = Pump.principalUser,
                 stream = user.minorStream,
                 act = {
                     verb: "remove",
@@ -1845,7 +1848,7 @@
                     view.fileCount--;
                     return true;
                 }).on("complete", function(event, id, fileName, responseJSON) {
-                    var stream = Pump.currentUser.majorStream,
+                    var stream = Pump.principalUser.majorStream,
                         act = new Pump.Activity({
                             verb: "post",
                             cc: [{id: "http://activityschema.org/collection/public",
@@ -1871,7 +1874,7 @@
         },
         saveProfile: function(img) {
             var view = this,
-                profile = Pump.currentUser.profile,
+                profile = Pump.principal,
                 props = {"displayName": view.$('#realname').val(),
                          "location": { objectType: "place", 
                                        displayName: view.$('#location').val() },
@@ -1896,7 +1899,7 @@
         saveSettings: function() {
 
             var view = this,
-                user = Pump.currentUser,
+                user = Pump.principalUser,
                 profile = user.profile,
                 haveNewAvatar = (view.fileCount > 0);
 
@@ -1924,7 +1927,7 @@
         },
         saveAccount: function() {
             var view = this,
-                user = Pump.currentUser,
+                user = Pump.principalUser,
                 password = view.$('#password').val(),
                 repeat = view.$('#repeat').val();
 
@@ -2016,7 +2019,7 @@
                 members = view.options.data.members,
                 people = view.options.data.people,
                 ids = [],
-                stream = Pump.currentUser.minorStream,
+                stream = Pump.principalUser.minorStream,
                 done;
 
             // Extract the IDs from the data- attributes of toggled thumbnails
@@ -2092,7 +2095,7 @@
                         content: text
                     }
                 }),
-                stream = Pump.currentUser.majorStream,
+                stream = Pump.principalUser.majorStream,
                 strToObj = function(str) {
                     var colon = str.indexOf(":"),
                         type = str.substr(0, colon),
@@ -2167,7 +2170,7 @@
                     }
                 }).on("complete", function(event, id, fileName, responseJSON) {
 
-                    var stream = Pump.currentUser.majorStream,
+                    var stream = Pump.principalUser.majorStream,
                         to = view.$('#post-picture #picture-to').val(),
                         cc = view.$('#post-picture #picture-cc').val(),
                         strToObj = function(str) {
@@ -2250,7 +2253,7 @@
                 description = view.$('#new-list #list-description').val(),
                 name = view.$('#new-list #list-name').val(),
                 act,
-                stream = Pump.currentUser.minorStream;
+                stream = Pump.principalUser.minorStream;
 
             if (!name) {
                 view.showError("Your list must have a name.");

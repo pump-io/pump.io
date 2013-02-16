@@ -93,7 +93,8 @@ if (!window.Pump) {
                         return;
                     }
 
-                    user = Pump.currentUser = Pump.User.unique(data);
+                    user = Pump.principalUser = Pump.User.unique(data);
+                    Pump.principal = Pump.principalUser.profile;
 
                     major = user.majorDirectInbox;
                     minor = user.minorDirectInbox;
@@ -106,7 +107,7 @@ if (!window.Pump) {
                             return;
                         }
 
-                        Pump.currentUser = user;
+                        Pump.principalUser = user;
 
                         Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
                                                           model: user,
