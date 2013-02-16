@@ -48,6 +48,8 @@
           <%= partial('nav-nologin') %>
           <% } else if (principalUser) { %>
           <%= partial('nav-loggedin') %>
+          <% } else if (principal) { %>
+          <%= partial('nav-remote') %>
           <% } else { %>
           <%= partial('nav-anonymous') %>
           <% } %>
