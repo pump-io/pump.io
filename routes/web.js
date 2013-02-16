@@ -1039,17 +1039,17 @@ var authorized = function(req, res, next) {
             ActivityObject.ensureObject(obj, this);
         },
         function(err, results) {
-            var props;
+            var at;
             if (err) throw err;
             principal = results;
-            props = {
+            at = new RemoteAccessToken({
                 id: principal.id,
                 type: principal.objectType,
                 token: pair.token,
                 secret: pair.secret,
                 hostname: host.hostname
-            };
-            RemoteAccessToken.create(props, this);
+            });
+            at.save(this);
         },
         function(err, at) {
             if (err) throw err;
