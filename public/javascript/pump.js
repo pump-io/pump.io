@@ -70,6 +70,12 @@ if (!window.Pump) {
         if (Pump.principalUser) {
             Pump.principalUser = Pump.User.unique(Pump.principalUser);
             Pump.principal = Pump.principalUser.profile;
+            Pump.body.nav = new Pump.UserNav({el: Pump.body.$(".navbar-inner .container"),
+                                              model: Pump.principalUser,
+                                              data: {
+                                                  messages: Pump.principalUser.majorDirectInbox,
+                                                  notifications: Pump.principalUser.minorDirectInbox
+                                              }});
         } else if (Pump.principal) {
             Pump.principal = Pump.Person.unique(Pump.principal);
         } else {
