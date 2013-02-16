@@ -317,24 +317,29 @@ if (!window.Pump) {
     };
 
     Pump.ajax = function(options) {
-        Pump.ensureCred(function(err, cred) {
-            var pair;
-            if (err) {
-                Pump.error("Couldn't get OAuth credentials. :(");
-            } else {
-                options.consumerKey = cred.clientID;
-                options.consumerSecret = cred.clientSecret;
-                pair = Pump.getUserCred();
+        // For RO stuff, we use session auth
+        if (options.type == "GET") {
+            $.ajax(options);
+        } else {
+            Pump.ensureCred(function(err, cred) {
+                var pair;
+                if (err) {
+                    Pump.error("Couldn't get OAuth credentials. :(");
+                } else {
+                    options.consumerKey = cred.clientID;
+                    options.consumerSecret = cred.clientSecret;
+                    pair = Pump.getUserCred();
 
-                if (pair) {
-                    options.token = pair.token;
-                    options.tokenSecret = pair.secret;
+                    if (pair) {
+                        options.token = pair.token;
+                        options.tokenSecret = pair.secret;
+                    }
+
+                    options = Pump.oauthify(options);
+                    $.ajax(options);
                 }
-
-                options = Pump.oauthify(options);
-                $.ajax(options);
-            }
-        });
+            });
+        }
     };
 
     Pump.setupInfiniteScroll = function() {
