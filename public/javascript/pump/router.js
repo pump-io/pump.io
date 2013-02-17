@@ -70,7 +70,7 @@
         settings: function() {
             Pump.body.startLoad();
             Pump.body.setContent({contentView: Pump.SettingsContent,
-                                  model: Pump.currentUser.profile,
+                                  model: Pump.principal,
                                   title: "Settings"},
                                  function() {
                                      Pump.body.endLoad();
@@ -80,7 +80,7 @@
         account: function() {
             Pump.body.startLoad();
             Pump.body.setContent({contentView: Pump.AccountContent,
-                                  model: Pump.currentUser,
+                                  model: Pump.principalUser,
                                   title: "Account"},
                                  function() {
                                      Pump.body.endLoad();
@@ -88,7 +88,7 @@
         },
 
         messages: function() {
-            var user = Pump.currentUser,
+            var user = Pump.principalUser,
                 major = user.majorDirectInbox,
                 minor = user.minorDirectInbox;
 
@@ -114,7 +114,7 @@
 
             Pump.body.startLoad();
             if (pair) {
-                var user = Pump.currentUser,
+                var user = Pump.principalUser,
                     major = user.majorInbox,
                     minor = user.minorInbox;
 

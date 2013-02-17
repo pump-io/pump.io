@@ -23,7 +23,6 @@
         <b class="caret"></b>
       </a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="profile-dropdown">
-        <% if (principalUser) { %>
         <li><a tabindex="-1" href="/<%- principalUser.nickname %>">Activity</a></li>
         <li><a tabindex="-1" href="/<%- principalUser.nickname %>/favorites">Favorites</a></li>
         <li><a tabindex="-1" href="/<%- principalUser.nickname %>/followers">Followers</a></li>
@@ -35,17 +34,14 @@
         <li><a tabindex="-1" href="/main/settings">Settings</a></li>
         <li><a tabindex="-1" href="/main/account">Account</a></li>
         <li class="divider"></li>
-        <% } %>
         <li><a tabindex="-1" id="logout" href="#">Log out</a></li>
       </ul>
     </li>
   </ul>
 
-  <% if (principalUser) { %>
   <div class="pull-right">
     <%= partial("messages", {messages: {totalItems: 0, items: []}}) %>
     <%= partial("notifications", {notifications: {totalItems: 0, items: []}}) %>
   </div>
-  <% } %>
 
 </div>

@@ -450,7 +450,7 @@ var showStream = function(req, res, next) {
         getMinor = function(callback) {
             Step(
                 function() {
-                    req.user.getMajorOutboxStream(this);
+                    req.user.getMinorOutboxStream(this);
                 },
                 function(err, str) {
                     if (err) throw err;
