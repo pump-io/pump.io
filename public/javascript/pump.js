@@ -78,6 +78,8 @@ if (!window.Pump) {
                                               }});
         } else if (Pump.principal) {
             Pump.principal = Pump.Person.unique(Pump.principal);
+            Pump.body.nav = new Pump.RemoteNav({el: Pump.body.$(".navbar-inner .container"),
+                                                model: Pump.principal});
         } else {
             // Check if we have stored OAuth credentials
 

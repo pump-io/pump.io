@@ -57,6 +57,7 @@ var databank = require("databank"),
     principalUserOnly = authc.principalUserOnly,
     clientAuth = authc.clientAuth,
     userAuth = authc.userAuth,
+    someReadAuth = authc.someReadAuth,
     NoSuchThingError = databank.NoSuchThingError,
     createUser = api.createUser,
     addLiked = finishers.addLiked,
@@ -77,7 +78,7 @@ var addRoutes = function(app) {
     app.get("/main/login", app.session, principal, showLogin);
     app.post("/main/login", app.session, clientAuth, handleLogin);
 
-    app.post("/main/logout", app.session, userAuth, principal, handleLogout);
+    app.post("/main/logout", app.session, someReadAuth, handleLogout);
 
     app.post("/main/renew", app.session, userAuth, principal, renewSession);
 
@@ -234,29 +235,46 @@ var showLogin = function(req, res, next) {
 };
 
 var handleLogout = function(req, res, next) {
+
+    var clearAccessTokens = function(req, callback) {
+
+        if (!req.principalUser) {
+            callback(null);
+            return;
+        }
+
+        Step(
+            function() {
+                AccessToken.search({"consumer_key": req.client.consumer_key,
+                                    "username": req.principalUser.nickname},
+                                   this);
+            },
+            function(err, tokens) {
+                var i, group = this.group();
+                if (err) throw err;
+                for (i = 0; i < tokens.length; i++) {
+                    // XXX: keep for auditing?
+                    tokens[i].del(group());
+                }
+            },
+            callback
+        );
+    };
+
     Step(
         function() {
             clearPrincipal(req.session, this);
         },
         function(err) {
             if (err) throw err;
-            AccessToken.search({"consumer_key": req.client.consumer_key,
-                                "username": req.principalUser.nickname},
-                               this);
-        },
-        function(err, tokens) {
-            var i, group = this.group();
-            if (err) throw err;
-            for (i = 0; i < tokens.length; i++) {
-                // XXX: keep for auditing?
-                tokens[i].del(group());
-            }
+            clearAccessTokens(req, this);
         },
         function(err) {
             if (err) {
                 next(err);
             } else {
                 req.principalUser = null;
+                req.principal = null;
                 res.json("OK");
             }
         }
