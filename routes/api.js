@@ -1094,8 +1094,8 @@ var postToInbox = function(req, res, next) {
 
     // Must be either a host or a webfinger
 
-    if (req.principal.id != activity.actor.id) {
-        next(new HTTPError("Invalid actor", 400));
+    if (ActivityObject.canonicalID(activity.actor.id) != ActivityObject.canonicalID(req.principal.id)) {
+        next(new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400));
         return;
     }
 
