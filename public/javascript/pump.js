@@ -464,16 +464,49 @@ if (!window.Pump) {
     };
 
     Pump.newMinorActivity = function(act, callback) {
-        Pump.addToStream(Pump.principalUser.minorStream, act, callback);
+        if (Pump.principalUser) {
+            Pump.addToStream(Pump.principalUser.minorStream, act, callback);
+        } else {
+            Pump.proxyActivity(act, callback);
+        }
     };
 
 
     Pump.newMajorActivity = function(act, callback) {
-        Pump.addToStream(Pump.principalUser.majorStream, act, callback);
+        if (Pump.principalUser) {
+            Pump.addToStream(Pump.principalUser.majorStream, act, callback);
+        } else {
+            Pump.proxyActivity(act, callback);
+        }
     };
 
     Pump.addToStream = function(stream, act, callback) {
         stream.create(act, {
+            success: function(act) {
+                callback(null, act);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                var type, response;
+                type = jqXHR.getResponseHeader("Content-Type");
+                if (type && type.indexOf("application/json") !== -1) {
+                    response = JSON.parse(jqXHR.responseText);
+                    callback(new Error(response.error), null);
+                } else {
+                    callback(new Error(errorThrown), null);
+                }
+            }
+        });
+    };
+
+    // XXX: This POSTs with session auth; subject to XSS.
+
+    Pump.proxyActivity = function(act, callback) {
+        $.ajax({
+            contentType: "application/json",
+            data: JSON.stringify(act),
+            dataType: "json",
+            type: "POST",
+            url: "/main/proxy",
             success: function(act) {
                 callback(null, act);
             },

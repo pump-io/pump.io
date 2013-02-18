@@ -114,6 +114,8 @@ var addRoutes = function(app) {
     app.get("/shared/showdown.js", sharedFile("showdown/src/showdown.js"));
     app.get("/shared/underscore.js", sharedFile("underscore/underscore.js"));
     app.get("/shared/underscore-min.js", sharedFile("underscore/underscore-min.js"));
+
+    app.post("/main/proxy", app.session, principal, principalNotUser, proxyActivity);
 };
 
 var sharedFile = function(fname) {
@@ -1060,6 +1062,77 @@ var authorized = function(req, res, next) {
                 next(err);
             } else {
                 res.redirect("/");
+            }
+        }
+    );
+};
+
+var principalNotUser = function(req, res, next) {
+    if (!req.principal) {
+        next(new HTTPError("No principal", 401));
+    } else if (req.principalUser) {
+        next(new HTTPError("Only for remote users", 401));
+    } else {
+        next();
+    }
+};
+
+var proxyActivity = function(req, res, next) {
+
+    var principal = req.principal,
+        props = Scrubber.scrubActivity(req.body),
+        activity = new Activity(props),
+        at,
+        host,
+        oa;
+
+    // XXX: we overwrite anything here
+
+    activity.generator = req.generator;
+
+    if (!_.has(principal, "links") ||
+        !_.has(principal.links, "activity-outbox") ||
+        !_.has(principal.links["activity-outbox"], "href")) {
+        next(new Error("No activity outbox endpoint for " + principal.id, 400));
+        return;
+    }
+
+    Step(
+        function() {
+            RemoteAccessToken.get(principal.id, this);
+        },
+        function(err, results) {
+            if (err) throw err;
+            at = results;
+            Host.ensureHost(at.hostname, this);
+        },
+        function(err, results) {
+            if (err) throw err;
+            host = results;
+            host.getOAuth(this);
+        },
+        function(err, results) {
+            if (err) throw err;
+            oa = results;
+            oa.post(principal.links["activity-outbox"].href,
+                    at.token,
+                    at.secret,
+                    JSON.stringify(activity),
+                    "application/json",
+                    this);
+        },
+        function(err, doc, response) {
+            var act;
+            if (err) {
+                if (err.statusCode) {
+                    next(new Error("Remote OAuth error code " + err.statusCode + ": " + err.data));
+                } else {
+                    next(err);
+                }
+            } else {
+                act = new Activity(JSON.parse(doc));
+                act.sanitize(principal);
+                res.json(act);
             }
         }
     );
