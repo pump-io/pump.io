@@ -175,10 +175,10 @@ suite.addBatch({
                         assert.isObject(user);
                     },
                     "and we test the lrdd endpoint":
-                    xrdutil.xrdContext("https://secure.localhost/api/lrdd?uri=caterpillar@secure.localhost",
+                    xrdutil.xrdContext("https://secure.localhost/api/lrdd?resource=caterpillar@secure.localhost",
                                        webfinger),
-                    "and we test the lrdd.json endpoint":
-                    xrdutil.jrdContext("https://secure.localhost/api/lrdd.json?uri=caterpillar@secure.localhost",
+                    "and we test the webfinger endpoint":
+                    xrdutil.jrdContext("https://secure.localhost/.well-known/webfinger?resource=caterpillar@secure.localhost",
                                        webfinger),
                     "and we get the user": {
                         topic: function(user, cl) {
