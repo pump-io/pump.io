@@ -104,6 +104,7 @@ if (!window.Pump) {
 
                         if (err) {
                             Pump.error(err);
+                            Pump.clearUserCred();
                             return;
                         }
 
