@@ -117,6 +117,7 @@ if (!window.Pump) {
                             var sp, continueTo;
 
                             if (err) {
+                                Pump.clearUserCred();
                                 Pump.error(err);
                                 return;
                             }

@@ -126,7 +126,7 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.isObject(obj);
                     assert.include(obj, "id");
-                    assert.equal(obj.id, "alice@geographic.example");
+                    assert.equal(obj.id, "acct:alice@geographic.example");
                 }
             }
         },
