@@ -1119,64 +1119,72 @@
                 act = new Pump.Activity({
                     verb: "favorite",
                     object: view.model.object.toJSON()
-                }),
-                stream = Pump.principalUser.minorStream;
+                });
 
-            stream.create(act, {success: function(act) {
+            Pump.newMinorActivity(act, function(err, act) {
                 view.$(".favorite")
                     .removeClass("favorite")
                     .addClass("unfavorite")
                     .html("Unlike <i class=\"icon-thumbs-down\"></i>");
                 Pump.addMinorActivity(act);
-            }});
+            });
         },
         unfavoriteObject: function() {
             var view = this,
                 act = new Pump.Activity({
                     verb: "unfavorite",
                     object: view.model.object.toJSON()
-                }),
-                stream = Pump.principalUser.minorStream;
+                });
 
-            stream.create(act, {success: function(act) {
-                view.$(".unfavorite")
-                    .removeClass("unfavorite")
-                    .addClass("favorite")
-                    .html("Like <i class=\"icon-thumbs-up\"></i>");
-                Pump.addMinorActivity(act);
-            }});
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".unfavorite")
+                        .removeClass("unfavorite")
+                        .addClass("favorite")
+                        .html("Like <i class=\"icon-thumbs-up\"></i>");
+                    Pump.addMinorActivity(act);
+                }
+            });
         },
         shareObject: function() {
             var view = this,
                 act = new Pump.Activity({
                     verb: "share",
                     object: view.model.object.toJSON()
-                }),
-                stream = Pump.principalUser.majorStream;
+                });
 
-            stream.create(act, {success: function(act) {
-                view.$(".share")
-                    .removeClass("share")
-                    .addClass("unshare")
-                    .html("Unshare <i class=\"icon-remove\"></i>");
-                Pump.addMajorActivity(act);
-            }});
+            Pump.newMajorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".share")
+                        .removeClass("share")
+                        .addClass("unshare")
+                        .html("Unshare <i class=\"icon-remove\"></i>");
+                    Pump.addMajorActivity(act);
+                }
+            });
         },
         unshareObject: function() {
             var view = this,
                 act = new Pump.Activity({
                     verb: "unshare",
                     object: view.model.object.toJSON()
-                }),
-                stream = Pump.principalUser.minorStream;
+                });
 
-            stream.create(act, {success: function(act) {
-                view.$(".unshare")
-                    .removeClass("unshare")
-                    .addClass("share")
-                    .html("Share <i class=\"icon-share-alt\"></i>");
-                Pump.addMinorActivity(act);
-            }});
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".unshare")
+                        .removeClass("unshare")
+                        .addClass("share")
+                        .html("Share <i class=\"icon-share-alt\"></i>");
+                    Pump.addMinorActivity(act);
+                }
+            });
         },
         openComment: function() {
             var view = this,
@@ -1287,36 +1295,36 @@
                         objectType: "comment",
                         content: text
                     }
-                }),
-                stream = Pump.principalUser.minorStream;
+                });
 
             act.object.inReplyTo = orig;
 
             view.startSpin();
 
-            stream.create(act, {success: function(act) {
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    var object = act.object,
+                        repl;
+                    // These get stripped for "posts"; re-add it
 
-                var object = act.object,
-                    repl;
+                    object.author = Pump.principal; 
 
-                // These get stripped for "posts"; re-add it
+                    repl = new Pump.ReplyView({model: object});
 
-                object.author = Pump.principal; 
+                    repl.on("ready", function() {
 
-                repl = new Pump.ReplyView({model: object});
+                        view.stopSpin();
 
-                repl.on("ready", function() {
+                        view.$el.replaceWith(repl.$el);
+                    });
 
-                    view.stopSpin();
+                    repl.render();
 
-                    view.$el.replaceWith(repl.$el);
-                });
-
-                repl.render();
-
-                Pump.addMinorActivity(act);
-
-            }});
+                    Pump.addMinorActivity(act);
+                }
+            });
 
             return false;
         }
@@ -1347,32 +1355,40 @@
                 act = {
                     verb: "follow",
                     object: view.model.toJSON()
-                },
-                stream = Pump.principalUser.stream;
+                };
 
-            stream.create(act, {success: function(act) {
-                view.$(".follow")
-                    .removeClass("follow")
-                    .removeClass("btn-primary")
-                    .addClass("stop-following")
-                    .html("Stop following");
-            }});
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".follow")
+                        .removeClass("follow")
+                        .removeClass("btn-primary")
+                        .addClass("stop-following")
+                        .html("Stop following");
+                    Pump.addMinorActivity(act);
+                }
+            });
         },
         stopFollowingProfile: function() {
             var view = this,
                 act = {
                     verb: "stop-following",
                     object: view.model.toJSON()
-                },
-                stream = Pump.principalUser.stream;
+                };
 
-            stream.create(act, {success: function(act) {
-                view.$(".stop-following")
-                    .removeClass("stop-following")
-                    .addClass("btn-primary")
-                    .addClass("follow")
-                    .html("Follow");
-            }});
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".stop-following")
+                        .removeClass("stop-following")
+                        .addClass("btn-primary")
+                        .addClass("follow")
+                        .html("Follow");
+                    Pump.addMinorActivity(act);
+                }
+            });
         }
     });
 
@@ -1785,7 +1801,6 @@
                 list = view.options.data.list,
                 members = view.options.data.people,
                 user = Pump.principalUser,
-                stream = user.minorStream,
                 act = {
                     verb: "remove",
                     object: {
@@ -1798,11 +1813,16 @@
                     }
                 };
 
-            stream.create(act, {success: function(activity) {
-                members.remove(person.id);
-                list.totalItems--;
-                list.trigger("change");
-            }});
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    members.remove(person.id);
+                    list.totalItems--;
+                    list.trigger("change");
+                    Pump.addMinorActivity(act);
+                }
+            });
         }
     });
 
@@ -1848,24 +1868,21 @@
                     view.fileCount--;
                     return true;
                 }).on("complete", function(event, id, fileName, responseJSON) {
-                    var stream = Pump.principalUser.majorStream,
-                        act = new Pump.Activity({
+                    var act = new Pump.Activity({
                             verb: "post",
                             cc: [{id: "http://activityschema.org/collection/public",
                                   objectType: "collection"}],
                             object: responseJSON.obj
                         });
 
-                    stream.create(act, 
-                                  {
-                                      success: function(act) {
-                                          view.saveProfile(act.object.get("fullImage"));
-                                      },
-                                      error: function() {
-                                          view.showError("Couldn't create");
-                                          view.stopSpin();
-                                      }
-                                  });
+                    Pump.newMajorActivity(act, function(err, act) {
+                        if (err) {
+                            view.showError(err);
+                            view.stopSpin();
+                        } else {
+                            view.saveProfile(act.object.get("fullImage"));
+                        }
+                    });
                 }).on("error", function(event, id, fileName, reason) {
                     view.showError(reason);
                     view.stopSpin();
@@ -2019,7 +2036,6 @@
                 members = view.options.data.members,
                 people = view.options.data.people,
                 ids = [],
-                stream = Pump.principalUser.minorStream,
                 done;
 
             // Extract the IDs from the data- attributes of toggled thumbnails
@@ -2058,11 +2074,16 @@
                         }
                     };
 
-                stream.create(act, {success: function(activity) {
-                    members.add(person, {at: 0});
-                    list.totalItems++;
-                    list.trigger("change");
-                }});
+                Pump.newMinorActivity(act, function(err, act) {
+                    if (err) {
+                        view.showError(err);
+                    } else {
+                        members.add(person, {at: 0});
+                        list.totalItems++;
+                        list.trigger("change");
+                        Pump.addMinorActivity(act);
+                    }
+                });
             });
         }
     });
@@ -2095,7 +2116,6 @@
                         content: text
                     }
                 }),
-                stream = Pump.principalUser.majorStream,
                 strToObj = function(str) {
                     var colon = str.indexOf(":"),
                         type = str.substr(0, colon),
@@ -2116,14 +2136,18 @@
 
             view.startSpin();
             
-            stream.create(act, {success: function(act) {
-                view.$el.modal('hide');
-                view.stopSpin();
-                Pump.resetWysihtml5(view.$('#note-content'));
-                // Reload the current page
-                Pump.addMajorActivity(act);
-                view.remove();
-            }});
+            Pump.newMajorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$el.modal('hide');
+                    view.stopSpin();
+                    Pump.resetWysihtml5(view.$('#note-content'));
+                    // Reload the current page
+                    Pump.addMajorActivity(act);
+                    view.remove();
+                }
+            });
         }
     });
 
@@ -2195,16 +2219,20 @@
                         act.cc = new Pump.ActivityObjectBag(_.map(cc, strToObj));
                     }
 
-                    stream.create(act, {success: function(act) {
-                        view.$el.modal('hide');
-                        view.stopSpin();
-                        view.$("#picture-fineupload").fineUploader('reset');
-                        Pump.resetWysihtml5(view.$('#picture-description'));
-                        view.$('#picture-title').val("");
-                        // Reload the current content
-                        Pump.addMajorActivity(act);
-                        view.remove();
-                    }});
+                    Pump.newMajorActivity(act, function(err, act) {
+                        if (err) {
+                            view.showError(err);
+                        } else {
+                            view.$el.modal('hide');
+                            view.stopSpin();
+                            view.$("#picture-fineupload").fineUploader('reset');
+                            Pump.resetWysihtml5(view.$('#picture-description'));
+                            view.$('#picture-title').val("");
+                            // Reload the current content
+                            Pump.addMajorActivity(act);
+                            view.remove();
+                        }
+                    });
                 }).on("error", function(event, id, fileName, reason) {
                     view.showError(reason);
                 });
@@ -2252,8 +2280,7 @@
             var view = this,
                 description = view.$('#new-list #list-description').val(),
                 name = view.$('#new-list #list-name').val(),
-                act,
-                stream = Pump.principalUser.minorStream;
+                act;
 
             if (!name) {
                 view.showError("Your list must have a name.");
@@ -2275,34 +2302,38 @@
                 
                 view.startSpin();
 
-                stream.create(act, {success: function(act) {
+                Pump.newMinorActivity(act, function(err, act) {
                     var aview;
+                    if (err) {
+                        view.showError(err);
+                    } else {
 
-                    view.$el.modal('hide');
-                    view.stopSpin();
-                    Pump.resetWysihtml5(view.$('#list-description'));
-                    view.$('#list-name').val("");
+                        view.$el.modal('hide');
+                        view.stopSpin();
+                        Pump.resetWysihtml5(view.$('#list-description'));
+                        view.$('#list-name').val("");
 
-                    view.remove();
+                        view.remove();
 
-                    // it's minor
+                        // it's minor
 
-                    Pump.addMinorActivity(act);
+                        Pump.addMinorActivity(act);
 
-                    if ($("#list-menu-inner").length > 0) {
-                        aview = new Pump.ListMenuItem({model: act.object, data: {list: act.object}});
-                        aview.on("ready", function() {
-                            var rel;
-                            aview.$el.hide();
-                            $("#list-menu-inner").prepend(aview.$el);
-                            aview.$el.slideDown('fast');
-                            // Go to the new list page
-                            rel = Pump.rel(act.object.get("url"));
-                            Pump.router.navigate(rel, true);
-                        });
-                        aview.render();
+                        if ($("#list-menu-inner").length > 0) {
+                            aview = new Pump.ListMenuItem({model: act.object, data: {list: act.object}});
+                            aview.on("ready", function() {
+                                var rel;
+                                aview.$el.hide();
+                                $("#list-menu-inner").prepend(aview.$el);
+                                aview.$el.slideDown('fast');
+                                // Go to the new list page
+                                rel = Pump.rel(act.object.get("url"));
+                                Pump.router.navigate(rel, true);
+                            });
+                            aview.render();
+                        }
                     }
-                }});
+                });
             }
 
             return false;
