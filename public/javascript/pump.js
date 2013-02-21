@@ -411,7 +411,7 @@ if (!window.Pump) {
             selectorToView = {
                 "#main": {View: Pump.MainContent},
                 "#login": {View: Pump.LoginContent},
-                "#registration": {View: Pump.RegisterContent},
+                "#register": {View: Pump.RegisterContent},
                 "#inbox": {View: Pump.InboxContent, models: {major: Pump.ActivityStream, minor: Pump.ActivityStream}},
                 ".object-page": {View: Pump.ObjectContent, models: {object: Pump.ActivityObject}},
                 ".major-activity-page": {View: Pump.ActivityContent, models: {activity: Pump.Activity}},
