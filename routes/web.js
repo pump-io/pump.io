@@ -22,6 +22,9 @@ var databank = require("databank"),
     fs = require("fs"),
     Step = require("step"),
     _ = require("underscore"),
+    validator = require("validator"),
+    check = validator.check,
+    sanitize = validator.sanitize,
     FilteredStream = require("../lib/filteredstream").FilteredStream,
     filters = require("../lib/filters"),
     publicOnly = filters.publicOnly,
@@ -34,9 +37,12 @@ var databank = require("databank"),
     AccessToken = require("../lib/model/accesstoken").AccessToken,
     User = require("../lib/model/user").User,
     Collection = require("../lib/model/collection").Collection,
+    RemoteRequestToken = require("../lib/model/remoterequesttoken").RemoteRequestToken,
+    RemoteAccessToken = require("../lib/model/remoteaccesstoken").RemoteAccessToken,
+    Host = require("../lib/model/host").Host,
     mw = require("../lib/middleware"),
     omw = require("../lib/objectmiddleware"),
-    sa = require("../lib/sessionauth"),
+    authc = require("../lib/authc"),
     he = require("../lib/httperror"),
     Scrubber = require("../lib/scrubber"),
     finishers = require("../lib/finishers"),
@@ -45,12 +51,13 @@ var databank = require("databank"),
     HTTPError = he.HTTPError,
     reqUser = mw.reqUser,
     reqGenerator = mw.reqGenerator,
-    principal = sa.principal,
-    setPrincipal = sa.setPrincipal,
-    clearPrincipal = sa.clearPrincipal,
-    principalUserOnly = sa.principalUserOnly,
-    clientAuth = mw.clientAuth,
-    userAuth = mw.userAuth,
+    principal = authc.principal,
+    setPrincipal = authc.setPrincipal,
+    clearPrincipal = authc.clearPrincipal,
+    principalUserOnly = authc.principalUserOnly,
+    clientAuth = authc.clientAuth,
+    userAuth = authc.userAuth,
+    someReadAuth = authc.someReadAuth,
     NoSuchThingError = databank.NoSuchThingError,
     createUser = api.createUser,
     addLiked = finishers.addLiked,
@@ -71,10 +78,15 @@ var addRoutes = function(app) {
     app.get("/main/login", app.session, principal, showLogin);
     app.post("/main/login", app.session, clientAuth, handleLogin);
 
-    app.post("/main/logout", app.session, userAuth, principal, handleLogout);
+    app.post("/main/logout", app.session, someReadAuth, handleLogout);
 
     app.post("/main/renew", app.session, userAuth, principal, renewSession);
 
+    app.get("/main/remote", app.session, principal, showRemote);
+    app.post("/main/remote", app.session, handleRemote);
+
+    app.get("/main/authorized/:hostname", app.session, reqHost, reqToken, authorized);
+    
     if (app.config.uploaddir) {
         app.post("/main/upload", app.session, principal, principalUserOnly, uploadFile);
     }
@@ -103,6 +115,8 @@ var addRoutes = function(app) {
     app.get("/shared/showdown.js", sharedFile("showdown/src/showdown.js"));
     app.get("/shared/underscore.js", sharedFile("underscore/underscore.js"));
     app.get("/shared/underscore-min.js", sharedFile("underscore/underscore-min.js"));
+
+    app.post("/main/proxy", app.session, principal, principalNotUser, proxyActivity);
 };
 
 var sharedFile = function(fname) {
@@ -125,81 +139,6 @@ var showMain = function(req, res, next) {
         req.log.info({msg: "Showing welcome page"});
         res.render("main", {page: {title: "Welcome"}});
     }
-};
-
-var showDirect = function(req, res, next) {
-
-    var pump = this,
-        user = req.principalUser,
-        profile = req.principal,
-        getMajor = function(callback) {
-            var activities;
-            Step(
-                function() {
-                    user.getMajorDirectInboxStream(this);
-                },
-                function(err, str) {
-                    if (err) throw err;
-                    str.getIDs(0, 20, this);
-                },
-                function(err, ids) {
-                    if (err) throw err;
-                    Activity.readArray(ids, this);
-                },
-                function(err, results) {
-                    var objects;
-                    if (err) throw err;
-                    activities = results;
-                    objects = _.pluck(activities, "object");
-                    addLiked(profile, objects, this.parallel());
-                    addShared(profile, objects, this.parallel());
-                    addLikers(profile, objects, this.parallel());
-                    firstFewReplies(profile, objects, this.parallel());
-                    firstFewShares(profile, objects, this.parallel());
-                },
-                function(err) {
-                    if (err) {
-                        callback(err, null);
-                    } else {
-                        callback(null, activities);
-                    }
-                }
-            );
-        },
-        getMinor = function(callback) {
-            Step(
-                function() {
-                    user.getMinorDirectInboxStream(this);
-                },
-                function(err, str) {
-                    if (err) throw err;
-                    str.getIDs(0, 20, this);
-                },
-                function(err, ids) {
-                    if (err) throw err;
-                    Activity.readArray(ids, this);
-                },
-                callback
-            );
-        };
-
-    Step(
-        function() {
-            getMajor(this.parallel());
-            getMinor(this.parallel());
-        },
-        function(err, major, minor) {
-            var data;
-            if (err) {
-                next(err);
-            } else {
-                res.render("direct", {page: { title: "Direct" },
-                                      major: major,
-                                      minor: minor,
-                                      user: user});
-            }
-        }
-    );
 };
 
 var showInbox = function(req, res, next) {
@@ -296,30 +235,93 @@ var showLogin = function(req, res, next) {
 };
 
 var handleLogout = function(req, res, next) {
+
+    var clearAccessTokens = function(req, callback) {
+
+        if (!req.principalUser) {
+            callback(null);
+            return;
+        }
+
+        Step(
+            function() {
+                AccessToken.search({"consumer_key": req.client.consumer_key,
+                                    "username": req.principalUser.nickname},
+                                   this);
+            },
+            function(err, tokens) {
+                var i, group = this.group();
+                if (err) throw err;
+                for (i = 0; i < tokens.length; i++) {
+                    // XXX: keep for auditing?
+                    tokens[i].del(group());
+                }
+            },
+            callback
+        );
+    };
+
     Step(
         function() {
             clearPrincipal(req.session, this);
         },
         function(err) {
             if (err) throw err;
-            AccessToken.search({"consumer_key": req.client.consumer_key,
-                                "username": req.remoteUser.nickname},
-                               this);
-        },
-        function(err, tokens) {
-            var i, group = this.group();
-            if (err) throw err;
-            for (i = 0; i < tokens.length; i++) {
-                // XXX: keep for auditing?
-                tokens[i].del(group());
-            }
+            clearAccessTokens(req, this);
         },
         function(err) {
             if (err) {
                 next(err);
             } else {
-                req.remoteUser = null;
+                req.principalUser = null;
+                req.principal = null;
                 res.json("OK");
+            }
+        }
+    );
+};
+
+var showRemote = function(req, res, next) {
+    res.render("remote", {page: {title: "Remote login"}});
+};
+
+var handleRemote = function(req, res, next) {
+
+    var webfinger = req.body.webfinger,
+        hostname,
+        parts,
+        host;
+
+    try {
+        check(webfinger).isEmail();
+    } catch(e) {
+        next(new HTTPError(e.message, 400));
+        return;
+    }
+
+    parts = webfinger.split("@", 2);
+
+    if (parts.length < 2) {
+        next(new HTTPError("Bad format for webfinger", 400));
+        return;
+    }
+
+    hostname = parts[1];
+
+    Step(
+        function() {
+            Host.ensureHost(hostname, this);
+        },
+        function(err, result) {
+            if (err) throw err;
+            host = result;
+            host.getRequestToken(this);
+        },
+        function(err, rt) {
+            if (err) {
+                next(err);
+            } else {
+                res.redirect(host.authorizeURL(rt));
             }
         }
     );
@@ -371,8 +373,7 @@ var userIsActor = function(req, res, next) {
 
 var principalActorOrRecipient = function(req, res, next) {
 
-    var user = req.principalUser,
-        person = req.principal,
+    var person = req.principal,
         activity = req.activity;
 
     if (activity && activity.actor && person && activity.actor.id == person.id) {
@@ -397,17 +398,15 @@ var principalActorOrRecipient = function(req, res, next) {
 
 var showActivity = function(req, res, next) {
 
-    var activity = req.activity,
-        user = req.principalUser,
-        principal = req.principal;
+    var activity = req.activity;
 
     if (activity.isMajor()) {
         res.render("major-activity-page", {page: {title: activity.content},
-                                           user: user,
+                                           principal: principal,
                                            activity: activity});
     } else {
         res.render("minor-activity-page", {page: {title: activity.content},
-                                           user: user,
+                                           principal: principal,
                                            activity: activity});
     }
 };
@@ -471,7 +470,7 @@ var showStream = function(req, res, next) {
         getMinor = function(callback) {
             Step(
                 function() {
-                    req.user.getMajorOutboxStream(this);
+                    req.user.getMinorOutboxStream(this);
                 },
                 function(err, str) {
                     if (err) throw err;
@@ -504,7 +503,6 @@ var showStream = function(req, res, next) {
                                     major: major,
                                     minor: minor,
                                     profile: req.user.profile,
-                                    user: req.principalUser,
                                     data: {
                                         major: major,
                                         minor: minor,
@@ -562,7 +560,6 @@ var showFavorites = function(req, res, next) {
             } else {
                 res.render("favorites", {page: {title: req.user.nickname + " favorites"},
                                          objects: objects,
-                                         user: req.principalUser,
                                          profile: req.user.profile,
                                          data: {
                                              objects: objects,
@@ -610,7 +607,6 @@ var showFollowers = function(req, res, next) {
             } else {
                 res.render("followers", {page: {title: req.user.nickname + " followers"},
                                          people: followers,
-                                         user: req.principalUser,
                                          profile: req.user.profile,
                                          data: {
                                              profile: req.user.profile,
@@ -658,7 +654,6 @@ var showFollowing = function(req, res, next) {
             } else {
                 res.render("following", {page: {title: req.user.nickname + " following"},
                                          people: following,
-                                         user: req.principalUser,
                                          profile: req.user.profile,
                                          data: {
                                              profile: req.user.profile,
@@ -761,7 +756,6 @@ var showLists = function(req, res, next) {
                 next(err);
             } else {
                 res.render("lists", {page: {title: req.user.profile.displayName + " - Lists"},
-                                     user: req.principalUser,
                                      profile: req.user.profile,
                                      list: null,
                                      lists: lists,
@@ -831,7 +825,6 @@ var showList = function(req, res, next) {
                 next(err);
             } else {
                 res.render("list", {page: {title: req.user.profile.displayName + " - Lists"},
-                                    user: req.principalUser,
                                     profile: req.user.profile,
                                     lists: lists,
                                     list: list,
@@ -917,7 +910,6 @@ var principalAuthorOrRecipient = function(req, res, next) {
 
     var type = req.type,
         obj = req[type],
-        user = req.principalUser,
         person = req.principal;
 
     if (obj && obj.author && person && obj.author.id == person.id) {
@@ -977,7 +969,6 @@ var showObject = function(req, res, next) {
                     title = type + " by " + person.displayName;
                 }
                 res.render("object", {page: {title: title},
-                                      user: req.principalUser,
                                       object: obj,
                                       data: {
                                           object: obj
@@ -990,25 +981,176 @@ var showObject = function(req, res, next) {
 
 var renewSession = function(req, res, next) {
 
-    var user = req.remoteUser,
-        principalUser = req.principalUser;
+    var principal = req.principal;
 
     Step(
         function() {
             // We only need to set this if it's not already set
-
-            if (!principalUser || principalUser.nickname != user.nickname) {
-                setPrincipal(req.session, user.profile, this);
-            } else {
-                this(null);
-            }
+            setPrincipal(req.session, principal, this);
         },
         function(err) {
             if (err) {
                 next(err);
             } else {
-                user.sanitize();
-                res.json(user);
+                principal.sanitize();
+                res.json(principal);
+            }
+        }
+    );
+};
+
+var reqHost = function(req, res, next) {
+    var hostname = req.params.hostname;
+
+    Step(
+        function() {
+            Host.get(hostname, this);
+        },
+        function(err, host) {
+            if (err) {
+                next(err);
+            } else {
+                req.host = host;
+                next();
+            }
+        }
+    );
+};
+
+var reqToken = function(req, res, next) {
+    var token = req.query.oauth_token,
+        host = req.host;
+
+    Step(
+        function() {
+            RemoteRequestToken.get(RemoteRequestToken.key(host.hostname, token), this);
+        },
+        function(err, rt) {
+            if (err) {
+                next(err);
+            } else {
+                req.rt = rt;
+                next();
+            }
+        }
+    );
+};
+
+var authorized = function(req, res, next) {
+
+    var rt = req.rt,
+        host = req.host,
+        verifier = req.query.oauth_verifier,
+        principal,
+        pair;
+
+    Step(
+        function() {
+            host.getAccessToken(rt, verifier, this);
+        },
+        function(err, results) {
+            if (err) throw err;
+            pair = results;
+            host.whoami(pair.token, pair.secret, this);
+        },
+        function(err, obj) {
+            if (err) throw err;
+            // XXX: test id and url for hostname
+            ActivityObject.ensureObject(obj, this);
+        },
+        function(err, results) {
+            var at;
+            if (err) throw err;
+            principal = results;
+            at = new RemoteAccessToken({
+                id: principal.id,
+                type: principal.objectType,
+                token: pair.token,
+                secret: pair.secret,
+                hostname: host.hostname
+            });
+            at.save(this);
+        },
+        function(err, at) {
+            if (err) throw err;
+            setPrincipal(req.session, principal, this);
+        },
+        function(err) {
+            if (err) {
+                next(err);
+            } else {
+                res.redirect("/");
+            }
+        }
+    );
+};
+
+var principalNotUser = function(req, res, next) {
+    if (!req.principal) {
+        next(new HTTPError("No principal", 401));
+    } else if (req.principalUser) {
+        next(new HTTPError("Only for remote users", 401));
+    } else {
+        next();
+    }
+};
+
+var proxyActivity = function(req, res, next) {
+
+    var principal = req.principal,
+        props = Scrubber.scrubActivity(req.body),
+        activity = new Activity(props),
+        at,
+        host,
+        oa;
+
+    // XXX: we overwrite anything here
+
+    activity.generator = req.generator;
+
+    if (!_.has(principal, "links") ||
+        !_.has(principal.links, "activity-outbox") ||
+        !_.has(principal.links["activity-outbox"], "href")) {
+        next(new Error("No activity outbox endpoint for " + principal.id, 400));
+        return;
+    }
+
+    Step(
+        function() {
+            RemoteAccessToken.get(principal.id, this);
+        },
+        function(err, results) {
+            if (err) throw err;
+            at = results;
+            Host.ensureHost(at.hostname, this);
+        },
+        function(err, results) {
+            if (err) throw err;
+            host = results;
+            host.getOAuth(this);
+        },
+        function(err, results) {
+            if (err) throw err;
+            oa = results;
+            oa.post(principal.links["activity-outbox"].href,
+                    at.token,
+                    at.secret,
+                    JSON.stringify(activity),
+                    "application/json",
+                    this);
+        },
+        function(err, doc, response) {
+            var act;
+            if (err) {
+                if (err.statusCode) {
+                    next(new Error("Remote OAuth error code " + err.statusCode + ": " + err.data));
+                } else {
+                    next(err);
+                }
+            } else {
+                act = new Activity(JSON.parse(doc));
+                act.sanitize(principal);
+                res.json(act);
             }
         }
     );

@@ -44,10 +44,12 @@
 
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
-          <% if (_.has( "user") && user) { %>
-          <%= partial('nav-loggedin') %>
-          <% } else if (page.nologin) { %>
+          <% if (page.nologin) { %>
           <%= partial('nav-nologin') %>
+          <% } else if (principalUser) { %>
+          <%= partial('nav-loggedin') %>
+          <% } else if (principal) { %>
+          <%= partial('nav-remote') %>
           <% } else { %>
           <%= partial('nav-anonymous') %>
           <% } %>
@@ -141,6 +143,19 @@
       });
 
       Pump.initialData = <%= JSON.stringify(data) %>;
+
+      <% if (principal) { %>
+      Pump.principal = <%= JSON.stringify(principal) %>;
+      <% } else { %>
+      Pump.principal = null;
+      <% } %>
+
+      <% if (principalUser) { %>
+      Pump.principalUser = <%= JSON.stringify(principalUser) %>;
+      <% } else { %>
+      Pump.principalUser = null;
+      <% } %>
+
     </script>
   </body>
 

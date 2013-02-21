@@ -21,7 +21,7 @@
     <div class="object-content">
       <%= obj.content %>
     </div>
-    <% if (user) { %>
+    <% if (principal) { %>
     <%= partial("responses", {obj: obj}) %>
     <% } %>
     <% if (!obj.likes || obj.likes.totalItems === 0) { %>

@@ -75,6 +75,11 @@ var confirmEmail = function(message, callback) {
         match = urlre.exec(message.data),
         url = (match.length > 0) ? match[0] : null;
 
+    if (!url) {
+        callback(new Error("No URL matched"), null);
+        return;
+    }
+
     http.get(url, function(res) {
         if (res.statusCode < 200 || res.statusCode >= 300) {
             callback(new Error("Bad status code: " + res.statusCode));

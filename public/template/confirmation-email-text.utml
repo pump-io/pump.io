@@ -1,4 +1,4 @@
-Welcome to <%= config.site %>, <%= user.profile.displayName %>!
+Welcome to <%= config.site %>, <%= principal.displayName %>!
 
 You have signed up for <%= config.site %>. To confirm this email address, click on the link below:
 

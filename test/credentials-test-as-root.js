@@ -150,6 +150,73 @@ suite.addBatch({
                 assert.ifError(err);
             }
         },
+        "and we try to get host credentials for a valid user": {
+            topic: function() {
+                var callback = this.callback;
+
+                Credentials.getForHostname("acct:user2@dialback.localhost",
+                                           "social.localhost",
+                                           callback);
+            },
+            "it works": function(err, cred) {
+                assert.ifError(err);
+                assert.isObject(cred);
+            },
+            "results include client_id and client_secret": function(err, cred) {
+                assert.ifError(err);
+                assert.isObject(cred);
+                assert.include(cred, "client_id");
+                assert.include(cred, "client_secret");
+            }
+        },
+        "and we try to get host credentials for a valid host": {
+            topic: function() {
+                var callback = this.callback;
+
+                Credentials.getForHostname("dialback.localhost",
+                                           "social.localhost",
+                                           callback);
+            },
+            "it works": function(err, cred) {
+                assert.ifError(err);
+                assert.isObject(cred);
+            },
+            "results include client_id and client_secret": function(err, cred) {
+                assert.ifError(err);
+                assert.isObject(cred);
+                assert.include(cred, "client_id");
+                assert.include(cred, "client_secret");
+            }
+        },
+        "and we try to get host credentials for a valid Host object": {
+            topic: function() {
+                var callback = this.callback,
+                    Host = require("../lib/model/host").Host;
+
+                Step(
+                    function() {
+                        Host.ensureHost("social.localhost", this);
+                    },
+                    function(err, host) {
+                        if (err) throw err;
+                        Credentials.getForHost("acct:user3@dialback.localhost",
+                                               host,
+                                               this);
+                    },
+                    callback
+                );
+            },
+            "it works": function(err, cred) {
+                assert.ifError(err);
+                assert.isObject(cred);
+            },
+            "results include client_id and client_secret": function(err, cred) {
+                assert.ifError(err);
+                assert.isObject(cred);
+                assert.include(cred, "client_id");
+                assert.include(cred, "client_secret");
+            }
+        },
         "and we try to get credentials for a valid user": {
             topic: function() {
                 var callback = this.callback;

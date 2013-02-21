@@ -16,7 +16,7 @@
           <label for="picture-to">To</label>
           <select name="to" id="picture-to" multiple="" style="width: 80%">
             <option value="collection:http://activityschema.org/collection/public">Public</option>
-            <option value="collection:<%- user.profile.followers.url %>">Followers</option>
+            <option value="collection:<%- principal.followers.url %>">Followers</option>
             <% if (lists && lists.length > 0) { %>
             <optgroup label="Lists">
               <% _.each(lists, function(list) { %>
@@ -37,7 +37,7 @@
           <label for="picture-cc">CC</label>
           <select name="cc" id="picture-cc" multiple="" style="width: 80%">
             <option value="collection:http://activityschema.org/collection/public">Public</option>
-            <option selected="selected" value="collection:<%- user.profile.followers.url %>">Followers</option>
+            <option selected="selected" value="collection:<%- principal.followers.url %>">Followers</option>
             <% if (lists && lists.length > 0) { %>
             <optgroup label="Lists">
               <% _.each(lists, function(list) { %>

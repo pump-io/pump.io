@@ -3,7 +3,7 @@
 <% if (_.has(object, "url")) { %>
 <a href="<%- object.url %>">
   <% } %>
-  <% if (user && user.profile && user.profile.id == object.id) { %>
+  <% if (principal && principal.id == object.id) { %>
   You
   <% } else if (object.id == "http://activityschema.org/collection/public") { %>
   Public

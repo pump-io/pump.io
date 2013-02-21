@@ -9,7 +9,7 @@
       <div class="clearfix">
 	<label>Username</label>
 	<div class="input">
-          <span class="uneditable-input"><%- user.nickname %></span>
+          <span class="uneditable-input"><%- principalUser.nickname %></span>
 	  <span class="help-block">The name you log in with (unchangeable!)</span>
 	</div>
       </div>

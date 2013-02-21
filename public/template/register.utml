@@ -1,4 +1,4 @@
-<div class="registration">
+<div id="register">
   <form id="registration" class="form-horizontal">
     <legend>Register for a new account</legend>
     <p class="text-error" id="error"></p>
@@ -37,4 +37,6 @@
       </div>
     </div>
   </form>
+  <p><a href="/main/login">Already have an account?</a></p>
+  <p><a href="/main/remote">Account on another server?</a></p>
 </div>

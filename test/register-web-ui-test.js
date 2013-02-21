@@ -57,22 +57,22 @@ suite.addBatch({
                     return br;
                 },
                 "it includes a registration div": function(br) {
-                    assert.ok(br.query("div.registration"));
+                    assert.ok(br.query("div#register"));
                 },
                 "it includes a registration form": function(br) {
-                    assert.ok(br.query("div.registration form"));
+                    assert.ok(br.query("div#register form"));
                 },
                 "the registration form has a nickname field": function(br) {
-                    assert.ok(br.query("div.registration form input[name=\"nickname\"]"));
+                    assert.ok(br.query("div#register form input[name=\"nickname\"]"));
                 },
                 "the registration form has a password field": function(br) {
-                    assert.ok(br.query("div.registration form input[name=\"password\"]"));
+                    assert.ok(br.query("div#register form input[name=\"password\"]"));
                 },
                 "the registration form has a password repeat field": function(br) {
-                    assert.ok(br.query("div.registration form input[name=\"repeat\"]"));
+                    assert.ok(br.query("div#register form input[name=\"repeat\"]"));
                 },
                 "the registration form has a submit button": function(br) {
-                    assert.ok(br.query("div.registration form button[type=\"submit\"]"));
+                    assert.ok(br.query("div#register form button[type=\"submit\"]"));
                 },
                 "and we submit the form": {
                     topic: function(br) {

@@ -1,0 +1,17 @@
+<div class="remote">
+  <form id="remote" class="form-horizontal" action="/main/remote" method="post">
+    <legend>Login to a remote account</legend>
+    <div class="control-group" id="nickname-group">
+      <label class="control-label" for="webfinger">Webfinger</label>
+      <div class="controls">
+        <input type="email" id="webfinger" name="webfinger" size="30" placeholder="username@example.com">
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="controls">
+        <button type="submit" class="btn btn-primary">Login</button>
+      </div>
+    </div>
+  </form>
+  <p><a href="/main/login">Have an account here?</a></p>
+</div>

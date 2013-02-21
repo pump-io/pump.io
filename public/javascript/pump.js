@@ -67,72 +67,90 @@ if (!window.Pump) {
 
         Pump.setupInfiniteScroll();
 
-        // Check if we have stored OAuth credentials
+        if (Pump.principalUser) {
+            Pump.principalUser = Pump.User.unique(Pump.principalUser);
+            Pump.principal = Pump.principalUser.profile;
+            Pump.body.nav = new Pump.UserNav({el: Pump.body.$(".navbar-inner .container"),
+                                              model: Pump.principalUser,
+                                              data: {
+                                                  messages: Pump.principalUser.majorDirectInbox,
+                                                  notifications: Pump.principalUser.minorDirectInbox
+                                              }});
+        } else if (Pump.principal) {
+            Pump.principal = Pump.Person.unique(Pump.principal);
+            Pump.body.nav = new Pump.RemoteNav({el: Pump.body.$(".navbar-inner .container"),
+                                                model: Pump.principal});
+        } else {
+            // Check if we have stored OAuth credentials
 
-        Pump.ensureCred(function(err, cred) {
+            Pump.ensureCred(function(err, cred) {
 
-            var nickname, pair;
+                var nickname, pair;
 
-            if (err) {
-                Pump.error(err.message);
-                return;
-            }
+                if (err) {
+                    Pump.error(err.message);
+                    return;
+                }
 
-            pair = Pump.getUserCred();
+                pair = Pump.getUserCred();
 
-            if (pair) {
-                
-                // We need to renew the session, for images and objects and so on.
+                if (pair) {
+                    
+                    // We need to renew the session, for images and objects and so on.
 
-                Pump.renewSession(function(err, data) {
+                    Pump.renewSession(function(err, data) {
 
-                    var user, major, minor;
-
-                    if (err) {
-                        Pump.error(err);
-                        return;
-                    }
-
-                    user = Pump.currentUser = Pump.User.unique(data);
-
-                    major = user.majorDirectInbox;
-                    minor = user.minorDirectInbox;
-
-                    Pump.fetchObjects([major, minor], function(err, objs) {
-                        var sp, continueTo;
+                        var user, major, minor;
 
                         if (err) {
                             Pump.error(err);
+                            Pump.clearUserCred();
                             return;
                         }
 
-                        Pump.currentUser = user;
+                        user = Pump.principalUser = Pump.User.unique(data);
+                        Pump.principal = Pump.principalUser.profile;
 
-                        Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
-                                                          model: user,
-                                                          data: {
-                                                              messages: major,
-                                                              notifications: minor
-                                                          }});
-                        Pump.body.nav.render();
+                        major = user.majorDirectInbox;
+                        minor = user.minorDirectInbox;
 
-                        // If we're on the login page, and there's a current
-                        // user, redirect to the actual page
+                        Pump.fetchObjects([major, minor], function(err, objs) {
+                            var sp, continueTo;
 
-                        switch (window.location.pathname) {
-                        case "/main/login":
-                            Pump.body.content = new Pump.LoginContent();
-                            continueTo = Pump.getContinueTo();
-                            Pump.router.navigate(continueTo, true);
-                            break;
-                        case "/":
-                            Pump.router.home();
-                            break;
-                        }
+                            if (err) {
+                                Pump.clearUserCred();
+                                Pump.error(err);
+                                return;
+                            }
+
+                            Pump.principalUser = user;
+
+                            Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
+                                                              model: user,
+                                                              data: {
+                                                                  messages: major,
+                                                                  notifications: minor
+                                                              }});
+                            Pump.body.nav.render();
+
+                            // If we're on the login page, and there's a current
+                            // user, redirect to the actual page
+
+                            switch (window.location.pathname) {
+                            case "/main/login":
+                                Pump.body.content = new Pump.LoginContent();
+                                continueTo = Pump.getContinueTo();
+                                Pump.router.navigate(continueTo, true);
+                                break;
+                            case "/":
+                                Pump.router.home();
+                                break;
+                            }
+                        });
                     });
-                });
-            }
-        });
+                }
+            });
+        }
     });
 
     // Renew the cookie session
@@ -317,24 +335,29 @@ if (!window.Pump) {
     };
 
     Pump.ajax = function(options) {
-        Pump.ensureCred(function(err, cred) {
-            var pair;
-            if (err) {
-                Pump.error("Couldn't get OAuth credentials. :(");
-            } else {
-                options.consumerKey = cred.clientID;
-                options.consumerSecret = cred.clientSecret;
-                pair = Pump.getUserCred();
+        // For RO stuff, we use session auth
+        if (options.type == "GET") {
+            $.ajax(options);
+        } else {
+            Pump.ensureCred(function(err, cred) {
+                var pair;
+                if (err) {
+                    Pump.error("Couldn't get OAuth credentials. :(");
+                } else {
+                    options.consumerKey = cred.clientID;
+                    options.consumerSecret = cred.clientSecret;
+                    pair = Pump.getUserCred();
 
-                if (pair) {
-                    options.token = pair.token;
-                    options.tokenSecret = pair.secret;
+                    if (pair) {
+                        options.token = pair.token;
+                        options.tokenSecret = pair.secret;
+                    }
+
+                    options = Pump.oauthify(options);
+                    $.ajax(options);
                 }
-
-                options = Pump.oauthify(options);
-                $.ajax(options);
-            }
-        });
+            });
+        }
     };
 
     Pump.setupInfiniteScroll = function() {
@@ -388,7 +411,7 @@ if (!window.Pump) {
             selectorToView = {
                 "#main": {View: Pump.MainContent},
                 "#login": {View: Pump.LoginContent},
-                "#registration": {View: Pump.RegisterContent},
+                "#register": {View: Pump.RegisterContent},
                 "#inbox": {View: Pump.InboxContent, models: {major: Pump.ActivityStream, minor: Pump.ActivityStream}},
                 ".object-page": {View: Pump.ObjectContent, models: {object: Pump.ActivityObject}},
                 ".major-activity-page": {View: Pump.ActivityContent, models: {activity: Pump.Activity}},
@@ -442,6 +465,66 @@ if (!window.Pump) {
         }
 
         // XXX: set up initial data
+    };
+
+    Pump.newMinorActivity = function(act, callback) {
+        if (Pump.principalUser) {
+            Pump.addToStream(Pump.principalUser.minorStream, act, callback);
+        } else {
+            Pump.proxyActivity(act, callback);
+        }
+    };
+
+
+    Pump.newMajorActivity = function(act, callback) {
+        if (Pump.principalUser) {
+            Pump.addToStream(Pump.principalUser.majorStream, act, callback);
+        } else {
+            Pump.proxyActivity(act, callback);
+        }
+    };
+
+    Pump.addToStream = function(stream, act, callback) {
+        stream.create(act, {
+            success: function(act) {
+                callback(null, act);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                var type, response;
+                type = jqXHR.getResponseHeader("Content-Type");
+                if (type && type.indexOf("application/json") !== -1) {
+                    response = JSON.parse(jqXHR.responseText);
+                    callback(new Error(response.error), null);
+                } else {
+                    callback(new Error(errorThrown), null);
+                }
+            }
+        });
+    };
+
+    // XXX: This POSTs with session auth; subject to XSS.
+
+    Pump.proxyActivity = function(act, callback) {
+        $.ajax({
+            contentType: "application/json",
+            data: JSON.stringify(act),
+            dataType: "json",
+            type: "POST",
+            url: "/main/proxy",
+            success: function(act) {
+                callback(null, act);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                var type, response;
+                type = jqXHR.getResponseHeader("Content-Type");
+                if (type && type.indexOf("application/json") !== -1) {
+                    response = JSON.parse(jqXHR.responseText);
+                    callback(new Error(response.error), null);
+                } else {
+                    callback(new Error(errorThrown), null);
+                }
+            }
+        });
     };
 
 })(window._, window.$, window.Backbone, window.Pump);

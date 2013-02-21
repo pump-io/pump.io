@@ -18,7 +18,7 @@
 
 (function(_, $, Backbone, Pump) {
 
-    Pump.currentUser = null; // XXX: load from server...?
+    Pump.principalUser = null; // XXX: load from server...?
 
     Pump.clientID = null;
     Pump.clientSecret = null;

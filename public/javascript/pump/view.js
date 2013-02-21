@@ -258,9 +258,8 @@
                 });
             }
 
-            if (!_.has(main, "user")) {
-                main.user = (Pump.currentUser) ? Pump.currentUser.toJSON() : null;
-            }
+            main.principalUser = (Pump.principalUser) ? Pump.principalUser.toJSON() : null;
+            main.principal = (Pump.principal) ? Pump.principal.toJSON() : null;
 
             main.partial = function(name, locals) {
                 var template, scoped, html;
@@ -507,16 +506,19 @@
         }
     });
 
-    Pump.AnonymousNav = Pump.TemplateView.extend({
-        tagName: "div",
-        className: "container",
-        templateName: 'nav-anonymous',
+    Pump.NavView = Pump.TemplateView.extend({
         getStreams: function() {
             return {};
         }
     });
 
-    Pump.UserNav = Pump.TemplateView.extend({
+    Pump.AnonymousNav = Pump.NavView.extend({
+        tagName: "div",
+        className: "container",
+        templateName: 'nav-anonymous'
+    });
+
+    Pump.UserNav = Pump.NavView.extend({
         tagName: "div",
         className: "container",
         modelName: "user",
@@ -545,13 +547,13 @@
             "click #post-picture-button": "postPictureModal"
         },
         postNoteModal: function() {
-            var profile = Pump.currentUser.profile,
+            var profile = Pump.principal,
                 lists = profile.lists,
                 following = profile.following;
 
             following.once("getall", function() {
                 Pump.fetchObjects([lists], function(err, objs) {
-                    Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.currentUser,
+                    Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.principalUser,
                                                                lists: lists,
                                                                following: following}});
                 });
@@ -562,13 +564,13 @@
             return false;
         },
         postPictureModal: function() {
-            var profile = Pump.currentUser.profile,
+            var profile = Pump.principal,
                 lists = profile.lists,
                 following = profile.following;
 
             following.once("getall", function() {
                 Pump.fetchObjects([lists], function(err, objs) {
-                    Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.currentUser,
+                    Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.principalUser,
                                                                   lists: lists,
                                                                   following: following}});
                 });
@@ -583,7 +585,8 @@
                 options,
                 onSuccess = function(data, textStatus, jqXHR) {
                     var an;
-                    Pump.currentUser = null;
+                    Pump.principalUser = null;
+                    Pump.principal = null;
 
                     Pump.clearNickname();
                     Pump.clearUserCred();
@@ -638,6 +641,60 @@
         }
     });
 
+    Pump.RemoteNav = Pump.NavView.extend({
+        tagName: "div",
+        className: "container",
+        templateName: 'nav-remote',
+        events: {
+            "click #logout": "logout"
+        },
+        logout: function() {
+            var view = this,
+                options,
+                onSuccess = function(data, textStatus, jqXHR) {
+                    var an;
+                    Pump.principal = null;
+
+                    Pump.clearCaches();
+
+                    an = new Pump.AnonymousNav({el: ".navbar-inner .container"});
+                    an.render();
+
+                    if (Pump.config.sockjs) {
+                        // Request a new challenge
+                        Pump.setupSocket();
+                    }
+
+                    if (window.location.pathname == "/") {
+                        // If already home, reload to show main page
+                        Pump.router.home();
+                    } else {
+                        // Go home
+                        Pump.router.navigate("/", true);
+                    }
+                },
+                onError = function(jqXHR, textStatus, errorThrown) {
+                    showError(errorThrown);
+                },
+                showError = function(msg) {
+                    Pump.error(msg);
+                };
+
+            options = {
+                contentType: "application/json",
+                data: "",
+                dataType: "json",
+                type: "POST",
+                url: "/main/logout",
+                success: onSuccess,
+                error: onError
+            };
+
+            // Don't use Pump.ajax; it uses client auth
+            $.ajax(options);
+        }
+    });
+
     Pump.MessagesView = Pump.TemplateView.extend({
         templateName: "messages",
         modelName: "messages"
@@ -681,16 +738,17 @@
                     Pump.setNickname(data.nickname);
                     Pump.setUserCred(data.token, data.secret);
                     Pump.clearCaches();
-                    Pump.currentUser = Pump.User.unique(data);
-                    objs = [Pump.currentUser,
-                            Pump.currentUser.majorDirectInbox,
-                            Pump.currentUser.minorDirectInbox];
+                    Pump.principalUser = Pump.User.unique(data);
+                    Pump.principal = Pump.principalUser.profile;
+                    objs = [Pump.principalUser,
+                            Pump.principalUser.majorDirectInbox,
+                            Pump.principalUser.minorDirectInbox];
                     Pump.fetchObjects(objs, function(err, objs) {
                         Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
-                                                          model: Pump.currentUser,
+                                                          model: Pump.principalUser,
                                                           data: {
-                                                              messages: Pump.currentUser.majorDirectInbox,
-                                                              notifications: Pump.currentUser.minorDirectInbox
+                                                              messages: Pump.principalUser.majorDirectInbox,
+                                                              notifications: Pump.principalUser.minorDirectInbox
                                                           }});
                         Pump.body.nav.render();
                     });
@@ -755,20 +813,21 @@
                     Pump.setNickname(data.nickname);
                     Pump.setUserCred(data.token, data.secret);
                     Pump.clearCaches();
-                    Pump.currentUser = Pump.User.unique(data);
+                    Pump.principalUser = Pump.User.unique(data);
+                    Pump.principal = Pump.principalUser.profile;
                     if (Pump.config.sockjs) {
                         // Request a new challenge
                         Pump.setupSocket();
                     }
-                    objs = [Pump.currentUser,
-                            Pump.currentUser.majorDirectInbox,
-                            Pump.currentUser.minorDirectInbox];
+                    objs = [Pump.principalUser,
+                            Pump.principalUser.majorDirectInbox,
+                            Pump.principalUser.minorDirectInbox];
                     Pump.fetchObjects(objs, function(err, objs) {
                         Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
-                                                          model: Pump.currentUser,
+                                                          model: Pump.principalUser,
                                                           data: {
-                                                              messages: Pump.currentUser.majorDirectInbox,
-                                                              notifications: Pump.currentUser.minorDirectInbox
+                                                              messages: Pump.principalUser.majorDirectInbox,
+                                                              notifications: Pump.principalUser.minorDirectInbox
                                                           }});
                         Pump.body.nav.render();
                     });
@@ -843,6 +902,10 @@
 
             return false;
         }
+    });
+
+    Pump.RemoteContent = Pump.ContentView.extend({
+        templateName: 'remote'
     });
 
     Pump.ConfirmEmailInstructionsContent = Pump.ContentView.extend({
@@ -1113,64 +1176,72 @@
                 act = new Pump.Activity({
                     verb: "favorite",
                     object: view.model.object.toJSON()
-                }),
-                stream = Pump.currentUser.minorStream;
+                });
 
-            stream.create(act, {success: function(act) {
+            Pump.newMinorActivity(act, function(err, act) {
                 view.$(".favorite")
                     .removeClass("favorite")
                     .addClass("unfavorite")
                     .html("Unlike <i class=\"icon-thumbs-down\"></i>");
                 Pump.addMinorActivity(act);
-            }});
+            });
         },
         unfavoriteObject: function() {
             var view = this,
                 act = new Pump.Activity({
                     verb: "unfavorite",
                     object: view.model.object.toJSON()
-                }),
-                stream = Pump.currentUser.minorStream;
+                });
 
-            stream.create(act, {success: function(act) {
-                view.$(".unfavorite")
-                    .removeClass("unfavorite")
-                    .addClass("favorite")
-                    .html("Like <i class=\"icon-thumbs-up\"></i>");
-                Pump.addMinorActivity(act);
-            }});
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".unfavorite")
+                        .removeClass("unfavorite")
+                        .addClass("favorite")
+                        .html("Like <i class=\"icon-thumbs-up\"></i>");
+                    Pump.addMinorActivity(act);
+                }
+            });
         },
         shareObject: function() {
             var view = this,
                 act = new Pump.Activity({
                     verb: "share",
                     object: view.model.object.toJSON()
-                }),
-                stream = Pump.currentUser.majorStream;
+                });
 
-            stream.create(act, {success: function(act) {
-                view.$(".share")
-                    .removeClass("share")
-                    .addClass("unshare")
-                    .html("Unshare <i class=\"icon-remove\"></i>");
-                Pump.addMajorActivity(act);
-            }});
+            Pump.newMajorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".share")
+                        .removeClass("share")
+                        .addClass("unshare")
+                        .html("Unshare <i class=\"icon-remove\"></i>");
+                    Pump.addMajorActivity(act);
+                }
+            });
         },
         unshareObject: function() {
             var view = this,
                 act = new Pump.Activity({
                     verb: "unshare",
                     object: view.model.object.toJSON()
-                }),
-                stream = Pump.currentUser.minorStream;
+                });
 
-            stream.create(act, {success: function(act) {
-                view.$(".unshare")
-                    .removeClass("unshare")
-                    .addClass("share")
-                    .html("Share <i class=\"icon-share-alt\"></i>");
-                Pump.addMinorActivity(act);
-            }});
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".unshare")
+                        .removeClass("unshare")
+                        .addClass("share")
+                        .html("Share <i class=\"icon-share-alt\"></i>");
+                    Pump.addMinorActivity(act);
+                }
+            });
         },
         openComment: function() {
             var view = this,
@@ -1281,36 +1352,36 @@
                         objectType: "comment",
                         content: text
                     }
-                }),
-                stream = Pump.currentUser.minorStream;
+                });
 
             act.object.inReplyTo = orig;
 
             view.startSpin();
 
-            stream.create(act, {success: function(act) {
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    var object = act.object,
+                        repl;
+                    // These get stripped for "posts"; re-add it
 
-                var object = act.object,
-                    repl;
+                    object.author = Pump.principal; 
 
-                // These get stripped for "posts"; re-add it
+                    repl = new Pump.ReplyView({model: object});
 
-                object.author = Pump.currentUser.profile; 
+                    repl.on("ready", function() {
 
-                repl = new Pump.ReplyView({model: object});
+                        view.stopSpin();
 
-                repl.on("ready", function() {
+                        view.$el.replaceWith(repl.$el);
+                    });
 
-                    view.stopSpin();
+                    repl.render();
 
-                    view.$el.replaceWith(repl.$el);
-                });
-
-                repl.render();
-
-                Pump.addMinorActivity(act);
-
-            }});
+                    Pump.addMinorActivity(act);
+                }
+            });
 
             return false;
         }
@@ -1341,32 +1412,40 @@
                 act = {
                     verb: "follow",
                     object: view.model.toJSON()
-                },
-                stream = Pump.currentUser.stream;
+                };
 
-            stream.create(act, {success: function(act) {
-                view.$(".follow")
-                    .removeClass("follow")
-                    .removeClass("btn-primary")
-                    .addClass("stop-following")
-                    .html("Stop following");
-            }});
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".follow")
+                        .removeClass("follow")
+                        .removeClass("btn-primary")
+                        .addClass("stop-following")
+                        .html("Stop following");
+                    Pump.addMinorActivity(act);
+                }
+            });
         },
         stopFollowingProfile: function() {
             var view = this,
                 act = {
                     verb: "stop-following",
                     object: view.model.toJSON()
-                },
-                stream = Pump.currentUser.stream;
+                };
 
-            stream.create(act, {success: function(act) {
-                view.$(".stop-following")
-                    .removeClass("stop-following")
-                    .addClass("btn-primary")
-                    .addClass("follow")
-                    .html("Follow");
-            }});
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".stop-following")
+                        .removeClass("stop-following")
+                        .addClass("btn-primary")
+                        .addClass("follow")
+                        .html("Follow");
+                    Pump.addMinorActivity(act);
+                }
+            });
         }
     });
 
@@ -1597,7 +1676,7 @@
             "click .new-list": "newList"
         },
         newList: function() {
-            Pump.showModal(Pump.NewListModal, {data: {user: Pump.currentUser}});
+            Pump.showModal(Pump.NewListModal, {data: {user: Pump.principalUser}});
         },
         subs: {
             ".list": {
@@ -1710,7 +1789,7 @@
         },
         addListMember: function() {
             var view = this,
-                profile = Pump.currentUser.profile,
+                profile = Pump.principal,
                 list = view.model,
                 members = view.options.data.members,
                 following = profile.following;
@@ -1731,8 +1810,8 @@
             var view = this,
                 list = view.model,
                 lists = view.options.data.lists,
-                user = Pump.currentUser,
-                person = Pump.currentUser.profile;
+                user = Pump.principalUser,
+                person = Pump.principal;
 
             Pump.areYouSure("Delete the list '"+list.get("displayName")+"'?", function(err, sure) {
                 if (sure) {
@@ -1778,8 +1857,7 @@
                 person = view.model,
                 list = view.options.data.list,
                 members = view.options.data.people,
-                user = Pump.currentUser,
-                stream = user.minorStream,
+                user = Pump.principalUser,
                 act = {
                     verb: "remove",
                     object: {
@@ -1792,11 +1870,16 @@
                     }
                 };
 
-            stream.create(act, {success: function(activity) {
-                members.remove(person.id);
-                list.totalItems--;
-                list.trigger("change");
-            }});
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    members.remove(person.id);
+                    list.totalItems--;
+                    list.trigger("change");
+                    Pump.addMinorActivity(act);
+                }
+            });
         }
     });
 
@@ -1842,24 +1925,21 @@
                     view.fileCount--;
                     return true;
                 }).on("complete", function(event, id, fileName, responseJSON) {
-                    var stream = Pump.currentUser.majorStream,
-                        act = new Pump.Activity({
+                    var act = new Pump.Activity({
                             verb: "post",
                             cc: [{id: "http://activityschema.org/collection/public",
                                   objectType: "collection"}],
                             object: responseJSON.obj
                         });
 
-                    stream.create(act, 
-                                  {
-                                      success: function(act) {
-                                          view.saveProfile(act.object.get("fullImage"));
-                                      },
-                                      error: function() {
-                                          view.showError("Couldn't create");
-                                          view.stopSpin();
-                                      }
-                                  });
+                    Pump.newMajorActivity(act, function(err, act) {
+                        if (err) {
+                            view.showError(err);
+                            view.stopSpin();
+                        } else {
+                            view.saveProfile(act.object.get("fullImage"));
+                        }
+                    });
                 }).on("error", function(event, id, fileName, reason) {
                     view.showError(reason);
                     view.stopSpin();
@@ -1868,7 +1948,7 @@
         },
         saveProfile: function(img) {
             var view = this,
-                profile = Pump.currentUser.profile,
+                profile = Pump.principal,
                 props = {"displayName": view.$('#realname').val(),
                          "location": { objectType: "place", 
                                        displayName: view.$('#location').val() },
@@ -1893,7 +1973,7 @@
         saveSettings: function() {
 
             var view = this,
-                user = Pump.currentUser,
+                user = Pump.principalUser,
                 profile = user.profile,
                 haveNewAvatar = (view.fileCount > 0);
 
@@ -1921,7 +2001,7 @@
         },
         saveAccount: function() {
             var view = this,
-                user = Pump.currentUser,
+                user = Pump.principalUser,
                 password = view.$('#password').val(),
                 repeat = view.$('#repeat').val();
 
@@ -2013,7 +2093,6 @@
                 members = view.options.data.members,
                 people = view.options.data.people,
                 ids = [],
-                stream = Pump.currentUser.minorStream,
                 done;
 
             // Extract the IDs from the data- attributes of toggled thumbnails
@@ -2052,11 +2131,16 @@
                         }
                     };
 
-                stream.create(act, {success: function(activity) {
-                    members.add(person, {at: 0});
-                    list.totalItems++;
-                    list.trigger("change");
-                }});
+                Pump.newMinorActivity(act, function(err, act) {
+                    if (err) {
+                        view.showError(err);
+                    } else {
+                        members.add(person, {at: 0});
+                        list.totalItems++;
+                        list.trigger("change");
+                        Pump.addMinorActivity(act);
+                    }
+                });
             });
         }
     });
@@ -2089,7 +2173,6 @@
                         content: text
                     }
                 }),
-                stream = Pump.currentUser.majorStream,
                 strToObj = function(str) {
                     var colon = str.indexOf(":"),
                         type = str.substr(0, colon),
@@ -2110,14 +2193,18 @@
 
             view.startSpin();
             
-            stream.create(act, {success: function(act) {
-                view.$el.modal('hide');
-                view.stopSpin();
-                Pump.resetWysihtml5(view.$('#note-content'));
-                // Reload the current page
-                Pump.addMajorActivity(act);
-                view.remove();
-            }});
+            Pump.newMajorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$el.modal('hide');
+                    view.stopSpin();
+                    Pump.resetWysihtml5(view.$('#note-content'));
+                    // Reload the current page
+                    Pump.addMajorActivity(act);
+                    view.remove();
+                }
+            });
         }
     });
 
@@ -2164,7 +2251,7 @@
                     }
                 }).on("complete", function(event, id, fileName, responseJSON) {
 
-                    var stream = Pump.currentUser.majorStream,
+                    var stream = Pump.principalUser.majorStream,
                         to = view.$('#post-picture #picture-to').val(),
                         cc = view.$('#post-picture #picture-cc').val(),
                         strToObj = function(str) {
@@ -2189,16 +2276,20 @@
                         act.cc = new Pump.ActivityObjectBag(_.map(cc, strToObj));
                     }
 
-                    stream.create(act, {success: function(act) {
-                        view.$el.modal('hide');
-                        view.stopSpin();
-                        view.$("#picture-fineupload").fineUploader('reset');
-                        Pump.resetWysihtml5(view.$('#picture-description'));
-                        view.$('#picture-title').val("");
-                        // Reload the current content
-                        Pump.addMajorActivity(act);
-                        view.remove();
-                    }});
+                    Pump.newMajorActivity(act, function(err, act) {
+                        if (err) {
+                            view.showError(err);
+                        } else {
+                            view.$el.modal('hide');
+                            view.stopSpin();
+                            view.$("#picture-fineupload").fineUploader('reset');
+                            Pump.resetWysihtml5(view.$('#picture-description'));
+                            view.$('#picture-title').val("");
+                            // Reload the current content
+                            Pump.addMajorActivity(act);
+                            view.remove();
+                        }
+                    });
                 }).on("error", function(event, id, fileName, reason) {
                     view.showError(reason);
                 });
@@ -2246,8 +2337,7 @@
             var view = this,
                 description = view.$('#new-list #list-description').val(),
                 name = view.$('#new-list #list-name').val(),
-                act,
-                stream = Pump.currentUser.minorStream;
+                act;
 
             if (!name) {
                 view.showError("Your list must have a name.");
@@ -2269,34 +2359,38 @@
                 
                 view.startSpin();
 
-                stream.create(act, {success: function(act) {
+                Pump.newMinorActivity(act, function(err, act) {
                     var aview;
+                    if (err) {
+                        view.showError(err);
+                    } else {
 
-                    view.$el.modal('hide');
-                    view.stopSpin();
-                    Pump.resetWysihtml5(view.$('#list-description'));
-                    view.$('#list-name').val("");
+                        view.$el.modal('hide');
+                        view.stopSpin();
+                        Pump.resetWysihtml5(view.$('#list-description'));
+                        view.$('#list-name').val("");
 
-                    view.remove();
+                        view.remove();
 
-                    // it's minor
+                        // it's minor
 
-                    Pump.addMinorActivity(act);
+                        Pump.addMinorActivity(act);
 
-                    if ($("#list-menu-inner").length > 0) {
-                        aview = new Pump.ListMenuItem({model: act.object, data: {list: act.object}});
-                        aview.on("ready", function() {
-                            var rel;
-                            aview.$el.hide();
-                            $("#list-menu-inner").prepend(aview.$el);
-                            aview.$el.slideDown('fast');
-                            // Go to the new list page
-                            rel = Pump.rel(act.object.get("url"));
-                            Pump.router.navigate(rel, true);
-                        });
-                        aview.render();
+                        if ($("#list-menu-inner").length > 0) {
+                            aview = new Pump.ListMenuItem({model: act.object, data: {list: act.object}});
+                            aview.on("ready", function() {
+                                var rel;
+                                aview.$el.hide();
+                                $("#list-menu-inner").prepend(aview.$el);
+                                aview.$el.slideDown('fast');
+                                // Go to the new list page
+                                rel = Pump.rel(act.object.get("url"));
+                                Pump.router.navigate(rel, true);
+                            });
+                            aview.render();
+                        }
                     }
-                }});
+                });
             }
 
             return false;

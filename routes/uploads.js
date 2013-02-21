@@ -22,14 +22,13 @@ var path = require("path"),
     Activity = require("../lib/model/activity").Activity,
     HTTPError = require("../lib/httperror").HTTPError,
     mm = require("../lib/mimemap"),
-    mw = require("../lib/middleware"),
-    sa = require("../lib/sessionauth"),
+    authc = require("../lib/authc"),
     typeToClass = mm.typeToClass,
     typeToExt = mm.typeToExt,
     extToType = mm.extToType,
-    hasOAuth = mw.hasOAuth,
-    clientAuth = mw.clientAuth,
-    principal = sa.principal;
+    hasOAuth = authc.hasOAuth,
+    userOrClientAuth = authc.userOrClientAuth,
+    principal = authc.principal;
 
 var addRoutes = function(app) {
     if (app.session) {
@@ -43,7 +42,7 @@ var addRoutes = function(app) {
 
 var everyAuth = function(req, res, next) {
     if (hasOAuth(req)) {
-        clientAuth(req, res, next);
+        userOrClientAuth(req, res, next);
     } else if (req.session) {
         principal(req, res, next);
     } else {

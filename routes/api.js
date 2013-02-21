@@ -2,7 +2,7 @@
 //
 // The beating heart of a pumpin' good time
 //
-// Copyright 2011-2012, StatusNet Inc.
+// Copyright 2011-2013, StatusNet Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ var databank = require("databank"),
     URLMaker = require("../lib/urlmaker").URLMaker,
     Distributor = require("../lib/distributor"),
     mw = require("../lib/middleware"),
+    authc = require("../lib/authc"),
     omw = require("../lib/objectmiddleware"),
     randomString = require("../lib/randomstring").randomString,
     finishers = require("../lib/finishers"),
@@ -61,10 +62,15 @@ var databank = require("databank"),
     reqUser = mw.reqUser,
     reqGenerator = mw.reqGenerator,
     sameUser = mw.sameUser,
-    clientAuth = mw.clientAuth,
-    userAuth = mw.userAuth,
-    remoteUserAuth = mw.remoteUserAuth,
-    maybeAuth = mw.maybeAuth,
+    clientAuth = authc.clientAuth,
+    userAuth = authc.userAuth,
+    remoteUserAuth = authc.remoteUserAuth,
+    remoteWriteOAuth = authc.remoteWriteOAuth,
+    noneWriteOAuth = authc.noneWriteOAuth,
+    userWriteOAuth = authc.userWriteOAuth,
+    userReadAuth = authc.userReadAuth,
+    anyReadAuth = authc.anyReadAuth,
+    setPrincipal = authc.setPrincipal,
     fileContent = mw.fileContent,
     requestObject = omw.requestObject,
     authorOnly = omw.authorOnly,
@@ -117,93 +123,93 @@ var databank = require("databank"),
 
 var addRoutes = function(app) {
 
-    var i = 0, url, type, authz;
+    var smw = (app.session) ? [app.session] : [];
 
     // Users
-    app.get("/api/user/:nickname", clientAuth, reqUser, getUser);
-    app.put("/api/user/:nickname", userAuth, reqUser, sameUser, putUser);
-    app.del("/api/user/:nickname", userAuth, reqUser, sameUser, delUser);
+    app.get("/api/user/:nickname", smw, anyReadAuth, reqUser, getUser);
+    app.put("/api/user/:nickname", userWriteOAuth, reqUser, sameUser, putUser);
+    app.del("/api/user/:nickname", userWriteOAuth, reqUser, sameUser, delUser);
 
-    app.get("/api/user/:nickname/profile", clientAuth, reqUser, personType, getObject);
-    app.put("/api/user/:nickname/profile", userAuth, reqUser, sameUser, personType, reqGenerator, putObject);
+    app.get("/api/user/:nickname/profile", smw, anyReadAuth, reqUser, personType, getObject);
+    app.put("/api/user/:nickname/profile", userWriteOAuth, reqUser, sameUser, personType, reqGenerator, putObject);
 
     // Feeds
 
-    app.get("/api/user/:nickname/feed", clientAuth, reqUser, userStream);
-    app.post("/api/user/:nickname/feed", userAuth, reqUser, sameUser, reqGenerator, postActivity);
+    app.get("/api/user/:nickname/feed", smw, anyReadAuth, reqUser, userStream);
+    app.post("/api/user/:nickname/feed", userWriteOAuth, reqUser, sameUser, reqGenerator, postActivity);
 
-    app.get("/api/user/:nickname/feed/major", clientAuth, reqUser, userMajorStream);
-    app.get("/api/user/:nickname/feed/minor", clientAuth, reqUser, userMinorStream);
+    app.get("/api/user/:nickname/feed/major", smw, anyReadAuth, reqUser, userMajorStream);
+    app.get("/api/user/:nickname/feed/minor", smw, anyReadAuth, reqUser, userMinorStream);
 
-    app.post("/api/user/:nickname/feed/major", userAuth, reqUser, sameUser, isMajor, reqGenerator, postActivity);
-    app.post("/api/user/:nickname/feed/minor", userAuth, reqUser, sameUser, isMinor, reqGenerator, postActivity);
+    app.post("/api/user/:nickname/feed/major", userWriteOAuth, reqUser, sameUser, isMajor, reqGenerator, postActivity);
+    app.post("/api/user/:nickname/feed/minor", userWriteOAuth, reqUser, sameUser, isMinor, reqGenerator, postActivity);
 
     // Inboxen
 
-    app.get("/api/user/:nickname/inbox", userAuth, reqUser, sameUser, userInbox);
-    app.post("/api/user/:nickname/inbox", remoteUserAuth, reqUser, postToInbox);
+    app.get("/api/user/:nickname/inbox", smw, userReadAuth, reqUser, sameUser, userInbox);
+    app.post("/api/user/:nickname/inbox", remoteWriteOAuth, reqUser, postToInbox);
 
-    app.get("/api/user/:nickname/inbox/major", userAuth, reqUser, sameUser, userMajorInbox);
-    app.get("/api/user/:nickname/inbox/minor", userAuth, reqUser, sameUser, userMinorInbox);
-    app.get("/api/user/:nickname/inbox/direct", userAuth, reqUser, sameUser, userDirectInbox);
-    app.get("/api/user/:nickname/inbox/direct/major", userAuth, reqUser, sameUser, userMajorDirectInbox);
-    app.get("/api/user/:nickname/inbox/direct/minor", userAuth, reqUser, sameUser, userMinorDirectInbox);
+    app.get("/api/user/:nickname/inbox/major", smw, userReadAuth, reqUser, sameUser, userMajorInbox);
+    app.get("/api/user/:nickname/inbox/minor", smw, userReadAuth, reqUser, sameUser, userMinorInbox);
+    app.get("/api/user/:nickname/inbox/direct", smw, userReadAuth, reqUser, sameUser, userDirectInbox);
+    app.get("/api/user/:nickname/inbox/direct/major", smw, userReadAuth, reqUser, sameUser, userMajorDirectInbox);
+    app.get("/api/user/:nickname/inbox/direct/minor", smw, userReadAuth, reqUser, sameUser, userMinorDirectInbox);
 
     // Followers
 
-    app.get("/api/user/:nickname/followers", clientAuth, reqUser, userFollowers);
+    app.get("/api/user/:nickname/followers", smw, anyReadAuth, reqUser, userFollowers);
 
     // Following
 
-    app.get("/api/user/:nickname/following", clientAuth, reqUser, userFollowing);
-    app.post("/api/user/:nickname/following", clientAuth, reqUser, sameUser, reqGenerator, newFollow);
+    app.get("/api/user/:nickname/following", smw, anyReadAuth, reqUser, userFollowing);
+    app.post("/api/user/:nickname/following", userWriteOAuth, reqUser, sameUser, reqGenerator, newFollow);
 
     // Favorites
 
-    app.get("/api/user/:nickname/favorites", clientAuth, reqUser, userFavorites);
-    app.post("/api/user/:nickname/favorites", clientAuth, reqUser, sameUser, reqGenerator, newFavorite);
+    app.get("/api/user/:nickname/favorites", smw, anyReadAuth, reqUser, userFavorites);
+    app.post("/api/user/:nickname/favorites", userWriteOAuth, reqUser, sameUser, reqGenerator, newFavorite);
 
     // Lists
 
-    app.get("/api/user/:nickname/lists/:type", clientAuth, reqUser, userLists);
+    app.get("/api/user/:nickname/lists/:type", smw, anyReadAuth, reqUser, userLists);
 
     if (app.config.uploaddir) {
 
         // Uploads
 
-        app.get("/api/user/:nickname/uploads", userAuth, reqUser, sameUser, userUploads);
-        app.post("/api/user/:nickname/uploads", userAuth, reqUser, sameUser, fileContent, newUpload);
+        app.get("/api/user/:nickname/uploads", smw, userReadAuth, reqUser, sameUser, userUploads);
+        app.post("/api/user/:nickname/uploads", userWriteOAuth, reqUser, sameUser, fileContent, newUpload);
     }
     
     // Activities
 
-    app.get("/api/activity/:uuid", clientAuth, reqActivity, actorOrRecipient, getActivity);
-    app.put("/api/activity/:uuid", userAuth, reqActivity, actorOnly, putActivity);
-    app.del("/api/activity/:uuid", userAuth, reqActivity, actorOnly, delActivity);
+    app.get("/api/activity/:uuid", smw, anyReadAuth, reqActivity, actorOrRecipient, getActivity);
+    app.put("/api/activity/:uuid", userWriteOAuth, reqActivity, actorOnly, putActivity);
+    app.del("/api/activity/:uuid", userWriteOAuth, reqActivity, actorOnly, delActivity);
 
     // Other objects
 
-    app.get("/api/:type/:uuid", clientAuth, requestObject, authorOrRecipient, getObject);
-    app.put("/api/:type/:uuid", userAuth, requestObject, authorOnly, reqGenerator, putObject);
-    app.del("/api/:type/:uuid", userAuth, requestObject, authorOnly, reqGenerator, deleteObject);
+    app.get("/api/:type/:uuid", smw, anyReadAuth, requestObject, authorOrRecipient, getObject);
+    app.put("/api/:type/:uuid", userWriteOAuth, requestObject, authorOnly, reqGenerator, putObject);
+    app.del("/api/:type/:uuid", userWriteOAuth, requestObject, authorOnly, reqGenerator, deleteObject);
 
-    app.get("/api/:type/:uuid/likes", clientAuth, requestObject, authorOrRecipient, objectLikes);
-    app.get("/api/:type/:uuid/replies", clientAuth, requestObject, authorOrRecipient, objectReplies);
-    app.get("/api/:type/:uuid/shares", clientAuth, requestObject, authorOrRecipient, objectShares);
+    app.get("/api/:type/:uuid/likes", smw, anyReadAuth, requestObject, authorOrRecipient, objectLikes);
+    app.get("/api/:type/:uuid/replies", smw, anyReadAuth, requestObject, authorOrRecipient, objectReplies);
+    app.get("/api/:type/:uuid/shares", smw, anyReadAuth, requestObject, authorOrRecipient, objectShares);
 
     // Global user list
 
-    app.get("/api/users", clientAuth, listUsers);
-    app.post("/api/users", clientAuth, reqGenerator, createUser);
+    app.get("/api/users", smw, anyReadAuth, listUsers);
+    app.post("/api/users", noneWriteOAuth, reqGenerator, createUser);
 
     // Collection members
 
-    app.get("/api/collection/:uuid/members", clientAuth, requestCollection, authorOrRecipient, collectionMembers);
-    app.post("/api/collection/:uuid/members", userAuth, requestCollection, authorOnly, reqGenerator, newMember);
+    app.get("/api/collection/:uuid/members", smw, anyReadAuth, requestCollection, authorOrRecipient, collectionMembers);
+    app.post("/api/collection/:uuid/members", userWriteOAuth, requestCollection, authorOnly, reqGenerator, newMember);
 
     // Info about yourself
 
-    app.get("/api/whoami", userAuth, whoami);
+    app.get("/api/whoami", smw, userReadAuth, whoami);
 };
 
 // XXX: use a common function instead of faking up params
@@ -242,9 +248,9 @@ var isMinor = function(req, res, next) {
 
 var userOnly = function(req, res, next) {
     var person = req.person,
-        user = req.remoteUser;
+        principal = req.principal;
 
-    if (person && user && user.profile && person.id === user.profile.id && user.profile.objectType === "person") { 
+    if (person && principal && person.id === principal.id && principal.objectType === "person") { 
         next();
     } else {
         next(new HTTPError("Only the user can modify this profile.", 403));
@@ -254,7 +260,7 @@ var userOnly = function(req, res, next) {
 var actorOnly = function(req, res, next) {
     var act = req.activity;
 
-    if (act && act.actor && act.actor.id == req.remoteUser.profile.id) {
+    if (act && act.actor && act.actor.id == req.principal.id) {
         next();
     } else {
         next(new HTTPError("Only the actor can modify this object.", 403));
@@ -264,7 +270,7 @@ var actorOnly = function(req, res, next) {
 var actorOrRecipient = function(req, res, next) {
 
     var act = req.activity,
-        person = (req.remoteUser) ? req.remoteUser.profile : null;
+        person = req.principal;
 
     if (act && act.actor && person && act.actor.id == person.id) {
         next();
@@ -285,7 +291,7 @@ var getObject = function(req, res, next) {
     
     var type = req.type,
         obj = req[type],
-        profile = (req.remoteUser) ? req.remoteUser.profile : null;
+        profile = req.principal;
 
     Step(
         function() {
@@ -319,7 +325,7 @@ var putObject = function(req, res, next) {
         obj = req[type],
         updates = Scrubber.scrubObject(req.body),
         act = new Activity({
-            actor: req.remoteUser.profile,
+            actor: req.principal,
             generator: req.generator,
             verb: "update",
             object: _(obj).extend(updates)
@@ -327,7 +333,7 @@ var putObject = function(req, res, next) {
 
     Step(
         function() {
-            newActivity(act, req.remoteUser, this);
+            newActivity(act, req.principalUser, this);
         },
         function(err, act) {
             var d;
@@ -348,7 +354,7 @@ var deleteObject = function(req, res, next) {
     var type = req.type,
         obj = req[type],
         act = new Activity({
-            actor: req.remoteUser.profile,
+            actor: req.principal,
             verb: "delete",
             generator: req.generator,
             object: obj
@@ -356,7 +362,7 @@ var deleteObject = function(req, res, next) {
 
     Step(
         function() {
-            newActivity(act, req.remoteUser, this);
+            newActivity(act, req.principalUser, this);
         },
         function(err, act) {
             var d;
@@ -445,11 +451,11 @@ var objectReplies = function(req, res, next) {
         function(err, str) {
             var filtered;
             if (err) throw err;
-            if (!req.remoteUser) {
+            if (!req.principal) {
                 // XXX: keep a separate stream instead of filtering
                 filtered = new FilteredStream(str, objectPublicOnly);
             } else {
-                filtered = new FilteredStream(str, objectRecipientsOnly(req.remoteUser.profile));
+                filtered = new FilteredStream(str, objectRecipientsOnly(req.principal));
             }
             filtered.count(this.parallel());
             filtered.getObjects(args.start, args.end, this.parallel());
@@ -540,10 +546,10 @@ var getUser = function(req, res, next) {
         },
         function(err) {
             if (err) throw err;
-            if (!req.remoteUser) {
+            if (!req.principal) {
                 // skip
                 this(null);
-            } else if (req.remoteUser.nickname == req.user.nickname) {
+            } else if (req.principal.id == req.user.profile.id) {
                 // same user
                 req.user.profile.pump_io = {
                     followed: false
@@ -551,13 +557,13 @@ var getUser = function(req, res, next) {
                 // skip
                 this(null);
             } else {
-                addFollowed(req.remoteUser.profile, [req.user.profile], this);
+                addFollowed(req.principal, [req.user.profile], this);
             }
         },
         function(err) {
             if (err) next(err);
             // If no user, or different user, hide email
-            if (!req.remoteUser || (req.remoteUser.nickname != req.user.nickname)) {
+            if (!req.principal || (req.principal.id != req.user.profile.id)) {
                 delete req.user.email;
             }
             req.user.sanitize();
@@ -635,10 +641,10 @@ var reqActivity = function(req, res, next) {
 };
 
 var getActivity = function(req, res, next) {
-    var user = req.remoteUser,
+    var principal = req.principal,
         act = req.activity;
 
-    act.sanitize(user);
+    act.sanitize(principal);
 
     res.json(act);
 };
@@ -650,7 +656,7 @@ var putActivity = function(req, res, next) {
         if (err) {
             next(err);
         } else {
-            result.sanitize(req.remoteUser);
+            result.sanitize(req.principal);
             res.json(result);
         }
     });
@@ -772,13 +778,15 @@ var createUser = function(req, res, next) {
                     if (err) throw err;
                     confirmationURL = URLMaker.makeURL("/main/confirm/" + confirmation.code);
                     res.render("confirmation-email-html",
-                               {user: user,
+                               {principal: user.profile,
+                                principalUser: user,
                                 confirmation: confirmation,
                                 confirmationURL: confirmationURL,
                                 layout: false},
                                this.parallel());
                     res.render("confirmation-email-text",
-                               {user: user,
+                               {principal: user.profile,
+                                principalUser: user,
                                 confirmation: confirmation,
                                 confirmationURL: confirmationURL,
                                 layout: false},
@@ -922,12 +930,16 @@ var createUser = function(req, res, next) {
                 // If called as /main/register; see ./web.js
                 // XXX: Bad hack
                 if (req.session) {
-                    req.session.principal = {
-                        id: user.profile.id,
-                        objectType: user.profile.objectType
-                    };
-                }
-                res.json(user);
+		    setPrincipal(req.session, user.profile, function(err) {
+				     if (err) {
+					 next(err);
+				     } else {
+					 res.json(user);
+				     }
+				 });
+                } else {
+                    res.json(user);
+		}
             }
         }
     );
@@ -995,7 +1007,7 @@ var listUsers = function(req, res, next) {
 
             _.each(users, function(user) {
                 user.sanitize();
-                if (!req.remoteUser || req.remoteUser.nickname != user.nickname) {
+                if (!req.principal || req.principal.id != user.profile.id) {
                     delete user.email;
                 }
             });
@@ -1057,7 +1069,7 @@ var postActivity = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                activity.sanitize();
+                activity.sanitize(req.principal);
                 // ...then show (possibly modified) results.
                 res.json(activity);
                 // ...then distribute.
@@ -1082,17 +1094,9 @@ var postToInbox = function(req, res, next) {
 
     // Must be either a host or a webfinger
 
-    if (req.host) {
-        if (!ActivityObject.sameID(activity.actor.id, "http://" + req.host + "/") &&
-            !ActivityObject.sameID(activity.actor.id, "https://" + req.host + "/")) {
-            next(new HTTPError("Invalid actor", 400));
-            return;
-        }
-    } else if (req.webfinger) {
-        if (!ActivityObject.sameID(activity.actor.id, req.webfinger)) {
-            next(new HTTPError("Invalid actor", 400));
-            return;
-        }
+    if (ActivityObject.canonicalID(activity.actor.id) != ActivityObject.canonicalID(req.principal.id)) {
+        next(new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400));
+        return;
     }
 
     // Default verb
@@ -1145,7 +1149,7 @@ var postToInbox = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                activity.sanitize();
+                activity.sanitize(req.principal);
                 // ...then show (possibly modified) results.
                 // XXX: don't distribute
                 res.json(activity);
@@ -1274,16 +1278,16 @@ var filteredFeedRoute = function(urlmaker, titlemaker, streammaker, finisher) {
                     }
                 } else {
                     // Skip filtering if remote user == author
-                    if (req.remoteUser && req.remoteUser.profile.id == req.user.profile.id) {
+                    if (req.principal && req.principal.id == req.user.profile.id) {
                         str = outbox;
-                    } else if (!req.remoteUser) {
+                    } else if (!req.principal) {
                         // XXX: keep a separate stream instead of filtering
                         str = new FilteredStream(outbox, publicOnly);
                     } else {
-                        str = new FilteredStream(outbox, recipientsOnly(req.remoteUser.profile));
+                        str = new FilteredStream(outbox, recipientsOnly(req.principal));
                     }
 
-                    getStream(str, args, collection, req.remoteUser, this);
+                    getStream(str, args, collection, req.principal, this);
                 }
             },
             function(err) {
@@ -1402,7 +1406,7 @@ var feedRoute = function(urlmaker, titlemaker, streamgetter, finisher) {
                         throw err;
                     }
                 } else {
-                    getStream(inbox, args, collection, req.remoteUser, this);
+                    getStream(inbox, args, collection, req.principal, this);
                 }
             },
             function(err) {
@@ -1501,7 +1505,7 @@ var userMinorDirectInbox = feedRoute(
     }
 );
 
-var getStream = function(str, args, collection, user, callback) {
+var getStream = function(str, args, collection, principal, callback) {
 
     Step(
         function() {
@@ -1537,7 +1541,7 @@ var getStream = function(str, args, collection, user, callback) {
                 callback(err);
             } else {
                 activities.forEach(function(act) {
-                    act.sanitize(user);
+                    act.sanitize(principal);
                 });
                 collection.items = activities;
                 if (activities.length > 0) {
@@ -1618,10 +1622,10 @@ var userFollowers = function(req, res, next) {
 
             collection.items = people;
 
-            if (!req.remoteUser) {
+            if (!req.principal) {
                 this(null);
             } else {
-                addFollowed(req.remoteUser.profile, people, this);
+                addFollowed(req.principal, people, this);
             }
         },
         function(err) {
@@ -1726,10 +1730,10 @@ var userFollowing = function(req, res, next) {
 
             collection.items = people;
 
-            if (!req.remoteUser) {
+            if (!req.principal) {
                 // Same user; by definition, all are followed
                 this(null);
-            } else if (req.remoteUser.nickname == req.user.nickname) {
+            } else if (req.principal.id == req.user.profile.id) {
                 // Same user; by definition, all are followed
                 _.each(people, function(person) {
                     if (!_.has(person, "pump_io")) {
@@ -1739,7 +1743,7 @@ var userFollowing = function(req, res, next) {
                 });
                 this(null);
             } else {
-                addFollowed(req.remoteUser.profile, people, this);
+                addFollowed(req.principal, people, this);
             }
         },
         function(err) {
@@ -1849,15 +1853,15 @@ var userFavorites = function(req, res, next) {
                 res.json(collection);
                 return;
             }
-            if (req.remoteUser && req.remoteUser.profile.id == req.user.profile.id) {
+            if (req.principal && req.principal.id == req.user.profile.id) {
                 // Same user, don't filter
                 str = stream;
-            } else if (!req.remoteUser) {
+            } else if (!req.principal) {
                 // Public user, filter
                 str = new FilteredStream(stream, objectPublicOnly);
             } else {
                 // Registered user, filter
-                str = new FilteredStream(stream, objectRecipientsOnly(req.remoteUser.profile));
+                str = new FilteredStream(stream, objectRecipientsOnly(req.principal));
             }
             str.getObjects(args.start, args.end, this);
         },
@@ -1885,7 +1889,7 @@ var userFavorites = function(req, res, next) {
         function(err) {
 
             var third,
-                profile = (req.remoteUser) ? req.remoteUser.profile : null;
+                profile = req.principal;
 
             if (err) throw err;
 
@@ -1907,10 +1911,10 @@ var userFavorites = function(req, res, next) {
 
             third = this.parallel();
 
-            if (!req.remoteUser) { 
+            if (!req.principal) { 
                 // No user, no liked
                 third(null);
-            } else if (req.remoteUser.profile.id == req.user.profile.id) {
+            } else if (req.principal.id == req.user.profile.id) {
                 // Same user, all liked (by definition!)
                 _.each(collection.items, function(object) {
                     object.liked = true;
@@ -1918,7 +1922,7 @@ var userFavorites = function(req, res, next) {
                 third(null);
             } else {
                 // Different user; check for likes
-                addLiked(req.remoteUser.profile, collection.items, third);
+                addLiked(req.principal, collection.items, third);
             }
         },
         function(err) {
@@ -1966,7 +1970,7 @@ var newFavorite = function(req, res, next) {
 
 var userLists = function(req, res, next) {
     var type = req.params.type,
-        profile = (req.remoteUser) ? req.remoteUser.profile : null,
+        profile = req.principal,
         url = URLMaker.makeURL("api/user/" + req.user.nickname + "/lists/" + type),
         collection = {
             author: req.user.profile,
@@ -2166,7 +2170,7 @@ var userUploads = function(req, res, next) {
 
 var newUpload = function(req, res, next) {
 
-    var user = req.remoteUser,
+    var user = req.principalUser,
         mimeType = req.uploadMimeType,
         fileName = req.uploadFile,
         uploadDir = req.app.config.uploaddir;
@@ -2189,7 +2193,7 @@ var newUpload = function(req, res, next) {
 var collectionMembers = function(req, res, next) {
 
     var coll = req.collection,
-        profile = (req.remoteUser) ? req.remoteUser.profile : null, 
+        profile = req.principal, 
         base = "/api/collection/"+coll._uuid+"/members",
         url = URLMaker.makeURL(base),
         feed = {
@@ -2363,7 +2367,7 @@ var newMember = function(req, res, next) {
 
     Step(
         function() {
-            newActivity(act, req.remoteUser, this);
+            newActivity(act, req.principalUser, this);
         },
         function(err, act) {
             var d;
@@ -2440,7 +2444,7 @@ var streamArgs = function(req, defaultCount, maxCount) {
 };
 
 var whoami = function(req, res, next) {
-    res.redirect("/api/user/"+req.remoteUser.nickname+"/profile", 302);
+    res.redirect("/api/user/"+req.principalUser.nickname+"/profile", 302);
 };
 
 exports.addRoutes = addRoutes;
