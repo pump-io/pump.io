@@ -527,4 +527,8 @@ if (!window.Pump) {
         });
     };
 
+    Pump.setTitle = function(title) {
+        $("title").html(title + " - " + Pump.config.site);
+    };
+
 })(window._, window.$, window.Backbone, window.Pump);
