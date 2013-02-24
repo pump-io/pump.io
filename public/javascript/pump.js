@@ -335,8 +335,8 @@ if (!window.Pump) {
     };
 
     Pump.ajax = function(options) {
-        // For RO stuff, we use session auth
-        if (options.type == "GET") {
+        // For remote users, we use session auth
+        if (Pump.principal && !Pump.principalUser && options.type == "GET") {
             $.ajax(options);
         } else {
             Pump.ensureCred(function(err, cred) {
