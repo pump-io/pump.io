@@ -1423,7 +1423,7 @@ vows.describe("provider module interface").addBatch({
                                 } else {
                                     user = res1;
                                     rt = res2;
-                                    provider.authenticateUser(user.nickname, "adams", rt.token, function(err, newt) {
+                                    provider.authenticateUser(user.nickname, "john*adams", rt.token, function(err, newt) {
                                         if (err) {
                                             cb(err, null);
                                         } else { // should succeed here
