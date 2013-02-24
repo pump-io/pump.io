@@ -236,38 +236,9 @@ var showLogin = function(req, res, next) {
 
 var handleLogout = function(req, res, next) {
 
-    var clearAccessTokens = function(req, callback) {
-
-        if (!req.principalUser) {
-            callback(null);
-            return;
-        }
-
-        Step(
-            function() {
-                AccessToken.search({"consumer_key": req.client.consumer_key,
-                                    "username": req.principalUser.nickname},
-                                   this);
-            },
-            function(err, tokens) {
-                var i, group = this.group();
-                if (err) throw err;
-                for (i = 0; i < tokens.length; i++) {
-                    // XXX: keep for auditing?
-                    tokens[i].del(group());
-                }
-            },
-            callback
-        );
-    };
-
     Step(
         function() {
             clearPrincipal(req.session, this);
-        },
-        function(err) {
-            if (err) throw err;
-            clearAccessTokens(req, this);
         },
         function(err) {
             if (err) {
