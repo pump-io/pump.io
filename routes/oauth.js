@@ -91,7 +91,7 @@ var authenticate = function(req, res) {
                 }
 
                 if (req.principalUser) {
-                    authorize(null, req, res, true, rt, application, req.principalUser);
+                    authorize(null, req, res, true, rt, application, rt);
                 } else {
                     res.render("authentication", {page: {title: "Authentication",
                                                          nologin: true},
@@ -106,21 +106,35 @@ var authenticate = function(req, res) {
 // Renders the authorization form
 // Will *skip* the authorization form if the user has already authenticated already logged in
 
-var authorize = function(err, req, res, authorized, rt, application, user) {  
+var authorize = function(err, req, res, authenticated, rt, application) {  
 
-    var self = this;
-    
+    var self = this,
+        user;
+
     if (err) {
         res.render("authentication", {status: 400,
                                       page: {title: "Authentication",
                                              nologin: true},
                                       token: rt.token,
-                                      error: err});
+                                      error: err.message});
+        return;
+    }
+
+    if (!authenticated) {
+        res.render("authentication", {page: {title: "Authentication",
+                                             nologin: true},
+                                      token: rt.token,
+                                      error: "Incorrect username or password."});
         return;
     }
 
     Step(
         function() {
+            User.get(rt.username, this);
+        },
+        function(err, results) {
+            if (err) throw err;
+            user = results;
             // Make sure there's a session
             if (req.session) {
                 this(null);
@@ -130,7 +144,11 @@ var authorize = function(err, req, res, authorized, rt, application, user) {
         },
         function(err) {
             if (err) throw err;
-            authc.setPrincipal(req.session, user, this);
+            req.principal = user.profile;
+            req.principalUser = user;
+            res.local("principal", user.profile);
+            res.local("principalUser", user);
+            authc.setPrincipal(req.session, user.profile, this);
         },
         function(err) {
             if (err) throw err;
