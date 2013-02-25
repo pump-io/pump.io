@@ -1,8 +1,9 @@
+<% var author = (activity.verb == "share") ? activity.object.author : activity.actor; %>
 <li class="media activity major<% if (headless) { %> headless<% } %>" data-activity-id="<%- activity.id %>">
   <% if (!headless) { %>
-  <a class="pull-left" href="<%- activity.actor.url %>">
-    <% if (activity.actor.image && activity.actor.image.url) { %>
-    <img src="<%- activity.actor.image.url %>" width="64" height="64" class="img-rounded media-object" />
+  <a class="pull-left" href="<%- author.url %>">
+    <% if (author.image && author.image.url) { %>
+    <img src="<%- author.image.url %>" width="64" height="64" class="img-rounded media-object" />
     <% } else { %>
     <img src="/images/default.png" width="64" height="64" class="img-rounded media-object" />
     <% } %>
@@ -14,7 +15,7 @@
     <% } %>
     <p class="muted">
       <small>
-        <% if (!headless) { %><a href="<%- activity.actor.url %>"><%- activity.actor.displayName %></a> at <% } %>
+        <% if (!headless || author.id != activity.actor.id) { %><a href="<%- author.url %>"><%- author.displayName %></a> at <% } %>
         <a href="<%- activity.object.url || activity.url %>"><abbr title="<%- activity.published %>" class="easydate"><%- activity.published %></abbr></a>
         <% if (activity.location) { %> in <a href="<%- activity.location.url %>"><%- activity.location.displayName %></a><% } %>
         <% if (activity.generator && activity.generator.displayName) { %>
@@ -26,10 +27,10 @@
         <% } %>
         <% } %>
         <% if (activity.to && activity.to.length > 0) { %>
-        To: <%= partial("activity-object-list", {author: activity.actor, activity: activity, objects: activity.to}) %>
+        To: <%= partial("activity-object-list", {author: author, activity: activity, objects: activity.to}) %>
         <% } %>
         <% if (activity.cc && activity.cc.length > 0) { %>
-        CC: <%= partial("activity-object-list", {author: activity.actor, activity: activity, objects: activity.cc}) %>
+        CC: <%= partial("activity-object-list", {author: author, activity: activity, objects: activity.cc}) %>
         <% } %>
     </small></p>
     <% if (activity.object.image && activity.object.image.url) { %>
@@ -43,15 +44,15 @@
     <% } %>
     <% if (!activity.object.likes || activity.object.likes.totalItems === 0) { %>
     <% } else if (activity.object.likes.totalItems === 1) { %>
-    <p><small><%= partial("activity-object-collection", {author: activity.actor, coll: activity.object.likes}) %> likes this.</small></p>
+    <p><small><%= partial("activity-object-collection", {author: author, coll: activity.object.likes}) %> likes this.</small></p>
     <% } else { %>
-    <p><small><%= partial("activity-object-collection", {author: activity.actor, coll: activity.object.likes}) %> like this.</small></p>
+    <p><small><%= partial("activity-object-collection", {author: author, coll: activity.object.likes}) %> like this.</small></p>
     <% } %>
     <% if (!activity.object.shares || activity.object.shares.totalItems === 0) { %>
     <% } else if (activity.object.shares.totalItems === 1) { %>
-    <p><small><%= partial("activity-object-collection", {author: activity.actor, coll: activity.object.shares}) %> shared this.</small></p>
+    <p><small><%= partial("activity-object-collection", {author: author, coll: activity.object.shares}) %> shared this.</small></p>
     <% } else { %>
-    <p><small><%= partial("activity-object-collection", {author: activity.actor, coll: activity.object.shares}) %> shared this.</small></p>
+    <p><small><%= partial("activity-object-collection", {author: author, coll: activity.object.shares}) %> shared this.</small></p>
     <% } %>
     <%= partial("replies", {replies: activity.object.replies}) %>
   </div>
