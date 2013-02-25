@@ -527,6 +527,21 @@
         },
         pubDate: function() {
             return new Date.parse(this.published);
+        },
+        initialize: function() {
+            var activity = this;
+
+            Pump.Model.prototype.initialize.apply(activity);
+
+            // For "post" activities we strip the author
+            // This adds it back in; important for uniquified stuff
+
+            if (activity.verb == "post" &&
+                activity.object &&
+                !activity.object.author &&
+                activity.actor) {
+                activity.object.author = activity.actor;
+            }
         }
     });
 
