@@ -403,6 +403,14 @@ if (!window.Pump) {
         return pathname;
     };
 
+    Pump.htmlEncode = function(value) {
+        return $('<div/>').text(value).html();
+    };
+
+    Pump.htmlDecode = function(value) {
+        return $('<div/>').html(value).text();
+    };
+
     // Sets up the initial view and sub-views
 
     Pump.initialContentView = function() {

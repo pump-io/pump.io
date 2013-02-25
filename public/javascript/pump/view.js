@@ -1350,7 +1350,7 @@
                     verb: "post",
                     object: {
                         objectType: "comment",
-                        content: text
+                        content: Pump.htmlEncode(text)
                     }
                 });
 
