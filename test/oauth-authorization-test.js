@@ -324,12 +324,21 @@ suite.addBatch({
             "and we create a user using the API": {
                 topic: function(cl) {
                     var cb = this.callback;
-                    httputil.postJSON("http://localhost:4815/api/users", 
-                                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
-                                      {nickname: "alice", password: "white*rabbit"},
-                                      function(err, user, resp) {
-                                          cb(err, user);
-                                      });
+                    Step(
+                        function() {
+                            newClient(this);
+                        },
+                        function(err, other) {
+                            if (err) throw err;
+                            httputil.postJSON("http://localhost:4815/api/users", 
+                                              {consumer_key: other.client_id, consumer_secret: other.client_secret}, 
+                                              {nickname: "alice", password: "white*rabbit"},
+                                              this);
+                        },
+                        function(err, user, resp) {
+                            cb(err, user);
+                        }
+                    );
                 },
                 "it works": function(err, user) {
                     assert.ifError(err);
@@ -369,7 +378,7 @@ suite.addBatch({
                                     if (err) {
                                         cb(err);
                                     } else {
-                                        browser.fill("password", "whiterabbit", function(err) {
+                                        browser.fill("password", "white*rabbit", function(err) {
                                             if (err) {
                                                 cb(err);
                                             } else {
