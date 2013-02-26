@@ -122,9 +122,15 @@ var authorize = function(cl, rt, user, hostname, port, cb) {
             br.pressButton("#authenticate", this);
         },
         function(err, br) {
+            var verifier;
             if (err) throw err;
             if (!br.success) throw new OAuthError({statusCode: br.statusCode, data: br.error || br.text("#error")});
-            br.pressButton("Authorize", this);
+            verifier = br.text("#verifier");
+            if (verifier) {
+                cb(null, verifier);
+            } else {
+                br.pressButton("Authorize", this);
+            }
         },
         function(err, br) {
             var verifier;

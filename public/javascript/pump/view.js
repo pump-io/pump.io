@@ -1350,7 +1350,7 @@
                     verb: "post",
                     object: {
                         objectType: "comment",
-                        content: text
+                        content: Pump.htmlEncode(text)
                     }
                 });
 
@@ -2457,9 +2457,6 @@
                 return true;
             }
         },
-        setTitle: function(title) {
-            this.$("title").html(title + " - " + Pump.config.site);
-        },
         setContent: function(options, callback) {
 
             var View = options.contentView,
@@ -2525,7 +2522,7 @@
             }
 
             newView.once("ready", function() {
-                body.setTitle(title);
+                Pump.setTitle(title);
                 body.$(parent).children().replaceWith(newView.$el);
                 Pump.followStreams();
                 if (callback) {

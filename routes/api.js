@@ -1092,11 +1092,19 @@ var postToInbox = function(req, res, next) {
         next(new HTTPError("Invalid actor", 400));
     }
 
-    // Must be either a host or a webfinger
+    // We have slightly looser rules for hostnames
 
-    if (ActivityObject.canonicalID(activity.actor.id) != ActivityObject.canonicalID(req.principal.id)) {
-        next(new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400));
-        return;
+    if (req.client.webfinger) {
+        if (ActivityObject.canonicalID(activity.actor.id) != ActivityObject.canonicalID(req.principal.id)) {
+            next(new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400));
+            return;
+        }
+    } else if (req.client.hostname) {
+        if (ActivityObject.canonicalID(activity.actor.id) != "https://"+req.client.hostname + "/" &&
+            ActivityObject.canonicalID(activity.actor.id) != "http://"+req.client.hostname + "/") {
+            next(new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400));
+            return;
+        }
     }
 
     // Default verb

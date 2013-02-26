@@ -335,8 +335,8 @@ if (!window.Pump) {
     };
 
     Pump.ajax = function(options) {
-        // For RO stuff, we use session auth
-        if (options.type == "GET") {
+        // For remote users, we use session auth
+        if (Pump.principal && !Pump.principalUser && options.type == "GET") {
             $.ajax(options);
         } else {
             Pump.ensureCred(function(err, cred) {
@@ -401,6 +401,14 @@ if (!window.Pump) {
         pathname = a.pathname;
 
         return pathname;
+    };
+
+    Pump.htmlEncode = function(value) {
+        return $('<div/>').text(value).html();
+    };
+
+    Pump.htmlDecode = function(value) {
+        return $('<div/>').html(value).text();
     };
 
     // Sets up the initial view and sub-views
@@ -525,6 +533,10 @@ if (!window.Pump) {
                 }
             }
         });
+    };
+
+    Pump.setTitle = function(title) {
+        $("title").html(title + " - " + Pump.config.site);
     };
 
 })(window._, window.$, window.Backbone, window.Pump);

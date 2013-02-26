@@ -222,7 +222,7 @@ suite.addBatch({
                 },
                 "and we get an access token": {
                     topic: function(user, cl) {
-                        accessToken(cl, {nickname: "tyrion", password: "payURdebts"}, this.callback);
+                        accessToken(cl, {nickname: "tyrion", password: "payURd3bts"}, this.callback);
                     },
                     "it works": function(err, pair) {
                         assert.ifError(err);

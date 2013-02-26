@@ -311,6 +311,109 @@ suite.addBatch({
                 }
             }
         },
+        "and we submit the authentication form with the wrong password": {
+            topic: function() {
+                var callback = this.callback,
+                    cl,
+                    br;
+
+                Step(
+                    function() {
+                        newClient(this);
+                    },
+                    function(err, results) {
+                        if (err) throw err;
+                        cl = results;
+                        httputil.postJSON("http://localhost:4815/api/users", 
+                                          {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
+                                          {nickname: "dormouse", password: "feed*ur*head"},
+                                          this);
+                    },
+                    function(err, user) {
+                        if (err) throw err;
+                        requestToken(cl, this);
+                    },
+                    function(err, rt) {
+                        if (err) throw err;
+                        br = new Browser({runScripts: false});
+                        br.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, this);
+                    },
+                    function(err, br) {
+                        if (err) throw err;
+                        if (!br.success) throw new Error("Browser error");
+                        br.fill("username", "dormouse", this);
+                    },
+                    function(err) {
+                        if (err) throw err;
+                        br.fill("password", "BADPASSWORD", this);
+                    },
+                    function(err) {
+                        if (err) throw err;
+                        br.pressButton("#authenticate", this);
+                    },
+                    function(err) {
+                        if (err) {
+                            callback(err);
+                        } else if (br.statusCode < 400 || br.statusCode > 499) {
+                            callback(new Error("Bad status code: " + br.statusCode));
+                        } else {
+                            callback(null);
+                        }
+                    }
+                );
+            },
+            "it fails correctly": function(err) {
+                assert.ifError(err);
+            }
+        },
+        "and we submit the authentication form with a non-existent user": {
+            topic: function() {
+                var callback = this.callback,
+                    cl,
+                    br;
+
+                Step(
+                    function() {
+                        newClient(this);
+                    },
+                    function(err, results) {
+                        if (err) throw err;
+                        cl = results;
+                        requestToken(cl, this);
+                    },
+                    function(err, rt) {
+                        if (err) throw err;
+                        br = new Browser({runScripts: false});
+                        br.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, this);
+                    },
+                    function(err, br) {
+                        if (err) throw err;
+                        if (!br.success) throw new Error("Browser error");
+                        br.fill("username", "nonexistent", this);
+                    },
+                    function(err) {
+                        if (err) throw err;
+                        br.fill("password", "DOESNTMATTER", this);
+                    },
+                    function(err) {
+                        if (err) throw err;
+                        br.pressButton("#authenticate", this);
+                    },
+                    function(err) {
+                        if (err) {
+                            callback(err);
+                        } else if (br.statusCode < 400 || br.statusCode > 499) {
+                            callback(new Error("Bad status code: " + br.statusCode));
+                        } else {
+                            callback(null);
+                        }
+                    }
+                );
+            },
+            "it fails correctly": function(err) {
+                assert.ifError(err);
+            }
+        },
         "and we create a client using the api": {
             topic: function() {
                 newClient(this.callback);
@@ -324,12 +427,21 @@ suite.addBatch({
             "and we create a user using the API": {
                 topic: function(cl) {
                     var cb = this.callback;
-                    httputil.postJSON("http://localhost:4815/api/users", 
-                                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
-                                      {nickname: "alice", password: "white*rabbit"},
-                                      function(err, user, resp) {
-                                          cb(err, user);
-                                      });
+                    Step(
+                        function() {
+                            newClient(this);
+                        },
+                        function(err, other) {
+                            if (err) throw err;
+                            httputil.postJSON("http://localhost:4815/api/users", 
+                                              {consumer_key: other.client_id, consumer_secret: other.client_secret}, 
+                                              {nickname: "alice", password: "white*rabbit"},
+                                              this);
+                        },
+                        function(err, user, resp) {
+                            cb(err, user);
+                        }
+                    );
                 },
                 "it works": function(err, user) {
                     assert.ifError(err);
@@ -369,7 +481,7 @@ suite.addBatch({
                                     if (err) {
                                         cb(err);
                                     } else {
-                                        browser.fill("password", "whiterabbit", function(err) {
+                                        browser.fill("password", "white*rabbit", function(err) {
                                             if (err) {
                                                 cb(err);
                                             } else {

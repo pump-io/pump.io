@@ -2,7 +2,7 @@
 //
 // Routes for the OAuth authentication flow
 //
-// Copyright 2011-2012, StatusNet Inc.
+// Copyright 2011-2013, StatusNet Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,13 +17,18 @@
 // limitations under the License.
 
 var url = require("url"),
+    qs = require("querystring"),
     Step = require("step"),
     _ = require("underscore"),
     authc = require("../lib/authc"),
     RequestToken = require("../lib/model/requesttoken").RequestToken,
+    AccessToken = require("../lib/model/accesstoken").AccessToken,
     Client = require("../lib/model/client").Client,
     User = require("../lib/model/user").User,
     HTTPError = require("../lib/httperror").HTTPError;
+
+// Renders the login form
+// Will *skip* the login form if the user is already logged in
 
 var authenticate = function(req, res) {
     // XXX: I think there's an easier way to get this, but leave it for now.
@@ -58,36 +63,35 @@ var authenticate = function(req, res) {
             },
             function(err) {
                 if (err) throw err;
+
+                if (req.principal && !req.principalUser) {
+                    throw new Error("Logged in as remote user");
+                }
+
                 if (!req.principalUser) {
                     // skip this step
                     this(null, rt);
                     return;
                 }
-                // We automatically authenticate the RT
+
                 if (rt.username && rt.username != req.principalUser.nickname) {
                     throw new Error("Token already associated with a different user");
                 }
+
+                // We automatically authenticate the RT
                 rt.update({username: req.principalUser.nickname, authenticated: true}, this);
             },
             function(err, result) {
                 if (err) {
-                    res.render("error", {status: 400,
-                                         page: {title: "Error",
+                    res.render("error", {page: {title: "Error",
                                                 nologin: true},
+                                         status: 400,
                                          error: err});
-                } else if (req.principalUser) {
-                    res.render("authorization", {page: {title: "Authorization",
-                                                        nologin: true},
-                                                 token: rt.token,
-                                                 verifier: rt.verifier,
-                                                 principalUser: req.principalUser,
-                                                 principal: req.principal,
-                                                 application: application});
-                } else if (req.principal) {
-                    res.render("error", {status: 400,
-                                         page: {title: "Error",
-                                                nologin: true},
-                                         error: new Error("Logged in as remote user")});
+                    return;
+                }
+
+                if (req.principalUser) {
+                    authorize(null, req, res, true, rt, application, rt);
                 } else {
                     res.render("authentication", {page: {title: "Authentication",
                                                          nologin: true},
@@ -99,24 +103,68 @@ var authenticate = function(req, res) {
     }
 };
 
-var authorize = function(err, req, res, authorized, rt, application, user) {  
+// Renders the authorization form
+// Will *skip* the authorization form if the user has already authenticated already logged in
 
-    var self = this;
-    
+var authorize = function(err, req, res, authenticated, rt, application) {  
+
+    var self = this,
+        user;
+
     if (err) {
         res.render("authentication", {status: 400,
                                       page: {title: "Authentication",
                                              nologin: true},
                                       token: rt.token,
-                                      error: err});
-    } else {
-        User.get(rt.username, function(err, user) {
+                                      error: err.message});
+        return;
+    }
+
+    if (!authenticated) {
+        res.render("authentication", {page: {title: "Authentication",
+                                             nologin: true},
+                                      token: rt.token,
+                                      error: "Incorrect username or password."});
+        return;
+    }
+
+    Step(
+        function() {
+            User.get(rt.username, this);
+        },
+        function(err, results) {
+            if (err) throw err;
+            user = results;
+            // Make sure there's a session
+            if (req.session) {
+                this(null);
+            } else {
+                req.app.session(req, res, this);
+            }
+        },
+        function(err) {
+            if (err) throw err;
+            req.principal = user.profile;
+            req.principalUser = user;
+            res.local("principal", user.profile);
+            res.local("principalUser", user);
+            authc.setPrincipal(req.session, user.profile, this);
+        },
+        function(err) {
+            if (err) throw err;
+            AccessToken.search({consumer_key: application.consumer_key,
+                                username: user.nickname},
+                               this);
+        },
+        function(err, ats) {
+            var url, sep;
             if (err) {
                 res.render("error", {status: 400,
                                      page: {title: "Error",
                                             nologin: true},
                                      error: err});
-            } else {
+            } else if (!ats || ats.length === 0) {
+                // No access tokens yet; show authorization page
                 res.render("authorization", {page: {title: "Authorization",
                                                     nologin: true},
                                              token: rt.token,
@@ -124,9 +172,19 @@ var authorize = function(err, req, res, authorized, rt, application, user) {
                                              principalUser: user,
                                              principal: user.profile,
                                              application: application});
+            } else {
+                // Already authorized; either redirect back or show the verifier
+                if (rt.callback && rt.callback != "oob") {
+                    sep = (rt.callback.indexOf("?") === -1) ? "?" : "&";
+                    url = rt.callback + sep + qs.stringify({oauth_token: rt.token,
+                                                            oauth_verifier: rt.verifier});
+                    res.redirect(url);
+                } else {
+                    authorizationFinished(null, req, res, rt);
+                }
             }
-        });
-    }
+        }
+    );
 };  
 
 var authorizationFinished = function(err, req, res, rt) {
