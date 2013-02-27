@@ -1,8 +1,8 @@
 <% var object = activity.object,
        author = (activity.verb == "share") ? object.author : activity.actor; 
-   if (!object || !author) return; %>
+   if (!headless && !author) return; %>
 <li class="media activity major<% if (headless) { %> headless<% } %>" data-activity-id="<%- activity.id %>">
-  <% if (!headless && author) { %>
+  <% if (!headless) { %>
   <a class="pull-left" href="<%- author.url %>">
     <% if (author.image && author.image.url) { %>
     <img src="<%- author.image.url %>" width="64" height="64" class="img-rounded media-object" />
@@ -17,7 +17,7 @@
     <% } %>
     <p class="muted">
       <small>
-        <% if (!headless || activity.verb == "share") { %><a href="<%- author.url %>"><%- author.displayName %></a> at <% } %>
+        <% if (!headless || (activity.verb == "share" && author)) { %><a href="<%- author.url %>"><%- author.displayName %></a> at <% } %>
         <a href="<%- object.url || activity.url %>"><abbr title="<%- activity.published %>" class="easydate"><%- activity.published %></abbr></a>
         <% if (activity.location) { %> in <a href="<%- activity.location.url %>"><%- activity.location.displayName %></a><% } %>
         <% if (activity.generator && activity.generator.displayName) { %>
