@@ -1,7 +1,8 @@
 <% var object = activity.object,
-       author = (activity.verb == "share") ? object.author : activity.actor; %>
+       author = (activity.verb == "share") ? object.author : activity.actor; 
+   if (!object || !author) return; %>
 <li class="media activity major<% if (headless) { %> headless<% } %>" data-activity-id="<%- activity.id %>">
-  <% if (!headless) { %>
+  <% if (!headless && author) { %>
   <a class="pull-left" href="<%- author.url %>">
     <% if (author.image && author.image.url) { %>
     <img src="<%- author.image.url %>" width="64" height="64" class="img-rounded media-object" />
