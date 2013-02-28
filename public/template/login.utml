@@ -1,4 +1,4 @@
-<div class="login">
+<div id="loginpage">
   <form id="login" class="form-horizontal">
     <legend>Login to your account</legend>
     <div class="control-group" id="nickname-group">

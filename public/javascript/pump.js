@@ -418,7 +418,7 @@ if (!window.Pump) {
         var $content = $("#content"),
             selectorToView = {
                 "#main": {View: Pump.MainContent},
-                "#login": {View: Pump.LoginContent},
+                "#loginpage": {View: Pump.LoginContent},
                 "#register": {View: Pump.RegisterContent},
                 "#inbox": {View: Pump.InboxContent, models: {major: Pump.ActivityStream, minor: Pump.ActivityStream}},
                 ".object-page": {View: Pump.ObjectContent, models: {object: Pump.ActivityObject}},
