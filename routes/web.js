@@ -70,7 +70,7 @@ var databank = require("databank"),
 
 var addRoutes = function(app) {
 
-    app.get("/", app.session, principal, showMain);
+    app.get("/", app.session, principal, addMessages, showMain);
 
     app.get("/main/register", app.session, principal, showRegister);
     app.post("/main/register", app.session, principal, clientAuth, reqGenerator, createUser);
@@ -91,13 +91,13 @@ var addRoutes = function(app) {
         app.post("/main/upload", app.session, principal, principalUserOnly, uploadFile);
     }
 
-    app.get("/:nickname", app.session, principal, reqUser, showStream);
-    app.get("/:nickname/favorites", app.session, principal, reqUser, showFavorites);
-    app.get("/:nickname/followers", app.session, principal, reqUser, showFollowers);
-    app.get("/:nickname/following", app.session, principal, reqUser, showFollowing);
+    app.get("/:nickname", app.session, principal, addMessages, reqUser, showStream);
+    app.get("/:nickname/favorites", app.session, principal, addMessages, reqUser, showFavorites);
+    app.get("/:nickname/followers", app.session, principal, addMessages, reqUser, showFollowers);
+    app.get("/:nickname/following", app.session, principal, addMessages, reqUser, showFollowing);
 
-    app.get("/:nickname/lists", app.session, principal, reqUser, showLists);
-    app.get("/:nickname/list/:uuid", app.session, principal, reqUser, showList);
+    app.get("/:nickname/lists", app.session, principal, addMessages, reqUser, showLists);
+    app.get("/:nickname/list/:uuid", app.session, principal, addMessages, reqUser, showList);
 
     // For things that you can only see if you're logged in,
     // we redirect to the login page, then let you go there
@@ -106,9 +106,9 @@ var addRoutes = function(app) {
     app.get("/main/account", loginRedirect("/main/account"));
     app.get("/main/messages", loginRedirect("/main/messages"));
 
-    app.get("/:nickname/activity/:uuid", app.session, principal, requestActivity, reqUser, userIsActor, principalActorOrRecipient, showActivity);
+    app.get("/:nickname/activity/:uuid", app.session, principal, addMessages, requestActivity, reqUser, userIsActor, principalActorOrRecipient, showActivity);
 
-    app.get("/:nickname/:type/:uuid", app.session, principal, requestObject, reqUser, userIsAuthor, principalAuthorOrRecipient, showObject);
+    app.get("/:nickname/:type/:uuid", app.session, principal, addMessages, requestObject, reqUser, userIsAuthor, principalAuthorOrRecipient, showObject);
 
     // expose this one file over the web
 
@@ -1122,6 +1122,68 @@ var proxyActivity = function(req, res, next) {
                 act = new Activity(JSON.parse(doc));
                 act.sanitize(principal);
                 res.json(act);
+            }
+        }
+    );
+};
+
+// Middleware to add messages to the interface
+
+var addMessages = function(req, res, next) {
+
+    var user = req.principalUser,
+        getMessages = function(callback) {
+            Step(
+                function() {
+                    user.getMajorDirectInboxStream(this);
+                },
+                function(err, str) {
+                    if (err) throw err;
+                    str.getItems(0, 20, this);
+                },
+                function(err, ids) {
+                    if (err) throw err;
+                    Activity.readArray(ids, this);
+                },
+                callback
+            );
+        },
+        getNotifications = function(callback) {
+            Step(
+                function() {
+                    user.getMinorDirectInboxStream(this);
+                },
+                function(err, str) {
+                    if (err) throw err;
+                    str.getItems(0, 20, this);
+                },
+                function(err, ids) {
+                    if (err) throw err;
+                    Activity.readArray(ids, this);
+                },
+                callback
+            );
+        };
+
+    // We only do this for registered users
+
+    if (!user) {
+        next(null);
+        return;
+    }
+
+    Step(
+        function() {
+            getMessages(this.parallel());
+            getNotifications(this.parallel());
+        },
+        function(err, messages, notifications) {
+            if (err) {
+                next(err);
+            } else {
+                res.local("messages", messages);
+                res.local("notifications", notifications);
+                next();
             }
         }
     );
