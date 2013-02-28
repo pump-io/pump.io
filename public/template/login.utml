@@ -15,7 +15,7 @@
     </div>
     <div class="control-group">
       <div class="controls">
-        <button type="submit" class="btn btn-primary">Login</button>
+        <button type="submit" class="btn btn-primary" disabled="disabled">Login</button>
       </div>
     </div>
   </form>
