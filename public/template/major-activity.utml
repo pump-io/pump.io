@@ -1,5 +1,6 @@
 <% var object = activity.object,
-       author = (activity.verb == "share") ? object.author : activity.actor; %>
+       author = (activity.verb == "share") ? object.author : activity.actor; 
+   if (!headless && !author) return; %>
 <li class="media activity major<% if (headless) { %> headless<% } %>" data-activity-id="<%- activity.id %>">
   <% if (!headless) { %>
   <a class="pull-left" href="<%- author.url %>">
@@ -16,7 +17,7 @@
     <% } %>
     <p class="muted">
       <small>
-        <% if (!headless || activity.verb == "share") { %><a href="<%- author.url %>"><%- author.displayName %></a> at <% } %>
+        <% if (!headless || (activity.verb == "share" && author)) { %><a href="<%- author.url %>"><%- author.displayName %></a> at <% } %>
         <a href="<%- object.url || activity.url %>"><abbr title="<%- activity.published %>" class="easydate"><%- activity.published %></abbr></a>
         <% if (activity.location) { %> in <a href="<%- activity.location.url %>"><%- activity.location.displayName %></a><% } %>
         <% if (activity.generator && activity.generator.displayName) { %>
