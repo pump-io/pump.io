@@ -22,6 +22,7 @@ var assert = require("assert"),
     http = require("http"),
     querystring = require("querystring"),
     _ = require("underscore"),
+    version = require("../lib/version").version,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     newCredentials = oauthutil.newCredentials,
@@ -127,7 +128,7 @@ suite.addBatch({
                             headers: {
                                 "Content-Type": "application/json",
                                 "Content-Length": requestBody.length,
-                                "User-Agent": "pump.io/0.2.0"
+                                "User-Agent": "pump.io/"+version
                             }
                         },
                         callback = this.callback;

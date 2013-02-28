@@ -26,6 +26,7 @@ var assert = require("assert"),
     path = require("path"),
     OAuth = require("oauth").OAuth,
     Browser = require("zombie"),
+    version = require("../lib/version").version,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     setupApp = oauthutil.setupApp,
@@ -127,7 +128,7 @@ suite.addBatch({
                                "oob",
                                "HMAC-SHA1",
                                null, // nonce size; use default
-                               {"User-Agent": "pump.io/0.2.0"});
+                               {"User-Agent": "pump.io/"+version});
                                         
                 oa.getOAuthAccessToken("NOTATOKEN", "NOTATOKENSECRET", "NOTAVERIFIER", function(err, token, secret) {
                     if (err) {
@@ -158,7 +159,7 @@ suite.addBatch({
                                            "oob",
                                            "HMAC-SHA1",
                                            null, // nonce size; use default
-                                           {"User-Agent": "pump.io/0.2.0"});
+                                           {"User-Agent": "pump.io/"+version});
                         
                         oa.getOAuthAccessToken("NOTATOKEN", "NOTATOKENSECRET", "NOTAVERIFIER", function(err, token, secret) {
                             if (err) {
@@ -196,7 +197,7 @@ suite.addBatch({
                                            "oob",
                                            "HMAC-SHA1",
                                            null, // nonce size; use default
-                                           {"User-Agent": "pump.io/0.2.0"});
+                                           {"User-Agent": "pump.io/"+version});
                         
                         oa.getOAuthAccessToken("NOTATOKEN", "NOTATOKENSECRET", "NOTAVERIFIER", function(err, token, secret) {
                             if (err) {
@@ -240,7 +241,7 @@ suite.addBatch({
                                            "oob",
                                            "HMAC-SHA1",
                                            null, // nonce size; use default
-                                           {"User-Agent": "pump.io/0.2.0"});
+                                           {"User-Agent": "pump.io/"+version});
                         
                         oa.getOAuthAccessToken(rt.token, "NOTATOKENSECRET", "NOTAVERIFIER", function(err, token, secret) {
                             if (err) {
@@ -287,7 +288,7 @@ suite.addBatch({
                                            "oob",
                                            "HMAC-SHA1",
                                            null, // nonce size; use default
-                                           {"User-Agent": "pump.io/0.2.0"});
+                                           {"User-Agent": "pump.io/"+version});
                         
                         oa.getOAuthAccessToken(rt.token, rt.token_secret, "NOTAVERIFIER", function(err, token, secret) {
                             if (err) {
@@ -540,7 +541,7 @@ suite.addBatch({
                                                        "oob",
                                                        "HMAC-SHA1",
                                                        null, // nonce size; use default
-                                                       {"User-Agent": "pump.io/0.2.0"});
+                                                       {"User-Agent": "pump.io/"+version});
                                         
                                         oa.getOAuthAccessToken(pair.token, rt.token_secret, pair.verifier, function(err, token, secret) {
                                             if (err) {
@@ -576,7 +577,7 @@ suite.addBatch({
                                                            "oob",
                                                            "HMAC-SHA1",
                                                            null, // nonce size; use default
-                                                           {"User-Agent": "pump.io/0.2.0"});
+                                                           {"User-Agent": "pump.io/"+version});
                                             oa.getOAuthAccessToken(pair.token, rt.token_secret, pair.verifier, function(err, token, secret) {
                                                 if (err) {
                                                     cb(null);

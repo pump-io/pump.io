@@ -23,6 +23,7 @@ var assert = require("assert"),
     fs = require("fs"),
     path = require("path"),
     querystring = require("querystring"),
+    version = require("../lib/version").version,
     OAuth = require("oauth").OAuth,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
@@ -262,7 +263,7 @@ suite.addBatch({
                                    null,
                                    "HMAC-SHA1",
                                    null, // nonce size; use default
-                                   {"User-Agent": "pump.io/0.2.0"});
+                                   {"User-Agent": "pump.io/"+version});
                     
                     toSend = querystring.stringify({nickname: "delta", password: "dawn"});
 
