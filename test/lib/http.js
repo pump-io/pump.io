@@ -52,7 +52,7 @@ var newOAuth = function(serverURL, cred) {
                    null,
                    "HMAC-SHA1",
                    null, // nonce size; use default
-                   {"User-Agent": "pump.io/0.2.0-alpha.1"});
+                   {"User-Agent": "pump.io/0.2.0"});
 
     return oa;
 };
@@ -100,7 +100,7 @@ var options = function(host, port, path, callback) {
         path: path,
         method: "OPTIONS",
         headers: {
-            "User-Agent": "pump.io/0.2.0-alpha.1"
+            "User-Agent": "pump.io/0.2.0"
         }
     };
 
@@ -143,7 +143,7 @@ var post = function(host, port, path, params, callback) {
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",
             "Content-Length": requestBody.length,
-            "User-Agent": "pump.io/0.2.0-alpha.1"
+            "User-Agent": "pump.io/0.2.0"
         }
     };
 
@@ -281,7 +281,7 @@ var dialbackPost = function(endpoint, id, token, ts, requestBody, contentType, c
     reqOpts.headers = {
         "Content-Type": contentType,
         "Content-Length": requestBody.length,
-        "User-Agent": "pump.io/0.2.0-alpha.1"
+        "User-Agent": "pump.io/0.2.0"
     };
 
     if (id.indexOf("@") === -1) {
