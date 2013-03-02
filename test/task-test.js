@@ -19,6 +19,7 @@
 var assert = require("assert"),
     vows = require("vows"),
     databank = require("databank"),
+    version = require("../lib/version").version,
     URLMaker = require("../lib/urlmaker").URLMaker,
     modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
@@ -63,7 +64,7 @@ var testData = {
         verb: "post",
         object: {
             id: "urn:uuid:ad06288c-ec86-11e1-bc32-0024beb67924",
-            displayName: "pump.io-0.2.0-alpha.1",
+            displayName: "pump.io-"+version,
             objectType: "application"
         }
     },

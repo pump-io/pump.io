@@ -40,8 +40,8 @@
   </ul>
 
   <div class="pull-right">
-    <%= partial("messages", {messages: {totalItems: 0, items: []}}) %>
-    <%= partial("notifications", {notifications: {totalItems: 0, items: []}}) %>
+    <%= partial("messages", {messages: messages}) %>
+    <%= partial("notifications", {notifications: notifications}) %>
   </div>
 
 </div>

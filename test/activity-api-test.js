@@ -21,6 +21,7 @@ var assert = require("assert"),
     Step = require("step"),
     _ = require("underscore"),
     http = require("http"),
+    version = require("../lib/version").version,
     urlparse = require("url").parse,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
@@ -239,7 +240,7 @@ suite.addBatch({
                                 port: 4815,
                                 path: parsed.path,
                                 headers: {
-                                    "User-Agent": "pump.io/0.2.0-alpha.1",
+                                    "User-Agent": "pump.io/"+version,
                                     "Content-Type": "application/json"
                                 }
                             };
@@ -397,7 +398,7 @@ suite.addBatch({
                                 path: parsed.path,
                                 method: "PUT",
                                 headers: {
-                                    "User-Agent": "pump.io/0.2.0-alpha.1",
+                                    "User-Agent": "pump.io/"+version,
                                     "Content-Type": "application/json"
                                 }
                             },
@@ -581,7 +582,7 @@ suite.addBatch({
                                 path: parsed.path,
                                 method: "DELETE",
                                 headers: {
-                                    "User-Agent": "pump.io/0.2.0-alpha.1"
+                                    "User-Agent": "pump.io/"+version
                                 }
                             };
                         var req = http.request(options, function(res) {

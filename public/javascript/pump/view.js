@@ -724,7 +724,20 @@
     Pump.LoginContent = Pump.ContentView.extend({
         templateName: 'login',
         events: {
-            "submit #login": "doLogin"
+            "submit #login": "doLogin",
+            "keyup #password": "onKey",
+            "keyup #nickname": "onKey"
+        },
+        "onKey": function(event) {
+            var view = this,
+                nickname = view.$('#nickname').val(),
+                password = view.$('#password').val();
+
+            if (!nickname || !password || nickname.length === 0 || password.length < 8) {  
+              view.$(':submit').attr('disabled', 'disabled');
+            } else {
+                view.$(':submit').removeAttr('disabled');
+            }
         },
         "doLogin": function() {
             var view = this,

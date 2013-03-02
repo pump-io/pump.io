@@ -1,6 +1,6 @@
 # pump.io
 
-Version 0.2.0-alpha.1
+Version 0.3.0-alpha.1
 
 This is pump.io. It's a stream server that does most of what people
 really want from a social network.
@@ -9,7 +9,7 @@ really want from a social network.
 
 ## License
 
-Copyright 2011-2012, StatusNet Inc.
+Copyright 2011-2013, StatusNet Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

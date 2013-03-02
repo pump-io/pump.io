@@ -1,4 +1,4 @@
-<div class="login">
+<div id="loginpage">
   <form id="login" class="form-horizontal">
     <legend>Login to your account</legend>
     <div class="control-group" id="nickname-group">
@@ -15,7 +15,7 @@
     </div>
     <div class="control-group">
       <div class="controls">
-        <button type="submit" class="btn btn-primary">Login</button>
+        <button type="submit" class="btn btn-primary" disabled="disabled">Login</button>
       </div>
     </div>
   </form>

@@ -21,6 +21,7 @@ var cp = require("child_process"),
     Step = require("step"),
     _ = require("underscore"),
     http = require("http"),
+    version = require("../../lib/version").version,
     OAuth = require("oauth").OAuth,
     Browser = require("zombie"),
     httputil = require("./http");
@@ -57,7 +58,7 @@ var requestToken = function(cl, hostname, port, cb) {
                    "oob",
                    "HMAC-SHA1",
                    null, // nonce size; use default
-                   {"User-Agent": "pump.io/0.2.0-alpha.1"});
+                   {"User-Agent": "pump.io/"+version});
     
     oa.getOAuthRequestToken(function(err, token, secret) {
         if (err) {
@@ -164,7 +165,7 @@ var redeemToken = function(cl, rt, verifier, hostname, port, cb) {
                            "oob",
                            "HMAC-SHA1",
                            null, // nonce size; use default
-                           {"User-Agent": "pump.io/0.2.0-alpha.1"});
+                           {"User-Agent": "pump.io/"+version});
             
             oa.getOAuthAccessToken(rt.token, rt.token_secret, verifier, this);
         },

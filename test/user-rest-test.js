@@ -22,6 +22,7 @@ var assert = require("assert"),
     Step = require("step"),
     _ = require("underscore"),
     OAuth = require("oauth").OAuth,
+    version = require("../lib/version").version,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     setupApp = oauthutil.setupApp,
@@ -355,7 +356,7 @@ suite.addBatch({
                             path: "/api/user/xerxes",
                             method: "PUT",
                             headers: {
-                                "User-Agent": "pump.io/0.2.0-alpha.1",
+                                "User-Agent": "pump.io/"+version,
                                 "Content-Type": "application/json"
                             }
                         };
@@ -731,7 +732,7 @@ suite.addBatch({
                             path: "/api/user/victor",
                             method: "DELETE",
                             headers: {
-                                "User-Agent": "pump.io/0.2.0-alpha.1"
+                                "User-Agent": "pump.io/"+version
                             }
                         };
                     var req = http.request(options, function(res) {

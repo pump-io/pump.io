@@ -53,7 +53,7 @@ suite.addBatch({
             "and we visit the login URL": {
                 topic: function() {
                     var browser;
-                    browser = new Browser();
+                    browser = new Browser({runScripts: true});
 
                     browser.visit("http://localhost:4815/main/login", this.callback);
                 },
@@ -66,49 +66,19 @@ suite.addBatch({
                         return br;
                     },
                     "it includes a login div": function(br) {
-                        assert.ok(br.query("div.login"));
+                        assert.ok(br.query("div#loginpage"));
                     },
                     "it includes a login form": function(br) {
-                        assert.ok(br.query("div.login form"));
+                        assert.ok(br.query("div#loginpage form"));
                     },
                     "the login form has a nickname field": function(br) {
-                        assert.ok(br.query("div.login form input[name=\"nickname\"]"));
+                        assert.ok(br.query("div#loginpage form input[name=\"nickname\"]"));
                     },
                     "the login form has a password field": function(br) {
-                        assert.ok(br.query("div.login form input[name=\"password\"]"));
+                        assert.ok(br.query("div#loginpage form input[name=\"password\"]"));
                     },
                     "the login form has a submit button": function(br) {
-                        assert.ok(br.query("div.login form button[type=\"submit\"]"));
-                    },
-                    "and we submit the form": {
-                        topic: function(br) {
-                            var callback = this.callback;
-
-                            Step(
-                                function() {
-                                    br.fill("nickname", "croach", this);
-                                },
-                                function(err, br) {
-                                    if (err) throw err;
-                                    br.fill("password", "ihave1onus", this);
-                                },
-                                function(err, br) {
-                                    if (err) throw err;
-                                    br.pressButton("button[type=\"submit\"]", this);
-                                },
-                                function(err, br) {
-                                    if (err) {
-                                        callback(err, null);
-                                    } else {
-                                        callback(null, br);
-                                    }
-                                }
-                            );
-                        },
-                        "it works": function(err, br) {
-                            assert.ifError(err);
-                            assert.isTrue(br.success);
-                        }
+                        assert.ok(br.query("div#loginpage form button[type=\"submit\"]"));
                     }
                 }
             }
