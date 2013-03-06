@@ -1233,6 +1233,31 @@ suite.addBatch({
                     assert.isFalse(_(props.likes).has("items"));
                     assert.isTrue(_(props.likes).has("url"));
                 }
+            },
+            "and we check whether a full object is a reference": {
+                topic: function(ActivityObject) {
+                    var props = {
+                        id: "urn:uuid:32003b5c-8680-11e2-acaf-70f1a154e1aa",
+                        objectType: "note",
+                        content: "Hello, world!"
+                    };
+                    return ActivityObject.isReference(props);
+                },
+                "it is not": function(isRef) {
+                    assert.isFalse(isRef);
+                }
+            },
+            "and we check whether a reference is a reference": {
+                topic: function(ActivityObject) {
+                    var props = {
+                        id: "urn:uuid:5e2daa16-8680-11e2-823c-70f1a154e1aa",
+                        objectType: "person"
+                    };
+                    return ActivityObject.isReference(props);
+                },
+                "it is": function(isRef) {
+                    assert.isTrue(isRef);
+                }
             }
         }
     }
