@@ -63,6 +63,7 @@ suite.addBatch({
             "and we post a new activity": {
                 topic: function(cred) {
                     var cb = this.callback,
+                        url = "http://localhost:4815/api/user/gerold/feed",
                         act = {
                             verb: "post",
                             object: {
@@ -70,7 +71,7 @@ suite.addBatch({
                                 content: "Hello, world!"
                             }
                         };
-                    httputil.postJSON("http://localhost:4815/api/user/gerold/feed", cred, act, function(err, act, response) {
+                    httputil.postJSON(url, cred, act, function(err, act, response) {
                         cb(err, act);
                     });
                 },
@@ -131,6 +132,7 @@ suite.addBatch({
                         topic: function(got, act, cred) {
                             var cb = this.callback,
                                 newact = JSON.parse(JSON.stringify(act));
+
                             newact.mood = {
                                 displayName: "Friendly"
                             };
@@ -162,6 +164,8 @@ suite.addBatch({
                             assert.equal(newact.actor.id, act.actor.id);
                             assert.equal(newact.actor.objectType, act.actor.objectType);
                             assert.equal(newact.actor.displayName, act.actor.displayName);
+                            assert.equal(newact.actor.published, act.actor.published);
+                            assert.equal(newact.actor.updated, act.actor.updated);
                             assert.equal(newact.object.id, act.object.id);
                             assert.equal(newact.object.objectType, act.object.objectType);
                             assert.equal(newact.object.content, act.object.content);

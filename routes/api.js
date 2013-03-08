@@ -714,6 +714,7 @@ var usersStream = function(callback) {
 var thisService = function(app) {
     var Service = require("../lib/model/service").Service;
     return new Service({
+        objectType: Service.type,
         url: URLMaker.makeURL("/"),
         displayName: app.config.site || "pump.io"
     });
