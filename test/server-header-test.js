@@ -55,7 +55,6 @@ suite.addBatch({
             "headers include our Server: header": function(err, res, body) {
                 assert.isObject(res.headers);
                 assert.include(res.headers, "server");
-                console.log(res.headers.server);
                 assert.match(res.headers.server, new RegExp("pump.io/"+version));
             }
         }
