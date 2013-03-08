@@ -173,6 +173,38 @@ var post = function(host, port, path, params, callback) {
     req.end();
 };
 
+var head = function(url, callback) {
+
+    var options = urlparse(url);
+
+    options.method = "HEAD";
+    options.headers = {
+            "User-Agent": "pump.io/"+version
+    };
+
+    var mod = (options.protocol == "https:") ? https : http;
+
+    var req = mod.request(options, function(res) {
+        var body = "";
+        res.setEncoding("utf8");
+        res.on("data", function(chunk) {
+            body = body + chunk;
+        });
+        res.on("error", function(err) {
+            callback(err, null, null);
+        });
+        res.on("end", function() {
+            callback(null, res, body);
+        });
+    });
+
+    req.on("error", function(err) {
+        callback(err, null, null);
+    });
+
+    req.end();
+};
+
 var jsonHandler = function(callback) {
     return function(err, data, response) {
         var obj;
@@ -321,6 +353,7 @@ var dialbackPost = function(endpoint, id, token, ts, requestBody, contentType, c
 
 exports.options = options;
 exports.post = post;
+exports.head = head;
 exports.postJSON = postJSON;
 exports.postFile = postFile;
 exports.getJSON = getJSON;
