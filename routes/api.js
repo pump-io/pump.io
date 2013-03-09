@@ -34,6 +34,7 @@ var databank = require("databank"),
     objectPublicOnly = filters.objectPublicOnly,
     idRecipientsOnly = filters.idRecipientsOnly,
     idPublicOnly = filters.idPublicOnly,
+    version = require("../lib/version").version,
     HTTPError = require("../lib/httperror").HTTPError,
     Stamper = require("../lib/stamper").Stamper,
     Mailer = require("../lib/mailer"),
@@ -2521,7 +2522,7 @@ var proxyRequest = function(req, res, next) {
         },
         function(err, body, resp) {
             if (err) {
-                next(err);
+                next(new HTTPError("Unable to retrieve proxy data", 500));
             } else {
                 if (resp.headers["content-type"]) {
                     res.setHeader("Content-Type", resp.headers["content-type"]);
