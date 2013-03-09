@@ -21,6 +21,11 @@ var util = require("util"),
     vows = require("vows"),
     Step = require("step"),
     http = require("http"),
+    mkdirp = require("mkdirp"),
+    rimraf = require("rimraf"),
+    os = require("os"),
+    fs = require("fs"),
+    path = require("path"),
     querystring = require("querystring"),
     _ = require("underscore"),
     urlparse = require("url").parse,
@@ -31,172 +36,201 @@ var util = require("util"),
     pj = httputil.postJSON,
     gj = httputil.getJSON,
     dialbackApp = require("./lib/dialback").dialbackApp,
+    setupAppConfig = oauthutil.setupAppConfig,
     setupApp = oauthutil.setupApp;
 
-var suite = vows.describe("distributor remote test");
+var suite = vows.describe("proxy url test");
 
 var serverOf = function(url) {
     var parts = urlparse(url);
     return parts.hostname;
 };
 
+var assertProxyURL = function(obj, prop) {
+    assert.isObject(obj[prop], "Property '"+prop+"' is not an object");
+    assert.isObject(obj[prop].pump_io, "Property '"+prop+"' has no pump_io object property");
+    assert.isString(obj[prop].pump_io.proxyURL, "Property '"+prop+"' has no proxyURL in its pump_io section");
+};
+
 suite.addBatch({
-    "When we set up two apps": {
+    "When we create a temporary upload dir": {
         topic: function() {
-            var social, photo, callback = this.callback;
-            Step(
-                function() {
-                    setupApp(80, "social.localhost", this.parallel());
-                    setupApp(80, "photo.localhost", this.parallel());
-                },
-                function(err, social, photo) {
-                    if (err) {
-                        callback(err, null, null);
-                    } else {
-                        callback(null, social, photo);
-                    }
+            var callback = this.callback,
+                dirname = path.join(os.tmpDir(),
+                                    "upload-file-test",
+                                    ""+Date.now());
+            mkdirp(dirname, function (err) {
+                if (err) {
+                    callback(err, null);
+                } else {
+                    callback(null, dirname);
                 }
-            );
+            });
         },
-        "it works": function(err, social, photo) {
+        "it works": function(err, dir) {
             assert.ifError(err);
+            assert.isString(dir);
         },
-        teardown: function(social, photo) {
-            if (social && social.close) {
-                social.close();
-            }
-            if (photo && photo.close) {
-                photo.close();
-            }
+        teardown: function(dir) {
+            rimraf(dir, function(err) { 
+            });
         },
-        "and we register one user on each": {
-            topic: function() {
-                var callback = this.callback;
+        "And we set up two apps": {
+            topic: function(dir) {
+                var social, photo, callback = this.callback;
                 Step(
                     function() {
-                        newCredentials("colin", "t4steful", "social.localhost", 80, this.parallel());
-                        newCredentials("jane", "gritty*1", "photo.localhost", 80, this.parallel());
+                        setupAppConfig({port: 80, hostname: "social.localhost"},
+                                       this.parallel());
+                        setupAppConfig({port: 80, hostname: "photo.localhost", uploaddir: dir},
+                                       this.parallel());
                     },
-                    callback
+                    function(err, social, photo) {
+                        if (err) {
+                            callback(err, null, null);
+                        } else {
+                            callback(null, social, photo);
+                        }
+                    }
                 );
             },
-            "it works": function(err, cred1, cred2) {
+            "it works": function(err, social, photo) {
                 assert.ifError(err);
-                assert.isObject(cred1);
-                assert.isObject(cred2);
             },
-            "and one user follows the other": {
-                topic: function(cred1, cred2) {
-                    var url = "http://social.localhost/api/user/colin/feed",
-                        act = {
-                            verb: "follow",
-                            object: {
-                                id: "acct:jane@photo.localhost",
-                                objectType: "person"
-                            }
+            teardown: function(social, photo) {
+                if (social && social.close) {
+                    social.close();
+                }
+                if (photo && photo.close) {
+                    photo.close();
+                }
+            },
+            "and we register one user on each": {
+                topic: function() {
+                    var callback = this.callback;
+                    Step(
+                        function() {
+                            newCredentials("colin", "t4steful", "social.localhost", 80, this.parallel());
+                            newCredentials("jane", "gritty*1", "photo.localhost", 80, this.parallel());
                         },
-                        callback = this.callback;
-                    
-                    pj(url, cred1, act, function(err, body, resp) {
-                        if (err) {
-                            callback(err, null);
-                        } else {
-                            callback(null, body);
-                        }
-                    });
+                        callback
+                    );
                 },
-                "it works": function(err, body) {
+                "it works": function(err, cred1, cred2) {
                     assert.ifError(err);
-                    assert.isObject(body);
+                    assert.isObject(cred1);
+                    assert.isObject(cred2);
                 },
-                "and we wait a few seconds for delivery": {
-                    topic: function() {
-                        var callback = this.callback;
-                        setTimeout(function() { callback(null); }, 2000);
+                "and one user follows the other": {
+                    topic: function(cred1, cred2) {
+                        var url = "http://social.localhost/api/user/colin/feed",
+                            act = {
+                                verb: "follow",
+                                object: cred2.user.profile
+                            },
+                            callback = this.callback;
+                        
+                        pj(url, cred1, act, function(err, body, resp) {
+                            if (err) {
+                                callback(err, null);
+                            } else {
+                                callback(null, body);
+                            }
+                        });
                     },
-                    "it works": function(err) {
+                    "it works": function(err, body) {
                         assert.ifError(err);
+                        assert.isObject(body);
                     },
-                    "and the second user posts an image": {
-                        topic: function(act, cred1, cred2) {
-                            var url = "http://photo.localhost/api/user/jane/feed",
-                                callback = this.callback,
-                                post = {
-                                    verb: "post",
-                                    object: {
-                                        objectType: "image",
-                                        displayName: "My Photo"
-                                    }
-                                };
-                            
-                            pj(url, cred2, post, function(err, act, resp) {
-                                if (err) {
-                                    callback(err, null);
-                                } else {
-                                    callback(null, act);
-                                }
-                            });
+                    "and we wait a few seconds for delivery": {
+                        topic: function() {
+                            var callback = this.callback;
+                            setTimeout(function() { callback(null); }, 2000);
                         },
-                        "it works": function(err, act) {
+                        "it works": function(err) {
                             assert.ifError(err);
-                            assert.isObject(act);
                         },
-                        "and we wait a few seconds for delivery": {
-                            topic: function() {
-                                var callback = this.callback;
-                                setTimeout(function() { callback(null); }, 2000);
-                            },
-                            "it works": function(err) {
-                                assert.ifError(err);
-                            },
-                            "and we check the first user's major inbox": {
-                                topic: function(posted, followed, cred1, cred2) {
-                                    var callback = this.callback,
-                                        url = "http://social.localhost/api/user/colin/inbox/major";
-                                    gj(url, cred1, function(err, feed, resp) {
+                        "and the second user posts an image": {
+                            topic: function(act, cred1, cred2) {
+                                var up = "http://photo.localhost/api/user/jane/uploads",
+                                    feed = "http://photo.localhost/api/user/jane/feed",
+                                    fileName = path.join(__dirname, "data", "image1.jpg"),
+                                    callback = this.callback;
+
+                                Step(
+                                    function() {
+                                        httputil.postFile(up, cred2, fileName, "image/jpeg", this);
+                                    },
+                                    function(err, doc, response) {
+                                        var post;
+                                        if (err) throw err;
+                                        post = {
+                                            verb: "post",
+                                            object: doc
+                                        };
+                                        pj(feed, cred2, post, this);
+                                    },
+                                    function(err, act, resp) {
                                         if (err) {
-                                            callback(err, null, null);
+                                            callback(err, null);
                                         } else {
-                                            callback(null, feed, posted);
+                                            callback(null, act);
                                         }
-                                    });
+                                    }
+                                );
+                            },
+                            "it works": function(err, act) {
+                                assert.ifError(err);
+                                assert.isObject(act);
+                            },
+                            "and we wait a few seconds for delivery": {
+                                topic: function() {
+                                    var callback = this.callback;
+                                    setTimeout(function() { callback(null); }, 2000);
                                 },
-                                "it works": function(err, feed, act) {
+                                "it works": function(err) {
                                     assert.ifError(err);
-                                    assert.isObject(feed);
-                                    assert.isObject(act);
                                 },
-                                "the activity includes proxy URLs": function(err, feed, act) {
+                                "and we check the first user's inbox": {
+                                    topic: function(posted, followed, cred1, cred2) {
+                                        var callback = this.callback,
+                                            url = "http://social.localhost/api/user/colin/inbox";
 
-                                    var fi0;
+                                        gj(url, cred1, function(err, feed, resp) {
+                                            if (err) {
+                                                callback(err, null, null);
+                                            } else {
+                                                callback(null, feed, posted);
+                                            }
+                                        });
+                                    },
+                                    "it works": function(err, feed, act) {
+                                        assert.ifError(err);
+                                        assert.isObject(feed);
+                                        assert.isObject(act);
+                                    },
+                                    "the activity includes proxy URLs": function(err, feed, act) {
 
-                                    assert.ifError(err);
-                                    assert.isObject(feed);
-                                    assert.isObject(act);
-                                    assert.include(feed, "items");
-                                    assert.isArray(feed.items);
-                                    assert.greater(feed.items.length, 0);
-                                    assert.isObject(feed.items[0]);
-                                    assert.include(feed.items[0], "id");
-                                    assert.equal(feed.items[0].id, act.id);
+                                        var fi0;
 
-                                    fi0 = feed.items[0];
+                                        assert.ifError(err);
+                                        assert.isObject(feed);
+                                        assert.isObject(act);
+                                        assert.include(feed, "items");
+                                        assert.isArray(feed.items);
+                                        assert.greater(feed.items.length, 0);
 
-                                    assert.include(fi0, "object");
-                                    assert.include(fi0.object, "pump_io");
-                                    assert.include(fi0.object.pump_io, "proxyURL");
+                                        fi0 = _.find(feed.items, function(item) { return item.id == act.id; });
 
-                                    assert.include(fi0.object, "likes");
-                                    assert.include(fi0.object.likes, "pump_io");
-                                    assert.include(fi0.object.likes.pump_io, "proxyURL");
+                                        assert.isObject(fi0);
 
-                                    assert.include(fi0.object, "replies");
-                                    assert.include(fi0.object.replies, "pump_io");
-                                    assert.include(fi0.object.replies.pump_io, "proxyURL");
-
-                                    assert.include(fi0.object, "shares");
-                                    assert.include(fi0.object.shares, "pump_io");
-                                    assert.include(fi0.object.shares.pump_io, "proxyURL");
+                                        assertProxyURL(fi0, "object");
+                                        assertProxyURL(fi0.object, "likes");
+                                        assertProxyURL(fi0.object, "replies");
+                                        assertProxyURL(fi0.object, "shares");
+                                        assertProxyURL(fi0.object, "image");
+                                        assertProxyURL(fi0.object, "fullImage");
+                                    }
                                 }
                             }
                         }
