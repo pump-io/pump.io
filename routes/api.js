@@ -23,6 +23,7 @@ var databank = require("databank"),
     path = require("path"),
     fs = require("fs"),
     mkdirp = require("mkdirp"),
+    OAuth = require("oauth").OAuth,
     check = validator.check,
     sanitize = validator.sanitize,
     FilteredStream = require("../lib/filteredstream").FilteredStream,
@@ -47,6 +48,8 @@ var databank = require("databank"),
     Person = require("../lib/model/person").Person,
     Edge = require("../lib/model/edge").Edge,
     Favorite = require("../lib/model/favorite").Favorite,
+    Proxy = require("../lib/model/proxy").Proxy,
+    Credentials = require("./model/credentials").Credentials,
     stream = require("../lib/model/stream"),
     Stream = stream.Stream,
     NotInStreamError = stream.NotInStreamError,
@@ -124,6 +127,10 @@ var databank = require("databank"),
 var addRoutes = function(app) {
 
     var smw = (app.session) ? [app.session] : [];
+
+    // Proxy to a remote server
+
+    app.get("/api/proxy/:uuid", smw, userReadAuth, reqProxy, proxyRequest);
 
     // Users
     app.get("/api/user/:nickname", smw, anyReadAuth, reqUser, getUser);
@@ -2454,6 +2461,66 @@ var streamArgs = function(req, defaultCount, maxCount) {
 
 var whoami = function(req, res, next) {
     res.redirect("/api/user/"+req.principalUser.nickname+"/profile", 302);
+};
+
+var reqProxy = function(req, res, next) {
+    var id = req.params.uuid;
+
+    Step(
+        function() {
+            Proxy.search({id: id}, this);
+        },
+        function(err, proxies) {
+            if (err) {
+                next(err);
+            } else if (!proxies || proxies.length == 0) {
+                next(new HTTPError("No such proxy", 404));
+            } else if (proxies.length > 1) {
+                next(new HTTPError("Too many proxies", 500));
+            } else {
+                req.proxy = proxies[0];
+                next();
+            }
+        }
+    );
+};
+
+var proxyRequest = function(req, res, next) {
+
+    var principal = req.principal,
+        proxy = req.proxy;
+
+    Step(
+        function() {
+            Credentials.getFor(principal.id, proxy.url, this);
+        },
+        function(err, cred) {
+            var oa;
+            if (err) throw err;
+
+            oa = new OAuth(null,
+                           null,
+                           cred.client_id,
+                           cred.client_secret,
+                           "1.0",
+                           null,
+                           "HMAC-SHA1",
+                           null, // nonce size; use default
+                           {"User-Agent": "pump.io/"+version});
+            
+            oa.get(proxy.url, null, null, this);
+        },
+        function(err, body, resp) {
+            if (err) {
+                next(err);
+            } else {
+                if (resp.headers["content-type"]) {
+                    res.setHeader("Content-Type", resp.headers["content-type"]);
+                }
+                res.send(body);
+            }
+        }
+    );
 };
 
 exports.addRoutes = addRoutes;
