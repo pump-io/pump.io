@@ -1,8 +1,8 @@
-// distributor-remote-test-as-root.js
+// proxy-url-test-as-root.js
 //
-// Test distribution to remote servers
+// Test that remote objects get pump_io.proxyURL properties
 //
-// Copyright 2012, StatusNet Inc.
+// Copyright 2013, E14N https://e14n.com/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
