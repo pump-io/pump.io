@@ -230,6 +230,41 @@ suite.addBatch({
                                         assertProxyURL(fi0.object, "shares");
                                         assertProxyURL(fi0.object, "image");
                                         assertProxyURL(fi0.object, "fullImage");
+                                    },
+                                    "and we get the image proxyURL": {
+                                        topic: function(feed, posted, postedBefore, followed, cred1, cred2) {
+                                            var callback = this.callback,
+                                                fi0 = _.find(feed.items, function(item) { return item.id == posted.id; }),
+                                                url = fi0.object.image.pump_io.proxyURL,
+                                                oa;
+
+                                            oa = httputil.newOAuth(url, cred1);
+
+                                            oa.get(url, cred1.token, cred1.token_secret, function(err, data, response) {
+                                                callback(err, data);
+                                            });
+                                        },
+                                        "it works": function(err, data) {
+                                            console.dir(arguments);
+                                            assert.ifError(err);
+                                            assert.isString(data);
+                                        }
+                                    },
+                                    "and we get the replies proxyURL": {
+                                        topic: function(feed, posted, postedBefore, followed, cred1, cred2) {
+                                            var callback = this.callback,
+                                                fi0 = _.find(feed.items, function(item) { return item.id == posted.id; }),
+                                                url = fi0.object.replies.pump_io.proxyURL,
+                                                oa;
+
+                                            gj(url, cred1, function(err, replies, resp) {
+                                                callback(err, replies);
+                                            });
+                                        },
+                                        "it works": function(err, data) {
+                                            assert.ifError(err);
+                                            assert.isString(data);
+                                        }
                                     }
                                 }
                             }
