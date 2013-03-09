@@ -1350,7 +1350,8 @@ var userStream = filteredFeedRoute(
     },
     function(req, callback) {
         req.user.getOutboxStream(callback);
-    }
+    },
+    addProxyFinisher
 );
 
 var userMajorStream = filteredFeedRoute(
@@ -1375,7 +1376,8 @@ var userMinorStream = filteredFeedRoute(
     },
     function(req, callback) {
         req.user.getMinorOutboxStream(callback);
-    }
+    },
+    addProxyFinisher
 );
 
 var feedRoute = function(urlmaker, titlemaker, streamgetter, finisher) {
@@ -1459,7 +1461,8 @@ var userInbox = feedRoute(
     },
     function(req, callback) {
         req.user.getInboxStream(callback);
-    }
+    },
+    addProxyFinisher
 );
 
 var userMajorInbox = feedRoute(
@@ -1484,7 +1487,8 @@ var userMinorInbox = feedRoute(
     },
     function(req, callback) {
         req.user.getMinorInboxStream(callback);
-    }
+    },
+    addProxyFinisher
 );
 
 var userDirectInbox = feedRoute(
@@ -1496,7 +1500,8 @@ var userDirectInbox = feedRoute(
     },
     function(req, callback) {
         req.user.getDirectInboxStream(callback);
-    }
+    },
+    addProxyFinisher
 );
 
 var userMajorDirectInbox = feedRoute(
@@ -1521,7 +1526,8 @@ var userMinorDirectInbox = feedRoute(
     },
     function(req, callback) {
         req.user.getMinorDirectInboxStream(callback);
-    }
+    },
+    addProxyFinisher
 );
 
 var getStream = function(str, args, collection, principal, callback) {
