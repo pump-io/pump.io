@@ -5,7 +5,7 @@
   <% if (!headless) { %>
   <a class="pull-left" href="<%- author.url %>">
     <% if (author.image && author.image.url) { %>
-    <img src="<%- author.image.url %>" width="64" height="64" class="img-rounded media-object" />
+    <img src="<%- (author.image.pump_io && author.image.pump_io.proxyURL) ? author.image.pump_io.proxyURL : author.image.url %>" width="64" height="64" class="img-rounded media-object" />
     <% } else { %>
     <img src="/images/default.png" width="64" height="64" class="img-rounded media-object" />
     <% } %>
@@ -36,7 +36,7 @@
         <% } %>
     </small></p>
     <% if (object.image && object.image.url) { %>
-    <p><img src="<%- object.image.url %>" class="img-polaroid" /></p>
+    <p><img src="<%- (object.image.pump_io && object.image.pump_io.proxyURL) ? object.image.pump_io.proxyURL : object.image.url %>" class="img-polaroid" /></p>
     <% } %>
     <div class="activity-content">
       <%= object.content %>

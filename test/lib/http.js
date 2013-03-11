@@ -24,7 +24,7 @@ var http = require("http"),
     Step = require("step"),
     fs = require("fs"),
     version = require("../../lib/version").version,
-    OAuth = require("oauth").OAuth,
+    OAuth = require("oauth-evanp").OAuth,
     urlparse = require("url").parse;
 
 var OAuthJSONError = function(obj) {

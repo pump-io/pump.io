@@ -25,7 +25,7 @@ var _ = require("underscore"),
     common = require("../lib/pumpclient"),
     clientCred = common.clientCred,
     setUserCred = common.setUserCred,
-    OAuth = require("oauth").OAuth,
+    OAuth = require("oauth-evanp").OAuth,
     readline = require('readline'),
     argv = require("optimist")
         .usage("Usage: $0 -u <username>")
