@@ -2500,6 +2500,8 @@ var proxyRequest = function(req, res, next) {
     var principal = req.principal,
         proxy = req.proxy;
 
+    req.log.info({url: proxy.url, principal: principal.id}, "Getting object through proxy.");
+
     Step(
         function() {
             Credentials.getFor(principal.id, proxy.url, this);
@@ -2520,14 +2522,15 @@ var proxyRequest = function(req, res, next) {
             
             oa.get(proxy.url, null, null, this);
         },
-        function(err, body, resp) {
+        function(err, pbody, pres) {
             if (err) {
                 next(new HTTPError("Unable to retrieve proxy data", 500));
             } else {
-                if (resp.headers["content-type"]) {
-                    res.setHeader("Content-Type", resp.headers["content-type"]);
+                if (pres.headers["content-type"]) {
+                    res.setHeader("Content-Type", pres.headers["content-type"]);
                 }
-                res.send(body);
+                req.log.info({headers: pres.headers}, "Received object");
+                res.send(pbody);
             }
         }
     );
