@@ -245,7 +245,6 @@ suite.addBatch({
                                             });
                                         },
                                         "it works": function(err, data) {
-                                            console.dir(arguments);
                                             assert.ifError(err);
                                             assert.isString(data);
                                         }
