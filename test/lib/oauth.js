@@ -22,7 +22,7 @@ var cp = require("child_process"),
     _ = require("underscore"),
     http = require("http"),
     version = require("../../lib/version").version,
-    OAuth = require("oauth").OAuth,
+    OAuth = require("oauth-evanp").OAuth,
     Browser = require("zombie"),
     httputil = require("./http");
 
