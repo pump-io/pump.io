@@ -21,7 +21,7 @@
 		      "dateformat": "1.x",
 		      "databank": "0.16.x",
                       "step": "0.0.x",
-                      "oauth": "0.9.x",
+                      "oauth-evanp": "0.9.x",
                       "optimist": "0.3.x",
                       "validator": "0.4.x",
                       "webfinger": "0.3.x",
