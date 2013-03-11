@@ -262,7 +262,7 @@ suite.addBatch({
                                         },
                                         "it works": function(err, data) {
                                             assert.ifError(err);
-                                            assert.isString(data);
+                                            assert.isObject(data);
                                         }
                                     }
                                 }
