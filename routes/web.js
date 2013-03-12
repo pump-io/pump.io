@@ -64,6 +64,7 @@ var databank = require("databank"),
     addShared = finishers.addShared,
     addLikers = finishers.addLikers,
     addProxy = finishers.addProxy,
+    addProxyObjects = finishers.addProxyObjects,
     firstFewReplies = finishers.firstFewReplies,
     firstFewShares = finishers.firstFewShares,
     addFollowed = finishers.addFollowed,
@@ -507,6 +508,7 @@ var showFavorites = function(req, res, next) {
         principal = req.principal,
         filter = (principal) ? ((principal.id == req.user.profile.id) ? always : objectRecipientsOnly(principal)) : objectPublicOnly,
         getFavorites = function(callback) {
+            var objects;
             Step(
                 function() {
                     req.user.favoritesStream(this);
@@ -524,7 +526,16 @@ var showFavorites = function(req, res, next) {
                         ActivityObject.getObject(ref.objectType, ref.id, group());
                     });
                 },
-                function(err, objects) {
+                function(err, results) {
+                    if (err) throw err;
+                    objects = results;
+                    if (req.principalUser) {
+                        addProxyObjects(objects, this);
+                    } else {
+                        this(null);
+                    }
+                },
+                function(err) {
                     if (err) {
                         callback(err, null);
                     } else {
@@ -569,7 +580,10 @@ var showFollowers = function(req, res, next) {
                 function(err, results) {
                     if (err) throw err;
                     followers = results;
-                    addFollowed(req.principal, followers, this);
+                    addFollowed(req.principal, followers, this.parallel());
+                    if (req.principalUser) {
+                        addProxyObjects(followers, this.parallel());
+                    }
                 },
                 function(err) {
                     if (err) {
@@ -616,7 +630,10 @@ var showFollowing = function(req, res, next) {
                 function(err, results) {
                     if (err) throw err;
                     following = results;
-                    addFollowed(req.principal, following, this);
+                    addFollowed(req.principal, following, this.parallel());
+                    if (req.principalUser) {
+                        addProxyObjects(following, this.parallel());
+                    }
                 },
                 function(err) {
                     if (err) {
@@ -789,10 +806,18 @@ var showList = function(req, res, next) {
                     });
                 },
                 function(err, objs) {
+                    if (err) throw err;
+                    list.members.items = objs;
+                    if (req.principalUser) {
+                        addProxyObjects(list.members.items, this);
+                    } else {
+                        this(null);
+                    }
+                },
+                function(err) {
                     if (err) {
                         callback(err, null);
                     } else {
-                        list.members.items = objs;
                         callback(null, list);
                     }
                 }
