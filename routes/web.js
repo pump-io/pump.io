@@ -63,6 +63,7 @@ var databank = require("databank"),
     addLiked = finishers.addLiked,
     addShared = finishers.addShared,
     addLikers = finishers.addLikers,
+    addProxy = finishers.addProxy,
     firstFewReplies = finishers.firstFewReplies,
     firstFewShares = finishers.firstFewShares,
     addFollowed = finishers.addFollowed,
@@ -170,6 +171,9 @@ var showInbox = function(req, res, next) {
                     addLikers(profile, objects, this.parallel());
                     firstFewReplies(profile, objects, this.parallel());
                     firstFewShares(profile, objects, this.parallel());
+                    if (user) {
+                        addProxy(activities, this.parallel());
+                    }
                 },
                 function(err) {
                     if (err) {
@@ -428,6 +432,9 @@ var showStream = function(req, res, next) {
                     addLikers(principal, objects, this.parallel());
                     firstFewReplies(principal, objects, this.parallel());
                     firstFewShares(principal, objects, this.parallel());
+                    if (req.principalUser) {
+                        addProxy(activities, this.parallel());
+                    }
                 },
                 function(err) {
                     if (err) {
@@ -446,6 +453,14 @@ var showStream = function(req, res, next) {
                 function(err, str) {
                     if (err) throw err;
                     getFiltered(str, filter, principal, 0, 20, this);
+                },
+                function(err, activities) {
+                    if (err) throw err;
+                    if (req.principalUser) {
+                        addProxy(activities, this);
+                    } else {
+                        this(null);
+                    }
                 },
                 callback
             );
