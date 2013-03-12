@@ -1,7 +1,7 @@
 <li class="media person major" data-person-id="<%- person.id %>">
   <a class="pull-left" href="<%- person.url %>">
     <% if (person.image && person.image.url) { %>
-    <img src="<%- person.image.url %>" width="64" height="64" class="img-rounded media-object" />
+    <img src="<%- (person.image.pump_io && person.image.pump_io.proxyURL) ? person.image.pump_io.proxyURL : person.image.url %>" width="64" height="64" class="img-rounded media-object" />
     <% } else { %>
     <img src="/images/default.png" width="64" height="64" class="img-rounded media-object" />
     <% } %>
