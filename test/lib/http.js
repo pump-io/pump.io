@@ -24,7 +24,7 @@ var http = require("http"),
     Step = require("step"),
     fs = require("fs"),
     version = require("../../lib/version").version,
-    OAuth = require("oauth").OAuth,
+    OAuth = require("oauth-evanp").OAuth,
     urlparse = require("url").parse;
 
 var OAuthJSONError = function(obj) {
@@ -169,6 +169,38 @@ var post = function(host, port, path, params, callback) {
     });
 
     req.write(requestBody);
+
+    req.end();
+};
+
+var head = function(url, callback) {
+
+    var options = urlparse(url);
+
+    options.method = "HEAD";
+    options.headers = {
+            "User-Agent": "pump.io/"+version
+    };
+
+    var mod = (options.protocol == "https:") ? https : http;
+
+    var req = mod.request(options, function(res) {
+        var body = "";
+        res.setEncoding("utf8");
+        res.on("data", function(chunk) {
+            body = body + chunk;
+        });
+        res.on("error", function(err) {
+            callback(err, null, null);
+        });
+        res.on("end", function() {
+            callback(null, res, body);
+        });
+    });
+
+    req.on("error", function(err) {
+        callback(err, null, null);
+    });
 
     req.end();
 };
@@ -321,6 +353,7 @@ var dialbackPost = function(endpoint, id, token, ts, requestBody, contentType, c
 
 exports.options = options;
 exports.post = post;
+exports.head = head;
 exports.postJSON = postJSON;
 exports.postFile = postFile;
 exports.getJSON = getJSON;

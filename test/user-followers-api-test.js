@@ -22,7 +22,7 @@ var assert = require("assert"),
     Step = require("step"),
     _ = require("underscore"),
     Queue = require("jankyqueue"),
-    OAuth = require("oauth").OAuth,
+    OAuth = require("oauth-evanp").OAuth,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     setupApp = oauthutil.setupApp,
@@ -288,11 +288,10 @@ suite.addBatch({
                                 register(cl, "cersei", "i{heart}p0wer", this);
                             },
                             function(err, user2) {
+                                var pair;
                                 if (err) throw err;
-                                accessToken(cl, {nickname: "cersei", password: "i{heart}p0wer"}, this);
-                            },
-                            function(err, pair) {
-                                if (err) throw err;
+                                pair = {token: user2.token,
+                                        token_secret: user2.secret};
                                 httputil.getJSON("http://localhost:4815/api/user/tyrion/followers",
                                                  {consumer_key: cl.client_id,
                                                   consumer_secret: cl.client_secret,
@@ -378,11 +377,10 @@ suite.addBatch({
                                 register(cl, "tywin", "c4st3rly*r0ck", this);
                             },
                             function(err, user2) {
+                                var pair;
                                 if (err) throw err;
-                                accessToken(cl, {nickname: "tywin", password: "c4st3rly*r0ck"}, this);
-                            },
-                            function(err, pair) {
-                                if (err) throw err;
+                                pair = {token: user2.token,
+                                        token_secret: user2.secret};
                                 httputil.getJSON("http://localhost:4815/api/user/tyrion/following",
                                                  {consumer_key: cl.client_id,
                                                   consumer_secret: cl.client_secret,

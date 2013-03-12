@@ -23,6 +23,7 @@ var databank = require("databank"),
     path = require("path"),
     fs = require("fs"),
     mkdirp = require("mkdirp"),
+    OAuth = require("oauth-evanp").OAuth,
     check = validator.check,
     sanitize = validator.sanitize,
     FilteredStream = require("../lib/filteredstream").FilteredStream,
@@ -33,6 +34,7 @@ var databank = require("databank"),
     objectPublicOnly = filters.objectPublicOnly,
     idRecipientsOnly = filters.idRecipientsOnly,
     idPublicOnly = filters.idPublicOnly,
+    version = require("../lib/version").version,
     HTTPError = require("../lib/httperror").HTTPError,
     Stamper = require("../lib/stamper").Stamper,
     Mailer = require("../lib/mailer"),
@@ -47,6 +49,8 @@ var databank = require("databank"),
     Person = require("../lib/model/person").Person,
     Edge = require("../lib/model/edge").Edge,
     Favorite = require("../lib/model/favorite").Favorite,
+    Proxy = require("../lib/model/proxy").Proxy,
+    Credentials = require("../lib/model/credentials").Credentials,
     stream = require("../lib/model/stream"),
     Stream = stream.Stream,
     NotInStreamError = stream.NotInStreamError,
@@ -86,6 +90,8 @@ var databank = require("databank"),
     addLikers = finishers.addLikers,
     addSharedFinisher = finishers.addSharedFinisher,
     addShared = finishers.addShared,
+    addProxyFinisher = finishers.addProxyFinisher,
+    addProxy = finishers.addProxy,
     firstFewRepliesFinisher = finishers.firstFewRepliesFinisher,
     firstFewReplies = finishers.firstFewReplies,
     firstFewSharesFinisher = finishers.firstFewSharesFinisher,
@@ -124,6 +130,10 @@ var databank = require("databank"),
 var addRoutes = function(app) {
 
     var smw = (app.session) ? [app.session] : [];
+
+    // Proxy to a remote server
+
+    app.get("/api/proxy/:uuid", smw, userReadAuth, reqProxy, proxyRequest);
 
     // Users
     app.get("/api/user/:nickname", smw, anyReadAuth, reqUser, getUser);
@@ -714,6 +724,7 @@ var usersStream = function(callback) {
 var thisService = function(app) {
     var Service = require("../lib/model/service").Service;
     return new Service({
+        objectType: Service.type,
         url: URLMaker.makeURL("/"),
         displayName: app.config.site || "pump.io"
     });
@@ -1324,7 +1335,8 @@ var filteredFeedRoute = function(urlmaker, titlemaker, streammaker, finisher) {
 };
 
 
-var majorFinishers = doFinishers([addLikedFinisher,
+var majorFinishers = doFinishers([addProxyFinisher,
+                                  addLikedFinisher,
                                   firstFewRepliesFinisher,
                                   addLikersFinisher,
                                   addSharedFinisher,
@@ -1339,7 +1351,8 @@ var userStream = filteredFeedRoute(
     },
     function(req, callback) {
         req.user.getOutboxStream(callback);
-    }
+    },
+    addProxyFinisher
 );
 
 var userMajorStream = filteredFeedRoute(
@@ -1364,7 +1377,8 @@ var userMinorStream = filteredFeedRoute(
     },
     function(req, callback) {
         req.user.getMinorOutboxStream(callback);
-    }
+    },
+    addProxyFinisher
 );
 
 var feedRoute = function(urlmaker, titlemaker, streamgetter, finisher) {
@@ -1448,7 +1462,8 @@ var userInbox = feedRoute(
     },
     function(req, callback) {
         req.user.getInboxStream(callback);
-    }
+    },
+    addProxyFinisher
 );
 
 var userMajorInbox = feedRoute(
@@ -1473,7 +1488,8 @@ var userMinorInbox = feedRoute(
     },
     function(req, callback) {
         req.user.getMinorInboxStream(callback);
-    }
+    },
+    addProxyFinisher
 );
 
 var userDirectInbox = feedRoute(
@@ -1485,7 +1501,8 @@ var userDirectInbox = feedRoute(
     },
     function(req, callback) {
         req.user.getDirectInboxStream(callback);
-    }
+    },
+    addProxyFinisher
 );
 
 var userMajorDirectInbox = feedRoute(
@@ -1510,7 +1527,8 @@ var userMinorDirectInbox = feedRoute(
     },
     function(req, callback) {
         req.user.getMinorDirectInboxStream(callback);
-    }
+    },
+    addProxyFinisher
 );
 
 var getStream = function(str, args, collection, principal, callback) {
@@ -2453,6 +2471,69 @@ var streamArgs = function(req, defaultCount, maxCount) {
 
 var whoami = function(req, res, next) {
     res.redirect("/api/user/"+req.principalUser.nickname+"/profile", 302);
+};
+
+var reqProxy = function(req, res, next) {
+    var id = req.params.uuid;
+
+    Step(
+        function() {
+            Proxy.search({id: id}, this);
+        },
+        function(err, proxies) {
+            if (err) {
+                next(err);
+            } else if (!proxies || proxies.length == 0) {
+                next(new HTTPError("No such proxy", 404));
+            } else if (proxies.length > 1) {
+                next(new HTTPError("Too many proxies", 500));
+            } else {
+                req.proxy = proxies[0];
+                next();
+            }
+        }
+    );
+};
+
+var proxyRequest = function(req, res, next) {
+
+    var principal = req.principal,
+        proxy = req.proxy;
+
+    req.log.info({url: proxy.url, principal: principal.id}, "Getting object through proxy.");
+
+    Step(
+        function() {
+            Credentials.getFor(principal.id, proxy.url, this);
+        },
+        function(err, cred) {
+            var oa;
+            if (err) throw err;
+
+            oa = new OAuth(null,
+                           null,
+                           cred.client_id,
+                           cred.client_secret,
+                           "1.0",
+                           null,
+                           "HMAC-SHA1",
+                           null, // nonce size; use default
+                           {"User-Agent": "pump.io/"+version});
+            
+            oa.get(proxy.url, null, null, this);
+        },
+        function(err, pbody, pres) {
+            if (err) {
+                next(new HTTPError("Unable to retrieve proxy data", 500));
+            } else {
+                if (pres.headers["content-type"]) {
+                    res.setHeader("Content-Type", pres.headers["content-type"]);
+                }
+                req.log.info({headers: pres.headers}, "Received object");
+                res.send(pbody);
+            }
+        }
+    );
 };
 
 exports.addRoutes = addRoutes;

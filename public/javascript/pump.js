@@ -69,7 +69,7 @@ if (!window.Pump) {
 
         if (Pump.principalUser) {
             Pump.principalUser = Pump.User.unique(Pump.principalUser);
-            Pump.principal = Pump.principalUser.profile;
+            Pump.principal = Pump.Person.unique(Pump.principal);
             Pump.body.nav = new Pump.UserNav({el: Pump.body.$(".navbar-inner .container"),
                                               model: Pump.principalUser,
                                               data: {

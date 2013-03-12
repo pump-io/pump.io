@@ -21,7 +21,7 @@ var assert = require("assert"),
     Step = require("step"),
     _ = require("underscore"),
     querystring = require("querystring"),
-    OAuth = require("oauth").OAuth,
+    OAuth = require("oauth-evanp").OAuth,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth");
 
