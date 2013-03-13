@@ -57,8 +57,7 @@ var uploadedFile = function(req, res, next) {
         ext = slug.match(/\.(.*)$/)[1],
         type = extToType(ext),
         Cls = typeToClass(type),
-        profile = (req.remoteUser) ? req.remoteUser.profile : 
-            ((req.principal) ? req.principal : null),
+        profile = req.principal,
         obj;
 
     req.log.info({profile: profile, slug: slug}, "Checking permissions");
