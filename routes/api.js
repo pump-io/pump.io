@@ -943,12 +943,12 @@ var createUser = function(req, res, next) {
                 // XXX: Bad hack
                 if (req.session) {
 		    setPrincipal(req.session, user.profile, function(err) {
-				     if (err) {
-					 next(err);
-				     } else {
-					 res.json(user);
-				     }
-				 });
+			if (err) {
+			    next(err);
+			} else {
+			    res.json(user);
+			}
+		    });
                 } else {
                     res.json(user);
 		}
@@ -2287,7 +2287,7 @@ var collectionMembers = function(req, res, next) {
             }
             filtered.count(this.parallel());
             type = (req.query.type) ? req.query.type :
-                   (coll.objectTypes.length > 0) ? coll.objectTypes[0] :
+                (coll.objectTypes.length > 0) ? coll.objectTypes[0] :
                 Person.type;
             if (_(args).has("before")) {
                 filtered.getObjectsGreaterThan({id: args.before, objectType: type}, args.count, this.parallel());
@@ -2529,13 +2529,25 @@ var proxyRequest = function(req, res, next) {
 
     req.log.info({url: proxy.url, principal: principal.id}, "Getting object through proxy.");
 
+    // XXX: check local cache first
+
     Step(
         function() {
             Credentials.getFor(principal.id, proxy.url, this);
         },
         function(err, cred) {
-            var oa;
+            var oa, headers;
             if (err) throw err;
+
+            headers = {"User-Agent": "pump.io/"+version};
+
+            if (req.headers["if-modified-since"]) {
+                headers["If-Modified-Since"] = req.headers["if-modified-since"];
+            }
+
+            if (req.headers["if-none-match"]) {
+                headers["If-None-Match"] = req.headers["if-none-match"];
+            }
 
             oa = new OAuth(null,
                            null,
@@ -2545,17 +2557,36 @@ var proxyRequest = function(req, res, next) {
                            null,
                            "HMAC-SHA1",
                            null, // nonce size; use default
-                           {"User-Agent": "pump.io/"+version});
+                           headers);
             
             oa.get(proxy.url, null, null, this);
         },
         function(err, pbody, pres) {
+            var toCopy;
             if (err) {
-                next(new HTTPError("Unable to retrieve proxy data", 500));
+                if (err.statusCode == 304) {
+                    res.statusCode = 304;
+                    res.end();
+                } else {
+                    next(new HTTPError("Unable to retrieve proxy data", 500));
+                }
             } else {
                 if (pres.headers["content-type"]) {
                     res.setHeader("Content-Type", pres.headers["content-type"]);
                 }
+                if (pres.headers["last-modified"]) {
+                    res.setHeader("Last-Modified", pres.headers["last-modified"]);
+                }
+                if (pres.headers["etag"]) {
+                    res.setHeader("ETag", pres.headers["etag"]);
+                }
+                if (pres.headers["expires"]) {
+                    res.setHeader("Expires", pres.headers["expires"]);
+                }
+                if (pres.headers["cache-control"]) {
+                    res.setHeader("Cache-Control", pres.headers["cache-control"]);
+                }
+                // XXX: save to local cache
                 req.log.info({headers: pres.headers}, "Received object");
                 res.send(pbody);
             }

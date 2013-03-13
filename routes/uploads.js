@@ -33,6 +33,10 @@ var connect = require("connect"),
     userOrClientAuth = authc.userOrClientAuth,
     principal = authc.principal;
 
+// Default expires is one year
+
+var EXPIRES = 365 * 24 * 60 * 60 * 1000;
+
 var addRoutes = function(app) {
     if (app.session) {
         app.get("/uploads/*", app.session, everyAuth, uploadedFile);
@@ -64,13 +68,15 @@ var sendFile = function(req, res, slug, next) {
             fs.stat(fullpath, this);
         },
         function(err, stats) {
-	    if (err && err.code == 'ENOENT') {
+	    if (err && err.code == "ENOENT") {
                 next(new HTTPError("No such upload: " + slug, 404));
             } else if (err) {
                 next(err);
             } else {
-                res.setHeader('Last-Modified', stats.mtime.toUTCString());
-                res.setHeader('ETag', cutils.etag(stats));
+                res.setHeader("Cache-Control", "private");
+                res.setHeader("Last-Modified", stats.mtime.toUTCString());
+                res.setHeader("ETag", cutils.etag(stats));
+                res.setHeader("Expires", (new Date(stats.mtime.value + EXPIRES)).toUTCString());
 
                 if (!cutils.modified(req, res)) {
                     cutils.notModified(res);
