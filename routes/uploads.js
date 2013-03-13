@@ -16,7 +16,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var path = require("path"),
+var connect = require("connect"),
+    cutils = connect.utils,
+    fs = require("fs"),
+    path = require("path"),
     Step = require("step"),
     _ = require("underscore"),
     Activity = require("../lib/model/activity").Activity,
@@ -50,6 +53,35 @@ var everyAuth = function(req, res, next) {
     }
 };
 
+var sendFile = function(req, res, slug, next) {
+
+    var fullpath = path.join(req.app.config.uploaddir, slug),
+        size,
+        mtime;
+
+    Step(
+        function() {
+            fs.stat(fullpath, this);
+        },
+        function(err, stats) {
+	    if (err && err.code == 'ENOENT') {
+                next(new HTTPError("No such upload: " + slug, 404));
+            } else if (err) {
+                next(err);
+            } else {
+                res.setHeader('Last-Modified', stats.mtime.toUTCString());
+                res.setHeader('ETag', cutils.etag(stats));
+
+                if (!cutils.modified(req, res)) {
+                    cutils.notModified(res);
+                } else {
+                    res.sendfile(fullpath);
+                }
+            }
+        }
+    );
+};
+
 // Check downloads of uploaded files
 
 var uploadedFile = function(req, res, next) {
@@ -57,8 +89,7 @@ var uploadedFile = function(req, res, next) {
         ext = slug.match(/\.(.*)$/)[1],
         type = extToType(ext),
         Cls = typeToClass(type),
-        profile = (req.remoteUser) ? req.remoteUser.profile : 
-            ((req.principal) ? req.principal : null),
+        profile = req.principal,
         obj;
 
     req.log.info({profile: profile, slug: slug}, "Checking permissions");
@@ -76,7 +107,7 @@ var uploadedFile = function(req, res, next) {
             if (profile &&
                 obj.author &&
                 profile.id == obj.author.id) {
-                res.sendfile(path.join(req.app.config.uploaddir, slug));
+                sendFile(req, res, slug, next);
                 return;
             }
             Activity.postOf(obj, this);
@@ -94,7 +125,7 @@ var uploadedFile = function(req, res, next) {
             } else if (!flag) {
                 next(new HTTPError("Not allowed", 403));
             } else {
-                res.sendfile(path.join(req.app.config.uploaddir, slug));
+                sendFile(req, res, slug, next);
             }
         }
     );
