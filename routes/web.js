@@ -63,6 +63,8 @@ var databank = require("databank"),
     addLiked = finishers.addLiked,
     addShared = finishers.addShared,
     addLikers = finishers.addLikers,
+    addProxy = finishers.addProxy,
+    addProxyObjects = finishers.addProxyObjects,
     firstFewReplies = finishers.firstFewReplies,
     firstFewShares = finishers.firstFewShares,
     addFollowed = finishers.addFollowed,
@@ -170,6 +172,9 @@ var showInbox = function(req, res, next) {
                     addLikers(profile, objects, this.parallel());
                     firstFewReplies(profile, objects, this.parallel());
                     firstFewShares(profile, objects, this.parallel());
+                    if (user) {
+                        addProxy(activities, this.parallel());
+                    }
                 },
                 function(err) {
                     if (err) {
@@ -428,6 +433,9 @@ var showStream = function(req, res, next) {
                     addLikers(principal, objects, this.parallel());
                     firstFewReplies(principal, objects, this.parallel());
                     firstFewShares(principal, objects, this.parallel());
+                    if (req.principalUser) {
+                        addProxy(activities, this.parallel());
+                    }
                 },
                 function(err) {
                     if (err) {
@@ -446,6 +454,14 @@ var showStream = function(req, res, next) {
                 function(err, str) {
                     if (err) throw err;
                     getFiltered(str, filter, principal, 0, 20, this);
+                },
+                function(err, activities) {
+                    if (err) throw err;
+                    if (req.principalUser) {
+                        addProxy(activities, this);
+                    } else {
+                        this(null);
+                    }
                 },
                 callback
             );
@@ -492,6 +508,7 @@ var showFavorites = function(req, res, next) {
         principal = req.principal,
         filter = (principal) ? ((principal.id == req.user.profile.id) ? always : objectRecipientsOnly(principal)) : objectPublicOnly,
         getFavorites = function(callback) {
+            var objects;
             Step(
                 function() {
                     req.user.favoritesStream(this);
@@ -509,7 +526,16 @@ var showFavorites = function(req, res, next) {
                         ActivityObject.getObject(ref.objectType, ref.id, group());
                     });
                 },
-                function(err, objects) {
+                function(err, results) {
+                    if (err) throw err;
+                    objects = results;
+                    if (req.principalUser) {
+                        addProxyObjects(objects, this);
+                    } else {
+                        this(null);
+                    }
+                },
+                function(err) {
                     if (err) {
                         callback(err, null);
                     } else {
@@ -554,7 +580,10 @@ var showFollowers = function(req, res, next) {
                 function(err, results) {
                     if (err) throw err;
                     followers = results;
-                    addFollowed(req.principal, followers, this);
+                    addFollowed(req.principal, followers, this.parallel());
+                    if (req.principalUser) {
+                        addProxyObjects(followers, this.parallel());
+                    }
                 },
                 function(err) {
                     if (err) {
@@ -601,7 +630,10 @@ var showFollowing = function(req, res, next) {
                 function(err, results) {
                     if (err) throw err;
                     following = results;
-                    addFollowed(req.principal, following, this);
+                    addFollowed(req.principal, following, this.parallel());
+                    if (req.principalUser) {
+                        addProxyObjects(following, this.parallel());
+                    }
                 },
                 function(err) {
                     if (err) {
@@ -774,6 +806,15 @@ var showList = function(req, res, next) {
                     });
                 },
                 function(err, objs) {
+                    if (err) throw err;
+                    list.members.items = objs;
+                    if (req.principalUser) {
+                        addProxyObjects(list.members.items, this);
+                    } else {
+                        this(null);
+                    }
+                },
+                function(err) {
                     if (err) {
                         callback(err, null);
                     } else {
