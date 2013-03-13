@@ -92,6 +92,7 @@ var databank = require("databank"),
     addShared = finishers.addShared,
     addProxyFinisher = finishers.addProxyFinisher,
     addProxy = finishers.addProxy,
+    addProxyObjects = finishers.addProxyObjects,
     firstFewRepliesFinisher = finishers.firstFewRepliesFinisher,
     firstFewReplies = finishers.firstFewReplies,
     firstFewSharesFinisher = finishers.firstFewSharesFinisher,
@@ -1651,7 +1652,10 @@ var userFollowers = function(req, res, next) {
             if (!req.principal) {
                 this(null);
             } else {
-                addFollowed(req.principal, people, this);
+                addFollowed(req.principal, people, this.parallel());
+                if (req.principalUser) {
+                    addProxyObjects(people, this.parallel());
+                }
             }
         },
         function(err) {
@@ -1700,15 +1704,31 @@ var userFollowers = function(req, res, next) {
 
 var userFollowing = function(req, res, next) {
 
-    var collection = {
-        author: req.user.profile,
-        displayName: "People that " + (req.user.profile.displayName || req.user.nickname) + " is following",
-        id: URLMaker.makeURL("api/user/" + req.user.nickname + "/following"),
-        objectTypes: ["person"],
-        items: []
-    };
-
-    var args;
+    var args,
+        collection = {
+            author: req.user.profile,
+            displayName: "People that " + (req.user.profile.displayName || req.user.nickname) + " is following",
+            id: URLMaker.makeURL("api/user/" + req.user.nickname + "/following"),
+            objectTypes: ["person"],
+            items: []
+        },
+        followedFlags = function(people, callback) {
+            if (!req.principal) {
+                // No principal; by definition, none are followed
+                callback(null);
+            } else if (req.principal.id == req.user.profile.id) {
+                // Same user; by definition, all are followed
+                _.each(people, function(person) {
+                    if (!_.has(person, "pump_io")) {
+                        person.pump_io = {};
+                    }
+                    person.pump_io.followed = true;
+                });
+                callback(null);
+            } else {
+                addFollowed(req.principal, people, callback);
+            }
+        };
 
     try {
         args = streamArgs(req, DEFAULT_FOLLOWING, MAX_FOLLOWING);
@@ -1755,21 +1775,9 @@ var userFollowing = function(req, res, next) {
             if (err) throw err;
 
             collection.items = people;
-
-            if (!req.principal) {
-                // Same user; by definition, all are followed
-                this(null);
-            } else if (req.principal.id == req.user.profile.id) {
-                // Same user; by definition, all are followed
-                _.each(people, function(person) {
-                    if (!_.has(person, "pump_io")) {
-                        person.pump_io = {};
-                    }
-                    person.pump_io.followed = true;
-                });
-                this(null);
-            } else {
-                addFollowed(req.principal, people, this);
+            followedFlags(people, this.parallel());
+            if (req.principalUser) {
+                addProxyObjects(people, this.parallel());
             }
         },
         function(err) {
@@ -1842,14 +1850,29 @@ var newFollow = function(req, res, next) {
 };
 
 var userFavorites = function(req, res, next) {
-    var collection = {
-        author: req.user.profile,
-        displayName: "Things that " + (req.user.profile.displayName || req.user.nickname) + " has favorited",
-        id: URLMaker.makeURL("api/user/" + req.user.nickname + "/favorites"),
-        items: []
-    },
-        args,
-        stream;
+    var args,
+        stream,
+        collection = {
+            author: req.user.profile,
+            displayName: "Things that " + (req.user.profile.displayName || req.user.nickname) + " has favorited",
+            id: URLMaker.makeURL("api/user/" + req.user.nickname + "/favorites"),
+            items: []
+        },
+        addLikedFlags = function(objects, callback) {
+            if (!req.principal) { 
+                // No user, no liked
+                callback(null);
+            } else if (req.principal.id == req.user.profile.id) {
+                // Same user, all liked (by definition!)
+                _.each(collection.items, function(object) {
+                    object.liked = true;
+                });
+                callback(null);
+            } else {
+                // Different user; check for likes
+                addLiked(req.principal, collection.items, callback);
+            }
+        };
 
     try {
         args = streamArgs(req, DEFAULT_FAVORITES, MAX_FAVORITES);
@@ -1914,8 +1937,7 @@ var userFavorites = function(req, res, next) {
         },
         function(err) {
 
-            var third,
-                profile = req.principal;
+            var profile = req.principal;
 
             if (err) throw err;
 
@@ -1935,20 +1957,14 @@ var userFavorites = function(req, res, next) {
 
             addShared(profile, collection.items, this.parallel());
 
-            third = this.parallel();
+            // Add the liked flag for each object
 
-            if (!req.principal) { 
-                // No user, no liked
-                third(null);
-            } else if (req.principal.id == req.user.profile.id) {
-                // Same user, all liked (by definition!)
-                _.each(collection.items, function(object) {
-                    object.liked = true;
-                });
-                third(null);
-            } else {
-                // Different user; check for likes
-                addLiked(req.principal, collection.items, third);
+            addLikedFlags(collection.items, this.parallel());
+
+            // Add the proxy URLs for each object
+
+            if (req.principalUser) {
+                addProxyObjects(collection.items, this.parallel());
             }
         },
         function(err) {
@@ -2235,7 +2251,16 @@ var collectionMembers = function(req, res, next) {
             items: []
         },
         args,
-        str;
+        str,
+        addLikedFlags = function(members, callback) {
+            if (!profile) { 
+                // No user, no liked
+                callback(null);
+            } else {
+                // Different user; check for likes
+                addLiked(profile, feed.items, callback);
+            }
+        };
 
     try {
         args = streamArgs(req, DEFAULT_MEMBERS, MAX_MEMBERS);
@@ -2302,21 +2327,23 @@ var collectionMembers = function(req, res, next) {
 
             addLikers(profile, feed.items, this.parallel());
 
-            third = this.parallel();
+            // Add the first few "likers" for each object
 
-            if (!profile) { 
-                // No user, no liked
-                third(null);
-            } else {
-                // Different user; check for likes
-                addLiked(profile, feed.items, third);
-            }
+            addLikedFlags(feed.items, this.parallel());
+
+            // Add the followed flag to applicable objects
 
             followable = _.filter(feed.items, function(obj) {
                 return obj.isFollowable();
             });
 
             addFollowed(profile, followable, this.parallel());
+
+            // Add proxy URLs
+
+            if (req.principalUser) {
+                addProxyObjects(feed.items, this.parallel());
+            }
         },
         function(err) {
 
