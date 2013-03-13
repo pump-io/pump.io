@@ -1,7 +1,7 @@
 <li class="media object major" data-object-id="<%- obj.id %>">
   <a class="pull-left" href="<%- obj.author.url %>">
     <% if (obj.author && obj.author.image && obj.author.image.url) { %>
-    <img src="<%- (author.image.pump_io && author.image.pump_io.proxyURL) ? author.image.pump_io.proxyURL : author.image.url %>" width="64" height="64" class="img-rounded media-object" />
+    <img src="<%- (obj.author.image.pump_io && obj.author.image.pump_io.proxyURL) ? obj.author.image.pump_io.proxyURL : obj.author.image.url %>" width="64" height="64" class="img-rounded media-object" />
     <% } else { %>
     <img src="/images/default.png" width="64" height="64" class="img-rounded media-object" />
     <% } %>
