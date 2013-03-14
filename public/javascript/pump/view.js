@@ -1297,19 +1297,21 @@
             var view = this,
                 replies = view.collection,
                 full = new Pump.FullReplyStreamView({collection: replies});
+            
+	    Pump.body.startLoad();
 
             full.on("ready", function() {
-
                 full.$el.hide();
-
                 view.$el.replaceWith(full.$el);
-
                 full.$el.fadeIn('slow');
-
-                replies.getAll();
+                Pump.body.endLoad();
             });
 
-            full.render();
+	    replies.on("getall", function() {
+		full.render();
+	    });
+
+            replies.getAll();
         },
         placeSub: function(aview, $el) {
             var view = this,
