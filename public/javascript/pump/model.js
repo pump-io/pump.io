@@ -49,6 +49,8 @@
 
             if (type == 'POST') {
                 params.url = getValue(model.collection, 'url');
+            } else if (model.proxyURL) {
+                params.url = model.proxyURL;
             } else {
                 params.url = getValue(model, 'url');
             }
@@ -130,7 +132,6 @@
             _.each(obj.peopleStreams, initer(obj, Pump.PeopleStream));
             _.each(obj.listStreams, initer(obj, Pump.ListStream));
             _.each(obj.people, initer(obj, Pump.Person));
-
         },
         toJSON: function(seen) {
 
@@ -286,6 +287,11 @@
                     this.prevLink = response.links.prev.href;
                 }
             }
+            if (_.has(response, "pump_io")) {
+                if (_.has(response.pump_io, "proxyURL")) {
+                    this.proxyURL = response.pump_io.proxyURL;
+                }
+            }
             if (_.has(response, "items")) {
                 return response.items;
             } else {
@@ -429,10 +435,11 @@
         },
         getAll: function() { // Get stuff later than the current group
             var coll = this,
+                url = (coll.proxyURL) ? coll.proxyURL : coll.url,
                 count,
                 options;
 
-            if (!coll.url) {
+            if (!url) {
                 // No URL
                 return;
             }
@@ -446,7 +453,7 @@
             options = {
                 type: "GET",
                 dataType: "json",
-                url: coll.url + "?count=" + count,
+                url: url + "?count=" + count,
                 success: function(data) {
                     if (data.items) {
                         coll.add(data.items);
@@ -516,8 +523,11 @@
         activityObjectBags: ['to', 'cc', 'bto', 'bcc'],
         url: function() {
             var links = this.get("links"),
+                pump_io = this.get("pump_io"),
                 uuid = this.get("uuid");
-            if (links && _.isObject(links) && links.self) {
+            if (pump_io && pump_io.proxyURL) {
+                return pump_io.proxyURL;
+            } else if (links && _.isObject(links) && links.self) {
                 return links.self;
             } else if (uuid) {
                 return "/api/activity/" + uuid;
@@ -576,14 +586,17 @@
         activityObjectStreams: ['likes', 'replies', 'shares'],
         url: function() {
             var links = this.get("links"),
+                pump_io = this.get("pump_io"),
                 uuid = this.get("uuid"),
                 objectType = this.get("objectType");
-            if (links &&
-                _.isObject(links) && 
-                _.has(links, "self") &&
-                _.isObject(links.self) &&
-                _.has(links.self, "href") &&
-                _.isString(links.self.href)) {
+            if (pump_io && pump_io.proxyURL) {
+                return pump_io.proxyURL;
+            } else if (links &&
+                       _.isObject(links) && 
+                       _.has(links, "self") &&
+                       _.isObject(links.self) &&
+                       _.has(links.self, "href") &&
+                       _.isString(links.self.href)) {
                 return links.self.href;
             } else if (objectType) {
                 return "/api/"+objectType+"/" + uuid;

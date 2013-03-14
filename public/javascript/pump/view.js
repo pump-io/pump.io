@@ -1300,7 +1300,6 @@
                 full.$el.fadeIn('slow');
 
                 replies.getAll();
-
             });
 
             full.render();
