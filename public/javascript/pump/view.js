@@ -728,6 +728,13 @@
             "keyup #password": "onKey",
             "keyup #nickname": "onKey"
         },
+        ready: function() {
+            var view = this;
+            // setup subViews
+            view.setupSubs();
+            // Initialize state of login button
+            view.onKey();
+        },
         "onKey": function(event) {
             var view = this,
                 nickname = view.$('#nickname').val(),
@@ -1300,7 +1307,6 @@
                 full.$el.fadeIn('slow');
 
                 replies.getAll();
-
             });
 
             full.render();
