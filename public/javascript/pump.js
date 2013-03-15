@@ -457,7 +457,7 @@ if (!window.Pump) {
                     options = {el: $el, data: {}};
                     data = Pump.initialData;
                     _.each(data, function(value, name) {
-                        if (name == View.modelName) {
+                        if (name == View.prototype.modelName) {
                             options.model = def.models[name].unique(value);
                         } else if (def.models[name]) {
                             options.data[name] = def.models[name].unique(value);
