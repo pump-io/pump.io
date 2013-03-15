@@ -50,10 +50,10 @@ var testData = {
     "create": {
         displayName: "Evan Prodromou",
         url: "http://www.facebook.com/evan.prodromou",
-        summary: "Founder and CTO of E14N https://e14n.com/
+        summary: "Founder and CTO of E14N https://e14n.com/"
     },
     "update": {
-        summary: "Founder and CEO of E14N https://e14n.com/
+        summary: "Founder and CEO of E14N https://e14n.com/"
     }
 };
 
