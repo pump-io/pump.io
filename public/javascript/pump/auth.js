@@ -103,6 +103,15 @@
         return;
     };
 
+    Pump.clearCred = function() {
+	Pump.clientID = null;
+	Pump.clientSecret = null;
+	if (localStorage) {
+            delete localStorage['cred:clientID'];
+            delete localStorage['cred:clientSecret'];
+        }
+    };
+
     Pump.ensureCred = function(callback) {
         var cred = Pump.getCred();
         if (cred) {
