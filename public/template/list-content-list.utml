@@ -8,7 +8,7 @@
     </div>
     <h3><%- list.displayName %></h3>
     <% if (list.content) { %>
-    <p><%- list.content %></p>    
+    <p><%= list.content %></p>    
     <% } %>
   </div>
   <div class="row" id="list-members">
