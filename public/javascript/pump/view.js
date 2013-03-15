@@ -822,7 +822,20 @@
                 repeat = view.$('#registration input[name="repeat"]').val(),
                 email = (Pump.config.requireEmail) ? view.$('#registration input[name="email"]').val() : null,
                 options,
+                retries = 0,
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
+                makeRequest = function(options) {
+                    Pump.ensureCred(function(err, cred) {
+                        if (err) {
+                            view.showError("Couldn't get OAuth credentials. :(");
+                        } else {
+                            options.consumerKey = cred.clientID;
+                            options.consumerSecret = cred.clientSecret;
+                            options = Pump.oauthify(options);
+                            $.ajax(options);
+                        }
+                    });
+                },
                 onSuccess = function(data, textStatus, jqXHR) {
                     var objs;
                     if (Pump.config.requireEmail) {
@@ -859,13 +872,21 @@
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     var type, response;
-                    view.stopSpin();
-                    type = jqXHR.getResponseHeader("Content-Type");
-                    if (type && type.indexOf("application/json") !== -1) {
-                        response = JSON.parse(jqXHR.responseText);
-                        view.showError(response.error);
+                    // If we get this error, it (usually!) means our client credentials are bad.
+                    // Get new credentials and retry (once!).
+                    if (jqXHR.status == 401 && retries === 0) {
+                        Pump.clearCred();
+                        makeRequest(options);
+                        retries = 1;
                     } else {
-                        view.showError(errorThrown);
+                        view.stopSpin();
+                        type = jqXHR.getResponseHeader("Content-Type");
+                        if (type && type.indexOf("application/json") !== -1) {
+                            response = JSON.parse(jqXHR.responseText);
+                            view.showError(response.error);
+                        } else {
+                            view.showError(errorThrown);
+                        }
                     }
                 };
 
@@ -908,16 +929,7 @@
                     error: onError
                 };
 
-                Pump.ensureCred(function(err, cred) {
-                    if (err) {
-                        view.showError("Couldn't get OAuth credentials. :(");
-                    } else {
-                        options.consumerKey = cred.clientID;
-                        options.consumerSecret = cred.clientSecret;
-                        options = Pump.oauthify(options);
-                        $.ajax(options);
-                    }
-                });
+                makeRequest(options);
             }
 
             return false;
@@ -985,6 +997,7 @@
         },
         subs: {
             "#profile-block": {
+
                 attr: "profileBlock",
                 subView: "ProfileBlock",
                 subOptions: {
@@ -1298,7 +1311,7 @@
                 replies = view.collection,
                 full = new Pump.FullReplyStreamView({collection: replies});
             
-	    Pump.body.startLoad();
+            Pump.body.startLoad();
 
             full.on("ready", function() {
                 full.$el.hide();
@@ -1307,9 +1320,9 @@
                 Pump.body.endLoad();
             });
 
-	    replies.on("getall", function() {
-		full.render();
-	    });
+            replies.on("getall", function() {
+                full.render();
+            });
 
             replies.getAll();
         },
