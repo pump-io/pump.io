@@ -9,7 +9,7 @@ really want from a social network.
 
 ## License
 
-Copyright 2011-2013, StatusNet Inc.
+Copyright 2011-2012, E14N https://e14n.com/
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

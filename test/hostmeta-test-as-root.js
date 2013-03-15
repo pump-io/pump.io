@@ -1,6 +1,6 @@
 // .well-known/host-meta
 //
-// Copyright 2012 StatusNet Inc.
+// Copyright 2012 E14N https://e14n.com/
 //
 // "I never met a host I didn't like"
 // 

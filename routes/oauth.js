@@ -2,7 +2,7 @@
 //
 // Routes for the OAuth authentication flow
 //
-// Copyright 2011-2013, StatusNet Inc.
+// Copyright 2011-2013, E14N https://e14n.com/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
