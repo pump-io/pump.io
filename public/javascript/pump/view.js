@@ -1423,7 +1423,112 @@
 
     Pump.MajorObjectView = Pump.TemplateView.extend({
         templateName: 'major-object',
-        parts: ["responses", "reply"]
+        parts: ["responses", "reply"],
+        events: {
+            "click .favorite": "favoriteObject",
+            "click .unfavorite": "unfavoriteObject",
+            "click .share": "shareObject",
+            "click .unshare": "unshareObject",
+            "click .comment": "openComment"
+        },
+        setupSubs: function() {
+            var view = this,
+                model = view.model,
+                $el = view.$(".replies");
+
+            if (view.replyStream) {
+                view.replyStream.setElement($el);
+                return;
+            }
+
+            view.replyStream = new Pump.ReplyStreamView({el: $el, collection: model.replies});
+        },
+        favoriteObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "favorite",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMinorActivity(act, function(err, act) {
+                view.$(".favorite")
+                    .removeClass("favorite")
+                    .addClass("unfavorite")
+                    .html("Unlike <i class=\"icon-thumbs-down\"></i>");
+                Pump.addMinorActivity(act);
+            });
+        },
+        unfavoriteObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "unfavorite",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".unfavorite")
+                        .removeClass("unfavorite")
+                        .addClass("favorite")
+                        .html("Like <i class=\"icon-thumbs-up\"></i>");
+                    Pump.addMinorActivity(act);
+                }
+            });
+        },
+        shareObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "share",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMajorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".share")
+                        .removeClass("share")
+                        .addClass("unshare")
+                        .html("Unshare <i class=\"icon-remove\"></i>");
+                    Pump.addMajorActivity(act);
+                }
+            });
+        },
+        unshareObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "unshare",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".unshare")
+                        .removeClass("unshare")
+                        .addClass("share")
+                        .html("Share <i class=\"icon-share-alt\"></i>");
+                    Pump.addMinorActivity(act);
+                }
+            });
+        },
+        openComment: function() {
+            var view = this,
+                form;
+
+            if (view.$("form.post-comment").length > 0) {
+                view.$("form.post-comment textarea").focus();
+            } else {
+                form = new Pump.CommentForm({original: view.model});
+                form.on("ready", function() {
+                    view.$(".replies").append(form.$el);
+                });
+                form.render();
+            }
+        }
     });
 
     Pump.ReplyView = Pump.TemplateView.extend({
@@ -2080,7 +2185,112 @@
         modelName: "object",
         parts: ["responses",
                 "reply",
-                "activity-object-collection"]
+                "activity-object-collection"],
+        events: {
+            "click .favorite": "favoriteObject",
+            "click .unfavorite": "unfavoriteObject",
+            "click .share": "shareObject",
+            "click .unshare": "unshareObject",
+            "click .comment": "openComment"
+        },
+        setupSubs: function() {
+            var view = this,
+                model = view.model,
+                $el = view.$(".replies");
+
+            if (view.replyStream) {
+                view.replyStream.setElement($el);
+                return;
+            }
+
+            view.replyStream = new Pump.ReplyStreamView({el: $el, collection: model.replies});
+        },
+        favoriteObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "favorite",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMinorActivity(act, function(err, act) {
+                view.$(".favorite")
+                    .removeClass("favorite")
+                    .addClass("unfavorite")
+                    .html("Unlike <i class=\"icon-thumbs-down\"></i>");
+                Pump.addMinorActivity(act);
+            });
+        },
+        unfavoriteObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "unfavorite",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".unfavorite")
+                        .removeClass("unfavorite")
+                        .addClass("favorite")
+                        .html("Like <i class=\"icon-thumbs-up\"></i>");
+                    Pump.addMinorActivity(act);
+                }
+            });
+        },
+        shareObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "share",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMajorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".share")
+                        .removeClass("share")
+                        .addClass("unshare")
+                        .html("Unshare <i class=\"icon-remove\"></i>");
+                    Pump.addMajorActivity(act);
+                }
+            });
+        },
+        unshareObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "unshare",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".unshare")
+                        .removeClass("unshare")
+                        .addClass("share")
+                        .html("Share <i class=\"icon-share-alt\"></i>");
+                    Pump.addMinorActivity(act);
+                }
+            });
+        },
+        openComment: function() {
+            var view = this,
+                form;
+
+            if (view.$("form.post-comment").length > 0) {
+                view.$("form.post-comment textarea").focus();
+            } else {
+                form = new Pump.CommentForm({original: view.model});
+                form.on("ready", function() {
+                    view.$(".replies").append(form.$el);
+                });
+                form.render();
+            }
+        }
     });
 
     Pump.ChooseContactModal = Pump.TemplateView.extend({
