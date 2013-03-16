@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -15,25 +16,23 @@
   <body>
     <div class="wrapper">
       <header>
-        <h1>pump.io</h1>
-        <p>Social server with an ActivityStreams API</p>
-
-        <p class="view"><a href="https://github.com/e14n/pump.io">View the Project on GitHub <small>e14n/pump.io</small></a></p>
-
+        <h1 class="header">pump.io</h1>
+        <p class="header">Social server with an ActivityStreams API</p>
 
         <ul>
-          <li><a href="https://github.com/e14n/pump.io/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/e14n/pump.io/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/e14n/pump.io">View On <strong>GitHub</strong></a></li>
+          <li class="download"><a class="buttons" href="https://github.com/e14n/pump.io/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/e14n/pump.io/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/e14n/pump.io">View On GitHub</a></li>
         </ul>
 
-        <p><a href="tryit.html">Try it</a></p>
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/e14n">e14n</a></p>
+
 
       </header>
       <section>
         <h1>pump.io</h1>
 
-<p>Version 0.2.0-alpha.1</p>
+<p>Version 0.2.1</p>
 
 <p>This is pump.io. It's a stream server that does most of what people
 really want from a social network.</p>
@@ -42,7 +41,7 @@ really want from a social network.</p>
 
 <h2>License</h2>
 
-<p>Copyright 2011-2012, StatusNet Inc.</p>
+<p>Copyright 2011-2012, E14N <a href="https://e14n.com/">https://e14n.com/</a></p>
 
 <p>Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -203,6 +202,27 @@ can create a user like <code>pump</code> and use that.</li>
 <em>uploaddir</em> If you want to enable file uploads, set this to the
 full path of a local directory. It should be writeable and readable by the 
 'serverUser'.</li>
+<li>
+<em>debugClient</em> For developers, if you're debugging the Web interface
+and you want to use the non-minified version of the JavaScript libraries,
+set this to <code>true</code>. Defaults to <code>false</code>, which is what people should
+use in production.</li>
+<li>
+<em>firehose</em> Firehose host running the
+<a href="https://github.com/e14n/ofirehose">ofirehose</a> software. Defaults
+to "ofirehose.com". Public notices will be ping this firehose
+server and from there go out to search engines and the world. If
+you want to disconnect from the public web, set this to something
+falsy.</li>
+<li>
+<em>spamhost</em> Host running activityspam software to use to test updates for spam.</li>
+<li>
+<em>spamclientid</em> oauth pair for spam server.</li>
+<li>
+<em>spamclientsecret</em> oauth pair for spam server.</li>
+<li>
+<em>disableRegistration</em> default false. Disables registering new users on the
+site through the Web or the API.</li>
 </ul><h2>Bugs</h2>
 
 <p>If you find bugs, you can report them here:</p>
@@ -210,13 +230,39 @@ full path of a local directory. It should be writeable and readable by the
 <p><a href="https://github.com/e14n/pump.io/issues">https://github.com/e14n/pump.io/issues</a></p>
 
 <p>You can also email me at <a href="mailto:evan@e14n.com">evan@e14n.com</a>.</p>
+
+<h2>Colophon</h2>
+
+<p>This software includes the following great packages of client-side software.</p>
+
+<ul>
+<li>Twitter Bootstrap</li>
+<li>Backbone</li>
+<li>JQuery</li>
+<li>Fine Uploader</li>
+<li>WysiHTML5</li>
+<li>Spin.js</li>
+<li>SockJS</li>
+<li>Select2</li>
+<li>JQuery Easydate</li>
+<li>OAuth.js</li>
+</ul><p>It also uses these icon sets:</p>
+
+<ul>
+<li>Fancy Avatars, © 2009 Brandon Mathis, <a href="http://brandonmathis.com/projects/fancy-avatars/">http://brandonmathis.com/projects/fancy-avatars/</a> (CC-By)</li>
+<li>Glyphicons, <a href="http://glyphicons.com/">http://glyphicons.com/</a> (CC-By)</li>
+</ul><p>This sample photo is used for the main page:</p>
+
+<ul>
+<li>
+<a href="http://www.flickr.com/photos/makelessnoise/240072395/">http://www.flickr.com/photos/makelessnoise/240072395/</a> (CC-by)</li>
+</ul>
       </section>
       <footer>
-        <p>This project is maintained by <a href="https://github.com/e14n">e14n</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
       </footer>
     </div>
-    <script src="javascripts/scale.fix.js"></script>
-    
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
   </body>
 </html>
