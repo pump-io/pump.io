@@ -818,7 +818,6 @@ var showList = function(req, res, next) {
                     if (err) {
                         callback(err, null);
                     } else {
-                        list.members.items = objs;
                         callback(null, list);
                     }
                 }
