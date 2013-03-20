@@ -139,9 +139,7 @@ suite.addBatch({
                             assert.include(feed, "items");
                             assert.isArray(feed.items);
                             assert.greater(feed.items.length, 0);
-                            assert.isObject(feed.items[0]);
-                            assert.include(feed.items[0], "id");
-                            assert.equal(feed.items[0].id, "acct:photog@photo.localhost");
+			    assert.isObject(_.find(feed.items, function(item) { return item.id == "acct:photog@photo.localhost" }));
                         }
                     },
                     "and we check the second user's followers list": {
@@ -233,9 +231,7 @@ suite.addBatch({
                             assert.include(feed, "items");
                             assert.isArray(feed.items);
                             assert.greater(feed.items.length, 0);
-                            assert.isObject(feed.items[0]);
-                            assert.include(feed.items[0], "id");
-                            assert.equal(feed.items[0].id, act.id);
+                            assert.isObject(_.find(feed.items, function(item) { return item.id == act.id; }));
                         }
                     },
                     "and the second user posts an image": {
@@ -294,32 +290,34 @@ suite.addBatch({
                                     assert.include(feed, "items");
                                     assert.isArray(feed.items);
                                     assert.greater(feed.items.length, 0);
-                                    assert.isObject(feed.items[0]);
-                                    assert.include(feed.items[0], "id");
-                                    assert.equal(feed.items[0].id, act.id);
+				    assert.isObject(_.find(feed.items, function(item) { return item.id == act.id; }));
                                 },
                                 "activity is sanitized": function(err, feed, act) {
+				    var item;
                                     assert.ifError(err);
                                     assert.isObject(feed);
                                     assert.isArray(feed.items);
                                     assert.greater(feed.items.length, 0);
-                                    assert.isObject(feed.items[0]);
-                                    assert.isObject(feed.items[0].actor);
-                                    assert.isFalse(_(feed.items[0].actor).has("_user"));
+				    item = _.find(feed.items, function(item) { return item.id == act.id; });
+				    assert.isObject(item);
+				    assert.isObject(item.actor);
+                                    assert.isFalse(_(item.actor).has("_user"));
                                 },
                                 "activity likes and replies feeds have right host": function(err, feed, act) {
+				    var item;
                                     assert.ifError(err);
                                     assert.isObject(feed);
                                     assert.isArray(feed.items);
                                     assert.greater(feed.items.length, 0);
-                                    assert.isObject(feed.items[0]);
-                                    assert.isObject(feed.items[0].object);
-                                    assert.isObject(feed.items[0].object.likes);
-                                    assert.isString(feed.items[0].object.likes.url);
-                                    assert.equal(serverOf(feed.items[0].object.likes.url), "photo.localhost");
-                                    assert.isObject(feed.items[0].object.replies);
-                                    assert.isString(feed.items[0].object.replies.url);
-                                    assert.equal(serverOf(feed.items[0].object.replies.url), "photo.localhost");
+				    item = _.find(feed.items, function(item) { return item.id == act.id; });
+                                    assert.isObject(item);
+                                    assert.isObject(item.object);
+                                    assert.isObject(item.object.likes);
+                                    assert.isString(item.object.likes.url);
+                                    assert.equal(serverOf(item.object.likes.url), "photo.localhost");
+                                    assert.isObject(item.object.replies);
+                                    assert.isString(item.object.replies.url);
+                                    assert.equal(serverOf(item.object.replies.url), "photo.localhost");
                                 }
                             },
                             "and the first user responds": {
@@ -374,15 +372,15 @@ suite.addBatch({
                                             assert.isObject(act);
                                         },
                                         "it includes the activity": function(err, feed, act) {
+					    var item;
                                             assert.ifError(err);
                                             assert.isObject(feed);
                                             assert.isObject(act);
                                             assert.include(feed, "items");
                                             assert.isArray(feed.items);
                                             assert.greater(feed.items.length, 0);
-                                            assert.isObject(feed.items[0]);
-                                            assert.include(feed.items[0], "id");
-                                            assert.equal(feed.items[0].id, act.id);
+					    item = _.find(feed.items, function(item) { return item.id == act.id; });
+                                            assert.isObject(item);
                                         }
                                     },
                                     "and we check the image's replies": {
@@ -403,15 +401,15 @@ suite.addBatch({
                                             assert.isObject(feed);
                                         },
                                         "feed includes the comment": function(err, feed, pc) {
+					    var item;
                                             assert.ifError(err);
                                             assert.isObject(feed);
                                             assert.isObject(pc);
                                             assert.include(feed, "items");
                                             assert.isArray(feed.items);
                                             assert.greater(feed.items.length, 0);
-                                            assert.isObject(feed.items[0]);
-                                            assert.include(feed.items[0], "id");
-                                            assert.equal(feed.items[0].id, pc.object.id);
+					    item = _.find(feed.items, function(item) { return item.id == pc.object.id; });
+					    assert.isObject(item);
                                         }
                                     },
                                     "and the second user likes the comment": {
@@ -467,9 +465,8 @@ suite.addBatch({
                                                     assert.include(feed, "items");
                                                     assert.isArray(feed.items);
                                                     assert.greater(feed.items.length, 0);
-                                                    assert.isObject(feed.items[0]);
-                                                    assert.include(feed.items[0], "id");
-                                                    assert.equal(feed.items[0].id, act.id);
+						    item = _.find(feed.items, function(item) { return item.id == act.id; });
+						    assert.isObject(item);
                                                 }
                                             },
                                             "and we check the comment's likes feed": {
@@ -490,15 +487,15 @@ suite.addBatch({
                                                     assert.isObject(feed);
                                                 },
                                                 "feed includes the second user": function(err, feed, fc) {
+						    var item;
                                                     assert.ifError(err);
                                                     assert.isObject(feed);
                                                     assert.isObject(fc);
                                                     assert.include(feed, "items");
                                                     assert.isArray(feed.items);
                                                     assert.greater(feed.items.length, 0);
-                                                    assert.isObject(feed.items[0]);
-                                                    assert.include(feed.items[0], "id");
-                                                    assert.equal(feed.items[0].id, fc.actor.id);
+						    item = _.find(feed.items, function(item) { return item.id == fc.actor.id; });
+						    assert.isObject(item);
                                                 }
                                             }
                                         }
