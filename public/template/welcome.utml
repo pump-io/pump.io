@@ -5,8 +5,12 @@
 
 <ul>
   <li>
-    You should modify your <a href="<%- service.url %>main/settings">profile</a> 
-    to let people know more about you.
+    You should modify your <a href="<%- service.url %>main/settings">profile</a>
+    to let people know more about you. Don&apos;t forget to upload an avatar!
+  </li>
+  <li>
+    Your account id is <strong><%- (profile.id && profile.id.substr(0, 5) == 'acct:') ? profile.id.substr(5) : profile.id %></strong>.
+    You can use it with pump.io-enabled applications. Try it out on <a href="http://openfarmgame.com/">Open Farm Game</a>.
   </li>
 </ul>
 
