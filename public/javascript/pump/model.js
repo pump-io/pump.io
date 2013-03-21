@@ -388,13 +388,13 @@
                         coll.prevLink = data.links.prev.href;
                     }
                     if (_.isFunction(callback)) {
-                        callback(null);
+                        callback(null, data);
                     }
                 },
                 error: function(jqxhr) {
                     Pump.error("Failed getting more items.");
                     if (_.isFunction(callback)) {
-                        callback(new Error("Failed getting more items"));
+                        callback(new Error("Failed getting more items"), null);
                     }
                 }
             };
@@ -426,13 +426,13 @@
                         delete coll.nextLink;
                     }
                     if (_.isFunction(callback)) {
-                        callback(null);
+                        callback(null, data);
                     }
                 },
                 error: function(jqxhr) {
                     Pump.error("Failed getting more items.");
                     if (_.isFunction(callback)) {
-                        callback(new Error("Failed getting more items"));
+                        callback(new Error("Failed getting more items"), null);
                     }
                 }
             };
@@ -663,7 +663,7 @@
         initialize: function() {
             var user = this,
                 streamUrl = function(rel) {
-                    return "/api/user/" + user.get("nickname") + rel;
+                    return Pump.fullURL("/api/user/" + user.get("nickname") + rel);
                 },
                 userStream = function(rel) {
                     return Pump.ActivityStream.unique([], {url: streamUrl(rel)});
@@ -700,7 +700,7 @@
             return false;
         },
         url: function() {
-            return "/api/user/" + this.get("nickname");
+            return Pump.fullURL("/api/user/" + this.get("nickname"));
         }
     },
     {
