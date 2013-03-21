@@ -3,7 +3,7 @@
   <% _.each(objects, function(object) { %>
   <% try { %>
   <%= partial("major-object", {obj: object}) %>
-  <% } catch (e) { %>
+  <% } catch (err) { %>
   <!-- Error showing object <%- obj.id %>: <%- err.message %> -->
   <% } %>
   <% }); %>
