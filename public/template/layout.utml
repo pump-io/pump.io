@@ -60,7 +60,7 @@
 
       <div id="content">
         <%= body %>
-      </div>
+      </div> <!-- content -->
 
       <hr>
 
@@ -71,7 +71,7 @@
         <p><a href="http://pump.io/">pump.io</a> software available under the Apache License 2.0.</p>
       </footer>
 
-    </div> <!-- /container -->
+    </div> <!-- .container -->
 
     <% if (config.debugClient) { %>
     <script src="/javascript/libs/jquery-1.8.3.js"></script>
