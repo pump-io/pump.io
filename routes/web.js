@@ -460,7 +460,7 @@ var showStream = function(req, res, next) {
                     if (req.principalUser) {
                         addProxy(activities, this);
                     } else {
-                        this(null);
+                        this(null, activities);
                     }
                 },
                 callback
