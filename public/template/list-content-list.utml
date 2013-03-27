@@ -16,5 +16,5 @@
       <p><button class="btn" id="delete-list">Delete list</button></p>
       <% } %>
     </div> <!-- .span3 -->
-
+  </div> <!-- .row-fluid -->
 </div> <!-- #list-content-list -->
