@@ -447,6 +447,7 @@ var showStream = function(req, res, next) {
             );
         },
         getMinor = function(callback) {
+            var activities;
             Step(
                 function() {
                     req.user.getMinorOutboxStream(this);
@@ -455,15 +456,22 @@ var showStream = function(req, res, next) {
                     if (err) throw err;
                     getFiltered(str, filter, principal, 0, 20, this);
                 },
-                function(err, activities) {
+                function(err, results) {
                     if (err) throw err;
+                    activities = results;
                     if (req.principalUser) {
                         addProxy(activities, this);
                     } else {
-                        this(null, activities);
+                        this(null);
                     }
                 },
-                callback
+                function(err) {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        callback(null, activities);
+                    }
+                }
             );
         };
 
