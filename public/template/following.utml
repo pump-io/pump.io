@@ -14,4 +14,4 @@
        <%= partial("user-content-following") %>
     </div>
   </div>
-</div>
+</div> <!-- .user .user-following -->
