@@ -162,6 +162,9 @@ Here are the main configuration keys.
 * *spamclientsecret* oauth pair for spam server.
 * *disableRegistration* default false. Disables registering new users on the
   site through the Web or the API.
+* *noCDN* Use local copies of the JavaScript libraries instead of the
+   ones on the CDN. Good for debugging. Defaults to `false`, meaning
+   "use the CDN".
 
 ## Bugs
 
