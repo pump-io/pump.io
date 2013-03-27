@@ -1,9 +1,13 @@
 <div class="user user-list">
   <div class="row">
-    <%= partial("profile-block") %>
+    <div class="span12">
+      <%= partial("profile-block") %>
+    </div>
   </div>
   <div class="row">
-    <%= partial("profile-nav") %>
+    <div class="span12">
+      <%= partial("profile-nav") %>
+    </div>
   </div>
   <div class="row" id="user-content">
     <%= partial("user-content-list") %>
