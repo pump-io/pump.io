@@ -47,11 +47,15 @@ thing much more enjoyable.
 
 ## Installation
 
+### Prerequisites
+
 You'll need three things to get started:
 
 * node.js 0.8.0 or higher
 * npm 1.1.0 or higher
 * A database server (see below)
+
+### Install with npm
 
 The easiest way is to install the software globally using npm, like
 so:
@@ -59,13 +63,6 @@ so:
     npm install -g pump.io
 
 That should set up all the files and dependencies for you.
-
-#### Web server
-
-pump.io is designed to be a standalone server. You do not need
-to set up an Apache or nginx or lighttpd Web server in front of
-it. In fact, that's going to make things harder for you, and stuff
-like WebSockets is going to work less well.
 
 ### Local install
 
@@ -175,6 +172,28 @@ Here are the main configuration keys.
 * *noCDN* Use local copies of the JavaScript libraries instead of the
    ones on the CDN. Good for debugging. Defaults to `false`, meaning
    "use the CDN".
+
+### Web server proxy
+
+pump.io is designed to be a standalone server. You do not need
+to set up an Apache or nginx or lighttpd Web server in front of
+it. In fact, that's going to make things harder for you, and stuff
+like WebSockets is going to work less well.
+
+If you really insist, check the configuration options carefully. If
+you want http://pump.yourdomain.example/ to proxy to the pump.io
+daemon listening on port 8000 on 127.0.0.1, use configuration options
+like this:
+
+   "hostname": "pump.yourdomain.example",
+   "urlPort": 80,
+   "address": "127.0.0.1",
+   "port": 8000
+
+## Running the daemon
+
+You'll probably get a more reliable experience if you use
+[forever](https://npmjs.org/package/forever) to keep the daemon running.
 
 ## Bugs
 
