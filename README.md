@@ -60,6 +60,13 @@ so:
 
 That should set up all the files and dependencies for you.
 
+#### Web server
+
+pump.io is designed to be a standalone server. You do not need
+to set up an Apache or nginx or lighttpd Web server in front of
+it. In fact, that's going to make things harder for you, and stuff
+like WebSockets is going to work less well.
+
 ### Local install
 
 If you want to set up the software in its own directory, you can clone
@@ -128,6 +135,9 @@ Here are the main configuration keys.
    the IP of the hostname.
 * *port* Port to listen on. Defaults to 31337, which is no good. You
    should listen on 80 or 443 if you're going to have anyone use this.
+* *urlPort* Port to use for generating URLs. Defaults to the same as `port`,
+  but if you're insisting on proxying behind Apache or whatever despite
+  warnings not to, you can use this. 
 * *secret* A session-generating secret, server-wide password.
 * *noweb* Hide the Web interface. Since it's disabled for this release,
   this shouldn't cause you any problems.
