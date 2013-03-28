@@ -356,7 +356,7 @@ The feeds are at `/api/user/<nickname>/inbox/direct`,
 
 When objects like a "note" or an "image" are created, they're assigned
 a REST endpoint, usually something like
-`http://<hostname>/api/<objectType>/<id>`, where the <id> is a
+`http://<hostname>/api/<objectType>/<id>`, where the `<id>` is a
 screwy-looking random value. (It's a UUID in URL-safe base-64 format.)
 
 You can get the object endpoint from the object's `links` property;
