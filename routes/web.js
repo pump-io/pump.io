@@ -2,7 +2,7 @@
 //
 // Spurtin' out pumpy goodness all over your browser window
 //
-// Copyright 2011-2012, StatusNet Inc.
+// Copyright 2011-2012, E14N https://e14n.com/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -447,6 +447,7 @@ var showStream = function(req, res, next) {
             );
         },
         getMinor = function(callback) {
+            var activities;
             Step(
                 function() {
                     req.user.getMinorOutboxStream(this);
@@ -455,15 +456,22 @@ var showStream = function(req, res, next) {
                     if (err) throw err;
                     getFiltered(str, filter, principal, 0, 20, this);
                 },
-                function(err, activities) {
+                function(err, results) {
                     if (err) throw err;
+                    activities = results;
                     if (req.principalUser) {
                         addProxy(activities, this);
                     } else {
                         this(null);
                     }
                 },
-                callback
+                function(err) {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        callback(null, activities);
+                    }
+                }
             );
         };
 
@@ -818,7 +826,6 @@ var showList = function(req, res, next) {
                     if (err) {
                         callback(err, null);
                     } else {
-                        list.members.items = objs;
                         callback(null, list);
                     }
                 }

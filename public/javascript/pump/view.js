@@ -2,7 +2,7 @@
 //
 // Views for the pump.io client UI
 //
-// Copyright 2011-2013, StatusNet Inc.
+// Copyright 2011-2013, E14N https://e14n.com/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -728,6 +728,13 @@
             "keyup #password": "onKey",
             "keyup #nickname": "onKey"
         },
+        ready: function() {
+            var view = this;
+            // setup subViews
+            view.setupSubs();
+            // Initialize state of login button
+            view.onKey();
+        },
         "onKey": function(event) {
             var view = this,
                 nickname = view.$('#nickname').val(),
@@ -815,7 +822,20 @@
                 repeat = view.$('#registration input[name="repeat"]').val(),
                 email = (Pump.config.requireEmail) ? view.$('#registration input[name="email"]').val() : null,
                 options,
+                retries = 0,
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
+                makeRequest = function(options) {
+                    Pump.ensureCred(function(err, cred) {
+                        if (err) {
+                            view.showError("Couldn't get OAuth credentials. :(");
+                        } else {
+                            options.consumerKey = cred.clientID;
+                            options.consumerSecret = cred.clientSecret;
+                            options = Pump.oauthify(options);
+                            $.ajax(options);
+                        }
+                    });
+                },
                 onSuccess = function(data, textStatus, jqXHR) {
                     var objs;
                     if (Pump.config.requireEmail) {
@@ -852,13 +872,21 @@
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     var type, response;
-                    view.stopSpin();
-                    type = jqXHR.getResponseHeader("Content-Type");
-                    if (type && type.indexOf("application/json") !== -1) {
-                        response = JSON.parse(jqXHR.responseText);
-                        view.showError(response.error);
+                    // If we get this error, it (usually!) means our client credentials are bad.
+                    // Get new credentials and retry (once!).
+                    if (jqXHR.status == 401 && retries === 0) {
+                        Pump.clearCred();
+                        makeRequest(options);
+                        retries = 1;
                     } else {
-                        view.showError(errorThrown);
+                        view.stopSpin();
+                        type = jqXHR.getResponseHeader("Content-Type");
+                        if (type && type.indexOf("application/json") !== -1) {
+                            response = JSON.parse(jqXHR.responseText);
+                            view.showError(response.error);
+                        } else {
+                            view.showError(errorThrown);
+                        }
                     }
                 };
 
@@ -901,16 +929,7 @@
                     error: onError
                 };
 
-                Pump.ensureCred(function(err, cred) {
-                    if (err) {
-                        view.showError("Couldn't get OAuth credentials. :(");
-                    } else {
-                        options.consumerKey = cred.clientID;
-                        options.consumerSecret = cred.clientSecret;
-                        options = Pump.oauthify(options);
-                        $.ajax(options);
-                    }
-                });
+                makeRequest(options);
             }
 
             return false;
@@ -978,6 +997,7 @@
         },
         subs: {
             "#profile-block": {
+
                 attr: "profileBlock",
                 subView: "ProfileBlock",
                 subOptions: {
@@ -1290,20 +1310,21 @@
             var view = this,
                 replies = view.collection,
                 full = new Pump.FullReplyStreamView({collection: replies});
+            
+            Pump.body.startLoad();
 
             full.on("ready", function() {
-
                 full.$el.hide();
-
                 view.$el.replaceWith(full.$el);
-
                 full.$el.fadeIn('slow');
-
-                replies.getAll();
-
+                Pump.body.endLoad();
             });
 
-            full.render();
+            replies.on("getall", function() {
+                full.render();
+            });
+
+            replies.getAll();
         },
         placeSub: function(aview, $el) {
             var view = this,
@@ -1402,7 +1423,112 @@
 
     Pump.MajorObjectView = Pump.TemplateView.extend({
         templateName: 'major-object',
-        parts: ["responses", "reply"]
+        parts: ["responses", "reply"],
+        events: {
+            "click .favorite": "favoriteObject",
+            "click .unfavorite": "unfavoriteObject",
+            "click .share": "shareObject",
+            "click .unshare": "unshareObject",
+            "click .comment": "openComment"
+        },
+        setupSubs: function() {
+            var view = this,
+                model = view.model,
+                $el = view.$(".replies");
+
+            if (view.replyStream) {
+                view.replyStream.setElement($el);
+                return;
+            }
+
+            view.replyStream = new Pump.ReplyStreamView({el: $el, collection: model.replies});
+        },
+        favoriteObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "favorite",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMinorActivity(act, function(err, act) {
+                view.$(".favorite")
+                    .removeClass("favorite")
+                    .addClass("unfavorite")
+                    .html("Unlike <i class=\"icon-thumbs-down\"></i>");
+                Pump.addMinorActivity(act);
+            });
+        },
+        unfavoriteObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "unfavorite",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".unfavorite")
+                        .removeClass("unfavorite")
+                        .addClass("favorite")
+                        .html("Like <i class=\"icon-thumbs-up\"></i>");
+                    Pump.addMinorActivity(act);
+                }
+            });
+        },
+        shareObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "share",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMajorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".share")
+                        .removeClass("share")
+                        .addClass("unshare")
+                        .html("Unshare <i class=\"icon-remove\"></i>");
+                    Pump.addMajorActivity(act);
+                }
+            });
+        },
+        unshareObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "unshare",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".unshare")
+                        .removeClass("unshare")
+                        .addClass("share")
+                        .html("Share <i class=\"icon-share-alt\"></i>");
+                    Pump.addMinorActivity(act);
+                }
+            });
+        },
+        openComment: function() {
+            var view = this,
+                form;
+
+            if (view.$("form.post-comment").length > 0) {
+                view.$("form.post-comment textarea").focus();
+            } else {
+                form = new Pump.CommentForm({original: view.model});
+                form.on("ready", function() {
+                    view.$(".replies").append(form.$el);
+                });
+                form.render();
+            }
+        }
     });
 
     Pump.ReplyView = Pump.TemplateView.extend({
@@ -2059,7 +2185,112 @@
         modelName: "object",
         parts: ["responses",
                 "reply",
-                "activity-object-collection"]
+                "activity-object-collection"],
+        events: {
+            "click .favorite": "favoriteObject",
+            "click .unfavorite": "unfavoriteObject",
+            "click .share": "shareObject",
+            "click .unshare": "unshareObject",
+            "click .comment": "openComment"
+        },
+        setupSubs: function() {
+            var view = this,
+                model = view.model,
+                $el = view.$(".replies");
+
+            if (view.replyStream) {
+                view.replyStream.setElement($el);
+                return;
+            }
+
+            view.replyStream = new Pump.ReplyStreamView({el: $el, collection: model.replies});
+        },
+        favoriteObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "favorite",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMinorActivity(act, function(err, act) {
+                view.$(".favorite")
+                    .removeClass("favorite")
+                    .addClass("unfavorite")
+                    .html("Unlike <i class=\"icon-thumbs-down\"></i>");
+                Pump.addMinorActivity(act);
+            });
+        },
+        unfavoriteObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "unfavorite",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".unfavorite")
+                        .removeClass("unfavorite")
+                        .addClass("favorite")
+                        .html("Like <i class=\"icon-thumbs-up\"></i>");
+                    Pump.addMinorActivity(act);
+                }
+            });
+        },
+        shareObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "share",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMajorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".share")
+                        .removeClass("share")
+                        .addClass("unshare")
+                        .html("Unshare <i class=\"icon-remove\"></i>");
+                    Pump.addMajorActivity(act);
+                }
+            });
+        },
+        unshareObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "unshare",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".unshare")
+                        .removeClass("unshare")
+                        .addClass("share")
+                        .html("Share <i class=\"icon-share-alt\"></i>");
+                    Pump.addMinorActivity(act);
+                }
+            });
+        },
+        openComment: function() {
+            var view = this,
+                form;
+
+            if (view.$("form.post-comment").length > 0) {
+                view.$("form.post-comment textarea").focus();
+            } else {
+                form = new Pump.CommentForm({original: view.model});
+                form.on("ready", function() {
+                    view.$(".replies").append(form.$el);
+                });
+                form.render();
+            }
+        }
     });
 
     Pump.ChooseContactModal = Pump.TemplateView.extend({

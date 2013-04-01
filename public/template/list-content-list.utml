@@ -1,17 +1,20 @@
-<div class="container span9" id="list-content-list">
-  <div class="row">
-    <div class="pull-right">
+<div id="list-content-list">
+  <div class="row-fluid">
+    <div class="span9">
+      <h3><%- list.displayName %></h3>
+      <% if (list.content) { %>
+      <p><%= list.content %></p>    
+      <% } %>
+      <div id="list-members">
+        <%= partial("member-stream", {people: members}) %>
+      </div>
+
+    </div> <!-- .span9 -->
+    <div class="span3">
       <% if (principal && principal.id == profile.id) { %>
       <p><button class="btn" id="add-list-member">Add a member</button></p>
       <p><button class="btn" id="delete-list">Delete list</button></p>
       <% } %>
-    </div>
-    <h3><%- list.displayName %></h3>
-    <% if (list.content) { %>
-    <p><%- list.content %></p>    
-    <% } %>
-  </div>
-  <div class="row" id="list-members">
-    <%= partial("member-stream", {people: members}) %>
-  </div>
-</div>
+    </div> <!-- .span3 -->
+  </div> <!-- .row-fluid -->
+</div> <!-- #list-content-list -->

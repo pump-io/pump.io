@@ -4,4 +4,4 @@
   <%= partial("minor-activity", {activity: activity, headless: headless}) %>
   <% }); %>
   <% } %>
-</div>
+</ul>

@@ -1,7 +1,7 @@
 <li class="media object major" data-object-id="<%- obj.id %>">
   <a class="pull-left" href="<%- obj.author.url %>">
     <% if (obj.author && obj.author.image && obj.author.image.url) { %>
-    <img src="<%- (author.image.pump_io && author.image.pump_io.proxyURL) ? author.image.pump_io.proxyURL : author.image.url %>" width="64" height="64" class="img-rounded media-object" />
+    <img src="<%- (obj.author.image.pump_io && obj.author.image.pump_io.proxyURL) ? obj.author.image.pump_io.proxyURL : obj.author.image.url %>" width="64" height="64" class="img-rounded media-object" />
     <% } else { %>
     <img src="/images/default.png" width="64" height="64" class="img-rounded media-object" />
     <% } %>
@@ -26,15 +26,15 @@
     <% } %>
     <% if (!obj.likes || obj.likes.totalItems === 0) { %>
     <% } else if (obj.likes.totalItems === 1) { %>
-    <p><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.likes}) %> likes this.</small></p>
+    <p class="muted"><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.likes}) %> likes this.</small></p>
     <% } else { %>
-    <p><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.likes}) %> like this.</small></p>
+    <p class="muted"><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.likes}) %> like this.</small></p>
     <% } %>
     <% if (!obj.shares || obj.shares.totalItems === 0) { %>
     <% } else if (obj.shares.totalItems === 1) { %>
-    <p><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.shares}) %> shared this.</small></p>
+    <p class="muted"><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.shares}) %> shared this.</small></p>
     <% } else { %>
-    <p><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.shares}) %> shared this.</small></p>
+    <p class="muted"><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.shares}) %> shared this.</small></p>
     <% } %>
     <%= partial("replies", {replies: obj.replies}) %>
   </div>

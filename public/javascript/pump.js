@@ -2,7 +2,7 @@
 //
 // Entrypoint for the pump.io client UI
 //
-// Copyright 2011-2012, StatusNet Inc.
+// Copyright 2011-2012, E14N https://e14n.com/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -254,9 +254,19 @@ if (!window.Pump) {
 
         _.each(objs, function(obj) {
             try {
-                obj.fetch({update: true,
-                           success: onSuccess,
-                           error: onError});
+		if (obj.prevLink) {
+		    obj.getPrev(function(err) {
+			if (err) {
+			    onError(null, null, err);
+			} else {
+			    onSuccess();
+			}
+		    });
+		} else {
+                    obj.fetch({update: true,
+                               success: onSuccess,
+                               error: onError});
+		}
             } catch (e) {
                 onError(null, null, e);
             }
@@ -457,7 +467,7 @@ if (!window.Pump) {
                     options = {el: $el, data: {}};
                     data = Pump.initialData;
                     _.each(data, function(value, name) {
-                        if (name == View.modelName) {
+                        if (name == View.prototype.modelName) {
                             options.model = def.models[name].unique(value);
                         } else if (def.models[name]) {
                             options.data[name] = def.models[name].unique(value);

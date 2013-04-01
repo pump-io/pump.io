@@ -2,7 +2,7 @@
 //
 // Test the page module
 //
-// Copyright 2012, StatusNet Inc.
+// Copyright 2012, E14N https://e14n.com/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -50,10 +50,10 @@ var testData = {
     "create": {
         displayName: "Evan Prodromou",
         url: "http://www.facebook.com/evan.prodromou",
-        summary: "Founder and CTO of StatusNet Inc"
+        summary: "Founder and CTO of E14N https://e14n.com/"
     },
     "update": {
-        summary: "Founder and CEO of StatusNet Inc"
+        summary: "Founder and CEO of E14N https://e14n.com/"
     }
 };
 

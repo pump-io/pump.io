@@ -2,7 +2,7 @@
 //
 // The beating heart of a pumpin' good time
 //
-// Copyright 2011-2013, StatusNet Inc.
+// Copyright 2011-2013, E14N https://e14n.com/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -943,12 +943,12 @@ var createUser = function(req, res, next) {
                 // XXX: Bad hack
                 if (req.session) {
 		    setPrincipal(req.session, user.profile, function(err) {
-				     if (err) {
-					 next(err);
-				     } else {
-					 res.json(user);
-				     }
-				 });
+			if (err) {
+			    next(err);
+			} else {
+			    res.json(user);
+			}
+		    });
                 } else {
                     res.json(user);
 		}
@@ -1095,84 +1095,114 @@ var postActivity = function(req, res, next) {
 var postToInbox = function(req, res, next) {
 
     var props = Scrubber.scrubActivity(req.body),
-        activity = new Activity(props),
-        user = req.user;
+        act,
+        user = req.user,
+        newRemoteActivity = function(props, callback) {
+
+            var activity = new Activity(props);
+
+	    Step(
+		function() {
+		    // Default verb
+
+		    if (!_(activity).has("verb") || _(activity.verb).isNull()) {
+			activity.verb = "post";
+		    }
+
+		    // Add a received timestamp
+
+		    activity.received = Stamper.stamp();
+
+		    // TODO: return a 202 Accepted here?
+
+		    // First, ensure recipients
+		    activity.ensureRecipients(this);
+		},
+		function(err) {
+		    if (err) throw err;
+		    // apply the activity
+		    activity.apply(req.principal, this);
+		},
+		function(err) {
+		    if (err) {
+			if (err.name == "AppError") {
+			    throw new HTTPError(err.message, 400);
+			} else if (err.name == "NoSuchThingError") {
+			    throw new HTTPError(err.message, 400);
+			} else if (err.name == "AlreadyExistsError") {
+			    throw new HTTPError(err.message, 400);
+			} else if (err.name == "NoSuchItemError") {
+			    throw new HTTPError(err.message, 400);
+			} else if (err.name == "NotInStreamError") {
+			    throw new HTTPError(err.message, 400);
+			} else {
+			    throw err;
+			}
+		    }
+		    // ...then persist...
+		    activity.save(this);
+		},
+		callback
+	    );
+	};
 
     // Check for actor
 
-    if (!_(activity).has("actor")) {
+    if (!_(props).has("actor")) {
         next(new HTTPError("Invalid actor", 400));
     }
 
     // We have slightly looser rules for hostnames
 
     if (req.client.webfinger) {
-        if (ActivityObject.canonicalID(activity.actor.id) != ActivityObject.canonicalID(req.principal.id)) {
-            next(new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400));
+        if (ActivityObject.canonicalID(props.actor.id) != ActivityObject.canonicalID(req.principal.id)) {
+            next(new HTTPError("Actor is invalid since " + props.actor.id + " is not " + req.principal.id, 400));
             return;
         }
     } else if (req.client.hostname) {
-        if (ActivityObject.canonicalID(activity.actor.id) != "https://"+req.client.hostname + "/" &&
-            ActivityObject.canonicalID(activity.actor.id) != "http://"+req.client.hostname + "/") {
-            next(new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400));
+        if (ActivityObject.canonicalID(props.actor.id) != "https://" + req.client.hostname + "/" &&
+            ActivityObject.canonicalID(props.actor.id) != "http://" + req.client.hostname + "/") {
+            next(new HTTPError("Actor is invalid since " + props.actor.id + " is not " + req.principal.id, 400));
             return;
         }
     }
 
-    // Default verb
-
-    if (!_(activity).has("verb") || _(activity.verb).isNull()) {
-        activity.verb = "post";
-    }
-
-    // Add a received timestamp
-
-    activity.received = Stamper.stamp();
-
-    // TODO: return a 202 Accepted here?
-
     Step(
-        function() {
-            // First, ensure recipients
-            activity.ensureRecipients(this);
-        },
-        function(err) {
+	function() {
+	    Activity.get(props.id, this);
+	},
+	function(err, activity) {
+	    if (err && err.name == "NoSuchThingError") {
+		newRemoteActivity(props, this);
+	    } else if (err) {
+		throw err;
+	    } else {
+		if (req.client.webfinger) {
+		    if (ActivityObject.canonicalID(activity.actor.id) != ActivityObject.canonicalID(req.principal.id)) {
+			throw new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400);
+		    }
+		} else if (req.client.hostname) {
+		    if (ActivityObject.canonicalID(activity.actor.id) != "https://"+req.client.hostname + "/" &&
+			ActivityObject.canonicalID(activity.actor.id) != "http://"+req.client.hostname + "/") {
+			throw new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400);
+		    }
+		}
+		this(null, activity);
+	    }
+	},
+        function(err, activity) {
             if (err) throw err;
-            // apply the activity
-            activity.apply(null, this);
-        },
-        function(err) {
-            if (err) {
-                if (err.name == "AppError") {
-                    throw new HTTPError(err.message, 400);
-                } else if (err.name == "NoSuchThingError") {
-                    throw new HTTPError(err.message, 400);
-                } else if (err.name == "AlreadyExistsError") {
-                    throw new HTTPError(err.message, 400);
-                } else if (err.name == "NoSuchItemError") {
-                    throw new HTTPError(err.message, 400);
-                } else if (err.name == "NotInStreamError") {
-                    throw new HTTPError(err.message, 400);
-                } else {
-                    throw err;
-                }
-            }
-            // ...then persist...
-            activity.save(this);
-        },
-        function(err, saved) {
-            if (err) throw err;
-            activity = saved;
-            user.addToInbox(activity, this.parallel());
+	    act = activity;
+            user.addToInbox(activity, this);
         },
         function(err) {
             if (err) {
                 next(err);
             } else {
-                activity.sanitize(req.principal);
+                act.sanitize(req.principal);
                 // ...then show (possibly modified) results.
                 // XXX: don't distribute
-                res.json(activity);
+                res.json(act);
             }
         }
     );
@@ -2287,7 +2317,7 @@ var collectionMembers = function(req, res, next) {
             }
             filtered.count(this.parallel());
             type = (req.query.type) ? req.query.type :
-                   (coll.objectTypes.length > 0) ? coll.objectTypes[0] :
+                (coll.objectTypes.length > 0) ? coll.objectTypes[0] :
                 Person.type;
             if (_(args).has("before")) {
                 filtered.getObjectsGreaterThan({id: args.before, objectType: type}, args.count, this.parallel());
@@ -2529,13 +2559,25 @@ var proxyRequest = function(req, res, next) {
 
     req.log.info({url: proxy.url, principal: principal.id}, "Getting object through proxy.");
 
+    // XXX: check local cache first
+
     Step(
         function() {
             Credentials.getFor(principal.id, proxy.url, this);
         },
         function(err, cred) {
-            var oa;
+            var oa, headers;
             if (err) throw err;
+
+            headers = {"User-Agent": "pump.io/"+version};
+
+            if (req.headers["if-modified-since"]) {
+                headers["If-Modified-Since"] = req.headers["if-modified-since"];
+            }
+
+            if (req.headers["if-none-match"]) {
+                headers["If-None-Match"] = req.headers["if-none-match"];
+            }
 
             oa = new OAuth(null,
                            null,
@@ -2545,17 +2587,36 @@ var proxyRequest = function(req, res, next) {
                            null,
                            "HMAC-SHA1",
                            null, // nonce size; use default
-                           {"User-Agent": "pump.io/"+version});
+                           headers);
             
             oa.get(proxy.url, null, null, this);
         },
         function(err, pbody, pres) {
+            var toCopy;
             if (err) {
-                next(new HTTPError("Unable to retrieve proxy data", 500));
+                if (err.statusCode == 304) {
+                    res.statusCode = 304;
+                    res.end();
+                } else {
+                    next(new HTTPError("Unable to retrieve proxy data", 500));
+                }
             } else {
                 if (pres.headers["content-type"]) {
                     res.setHeader("Content-Type", pres.headers["content-type"]);
                 }
+                if (pres.headers["last-modified"]) {
+                    res.setHeader("Last-Modified", pres.headers["last-modified"]);
+                }
+                if (pres.headers["etag"]) {
+                    res.setHeader("ETag", pres.headers["etag"]);
+                }
+                if (pres.headers["expires"]) {
+                    res.setHeader("Expires", pres.headers["expires"]);
+                }
+                if (pres.headers["cache-control"]) {
+                    res.setHeader("Cache-Control", pres.headers["cache-control"]);
+                }
+                // XXX: save to local cache
                 req.log.info({headers: pres.headers}, "Received object");
                 res.send(pbody);
             }

@@ -6,7 +6,7 @@
 //
 // entry point activity pump application
 //
-// Copyright 2011-2012, StatusNet Inc.
+// Copyright 2011-2012, E14N https://e14n.com/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -100,6 +100,7 @@ var launchApps = function(config) {
         makeApp(config, function(err, app) {
             if (err) {
                 console.log(err);
+                process.exit(1);
             } else {
                 app.run(function(err) {});
             }

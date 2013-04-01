@@ -9,7 +9,7 @@ really want from a social network.
 
 ## License
 
-Copyright 2011-2013, StatusNet Inc.
+Copyright 2011-2013, E14N https://e14n.com/
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -47,11 +47,15 @@ thing much more enjoyable.
 
 ## Installation
 
+### Prerequisites
+
 You'll need three things to get started:
 
 * node.js 0.8.0 or higher
 * npm 1.1.0 or higher
 * A database server (see below)
+
+### Install with npm
 
 The easiest way is to install the software globally using npm, like
 so:
@@ -128,6 +132,9 @@ Here are the main configuration keys.
    the IP of the hostname.
 * *port* Port to listen on. Defaults to 31337, which is no good. You
    should listen on 80 or 443 if you're going to have anyone use this.
+* *urlPort* Port to use for generating URLs. Defaults to the same as `port`,
+  but if you're insisting on proxying behind Apache or whatever despite
+  warnings not to, you can use this. 
 * *secret* A session-generating secret, server-wide password.
 * *noweb* Hide the Web interface. Since it's disabled for this release,
   this shouldn't cause you any problems.
@@ -162,6 +169,31 @@ Here are the main configuration keys.
 * *spamclientsecret* oauth pair for spam server.
 * *disableRegistration* default false. Disables registering new users on the
   site through the Web or the API.
+* *noCDN* Use local copies of the JavaScript libraries instead of the
+   ones on the CDN. Good for debugging. Defaults to `false`, meaning
+   "use the CDN".
+
+### Web server proxy
+
+pump.io is designed to be a standalone server. You do not need
+to set up an Apache or nginx or lighttpd Web server in front of
+it. In fact, that's going to make things harder for you, and stuff
+like WebSockets is going to work less well.
+
+If you really insist, check the configuration options carefully. If
+you want http://pump.yourdomain.example/ to proxy to the pump.io
+daemon listening on port 8000 on 127.0.0.1, use configuration options
+like this:
+
+   "hostname": "pump.yourdomain.example",
+   "urlPort": 80,
+   "address": "127.0.0.1",
+   "port": 8000
+
+## Running the daemon
+
+You'll probably get a more reliable experience if you use
+[forever](https://npmjs.org/package/forever) to keep the daemon running.
 
 ## Bugs
 

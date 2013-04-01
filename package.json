@@ -7,7 +7,7 @@
     "devDependencies": {
         "vows": "0.7.x",
         "node-mocks-http": "0.0.x",
-        "zombie": "0.12.x",
+        "zombie": "1.4.x",
         "xml2js": "0.1.x",
         "simplesmtp": "0.1.x",
         "rimraf": "2.0.x"
@@ -61,6 +61,6 @@
         }
     ],
     "engine": {
-        "node": "0.8.x"
+        "node": ">=0.8"
     }
 }
