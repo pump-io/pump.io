@@ -20,7 +20,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var _ = require("underscore"),
+var urlfmt = require("url").format,
+    _ = require("underscore"),
     Step = require("step"),
     common = require("../lib/pumpclient"),
     clientCred = common.clientCred,
@@ -56,10 +57,16 @@ Step(
         clientCred(server, this);
     },
     function(err, cred) {
-        var proto = (port == 443) ? "https:" : "http:";
+        var proto = (port == 443) ? "https:" : "http:",
+            rtendpoint = urlfmt({protocol: proto,
+                                 host: (port == 80 || port == 443) ? server : server+":"+port,
+                                 pathname: "/oauth/request_token"}),
+            atendpoint = urlfmt({protocol: proto,
+                                 host: (port == 80 || port == 443) ? server : server+":"+port,
+                                 pathname: "/oauth/access_token"});
         if (err) throw err;
-        oa = new OAuth(proto+"//"+server+":"+port+"/oauth/request_token",
-                       proto+"//"+server+":"+port+"/oauth/access_token",
+        oa = new OAuth(rtendpoint,
+                       atendpoint,
                        cred.client_id,
                        cred.client_secret,
                        "1.0",
@@ -76,7 +83,10 @@ Step(
         var proto = (port == 443) ? "https:" : "http:";
         if (err) throw err;
         rt = {token: token, secret: secret};
-        url = proto+"//"+server+":"+port+"/oauth/authorize?oauth_token=" + rt.token;
+        url = urlfmt({protocol: proto,
+                      host: (port == 80 || port == 443) ? server : server+":"+port,
+                      pathname: "/oauth/authorize",
+                      query: {oauth_token: rt.token}});
         console.log("Login here: " + url);
         rl.question("What is the 'verifier' value? ", function(verifier) {
             verifier.trim();
