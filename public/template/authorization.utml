@@ -15,5 +15,5 @@
 <form id="authorize" method="post"> 
   <input type="hidden" id="oauth_token" name="oauth_token" value="<%- token %>"/> 
   <input type="hidden" id="verifier" name="verifier" value="<%- verifier %>"/> 
-  <input type="submit" class="btn btn-primary" value="Authorize"/>
+  <input type="submit" class="btn btn-primary" id="authorize" value="Authorize"/>
 </form>                
