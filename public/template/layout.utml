@@ -139,13 +139,17 @@
       }
       _.extend(Pump.config, {
           site: "<%- config.site %>",
-          requireEmail: <%- config.requireEmail %>,
-          disableRegistration: <%- config.disableRegistration %>,
-          canUpload: <%- config.canUpload %>,
-          sockjs: <%- config.sockjs %>
+          requireEmail: <%- config.requireEmail || false %>,
+          disableRegistration: <%- config.disableRegistration || false %>,
+          canUpload: <%- config.canUpload || false %>,
+          sockjs: <%- config.sockjs || false %>
       });
 
+      <% if (data) { %>
       Pump.initialData = <%= JSON.stringify(data) %>;
+      <% } else { %>
+      Pump.initialData = null;
+      <% } %>
 
       <% if (principal) { %>
       Pump.principal = <%= JSON.stringify(principal) %>;
