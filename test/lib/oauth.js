@@ -2,7 +2,7 @@
 //
 // Utilities for generating clients, request tokens, and access tokens
 //
-// Copyright 2012, E14N https://e14n.com/
+// Copyright 2012-2013 E14N https://e14n.com/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -165,8 +165,6 @@ var authorize = function(cl, rt, user, hostname, port, cb) {
 
 var redeemToken = function(cl, rt, verifier, hostname, port, cb) {
 
-    var proto, oa;
-
     if (!port) {
         cb = hostname;
         hostname = "localhost";
@@ -175,17 +173,7 @@ var redeemToken = function(cl, rt, verifier, hostname, port, cb) {
 
     Step(
         function() {
-            proto = (port === 443) ? "https" : "http";
-            oa = new OAuth(proto+"://"+hostname+":"+port+"/oauth/request_token",
-                           proto+"://"+hostname+":"+port+"/oauth/access_token",
-                           cl.client_id,
-                           cl.client_secret,
-                           "1.0",
-                           "oob",
-                           "HMAC-SHA1",
-                           null, // nonce size; use default
-                           {"User-Agent": "pump.io/"+version});
-            
+            var oa = getOAuth(hostname, port, cl.client_id, cl.client_secret);
             oa.getOAuthAccessToken(rt.token, rt.token_secret, verifier, this);
         },
         function(err, token, secret, res) {
