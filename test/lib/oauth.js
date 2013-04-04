@@ -124,9 +124,13 @@ var authorize = function(cl, rt, user, hostname, port, cb) {
                   pathname: "/oauth/authorize",
                   query: {oauth_token: rt.token}});
 
+    browser.on("error", function(err) {
+        cb(err, null);
+    });
+
     browser.visit(url)
         .then(function() {
-             browser
+            browser
                 .fill("#username", user.nickname)
                 .fill("#password", user.password)
                 .pressButton("#authenticate", function() {
@@ -135,6 +139,8 @@ var authorize = function(cl, rt, user, hostname, port, cb) {
                         // if so, press it
                         browser.pressButton("#authorize", function() {
                             cb(null, browser.text("#verifier"));
+                        }).fail(function(err) {
+                            cb(err, null);
                         });
                     } else {
                         cb(null, browser.text("#verifier"));
