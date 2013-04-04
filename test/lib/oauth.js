@@ -110,7 +110,7 @@ var newClient = function(hostname, port, cb) {
 
 var authorize = function(cl, rt, user, hostname, port, cb) {
 
-    var browser = new Browser({debug: true}),
+    var browser = new Browser(),
         url;
 
     if (!port) {
