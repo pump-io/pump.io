@@ -1,4 +1,4 @@
-<h2>Authorize</h2> 
+<h1>Authorize</h1> 
 
 <p>You are logged in as <strong id="username"><%- principalUser.nickname %></strong>.</p>
 
