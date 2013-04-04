@@ -131,11 +131,11 @@ var authorize = function(cl, rt, user, hostname, port, cb) {
         function(err) {
             if (err) throw err;
             if (!browser.success) throw new OAuthError({statusCode: browser.statusCode, data: browser.error || browser.text("#error")});
-            browser.fill("username", user.nickname, this);
+            browser.fill("#username", user.nickname, this);
         },
         function(err) {
             if (err) throw err;
-            browser.fill("password", user.password, this);
+            browser.fill("#password", user.password, this);
         },
         function(err) {
             if (err) throw err;
