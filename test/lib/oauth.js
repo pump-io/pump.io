@@ -110,7 +110,8 @@ var newClient = function(hostname, port, cb) {
 
 var authorize = function(cl, rt, user, hostname, port, cb) {
 
-    var browser = new Browser({runScripts: false, waitFor: 60000});
+    var browser = new Browser({debug: true}),
+        url;
 
     if (!port) {
         cb = hostname;
@@ -118,49 +119,28 @@ var authorize = function(cl, rt, user, hostname, port, cb) {
         port = 4815;
     }
 
-    Step(
-        function() {
-            var proto = (port === 443) ? "https" : "http",
-                url = urlfmt({protocol: proto,
-                              host: (port == 80 || port == 443) ? hostname : hostname+":"+port,
-                              pathname: "/oauth/authorize",
-                              query: {oauth_token: rt.token}});
-            
-            browser.visit(url, this);
-        },
-        function(err) {
-            if (err) throw err;
-            if (!browser.success) throw new OAuthError({statusCode: browser.statusCode, data: browser.error || browser.text("#error")});
-            browser.fill("#username", user.nickname, this);
-        },
-        function(err) {
-            if (err) throw err;
-            browser.fill("#password", user.password, this);
-        },
-        function(err) {
-            if (err) throw err;
-            browser.pressButton("#authenticate", this);
-        },
-        function(err) {
-            var verifier;
-            if (err) throw err;
-            if (!browser.success) throw new OAuthError({statusCode: browser.statusCode, data: browser.error || browser.text("#error")});
-            verifier = browser.text("#verifier");
-            if (verifier) {
-                cb(null, verifier);
-            } else {
-                browser.pressButton("Authorize", this);
-            }
-        },
-        function(err) {
-            var verifier;
-            if (err) throw err;
-            if (!browser.success) throw new OAuthError({statusCode: browser.statusCode, data: browser.error || browser.text("#error")});
-            verifier = browser.text("#verifier");
-            this(null, verifier);
-        },
-        cb
-    );
+    url = urlfmt({protocol: (port === 443) ? "https" : "http",
+                  host: (port == 80 || port == 443) ? hostname : hostname+":"+port,
+                  pathname: "/oauth/authorize",
+                  query: {oauth_token: rt.token}});
+
+    browser.visit(url)
+        .then(function() {
+             browser
+                .fill("#username", user.nickname)
+                .fill("#password", user.password)
+                .pressButton("#authenticate", function() {
+                    // is there an authorize button?
+                    if (browser.button("#authorize")) {
+                        // if so, press it
+                        browser.pressButton("#authorize", function() {
+                            cb(null, browser.text("#verifier"));
+                        });
+                    } else {
+                        cb(null, browser.text("#verifier"));
+                    }
+                });
+        });
 };
 
 var redeemToken = function(cl, rt, verifier, hostname, port, cb) {
