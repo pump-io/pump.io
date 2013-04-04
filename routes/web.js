@@ -112,19 +112,7 @@ var addRoutes = function(app) {
 
     app.get("/:nickname/:type/:uuid", app.session, principal, addMessages, requestObject, reqUser, userIsAuthor, principalAuthorOrRecipient, showObject);
 
-    // expose this one file over the web
-
-    app.get("/shared/showdown.js", sharedFile("showdown/src/showdown.js"));
-    app.get("/shared/underscore.js", sharedFile("underscore/underscore.js"));
-    app.get("/shared/underscore-min.js", sharedFile("underscore/underscore-min.js"));
-
     app.post("/main/proxy", app.session, principal, principalNotUser, proxyActivity);
-};
-
-var sharedFile = function(fname) {
-    return function(req, res, next) {
-        res.sendfile(path.join(__dirname, "..", "node_modules", fname));
-    };
 };
 
 var loginRedirect = function(rel) {
