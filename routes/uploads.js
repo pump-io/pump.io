@@ -81,7 +81,7 @@ var sendFile = function(req, res, slug, next) {
                 if (!cutils.modified(req, res)) {
                     cutils.notModified(res);
                 } else {
-                    res.sendfile(fullpath);
+                    res.sendfile(fullpath, {root:'/'});
                 }
             }
         }
