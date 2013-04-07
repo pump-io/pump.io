@@ -252,6 +252,7 @@ var showRemote = function(req, res, next) {
 var handleRemote = function(req, res, next) {
 
     var webfinger = req.body.webfinger,
+        continueTo = req.body.continueTo,
         hostname,
         parts,
         host;
@@ -261,6 +262,12 @@ var handleRemote = function(req, res, next) {
     } catch(e) {
         next(new HTTPError(e.message, 400));
         return;
+    }
+
+    // Save relative URL to return to
+
+    if (continueTo && continueTo.length > 0) {
+        req.session.continueTo = continueTo;
     }
 
     parts = webfinger.split("@", 2);
@@ -1083,8 +1090,13 @@ var authorized = function(req, res, next) {
             setPrincipal(req.session, principal, this);
         },
         function(err) {
+            var continueTo;
             if (err) {
                 next(err);
+            } else if (req.session.continueTo) {
+                continueTo = req.session.continueTo;
+                delete req.session.continueTo;
+                res.redirect(continueTo);
             } else {
                 res.redirect("/");
             }

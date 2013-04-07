@@ -779,6 +779,7 @@
                     // XXX: reload current data
                     view.stopSpin();
                     Pump.router.navigate(continueTo, true);
+                    Pump.clearContinueTo();
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     var type, response;
@@ -869,6 +870,7 @@
                     view.stopSpin();
                     // XXX: one-time on-boarding page
                     Pump.router.navigate(Pump.getContinueTo(), true);
+                    Pump.clearContinueTo();
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     var type, response;
@@ -937,7 +939,22 @@
     });
 
     Pump.RemoteContent = Pump.ContentView.extend({
-        templateName: 'remote'
+        templateName: 'remote',
+        ready: function() {
+            var view = this;
+            // setup subViews
+            view.setupSubs();
+            // Initialize continueTo
+            view.addContinueTo();
+        },
+        addContinueTo: function() {
+            var view = this,
+                continueTo = Pump.getContinueTo();
+            
+            if (continueTo && continueTo.length > 0) {
+                view.$("form#remote").append($("<input type='hidden' name='continueTo' value='"+Pump.htmlEncode(continueTo)+"'>"));
+            }
+        }
     });
 
     Pump.ConfirmEmailInstructionsContent = Pump.ContentView.extend({
