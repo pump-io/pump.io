@@ -151,6 +151,8 @@ var authorize = function(cl, rt, user, hostname, port, cb) {
 
 var redeemToken = function(cl, rt, verifier, hostname, port, cb) {
 
+    var proto, oa;
+
     if (!port) {
         cb = hostname;
         hostname = "localhost";
