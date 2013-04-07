@@ -2688,6 +2688,12 @@
                 $(el).attr('data-toggle') == 'collapse') {
                 return true;
             }
+
+            // Save a spot in case we come back
+
+            if ($(el).hasClass('save-continue-to')) {
+                Pump.saveContinueTo();
+            }
             
             if (!el.host || el.host === here.host) {
                 try {
