@@ -336,7 +336,6 @@ if (!window.Pump) {
             return continueTo;
         } else if (Pump.continueTo) {
             continueTo = Pump.continueTo;
-            Pump.continueTo = null;
             return continueTo;
         } else {
             return "";
@@ -345,6 +344,10 @@ if (!window.Pump) {
 
     Pump.saveContinueTo = function() {
         Pump.continueTo = window.location.pathname + window.location.search;
+    };
+
+    Pump.clearContinueTo = function() {
+        Pump.continueTo = null;
     };
 
     // We clear out cached stuff when login state changes
