@@ -235,7 +235,8 @@
                 main = {
                     config: Pump.config,
                     template: {},
-                    page: {}
+                    page: {url: window.location.pathname + window.location.search,
+                           title: window.document.title}
                 },
                 pc,
                 modelName = view.modelName || view.options.modelName || "model",

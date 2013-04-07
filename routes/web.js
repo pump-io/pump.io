@@ -127,7 +127,7 @@ var showMain = function(req, res, next) {
         showInbox(req, res, next);
     } else {
         req.log.info({msg: "Showing welcome page"});
-        res.render("main", {page: {title: "Welcome"}});
+        res.render("main", {page: {title: "Welcome", url: req.originalUrl}});
     }
 };
 
@@ -199,7 +199,7 @@ var showInbox = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("inbox", {page: { title: "Home" },
+                res.render("inbox", {page: { title: "Home", url: req.originalUrl },
                                      major: major,
                                      minor: minor,
                                      user: user,
@@ -219,12 +219,12 @@ var showRegister = function(req, res, next) {
     } else if (req.app.config.disableRegistration) {
         next(new HTTPError("No registration allowed.", 403));
     } else {
-        res.render("register", {page: {title: "Register"}});
+        res.render("register", {page: {title: "Register", url: req.originalUrl}});
     }
 };
 
 var showLogin = function(req, res, next) {
-    res.render("login", {page: {title: "Login"}});
+    res.render("login", {page: {title: "Login", url: req.originalUrl}});
 };
 
 var handleLogout = function(req, res, next) {
@@ -246,7 +246,7 @@ var handleLogout = function(req, res, next) {
 };
 
 var showRemote = function(req, res, next) {
-    res.render("remote", {page: {title: "Remote login"}});
+    res.render("remote", {page: {title: "Remote login", url: req.originalUrl}});
 };
 
 var handleRemote = function(req, res, next) {
@@ -365,11 +365,11 @@ var showActivity = function(req, res, next) {
     var activity = req.activity;
 
     if (activity.isMajor()) {
-        res.render("major-activity-page", {page: {title: activity.content},
+        res.render("major-activity-page", {page: {title: activity.content, url: req.originalUrl},
                                            principal: principal,
                                            activity: activity});
     } else {
-        res.render("minor-activity-page", {page: {title: activity.content},
+        res.render("minor-activity-page", {page: {title: activity.content, url: req.originalUrl},
                                            principal: principal,
                                            activity: activity});
     }
@@ -482,7 +482,7 @@ var showStream = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("user", {page: {title: req.user.profile.displayName},
+                res.render("user", {page: {title: req.user.profile.displayName, url: req.originalUrl},
                                     major: major,
                                     minor: minor,
                                     profile: req.user.profile,
@@ -551,7 +551,7 @@ var showFavorites = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("favorites", {page: {title: req.user.nickname + " favorites"},
+                res.render("favorites", {page: {title: req.user.nickname + " favorites", url: req.originalUrl},
                                          objects: objects,
                                          profile: req.user.profile,
                                          data: {
@@ -601,7 +601,7 @@ var showFollowers = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("followers", {page: {title: req.user.nickname + " followers"},
+                res.render("followers", {page: {title: req.user.nickname + " followers", url: req.originalUrl},
                                          people: followers,
                                          profile: req.user.profile,
                                          data: {
@@ -651,7 +651,7 @@ var showFollowing = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("following", {page: {title: req.user.nickname + " following"},
+                res.render("following", {page: {title: req.user.nickname + " following", url: req.originalUrl},
                                          people: following,
                                          profile: req.user.profile,
                                          data: {
@@ -754,7 +754,7 @@ var showLists = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("lists", {page: {title: req.user.profile.displayName + " - Lists"},
+                res.render("lists", {page: {title: req.user.profile.displayName + " - Lists", url: req.originalUrl},
                                      profile: req.user.profile,
                                      list: null,
                                      lists: lists,
@@ -831,7 +831,7 @@ var showList = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("list", {page: {title: req.user.profile.displayName + " - Lists"},
+                res.render("list", {page: {title: req.user.profile.displayName + " - Lists", url: req.originalUrl},
                                     profile: req.user.profile,
                                     lists: lists,
                                     list: list,
@@ -975,7 +975,7 @@ var showObject = function(req, res, next) {
                 } else {
                     title = type + " by " + person.displayName;
                 }
-                res.render("object", {page: {title: title},
+                res.render("object", {page: {title: title, url: req.originalUrl},
                                       object: obj,
                                       data: {
                                           object: obj

@@ -75,7 +75,8 @@ var confirm = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("confirmed", {page: {title: "Email address confirmed"},
+                res.render("confirmed", {page: {title: "Email address confirmed",
+                                                url: req.originalUrl},
                                          principalUser: user,
                                          principal: user.profile});
             }
