@@ -868,7 +868,7 @@
                     // Leave disabled
                     view.stopSpin();
                     // XXX: one-time on-boarding page
-                    Pump.router.navigate("", true);
+                    Pump.router.navigate(Pump.getContinueTo(), true);
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     var type, response;
