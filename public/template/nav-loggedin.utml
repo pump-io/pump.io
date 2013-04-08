@@ -3,11 +3,11 @@
   <a class="brand" href="/"><%- config.site %></a>
 
   <div class="btn-group">
-    <button type="button" class="btn primary" id="post-note-button">
+    <button type="button" class="btn btn-small primary" id="post-note-button">
       Note <i class="icon-pencil"></i>
     </button>
     <% if (config.canUpload) { %>
-    <button type="button" class="btn primary" id="post-picture-button">
+    <button type="button" class="btn btn-small primary" id="post-picture-button">
       Picture <i class="icon-picture"></i>
     </button>
     <% } %>

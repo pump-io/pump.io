@@ -1,10 +1,13 @@
 <div class="btn-group dropdown" id="messages">
-  <button class="btn dropdown-toggle btn-mini btn-success
+  <button class="btn dropdown-toggle btn-small btn-success
                  <% if (messages && messages.length <= 0) { %>
                  disabled
                  <% } %>"
                  data-toggle="dropdown" href="#">
-    <i class="icon-envelope icon-white"> <%- (messages) ? messages.length : 0 %></i>  
+    <i class="icon-envelope icon-white"></i>
+    <% if (messages && messages.length > 0) { %>
+    <span class="badge badge-important"><%- messages.length %></span>
+    <% } %>
   </button>
   <ul class="dropdown-menu" role="menu">
     <% if (_.isArray(messages)) {%>
