@@ -162,9 +162,14 @@ var addRoutes = function(app) {
 
     app.get("/api/user/:nickname/inbox/major", smw, userReadAuth, reqUser, sameUser, userMajorInbox);
     app.get("/api/user/:nickname/inbox/minor", smw, userReadAuth, reqUser, sameUser, userMinorInbox);
+
     app.get("/api/user/:nickname/inbox/direct", smw, userReadAuth, reqUser, sameUser, userDirectInbox);
     app.get("/api/user/:nickname/inbox/direct/major", smw, userReadAuth, reqUser, sameUser, userMajorDirectInbox);
     app.get("/api/user/:nickname/inbox/direct/minor", smw, userReadAuth, reqUser, sameUser, userMinorDirectInbox);
+
+    app.get("/api/user/:nickname/inbox/direct/unread", smw, userReadAuth, reqUser, sameUser, userDirectUnreadInbox);
+    app.get("/api/user/:nickname/inbox/direct/major/unread", smw, userReadAuth, reqUser, sameUser, userMajorDirectUnreadInbox);
+    app.get("/api/user/:nickname/inbox/direct/minor/unread", smw, userReadAuth, reqUser, sameUser, userMinorDirectUnreadInbox);
 
     // Followers
 
@@ -1558,6 +1563,45 @@ var userMinorDirectInbox = feedRoute(
     },
     function(req, callback) {
         req.user.getMinorDirectInboxStream(callback);
+    },
+    addProxyFinisher
+);
+
+var userDirectUnreadInbox = feedRoute(
+    function(req) {
+        return URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox/direct/unread");
+    },
+    function(req) {
+        return "Unread direct activities for " + (req.user.profile.displayName || req.user.nickname);
+    },
+    function(req, callback) {
+        req.user.getDirectUnreadInboxStream(callback);
+    },
+    addProxyFinisher
+);
+
+var userMajorDirectUnreadInbox = feedRoute(
+    function(req) {
+        return URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox/direct/major/unread");
+    },
+    function(req) {
+        return "Unread major activities directly for " + (req.user.profile.displayName || req.user.nickname);
+    },
+    function(req, callback) {
+        req.user.getMajorDirectUnreadInboxStream(callback);
+    },
+    addProxyFinisher
+);
+
+var userMinorDirectUnreadInbox = feedRoute(
+    function(req) {
+        return URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox/direct/minor/unread");
+    },
+    function(req) {
+        return "Unread minor activities directly for " + (req.user.profile.displayName || req.user.nickname);
+    },
+    function(req, callback) {
+        req.user.getMinorDirectUnreadInboxStream(callback);
     },
     addProxyFinisher
 );
