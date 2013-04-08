@@ -1,5 +1,5 @@
 <div class="btn-group" id="notifications">
-  <button class="btn dropdown-toggle btn-mini btn-success
+  <button class="btn dropdown-toggle btn-small btn-success
                  <% if (!notifications || notifications.length <= 0) { %>
                  disabled
                  <% } %>"

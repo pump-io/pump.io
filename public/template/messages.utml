@@ -1,5 +1,5 @@
 <div class="btn-group dropdown" id="messages">
-  <button class="btn dropdown-toggle btn-mini btn-success
+  <button class="btn dropdown-toggle btn-small btn-success
                  <% if (messages && messages.length <= 0) { %>
                  disabled
                  <% } %>"
