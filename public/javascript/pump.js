@@ -324,16 +324,30 @@ if (!window.Pump) {
         return params;
     };
 
+    Pump.continueTo = null;
+
     // Get the "continue" param
 
     Pump.getContinueTo = function() {
         var sp = Pump.searchParams(),
             continueTo = (_.has(sp, "continue")) ? sp["continue"] : null;
+
         if (continueTo && continueTo.length > 0 && continueTo[0] == "/") {
+            return continueTo;
+        } else if (Pump.continueTo) {
+            continueTo = Pump.continueTo;
             return continueTo;
         } else {
             return "";
         }
+    };
+
+    Pump.saveContinueTo = function() {
+        Pump.continueTo = window.location.pathname + window.location.search;
+    };
+
+    Pump.clearContinueTo = function() {
+        Pump.continueTo = null;
     };
 
     // We clear out cached stuff when login state changes

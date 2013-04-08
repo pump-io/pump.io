@@ -2,7 +2,7 @@
 //
 // Utilities for generating clients, request tokens, and access tokens
 //
-// Copyright 2012, E14N https://e14n.com/
+// Copyright 2012-2013 E14N https://e14n.com/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 // limitations under the License.
 
 var cp = require("child_process"),
+    urlfmt = require("url").format,
     path = require("path"),
     Step = require("step"),
     _ = require("underscore"),
@@ -39,8 +40,33 @@ OAuthError.prototype.toString = function() {
     return "OAuthError (" + this.statusCode + "):" + this.data;
 };
 
+var getOAuth = function(hostname, port, client_id, client_secret) {
+
+    var proto = (port === 443) ? "https" : "http",
+            rtendpoint = urlfmt({protocol: proto,
+                                 host: (port == 80 || port == 443) ? hostname : hostname+":"+port,
+                                 pathname: "/oauth/request_token"}),
+            atendpoint = urlfmt({protocol: proto,
+                                 host: (port == 80 || port == 443) ? hostname : hostname+":"+port,
+                                 pathname: "/oauth/access_token"}),
+        oa = new OAuth(rtendpoint,
+                       atendpoint,
+                       client_id,
+                       client_secret,
+                       "1.0",
+                       "oob",
+                       "HMAC-SHA1",
+                       null, // nonce size; use default
+                       {"User-Agent": "pump.io/"+version});
+
+    return oa;
+};
+
 var requestToken = function(cl, hostname, port, cb) {
-    var oa, proto;
+    var oa,
+        proto,
+        rtendpoint,
+        atendpoint;
 
     if (!port) {
         cb = hostname;
@@ -48,18 +74,8 @@ var requestToken = function(cl, hostname, port, cb) {
         port = 4815;
     }
 
-    proto = (port === 443) ? "https" : "http";
+    oa = getOAuth(hostname, port, cl.client_id, cl.client_secret);
 
-    oa = new OAuth(proto+"://"+hostname+":"+port+"/oauth/request_token",
-                   proto+"://"+hostname+":"+port+"/oauth/access_token",
-                   cl.client_id,
-                   cl.client_secret,
-                   "1.0",
-                   "oob",
-                   "HMAC-SHA1",
-                   null, // nonce size; use default
-                   {"User-Agent": "pump.io/"+version});
-    
     oa.getOAuthRequestToken(function(err, token, secret) {
         if (err) {
             cb(new OAuthError(err), null);
@@ -94,54 +110,43 @@ var newClient = function(hostname, port, cb) {
 
 var authorize = function(cl, rt, user, hostname, port, cb) {
 
+    var browser = new Browser(),
+        url;
+
     if (!port) {
         cb = hostname;
         hostname = "localhost";
         port = 4815;
     }
 
-    Step(
-        function() {
-            var browser, proto;
-            browser = new Browser({runScripts: false, waitFor: 60000});
+    url = urlfmt({protocol: (port === 443) ? "https" : "http",
+                  host: (port == 80 || port == 443) ? hostname : hostname+":"+port,
+                  pathname: "/oauth/authorize",
+                  query: {oauth_token: rt.token}});
 
-            proto = (port === 443) ? "https" : "http";
-            
-            browser.visit(proto+"://"+hostname+":"+port+"/oauth/authorize?oauth_token=" + rt.token, this);
-        },
-        function(err, br) {
-            if (err) throw err;
-            if (!br.success) throw new OAuthError({statusCode: br.statusCode, data: br.error || br.text("#error")});
-            br.fill("username", user.nickname, this);
-        },
-        function(err, br) {
-            if (err) throw err;
-            br.fill("password", user.password, this);
-        },
-        function(err, br) {
-            if (err) throw err;
-            br.pressButton("#authenticate", this);
-        },
-        function(err, br) {
-            var verifier;
-            if (err) throw err;
-            if (!br.success) throw new OAuthError({statusCode: br.statusCode, data: br.error || br.text("#error")});
-            verifier = br.text("#verifier");
-            if (verifier) {
-                cb(null, verifier);
-            } else {
-                br.pressButton("Authorize", this);
-            }
-        },
-        function(err, br) {
-            var verifier;
-            if (err) throw err;
-            if (!br.success) throw new OAuthError({statusCode: br.statusCode, data: br.error || br.text("#error")});
-            verifier = br.text("#verifier");
-            this(null, verifier);
-        },
-        cb
-    );
+    browser.on("error", function(err) {
+        cb(err, null);
+    });
+
+    browser.visit(url)
+        .then(function() {
+            browser
+                .fill("#username", user.nickname)
+                .fill("#password", user.password)
+                .pressButton("#authenticate", function() {
+                    // is there an authorize button?
+                    if (browser.button("#authorize")) {
+                        // if so, press it
+                        browser.pressButton("#authorize", function() {
+                            cb(null, browser.text("#verifier"));
+                        }).fail(function(err) {
+                            cb(err, null);
+                        });
+                    } else {
+                        cb(null, browser.text("#verifier"));
+                    }
+                });
+        });
 };
 
 var redeemToken = function(cl, rt, verifier, hostname, port, cb) {
@@ -156,17 +161,7 @@ var redeemToken = function(cl, rt, verifier, hostname, port, cb) {
 
     Step(
         function() {
-            proto = (port === 443) ? "https" : "http";
-            oa = new OAuth(proto+"://"+hostname+":"+port+"/oauth/request_token",
-                           proto+"://"+hostname+":"+port+"/oauth/access_token",
-                           cl.client_id,
-                           cl.client_secret,
-                           "1.0",
-                           "oob",
-                           "HMAC-SHA1",
-                           null, // nonce size; use default
-                           {"User-Agent": "pump.io/"+version});
-            
+            var oa = getOAuth(hostname, port, cl.client_id, cl.client_secret);
             oa.getOAuthAccessToken(rt.token, rt.token_secret, verifier, this);
         },
         function(err, token, secret, res) {
