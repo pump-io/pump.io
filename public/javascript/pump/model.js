@@ -23,8 +23,15 @@
     Backbone.sync = function(method, model, options) {
 
         var getValue = function(object, prop) {
-            if (!(object && object[prop])) return null;
-            return _.isFunction(object[prop]) ? object[prop]() : object[prop];
+            if (_.isFunction(object[prop])) {
+                return object[prop]();
+            } else if (object[prop]) {
+                return object[prop];
+            } else if (object.has && object.has(prop)) {
+                return object.get(prop);
+            } else {
+                return null;
+            }
         };
 
         var methodMap = {
@@ -251,133 +258,21 @@
         }
     });
 
-    // Our own collection. It maps to the ActivityStreams collection
-    // representation -- some high-level data, plus an array of items.
+    // An array of objects, usually the "items" in a stream
 
-    Pump.Collection = Backbone.Model.extend({
-        constructor: function(models, options) {
-            var coll = this;
-            // If we're being initialized with a JSON Collection, parse it.
-            if (_.isObject(models) && !_.isArray(models)) {
-                models = coll.parse(models);
-            }
-            if (_.isObject(options) && _.has(options, "url")) {
-                coll.url = options.url;
-                delete options.url;
-            }
-            // Use unique() to get unique items
-            models = _.map(models, function(raw) {
-                return coll.model.unique(raw);
-            });
-            Backbone.Collection.apply(this, [models, options]);
-        },
-        parse: function(response) {
-            if (_.has(response, "url")) {
-                this.url = response.url;
-            }
-            if (_.has(response, "totalItems")) {
-                this.totalItems = response.totalItems;
-            }
-            if (_.has(response, "links")) {
-                if (_.has(response.links, "next")) {
-                    this.nextLink = response.links.next.href;
-                }
-                if (_.has(response.links, "prev")) {
-                    this.prevLink = response.links.prev.href;
-                }
-            }
-            if (_.has(response, "pump_io")) {
-                if (_.has(response.pump_io, "proxyURL")) {
-                    this.proxyURL = response.pump_io.proxyURL;
-                }
-            }
-            if (_.has(response, "items")) {
-                return response.items;
-            } else {
-                return [];
-            }
-        },
-        toJSON: function(seen) {
-            var coll = this,
-                seenNow,
-                items;
+    Pump.Items = Backbone.Collection.extend({
 
-            if (!seen) { // Top-level; return as array
-                seenNow = [coll.url];
-                items = coll.models.map(function(item) {
-                    return item.toJSON(seenNow);
-                });
-                return items;
-            } else if (_.contains(seen, coll.url)) {
-                // Already seen; return as reference
-                return {
-                    url: coll.url,
-                    totalItems: coll.totalItems
-                };
-            } else {
-                seenNow = seen.slice(0);
-                seenNow.push(coll.url);
-                items = coll.models.slice(0, 4).map(function(item) {
-                    return item.toJSON(seenNow);
-                });
-                return {
-                    url: coll.url,
-                    totalItems: coll.totalItems,
-                    items: items
-                };
-            }
-        },
-        merge: function(models, options) {
-
-            var coll = this,
-                mapped,
-                props = {};
-
-            if (_.isArray(models)) {
-                props.items = models;
-                if (_.isObject(options)) {
-                    props = _.extend(props, options);
-                }
-            } else if (_.isObject(models) && !_.isArray(models)) {
-                props = _.extend(models, options);
-            }
-
-            if (_.has(props, "url") && !_.has(coll, "url")) {
-                coll.url = props.url;
-            }
-            if (_.has(props, "totalItems") && !_.has(coll, "totalItems")) {
-                coll.totalItems = props.totalItems;
-            }
-            if (_.has(props, "links")) {
-                if (_.has(props.links, "next") && !_.has(coll, "nextLink")) {
-                    coll.nextLink = props.links.next.href;
-                }
-                if (_.has(props.links, "prev") && !_.has(coll, "prevLink")) {
-                    coll.prevLink = props.links.prev.href;
-                }
-                if (_.has(props.links, "self") && !_.has(coll, "url")) {
-                    coll.url = props.links.self.href;
-                }
-            }
-
-            if (_.has(props, "items")) {
-                mapped = props.items.map(function(item) {
-                    return coll.model.unique(item);
-                });
-                coll.add(mapped);
-            }
-        },
         getPrev: function(callback) { // Get stuff later than the current group
-            var coll = this,
+            var items = this,
                 url,
                 options;
 
-            if (coll.prevLink) {
-                url = coll.prevLink;
-            } else if (coll.url && coll.length > 0) {
-                url = coll.url + "?since=" + coll.at(0).id;
+            if (items.prevLink) {
+                url = items.prevLink;
+            } else if (items.stream.url && items.length > 0) {
+                url = items.stream.url + "?since=" + items.at(0).id;
             } else {
-                Pump.error("Can't get prev for collection " + coll.url);
+                Pump.error("Can't get prev for array " + items.stream.url);
                 return;
             }
 
@@ -387,10 +282,10 @@
                 url: url,
                 success: function(data) {
                     if (data.items) {
-                        coll.add(data.items, {at: 0});
+                        items.add(data.items, {at: 0});
                     }
                     if (data.links && data.links.prev && data.links.prev.href) {
-                        coll.prevLink = data.links.prev.href;
+                        items.prevLink = data.links.prev.href;
                     }
                     if (_.isFunction(callback)) {
                         callback(null, data);
@@ -408,16 +303,16 @@
 
         },
         getNext: function(callback) { // Get stuff earlier than the current group
-            var coll = this,
+            var items = this,
                 url,
                 options;
 
-            if (coll.nextLink) {
-                url = coll.nextLink;
-            } else if (coll.url && coll.length > 0) {
-                url = coll.url + "?before=" + coll.at(coll.length - 1).id;
+            if (items.nextLink) {
+                url = items.nextLink;
+            } else if (items.stream.url && items.length > 0) {
+                url = items.stream.url + "?before=" + items.at(items.length - 1).id;
             } else {
-                Pump.error("Can't get next for collection " + coll.url);
+                Pump.error("Can't get next for array " + items.stream.url);
                 return;
             }
 
@@ -427,13 +322,13 @@
                 url: url,
                 success: function(data) {
                     if (data.items) {
-                        coll.add(data.items, {at: coll.length});
+                        items.add(data.items, {at: items.length});
                     }
                     if (data.links && data.links.next && data.links.next.href) {
-                        coll.nextLink = data.links.next.href;
+                        items.nextLink = data.links.next.href;
                     } else {
-                        // XXX: end-of-collection indicator?
-                        delete coll.nextLink;
+                        // XXX: end-of-array indicator?
+                        delete items.nextLink;
                     }
                     if (_.isFunction(callback)) {
                         callback(null, data);
@@ -450,8 +345,8 @@
             Pump.ajax(options);
         },
         getAll: function() { // Get stuff later than the current group
-            var coll = this,
-                url = (coll.proxyURL) ? coll.proxyURL : coll.url,
+            var items = this,
+                url = (items.proxyURL) ? items.proxyURL : items.stream.url,
                 count,
                 options;
 
@@ -460,8 +355,8 @@
                 return;
             }
 
-            if (_.isNumber(coll.totalItems)) {
-                count = Math.min(coll.totalItems, 200);
+            if (_.isNumber(items.totalItems)) {
+                count = Math.min(items.totalItems, 200);
             } else {
                 count = 200;
             }
@@ -472,15 +367,15 @@
                 url: url + "?count=" + count,
                 success: function(data) {
                     if (data.items) {
-                        coll.add(data.items);
+                        items.add(data.items);
                     }
                     if (data.links && data.links.next && data.links.next.href) {
-                        coll.nextLink = data.links.next.href;
+                        items.nextLink = data.links.next.href;
                     } else {
                         // XXX: end-of-collection indicator?
-                        delete coll.nextLink;
+                        delete items.nextLink;
                     }
-                    coll.trigger("getall");
+                    items.trigger("getall");
                 },
                 error: function(jqxhr) {
                     Pump.error("Failed getting more items.");
@@ -488,48 +383,35 @@
             };
 
             Pump.ajax(options);
+        },
+        url: function() {
+            var items = this;
+            return items.stream.url();
+        }
+    });
+
+    // A stream of objects. It maps to the ActivityStreams collection
+    // representation -- some wrap-up data like url and totalItems, plus an array of items.
+
+    Pump.Stream = Pump.Model.extend({
+        itemsClass: Pump.Items,
+        initialize: function() {
+            var str = this;
+
+            Pump.Model.prototype.initialize.apply(str);
+
+            if (str.has('items')) {
+                str.items        = new str.itemsClass(str.get('items'));
+                str.items.stream = str;
+            }
+        },
+        url: function() {
+            var str = this;
+            return str.get('url');
         }
     },
     {
-        cache: {},
-        keyAttr: "url", // works for in-model collections
-        unique: function(models, options) {
-            var inst,
-                cls = this,
-                key,
-                cached;
-
-            // If we're being initialized with a JSON Collection, parse it.
-            if (_.isObject(models) && !_.isArray(models)) {
-                key = models[cls.keyAttr];
-            } else if (_.isObject(options) && _.has(options, cls.keyAttr)) {
-                key = options[cls.keyAttr];
-            }
-
-            if (key && _.has(cls.cache, key)) {
-                cached = cls.cache[key];
-                cached.merge(models, options);
-            }
-
-            inst = new cls(models, options);
-
-            if (key) {
-                cls.cache[key] = inst;
-            }
-
-            inst.on("change:"+cls.keyAttr, function(model, key) {
-                var oldKey = model.previous(cls.keyAttr);
-                if (oldKey && _.has(cls.cache, oldKey)) {
-                    delete cls.cache[oldKey];
-                }
-                cls.cache[key] = inst;
-            });
-
-            return inst;
-        },
-        clearCache: function() {
-            this.cache = {};
-        }
+        keyAttr: "url"
     });
 
     // A social activity.
@@ -571,7 +453,11 @@
         }
     });
 
-    Pump.ActivityStream = Pump.Collection.extend({
+    Pump.ActivityStream = Pump.Stream.extend({
+        itemsClass: Pump.ActivityItems
+    });
+
+    Pump.ActivityItems = Pump.Items.extend({
         model: Pump.Activity,
         add: function(models, options) {
             // Usually add at the beginning of the list
@@ -622,6 +508,8 @@
         }
     });
 
+    // XXX: merge with Pump.Stream?
+
     Pump.List = Pump.ActivityObject.extend({
         objectType: "collection",
         peopleStreams: ['members'],
@@ -640,12 +528,19 @@
         }
     });
 
-    Pump.ActivityObjectStream = Pump.Collection.extend({
-        model: Pump.ActivityObject
+    Pump.ActivityObjectStream = Pump.Stream.extend({
+        itemsClass: Pump.ActivityObjectItems
     });
 
-    Pump.ListStream = Pump.Collection.extend({
+    Pump.ActivityObjectItems = Pump.Items.extend({
+    });
+
+    Pump.ListItems = Pump.Items.extend({
         model: Pump.List
+    });
+
+    Pump.ListStream = Pump.Stream.extend({
+        itemsClass: Pump.ListItems
     });
 
     // Unordered, doesn't have an URL
@@ -663,8 +558,12 @@
         }
     });
 
-    Pump.PeopleStream = Pump.ActivityObjectStream.extend({
+    Pump.PeopleItems = Pump.Items.extend({
         model: Pump.Person
+    });
+
+    Pump.PeopleStream = Pump.ActivityObjectStream.extend({
+        itemsClass: Pump.PeopleItems
     });
 
     Pump.User = Pump.Model.extend({
@@ -676,7 +575,7 @@
                     return Pump.fullURL("/api/user/" + user.get("nickname") + rel);
                 },
                 userStream = function(rel) {
-                    return Pump.ActivityStream.unique([], {url: streamUrl(rel)});
+                    return Pump.ActivityStream.unique({url: streamUrl(rel)});
                 };
 
             Pump.Model.prototype.initialize.apply(this, arguments);
