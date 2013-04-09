@@ -251,11 +251,10 @@
         }
     });
 
-    // Our own collection. It's a little screwy; there are
-    // a few ways to represent a collection in ActivityStreams JSON and
-    // the "infinite stream" thing throws things off a bit too.
+    // Our own collection. It maps to the ActivityStreams collection
+    // representation -- some high-level data, plus an array of items.
 
-    Pump.Collection = Backbone.Collection.extend({
+    Pump.Collection = Backbone.Model.extend({
         constructor: function(models, options) {
             var coll = this;
             // If we're being initialized with a JSON Collection, parse it.
