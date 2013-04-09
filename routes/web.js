@@ -47,6 +47,7 @@ var databank = require("databank"),
     Scrubber = require("../lib/scrubber"),
     finishers = require("../lib/finishers"),
     saveUpload = require("../lib/saveupload").saveUpload,
+    streams = require("../lib/streams"),
     api = require("./api"),
     HTTPError = he.HTTPError,
     reqUser = mw.reqUser,
@@ -133,67 +134,10 @@ var showMain = function(req, res, next) {
 
 var showInbox = function(req, res, next) {
 
-    var pump = this,
-        user = req.principalUser,
-        profile = req.principal,
-        getMajor = function(callback) {
-            var activities;
-            Step(
-                function() {
-                    user.getMajorInboxStream(this);
-                },
-                function(err, str) {
-                    if (err) throw err;
-                    str.getIDs(0, 20, this);
-                },
-                function(err, ids) {
-                    if (err) throw err;
-                    Activity.readArray(ids, this);
-                },
-                function(err, results) {
-                    var objects;
-                    if (err) throw err;
-                    activities = results;
-                    objects = _.pluck(activities, "object");
-                    addLiked(profile, objects, this.parallel());
-                    addShared(profile, objects, this.parallel());
-                    addLikers(profile, objects, this.parallel());
-                    firstFewReplies(profile, objects, this.parallel());
-                    firstFewShares(profile, objects, this.parallel());
-                    if (user) {
-                        addProxy(activities, this.parallel());
-                    }
-                },
-                function(err) {
-                    if (err) {
-                        callback(err, null);
-                    } else {
-                        callback(null, activities);
-                    }
-                }
-            );
-        },
-        getMinor = function(callback) {
-            Step(
-                function() {
-                    user.getMinorInboxStream(this);
-                },
-                function(err, str) {
-                    if (err) throw err;
-                    str.getIDs(0, 20, this);
-                },
-                function(err, ids) {
-                    if (err) throw err;
-                    Activity.readArray(ids, this);
-                },
-                callback
-            );
-        };
-
     Step(
         function() {
-            getMajor(this.parallel());
-            getMinor(this.parallel());
+            streams.getMajorInbox(req.principalUser, req.principal, this.parallel());
+            streams.getMinorInbox(req.principalUser, req.principal, this.parallel());
         },
         function(err, major, minor) {
             if (err) {
@@ -202,7 +146,7 @@ var showInbox = function(req, res, next) {
                 res.render("inbox", {page: { title: "Home", url: req.originalUrl },
                                      major: major,
                                      minor: minor,
-                                     user: user,
+                                     user: req.principalUser,
                                      data: {
                                          major: major,
                                          minor: minor
@@ -382,106 +326,12 @@ var showActivity = function(req, res, next) {
     }
 };
 
-var getFiltered = function(stream, filter, profile, start, end, callback) {
-    var filtered = new FilteredStream(stream, filter);
-
-    filtered = new FilteredStream(stream, filter),
-
-    Step(
-        function() {
-            filtered.getIDs(start, end, this);
-        },
-        function(err, ids) {
-            if (err) throw err;
-            Activity.readArray(ids, this);
-        },
-        function(err, activities) {
-            if (err) {
-                callback(err, null);
-            } else {
-                callback(null, activities);
-            }
-        }
-    );
-};
-
 var showStream = function(req, res, next) {
-    var pump = this,
-        principal = req.principal,
-        filter,
-        getMajor = function(callback) {
-            var activities;
-            Step(
-                function() {
-                    req.user.getMajorOutboxStream(this);
-                },
-                function(err, str) {
-                    if (err) throw err;
-                    getFiltered(str, filter, principal, 0, 20, this);
-                },
-                function(err, results) {
-                    var objects;
-                    activities = results;
-                    objects = _.pluck(activities, "object");
-                    addLiked(principal, objects, this.parallel());
-                    addShared(principal, objects, this.parallel());
-                    addLikers(principal, objects, this.parallel());
-                    firstFewReplies(principal, objects, this.parallel());
-                    firstFewShares(principal, objects, this.parallel());
-                    if (req.principalUser) {
-                        addProxy(activities, this.parallel());
-                    }
-                },
-                function(err) {
-                    if (err) {
-                        callback(err, null);
-                    } else {
-                        callback(null, activities);
-                    }
-                }
-            );
-        },
-        getMinor = function(callback) {
-            var activities;
-            Step(
-                function() {
-                    req.user.getMinorOutboxStream(this);
-                },
-                function(err, str) {
-                    if (err) throw err;
-                    getFiltered(str, filter, principal, 0, 20, this);
-                },
-                function(err, results) {
-                    if (err) throw err;
-                    activities = results;
-                    if (req.principalUser) {
-                        addProxy(activities, this);
-                    } else {
-                        this(null);
-                    }
-                },
-                function(err) {
-                    if (err) {
-                        callback(err, null);
-                    } else {
-                        callback(null, activities);
-                    }
-                }
-            );
-        };
-
-    if (principal && (principal.id == req.user.profile.id)) {
-        filter = always;
-    } else if (principal) {
-        filter = recipientsOnly(principal);
-    } else {
-        filter = publicOnly;
-    }
 
     Step(
         function() {
-            getMajor(this.parallel());
-            getMinor(this.parallel());
+            streams.userMajorStream(req.user, req.principal, this.parallel());
+            streams.userMinorStream(req.user, req.principal, this.parallel());
             addFollowed(principal, [req.user.profile], this.parallel());
             req.user.profile.expandFeeds(this.parallel());
         },
@@ -1179,39 +1029,7 @@ var proxyActivity = function(req, res, next) {
 
 var addMessages = function(req, res, next) {
 
-    var user = req.principalUser,
-        getMessages = function(callback) {
-            Step(
-                function() {
-                    user.getMajorDirectInboxStream(this);
-                },
-                function(err, str) {
-                    if (err) throw err;
-                    str.getItems(0, 20, this);
-                },
-                function(err, ids) {
-                    if (err) throw err;
-                    Activity.readArray(ids, this);
-                },
-                callback
-            );
-        },
-        getNotifications = function(callback) {
-            Step(
-                function() {
-                    user.getMinorDirectInboxStream(this);
-                },
-                function(err, str) {
-                    if (err) throw err;
-                    str.getItems(0, 20, this);
-                },
-                function(err, ids) {
-                    if (err) throw err;
-                    Activity.readArray(ids, this);
-                },
-                callback
-            );
-        };
+    var user = req.principalUser;
 
     // We only do this for registered users
 
@@ -1222,8 +1040,8 @@ var addMessages = function(req, res, next) {
 
     Step(
         function() {
-            getMessages(this.parallel());
-            getNotifications(this.parallel());
+            streams.userMajorDirectInbox(user, req.principal, this.parallel());
+            streams.userMinorDirectInbox(user, req.principal, this.parallel());
         },
         function(err, messages, notifications) {
             if (err) {
