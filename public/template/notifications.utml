@@ -4,7 +4,10 @@
                  disabled
                  <% } %>"
                  data-toggle="dropdown" href="#">
-    <i class="icon-exclamation-sign icon-white"> <%- (notifications) ? notifications.length : 0 %></i>  
+    <i class="icon-exclamation-sign icon-white"></i>
+    <% if (notifications && notifications.length > 0) { %>
+    <span class="badge badge-important"><%- notifications.length %></span>
+    <% } %>
   </button>
   <ul class="dropdown-menu">
     <% if (_.isArray(notifications)) {%>

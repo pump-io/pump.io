@@ -17,6 +17,7 @@
 // limitations under the License.
 
 var connect = require("connect"),
+    send = connect.middleware.static.send,
     cutils = connect.utils,
     fs = require("fs"),
     path = require("path"),
@@ -57,37 +58,6 @@ var everyAuth = function(req, res, next) {
     }
 };
 
-var sendFile = function(req, res, slug, next) {
-
-    var fullpath = path.join(req.app.config.uploaddir, slug),
-        size,
-        mtime;
-
-    Step(
-        function() {
-            fs.stat(fullpath, this);
-        },
-        function(err, stats) {
-	    if (err && err.code == "ENOENT") {
-                next(new HTTPError("No such upload: " + slug, 404));
-            } else if (err) {
-                next(err);
-            } else {
-                res.setHeader("Cache-Control", "private");
-                res.setHeader("Last-Modified", stats.mtime.toUTCString());
-                res.setHeader("ETag", cutils.etag(stats));
-                res.setHeader("Expires", (new Date(stats.mtime.value + EXPIRES)).toUTCString());
-
-                if (!cutils.modified(req, res)) {
-                    cutils.notModified(res);
-                } else {
-                    res.sendfile(fullpath);
-                }
-            }
-        }
-    );
-};
-
 // Check downloads of uploaded files
 
 var uploadedFile = function(req, res, next) {
@@ -113,7 +83,7 @@ var uploadedFile = function(req, res, next) {
             if (profile &&
                 obj.author &&
                 profile.id == obj.author.id) {
-                sendFile(req, res, slug, next);
+                send(req, res, next, {path: slug, root: req.app.config.uploaddir});
                 return;
             }
             Activity.postOf(obj, this);
@@ -131,7 +101,7 @@ var uploadedFile = function(req, res, next) {
             } else if (!flag) {
                 next(new HTTPError("Not allowed", 403));
             } else {
-                sendFile(req, res, slug, next);
+                send(req, res, next, {path: slug, root: req.app.config.uploaddir});
             }
         }
     );
