@@ -943,16 +943,16 @@ var createUser = function(req, res, next) {
                 // If called as /main/register; see ./web.js
                 // XXX: Bad hack
                 if (req.session) {
-		    setPrincipal(req.session, user.profile, function(err) {
-			if (err) {
-			    next(err);
-			} else {
-			    res.json(user);
-			}
-		    });
+                    setPrincipal(req.session, user.profile, function(err) {
+                        if (err) {
+                            next(err);
+                        } else {
+                            res.json(user);
+                        }
+                    });
                 } else {
                     res.json(user);
-		}
+                }
             }
         }
     );
@@ -1102,50 +1102,50 @@ var postToInbox = function(req, res, next) {
 
             var activity = new Activity(props);
 
-	    Step(
-		function() {
-		    // Default verb
+            Step(
+                function() {
+                    // Default verb
 
-		    if (!_(activity).has("verb") || _(activity.verb).isNull()) {
-			activity.verb = "post";
-		    }
+                    if (!_(activity).has("verb") || _(activity.verb).isNull()) {
+                        activity.verb = "post";
+                    }
 
-		    // Add a received timestamp
+                    // Add a received timestamp
 
-		    activity.received = Stamper.stamp();
+                    activity.received = Stamper.stamp();
 
-		    // TODO: return a 202 Accepted here?
+                    // TODO: return a 202 Accepted here?
 
-		    // First, ensure recipients
-		    activity.ensureRecipients(this);
-		},
-		function(err) {
-		    if (err) throw err;
-		    // apply the activity
-		    activity.apply(req.principal, this);
-		},
-		function(err) {
-		    if (err) {
-			if (err.name == "AppError") {
-			    throw new HTTPError(err.message, 400);
-			} else if (err.name == "NoSuchThingError") {
-			    throw new HTTPError(err.message, 400);
-			} else if (err.name == "AlreadyExistsError") {
-			    throw new HTTPError(err.message, 400);
-			} else if (err.name == "NoSuchItemError") {
-			    throw new HTTPError(err.message, 400);
-			} else if (err.name == "NotInStreamError") {
-			    throw new HTTPError(err.message, 400);
-			} else {
-			    throw err;
-			}
-		    }
-		    // ...then persist...
-		    activity.save(this);
-		},
-		callback
-	    );
-	};
+                    // First, ensure recipients
+                    activity.ensureRecipients(this);
+                },
+                function(err) {
+                    if (err) throw err;
+                    // apply the activity
+                    activity.apply(req.principal, this);
+                },
+                function(err) {
+                    if (err) {
+                        if (err.name == "AppError") {
+                            throw new HTTPError(err.message, 400);
+                        } else if (err.name == "NoSuchThingError") {
+                            throw new HTTPError(err.message, 400);
+                        } else if (err.name == "AlreadyExistsError") {
+                            throw new HTTPError(err.message, 400);
+                        } else if (err.name == "NoSuchItemError") {
+                            throw new HTTPError(err.message, 400);
+                        } else if (err.name == "NotInStreamError") {
+                            throw new HTTPError(err.message, 400);
+                        } else {
+                            throw err;
+                        }
+                    }
+                    // ...then persist...
+                    activity.save(this);
+                },
+                callback
+            );
+        };
 
     // Check for actor
 
@@ -1169,31 +1169,31 @@ var postToInbox = function(req, res, next) {
     }
 
     Step(
-	function() {
-	    Activity.get(props.id, this);
-	},
-	function(err, activity) {
-	    if (err && err.name == "NoSuchThingError") {
-		newRemoteActivity(props, this);
-	    } else if (err) {
-		throw err;
-	    } else {
-		if (req.client.webfinger) {
-		    if (ActivityObject.canonicalID(activity.actor.id) != ActivityObject.canonicalID(req.principal.id)) {
-			throw new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400);
-		    }
-		} else if (req.client.hostname) {
-		    if (ActivityObject.canonicalID(activity.actor.id) != "https://"+req.client.hostname + "/" &&
-			ActivityObject.canonicalID(activity.actor.id) != "http://"+req.client.hostname + "/") {
-			throw new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400);
-		    }
-		}
-		this(null, activity);
-	    }
-	},
+        function() {
+            Activity.get(props.id, this);
+        },
+        function(err, activity) {
+            if (err && err.name == "NoSuchThingError") {
+                newRemoteActivity(props, this);
+            } else if (err) {
+                throw err;
+            } else {
+                if (req.client.webfinger) {
+                    if (ActivityObject.canonicalID(activity.actor.id) != ActivityObject.canonicalID(req.principal.id)) {
+                        throw new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400);
+                    }
+                } else if (req.client.hostname) {
+                    if (ActivityObject.canonicalID(activity.actor.id) != "https://"+req.client.hostname + "/" &&
+                        ActivityObject.canonicalID(activity.actor.id) != "http://"+req.client.hostname + "/") {
+                        throw new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400);
+                    }
+                }
+                this(null, activity);
+            }
+        },
         function(err, activity) {
             if (err) throw err;
-	    act = activity;
+            act = activity;
             user.addToInbox(activity, this);
         },
         function(err) {
