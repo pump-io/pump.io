@@ -63,6 +63,7 @@ var databank = require("databank"),
     finishers = require("../lib/finishers"),
     mm = require("../lib/mimemap"),
     saveUpload = require("../lib/saveupload").saveUpload,
+    streams = require("../lib/streams").saveUpload,
     reqUser = mw.reqUser,
     reqGenerator = mw.reqGenerator,
     sameUser = mw.sameUser,
@@ -1283,341 +1284,38 @@ var newActivity = function(activity, user, callback) {
     );
 };
 
-var filteredFeedRoute = function(urlmaker, titlemaker, streammaker, finisher) {
+var streamEndpoint = function(streamCreator) {
 
     return function(req, res, next) {
 
-        var url = urlmaker(req),
-            collection = {
-                author: req.user.profile,
-                displayName: titlemaker(req),
-                id: url,
-                objectTypes: ["activity"],
-                url: url,
-                links: {
-                    first: {
-                        href: url
-                    },
-                    self: {
-                        href: url
-                    }
-                },
-                items: []
-            };
-
-        var args, str, ids;
+        var args;
 
         try {
-            args = streamArgs(req, DEFAULT_ACTIVITIES, MAX_ACTIVITIES);
+            args = streamArgs(req, DEFAULT_ITEMS, MAX_ITEMS);
         } catch (e) {
             next(e);
             return;
         }
 
-        Step(
-            function() {
-                streammaker(req, this);
-            },
-            function(err, outbox) {
-                if (err) {
-                    if (err.name == "NoSuchThingError") {
-                        collection.totalItems = 0;
-                        res.json(collection);
-                    } else {
-                        throw err;
-                    }
-                } else {
-                    // Skip filtering if remote user == author
-                    if (req.principal && req.principal.id == req.user.profile.id) {
-                        str = outbox;
-                    } else if (!req.principal) {
-                        // XXX: keep a separate stream instead of filtering
-                        str = new FilteredStream(outbox, publicOnly);
-                    } else {
-                        str = new FilteredStream(outbox, recipientsOnly(req.principal));
-                    }
-
-                    getStream(str, args, collection, req.principal, this);
-                }
-            },
-            function(err) {
-                if (err) throw err;
-                if (finisher) {
-                    finisher(req, collection, this);
-                } else {
-                    this(null);
-                }
-            },
-            function(err) {
-                if (err) {
-                    next(err);
-                } else {
-                    collection.items.forEach(function(act) {
-                        delete act.actor;
-                    });
-                    if (_.has(collection, "author")) {
-                        collection.author.sanitize();
-                    }
-                    res.json(collection);
-                }
+        streamCreator(req.user, req.principal, args, function(err, collection) {
+            if (err) {
+                next(err);
+            } else {
+                res.json(collection);
             }
-        );
+        });
     };
 };
 
-
-var majorFinishers = doFinishers([addProxyFinisher,
-                                  addLikedFinisher,
-                                  firstFewRepliesFinisher,
-                                  addLikersFinisher,
-                                  addSharedFinisher,
-                                  firstFewSharesFinisher]);
-
-var userStream = filteredFeedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/feed");
-    },
-    function(req) {
-        return "Activities by " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getOutboxStream(callback);
-    },
-    addProxyFinisher
-);
-
-var userMajorStream = filteredFeedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/feed/major");
-    },
-    function(req) {
-        return "Major activities by " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getMajorOutboxStream(callback);
-    },
-    majorFinishers
-);
-
-var userMinorStream = filteredFeedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/feed/minor");
-    },
-    function(req) {
-        return "Minor activities by " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getMinorOutboxStream(callback);
-    },
-    addProxyFinisher
-);
-
-var feedRoute = function(urlmaker, titlemaker, streamgetter, finisher) {
-
-    return function(req, res, next) {
-
-        var url = urlmaker(req),
-            collection = {
-                author: req.user.profile,
-                displayName: titlemaker(req),
-                id: url,
-                objectTypes: ["activity"],
-                url: url,
-                links: {
-                    first: {
-                        href: url
-                    },
-                    self: {
-                        href: url
-                    }
-                },
-                items: []
-            };
-
-        var args, str;
-
-        try {
-            args = streamArgs(req, DEFAULT_ACTIVITIES, MAX_ACTIVITIES);
-        } catch (e) {
-            next(e);
-            return;
-        }
-
-        Step(
-            function() {
-                streamgetter(req, this);
-            },
-            function(err, inbox) {
-                if (err) {
-                    if (err.name == "NoSuchThingError") {
-                        collection.totalItems = 0;
-                        if (_.has(collection, "author")) {
-                            collection.author.sanitize();
-                        }
-                        res.json(collection);
-                    } else {
-                        throw err;
-                    }
-                } else {
-                    getStream(inbox, args, collection, req.principal, this);
-                }
-            },
-            function(err) {
-                if (err) throw err;
-                if (finisher) {
-                    finisher(req, collection, this);
-                } else {
-                    this(null);
-                }
-            },
-            function(err) {
-                if (err) {
-                    next(err);
-                } else {
-                    if (_.has(collection, "author")) {
-                        collection.author.sanitize();
-                    }
-                    res.json(collection);
-                }
-            }
-        );
-    };
-};
-
-var userInbox = feedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox");
-    },
-    function(req) {
-        return "Activities for " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getInboxStream(callback);
-    },
-    addProxyFinisher
-);
-
-var userMajorInbox = feedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox/major");
-    },
-    function(req) {
-        return "Major activities for " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getMajorInboxStream(callback);
-    },
-    majorFinishers
-);
-
-var userMinorInbox = feedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox/minor");
-    },
-    function(req) {
-        return "Minor activities for " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getMinorInboxStream(callback);
-    },
-    addProxyFinisher
-);
-
-var userDirectInbox = feedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox/direct");
-    },
-    function(req) {
-        return "Activities directly for " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getDirectInboxStream(callback);
-    },
-    addProxyFinisher
-);
-
-var userMajorDirectInbox = feedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox/direct/major");
-    },
-    function(req) {
-        return "Major activities directly for " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getMajorDirectInboxStream(callback);
-    },
-    majorFinishers
-);
-
-var userMinorDirectInbox = feedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox/direct/minor");
-    },
-    function(req) {
-        return "Minor activities directly for " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getMinorDirectInboxStream(callback);
-    },
-    addProxyFinisher
-);
-
-var getStream = function(str, args, collection, principal, callback) {
-
-    Step(
-        function() {
-            str.count(this);
-        },
-        function(err, totalItems) {
-            if (err) throw err;
-            collection.totalItems = totalItems;
-            if (totalItems === 0) {
-                callback(null);
-                return;
-            }
-            if (_(args).has("before")) {
-                str.getIDsGreaterThan(args.before, args.count, this);
-            } else if (_(args).has("since")) {
-                str.getIDsLessThan(args.since, args.count, this);
-            } else {
-                str.getIDs(args.start, args.end, this);
-            }
-        },
-        function(err, ids) {
-            if (err) {
-                if (err.name == "NotInStreamError") {
-                    throw new HTTPError(err.message, 400);
-                } else {
-                    throw err;
-                }
-            }
-            Activity.readArray(ids, this);
-        },
-        function(err, activities) {
-            if (err) {
-                callback(err);
-            } else {
-                activities.forEach(function(act) {
-                    act.sanitize(principal);
-                });
-                collection.items = activities;
-                if (activities.length > 0) {
-                    collection.links.prev = {
-                        href: collection.url + "?since=" + encodeURIComponent(activities[0].id)
-                    };
-                    if ((_(args).has("start") && args.start + activities.length < collection.totalItems) ||
-                        (_(args).has("before") && activities.length >= args.count) ||
-                        (_(args).has("since"))) {
-                        collection.links.next = {
-                            href: collection.url + "?before=" + encodeURIComponent(activities[activities.length-1].id)
-                        };
-                    }
-                }
-                callback(null);
-            }
-        }
-    );
-};
+var userStream = streamEndpoint(streams.userStream);
+var userMajorStream = streamEndpoint(streams.userMajorStream);
+var userMinorStream = streamEndpoint(streams.userMinorStream);
+var userInbox = streamEndpoint(streams.userInbox);
+var userMajorInbox = streamEndpoint(streams.userMajorInbox);
+var userMinorInbox = streamEndpoint(streams.userMinorInbox);
+var userDirectInbox = streamEndpoint(streams.userDirectInbox);
+var userMajorDirectInbox = streamEndpoint(streams.userMajorDirectInbox);
+var userMinorDirectInbox = streamEndpoint(streams.userMinorDirectInbox);
 
 var userFollowers = function(req, res, next) {
 
