@@ -742,7 +742,7 @@
                 password = view.$('#password').val();
 
             if (!nickname || !password || nickname.length === 0 || password.length < 8) {  
-              view.$(':submit').attr('disabled', 'disabled');
+                view.$(':submit').attr('disabled', 'disabled');
             } else {
                 view.$(':submit').removeAttr('disabled');
             }
@@ -754,6 +754,7 @@
                 options,
                 continueTo = Pump.getContinueTo(),
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
+                retries = 0,
                 onSuccess = function(data, textStatus, jqXHR) {
                     var objs;
                     Pump.setNickname(data.nickname);
@@ -784,18 +785,26 @@
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     var type, response;
-                    view.stopSpin();
-                    type = jqXHR.getResponseHeader("Content-Type");
-                    if (type && type.indexOf("application/json") !== -1) {
-                        response = JSON.parse(jqXHR.responseText);
-                        view.showError(response.error);
+                    // This happens when our stored OAuth credentials are
+                    // invalid; usually because someone re-installed server software
+                    if (jqXHR.status == 401 && retries === 0 && jqXHR.responseText == "Invalid / used nonce") {
+                        Pump.clearCred();
+                        retries = 1;
+                        Pump.ajax(options);
                     } else {
-                        view.showError(errorThrown);
+                        view.stopSpin();
+                        type = jqXHR.getResponseHeader("Content-Type");
+                        if (type && type.indexOf("application/json") !== -1) {
+                            response = JSON.parse(jqXHR.responseText);
+                            view.showError(response.error);
+                        } else {
+                            view.showError(errorThrown);
+                        }
                     }
                 };
 
             view.startSpin();
-
+            
             options = {
                 contentType: "application/json",
                 data: JSON.stringify(params),
@@ -2083,11 +2092,11 @@
                     return true;
                 }).on("complete", function(event, id, fileName, responseJSON) {
                     var act = new Pump.Activity({
-                            verb: "post",
-                            cc: [{id: "http://activityschema.org/collection/public",
-                                  objectType: "collection"}],
-                            object: responseJSON.obj
-                        });
+                        verb: "post",
+                        cc: [{id: "http://activityschema.org/collection/public",
+                              objectType: "collection"}],
+                        object: responseJSON.obj
+                    });
 
                     Pump.newMajorActivity(act, function(err, act) {
                         if (err) {
