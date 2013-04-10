@@ -358,7 +358,7 @@ var contextEndpoint = function(contextifier, streamCreator) {
 
         streamCreator(contextifier(req), req.principal, args, function(err, collection) {
             if (err) {
-                next(err);
+                // next(err);
             } else {
                 res.json(collection);
             }
@@ -372,7 +372,7 @@ var objectReplies = contextEndpoint(
         return {type: type,
                 obj: req[type]};
     },
-    stream.objectReplies
+    streams.objectReplies
 );
 
 // Feed of actors (usually persons) who have shared the object
@@ -384,7 +384,7 @@ var objectShares = contextEndpoint(
         return {type: type,
                 obj: req[type]};
     },
-    stream.objectShares
+    streams.objectShares
 );
 
 // Feed of actors (usually persons) who have liked the object
@@ -396,7 +396,7 @@ var objectLikes = contextEndpoint(
         return {type: type,
                 obj: req[type]};
     },
-    stream.objectLikes
+    streams.objectLikes
 );
 
 var getUser = function(req, res, next) {
