@@ -1182,7 +1182,7 @@ var userLists = contextEndpoint(
     function(req) {
         return {
             user: req.user,
-            type: req.param.type
+            type: req.params.type
         };
     },
     streams.userLists
