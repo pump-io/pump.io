@@ -370,16 +370,22 @@
         },
         getPrev: function(callback) { // Get stuff later than the current group
             var coll = this,
+                url,
                 options;
 
-            if (!coll.prevLink) {
-                throw new Error("No prevLink.");
+            if (coll.prevLink) {
+                url = coll.prevLink;
+            } else if (coll.url && coll.length > 0) {
+                url = coll.url + "?since=" + coll.at(0).id;
+            } else {
+                Pump.error("Can't get prev for collection " + coll.url);
+                return;
             }
 
             options = {
                 type: "GET",
                 dataType: "json",
-                url: coll.prevLink,
+                url: url,
                 success: function(data) {
                     if (data.items) {
                         coll.add(data.items, {at: 0});
@@ -392,7 +398,7 @@
                     }
                 },
                 error: function(jqxhr) {
-                    Pump.error("Failed getting more items.");
+                    Pump.error("Failed getting more items for " + url);
                     if (_.isFunction(callback)) {
                         callback(new Error("Failed getting more items"), null);
                     }
@@ -404,17 +410,22 @@
         },
         getNext: function(callback) { // Get stuff earlier than the current group
             var coll = this,
+                url,
                 options;
 
-            if (!coll.nextLink) {
-                // No next link
+            if (coll.nextLink) {
+                url = coll.nextLink;
+            } else if (coll.url && coll.length > 0) {
+                url = coll.url + "?before=" + coll.at(coll.length - 1).id;
+            } else {
+                Pump.error("Can't get next for collection " + coll.url);
                 return;
             }
 
             options = {
                 type: "GET",
                 dataType: "json",
-                url: coll.nextLink,
+                url: url,
                 success: function(data) {
                     if (data.items) {
                         coll.add(data.items, {at: coll.length});
@@ -430,7 +441,7 @@
                     }
                 },
                 error: function(jqxhr) {
-                    Pump.error("Failed getting more items.");
+                    Pump.error("Failed getting more items for " + url);
                     if (_.isFunction(callback)) {
                         callback(new Error("Failed getting more items"), null);
                     }
