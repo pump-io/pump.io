@@ -420,6 +420,9 @@ suite.addBatch({
                                 list = _.find(doc.items, function(item) {
                                     return item.displayName == "Family";
                                 });
+                                if (!list) {
+                                    throw new Error("No 'Family' list found");
+                                }
                                 person = {
                                     objectType: "person",
                                     id: "urn:uuid:2dbe56f6-4877-11e2-a117-2c8158efb9e9",
