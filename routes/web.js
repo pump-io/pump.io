@@ -470,41 +470,6 @@ var handleLogin = function(req, res, next) {
     );
 };
 
-var getAllLists = function(user, callback) {
-    var lists;
-
-    Step(
-        function() {
-            user.getLists("person", this);
-        },
-        function(err, str) {
-            if (err) throw err;
-            str.getItems(0, 100, this);
-        },
-        function(err, ids) {
-            if (err) throw err;
-            Collection.readAll(ids, this);
-        },
-        function(err, objs) {
-            var group;
-            if (err) throw err;
-            lists = objs;
-            group = this.group();
-            // XXX: Unencapsulate this and do it in 1-2 calls
-            _.each(lists, function(list) {
-                list.expandFeeds(group());
-            });
-        },
-        function(err) {
-            if (err) {
-                callback(err, null);
-            } else {
-                callback(null, lists);
-            }
-        }
-    );
-};
-
 var showLists = function(req, res, next) {
 
     var user = req.user,
@@ -512,7 +477,7 @@ var showLists = function(req, res, next) {
 
     Step(
         function() {
-            getAllLists(user, this.parallel());
+            streams.userLists({user: user, type: "person"}, principal, this.parallel());
             addFollowed(principal, [req.user.profile], this.parallel());
             req.user.profile.expandFeeds(this.parallel());
         },
@@ -520,7 +485,8 @@ var showLists = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("lists", {page: {title: req.user.profile.displayName + " - Lists", url: req.originalUrl},
+                res.render("lists", {page: {title: req.user.profile.displayName + " - Lists",
+                                            url: req.originalUrl},
                                      profile: req.user.profile,
                                      list: null,
                                      lists: lists,
@@ -539,7 +505,7 @@ var showList = function(req, res, next) {
 
     var user = req.user,
         principal = req.principal,
-        getList = function(user, uuid, callback) {
+        getList = function(uuid, callback) {
             var list;
             Step(
                 function() {
@@ -550,36 +516,13 @@ var showList = function(req, res, next) {
                     if (results.length === 0) throw new HTTPError("Not found", 404);
                     if (results.length > 1) throw new HTTPError("Too many lists", 500);
                     list = results[0];
-                    list.expandFeeds(this);
+                    streams.collectionMembers({collection: list}, principal, this);
                 },
-                function(err) {
-                    if (err) throw err;
-                    list.getStream(this);
-                },
-                function(err, str) {
-                    if (err) throw err;
-                    str.getObjects(0, 20, this);
-                },
-                function(err, refs) {
-                    var group = this.group();
-                    if (err) throw err;
-                    _.each(refs, function(ref) {
-                        ActivityObject.getObject(ref.objectType, ref.id, group());
-                    });
-                },
-                function(err, objs) {
-                    if (err) throw err;
-                    list.members.items = objs;
-                    if (req.principalUser) {
-                        addProxyObjects(list.members.items, this);
-                    } else {
-                        this(null);
-                    }
-                },
-                function(err) {
+                function(err, collection) {
                     if (err) {
                         callback(err, null);
                     } else {
+                        list.members = collection;
                         callback(null, list);
                     }
                 }
@@ -588,7 +531,7 @@ var showList = function(req, res, next) {
 
     Step(
         function() {
-            getAllLists(user, this.parallel());
+            streams.userLists({user: user, type: "person"}, principal, this.parallel());
             getList(req.user, req.param.uuid, this.parallel());
             addFollowed(principal, [req.user.profile], this.parallel());
             req.user.profile.expandFeeds(this.parallel());
@@ -597,7 +540,8 @@ var showList = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("list", {page: {title: req.user.profile.displayName + " - Lists", url: req.originalUrl},
+                res.render("list", {page: {title: req.user.profile.displayName + " - Lists",
+                                           url: req.originalUrl},
                                     profile: req.user.profile,
                                     lists: lists,
                                     list: list,
