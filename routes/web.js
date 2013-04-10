@@ -357,50 +357,9 @@ var showStream = function(req, res, next) {
 
 var showFavorites = function(req, res, next) {
 
-    var pump = this,
-        principal = req.principal,
-        filter = (principal) ? ((principal.id == req.user.profile.id) ? always : objectRecipientsOnly(principal)) : objectPublicOnly,
-        getFavorites = function(callback) {
-            var objects;
-            Step(
-                function() {
-                    req.user.favoritesStream(this);
-                },
-                function(err, faveStream) {
-                    var filtered;
-                    if (err) throw err;
-                    filtered = new FilteredStream(faveStream, filter);
-                    filtered.getObjects(0, 20, this);
-                },
-                function(err, refs) {
-                    var group = this.group();
-                    if (err) throw err;
-                    _.each(refs, function(ref) {
-                        ActivityObject.getObject(ref.objectType, ref.id, group());
-                    });
-                },
-                function(err, results) {
-                    if (err) throw err;
-                    objects = results;
-                    if (req.principalUser) {
-                        addProxyObjects(objects, this);
-                    } else {
-                        this(null);
-                    }
-                },
-                function(err) {
-                    if (err) {
-                        callback(err, null);
-                    } else {
-                        callback(null, objects);
-                    }
-                }
-            );
-        };
-
     Step(
         function() {
-            getFavorites(this.parallel());
+            streams.userFavorites(req.user, req.principal, this.parallel());
             addFollowed(principal, [req.user.profile], this.parallel());
             req.user.profile.expandFeeds(this.parallel());
         },
@@ -423,34 +382,9 @@ var showFavorites = function(req, res, next) {
 
 var showFollowers = function(req, res, next) {
 
-    var pump = this,
-        getFollowers = function(callback) {
-            var followers;
-            Step(
-                function() {
-                    req.user.getFollowers(0, 20, this);
-                },
-                function(err, results) {
-                    if (err) throw err;
-                    followers = results;
-                    addFollowed(req.principal, followers, this.parallel());
-                    if (req.principalUser) {
-                        addProxyObjects(followers, this.parallel());
-                    }
-                },
-                function(err) {
-                    if (err) {
-                        callback(err, null);
-                    } else {
-                        callback(null, followers);
-                    }
-                }
-            );
-        };
-
     Step(
         function() {
-            getFollowers(this.parallel());
+            streams.userFollowers(req.user, req.principal, this.parallel());
             addFollowed(principal, [req.user.profile], this.parallel());
             req.user.profile.expandFeeds(this.parallel());
         },
@@ -473,34 +407,9 @@ var showFollowers = function(req, res, next) {
 
 var showFollowing = function(req, res, next) {
 
-    var pump = this,
-        getFollowing = function(callback) {
-            var following;
-            Step(
-                function() {
-                    req.user.getFollowing(0, 20, this);
-                },
-                function(err, results) {
-                    if (err) throw err;
-                    following = results;
-                    addFollowed(req.principal, following, this.parallel());
-                    if (req.principalUser) {
-                        addProxyObjects(following, this.parallel());
-                    }
-                },
-                function(err) {
-                    if (err) {
-                        callback(err, null);
-                    } else {
-                        callback(null, following);
-                    }
-                }
-            );
-        };
-
     Step(
         function() {
-            getFollowing(this.parallel());
+            streams.userFollowing(req.user, req.principal, this.parallel());
             addFollowed(principal, [req.user.profile], this.parallel());
             req.user.profile.expandFeeds(this.parallel());
         },
