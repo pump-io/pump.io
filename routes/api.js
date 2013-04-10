@@ -24,12 +24,7 @@ var databank = require("databank"),
     OAuth = require("oauth-evanp").OAuth,
     check = validator.check,
     sanitize = validator.sanitize,
-    FilteredStream = require("../lib/filteredstream").FilteredStream,
     filters = require("../lib/filters"),
-    objectRecipientsOnly = filters.objectRecipientsOnly,
-    objectPublicOnly = filters.objectPublicOnly,
-    idRecipientsOnly = filters.idRecipientsOnly,
-    idPublicOnly = filters.idPublicOnly,
     version = require("../lib/version").version,
     HTTPError = require("../lib/httperror").HTTPError,
     Stamper = require("../lib/stamper").Stamper,
@@ -99,29 +94,7 @@ var databank = require("databank"),
     typeToExt = mm.typeToExt,
     extToType = mm.extToType,
     DEFAULT_ITEMS = 20,
-    DEFAULT_ACTIVITIES = DEFAULT_ITEMS,
-    DEFAULT_FAVORITES = DEFAULT_ITEMS,
-    DEFAULT_LIKES = DEFAULT_ITEMS,
-    DEFAULT_REPLIES = DEFAULT_ITEMS,
-    DEFAULT_SHARES = DEFAULT_ITEMS,
-    DEFAULT_FOLLOWERS = DEFAULT_ITEMS,
-    DEFAULT_FOLLOWING = DEFAULT_ITEMS,
-    DEFAULT_MEMBERS = DEFAULT_ITEMS,
-    DEFAULT_USERS = DEFAULT_ITEMS,
-    DEFAULT_LISTS = DEFAULT_ITEMS,
-    DEFAULT_UPLOADS = DEFAULT_ITEMS,
-    MAX_ITEMS = DEFAULT_ITEMS * 10,
-    MAX_ACTIVITIES = MAX_ITEMS,
-    MAX_FAVORITES = MAX_ITEMS,
-    MAX_LIKES = MAX_ITEMS,
-    MAX_REPLIES = MAX_ITEMS,
-    MAX_SHARES = MAX_ITEMS,
-    MAX_FOLLOWERS = MAX_ITEMS,
-    MAX_FOLLOWING = MAX_ITEMS,
-    MAX_MEMBERS = MAX_ITEMS,
-    MAX_USERS = MAX_ITEMS,
-    MAX_LISTS = MAX_ITEMS,
-    MAX_UPLOADS = MAX_ITEMS;
+    MAX_ITEMS = DEFAULT_ITEMS * 10;
 
 // Initialize the app controller
 
@@ -385,166 +358,61 @@ var deleteObject = function(req, res, next) {
     );
 };
 
-var objectLikes = function(req, res, next) {
+var contextEndpoint = function(contextifier, streamCreator) {
 
-    var type = req.type,
-        obj = req[type];
+    return function(req, res, next) {
 
-    var collection = {
-        displayName: "People who like " + obj.displayName,
-        id: URLMaker.makeURL("api/" + type + "/" + obj._uuid + "/likes"),
-        items: []
-    };
+        var args;
 
-    var args;
+        try {
+            args = streamArgs(req, DEFAULT_ITEMS, MAX_ITEMS);
+        } catch (e) {
+            next(e);
+            return;
+        }
 
-    try {
-        args = streamArgs(req, DEFAULT_LIKES, MAX_LIKES);
-    } catch (e) {
-        next(e);
-        return;
-    }
-
-    Step(
-        function() {
-            obj.favoritersCount(this);
-        },
-        function(err, count) {
-            if (err) {
-                if (err.name == "NoSuchThingError") {
-                    collection.totalItems = 0;
-                    res.json(collection);
-                } else {
-                    throw err;
-                }
-            }
-            collection.totalItems = count;
-            obj.getFavoriters(args.start, args.end, this);
-        },
-        function(err, likers) {
+        streamCreator(contextifier(req), req.principal, args, function(err, collection) {
             if (err) {
                 next(err);
             } else {
-                collection.items = likers;
                 res.json(collection);
             }
-        }
-    );
-};
-
-var objectReplies = function(req, res, next) {
-
-    var type = req.type,
-        obj = req[type];
-
-    var collection = {
-        displayName: "Replies to " + ((obj.displayName) ? obj.displayName : obj.id),
-        id: URLMaker.makeURL("api/" + type + "/" + obj._uuid + "/replies"),
-        items: []
+        });
     };
-
-    var args;
-
-    try {
-        args = streamArgs(req, DEFAULT_REPLIES, MAX_REPLIES);
-    } catch (e) {
-        next(e);
-        return;
-    }
-
-    Step(
-        function() {
-            obj.getRepliesStream(this);
-        },
-        function(err, str) {
-            var filtered;
-            if (err) throw err;
-            if (!req.principal) {
-                // XXX: keep a separate stream instead of filtering
-                filtered = new FilteredStream(str, objectPublicOnly);
-            } else {
-                filtered = new FilteredStream(str, objectRecipientsOnly(req.principal));
-            }
-            filtered.count(this.parallel());
-            filtered.getObjects(args.start, args.end, this.parallel());
-        },
-        function(err, count, refs) {
-            var group = this.group();
-            if (err) throw err;
-            collection.totalItems = count;
-            _.each(refs, function(ref) {
-                ActivityObject.getObject(ref.objectType, ref.id, group());
-            });
-        },
-        function(err, objs) {
-            if (err) {
-                next(err);
-            } else {
-                _.each(objs, function(obj) {
-                    obj.sanitize();
-                    delete obj.inReplyTo;
-                });
-                collection.items = objs;
-                res.json(collection);
-            }
-        }
-    );
 };
+
+var objectReplies = contextEndpoint(
+    function(req) {
+        var type = req.type;
+        return {type: type,
+                obj: req[type]};
+    },
+    stream.objectReplies
+);
 
 // Feed of actors (usually persons) who have shared the object
 // It's stored as a stream, so we get those
 
-var objectShares = function(req, res, next) {
+var objectShares = contextEndpoint(
+    function(req) {
+        var type = req.type;
+        return {type: type,
+                obj: req[type]};
+    },
+    stream.objectReplies
+);
 
-    var type = req.type,
-        obj = req[type];
+// Feed of actors (usually persons) who have liked the object
+// It's stored as a stream, so we get those
 
-    var collection = {
-        displayName: "Shares of " + ((obj.displayName) ? obj.displayName : obj.id),
-        id: URLMaker.makeURL("api/" + type + "/" + obj._uuid + "/shares"),
-        items: []
-    };
-
-    var args;
-
-    try {
-        args = streamArgs(req, DEFAULT_SHARES, MAX_SHARES);
-    } catch (e) {
-        next(e);
-        return;
-    }
-
-    Step(
-        function() {
-            obj.getSharesStream(this);
-        },
-        function(err, str) {
-            var filtered;
-            if (err) throw err;
-            str.count(this.parallel());
-            str.getObjects(args.start, args.end, this.parallel());
-        },
-        function(err, count, refs) {
-            var group = this.group();
-            if (err) throw err;
-            collection.totalItems = count;
-            _.each(refs, function(ref) {
-                ActivityObject.getObject(ref.objectType, ref.id, group());
-            });
-        },
-        function(err, objs) {
-            if (err) {
-                next(err);
-            } else {
-                _.each(objs, function(obj) {
-                    obj.sanitize();
-                });
-                collection.items = objs;
-                res.json(collection);
-            }
-        }
-    );
-};
+var objectLikes = contextEndpoint(
+    function(req) {
+        var type = req.type;
+        return {type: type,
+                obj: req[type]};
+    },
+    stream.objectLikes
+);
 
 var getUser = function(req, res, next) {
 
@@ -974,7 +842,7 @@ var listUsers = function(req, res, next) {
     var args, str;
 
     try {
-        args = streamArgs(req, DEFAULT_USERS, MAX_USERS);
+        args = streamArgs(req, DEFAULT_ITEMS, MAX_ITEMS);
     } catch (e) {
         next(e);
         return;
@@ -1319,6 +1187,16 @@ var userFavorites = streamEndpoint(streams.userFavorites);
 
 var userUploads = streamEndpoint(streams.userUploads);
 
+var userLists = contextEndpoint(
+    function(req) {
+        return {
+            user: req.user,
+            type: req.param.type
+        };
+    },
+    streams.userLists
+);
+
 var newFollow = function(req, res, next) {
     var obj = Scrubber.scrubObject(req.body),
         act = new Activity({
@@ -1373,119 +1251,6 @@ var newFavorite = function(req, res, next) {
     );
 };
 
-var userLists = function(req, res, next) {
-    var type = req.params.type,
-        profile = req.principal,
-        url = URLMaker.makeURL("api/user/" + req.user.nickname + "/lists/" + type),
-        collection = {
-            author: req.user.profile,
-            displayName: "Collections of " + type + "s for " + (req.user.profile.displayName || req.user.nickname),
-            id: url,
-            objectTypes: ["collection"],
-            url: url,
-            links: {
-                first: {
-                    href: url
-                },
-                self: {
-                    href: url
-                }
-            },
-            items: []
-        };
-
-    var args, lists, stream;
-
-    try {
-        args = streamArgs(req, DEFAULT_LISTS, MAX_LISTS);
-    } catch (e) {
-        next(e);
-        return;
-    }
-
-    Step(
-        function() {
-            req.user.getLists(type, this);
-        },
-        function(err, result) {
-            if (err) throw err;
-            stream = result;
-            stream.count(this);
-        },
-        function(err, totalItems) {
-            var filtered;
-            if (err) throw err;
-            collection.totalItems = totalItems;
-            if (totalItems === 0) {
-                if (_.has(collection, "author")) {
-                    collection.author.sanitize();
-                }
-                res.json(collection);
-                return;
-            }
-            if (!profile) {
-                filtered = new FilteredStream(stream, idPublicOnly(Collection.type));
-            } else if (profile.id == req.user.profile.id) {
-                filtered = stream;
-            } else {
-                filtered = new FilteredStream(stream, idRecipientsOnly(profile, Collection.type));
-            }
-
-            if (_(args).has("before")) {
-                filtered.getIDsGreaterThan(args.before, args.count, this);
-            } else if (_(args).has("since")) {
-                filtered.getIDsLessThan(args.since, args.count, this);
-            } else {
-                filtered.getIDs(args.start, args.end, this);
-            }
-        },
-        function(err, ids) {
-            if (err) {
-                if (err.name == "NotInStreamError") {
-                    throw new HTTPError(err.message, 400);
-                } else {
-                    throw err;
-                }
-            }
-            Collection.readArray(ids, this);
-        },
-        function(err, results) {
-            var group = this.group();
-            if (err) throw err;
-            lists = results;
-            _.each(lists, function(list) {
-                list.expandFeeds(group());
-            });
-        },
-        function(err) {
-            if (err) {
-                next(err);
-            } else {
-                _.each(lists, function(item) {
-                    item.sanitize();
-                });
-                collection.items = lists;
-                if (lists.length > 0) {
-                    collection.links.prev = {
-                        href: collection.url + "?since=" + encodeURIComponent(lists[0].id)
-                    };
-                    if ((_(args).has("start") && args.start + lists.length < collection.totalItems) ||
-                        (_(args).has("before") && lists.length >= args.count) ||
-                        (_(args).has("since"))) {
-                        collection.links.next = {
-                            href: collection.url + "?before=" + encodeURIComponent(lists[lists.length-1].id)
-                        };
-                    }
-                }
-                if (_.has(collection, "author")) {
-                    collection.author.sanitize();
-                }
-                res.json(collection);
-            }
-        }
-    );
-};
-
 var newUpload = function(req, res, next) {
 
     var user = req.principalUser,
@@ -1508,179 +1273,12 @@ var newUpload = function(req, res, next) {
     );
 };
 
-var collectionMembers = function(req, res, next) {
-
-    var coll = req.collection,
-        profile = req.principal, 
-        base = "/api/collection/"+coll._uuid+"/members",
-        url = URLMaker.makeURL(base),
-        feed = {
-            author: coll.author,
-            displayName: "Members of " + (coll.displayName || "a collection") + " by " + coll.author.displayName,
-            id: url,
-            objectTypes: coll.objectTypes,
-            links: {
-                first: {
-                    href: url
-                }
-            },
-            items: []
-        },
-        args,
-        str,
-        addLikedFlags = function(members, callback) {
-            if (!profile) { 
-                // No user, no liked
-                callback(null);
-            } else {
-                // Different user; check for likes
-                addLiked(profile, feed.items, callback);
-            }
-        };
-
-    try {
-        args = streamArgs(req, DEFAULT_MEMBERS, MAX_MEMBERS);
-    } catch (e) {
-        next(e);
-        return;
-    }
-
-    Step(
-        function() {
-            coll.getStream(this);
-        },
-        function(err, result) {
-            var filtered, type;
-            if (err) throw err;
-            str = result;
-            if (!profile) {
-                filtered = new FilteredStream(str, objectPublicOnly);
-            } else if (profile.id == coll.author.id) {
-                // no filter
-                filtered = str;
-            } else {
-                filtered = new FilteredStream(str, objectRecipientsOnly(profile));
-            }
-            filtered.count(this.parallel());
-            type = (req.query.type) ? req.query.type :
-                (coll.objectTypes.length > 0) ? coll.objectTypes[0] :
-                Person.type;
-            if (_(args).has("before")) {
-                filtered.getObjectsGreaterThan({id: args.before, objectType: type}, args.count, this.parallel());
-            } else if (_(args).has("since")) {
-                filtered.getObjectsLessThan({id: args.since, objectType: type}, args.count, this.parallel());
-            } else {
-                filtered.getObjects(args.start, args.end, this.parallel());
-            }
-        },
-        function(err, count, refs) {
-            var group;
-            if (err) throw err;
-            feed.totalItems = count;
-            // XXX: short-circuit here if count === 0
-            group = this.group();
-            _.each(refs, function(ref) {
-                ActivityObject.getObject(ref.objectType, ref.id, group());
-            });
-        },
-        function(err, objects) {
-
-            var third, followable;
-
-            if (err) throw err;
-
-            feed.items = objects;
-
-            // Add the first few replies for each object
-
-            firstFewReplies(profile, feed.items, this.parallel());
-
-            // Add the first few shares for each object
-
-            firstFewShares(profile, feed.items, this.parallel());
-
-            // Add the first few "likers" for each object
-
-            addLikers(profile, feed.items, this.parallel());
-
-            // Add the first few "likers" for each object
-
-            addLikedFlags(feed.items, this.parallel());
-
-            // Add the followed flag to applicable objects
-
-            followable = _.filter(feed.items, function(obj) {
-                return obj.isFollowable();
-            });
-
-            addFollowed(profile, followable, this.parallel());
-
-            // Add proxy URLs
-
-            if (req.principalUser) {
-                addProxyObjects(feed.items, this.parallel());
-            }
-        },
-        function(err) {
-
-            var nextParams, prevParams;
-
-            if (err) {
-                next(err);
-                return;
-            }
-
-            _.each(feed.items, function(obj) {
-                obj.sanitize();
-            });
-
-            feed.startIndex = args.start;
-            feed.itemsPerPage = args.count;
-
-            feed.links = {
-                self: {
-                    href: URLMaker.makeURL(base, {offset: args.start, count: args.count})
-                },
-                current: {
-                    href: URLMaker.makeURL(base)
-                }
-            };
-
-            if (feed.items.length > 0) {
-
-                prevParams = {since: feed.items[0].id};
-
-                if (!feed.objectTypes ||
-                    feed.objectTypes.length != 1 ||
-                    feed.items[0].objectType != feed.objectTypes[0]) {
-                    prevParams.type = feed.items[0].objectType;
-                }
-                
-                feed.links.prev = {
-                    href: URLMaker.makeURL(base, prevParams)
-                };
-
-                nextParams = {before: feed.items[feed.items.length - 1].id};
-
-                if (!feed.objectTypes ||
-                    feed.objectTypes.length != 1 ||
-                    feed.items[feed.items.length - 1].objectType != feed.objectTypes[0]) {
-                    nextParams.type = feed.items[feed.items.length - 1].objectType;
-                }
-                
-                feed.links.next = {
-                    href: URLMaker.makeURL(base, nextParams)
-                };
-            }
-
-            if (_.has(feed, "author")) {
-                feed.author.sanitize();
-            }
-
-            res.json(feed);
-        }
-    );
-};
+var collectionMembers = contextEndpoint(
+    function(req) {
+        return {collection: req.collection};
+    },
+    streams.collectionMembers
+);
 
 var newMember = function(req, res, next) {
 
@@ -1692,7 +1290,6 @@ var newMember = function(req, res, next) {
             target: coll,
             generator: req.generator
         });
-
 
     Step(
         function() {
@@ -1786,7 +1383,7 @@ var reqProxy = function(req, res, next) {
         function(err, proxies) {
             if (err) {
                 next(err);
-            } else if (!proxies || proxies.length == 0) {
+            } else if (!proxies || proxies.length === 0) {
                 next(new HTTPError("No such proxy", 404));
             } else if (proxies.length > 1) {
                 next(new HTTPError("Too many proxies", 500));
