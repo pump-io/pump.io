@@ -31,8 +31,7 @@ var assert = require("assert"),
     newCredentials = oauthutil.newCredentials,
     newPair = oauthutil.newPair,
     newClient = oauthutil.newClient,
-    register = oauthutil.register,
-    accessToken = oauthutil.accessToken;
+    register = oauthutil.register;
 
 var ignore = function(err) {};
 var makeCred = function(cl, pair) {
@@ -42,6 +41,9 @@ var makeCred = function(cl, pair) {
         token: pair.token,
         token_secret: pair.token_secret
     };
+};
+var pairOf = function(user) {
+    return {token: user.token, token_secret: user.secret};
 };
 
 var suite = vows.describe("follow person activity test");
@@ -81,28 +83,26 @@ suite.addBatch({
                             register(cl, "curly", "nyuk+nyuk+nyuk", this.parallel());
                         },
                         function(err, user1, user2, user3) {
+                            var act, url, cred;
                             if (err) throw err;
+
                             users.larry.profile = user1.profile;
                             users.moe.profile   = user2.profile;
                             users.curly.profile = user3.profile;
-                            accessToken(cl, {nickname: "larry", password: "wiry1hair"}, this.parallel());
-                            accessToken(cl, {nickname: "moe", password: "bowlcutZ|are|cool"}, this.parallel());
-                            accessToken(cl, {nickname: "curly", password: "nyuk+nyuk+nyuk"}, this.parallel());
-                        },
-                        function(err, pair1, pair2, pair3) {
-                            if (err) throw err;
-                            users.larry.pair = pair1;
-                            users.moe.pair   = pair2;
-                            users.curly.pair = pair3;
-                            var act = {
+
+                            users.larry.pair    = pairOf(user1);
+                            users.moe.pair      = pairOf(user2);
+                            users.curly.pair    = pairOf(user3);
+
+                            act = {
                                 verb: "follow",
                                 object: {
                                     objectType: "person",
                                     id: users.moe.profile.id
                                 }
-                            },
-                                url = "http://localhost:4815/api/user/larry/feed",
-                                cred = makeCred(cl, users.larry.pair);
+                            };
+                            url = "http://localhost:4815/api/user/larry/feed";
+                            cred = makeCred(cl, users.larry.pair);
 
                             httputil.postJSON(url, cred, act, this);
                         },
@@ -185,23 +185,20 @@ suite.addBatch({
                             register(cl, "jeckle", "up to hijinks", this.parallel());
                         },
                         function(err, heckle, jeckle) {
+                            var act, url, cred;
                             if (err) throw err;
                             users.heckle = heckle;
                             users.jeckle  = jeckle;
-                            accessToken(cl, {nickname: "heckle", password: "have a cigar"}, this);
-                        },
-                        function(err, pair) {
-                            if (err) throw err;
-                            hpair = pair;
-                            var act = {
+                            hpair = pairOf(heckle);
+                            act = {
                                 verb: "follow",
                                 object: {
                                     objectType: "person",
                                     id: users.jeckle.profile.id
                                 }
-                            },
-                                url = "http://localhost:4815/api/user/heckle/feed",
-                                cred = makeCred(cl, users.heckle.pair);
+                            };
+                            url = "http://localhost:4815/api/user/heckle/feed";
+                            cred = makeCred(cl, users.heckle.pair);
 
                             httputil.postJSON(url, cred, act, this);
                         },
@@ -241,22 +238,19 @@ suite.addBatch({
                             register(cl, "tom", "silent*cat", this);
                         },
                         function(err, tom) {
+                            var act, url, cred, pair;
                             if (err) throw err;
-                            accessToken(cl, {nickname: "tom", password: "silent*cat"}, this);
-                        },
-                        function(err, pair) {
-                            if (err) throw err;
-                            var act = {
+                            pair = pairOf(tom);
+                            act = {
                                 verb: "follow",
                                 object: {
                                     objectType: "person",
                                     id: "urn:uuid:6e621028-cdbc-4550-a593-4268e0f729f5",
                                     displayName: "Jerry"
                                 }
-                            },
-                                url = "http://localhost:4815/api/user/tom/feed",
-                                cred = makeCred(cl, pair);
-
+                            };
+                            url = "http://localhost:4815/api/user/tom/feed";
+                            cred = makeCred(cl, pair);
                             httputil.postJSON(url, cred, act, this);
                         },
                         function(err, posted, result) {
@@ -292,26 +286,26 @@ suite.addBatch({
                             register(cl, "jill", "pail/of/water", this.parallel());
                         },
                         function(err, user1, user2) {
+
+                            var act, url, cred;
+
                             if (err) throw err;
                             users.jack.profile = user1.profile;
                             users.jill.profile = user2.profile;
-                            accessToken(cl, {nickname: "jack", password: "up|the|hill"}, this.parallel());
-                            accessToken(cl, {nickname: "jill", password: "pail/of/water"}, this.parallel());
-                        },
-                        function(err, pair1, pair2) {
-                            if (err) throw err;
-                            users.jack.pair = pair1;
-                            users.jill.pair = pair2;
+                            users.jack.pair = pairOf(user1);
+                            users.jill.pair = pairOf(user2);
 
-                            var act = {
+                            act = {
                                 verb: "follow",
                                 object: {
                                     objectType: "person",
                                     id: users.jill.profile.id
                                 }
-                            },
-                                url = "http://localhost:4815/api/user/jack/feed",
-                                cred = makeCred(cl, users.jack.pair);
+                            };
+
+                            url = "http://localhost:4815/api/user/jack/feed";
+
+                            cred = makeCred(cl, users.jack.pair);
 
                             httputil.postJSON(url, cred, act, this);
                         },
@@ -385,19 +379,15 @@ suite.addBatch({
                             register(cl, "costello", "who's+on+3rd", this.parallel());
                         },
                         function(err, user1, user2) {
+                            var url, cred;
                             if (err) throw err;
                             users.abbott.profile = user1.profile;
                             users.costello.profile = user2.profile;
-                            accessToken(cl, {nickname: "abbott", password: "what's|the|name"}, this.parallel());
-                            accessToken(cl, {nickname: "costello", password: "who's+on+3rd"}, this.parallel());
-                        },
-                        function(err, pair1, pair2) {
-                            if (err) throw err;
-                            users.abbott.pair = pair1;
-                            users.costello.pair = pair2;
+                            users.abbott.pair = pairOf(user1);
+                            users.costello.pair = pairOf(user2);
 
-                            var url = "http://localhost:4815/api/user/abbott/following",
-                                cred = makeCred(cl, users.abbott.pair);
+                            url = "http://localhost:4815/api/user/abbott/following";
+                            cred = makeCred(cl, users.abbott.pair);
 
                             httputil.postJSON(url, cred, users.costello.profile, this);
                         },
@@ -481,22 +471,18 @@ suite.addBatch({
                             register(cl, "cop", "what's|the|hubbub", this.parallel());
                         },
                         function(err, user1, user2, user3) {
+                            var url, cred;
                             if (err) throw err;
                             users.laurel.profile = user1.profile;
                             users.hardy.profile = user2.profile;
-                            users.hardy.profile = user3.profile;
-                            accessToken(cl, {nickname: "laurel", password: "b0wler*HAT"}, this.parallel());
-                            accessToken(cl, {nickname: "hardy", password: "n0w,st4nley..."}, this.parallel());
-                            accessToken(cl, {nickname: "cop", password: "what's|the|hubbub"}, this.parallel());
-                        },
-                        function(err, pair1, pair2, pair3) {
-                            if (err) throw err;
-                            users.laurel.pair = pair1;
-                            users.hardy.pair = pair2;
-                            users.cop.pair = pair3;
+                            users.cop.profile = user3.profile;
 
-                            var url = "http://localhost:4815/api/user/hardy/following",
-                                cred = makeCred(cl, users.laurel.pair);
+                            users.laurel.pair = pairOf(user1);
+                            users.hardy.pair = pairOf(user2);
+                            users.cop.pair = pairOf(user3);
+
+                            url = "http://localhost:4815/api/user/hardy/following";
+                            cred = makeCred(cl, users.laurel.pair);
 
                             httputil.postJSON(url, cred, users.cop.profile, this);
                         },
