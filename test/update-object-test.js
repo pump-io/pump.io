@@ -28,7 +28,6 @@ var assert = require("assert"),
     actutil = require("./lib/activity"),
     setupApp = oauthutil.setupApp,
     register = oauthutil.register,
-    accessToken = oauthutil.accessToken,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair,
     newCredentials = oauthutil.newCredentials;
