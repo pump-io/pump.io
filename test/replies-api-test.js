@@ -27,7 +27,6 @@ var assert = require("assert"),
     actutil = require("./lib/activity"),
     setupApp = oauthutil.setupApp,
     register = oauthutil.register,
-    accessToken = oauthutil.accessToken,
     newCredentials = oauthutil.newCredentials;
 
 var suite = vows.describe("Activity API test");

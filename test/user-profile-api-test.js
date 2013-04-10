@@ -27,8 +27,7 @@ var assert = require("assert"),
     setupApp = oauthutil.setupApp,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair,
-    register = oauthutil.register,
-    accessToken = oauthutil.accessToken;
+    register = oauthutil.register;
 
 var suite = vows.describe("user profile API");
 

@@ -31,8 +31,7 @@ var assert = require("assert"),
     newCredentials = oauthutil.newCredentials,
     newPair = oauthutil.newPair,
     newClient = oauthutil.newClient,
-    register = oauthutil.register,
-    accessToken = oauthutil.accessToken;
+    register = oauthutil.register;
 
 var DANGEROUS = "This is a <script>alert('Boo!')</script> dangerous string.";
 var HARMLESS = "This is a harmless string.";
