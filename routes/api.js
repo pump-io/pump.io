@@ -384,7 +384,7 @@ var objectShares = contextEndpoint(
         return {type: type,
                 obj: req[type]};
     },
-    stream.objectReplies
+    stream.objectShares
 );
 
 // Feed of actors (usually persons) who have liked the object
