@@ -63,7 +63,7 @@ var assertValidList = function(doc, total, count) {
     assert.include(doc, "totalItems");
     assert.include(doc, "items");
     assert.include(doc, "displayName");
-    assert.include(doc, "id");
+    assert.include(doc, "url");
     assert.include(doc, "links");
     assert.include(doc.links, "current");
     assert.include(doc.links.current, "href");
