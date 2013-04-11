@@ -125,8 +125,8 @@ var showInbox = function(req, res, next) {
 
     Step(
         function() {
-            streams.getMajorInbox(req.principalUser, req.principal, this.parallel());
-            streams.getMinorInbox(req.principalUser, req.principal, this.parallel());
+            streams.userMajorInbox(req.principalUser, req.principal, this.parallel());
+            streams.userMinorInbox(req.principalUser, req.principal, this.parallel());
         },
         function(err, major, minor) {
             if (err) {
