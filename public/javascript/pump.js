@@ -254,7 +254,7 @@ if (!window.Pump) {
 
         _.each(objs, function(obj) {
             try {
-		if (obj.prevLink) {
+		if (_.isFunction(obj.prevLink) && obj.prevLink()) {
 		    obj.getPrev(function(err) {
 			if (err) {
 			    onError(null, null, err);
