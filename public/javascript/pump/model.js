@@ -261,6 +261,14 @@
     // An array of objects, usually the "items" in a stream
 
     Pump.Items = Backbone.Collection.extend({
+        constructor: function(models, options) {
+            var items = this;
+            // Use unique() to get unique items
+            models = _.map(models, function(raw) {
+                return items.model.unique(raw);
+            });
+            Backbone.Collection.apply(this, [models, options]);
+        },
         url: function() {
             var items = this;
             return items.stream.url();
