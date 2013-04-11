@@ -1,11 +1,11 @@
 <div id="inbox">
   <div class="row">
     <div class="span9">
-      <%= partial("major-stream", {headless: false}) %>
+      <%= partial("major-stream", {activities: major.items, headless: false}) %>
     </div>
     <div class="span3" id="sidebar">
       <h3>Meanwhile...</h3>
-      <%= partial("minor-stream", {headless: false}) %>
+      <%= partial("minor-stream", {activities: minor.items, headless: false}) %>
     </div>
   </div>
 </div>
