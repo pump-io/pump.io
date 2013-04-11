@@ -74,7 +74,7 @@ vows.describe("urlmaker module interface").addBatch({
                 "its parts are correct": function(url) {
                     var parts = parseURL(url);
                     assert.equal(parts.hostname, "example.com");
-                    assert.isUndefined(parts.port);
+                    assert.isNull(parts.port);
                     assert.equal(parts.host, "example.com"); // NOT example.com:80
                     assert.equal(parts.path, "/login");
                 }
