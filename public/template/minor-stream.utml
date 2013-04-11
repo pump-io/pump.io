@@ -1,6 +1,6 @@
 <ul class="media-list" id="minor-stream">
-  <% if (minor) { %>
-  <% _.each(minor, function(activity) { %>
+  <% if (activities) { %>
+  <% _.each(activities, function(activity) { %>
   <%= partial("minor-activity", {activity: activity, headless: headless}) %>
   <% }); %>
   <% } %>
