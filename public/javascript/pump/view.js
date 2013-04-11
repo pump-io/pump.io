@@ -448,7 +448,7 @@
         placeSub: function(aview, $el) {
             var view = this,
                 model = aview.model,
-                idx = view.collection.indexOf(model);
+                idx = view.collection.items.indexOf(model);
 
             if (idx <= 0) {
                 view.$el.prepend(aview.$el);
@@ -1350,7 +1350,7 @@
         placeSub: function(aview, $el) {
             var view = this,
                 model = aview.model,
-                idx = view.collection.indexOf(model);
+                idx = view.collection.items.indexOf(model);
 
             // Invert direction
             if (idx <= 0) {
@@ -1377,7 +1377,7 @@
         placeSub: function(aview, $el) {
             var view = this,
                 model = aview.model,
-                idx = view.collection.indexOf(model);
+                idx = view.collection.items.indexOf(model);
 
             // Invert direction
             if (idx <= 0) {
