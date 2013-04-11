@@ -358,7 +358,7 @@ var contextEndpoint = function(contextifier, streamCreator) {
 
         streamCreator(contextifier(req), req.principal, args, function(err, collection) {
             if (err) {
-                // next(err);
+                next(err);
             } else {
                 res.json(collection);
             }
@@ -1171,7 +1171,7 @@ var userFollowing = streamEndpoint(streams.userFollowing);
 
 var userFavorites = contextEndpoint(
     function(req) {
-        return {user: req.user};
+        return {user: req.user, author: req.person};
     },
     streams.userFavorites
 );
@@ -1266,7 +1266,7 @@ var newUpload = function(req, res, next) {
 
 var collectionMembers = contextEndpoint(
     function(req) {
-        var context = {collection: req.collection, user: req.collection.author};
+        var context = {collection: req.collection, author: req.collection.author};
         if (req.query.type) {
             context.type = req.query.type;
         } else if (req.collection.objectTypes && req.collection.objectTypes.length > 0) {
