@@ -69,7 +69,6 @@ var types = [
     "dialbackrequest",
     "recentdialbackrequests",
     "session",
-    "sessionlist",
     "share"
 ];
 
