@@ -261,129 +261,6 @@
     // An array of objects, usually the "items" in a stream
 
     Pump.Items = Backbone.Collection.extend({
-
-        getPrev: function(callback) { // Get stuff later than the current group
-            var items = this,
-                url,
-                options;
-
-            if (items.prevLink) {
-                url = items.prevLink;
-            } else if (items.stream.url && items.length > 0) {
-                url = items.stream.url + "?since=" + items.at(0).id;
-            } else {
-                Pump.error("Can't get prev for array " + items.stream.url);
-                return;
-            }
-
-            options = {
-                type: "GET",
-                dataType: "json",
-                url: url,
-                success: function(data) {
-                    if (data.items) {
-                        items.add(data.items, {at: 0});
-                    }
-                    if (data.links && data.links.prev && data.links.prev.href) {
-                        items.prevLink = data.links.prev.href;
-                    }
-                    if (_.isFunction(callback)) {
-                        callback(null, data);
-                    }
-                },
-                error: function(jqxhr) {
-                    Pump.error("Failed getting more items for " + url);
-                    if (_.isFunction(callback)) {
-                        callback(new Error("Failed getting more items"), null);
-                    }
-                }
-            };
-
-            Pump.ajax(options);
-
-        },
-        getNext: function(callback) { // Get stuff earlier than the current group
-            var items = this,
-                url,
-                options;
-
-            if (items.nextLink) {
-                url = items.nextLink;
-            } else if (items.stream.url && items.length > 0) {
-                url = items.stream.url + "?before=" + items.at(items.length - 1).id;
-            } else {
-                Pump.error("Can't get next for array " + items.stream.url);
-                return;
-            }
-
-            options = {
-                type: "GET",
-                dataType: "json",
-                url: url,
-                success: function(data) {
-                    if (data.items) {
-                        items.add(data.items, {at: items.length});
-                    }
-                    if (data.links && data.links.next && data.links.next.href) {
-                        items.nextLink = data.links.next.href;
-                    } else {
-                        // XXX: end-of-array indicator?
-                        delete items.nextLink;
-                    }
-                    if (_.isFunction(callback)) {
-                        callback(null, data);
-                    }
-                },
-                error: function(jqxhr) {
-                    Pump.error("Failed getting more items for " + url);
-                    if (_.isFunction(callback)) {
-                        callback(new Error("Failed getting more items"), null);
-                    }
-                }
-            };
-
-            Pump.ajax(options);
-        },
-        getAll: function() { // Get stuff later than the current group
-            var items = this,
-                url = (items.proxyURL) ? items.proxyURL : items.stream.url,
-                count,
-                options;
-
-            if (!url) {
-                // No URL
-                return;
-            }
-
-            if (_.isNumber(items.totalItems)) {
-                count = Math.min(items.totalItems, 200);
-            } else {
-                count = 200;
-            }
-
-            options = {
-                type: "GET",
-                dataType: "json",
-                url: url + "?count=" + count,
-                success: function(data) {
-                    if (data.items) {
-                        items.add(data.items);
-                    }
-                    if (data.links && data.links.next && data.links.next.href) {
-                        items.nextLink = data.links.next.href;
-                    } else {
-                        // XXX: end-of-collection indicator?
-                        delete items.nextLink;
-                    }
-                    items.trigger("getall");
-                },
-                error: function(jqxhr) {
-                    Pump.error("Failed getting more items.");
-                }
-            };
-
-            Pump.ajax(options);
-        },
         url: function() {
             var items = this;
             return items.stream.url();
@@ -394,20 +271,187 @@
     // representation -- some wrap-up data like url and totalItems, plus an array of items.
 
     Pump.Stream = Pump.Model.extend({
+        activityObjects: ['author'],
         itemsClass: Pump.Items,
         initialize: function() {
             var str = this;
 
             Pump.Model.prototype.initialize.apply(str);
 
+            // We should always have items
+
             if (str.has('items')) {
                 str.items        = new str.itemsClass(str.get('items'));
-                str.items.stream = str;
+            } else {
+                str.items        = new str.itemsClass([]);
             }
+
+            str.items.stream = str;
         },
         url: function() {
             var str = this;
-            return str.get('url');
+            if (str.has('pump_io') && _.has(str.get('pump_io'), 'proxyURL')) {
+                return str.get('pump_io').proxyURL;
+            } else {
+                return str.get('url');
+            }
+        },
+        nextLink: function() {
+            var str = this;
+            if (str.has('links') && _.has(str.get('links'), 'next')) {
+                return str.get('links').next.href;
+            } else {
+                return null;
+            }
+        },
+        prevLink: function() {
+            var str = this;
+            if (str.has('links') && _.has(str.get('links'), 'prev')) {
+                return str.get('links').prev.href;
+            } else if (str.items && str.items.length > 0) {
+                return str.url() + "?since=" + str.items.at(0).id;
+            } else {
+                return null;
+            }
+        },
+        getPrev: function(callback) { // Get stuff later than the current group
+            var stream = this,
+                prevLink = stream.prevLink(),
+                options;
+
+            if (!prevLink) {
+                Pump.error("Can't get prevLink for stream " + stream.url());
+                return;
+            }
+
+            options = {
+                type: "GET",
+                dataType: "json",
+                url: prevLink,
+                success: function(data) {
+                    if (data.items) {
+                        if (stream.items) {
+                            stream.items.add(data.items, {at: 0});
+                        } else {
+                            stream.items = new stream.itemsClass(data.items);
+                        }
+                    }
+                    if (data.links && data.links.prev && data.links.prev.href) {
+                        if (stream.has('links')) {
+                            stream.get('links').prev = data.links.prev;
+                        } else {
+                            stream.set('links', data.links);
+                        }
+                    }
+                    if (_.isFunction(callback)) {
+                        callback(null, data);
+                    }
+                },
+                error: function(jqxhr) {
+                    Pump.error("Failed getting more items for " + stream.url());
+                    if (_.isFunction(callback)) {
+                        callback(new Error("Failed getting more items"), null);
+                    }
+                }
+            };
+
+            Pump.ajax(options);
+
+        },
+        getNext: function(callback) { // Get stuff earlier than the current group
+            var stream = this,
+                nextLink = stream.nextLink(),
+                options;
+
+            if (!nextLink) {
+                Pump.error("Can't get nextLink for stream " + stream.url());
+                return;
+            }
+
+            options = {
+                type: "GET",
+                dataType: "json",
+                url: nextLink,
+                success: function(data) {
+                    if (data.items) {
+                        if (stream.items) {
+                            stream.items.add(data.items);
+                        } else {
+                            stream.items = new stream.itemsClass(data.items);
+                        }
+                    }
+                    if (data.links && data.links.next && data.links.next.href) {
+                        if (stream.has('links')) {
+                            stream.get('links').next = data.links.next;
+                        } else {
+                            stream.set('links', data.links);
+                        }
+                    }
+                    if (_.isFunction(callback)) {
+                        callback(null, data);
+                    }
+                },
+                error: function(jqxhr) {
+                    Pump.error("Failed getting more items for " + stream.url());
+                    if (_.isFunction(callback)) {
+                        callback(new Error("Failed getting more items"), null);
+                    }
+                }
+            };
+
+            Pump.ajax(options);
+        },
+        getAll: function(callback) { // Get stuff later than the current group
+            var stream = this,
+                url = stream.url(),
+                count,
+                options;
+
+            if (!url) {
+                Pump.error("No url for stream");
+                return;
+            }
+
+            if (_.isNumber(stream.get('totalItems'))) {
+                count = Math.min(stream.get('totalItems'), 200);
+            } else {
+                count = 200;
+            }
+
+            options = {
+                type: "GET",
+                dataType: "json",
+                url: url + "?count=" + count,
+                success: function(data) {
+                    if (data.items) {
+                        if (stream.items) {
+                            stream.items.add(data.items);
+                        } else {
+                            stream.items = new stream.itemsClass(data.items);
+                        }
+                    }
+                    if (data.links && data.links.next && data.links.next.href) {
+                        if (stream.has('links')) {
+                            stream.get('links').next = data.links.next;
+                        } else {
+                            stream.set('links', data.links);
+                        }
+                    } else {
+                        // XXX: end-of-collection indicator?
+                    }
+                    stream.trigger("getall");
+                    if (_.isFunction(callback)) {
+                        callback(null, data);
+                    }
+                },
+                error: function(jqxhr) {
+                    if (_.isFunction(callback)) {
+                        callback(new Error("Failed getting all items for " + stream.url()), null);
+                    }
+                }
+            };
+
+            Pump.ajax(options);
         }
     },
     {
@@ -453,10 +497,6 @@
         }
     });
 
-    Pump.ActivityStream = Pump.Stream.extend({
-        itemsClass: Pump.ActivityItems
-    });
-
     Pump.ActivityItems = Pump.Items.extend({
         model: Pump.Activity,
         add: function(models, options) {
@@ -480,6 +520,10 @@
                 return 0;
             }
         }
+    });
+
+    Pump.ActivityStream = Pump.Stream.extend({
+        itemsClass: Pump.ActivityItems
     });
 
     Pump.ActivityObject = Pump.Model.extend({
@@ -528,11 +572,11 @@
         }
     });
 
-    Pump.ActivityObjectStream = Pump.Stream.extend({
-        itemsClass: Pump.ActivityObjectItems
+    Pump.ActivityObjectItems = Pump.Items.extend({
     });
 
-    Pump.ActivityObjectItems = Pump.Items.extend({
+    Pump.ActivityObjectStream = Pump.Stream.extend({
+        itemsClass: Pump.ActivityObjectItems
     });
 
     Pump.ListItems = Pump.Items.extend({
