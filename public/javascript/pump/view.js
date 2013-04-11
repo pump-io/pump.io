@@ -552,15 +552,13 @@
                 lists = profile.lists,
                 following = profile.following;
 
-            following.once("getall", function() {
+            following.getAll(function() {
                 Pump.fetchObjects([lists], function(err, objs) {
                     Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.principalUser,
                                                                lists: lists,
                                                                following: following}});
                 });
             });
-
-            following.getAll();
 
             return false;
         },
@@ -569,15 +567,13 @@
                 lists = profile.lists,
                 following = profile.following;
 
-            following.once("getall", function() {
+            following.getAll(function() {
                 Pump.fetchObjects([lists], function(err, objs) {
                     Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.principalUser,
                                                                   lists: lists,
                                                                   following: following}});
                 });
             });
-
-            following.getAll();
 
             return false;
         },
@@ -1347,11 +1343,9 @@
                 Pump.body.endLoad();
             });
 
-            replies.on("getall", function() {
+            replies.getAll(function() {
                 full.render();
             });
-
-            replies.getAll();
         },
         placeSub: function(aview, $el) {
             var view = this,
@@ -1960,15 +1954,13 @@
                 members = view.options.data.members,
                 following = profile.following;
 
-            following.once("getall", function() {
+            following.getAll(function() {
                 Pump.fetchObjects([profile, list], function(err, objs) {
                     Pump.showModal(Pump.ChooseContactModal, {data: {list: list,
                                                                     members: members,
                                                                     people: following}});
                 });
             });
-
-            following.getAll();
 
             return false;
         },
