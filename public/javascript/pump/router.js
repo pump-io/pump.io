@@ -183,7 +183,7 @@
                 Pump.body.setContent({
                     contentView: Pump.FavoritesContent,
                     userContentView: Pump.FavoritesUserContent,
-                    userContentCollection: favorites,
+                    userContentStream: favorites,
                     title: nickname + " favorites",
                     data: { objects: favorites,
                             profile: profile }
@@ -209,7 +209,7 @@
                 }
                 Pump.body.setContent({contentView: Pump.FollowersContent,
                                       userContentView: Pump.FollowersUserContent,
-                                      userContentCollection: followers,
+                                      userContentStream: followers,
                                       title: nickname + " followers",
                                       data: {people: followers,
                                              profile: profile}},
@@ -236,7 +236,7 @@
                 }
                 Pump.body.setContent({contentView: Pump.FollowingContent,
                                       userContentView: Pump.FollowingUserContent,
-                                      userContentCollection: following,
+                                      userContentStream: following,
                                       title: nickname + " following",
                                       data: {people: following,
                                              profile: profile}},

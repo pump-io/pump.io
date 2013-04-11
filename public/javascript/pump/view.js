@@ -47,21 +47,22 @@
                     // When a change has happened, re-render
                     view.remove();
                 });
-            } else if (_.has(view, "collection") && _.isObject(view.collection)) {
-                view.listenTo(view.collection, "add", function(model, collection, options) {
-                    view.showAdded(model);
-                });
-                view.listenTo(view.collection, "remove", function(model, collection, options) {
-                    view.showRemoved(model);
-                });
-                view.listenTo(view.collection, "reset", function(collection, options) {
-                    // When a change has happened, re-render
-                    view.render();
-                });
-                view.listenTo(view.collection, "sort", function(collection, options) {
-                    // When a change has happened, re-render
-                    view.render();
-                });
+                if (_.has(view.model, "items") && _.isObject(view.model.items)) {
+                    view.listenTo(view.model.items, "add", function(model, collection, options) {
+                        view.showAdded(model);
+                    });
+                    view.listenTo(view.model.items, "remove", function(model, collection, options) {
+                        view.showRemoved(model);
+                    });
+                    view.listenTo(view.model.items, "reset", function(collection, options) {
+                        // When a change has happened, re-render
+                        view.render();
+                    });
+                    view.listenTo(view.model.items, "sort", function(collection, options) {
+                        // When a change has happened, re-render
+                        view.render();
+                    });
+                }
             }
         },
         setElement: function(element, delegate) {
@@ -100,7 +101,7 @@
                     return;
                 }
 
-                if (def.idAttr && view.collection) {
+                if (def.idAttr && view.model && view.model.items) {
 
                     if (def.map) {
                         if (!view[def.map]) {
@@ -117,7 +118,7 @@
                             return;
                         }
 
-                        options.model = view.collection.get(id);
+                        options.model = view.model.items.get(id);
 
                         if (!options.model) {
                             return;
@@ -128,7 +129,7 @@
                                 options.data = {};
                                 _.each(def.subOptions.data, function(item) {
                                     if (item == view.modelName) {
-                                        options.data[item] = view.collection || view.model;
+                                        options.data[item] = view.model.items || view.model;
                                     } else {
                                         options.data[item] = data[item];
                                     }
@@ -151,9 +152,6 @@
                 if (def.subOptions) {
                     if (def.subOptions.model) {
                         options.model = data[def.subOptions.model];
-                    }
-                    if (def.subOptions.collection) {
-                        options.collection = data[def.subOptions.collection];
                     }
                     if (def.subOptions.data) {
                         options.data = {};
@@ -243,8 +241,8 @@
                 partials = {},
                 cnt;
 
-            if (view.collection) {
-                main[modelName] = view.collection.toJSON();
+            if (view.model && view.model.items) {
+                main[modelName] = view.model.items.toJSON();
             } else if (view.model) {
                 main[modelName] = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model);
             }
@@ -384,7 +382,7 @@
                 return;
             }
 
-            if (!view.collection) {
+            if (!view.model || !view.model.items) {
                 return;
             }
 
@@ -448,7 +446,7 @@
         placeSub: function(aview, $el) {
             var view = this,
                 model = aview.model,
-                idx = view.collection.items.indexOf(model);
+                idx = view.model.items.indexOf(model);
 
             if (idx <= 0) {
                 view.$el.prepend(aview.$el);
@@ -472,7 +470,7 @@
                 return;
             }
 
-            if (!view.collection) {
+            if (!view.model || !view.model.items) {
                 return;
             }
 
@@ -531,14 +529,14 @@
                 attr: "majorStreamView",
                 subView: "MessagesView",
                 subOptions: {
-                    collection: "messages"
+                    model: "messages"
                 }
             },
             "#notifications": {
                 attr: "minorStreamView",
                 subView: "NotificationsView",
                 subOptions: {
-                    collection: "notifications"
+                    model: "notifications"
                 }
             }
         },
@@ -628,11 +626,11 @@
         getStreams: function() {
             var view = this,
                 streams = {};
-            if (view.majorStreamView && view.majorStreamView.collection) {
-                streams.messages = view.majorStreamView.collection;
+            if (view.majorStreamView && view.majorStreamView.model) {
+                streams.messages = view.majorStreamView.model;
             }
-            if (view.minorStreamView && view.minorStreamView.collection) {
-                streams.notifications = view.minorStreamView.collection;
+            if (view.minorStreamView && view.minorStreamView.model) {
+                streams.notifications = view.minorStreamView.model;
             }
             return streams;
         }
@@ -1009,11 +1007,11 @@
                 streams = {};
             if (view.userContent) {
                 uc = view.userContent;
-                if (uc.majorStreamView && uc.majorStreamView.collection) {
-                    streams.major = uc.majorStreamView.collection;
+                if (uc.majorStreamView && uc.majorStreamView.model) {
+                    streams.major = uc.majorStreamView.model;
                 }
-                if (uc.minorStreamView && uc.minorStreamView.collection) {
-                    streams.minor = uc.minorStreamView.collection;
+                if (uc.minorStreamView && uc.minorStreamView.model) {
+                    streams.minor = uc.minorStreamView.model;
                 }
             }
             return streams;
@@ -1054,7 +1052,7 @@
                 attr: "majorStreamView",
                 subView: "MajorStreamView",
                 subOptions: {
-                    collection: "major",
+                    model: "major",
                     data: ["headless"]
                 }
             },
@@ -1062,7 +1060,7 @@
                 attr: "minorStreamView",
                 subView: "MinorStreamView",
                 subOptions: {
-                    collection: "minor",
+                    model: "minor",
                     data: ["headless"]
                 }
             }
@@ -1129,11 +1127,11 @@
         getStreams: function() {
             var view = this,
                 streams = {};
-            if (view.majorStreamView && view.majorStreamView.collection) {
-                streams.major = view.majorStreamView.collection;
+            if (view.majorStreamView && view.majorStreamView.model) {
+                streams.major = view.majorStreamView.model;
             }
-            if (view.minorStreamView && view.minorStreamView.collection) {
-                streams.minor = view.minorStreamView.collection;
+            if (view.minorStreamView && view.minorStreamView.model) {
+                streams.minor = view.minorStreamView.model;
             }
             return streams;
         },
@@ -1142,7 +1140,7 @@
                 attr: "majorStreamView",
                 subView: "MajorStreamView",
                 subOptions: {
-                    collection: "major",
+                    model: "major",
                     data: ["headless"]
                 }
             },
@@ -1150,7 +1148,7 @@
                 attr: "minorStreamView",
                 subView: "MinorStreamView",
                 subOptions: {
-                    collection: "minor",
+                    model: "minor",
                     data: ["headless"]
                 }
             }
@@ -1185,7 +1183,7 @@
                 attr: "majorStreamView",
                 subView: "MajorStreamView",
                 subOptions: {
-                    collection: "major",
+                    model: "major",
                     data: ["headless"]
                 }
             },
@@ -1193,7 +1191,7 @@
                 attr: "minorStreamView",
                 subView: "MinorStreamView",
                 subOptions: {
-                    collection: "minor",
+                    model: "minor",
                     data: ["headless"]
                 }
             }
@@ -1225,7 +1223,7 @@
                 return;
             }
 
-            view.replyStream = new Pump.ReplyStreamView({el: $el, collection: model.object.replies});
+            view.replyStream = new Pump.ReplyStreamView({el: $el, model: model.object.replies});
         },
         favoriteObject: function() {
             var view = this,
@@ -1331,8 +1329,8 @@
         },
         showAllReplies: function() {
             var view = this,
-                replies = view.collection,
-                full = new Pump.FullReplyStreamView({collection: replies});
+                replies = view.model,
+                full = new Pump.FullReplyStreamView({model: replies});
             
             Pump.body.startLoad();
 
@@ -1350,7 +1348,7 @@
         placeSub: function(aview, $el) {
             var view = this,
                 model = aview.model,
-                idx = view.collection.items.indexOf(model);
+                idx = view.model.items.indexOf(model);
 
             // Invert direction
             if (idx <= 0) {
@@ -1358,7 +1356,7 @@
             } else if (idx >= $el.length) {
                 view.$(".reply-objects").prepend(aview.$el);
             } else {
-                aview.$el.insertBefore($el[view.collection.length - 1 - idx]);
+                aview.$el.insertBefore($el[view.model.length - 1 - idx]);
             }
         }
     });
@@ -1377,7 +1375,7 @@
         placeSub: function(aview, $el) {
             var view = this,
                 model = aview.model,
-                idx = view.collection.items.indexOf(model);
+                idx = view.model.items.indexOf(model);
 
             // Invert direction
             if (idx <= 0) {
@@ -1385,7 +1383,7 @@
             } else if (idx >= $el.length) {
                 view.$(".reply-objects").prepend(aview.$el);
             } else {
-                aview.$el.insertBefore($el[view.collection.length - 1 - idx]);
+                aview.$el.insertBefore($el[view.model.length - 1 - idx]);
             }
         }
     });
@@ -1462,7 +1460,7 @@
                 return;
             }
 
-            view.replyStream = new Pump.ReplyStreamView({el: $el, collection: model.replies});
+            view.replyStream = new Pump.ReplyStreamView({el: $el, model: model.replies});
         },
         favoriteObject: function() {
             var view = this,
@@ -1643,7 +1641,7 @@
                 attr: "userContent",
                 subView: "FavoritesUserContent",
                 subOptions: {
-                    collection: "objects",
+                    model: "objects",
                     data: ["profile"]
                 }
             }
@@ -1688,7 +1686,7 @@
                 attr: "userContent",
                 subView: "FollowersUserContent",
                 subOptions: {
-                    collection: "people",
+                    model: "people",
                     data: ["profile"]
                 }
             }
@@ -1696,8 +1694,8 @@
         getStreams: function() {
             var view = this,
                 streams = {};
-            if (view.userContent && view.userContent.peopleStreamView && view.userContent.peopleStreamView.collection) {
-                streams.major = view.userContent.collection;
+            if (view.userContent && view.userContent.peopleStreamView && view.userContent.peopleStreamView.model) {
+                streams.major = view.userContent.model;
             }
             return streams;
         }
@@ -1713,7 +1711,7 @@
                 attr: "peopleStreamView",
                 subView: "PeopleStreamView",
                 subOptions: {
-                    collection: "people"
+                    model: "people"
                 }
             }
         }
@@ -1752,7 +1750,7 @@
                 attr: "userContent",
                 subView: "FollowingUserContent",
                 subOptions: {
-                    collection: "people",
+                    model: "people",
                     data: ["profile"]
                 }
             }
@@ -1760,8 +1758,8 @@
         getStreams: function() {
             var view = this,
                 streams = {};
-            if (view.userContent && view.userContent.peopleStreamView && view.userContent.peopleStreamView.collection) {
-                streams.major = view.userContent.collection;
+            if (view.userContent && view.userContent.peopleStreamView && view.userContent.peopleStreamView.model) {
+                streams.major = view.userContent.model;
             }
             return streams;
         }
@@ -1777,7 +1775,7 @@
                 attr: "peopleStreamView",
                 subView: "PeopleStreamView",
                 subOptions: {
-                    collection: "people"
+                    model: "people"
                 }
             }
         }
@@ -1820,7 +1818,7 @@
                 attr: "listMenu",
                 subView: "ListMenu",
                 subOptions: {
-                    collection: "lists",
+                    model: "lists",
                     data: ["profile", "list"]
                 }
             }
@@ -1893,7 +1891,7 @@
             if (view.userContent &&
                 view.userContent.listContent &&
                 view.userContent.listContent.memberStreamView) {
-                streams.major = view.userContent.listContent.memberStreamView.collection;
+                streams.major = view.userContent.listContent.memberStreamView.model;
             }
 
             return streams;
@@ -1913,7 +1911,7 @@
                 attr: "listMenu",
                 subView: "ListMenu",
                 subOptions: {
-                    collection: "lists",
+                    model: "lists",
                     data: ["profile"]
                 }
             },
@@ -1940,7 +1938,7 @@
                 $el = view.$("#member-stream");
 
             if ($el && list && list.members) {
-                view.memberStreamView = new Pump.MemberStreamView({el: $el, collection: people, data: {list: list}});
+                view.memberStreamView = new Pump.MemberStreamView({el: $el, model: people, data: {list: list}});
             }
         },
         events: {
@@ -2222,7 +2220,7 @@
                 return;
             }
 
-            view.replyStream = new Pump.ReplyStreamView({el: $el, collection: model.replies});
+            view.replyStream = new Pump.ReplyStreamView({el: $el, model: model.replies});
         },
         favoriteObject: function() {
             var view = this,
@@ -2759,8 +2757,8 @@
 
                 body.content.profileBlock = oldContent.profileBlock;
 
-                if (options.userContentCollection) {
-                    userContentOptions = _.extend({collection: options.userContentCollection}, options);
+                if (options.userContentStream) {
+                    userContentOptions = _.extend({model: options.userContentStream}, options);
                 } else {
                     userContentOptions = options;
                 }
