@@ -1266,7 +1266,13 @@ var newUpload = function(req, res, next) {
 
 var collectionMembers = contextEndpoint(
     function(req) {
-        return {collection: req.collection};
+        var context = {collection: req.collection, user: req.collection.author};
+        if (req.query.type) {
+            context.type = req.query.type;
+        } else if (req.collection.objectTypes && req.collection.objectTypes.length > 0) {
+            context.type = req.collection.objectTypes[0];
+        }
+        return context;
     },
     streams.collectionMembers
 );
