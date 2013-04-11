@@ -1,7 +1,7 @@
 <div class="user-content" id="user-content-followers">
   <h2>Followers</h2>
   <div class="span9">
-    <%= partial("people-stream") %>
+    <%= partial("people-stream", {people: people.items}) %>
   </div>
 </div>
 
