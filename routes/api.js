@@ -1176,7 +1176,12 @@ var userFavorites = contextEndpoint(
     streams.userFavorites
 );
 
-var userUploads = streamEndpoint(streams.userUploads);
+var userUploads = contextEndpoint(
+    function(req) {
+        return {user: req.user, author: req.person};
+    },
+    streams.userUploads
+);
 
 var userLists = contextEndpoint(
     function(req) {
