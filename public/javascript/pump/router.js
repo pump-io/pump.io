@@ -170,7 +170,7 @@
         favorites: function(nickname) {
             var router = this,
                 user = Pump.User.unique({nickname: nickname}),
-                favorites = Pump.ActivityObjectStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/favorites")});
+                favorites = Pump.ActivityObjectStream.unique({url: Pump.fullURL("/api/user/"+nickname+"/favorites")});
 
             Pump.body.startLoad();
 
@@ -197,7 +197,7 @@
         followers: function(nickname) {
             var router = this,
                 user = Pump.User.unique({nickname: nickname}),
-                followers = Pump.PeopleStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/followers")});
+                followers = Pump.PeopleStream.unique({url: Pump.fullURL("/api/user/"+nickname+"/followers")});
 
             Pump.body.startLoad();
 
@@ -222,7 +222,7 @@
         following: function(nickname) {
             var router = this,
                 user = Pump.User.unique({nickname: nickname}),
-                following = Pump.PeopleStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/following")});
+                following = Pump.PeopleStream.unique({url: Pump.fullURL("/api/user/"+nickname+"/following")});
 
             // XXX: parallelize this?
 
@@ -249,7 +249,7 @@
         lists: function(nickname) {
             var router = this,
                 user = Pump.User.unique({nickname: nickname}),
-                lists = Pump.ListStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/lists/person")});
+                lists = Pump.ListStream.unique({url: Pump.fullURL("/api/user/"+nickname+"/lists/person")});
 
             Pump.body.startLoad();
 
@@ -276,7 +276,7 @@
 
             var router = this,
                 user = Pump.User.unique({nickname: nickname}),
-                lists = Pump.ListStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/lists/person")}),
+                lists = Pump.ListStream.unique({url: Pump.fullURL("/api/user/"+nickname+"/lists/person")}),
                 list = Pump.List.unique({links: {self: {href: "/api/collection/"+uuid}}});
 
             Pump.body.startLoad();
