@@ -348,7 +348,7 @@ var showFavorites = function(req, res, next) {
 
     Step(
         function() {
-            streams.userFavorites(req.user, req.principal, this.parallel());
+            streams.userFavorites({user: req.user}, req.principal, this.parallel());
             addFollowed(principal, [req.user.profile], this.parallel());
             req.user.profile.expandFeeds(this.parallel());
         },
