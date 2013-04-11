@@ -354,7 +354,6 @@ if (!window.Pump) {
 
     Pump.clearCaches = function() {
         Pump.Model.clearCache();
-        Pump.Collection.clearCache();
         Pump.User.clearCache();
     };
 
