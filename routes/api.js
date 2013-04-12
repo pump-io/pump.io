@@ -1166,8 +1166,19 @@ var userDirectInbox = streamEndpoint(streams.userDirectInbox);
 var userMajorDirectInbox = streamEndpoint(streams.userMajorDirectInbox);
 var userMinorDirectInbox = streamEndpoint(streams.userMinorDirectInbox);
 
-var userFollowers = streamEndpoint(streams.userFollowers);
-var userFollowing = streamEndpoint(streams.userFollowing);
+var userFollowers = contextEndpoint(
+    function(req) {
+        return {user: req.user, author: req.person};
+    },
+    streams.userFollowers
+);
+
+var userFollowing = contextEndpoint(
+    function(req) {
+        return {user: req.user, author: req.person};
+    },
+    streams.userFollowing
+);
 
 var userFavorites = contextEndpoint(
     function(req) {
