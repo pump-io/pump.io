@@ -230,34 +230,29 @@
         unique: function(props) {
             var inst,
                 cls = this,
-                key = props[cls.keyAttr],
-                cached;
+                key = props[cls.keyAttr];
 
             if (key && _.has(cls.cache, key)) {
-                cached = cls.cache[key];
+
+                inst = cls.cache[key];
                 // Check the updated flag
-                if (_.has(props, "updated") && cached.has("updated")) {
-                    // Latest received, so maybe the most recent...?
-                    cached.merge(props);
-                } else {
-                    // Latest received, so maybe the most recent...?
-                    cached.merge(props);
+                inst.merge(props);
+
+            } else {
+                inst = new cls(props);
+
+                if (key) {
+                    cls.cache[key] = inst;
                 }
+
+                inst.on("change:"+cls.keyAttr, function(model, key) {
+                    var oldKey = model.previous(cls.keyAttr);
+                    if (oldKey && _.has(cls.cache, oldKey)) {
+                        delete cls.cache[oldKey];
+                    }
+                    cls.cache[key] = inst;
+                });
             }
-
-            inst = new cls(props);
-
-            if (key) {
-                cls.cache[key] = inst;
-            }
-
-            inst.on("change:"+cls.keyAttr, function(model, key) {
-                var oldKey = model.previous(cls.keyAttr);
-                if (oldKey && _.has(cls.cache, oldKey)) {
-                    delete cls.cache[oldKey];
-                }
-                cls.cache[key] = inst;
-            });
 
             return inst;
         },
@@ -313,14 +308,15 @@
             return "collection";
         },
         initialize: function() {
-            var str = this;
+            var str = this,
+                items = str.get('items');
 
             Pump.Model.prototype.initialize.apply(str);
 
             // We should always have items
 
-            if (str.has('items')) {
-                str.items        = new str.itemsClass(str.get('items'));
+            if (_.isArray(items)) {
+                str.items        = new str.itemsClass(items);
             } else {
                 str.items        = new str.itemsClass([]);
             }
