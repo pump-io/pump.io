@@ -1612,7 +1612,8 @@
 
     Pump.ProfileBlock = Pump.PersonView.extend({
         templateName: 'profile-block',
-        modelName: 'profile'
+        modelName: 'profile',
+        parts: ["profile-responses"]
     });
 
     Pump.FavoritesContent = Pump.ContentView.extend({
