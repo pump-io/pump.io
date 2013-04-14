@@ -373,7 +373,7 @@ var showFollowers = function(req, res, next) {
 
     Step(
         function() {
-            streams.userFollowers(req.user, req.principal, this.parallel());
+            streams.userFollowers({user: req.user, author: req.user.profile}, req.principal, this.parallel());
             addFollowed(principal, [req.user.profile], this.parallel());
             req.user.profile.expandFeeds(this.parallel());
         },
@@ -398,7 +398,7 @@ var showFollowing = function(req, res, next) {
 
     Step(
         function() {
-            streams.userFollowing(req.user, req.principal, this.parallel());
+            streams.userFollowing({user: req.user, author: req.user.profile}, req.principal, this.parallel());
             addFollowed(principal, [req.user.profile], this.parallel());
             req.user.profile.expandFeeds(this.parallel());
         },
