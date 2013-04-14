@@ -140,6 +140,17 @@
             _.each(obj.listStreams, initer(obj, Pump.ListStream));
             _.each(obj.people, initer(obj, Pump.Person));
         },
+        toJSONRef: function() {
+            var obj = this;
+            return {
+                id: obj.get(obj.idAttribute),
+                objectType: obj.getObjectType()
+            };
+        },
+        getObjectType: function() {
+            var obj = this;
+            return obj.get("objectType");
+        },
         toJSON: function(seen) {
 
             var obj = this,
@@ -154,10 +165,7 @@
 
             if (seen && id && _.contains(seen, id)) {
 
-                json = {
-                    id: obj.id,
-                    objectType: obj.get("objectType")
-                };
+                json = obj.toJSONRef();
 
             } else {
 
@@ -272,6 +280,24 @@
         url: function() {
             var items = this;
             return items.stream.url();
+        },
+        toJSON: function(seen) {
+            var items = this;
+
+            return items.map(function(item) {
+                return item.toJSON(seen);
+            });
+        },
+        merge: function(props) {
+            var items = this,
+                unique;
+            
+            if (_.has(props, "items")) {
+                unique = props.items.map(function(item) {
+                    return items.model.unique(item);
+                });
+                items.add(unique);
+            }
         }
     });
 
@@ -281,6 +307,11 @@
     Pump.Stream = Pump.Model.extend({
         activityObjects: ['author'],
         itemsClass: Pump.Items,
+        idAttribute: "url",
+        getObjectType: function() {
+            var obj = this;
+            return "collection";
+        },
         initialize: function() {
             var str = this;
 
@@ -460,6 +491,46 @@
             };
 
             Pump.ajax(options);
+        },
+        toJSONRef: function() {
+            var str = this;
+            return {
+                totalItems: str.get("totalItems"),
+                url: str.get("url")
+            };
+        },
+        toJSON: function(seen) {
+            var str = this,
+                url = str.get("url"),
+                json,
+                seenNow;
+
+            json = Pump.Model.prototype.toJSON.apply(str, [seen]);
+
+            if (!seen || (url && !_.contains(seen, url))) {
+
+                if (seen) {
+                    seenNow = seen.slice(0);
+                } else {
+                    seenNow = [];
+                }
+
+                if (url) {
+                    seenNow.push(url);
+                }
+
+                json.items = str.items.toJSON(seenNow);
+            }
+
+            return json;
+        },
+        complicated: function() {
+            var str = this,
+                names = Pump.Model.prototype.complicated.apply(str);
+            
+            names.push("items");
+
+            return names;
         }
     },
     {

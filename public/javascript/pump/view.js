@@ -241,9 +241,7 @@
                 partials = {},
                 cnt;
 
-            if (view.model && view.model.items) {
-                main[modelName] = view.model.items.toJSON();
-            } else if (view.model) {
+            if (view.model) {
                 main[modelName] = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model);
             }
 
