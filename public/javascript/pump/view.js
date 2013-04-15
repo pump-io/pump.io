@@ -23,7 +23,9 @@
     Pump.templates = {};
 
     Pump.TemplateError = function(template, data, err) {
-        Error.captureStackTrace(this, Pump.TemplateError);
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, Pump.TemplateError);
+        }
         this.name     = "TemplateError";
         this.template = template;
         this.data     = data;
