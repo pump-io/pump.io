@@ -1,6 +1,6 @@
 <div class="user-content" id="user-content-list">
   <div class="span2" id="list-menu">
-    <%= partial("list-menu") %>
+    <%= partial("list-menu", {items: lists.items}) %>
   </div>
   <div class="span10" id="list-content">
     <%= partial("list-content-list") %>
