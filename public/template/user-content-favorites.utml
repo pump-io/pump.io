@@ -1,4 +1,4 @@
 <div id="user-content-favorites">
-  <%= partial("object-stream", {objects: objects.items}) %>
+  <%= partial("object-stream", {objects: favorites.items}) %>
 </div>
 

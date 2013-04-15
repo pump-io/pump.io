@@ -180,17 +180,19 @@
                     Pump.error(err);
                     return;
                 }
-                Pump.body.setContent({
-                    contentView: Pump.FavoritesContent,
-                    userContentView: Pump.FavoritesUserContent,
-                    userContentStream: favorites,
-                    title: nickname + " favorites",
-                    data: { objects: favorites,
-                            profile: profile }
-                },
-                                     function() {
-                                         Pump.body.endLoad();
-                                     });
+                Pump.body.setContent(
+                    {
+                        contentView: Pump.FavoritesContent,
+                        userContentView: Pump.FavoritesUserContent,
+                        userContentStream: favorites,
+                        title: nickname + " favorites",
+                        data: {favorites: favorites,
+                               profile: profile}
+                    },
+                    function() {
+                        Pump.body.endLoad();
+                    }
+                );
             });
         },
 

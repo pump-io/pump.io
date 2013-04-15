@@ -357,10 +357,10 @@ var showFavorites = function(req, res, next) {
                 next(err);
             } else {
                 res.render("favorites", {page: {title: req.user.nickname + " favorites", url: req.originalUrl},
-                                         objects: objects,
+                                         favorites: objects,
                                          profile: req.user.profile,
                                          data: {
-                                             objects: objects,
+                                             favorites: objects,
                                              profile: req.user.profile
                                          }
                                         });
