@@ -339,7 +339,7 @@ var setupApp = function(port, hostname, callback) {
 
 var setupAppConfig = function(config, callback) {
 
-    var prop, args = [];
+    var prop, args = [], credwait = {}; 
 
     config.port = config.port || 4815;
     config.hostname = config.hostname || "localhost";
@@ -353,6 +353,13 @@ var setupAppConfig = function(config, callback) {
     var dummy = {
         close: function() {
             child.kill();
+        },
+        killCred: function(webfinger, callback) {
+            var timeout = setTimeout(function() {
+                callback(new Error("Timed out waiting for cred to die."));
+            }, 30000);
+            credwait[webfinger] = {callback: callback, timeout: timeout};
+            child.send({cmd: "killcred", webfinger: webfinger});
         }
     };
 
@@ -361,6 +368,13 @@ var setupAppConfig = function(config, callback) {
             callback(null, dummy);
         } else if (msg.cmd == "error") {
             callback(msg.value, null);
+        } else if (msg.cmd == "credkilled") {
+            clearTimeout(credwait[msg.webfinger].timeout);
+            if (msg.error) {
+                credwait[msg.webfinger].callback(new Error(msg.error));
+            } else {
+                credwait[msg.webfinger].callback(null);
+            }
         }
     });
 };
