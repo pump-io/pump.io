@@ -316,12 +316,17 @@
             // We should always have items
 
             if (_.isArray(items)) {
-                str.items        = new str.itemsClass(items);
+                str.items = new str.itemsClass(items);
             } else {
-                str.items        = new str.itemsClass([]);
+                str.items = new str.itemsClass([]);
             }
 
             str.items.stream = str;
+
+            str.on("change:items", function(newStr, items) {
+                var str = this;
+                str.items.reset(items);
+            });
         },
         url: function() {
             var str = this;
