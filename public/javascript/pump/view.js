@@ -1660,7 +1660,7 @@
                 "activity-object-collection"],
         subs: {
             ".object.major": {
-                map: "objects",
+                map: "favorites",
                 subView: "MajorObjectView",
                 idAttr: "data-object-id"
             }
