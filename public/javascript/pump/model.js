@@ -300,7 +300,7 @@
     // representation -- some wrap-up data like url and totalItems, plus an array of items.
 
     Pump.Stream = Pump.Model.extend({
-        activityObjects: ['author'],
+        people: ['author'],
         itemsClass: Pump.Items,
         idAttribute: "url",
         getObjectType: function() {
