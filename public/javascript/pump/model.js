@@ -653,6 +653,7 @@
     });
 
     Pump.ActivityObjectItems = Pump.Items.extend({
+        model: Pump.ActivityObject
     });
 
     Pump.ActivityObjectStream = Pump.Stream.extend({
