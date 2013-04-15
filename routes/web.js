@@ -382,11 +382,11 @@ var showFollowers = function(req, res, next) {
                 next(err);
             } else {
                 res.render("followers", {page: {title: req.user.nickname + " followers", url: req.originalUrl},
-                                         people: followers,
+                                         followers: followers,
                                          profile: req.user.profile,
                                          data: {
                                              profile: req.user.profile,
-                                             people: followers
+                                             followers: followers
                                          }
                                         });
             }
@@ -407,11 +407,11 @@ var showFollowing = function(req, res, next) {
                 next(err);
             } else {
                 res.render("following", {page: {title: req.user.nickname + " following", url: req.originalUrl},
-                                         people: following,
+                                         following: following,
                                          profile: req.user.profile,
                                          data: {
                                              profile: req.user.profile,
-                                             people: following
+                                             following: following
                                          }});
             }
         }

@@ -211,7 +211,7 @@
                                       userContentView: Pump.FollowersUserContent,
                                       userContentStream: followers,
                                       title: nickname + " followers",
-                                      data: {people: followers,
+                                      data: {followers: followers,
                                              profile: profile}},
                                      function() {
                                          Pump.body.endLoad();
@@ -238,7 +238,7 @@
                                       userContentView: Pump.FollowingUserContent,
                                       userContentStream: following,
                                       title: nickname + " following",
-                                      data: {people: following,
+                                      data: {following: following,
                                              profile: profile}},
                                      function() {
                                          Pump.body.endLoad();
