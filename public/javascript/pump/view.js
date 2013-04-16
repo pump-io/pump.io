@@ -2203,6 +2203,7 @@
         modelName: "object",
         parts: ["responses",
                 "reply",
+                "replies",
                 "activity-object-collection"],
         events: {
             "click .favorite": "favoriteObject",
