@@ -8,47 +8,10 @@
       <fieldset>
         <textarea id="note-content" class="span5" name="note" rows="6"></textarea>
         <div>
-          <label for="note-to">To</label>
-          <select name="to" id="note-to" multiple="" style="width: 80%">
-            <option value="collection:http://activityschema.org/collection/public">Public</option>
-            <option value="collection:<%- principal.followers.url %>">Followers</option>
-            <% if (lists && lists.length > 0) { %>
-            <optgroup label="Lists">
-              <% _.each(lists, function(list) { %>
-              <option value="collection:<%- list.id %>"><%- list.displayName %></option>
-              <% }); %>
-            </optgroup>
-            <% } %>
-            <% if (following && following.length > 0) { %>
-            <optgroup label="People">
-              <% _.each(following, function(contact) { %>
-              <option value="<%- contact.objectType %>:<%- contact.id %>"><%- contact.displayName %></option>
-              <% }); %>
-            </optgroup>
-            <% } %>
-          </select>
+          <%= partial("recipient-selector", {name: "to", id: "note-to", label: "To"}) %>
         </div>
         <div>
-          <label for="note-cc">CC</label>
-          <select name="cc" id="note-cc" multiple="" style="width: 80%">
-            <option value="collection:http://activityschema.org/collection/public">Public</option>
-            <option selected="selected" value="collection:<%- principal.followers.url %>">Followers</option>
-            <!-- <%- JSON.stringify(lists) %> -->
-            <% if (lists && lists.items && lists.items.length > 0) { %>
-            <optgroup label="Lists">
-              <% _.each(lists.items, function(list) { %>
-              <option value="collection:<%- list.id %>"><%- list.displayName %></option>
-              <% }); %>
-            </optgroup>
-            <% } %>
-            <% if (following && following.items && following.items.length > 0) { %>
-            <optgroup label="People">
-              <% _.each(following.items, function(contact) { %>
-              <option value="<%- contact.objectType %>:<%- contact.id %>"><%- contact.displayName %></option>
-              <% }); %>
-            </optgroup>
-            <% } %>
-          </select>
+          <%= partial("recipient-selector", {name: "cc", id: "note-cc", label: "CC"}) %>
         </div>
       </fieldset>
     </form>

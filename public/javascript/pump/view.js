@@ -2412,6 +2412,7 @@
         tagName: "div",
         className: "modal-holder",
         templateName: 'post-note',
+        parts: ["recipient-selector"],
         ready: function() {
             var view = this;
             view.$('#note-content').wysihtml5({
@@ -2474,6 +2475,7 @@
         tagName: "div",
         className: "modal-holder",
         templateName: 'post-picture',
+        parts: ["recipient-selector"],
         events: {
             "click #send-picture": "postPicture"
         },
