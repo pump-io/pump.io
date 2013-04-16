@@ -162,7 +162,7 @@
         var streams = Pump.getStreams();
         
         _.each(streams, function(stream, name) {
-            Pump.socket.send(JSON.stringify({cmd: "unfollow", url: stream.url}));
+            Pump.socket.send(JSON.stringify({cmd: "unfollow", url: stream.url()}));
         });
     };
 
