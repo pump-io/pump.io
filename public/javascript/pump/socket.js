@@ -47,12 +47,12 @@
 
     Pump.updateStream = function(url, activity) {
         var streams = Pump.getStreams(),
-            target = _.find(streams, function(stream) { return stream.url == url; }),
+            target = _.find(streams, function(stream) { return stream.url() == url; }),
             act;
 
         if (target) {
             act = Pump.Activity.unique(activity);
-            target.unshift(act);
+            target.items.unshift(act);
         }
     };
 
@@ -145,7 +145,7 @@
         var streams = Pump.getStreams();
         
         _.each(streams, function(stream, name) {
-            Pump.socket.send(JSON.stringify({cmd: "follow", url: stream.url}));
+            Pump.socket.send(JSON.stringify({cmd: "follow", url: stream.url()}));
         });
     };
 
