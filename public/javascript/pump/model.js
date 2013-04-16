@@ -360,7 +360,9 @@
                 options;
 
             if (!prevLink) {
-                Pump.error("Can't get prevLink for stream " + stream.url());
+                if (_.isFunction(callback)) {
+                    callback(new Error("Can't get prevLink for stream " + stream.url()), null);
+                }
                 return;
             }
 
@@ -388,9 +390,8 @@
                     }
                 },
                 error: function(jqxhr) {
-                    Pump.error("Failed getting more items for " + stream.url());
                     if (_.isFunction(callback)) {
-                        callback(new Error("Failed getting more items"), null);
+                        callback(new Error("Failed getting more items for " + stream.url()), null);
                     }
                 }
             };
@@ -404,7 +405,9 @@
                 options;
 
             if (!nextLink) {
-                Pump.error("Can't get nextLink for stream " + stream.url());
+                if (_.isFunction(callback)) {
+                    callback(new Error("Can't get nextLink for stream " + stream.url()), null);
+                }
                 return;
             }
 
@@ -432,9 +435,8 @@
                     }
                 },
                 error: function(jqxhr) {
-                    Pump.error("Failed getting more items for " + stream.url());
                     if (_.isFunction(callback)) {
-                        callback(new Error("Failed getting more items"), null);
+                        callback(new Error("Failed getting more items for " + stream.url()), null);
                     }
                 }
             };
@@ -448,7 +450,9 @@
                 options;
 
             if (!url) {
-                Pump.error("No url for stream");
+                if (_.isFunction(callback)) {
+                    callback(new Error("No url for stream"), null);
+                }
                 return;
             }
 
