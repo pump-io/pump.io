@@ -32,8 +32,6 @@ if (!window.Pump) {
 
     $(document).ready(function() {
 
-        // XXX: set up initial models
-        
         // Set up router
 
         Pump.router   = new Pump.Router();
