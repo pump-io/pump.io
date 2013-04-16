@@ -402,7 +402,7 @@ if (!window.Pump) {
                     streams = Pump.getStreams();
                     if (streams.major && streams.major.nextLink) {
                         Pump.body.startLoad();
-                        streams.major.getNext(function() {
+                        streams.major.getNext(function(err) {
                             Pump.body.endLoad();
                         });
                     }
