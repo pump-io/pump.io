@@ -1069,7 +1069,7 @@
 
     Pump.MajorStreamView = Pump.TemplateView.extend({
         templateName: 'major-stream',
-        modelName: 'major',
+        modelName: 'activities',
         parts: ["major-activity",
                 "responses",
                 "reply",
@@ -1090,7 +1090,7 @@
 
     Pump.MinorStreamView = Pump.TemplateView.extend({
         templateName: 'minor-stream',
-        modelName: 'minor',
+        modelName: 'activities',
         parts: ["minor-activity"],
         subs: {
             ".activity.minor": {
