@@ -6,7 +6,7 @@
       <p><%= list.content %></p>    
       <% } %>
       <div id="list-members">
-        <%= partial("member-stream", {people: members.list}) %>
+        <%= partial("member-stream", {people: members}) %>
       </div>
 
     </div> <!-- .span9 -->
