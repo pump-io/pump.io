@@ -1687,7 +1687,7 @@
                 attr: "userContent",
                 subView: "FollowersUserContent",
                 subOptions: {
-                    model: "people",
+                    model: "followers",
                     data: ["profile"]
                 }
             }
@@ -1712,7 +1712,7 @@
                 attr: "peopleStreamView",
                 subView: "PeopleStreamView",
                 subOptions: {
-                    model: "people"
+                    model: "followers"
                 }
             }
         }
@@ -1751,7 +1751,7 @@
                 attr: "userContent",
                 subView: "FollowingUserContent",
                 subOptions: {
-                    model: "people",
+                    model: "following",
                     data: ["profile"]
                 }
             }
@@ -1776,7 +1776,7 @@
                 attr: "peopleStreamView",
                 subView: "PeopleStreamView",
                 subOptions: {
-                    model: "people"
+                    model: "following"
                 }
             }
         }
