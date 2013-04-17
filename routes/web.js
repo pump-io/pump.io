@@ -123,10 +123,12 @@ var showMain = function(req, res, next) {
 
 var showInbox = function(req, res, next) {
 
+    var user = req.principalUser;
+
     Step(
         function() {
-            streams.userMajorInbox(req.principalUser, req.principal, this.parallel());
-            streams.userMinorInbox(req.principalUser, req.principal, this.parallel());
+            streams.userMajorInbox(user, req.principal, this.parallel());
+            streams.userMinorInbox(user, req.principal, this.parallel());
         },
         function(err, major, minor) {
             if (err) {
@@ -135,7 +137,7 @@ var showInbox = function(req, res, next) {
                 res.render("inbox", {page: { title: "Home", url: req.originalUrl },
                                      major: major,
                                      minor: minor,
-                                     user: req.principalUser,
+                                     user: user,
                                      data: {
                                          major: major,
                                          minor: minor
