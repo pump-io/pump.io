@@ -252,19 +252,9 @@ if (!window.Pump) {
 
         _.each(objs, function(obj) {
             try {
-                if (_.isFunction(obj.prevLink) && obj.prevLink()) {
-                    obj.getPrev(function(err) {
-                        if (err) {
-                            onError(null, null, err);
-                        } else {
-                            onSuccess();
-                        }
-                    });
-                } else {
-                    obj.fetch({update: true,
-                               success: onSuccess,
-                               error: onError});
-                }
+                obj.fetch({update: true,
+                           success: onSuccess,
+                           error: onError});
             } catch (e) {
                 onError(null, null, e);
             }
