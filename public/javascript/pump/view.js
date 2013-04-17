@@ -1642,7 +1642,7 @@
                 attr: "userContent",
                 subView: "FavoritesUserContent",
                 subOptions: {
-                    model: "objects",
+                    model: "favorites",
                     data: ["profile"]
                 }
             }
@@ -1651,7 +1651,7 @@
 
     Pump.FavoritesUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-favorites',
-        modelName: "objects",
+        modelName: "favorites",
         parts: ["object-stream",
                 "major-object",
                 "responses",
@@ -1704,6 +1704,7 @@
 
     Pump.FollowersUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-followers',
+        modelName: 'followers',
         parts: ["people-stream",
                 "major-person",
                 "profile-responses"],
@@ -1768,6 +1769,7 @@
 
     Pump.FollowingUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-following',
+        modelName: 'following',
         parts: ["people-stream",
                 "major-person",
                 "profile-responses"],
