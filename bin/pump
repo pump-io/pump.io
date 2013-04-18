@@ -82,21 +82,25 @@ var launchApps = function(config) {
         unclustered = ["memory", "disk", "leveldb"],
         log = setupLog(config);
 
+    if (_(config).has("children")) {
+        cnt = config.children;
+    } else if (_(config).has("driver") && unclustered.indexOf(config.driver) !== -1) {
+        cnt = 1;
+    } else {
+        cnt = Math.max(os.cpus().length - 1, 1);
+    }
+
+    // Useful for some processes in each worker
+    config.workers = cnt;
+
     if (cluster.isMaster) {
-        if (_(config).has("children")) {
-            cnt = config.children;
-        } else if (_(config).has("driver") && unclustered.indexOf(config.driver) !== -1) {
-            cnt = 1;
-        } else {
-            cnt = Math.max(os.cpus().length - 1, 1);
-        }
 
         Dispatch.start(log);
 
         for (i = 0; i < cnt; i++) {
             cluster.fork();
         }
-    } else { 
+    } else {
         makeApp(config, function(err, app) {
             if (err) {
                 console.log(err);
