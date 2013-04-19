@@ -42,25 +42,31 @@
 
             if (_.has(view, "model") && _.isObject(view.model)) {
                 view.listenTo(view.model, "change", function(options) {
+                    console.log("Re-rendering " + view.templateName + " based on change to " + view.model.id);
                     // When a change has happened, re-render
                     view.render();
                 });
                 view.listenTo(view.model, "destroy", function(options) {
+                    console.log("Re-rendering " + view.templateName + " based on destroyed " + view.model.id);
                     // When a change has happened, re-render
                     view.remove();
                 });
                 if (_.has(view.model, "items") && _.isObject(view.model.items)) {
                     view.listenTo(view.model.items, "add", function(model, collection, options) {
+                        console.log("Re-rendering " + view.templateName + " based on addition to " + view.model.id);
                         view.showAdded(model);
                     });
                     view.listenTo(view.model.items, "remove", function(model, collection, options) {
+                        console.log("Re-rendering " + view.templateName + " based on removal from " + view.model.id);
                         view.showRemoved(model);
                     });
                     view.listenTo(view.model.items, "reset", function(collection, options) {
+                        console.log("Re-rendering " + view.templateName + " based on reset of " + view.model.id);
                         // When a change has happened, re-render
                         view.render();
                     });
                     view.listenTo(view.model.items, "sort", function(collection, options) {
+                        console.log("Re-rendering " + view.templateName + " based on resort of " + view.model.id);
                         // When a change has happened, re-render
                         view.render();
                     });
