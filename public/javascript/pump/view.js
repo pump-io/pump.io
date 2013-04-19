@@ -2798,6 +2798,7 @@
                 Pump.setTitle(title);
                 body.$(parent).children().replaceWith(newView.$el);
                 Pump.followStreams();
+                window.scrollTo(0, 0);
                 if (callback) {
                     callback();
                 }
