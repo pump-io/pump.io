@@ -507,6 +507,9 @@ var showList = function(req, res, next) {
                     if (results.length === 0) throw new HTTPError("Not found", 404);
                     if (results.length > 1) throw new HTTPError("Too many lists", 500);
                     list = results[0];
+                    if (list.author.id != user.profile.id) {
+                        throw new HTTPError("User " + user.nickname + " is not author of " + list.id, 400);
+                    }
                     streams.collectionMembers({collection: list}, principal, this);
                 },
                 function(err, collection) {
@@ -523,7 +526,7 @@ var showList = function(req, res, next) {
     Step(
         function() {
             streams.userLists({user: user, type: "person"}, principal, this.parallel());
-            getList(req.user, req.param.uuid, this.parallel());
+            getList(req.param.uuid, this.parallel());
             addFollowed(principal, [req.user.profile], this.parallel());
             req.user.profile.expandFeeds(this.parallel());
         },
