@@ -510,6 +510,8 @@ var showList = function(req, res, next) {
                     if (list.author.id != user.profile.id) {
                         throw new HTTPError("User " + user.nickname + " is not author of " + list.id, 400);
                     }
+                    // Make it a real object
+                    list.author = user.profile;
                     streams.collectionMembers({collection: list}, principal, this);
                 },
                 function(err, collection) {
