@@ -42,7 +42,7 @@
 
             if (_.has(view, "model") && _.isObject(view.model)) {
                 view.listenTo(view.model, "change", function(model, options) {
-                    console.log("Re-rendering " + view.templateName + " based on change to " + view.model.id);
+                    console.log("Re-rendering " + view.templateName + " #" + view.cid + " based on change to " + view.model.id);
                     // When a change has happened, re-render
                     view.render();
                 });
@@ -1621,7 +1621,11 @@
     Pump.ProfileBlock = Pump.PersonView.extend({
         templateName: 'profile-block',
         modelName: 'profile',
-        parts: ["profile-responses"]
+        parts: ["profile-responses"],
+        initialize: function(options) {
+            console.log("Initializing profile-block #" + this.cid);
+            Pump.PersonView.prototype.initialize.apply(this);
+        }
     });
 
     Pump.FavoritesContent = Pump.ContentView.extend({
@@ -2758,7 +2762,9 @@
 
             // XXX: double-check this
 
+            console.log("Initializing new " + View.prototype.templateName);
             body.content = new View(options);
+            console.log("Done initializing new " + View.prototype.templateName);
 
             // We try and only update the parts that have changed
 
@@ -2766,6 +2772,13 @@
                 options.userContentView &&
                 oldContent.profileBlock &&
                 oldContent.profileBlock.model.get("id") == profile.get("id")) {
+
+                if (body.content.profileBlock) {
+                    console.log("Removing profile block #" + body.content.profileBlock.cid + " from " + View.prototype.templateName);
+                    body.content.profileBlock.remove();
+                }
+
+                console.log("Connecting profile block #" + oldContent.profileBlock.cid + " to " + View.prototype.templateName);
 
                 body.content.profileBlock = oldContent.profileBlock;
 
@@ -2780,7 +2793,15 @@
                 if (options.listContentView &&
                     oldContent.userContent.listMenu) {
 
+                    if (body.content.userContent.listMenu) {
+                        console.log("Removing list menu #" + body.content.userContent.listMenu.cid + " from " + View.prototype.templateName);
+                        body.content.userContent.listMenu.remove();
+                    }
+
+                    console.log("Connecting list menu #" + oldContent.userContent.listMenu.cid + " to " + View.prototype.templateName);
+
                     body.content.userContent.listMenu = oldContent.userContent.listMenu;
+
                     if (options.listContentModel) {
                         listContentOptions = _.extend({model: options.listContentModel}, options);
                     } else {
@@ -2794,10 +2815,25 @@
                 } else {
                     parent = "#user-content";
                     newView = body.content.userContent;
+
+                    if (oldContent.userContent.listMenu) {
+                        console.log("Removing list menu #" + oldContent.userContent.listMenu.cid);
+                        oldContent.userContent.listMenu.remove();
+                    }
                 }
             } else {
                 parent = "#content";
                 newView = body.content;
+
+                if (oldContent && oldContent.profileBlock) {
+                    console.log("Removing profile block #" + oldContent.profileBlock.cid);
+                    oldContent.profileBlock.remove();
+                }
+
+                if (oldContent && oldContent.userContent && oldContent.userContent.listMenu) {
+                    console.log("Removing list menu #" + oldContent.userContent.listMenu.cid);
+                    oldContent.userContent.listMenu.remove();
+                }
             }
 
             newView.once("ready", function() {
