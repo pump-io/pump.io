@@ -41,8 +41,9 @@
             var view = this;
 
             if (_.has(view, "model") && _.isObject(view.model)) {
-                view.listenTo(view.model, "change", function(options) {
+                view.listenTo(view.model, "change", function(model, options) {
                     console.log("Re-rendering " + view.templateName + " based on change to " + view.model.id);
+                    console.dir(model);
                     // When a change has happened, re-render
                     view.render();
                 });
