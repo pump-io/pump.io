@@ -575,7 +575,7 @@
             }
         },
         pubDate: function() {
-            return new Date.parse(this.published);
+            return Date.parse(this.published);
         },
         initialize: function() {
             var activity = this;
