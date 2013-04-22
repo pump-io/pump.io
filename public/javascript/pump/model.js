@@ -298,7 +298,7 @@
 
             if (_.isArray(props)) {
                 Pump.debug("Merging items of " + items.url() + "of length " + items.length + " with array of length " + props.length);
-                unique = props.items.map(function(item) {
+                unique = props.map(function(item) {
                     return items.model.unique(item);
                 });
                 items.add(unique);
