@@ -2728,6 +2728,11 @@
                 Pump.saveContinueTo();
             }
             
+            if (!pathname) {
+                Pump.debug("Silently not navigating to non-existent target.");
+                return false;
+            }
+
             if (!el.host || el.host === here.host) {
                 try {
                     Pump.debug("Navigating to " + pathname);
