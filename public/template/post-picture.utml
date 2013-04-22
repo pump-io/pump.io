@@ -13,46 +13,10 @@
         <textarea id="picture-description" class="span5" name="description" placeholder="Description (optional)" rows="3">
         </textarea>
         <div>
-          <label for="picture-to">To</label>
-          <select name="to" id="picture-to" multiple="" style="width: 80%">
-            <option value="collection:http://activityschema.org/collection/public">Public</option>
-            <option value="collection:<%- principal.followers.url %>">Followers</option>
-            <% if (lists && lists.length > 0) { %>
-            <optgroup label="Lists">
-              <% _.each(lists, function(list) { %>
-              <option value="collection:<%- list.id %>"><%- list.displayName %></option>
-              <% }); %>
-            </optgroup>
-            <% } %>
-            <% if (following && following.length > 0) { %>
-            <optgroup label="People">
-              <% _.each(following, function(contact) { %>
-              <option value="<%- contact.objectType %>:<%- contact.id %>"><%- contact.displayName %></option>
-              <% }); %>
-            </optgroup>
-            <% } %>
-          </select>
+          <%= partial("recipient-selector", {name: "to", id: "picture-to", label: "To"}) %>
         </div>
         <div>
-          <label for="picture-cc">CC</label>
-          <select name="cc" id="picture-cc" multiple="" style="width: 80%">
-            <option value="collection:http://activityschema.org/collection/public">Public</option>
-            <option selected="selected" value="collection:<%- principal.followers.url %>">Followers</option>
-            <% if (lists && lists.length > 0) { %>
-            <optgroup label="Lists">
-              <% _.each(lists, function(list) { %>
-              <option value="collection:<%- list.id %>"><%- list.displayName %></option>
-              <% }); %>
-            </optgroup>
-            <% } %>
-            <% if (following && following.length > 0) { %>
-            <optgroup label="People">
-              <% _.each(following, function(contact) { %>
-              <option value="<%- contact.objectType %>:<%- contact.id %>"><%- contact.displayName %></option>
-              <% }); %>
-            </optgroup>
-            <% } %>
-          </select>
+          <%= partial("recipient-selector", {name: "cc", id: "picture-cc", label: "CC"}) %>
         </div>
       </fieldset>
     </form>

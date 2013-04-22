@@ -27,8 +27,8 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     setupApp = oauthutil.setupApp,
     newClient = oauthutil.newClient,
-    register = oauthutil.register,
-    accessToken = oauthutil.accessToken;
+    newPair = oauthutil.newPair,
+    register = oauthutil.register;
 
 var suite = vows.describe("user REST API");
 
@@ -39,6 +39,10 @@ var makeCred = function(cl, pair) {
         token: pair.token,
         token_secret: pair.token_secret
     };
+};
+
+var pairOf = function(user) {
+    return {token: user.token, token_secret: user.secret};
 };
 
 var makeUserCred = function(cl, user) {
@@ -229,19 +233,16 @@ suite.addBatch({
             },
             "and we GET the user data with client credentials and the same user's access token": {
                 topic: function(user, cl) {
-                    var cb = this.callback;
+                    var cb = this.callback,
+                        pair = pairOf(user);
                     Step(
                         function() {
-                            accessToken(cl, {nickname: "zardoz", password: "this*is*my*gun"}, this);
-                        },
-                        function(err, pair) {
-                            if (err) throw err;
                             httputil.getJSON("http://localhost:4815/api/user/zardoz",
                                              {consumer_key: cl.client_id,
                                               consumer_secret: cl.client_secret,
                                               token: pair.token,
                                               token_secret: pair.token_secret},
-                                              this);
+                                             this);
                         },
                         function(err, results) {
                             if (err) {
@@ -262,17 +263,15 @@ suite.addBatch({
                             register(cl, "yankee", "d0odle|d4ndy", this);
                         },
                         function(err, user2) {
+                            var pair;
                             if (err) throw err;
-                            accessToken(cl, {nickname: "yankee", password: "d0odle|d4ndy"}, this);
-                        },
-                        function(err, pair) {
-                            if (err) throw err;
+                            pair = pairOf(user2);
                             httputil.getJSON("http://localhost:4815/api/user/zardoz",
                                              {consumer_key: cl.client_id,
                                               consumer_secret: cl.client_secret,
                                               token: pair.token,
                                               token_secret: pair.token_secret},
-                                              this);
+                                             this);
                         },
                         function(err, results) {
                             if (err) {
@@ -416,11 +415,7 @@ suite.addBatch({
                     
                     Step(
                         function() {
-                            register(cl, "themistocles", "salamis!", this);
-                        },
-                        function(err, res) {
-                            if (err) throw err;
-                            accessToken(cl, {nickname: "themistocles", password: "salamis!"}, this);
+                            newPair(cl, "themistocles", "salamis!", this);
                         },
                         function(err, pair) {
                             if (err) {
@@ -441,24 +436,13 @@ suite.addBatch({
             },
             "and we PUT new user data with client credentials and the same user's access token": {
                 topic: function(user, cl) {
-                    var cb = this.callback;
-                    
-                    Step(
-                        function() {
-                            accessToken(cl, {nickname: "xerxes", password: "sparta!!"}, this);
-                        },
-                        function(err, pair) {
-                            if (err) {
-                                cb(err);
-                            } else {
-                                httputil.putJSON("http://localhost:4815/api/user/xerxes",
-                                                 {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
-                                                  token: pair.token, token_secret: pair.token_secret},
-                                                 {nickname: "xerxes", password: "athens+1"},
-                                                 cb);
-                            }
-                        }
-                    );
+                    var cb = this.callback,
+                        pair = pairOf(user);
+                    httputil.putJSON("http://localhost:4815/api/user/xerxes",
+                                     {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
+                                      token: pair.token, token_secret: pair.token_secret},
+                                     {nickname: "xerxes", password: "athens+1"},
+                                     cb);
                 },
                 "it works": function(err, doc) {
                     assert.ifError(err);
@@ -518,46 +502,37 @@ suite.addBatch({
             "it works": function(err, user) {
                 assert.ifError(err);
             },
-            "and we get an access token": {
+            "and we PUT third-party user data": {
                 topic: function(user, cl) {
-                    accessToken(cl, {nickname: "c3po", password: "ih8anakin"}, this.callback);
+                    var cb = this.callback,
+                        pair = pairOf(user);
+                    httputil.putJSON("http://localhost:4815/api/user/c3po",
+                                     {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
+                                      token: pair.token, token_secret: pair.token_secret},
+                                     {nickname: "c3po", password: "ih8anakin", langs: 6000000},
+                                     function(err, body, res) {
+                                         cb(err, body);
+                                     });
                 },
-                "it works": function(err, pair) {
+                "it works": function(err, res) {
                     assert.ifError(err);
-                    assert.isObject(pair);
-                    assert.isString(pair.token);
-                    assert.isString(pair.token_secret);
+                    assert.include(res, "langs");
+                    assert.equal(res.langs, 6000000);
                 },
-                "and we PUT third-party user data": {
-                    topic: function(pair, user, cl) {
-                        var cb = this.callback;
-                        httputil.putJSON("http://localhost:4815/api/user/c3po",
-                                         {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
-                                          token: pair.token, token_secret: pair.token_secret},
-                                         {nickname: "c3po", password: "ih8anakin", langs: 6000000},
-                                         function(err, body, res) {
-                                             cb(err, body);
-                                         });
+                "and we GET user with third-party data": {
+                    topic: function(dup, user, cl) {
+                        var pair = pairOf(user);
+                        httputil.getJSON("http://localhost:4815/api/user/c3po",
+                                         {consumer_key: cl.client_id,
+                                          consumer_secret: cl.client_secret,
+                                          token: pair.token,
+                                          token_secret: pair.token_secret},
+                                         this.callback);
                     },
                     "it works": function(err, res) {
                         assert.ifError(err);
                         assert.include(res, "langs");
                         assert.equal(res.langs, 6000000);
-                    },
-                    "and we GET user with third-party data": {
-                        topic: function(dup, pair, user, cl) {
-                            httputil.getJSON("http://localhost:4815/api/user/c3po",
-                                             {consumer_key: cl.client_id,
-                                              consumer_secret: cl.client_secret,
-                                              token: pair.token,
-                                              token_secret: pair.token_secret},
-                                             this.callback);
-                        },
-                        "it works": function(err, res) {
-                            assert.ifError(err);
-                            assert.include(res, "langs");
-                            assert.equal(res.langs, 6000000);
-                        }
                     }
                 }
             }
@@ -605,78 +580,76 @@ suite.addBatch({
             "it works": function(err, user) {
                 assert.ifError(err);
             },
-            "and we get an access token": {
+            "and we PUT a new nickname": {
                 topic: function(user, cl) {
-                    accessToken(cl, {nickname: "willy", password: "w0nka+b4r"}, this.callback);
+                    var pair = pairOf(user);
+                    httputil.putJSON("http://localhost:4815/api/user/willy",
+                                     {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
+                                      token: pair.token, token_secret: pair.token_secret},
+                                     {nickname: "william", password: "w0nka+b4r"},
+                                     invert(this.callback));
                 },
-                "it works": function(err, pair) {
+                "it fails correctly": function(err) {
                     assert.ifError(err);
+                }
+            },
+            "and we PUT a new published value": {
+                topic: function(user, cl) {
+                    var pair = pairOf(user);
+                    httputil.putJSON("http://localhost:4815/api/user/willy",
+                                     {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
+                                      token: pair.token, token_secret: pair.token_secret},
+                                     {nickname: "willy", password: "w0nka+b4r", published: "2001-11-10T00:00:00"},
+                                     invert(this.callback));
                 },
-                "and we PUT a new nickname": {
-                    topic: function(pair, user, cl) {
-                        httputil.putJSON("http://localhost:4815/api/user/willy",
-                                         {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
-                                          token: pair.token, token_secret: pair.token_secret},
-                                         {nickname: "william", password: "w0nka+b4r"},
-                                         invert(this.callback));
-                    },
-                    "it fails correctly": function(err) {
-                        assert.ifError(err);
-                    }
+                "it fails correctly": function(err) {
+                    assert.ifError(err);
+                }
+            },
+            "and we PUT a new updated value": {
+                topic: function(user, cl) {
+                    var pair = pairOf(user);
+                    httputil.putJSON("http://localhost:4815/api/user/willy",
+                                     {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
+                                      token: pair.token, token_secret: pair.token_secret},
+                                     {nickname: "willy", password: "w0nka+b4r", updated: "2003-11-10T00:00:00"},
+                                     invert(this.callback));
                 },
-                "and we PUT a new published value": {
-                    topic: function(pair, user, cl) {
-                        httputil.putJSON("http://localhost:4815/api/user/willy",
-                                         {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
-                                          token: pair.token, token_secret: pair.token_secret},
-                                         {nickname: "willy", password: "w0nka+b4r", published: "2001-11-10T00:00:00"},
-                                         invert(this.callback));
-                    },
-                    "it fails correctly": function(err) {
-                        assert.ifError(err);
-                    }
+                "it fails correctly": function(err) {
+                    assert.ifError(err);
+                }
+            },
+            "and we PUT a new profile": {
+                topic: function(user, cl) {
+                    var profile = {
+                        objectType: "person",
+                        id: "urn:uuid:8cec1280-28a6-4173-a523-2207ea964a2a"
+                    };
+                    var pair = pairOf(user);
+
+                    httputil.putJSON("http://localhost:4815/api/user/willy",
+                                     {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
+                                      token: pair.token, token_secret: pair.token_secret},
+                                     {nickname: "willy", password: "w0nka+b4r", profile: profile},
+                                     invert(this.callback));
                 },
-                "and we PUT a new updated value": {
-                    topic: function(pair, user, cl) {
-                        httputil.putJSON("http://localhost:4815/api/user/willy",
-                                         {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
-                                          token: pair.token, token_secret: pair.token_secret},
-                                         {nickname: "willy", password: "w0nka+b4r", updated: "2003-11-10T00:00:00"},
-                                         invert(this.callback));
-                    },
-                    "it fails correctly": function(err) {
-                        assert.ifError(err);
-                    }
+                "it fails correctly": function(err) {
+                    assert.ifError(err);
+                }
+            },
+            "and we PUT new profile data": {
+                topic: function(user, cl) {
+                    var profile = user.profile,
+                        pair = pairOf(user);
+                    profile.displayName = "William Q. Wonka";
+                    httputil.putJSON("http://localhost:4815/api/user/willy",
+                                     {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
+                                      token: pair.token, token_secret: pair.token_secret},
+                                     {nickname: "willy", password: "w0nka+b4r", profile: profile},
+                                     invert(this.callback));
                 },
-                "and we PUT a new profile": {
-                    topic: function(pair, user, cl) {
-                        var profile = {
-                            objectType: "person",
-                            id: "urn:uuid:8cec1280-28a6-4173-a523-2207ea964a2a"
-                        };
-                        httputil.putJSON("http://localhost:4815/api/user/willy",
-                                         {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
-                                          token: pair.token, token_secret: pair.token_secret},
-                                         {nickname: "willy", password: "w0nka+b4r", profile: profile},
-                                         invert(this.callback));
-                    },
-                    "it fails correctly": function(err) {
-                        assert.ifError(err);
-                    }
-                },
-                "and we PUT new profile data": {
-                    topic: function(pair, user, cl) {
-                        var profile = user.profile;
-                        profile.displayName = "William Q. Wonka";
-                        httputil.putJSON("http://localhost:4815/api/user/willy",
-                                         {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
-                                          token: pair.token, token_secret: pair.token_secret},
-                                         {nickname: "willy", password: "w0nka+b4r", profile: profile},
-                                         invert(this.callback));
-                    },
-                    "it fails correctly": function(err) {
-                        assert.ifError(err);
-                    }
+                "it fails correctly": function(err) {
+                    assert.ifError(err);
                 }
             }
         }
@@ -786,11 +759,7 @@ suite.addBatch({
                     var cb = this.callback;
                     Step(
                         function() {
-                            register(cl, "napoleon", "the+3rd!", this);
-                        },
-                        function(err, res) {
-                            if (err) throw err;
-                            accessToken(cl, {nickname: "napoleon", password: "the+3rd!"}, this);
+                            newPair(cl, "napoleon", "the+3rd!", this);
                         },
                         function(err, pair) {
                             if (err) {
@@ -810,22 +779,12 @@ suite.addBatch({
             },
             "and we DELETE the user with client credentials and the same user's access token": {
                 topic: function(user, cl) {
-                    var cb = this.callback;
-                    Step(
-                        function() {
-                            accessToken(cl, {nickname: "victor", password: "les+miz!"}, this);
-                        },
-                        function(err, pair) {
-                            if (err) {
-                                cb(err);
-                            } else {
-                                httputil.delJSON("http://localhost:4815/api/user/victor",
-                                                 {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
-                                                  token: pair.token, token_secret: pair.token_secret},
-                                                 cb);
-                            }
-                        }
-                    );
+                    var cb = this.callback,
+                        pair = pairOf(user);
+                    httputil.delJSON("http://localhost:4815/api/user/victor",
+                                     {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
+                                      token: pair.token, token_secret: pair.token_secret},
+                                     cb);
                 },
                 "it works": function(err, body, result) {
                     assert.ifError(err);

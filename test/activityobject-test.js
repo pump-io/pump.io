@@ -1258,6 +1258,37 @@ suite.addBatch({
                 "it is": function(isRef) {
                     assert.isTrue(isRef);
                 }
+            },
+            "and we get a stream of favoriters": {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Place = require("../lib/model/place").Place,
+                        place = null;
+                    
+                    Step(
+                        function() {
+                            Place.create({displayName: "Empire State Building",
+                                          "position": "40.749-73.986/"},
+                                         this);
+                        },
+                        function(err, results) {
+                            if (err) throw err;
+                            place = results;
+                            place.getFavoritersStream(this);
+                        },
+                        function(err, str) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                cb(null, str);
+                            }
+                        }
+                    );
+                },
+                "it works": function(err, str) {
+                    assert.ifError(err);
+                    assert.isObject(str);
+                }
             }
         }
     }

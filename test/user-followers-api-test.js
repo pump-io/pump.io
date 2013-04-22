@@ -28,8 +28,7 @@ var assert = require("assert"),
     setupApp = oauthutil.setupApp,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair,
-    register = oauthutil.register,
-    accessToken = oauthutil.accessToken;
+    register = oauthutil.register;
 
 var suite = vows.describe("user followers API");
 
@@ -52,6 +51,10 @@ var makeCred = function(cl, pair) {
     };
 };
 
+var pairOf = function(user) {
+    return {token: user.token, token_secret: user.secret};
+};
+
 var assertValidList = function(doc, total, count) {
     assert.include(doc, "author");
     assert.include(doc.author, "id");
@@ -60,7 +63,7 @@ var assertValidList = function(doc, total, count) {
     assert.include(doc, "totalItems");
     assert.include(doc, "items");
     assert.include(doc, "displayName");
-    assert.include(doc, "id");
+    assert.include(doc, "url");
     assert.include(doc, "links");
     assert.include(doc.links, "current");
     assert.include(doc.links.current, "href");
@@ -147,7 +150,6 @@ suite.addBatch({
                     assert.ifError(err);
                 }
             },
-
             "and we register a user": {
 
                 topic: function(cl) {
@@ -220,64 +222,58 @@ suite.addBatch({
                         assert.ifError(err);
                     }
                 },
-                "and we get an access token": {
+                "and we GET the following list with client credentials and the same user's access token": {
                     topic: function(user, cl) {
-                        accessToken(cl, {nickname: "tyrion", password: "payURd3bts"}, this.callback);
+                        var cb = this.callback,
+                            pair = pairOf(user);
+                        Step(
+                            function() {
+                                httputil.getJSON("http://localhost:4815/api/user/tyrion/following",
+                                                 {consumer_key: cl.client_id,
+                                                  consumer_secret: cl.client_secret,
+                                                  token: pair.token,
+                                                  token_secret: pair.token_secret},
+                                                 this);
+                            },
+                            function(err, results) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    cb(null, results);
+                                }
+                            }
+                        );
                     },
-                    "it works": function(err, pair) {
+                    "it works": function(err, doc) {
                         assert.ifError(err);
-                    },
-                    "and we GET the following list with client credentials and the same user's access token": {
-                        topic: function(pair, user, cl) {
-                            var cb = this.callback;
-                            Step(
-                                function() {
-                                    httputil.getJSON("http://localhost:4815/api/user/tyrion/following",
-                                                     {consumer_key: cl.client_id,
-                                                      consumer_secret: cl.client_secret,
-                                                      token: pair.token,
-                                                      token_secret: pair.token_secret},
-                                                     this);
-                                },
-                                function(err, results) {
-                                    if (err) {
-                                        cb(err, null);
-                                    } else {
-                                        cb(null, results);
-                                    }
+                        assertValidList(doc, 0);
+                    }
+                },
+                "and we GET the followers list with client credentials and the same user's access token": {
+                    topic: function(user, cl) {
+                        var cb = this.callback,
+                            pair = pairOf(user);
+                        Step(
+                            function() {
+                                httputil.getJSON("http://localhost:4815/api/user/tyrion/followers",
+                                                 {consumer_key: cl.client_id,
+                                                  consumer_secret: cl.client_secret,
+                                                  token: pair.token,
+                                                  token_secret: pair.token_secret},
+                                                 this);
+                            },
+                            function(err, results) {
+                                if (err) {
+                                    cb(err, null);
+                                } else {
+                                    cb(null, results);
                                 }
-                            );
-                        },
-                        "it works": function(err, doc) {
-                            assert.ifError(err);
-                            assertValidList(doc, 0);
-                        }
+                            }
+                        );
                     },
-                    "and we GET the followers list with client credentials and the same user's access token": {
-                        topic: function(pair, user, cl) {
-                            var cb = this.callback;
-                            Step(
-                                function() {
-                                    httputil.getJSON("http://localhost:4815/api/user/tyrion/followers",
-                                                     {consumer_key: cl.client_id,
-                                                      consumer_secret: cl.client_secret,
-                                                      token: pair.token,
-                                                      token_secret: pair.token_secret},
-                                                     this);
-                                },
-                                function(err, results) {
-                                    if (err) {
-                                        cb(err, null);
-                                    } else {
-                                        cb(null, results);
-                                    }
-                                }
-                            );
-                        },
-                        "it works": function(err, doc) {
-                            assert.ifError(err);
-                            assertValidList(doc, 0);
-                        }
+                    "it works": function(err, doc) {
+                        assert.ifError(err);
+                        assertValidList(doc, 0);
                     }
                 },
                 "and we GET the followers list with client credentials and a different user's access token": {
@@ -416,18 +412,16 @@ suite.addBatch({
                             register(cl, "greatjon", "bl00dyt0ugh", this.parallel());
                         },
                         function(err, robb, greatjon) {
+                            var act, url, cred;
                             if (err) throw err;
+
                             users = {
                                 robb: robb,
                                 greatjon: greatjon
                             };
-                            accessToken(cl, {nickname: "robb", password: "gr3yw1nd"}, this.parallel());
-                            accessToken(cl, {nickname: "greatjon", password: "bl00dyt0ugh"}, this.parallel());
-                        },
-                        function(err, robbPair, greatjonPair) {
-                            var act, url, cred;
-                            if (err) throw err;
-                            pairs = {robb: robbPair, greatjon: greatjonPair};
+
+                            pairs = {robb: pairOf(robb), greatjon: pairOf(greatjon)};
+
                             act = {
                                 verb: "follow",
                                 object: {
@@ -438,7 +432,7 @@ suite.addBatch({
                                     displayName: "Raucous"
                                 }
                             };
-                            url = "http://localhost:4815/api/user/greatjon/feed",
+                            url = "http://localhost:4815/api/user/greatjon/feed";
                             cred = makeCred(cl, pairs.greatjon);
 
                             httputil.postJSON(url, cred, act, function(err, posted, result) {
@@ -559,14 +553,10 @@ suite.addBatch({
                             register(cl, "nymeria", "gr0000wl", this);
                         },
                         function(err, nymeria) {
-                            if (err) throw err;
-                            user = nymeria;
-                            accessToken(cl, {nickname: "nymeria", password: "gr0000wl"}, this);
-                        },
-                        function(err, result) {
                             var i, group = this.group(), q = new Queue(10);
                             if (err) throw err;
-                            pair = result;
+                            user = nymeria;
+                            pair = pairOf(user);
                             for (i = 0; i < 100; i++) {
                                 q.enqueue(newPair, [cl, "wolf" + i, "grrr!grrr!"+i], group());
                             }
@@ -782,14 +772,10 @@ suite.addBatch({
                             register(cl, "varys", "i*hate*magic", this);
                         },
                         function(err, varys) {
-                            if (err) throw err;
-                            user = varys;
-                            accessToken(cl, {nickname: "varys", password: "i*hate*magic"}, this);
-                        },
-                        function(err, result) {
                             var i, group = this.group();
                             if (err) throw err;
-                            pair = result;
+                            user = varys;
+                            pair = pairOf(user);
                             for (i = 0; i < 50; i++) {
                                 register(cl, "littlebird"+i, "sekrit!"+i, group());
                             }

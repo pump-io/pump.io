@@ -49,7 +49,7 @@ var assertValidList = function(doc, count, itemCount) {
     assert.include(doc, "totalItems");
     assert.include(doc, "items");
     assert.include(doc, "displayName");
-    assert.include(doc, "id");
+    assert.include(doc, "url");
     if (_(count).isNumber()) {
         assert.equal(doc.totalItems, count);
     }

@@ -25,7 +25,6 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     setupApp = oauthutil.setupApp,
     register = oauthutil.register,
-    accessToken = oauthutil.accessToken,
     newCredentials = oauthutil.newCredentials,
     newPair = oauthutil.newPair,
     newClient = oauthutil.newClient;
@@ -41,6 +40,10 @@ var makeCred = function(cl, pair) {
         token: pair.token,
         token_secret: pair.token_secret
     };
+};
+
+var pairOf = function(user) {
+    return {token: user.token, token_secret: user.secret};
 };
 
 // A batch for testing the visibility of bcc and bto addressing
@@ -79,24 +82,17 @@ suite.addBatch({
                             register(cl, "mrshowell", "pearlsb4sw1ne", this.parallel());
                         },
                         function(err, user1, user2, user3, user4) {
+                            var url, cred, act;
                             if (err) throw err;
                             users.gilligan.profile = user1.profile;
                             users.skipper.profile   = user2.profile;
                             users.professor.profile = user3.profile;
                             users.mrshowell.profile = user4.profile;
-                            accessToken(cl, {nickname: "gilligan", password: "s4ilorh4t"}, this.parallel());
-                            accessToken(cl, {nickname: "skipper", password: "coc0nuts"}, this.parallel());
-                            accessToken(cl, {nickname: "professor", password: "radi0|rescue"}, this.parallel());
-                            accessToken(cl, {nickname: "mrshowell", password: "pearlsb4sw1ne"}, this.parallel());
-                        },
-                        function(err, pair1, pair2, pair3, pair4) {
-                            var url, cred, act;
-                            if (err) throw err;
-                            users.gilligan.pair = pair1;
-                            users.skipper.pair = pair2;
-                            users.professor.pair = pair3;
-                            users.mrshowell.pair = pair4;
-                            cred = makeCred(cl, pair4);
+                            users.gilligan.pair = pairOf(user1);
+                            users.skipper.pair = pairOf(user2);
+                            users.professor.pair = pairOf(user3);
+                            users.mrshowell.pair = pairOf(user4);
+                            cred = makeCred(cl, users.mrshowell.pair);
                             act = {
                                 verb: "follow",
                                 object: {
@@ -287,24 +283,19 @@ suite.addBatch({
                             register(cl, "santa", "Ho ho ho, merry X-mas!", this.parallel());
                         },
                         function(err, user1, user2, user3, user4) {
+                            var url, cred, act;
                             if (err) throw err;
                             users.maryanne.profile = user1.profile;
                             users.ginger.profile   = user2.profile;
                             users.mrhowell.profile = user3.profile;
                             users.santa.profile = user4.profile;
-                            accessToken(cl, {nickname: "maryanne", password: "gingh4m|dr3ss"}, this.parallel());
-                            accessToken(cl, {nickname: "ginger", password: "glamour+m0del"}, this.parallel());
-                            accessToken(cl, {nickname: "mrhowell", password: "w3alth&p0w3r"}, this.parallel());
-                            accessToken(cl, {nickname: "santa", password: "Ho ho ho, merry X-mas!"}, this.parallel());
-                        },
-                        function(err, pair1, pair2, pair3, pair4) {
-                            var url, cred, act;
-                            if (err) throw err;
-                            users.maryanne.pair = pair1;
-                            users.ginger.pair = pair2;
-                            users.mrhowell.pair = pair3;
-                            users.santa.pair = pair4;
-                            cred = makeCred(cl, pair4);
+
+                            users.maryanne.pair = pairOf(user1);
+                            users.ginger.pair   = pairOf(user2);
+                            users.mrhowell.pair = pairOf(user3);
+                            users.santa.pair    = pairOf(user4);
+
+                            cred = makeCred(cl, users.santa.pair);
                             act = {
                                 verb: "follow",
                                 object: {

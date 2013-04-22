@@ -27,7 +27,6 @@ var assert = require("assert"),
     actutil = require("./lib/activity"),
     setupApp = oauthutil.setupApp,
     register = oauthutil.register,
-    accessToken = oauthutil.accessToken,
     newCredentials = oauthutil.newCredentials;
 
 var suite = vows.describe("Activity API test");
@@ -110,8 +109,8 @@ suite.addBatch({
                     "it is an empty collection": function(err, coll) {
                         assert.ifError(err);
                         assert.isObject(coll);
-                        assert.includes(coll, "id");
-                        assert.isString(coll.id);
+                        assert.includes(coll, "url");
+                        assert.isString(coll.url);
                         assert.includes(coll, "totalItems");
                         assert.isNumber(coll.totalItems);
                         assert.equal(coll.totalItems, 0);
@@ -236,8 +235,8 @@ suite.addBatch({
                         "it is an empty collection": function(err, coll) {
                             assert.ifError(err);
                             assert.isObject(coll);
-                            assert.includes(coll, "id");
-                            assert.isString(coll.id);
+                            assert.includes(coll, "url");
+                            assert.isString(coll.url);
                             assert.includes(coll, "totalItems");
                             assert.isNumber(coll.totalItems);
                             assert.equal(coll.totalItems, 0);
@@ -330,8 +329,8 @@ suite.addBatch({
                             collIDs = {},
                             commentIDs = {};
                         assert.isObject(coll);
-                        assert.includes(coll, "id");
-                        assert.isString(coll.id);
+                        assert.includes(coll, "url");
+                        assert.isString(coll.url);
                         assert.includes(coll, "totalItems");
                         assert.isNumber(coll.totalItems);
                         assert.equal(coll.totalItems, 100);

@@ -1,6 +1,6 @@
-// major-stream-replies-test.js
+// major-stream-shares-test.js
 //
-// Test that objects have "replies" stream in */major streams
+// Test that objects have "shares" stream in */major streams
 //
 // Copyright 2012, E14N https://e14n.com/
 //
@@ -28,7 +28,6 @@ var assert = require("assert"),
     setupApp = oauthutil.setupApp,
     newClient = oauthutil.newClient,
     register = oauthutil.register,
-    accessToken = oauthutil.accessToken,
     newCredentials = oauthutil.newCredentials,
     newPair = oauthutil.newPair;
 

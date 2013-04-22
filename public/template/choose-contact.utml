@@ -11,7 +11,7 @@
   <div class="modal-body">
     <form id="choose-contact" class="form-horizontal">
       <ul class="thumbnails">
-        <% _.each(people, function(person) {
+        <% _.each(people.items, function(person) {
            var abbrev = (person.id && person.id.substr(0, 5) == 'acct:') ?
            person.id.substr(5) : person.preferredUsername,
            imgUrl = (person.image && person.image.url) ? person.image.url : "/images/default.png";

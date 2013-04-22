@@ -1,4 +1,4 @@
-<div class="activities user-content" id="user-content-activities">
+<div class="row activities user-content" id="user-content-activities">
   <div class="span9">
     <%= partial("major-stream", {headless: true}) %>
   </div>

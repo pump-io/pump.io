@@ -28,7 +28,7 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     setupApp = oauthutil.setupApp,
     register = oauthutil.register,
-    accessToken = oauthutil.accessToken,
+    newPair = oauthutil.newPair,
     newCredentials = oauthutil.newCredentials;
 
 var ignore = function(err) {};
@@ -182,11 +182,7 @@ suite.addBatch({
                         };
                     Step(
                         function() {
-                            register(cl, "boots", "b4nanazz", this);
-                        },
-                        function(err, user) {
-                            if (err) throw err;
-                            accessToken(cl, {nickname: "boots", password: "b4nanazz"}, this);
+                            newPair(cl, "boots", "b4nanazz", this);
                         },
                         function(err, pair) {
                             var nuke;

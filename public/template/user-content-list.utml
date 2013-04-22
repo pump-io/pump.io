@@ -1,4 +1,4 @@
-<div class="user-content" id="user-content-list">
+<div class="user-content row" id="user-content-list">
   <div class="span2" id="list-menu">
     <%= partial("list-menu") %>
   </div>

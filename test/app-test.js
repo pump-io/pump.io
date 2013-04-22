@@ -18,20 +18,8 @@
 
 var assert = require("assert"),
     vows = require("vows"),
-    databank = require("databank"),
-    Step = require("step"),
     fs = require("fs"),
-    path = require("path"),
-    schema = require("../lib/schema"),
-    URLMaker = require("../lib/urlmaker").URLMaker,
-    randomString = require("../lib/randomstring").randomString,
-    Client = require("../lib/model/client").Client,
-    RequestToken = require("../lib/model/requesttoken").RequestToken,
-    AccessToken = require("../lib/model/accesstoken").AccessToken,
-    User = require("../lib/model/user").User,
-    methodContext = require("./lib/methods").methodContext,
-    Databank = databank.Databank,
-    DatabankObject = databank.DatabankObject;
+    path = require("path");
 
 var ignore = function(err) {};
 

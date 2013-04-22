@@ -25,7 +25,6 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     setupApp = oauthutil.setupApp,
     register = oauthutil.register,
-    accessToken = oauthutil.accessToken,
     newPair = oauthutil.newPair,
     newClient = oauthutil.newClient;
 
@@ -40,6 +39,10 @@ var makeCred = function(cl, pair) {
         token: pair.token,
         token_secret: pair.token_secret
     };
+};
+
+var pairOf = function(user) {
+    return {token: user.token, token_secret: user.secret};
 };
 
 var clientCred = function(cl) {
@@ -128,18 +131,18 @@ suite.addBatch({
                             register(cl, "henrietta", "meow|password|meow", this.parallel());
                         },
                         function(err, user1, user2) {
+                            var act, cred, url;
+
                             if (err) throw err;
+
                             users.xtheowl.profile = user1.profile;
                             users.henrietta.profile = user2.profile;
-                            accessToken(cl, {nickname: "xtheowl", password: "b3nfr4nkl1n"}, this.parallel());
-                            accessToken(cl, {nickname: "henrietta", password: "meow|password|meow"}, this.parallel());
-                        },
-                        function(err, pair1, pair2) {
-                            var act, cred, url;
-                            if (err) throw err;
-                            users.xtheowl.pair = pair1;
-                            users.henrietta.pair = pair2;
+
+                            users.xtheowl.pair = pairOf(user1);
+                            users.henrietta.pair = pairOf(user2);
+
                             cred = makeCred(cl, users.xtheowl.pair);
+
                             act = {
                                 verb: "post",
                                 to: [{
