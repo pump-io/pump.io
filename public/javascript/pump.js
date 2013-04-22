@@ -174,9 +174,11 @@ if (!window.Pump) {
     // send them here and I'll figure it out.
 
     Pump.error = function(err) {
-        console.log(err);
-        if (err.stack) {
-            console.log(err.stack);
+        if (window.console) {
+            console.log(err);
+            if (err.stack) {
+                console.log(err.stack);
+            }
         }
     };
 
