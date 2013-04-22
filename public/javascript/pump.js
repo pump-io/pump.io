@@ -180,6 +180,14 @@ if (!window.Pump) {
         }
     };
 
+    // For debugging output
+
+    Pump.debug = function(msg) {
+        if (Pump.config.debugClient && window.console) {
+            console.log(msg);
+        }
+    };
+
     // Given a relative URL like /main/register, make a fully-qualified
     // URL on the current server
 

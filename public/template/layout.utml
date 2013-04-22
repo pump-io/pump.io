@@ -142,6 +142,7 @@
           requireEmail: <%- config.requireEmail || false %>,
           disableRegistration: <%- config.disableRegistration || false %>,
           canUpload: <%- config.canUpload || false %>,
+          debugClient: <%- config.debugClient || false %>,
           sockjs: <%- config.sockjs || false %>
       });
 

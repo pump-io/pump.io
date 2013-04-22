@@ -194,7 +194,7 @@
             var model = this,
                 complicated = model.complicated();
 
-            console.log("Merging " + model.id + " with " + (props.id || props.url || "unknown"));
+            Pump.debug("Merging " + model.id + " with " + (props.id || props.url || props.nickname || "unknown"));
 
             _.each(props, function(value, key) {
                 if (!model.has(key)) {

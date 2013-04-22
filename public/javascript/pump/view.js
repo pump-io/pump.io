@@ -42,31 +42,31 @@
 
             if (_.has(view, "model") && _.isObject(view.model)) {
                 view.listenTo(view.model, "change", function(model, options) {
-                    console.log("Re-rendering " + view.templateName + " #" + view.cid + " based on change to " + view.model.id);
+                    Pump.debug("Re-rendering " + view.templateName + " #" + view.cid + " based on change to " + view.model.id);
                     // When a change has happened, re-render
                     view.render();
                 });
                 view.listenTo(view.model, "destroy", function(options) {
-                    console.log("Re-rendering " + view.templateName + " based on destroyed " + view.model.id);
+                    Pump.debug("Re-rendering " + view.templateName + " based on destroyed " + view.model.id);
                     // When a change has happened, re-render
                     view.remove();
                 });
                 if (_.has(view.model, "items") && _.isObject(view.model.items)) {
                     view.listenTo(view.model.items, "add", function(model, collection, options) {
-                        console.log("Re-rendering " + view.templateName + " based on addition to " + view.model.id);
+                        Pump.debug("Re-rendering " + view.templateName + " based on addition to " + view.model.id);
                         view.showAdded(model);
                     });
                     view.listenTo(view.model.items, "remove", function(model, collection, options) {
-                        console.log("Re-rendering " + view.templateName + " based on removal from " + view.model.id);
+                        Pump.debug("Re-rendering " + view.templateName + " based on removal from " + view.model.id);
                         view.showRemoved(model);
                     });
                     view.listenTo(view.model.items, "reset", function(collection, options) {
-                        console.log("Re-rendering " + view.templateName + " based on reset of " + view.model.id);
+                        Pump.debug("Re-rendering " + view.templateName + " based on reset of " + view.model.id);
                         // When a change has happened, re-render
                         view.render();
                     });
                     view.listenTo(view.model.items, "sort", function(collection, options) {
-                        console.log("Re-rendering " + view.templateName + " based on resort of " + view.model.id);
+                        Pump.debug("Re-rendering " + view.templateName + " based on resort of " + view.model.id);
                         // When a change has happened, re-render
                         view.render();
                     });
@@ -275,7 +275,7 @@
                     scoped = main;
                 }
                 if (!_.has(partials, name)) {
-                    console.log("Didn't preload template " + name + " for " + view.templateName + " so fetching sync");
+                    Pump.debug("Didn't preload template " + name + " for " + view.templateName + " so fetching sync");
                     // XXX: Put partials in the parts array of the
                     // view to avoid this shameful sync call
                     partials[name] = getTemplateSync(name);
@@ -1623,7 +1623,7 @@
         modelName: 'profile',
         parts: ["profile-responses"],
         initialize: function(options) {
-            console.log("Initializing profile-block #" + this.cid);
+            Pump.debug("Initializing profile-block #" + this.cid);
             Pump.PersonView.prototype.initialize.apply(this);
         }
     });
@@ -2730,6 +2730,7 @@
             
             if (!el.host || el.host === here.host) {
                 try {
+                    Pump.debug("Navigating to " + pathname);
                     Pump.router.navigate(pathname, true);
                 } catch (e) {
                     Pump.error(e);
@@ -2737,6 +2738,7 @@
                 // Always return false
                 return false;
             } else {
+                Pump.debug("Default anchor handling");
                 return true;
             }
         },
@@ -2762,9 +2764,9 @@
 
             // XXX: double-check this
 
-            console.log("Initializing new " + View.prototype.templateName);
+            Pump.debug("Initializing new " + View.prototype.templateName);
             body.content = new View(options);
-            console.log("Done initializing new " + View.prototype.templateName);
+            Pump.debug("Done initializing new " + View.prototype.templateName);
 
             // We try and only update the parts that have changed
 
@@ -2774,11 +2776,11 @@
                 oldContent.profileBlock.model.get("id") == profile.get("id")) {
 
                 if (body.content.profileBlock) {
-                    console.log("Removing profile block #" + body.content.profileBlock.cid + " from " + View.prototype.templateName);
+                    Pump.debug("Removing profile block #" + body.content.profileBlock.cid + " from " + View.prototype.templateName);
                     body.content.profileBlock.remove();
                 }
 
-                console.log("Connecting profile block #" + oldContent.profileBlock.cid + " to " + View.prototype.templateName);
+                Pump.debug("Connecting profile block #" + oldContent.profileBlock.cid + " to " + View.prototype.templateName);
 
                 body.content.profileBlock = oldContent.profileBlock;
 
@@ -2794,11 +2796,11 @@
                     oldContent.userContent.listMenu) {
 
                     if (body.content.userContent.listMenu) {
-                        console.log("Removing list menu #" + body.content.userContent.listMenu.cid + " from " + View.prototype.templateName);
+                        Pump.debug("Removing list menu #" + body.content.userContent.listMenu.cid + " from " + View.prototype.templateName);
                         body.content.userContent.listMenu.remove();
                     }
 
-                    console.log("Connecting list menu #" + oldContent.userContent.listMenu.cid + " to " + View.prototype.templateName);
+                    Pump.debug("Connecting list menu #" + oldContent.userContent.listMenu.cid + " to " + View.prototype.templateName);
 
                     body.content.userContent.listMenu = oldContent.userContent.listMenu;
 
@@ -2817,7 +2819,7 @@
                     newView = body.content.userContent;
 
                     if (oldContent.userContent.listMenu) {
-                        console.log("Removing list menu #" + oldContent.userContent.listMenu.cid);
+                        Pump.debug("Removing list menu #" + oldContent.userContent.listMenu.cid);
                         oldContent.userContent.listMenu.remove();
                     }
                 }
@@ -2826,12 +2828,12 @@
                 newView = body.content;
 
                 if (oldContent && oldContent.profileBlock) {
-                    console.log("Removing profile block #" + oldContent.profileBlock.cid);
+                    Pump.debug("Removing profile block #" + oldContent.profileBlock.cid);
                     oldContent.profileBlock.remove();
                 }
 
                 if (oldContent && oldContent.userContent && oldContent.userContent.listMenu) {
-                    console.log("Removing list menu #" + oldContent.userContent.listMenu.cid);
+                    Pump.debug("Removing list menu #" + oldContent.userContent.listMenu.cid);
                     oldContent.userContent.listMenu.remove();
                 }
             }
