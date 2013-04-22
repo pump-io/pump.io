@@ -190,6 +190,13 @@
 
             return json;
         },
+        set: function(props) {
+            var model = this;
+            if (_.has(props, "items")) {
+                Pump.debug("Setting property 'items' for model " + model.id);
+            }
+            return Backbone.Model.prototype.set.apply(model, arguments);
+        },
         merge: function(props) {
             var model = this,
                 complicated = model.complicated();
@@ -198,14 +205,11 @@
 
             _.each(props, function(value, key) {
                 if (!model.has(key)) {
-                    Pump.debug("Assigning " + model.id + " a new property " + key);
                     model.set(key, value);
                 } else if (_.contains(complicated, key) && model[key] && _.isFunction(model[key].merge)) {
-                    Pump.debug("Delegating merge of " + model.id + " to property " + key);
                     model[key].merge(value);
                 } else {
                     // XXX: resolve non-complicated stuff
-                    Pump.debug("No merge into " + model.id + " for property " + key);
                 }
             });
         },
@@ -333,6 +337,7 @@
 
             str.on("change:items", function(newStr, items) {
                 var str = this;
+                Pump.debug("Resetting items of " + str.url() + " to new array of length " + items.length);
                 str.items.reset(items);
             });
         },
