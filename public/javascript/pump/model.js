@@ -431,7 +431,8 @@
                 success: function(data) {
                     if (data.items) {
                         if (stream.items) {
-                            stream.items.add(data.items);
+                            // Add them at the end
+                            stream.items.add(data.items, {at: stream.items.length});
                         } else {
                             stream.items = new stream.itemsClass(data.items);
                         }
