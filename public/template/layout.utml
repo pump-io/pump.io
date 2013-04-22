@@ -35,6 +35,10 @@
     <link href="/stylesheet/bootstrap-wysihtml5.css" rel="stylesheet">
     <link href="/stylesheet/select2.css" rel="stylesheet">
 
+    <!-- Finally, our own override sheet -->
+
+    <link href="/stylesheet/pumpio.css" rel="stylesheet">
+
     <!--[if lt IE 9]>
         <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
