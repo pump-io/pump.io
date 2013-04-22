@@ -279,44 +279,39 @@
             var router = this,
                 user = Pump.User.unique({nickname: nickname}),
                 lists = Pump.ListStream.unique({url: Pump.fullURL("/api/user/"+nickname+"/lists/person")}),
-                list = Pump.List.unique({links: {self: {href: "/api/collection/"+uuid}}});
+                list = Pump.List.unique({links: {self: {href: "/api/collection/"+uuid}}}),
+                members = Pump.PeopleStream.unique({url: Pump.fullURL("/api/collection/"+uuid+"/members")});
 
             Pump.body.startLoad();
 
-            Pump.fetchObjects([user, lists, list], function(err, objs) {
-
-                var members;
+            Pump.fetchObjects([user, lists, list, members], function(err, objs) {
 
                 if (err) {
                     Pump.error(err);
                     return;
                 }
 
-                members = list.members;
+                var profile = user.profile,
+                    options = {contentView: Pump.ListContent,
+                               userContentView: Pump.ListUserContent,
+                               listContentView: Pump.ListListContent,
+                               title: nickname + " - list -" + list.get("displayName"),
+                               listContentModel: list,
+                               data: {lists: lists,
+                                      list: list,
+                                      profile: profile,
+                                      members: members}};
 
-                Pump.fetchObjects([members], function(err, objs) {
+                if (err) {
+                    Pump.error(err);
+                    return;
+                }
 
-                    var profile = user.profile,
-                        options = {contentView: Pump.ListContent,
-                                   userContentView: Pump.ListUserContent,
-                                   listContentView: Pump.ListListContent,
-                                   title: nickname + " - list -" + list.get("displayName"),
-                                   listContentModel: list,
-                                   data: {lists: lists,
-                                          list: list,
-                                          profile: profile,
-                                          members: members}};
-
-                    if (err) {
-                        Pump.error(err);
-                        return;
-                    }
-
-                    Pump.body.setContent(options, function(view) {
-                        Pump.body.content.userContent.listMenu.$(".active").removeClass("active");
-                        Pump.body.content.userContent.listMenu.$("li[data-list-id='"+list.id+"']").addClass("active");
-                        Pump.body.endLoad();
-                    });
+                Pump.body.setContent(options, function(view) {
+                    var lm = Pump.body.content.userContent.listMenu;
+                    lm.$(".active").removeClass("active");
+                    lm.$("li[data-list-id='"+list.id+"']").addClass("active");
+                    Pump.body.endLoad();
                 });
             });
         },

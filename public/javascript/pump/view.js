@@ -2410,7 +2410,7 @@
                     if (err) {
                         view.showError(err);
                     } else {
-                        members.add(person, {at: 0});
+                        members.items.add(person, {at: 0});
                         list.totalItems++;
                         list.trigger("change");
                         Pump.addMinorActivity(act);
