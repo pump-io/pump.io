@@ -2712,8 +2712,24 @@
         },
         navigateToHref: function(ev) {
             var el = (ev.srcElement || ev.currentTarget),
-                pathname = el.pathname, // XXX: HTML5
                 here = window.location;
+
+            // This gets fired for children of <a> elements, too. So we navigate
+            // up the DOM tree till we find an element that has a pathname (or
+            // we run out of tree)
+
+            for (el = (ev.srcElement || ev.currentTarget); el; el = el.parentNode) {
+                if (el.pathname) {
+                    break;
+                }
+            }
+
+            // Check for a good value
+
+            if (!el || !el.pathname) {
+                Pump.debug("Silently not navigating to non-existent target.");
+                return false;
+            }
 
             // Bootstrap components; let these through
 
@@ -2727,16 +2743,13 @@
             if ($(el).hasClass('save-continue-to')) {
                 Pump.saveContinueTo();
             }
-            
-            if (!pathname) {
-                Pump.debug("Silently not navigating to non-existent target.");
-                return false;
-            }
 
-            if (!el.host || el.host === here.host) {
+            // For local <a>, use the router
+
+            if (!el.host || el.host == here.host) {
                 try {
-                    Pump.debug("Navigating to " + pathname);
-                    Pump.router.navigate(pathname, true);
+                    Pump.debug("Navigating to " + el.pathname);
+                    Pump.router.navigate(el.pathname, true);
                 } catch (e) {
                     Pump.error(e);
                 }
