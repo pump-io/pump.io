@@ -198,11 +198,14 @@
 
             _.each(props, function(value, key) {
                 if (!model.has(key)) {
+                    Pump.debug("Assigning " + model.id + " a new property " + key);
                     model.set(key, value);
                 } else if (_.contains(complicated, key) && model[key] && _.isFunction(model[key].merge)) {
+                    Pump.debug("Delegating merge of " + model.id + " to property " + key);
                     model[key].merge(value);
                 } else {
                     // XXX: resolve non-complicated stuff
+                    Pump.debug("No merge into " + model.id + " for property " + key);
                 }
             });
         },
@@ -288,12 +291,15 @@
         merge: function(props) {
             var items = this,
                 unique;
-            
-            if (_.has(props, "items")) {
+
+            if (_.isArray(props)) {
+                Pump.debug("Merging items of " + items.url() + "of length " + items.length + " with array of length " + props.length);
                 unique = props.items.map(function(item) {
                     return items.model.unique(item);
                 });
                 items.add(unique);
+            } else {
+                Pump.debug("Non-array passed to items.merge()");
             }
         }
     });
