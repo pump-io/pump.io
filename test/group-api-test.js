@@ -28,6 +28,7 @@ var assert = require("assert"),
     pj = httputil.postJSON,
     gj = httputil.getJSON,
     validActivity = actutil.validActivity,
+    validActivityObject = actutil.validActivityObject,
     setupApp = oauthutil.setupApp,
     newCredentials = oauthutil.newCredentials;
 
@@ -64,7 +65,8 @@ suite.addBatch({
                             verb: "create",
                             object: {
                                 objectType: "group",
-                                displayName: "Barbarians"
+                                displayName: "Barbarians",
+                                summary: "A safe place for barbarians to share their feelings"
                             }
                         };
 
@@ -75,6 +77,24 @@ suite.addBatch({
                 "it works": function(err, data) {
                     assert.ifError(err);
                     validActivity(data);
+                },
+                "and we retrieve that group with the REST API": {
+                    topic: function(act, cred) {
+                        var callback = this.callback,
+                            url = act.object.links.self.href;
+
+                        gj(url, cred, function(err, data, resp) {
+                            callback(err, data);
+                        });
+                    },
+                    "it works": function(err, group) {
+                        assert.ifError(err);
+                        assert.isObject(group);
+                    },
+                    "it looks right": function(err, group) {
+                        assert.ifError(err);
+                        validActivityObject(group);
+                    }
                 }
             }
         }
