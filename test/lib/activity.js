@@ -116,7 +116,18 @@ var validMediaLink = function(ml) {
         assert.isNumber(ml.duration);
     }
 };
-    
+
+var validFeed = function(feed) {
+    assert.include(feed, "url");
+    assert.isString(feed.url);
+    assert.include(feed, "totalItems");
+    assert.isNumber(feed.totalItems);
+    if (_.has(feed, "items")) {
+        assert.isArray(feed.items);
+    }
+};
+
 exports.validActivity       = validActivity;
 exports.validActivityObject = validActivityObject;
 exports.validMediaLink      = validMediaLink;
+exports.validFeed           = validFeed;
