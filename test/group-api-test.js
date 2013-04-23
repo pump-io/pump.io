@@ -94,6 +94,17 @@ suite.addBatch({
                     "it looks right": function(err, group) {
                         assert.ifError(err);
                         validActivityObject(group);
+                    },
+                    "it has a members feed": function(err, group) {
+                        assert.ifError(err);
+                        assert.isObject(group);
+                        assert.include(group, "members");
+                        assert.isObject(group.members);
+                        assert.include(group.members, "url");
+                        assert.isString(group.members.url);
+                        assert.include(group.members, "totalItems");
+                        assert.isNumber(group.members.totalItems);
+                        assert.equal(group.members.totalItems, 0);
                     }
                 }
             }
