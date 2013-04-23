@@ -29,6 +29,7 @@ var assert = require("assert"),
     gj = httputil.getJSON,
     validActivity = actutil.validActivity,
     validActivityObject = actutil.validActivityObject,
+    validFeed = actutil.validFeed,
     setupApp = oauthutil.setupApp,
     newCredentials = oauthutil.newCredentials;
 
@@ -105,6 +106,25 @@ suite.addBatch({
                         assert.include(group.members, "totalItems");
                         assert.isNumber(group.members.totalItems);
                         assert.equal(group.members.totalItems, 0);
+                    },
+                    "and we get the members feed": {
+                        topic: function(group, act, cred) {
+                            var callback = this.callback,
+                                url = group.members.url;
+
+                            gj(url, cred, function(err, data, resp) {
+                                callback(err, data);
+                            });
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                            validFeed(feed);
+                        },
+                        "it's empty": function(err, feed) {
+                            assert.ifError(err);
+                            assert.equal(feed.totalItems, 0);
+                            assert.isTrue(!_.has(feed, "items") || (_.isArray(feed.items) && feed.items.length === 0));
+                        }
                     }
                 }
             }

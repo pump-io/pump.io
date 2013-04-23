@@ -171,6 +171,10 @@ var addRoutes = function(app) {
     app.get("/api/collection/:uuid/members", smw, anyReadAuth, requestCollection, authorOrRecipient, collectionMembers);
     app.post("/api/collection/:uuid/members", userWriteOAuth, requestCollection, authorOnly, reqGenerator, newMember);
 
+    // Group members
+
+    app.get("/api/group/:uuid/members", smw, anyReadAuth, requestGroup, authorOrRecipient, groupMembers);
+
     // Info about yourself
 
     app.get("/api/whoami", smw, userReadAuth, whoami);
@@ -180,6 +184,11 @@ var addRoutes = function(app) {
 
 var requestCollection = function(req, res, next) {
     req.params.type = "collection";
+    requestObject(req, res, next);
+};
+
+var requestGroup = function(req, res, next) {
+    req.params.type = "group";
     requestObject(req, res, next);
 };
 
@@ -1289,6 +1298,14 @@ var collectionMembers = contextEndpoint(
         return context;
     },
     streams.collectionMembers
+);
+
+var groupMembers = contextEndpoint(
+    function(req) {
+        var context = {group: req.group, author: req.group.author};
+        return context;
+    },
+    streams.groupMembers
 );
 
 var newMember = function(req, res, next) {
