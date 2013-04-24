@@ -171,9 +171,10 @@ var addRoutes = function(app) {
     app.get("/api/collection/:uuid/members", smw, anyReadAuth, requestCollection, authorOrRecipient, collectionMembers);
     app.post("/api/collection/:uuid/members", userWriteOAuth, requestCollection, authorOnly, reqGenerator, newMember);
 
-    // Group members
+    // Group feeds (members and inbox)
 
     app.get("/api/group/:uuid/members", smw, anyReadAuth, requestGroup, authorOrRecipient, groupMembers);
+    app.get("/api/group/:uuid/inbox", smw, anyReadAuth, requestGroup, authorOrRecipient, groupInbox);
 
     // Info about yourself
 
@@ -1153,7 +1154,7 @@ var streamEndpoint = function(streamCreator) {
             return;
         }
 
-        streamCreator(req.user, req.principal, args, function(err, collection) {
+        streamCreator({user: req.user}, req.principal, args, function(err, collection) {
             if (err) {
                 next(err);
             } else {
@@ -1306,6 +1307,14 @@ var groupMembers = contextEndpoint(
         return context;
     },
     streams.groupMembers
+);
+
+var groupInbox = contextEndpoint(
+    function(req) {
+        var context = {group: req.group};
+        return context;
+    },
+    streams.groupInbox
 );
 
 var newMember = function(req, res, next) {
