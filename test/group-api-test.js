@@ -228,7 +228,28 @@ suite.addBatch({
                 "it works": function(err, data, cred) {
                     assert.ifError(err);
                     validActivity(data);
-                }
+                },
+		"and the creator checks the member feed": {
+		    topic: function(joinAct, memberCred, createAct, creatorCred) {
+                        var callback = this.callback,
+                        url = joinAct.object.members.url,
+			cred = creatorCred;
+
+                        gj(url, cred, function(err, data, resp) {
+                            callback(err, data);
+                        });
+                    },
+                    "it works": function(err, feed) {
+                        assert.ifError(err);
+                        validFeed(feed);
+                    },
+                    "it's got one item": function(err, feed) {
+                        assert.ifError(err);
+                        assert.equal(feed.totalItems, 1);
+                        assert.equal(feed.items.length, 1);
+                        validActivityObject(feed.items[0]);
+                    }
+		}
             }
         }
     }
