@@ -50,7 +50,7 @@ suite.addBatch({
         "it works": function(err, app) {
             assert.ifError(err);
         },
-        "and we get make a new user": {
+        "and we make a new user": {
             topic: function() {
                 newCredentials("fafhrd", "lankhmar+1", this.callback);
             },
@@ -155,6 +155,79 @@ suite.addBatch({
                             assert.isTrue(!_.has(feed, "items") || (_.isArray(feed.items) && feed.items.length === 0));
                         }
                     }
+                }
+            }
+        },
+        "and we make another group": {
+            topic: function() {
+                var callback = this.callback,
+                    url = "http://localhost:4815/api/user/graymouser/feed",
+                    act = {
+                        verb: "create",
+                        object: {
+                            objectType: "group",
+                            displayName: "Magicians",
+                            summary: "Let's talk sorcery!"
+                        }
+                    },
+                    cred;
+
+                Step(
+                    function() {
+                        newCredentials("graymouser", "swords+_+_", this);
+                    },
+                    function(err, results) {
+                        if (err) throw err;
+                        cred = results;
+                        pj(url, cred, act, this);
+                    },
+                    function(err, data, resp) {
+                        if (err) {
+                            callback(err, null, null);
+                        } else {
+                            callback(null, data, cred);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, data, cred) {
+                assert.ifError(err);
+                validActivity(data);
+            },
+            "and another user tries to join it": {
+                topic: function(created, cred) {
+                    var callback = this.callback,
+                        url = "http://localhost:4815/api/user/ningauble/feed",
+                        act = {
+                            verb: "join",
+                            object: {
+                                id: created.object.id,
+                                objectType: created.object.objectType
+                            }
+                        },
+                        newCred;
+
+                    Step(
+                        function() {
+                            newCredentials("ningauble", "*iiiiiii*", this);
+                        },
+                        function(err, results) {
+                            if (err) throw err;
+                            newCred = results;
+                            pj(url, newCred, act, this);
+                        },
+                        function(err, data, resp) {
+                            if (err) {
+                                callback(err, null, null);
+                            } else {
+                                callback(null, data, newCred);
+                            }
+                        }
+                    );
+                },
+                "it works": function(err, data, cred) {
+                    assert.ifError(err);
+                    validActivity(data);
                 }
             }
         }
