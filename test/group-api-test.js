@@ -107,6 +107,16 @@ suite.addBatch({
                         assert.isNumber(group.members.totalItems);
                         assert.equal(group.members.totalItems, 0);
                     },
+                    "it has an inbox feed": function(err, group) {
+                        assert.ifError(err);
+                        assert.isObject(group);
+                        assert.include(group, "links");
+                        assert.isObject(group.links);
+                        assert.include(group.links, "activity-inbox");
+                        assert.isObject(group.links["activity-inbox"]);
+                        assert.include(group.links["activity-inbox"], "href");
+                        assert.isString(group.links["activity-inbox"].href);
+                    },
                     "and we get the members feed": {
                         topic: function(group, act, cred) {
                             var callback = this.callback,
