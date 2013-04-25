@@ -236,8 +236,8 @@ suite.addBatch({
 		"and the creator checks the member feed": {
 		    topic: function(joinAct, memberCred, createAct, creatorCred) {
                         var callback = this.callback,
-                        url = joinAct.object.members.url,
-			cred = creatorCred;
+                            url = joinAct.object.members.url,
+			    cred = creatorCred;
 
                         gj(url, cred, function(err, data, resp) {
                             callback(err, data, joinAct.actor);
@@ -308,6 +308,75 @@ suite.addBatch({
                         }
                     }
 		}
+            }
+        },
+        "and two users join a group": {
+            topic: function() {
+                var callback = this.callback,
+                    creds = {},
+                    group;
+
+                Step(
+                    function() {
+                        var group = this.group();
+                        // Create three new users
+                        newCredentials("krovas", "grand*master", this.parallel());
+                        newCredentials("fissif", "i*steal*things", this.parallel());
+                        newCredentials("slevyas", "i*steal*things*too", this.parallel());
+                    },
+                    function(err, krovas, fissif, slevyas) {
+                        var url = "http://localhost:4815/api/user/krovas/feed",
+                            act = {
+                                verb: "create",
+                                to: [{
+                                    id: "http://activityschema.org/collection/public",
+                                    objectType: "collection"
+                                }],
+                                object: {
+                                    objectType: "group",
+                                    displayName: "Thieves' Guild",
+                                    summary: "For thieves"
+                                }
+                            };
+                        
+                        if (err) throw err;
+
+                        creds = {
+                            krovas: krovas,
+                            fissif: fissif,
+                            slevyas: slevyas
+                        };
+
+                        // One user creates a group
+
+                        pj(url, creds.krovas, act, this);
+                    },
+                    function(err, data, resp) {
+                        var url1 = "http://localhost:4815/api/user/fissif/feed",
+                            url2 = "http://localhost:4815/api/user/slevyas/feed",
+                            act;
+                        if (err) throw err;
+                        group = data.object;
+                        act = {
+                            verb: "join",
+                            object: group
+                        };
+                        pj(url1, creds.fissif, act, this.parallel());
+                        pj(url2, creds.slevyas, act, this.parallel());
+                    },
+                    function(err) {
+                        if (err) {
+                            callback(err, null, null);
+                        } else {
+                            callback(err, creds, group);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, creds, group) {
+                assert.ifError(err);
+                assert.isObject(creds);
+                validActivityObject(group);
             }
         }
     }
