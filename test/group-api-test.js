@@ -240,18 +240,51 @@ suite.addBatch({
 			cred = creatorCred;
 
                         gj(url, cred, function(err, data, resp) {
-                            callback(err, data);
+                            callback(err, data, joinAct.actor);
                         });
                     },
-                    "it works": function(err, feed) {
+                    "it works": function(err, feed, joiner) {
                         assert.ifError(err);
                         validFeed(feed);
                     },
-                    "it's got one item": function(err, feed) {
+                    "it's got our joined person": function(err, feed, joiner) {
                         assert.ifError(err);
                         assert.equal(feed.totalItems, 1);
                         assert.equal(feed.items.length, 1);
                         validActivityObject(feed.items[0]);
+                        assert.equal(feed.items[0].id, joiner.id);
+                    },
+                    "and the member leaves the group": {
+		        topic: function(feed, joiner, joinAct, memberCred, createAct, creatorCred) {
+                            var callback = this.callback,
+                                url = "http://localhost:4815/api/user/ningauble/feed",
+                                cred = memberCred,
+                                group = createAct.object,
+                                act = {
+                                    verb: "leave",
+                                    object: {
+                                        id: group.id,
+                                        objectType: group.objectType
+                                    }
+                                };
+
+                            Step(
+                                function() {
+                                    pj(url, cred, act, this);
+                                },
+                                function(err, data, resp) {
+                                    if (err) {
+                                        callback(err, null);
+                                    } else {
+                                        callback(null, data);
+                                    }
+                                }
+                            );
+                        },
+                        "it works": function(err, data) {
+                            assert.ifError(err);
+                            validActivity(data);
+                        }
                     }
 		}
             }
