@@ -35,7 +35,7 @@ var assert = require("assert"),
 
 var suite = vows.describe("Group API test");
 
-// A batch for testing the read-write access to the API
+// A batch for manipulating groups API
 
 suite.addBatch({
     "When we set up the app": {
