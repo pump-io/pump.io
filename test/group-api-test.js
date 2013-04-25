@@ -164,6 +164,10 @@ suite.addBatch({
                     url = "http://localhost:4815/api/user/graymouser/feed",
                     act = {
                         verb: "create",
+                        to: [{
+                            id: "http://activityschema.org/collection/public",
+                            objectType: "collection"
+                        }],
                         object: {
                             objectType: "group",
                             displayName: "Magicians",
