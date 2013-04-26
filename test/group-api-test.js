@@ -429,6 +429,30 @@ suite.addBatch({
                             item = _.find(feed.items, function(item) { return item.id == act.id; });
                             assert.isObject(item);
                         }
+                    },
+                    "and the other member checks their own inbox feed": {
+                        topic: function(act, group, creds) {
+                            var callback = this.callback,
+                                url = "http://localhost:4815/api/user/slevyas/inbox";
+                            gj(url, creds.slevyas, function(err, data, resp) {
+                                callback(err, data, act);
+                            });
+                        },
+                        "it works": function(err, feed, act) {
+                            assert.ifError(err);
+                            validFeed(feed);
+                        },
+                        "it includes the posted activity": function(err, feed, act) {
+                            var item;
+                            assert.ifError(err);
+                            assert.isObject(feed);
+                            assert.isNumber(feed.totalItems);
+                            assert.greater(feed.totalItems, 0);
+                            assert.isArray(feed.items);
+                            assert.greater(feed.items.length, 0);
+                            item = _.find(feed.items, function(item) { return item.id == act.id; });
+                            assert.isObject(item);
+                        }
                     }
                 }
             }
