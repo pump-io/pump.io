@@ -406,11 +406,11 @@ suite.addBatch({
                     "it works": function(err) {
                         assert.ifError(err);
                     },
-                    "and the poster checks the group's inbox feed": {
+                    "and the other member checks the group's inbox feed": {
                         topic: function(act, group, creds) {
                             var callback = this.callback,
                                 url = group.links["activity-inbox"].href;
-                            gj(url, creds.fissif, function(err, data, resp) {
+                            gj(url, creds.slevyas, function(err, data, resp) {
                                 callback(err, data, act);
                             });
                         },
