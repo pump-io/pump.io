@@ -395,6 +395,41 @@ suite.addBatch({
                 "it works": function(err, act) {
                     assert.ifError(err);
                     validActivity(act);
+                },
+                "and we wait a second for delivery": {
+                    topic: function(act, group, creds) {
+                        var callback = this.callback;
+                        setTimeout(function() {
+                            callback(null);
+                        }, 1000);
+                    },
+                    "it works": function(err) {
+                        assert.ifError(err);
+                    },
+                    "and the poster checks the group's inbox feed": {
+                        topic: function(act, group, creds) {
+                            var callback = this.callback,
+                                url = group.links["activity-inbox"].href;
+                            gj(url, creds.fissif, function(err, data, resp) {
+                                callback(err, data, act);
+                            });
+                        },
+                        "it works": function(err, feed, act) {
+                            assert.ifError(err);
+                            validFeed(feed);
+                        },
+                        "it includes the posted activity": function(err, feed, act) {
+                            var item;
+                            assert.ifError(err);
+                            assert.isObject(feed);
+                            assert.isNumber(feed.totalItems);
+                            assert.greater(feed.totalItems, 0);
+                            assert.isArray(feed.items);
+                            assert.greater(feed.items.length, 0);
+                            item = _.find(feed.items, function(item) { return item.id == act.id; });
+                            assert.isObject(item);
+                        }
+                    }
                 }
             }
         }
