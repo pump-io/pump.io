@@ -151,6 +151,61 @@ suite.addBatch({
                     assert.equal(count, 0);
                 }
             }
+        },
+        "and we create yet another stream": {
+            topic: function(Stream) {
+                Stream.create({name: "test-each-3"}, this.callback);
+            },
+            "it works": function(err, stream) {
+                assert.ifError(err);
+                assert.isObject(stream);
+            },
+            "and we add 5000 ids": {
+                topic: function(stream, Stream) {
+                    var cb = this.callback;
+                    Step(
+                        function() {
+                            var i, group = this.group();
+                            for (i = 0; i < 5000; i++) {
+                                stream.deliver("http://example.net/api/object/"+i, group());
+                            }
+                        },
+                        function(err) {
+                            if (err) {
+                                cb(err);
+                            } else {
+                                cb(null);
+                            }
+                        }
+                    );
+                },
+                "it works": function(err) {
+                    assert.ifError(err);
+                },
+                "and we iterate with a function that throws an exception": {
+                    topic: function(stream, Stream) {
+                        var theError = new Error("My test error"),
+                            callback = this.callback;
+                        stream.each(
+                            function(item, callback) {
+                                throw theError;
+                            },
+                            function(err) {
+                                if (err == theError) {
+                                    callback(null);
+                                } else if (err) {
+                                    callback(err);
+                                } else {
+                                    callback(new Error("Unexpected success"));
+                                }
+                            }
+                        );
+                    },
+                    "it works": function(err) {
+                        assert.ifError(err);
+                    }
+                }
+            }
         }
     }
 });
