@@ -309,6 +309,73 @@ suite.addBatch({
                     }
 		}
             }
+        },
+        "and two users join a group": {
+            topic: function() {
+                var callback = this.callback,
+                    creds,
+                    group;
+
+                Step(
+                    function() {
+                        newCredentials("krovas", "grand*master", this.parallel());
+                        newCredentials("fissif", "thief*no1", this.parallel());
+                        newCredentials("slevyas", "thief*no2", this.parallel());
+                    },
+                    function(err, cred1, cred2, cred3) {
+                        var url, act;
+                        if (err) throw err;
+                        creds = {
+                            krovas: cred1,
+                            fissif: cred2,
+                            slevyas: cred3
+                        };
+                        url = "http://localhost:4815/api/user/krovas/feed";
+                        act = {
+                            verb: "create",
+                            to: [{
+                                id: "http://activityschema.org/collection/public",
+                                objectType: "collection"
+                            }],
+                            object: {
+                                objectType: "group",
+                                displayName: "Thieves' Guild",
+                                summary: "For thieves to hang out and help each other steal stuff"
+                            }
+                        };
+                        pj(url, creds.krovas, act, this);
+                    },
+                    function(err, created) {
+                        var url, act;
+                        if (err) throw err;
+                        group = created.object;
+                        url = "http://localhost:4815/api/user/fissif/feed";
+                        act = {
+                            verb: "join",
+                            object: group
+                        };
+                        pj(url, creds.fissif, act, this.parallel());
+                        url = "http://localhost:4815/api/user/slevyas/feed";
+                        act = {
+                            verb: "join",
+                            object: group
+                        };
+                        pj(url, creds.slevyas, act, this.parallel());
+                    },
+                    function(err) {
+                        if (err) {
+                            callback(err, null, null);
+                        } else {
+                            callback(null, group, creds);
+                        }
+                    }
+                );
+            },
+            "it works": function(err, group, creds) {
+                assert.ifError(err);
+                validActivityObject(group);
+                assert.isObject(creds);
+            }
         }
     }
 });
