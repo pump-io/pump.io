@@ -375,6 +375,27 @@ suite.addBatch({
                 assert.ifError(err);
                 validActivityObject(group);
                 assert.isObject(creds);
+            },
+            "and one member posts to the group": {
+                topic: function(group, creds) {
+                    var callback = this.callback,
+                        url = "http://localhost:4815/api/user/fissif/feed",
+                        act = {
+                            verb: "post",
+                            to: [group],
+                            object: {
+                                objectType: "note",
+                                content: "When is the next big caper, guys?"
+                            }
+                        };
+                    pj(url, creds.fissif, act, function(err, data, resp) {
+                        callback(err, data);
+                    });
+                },
+                "it works": function(err, act) {
+                    assert.ifError(err);
+                    validActivity(act);
+                }
             }
         }
     }
