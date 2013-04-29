@@ -121,6 +121,38 @@ suite.addBatch({
                 "it works": function(err, body) {
                     assert.ifError(err);
                     validActivity(body);
+                },
+                "and the other users join it": {
+                    topic: function(createAct, creds) {
+                        var callback = this.callback,
+                            group = createAct.object;
+
+                        Step(
+                            function() {
+                                var url = "http://photo.localhost/api/user/harpo/feed",
+                                    act = {
+                                        verb: "join",
+                                        object: group
+                                    };
+                                pj(url, creds.harpo, act, this);
+                            },
+                            function(err, body, resp) {
+                                if (err) throw err;
+                                var url = "http://social.localhost/api/user/chico/feed",
+                                    act = {
+                                        verb: "join",
+                                        object: group
+                                    };
+                                pj(url, creds.chico, act, this);
+                            },
+                            function(err, body, resp) {
+                                callback(err);
+                            }
+                        );
+                    },
+                    "it works": function(err) {
+                        assert.ifError(err);
+                    }
                 }
             }
         }
