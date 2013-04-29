@@ -1,5 +1,5 @@
 /* ===================================================
- * bootstrap-transition.js v2.3.1
+ * bootstrap-transition.js v2.2.2
  * http://twitter.github.com/bootstrap/javascript.html#transitions
  * ===================================================
  * Copyright 2012 Twitter, Inc.
@@ -58,7 +58,7 @@
   })
 
 }(window.jQuery);/* ==========================================================
- * bootstrap-alert.js v2.3.1
+ * bootstrap-alert.js v2.2.2
  * http://twitter.github.com/bootstrap/javascript.html#alerts
  * ==========================================================
  * Copyright 2012 Twitter, Inc.
@@ -156,7 +156,7 @@
   $(document).on('click.alert.data-api', dismiss, Alert.prototype.close)
 
 }(window.jQuery);/* ============================================================
- * bootstrap-button.js v2.3.1
+ * bootstrap-button.js v2.2.2
  * http://twitter.github.com/bootstrap/javascript.html#buttons
  * ============================================================
  * Copyright 2012 Twitter, Inc.
@@ -260,7 +260,7 @@
   })
 
 }(window.jQuery);/* ==========================================================
- * bootstrap-carousel.js v2.3.1
+ * bootstrap-carousel.js v2.2.2
  * http://twitter.github.com/bootstrap/javascript.html#carousel
  * ==========================================================
  * Copyright 2012 Twitter, Inc.
@@ -289,7 +289,6 @@
 
   var Carousel = function (element, options) {
     this.$element = $(element)
-    this.$indicators = this.$element.find('.carousel-indicators')
     this.options = options
     this.options.pause == 'hover' && this.$element
       .on('mouseenter', $.proxy(this.pause, this))
@@ -300,24 +299,19 @@
 
     cycle: function (e) {
       if (!e) this.paused = false
-      if (this.interval) clearInterval(this.interval);
       this.options.interval
         && !this.paused
         && (this.interval = setInterval($.proxy(this.next, this), this.options.interval))
       return this
     }
 
-  , getActiveIndex: function () {
-      this.$active = this.$element.find('.item.active')
-      this.$items = this.$active.parent().children()
-      return this.$items.index(this.$active)
-    }
-
   , to: function (pos) {
-      var activeIndex = this.getActiveIndex()
+      var $active = this.$element.find('.item.active')
+        , children = $active.parent().children()
+        , activePos = children.index($active)
         , that = this
 
-      if (pos > (this.$items.length - 1) || pos < 0) return
+      if (pos > (children.length - 1) || pos < 0) return
 
       if (this.sliding) {
         return this.$element.one('slid', function () {
@@ -325,18 +319,18 @@
         })
       }
 
-      if (activeIndex == pos) {
+      if (activePos == pos) {
         return this.pause().cycle()
       }
 
-      return this.slide(pos > activeIndex ? 'next' : 'prev', $(this.$items[pos]))
+      return this.slide(pos > activePos ? 'next' : 'prev', $(children[pos]))
     }
 
   , pause: function (e) {
       if (!e) this.paused = true
       if (this.$element.find('.next, .prev').length && $.support.transition.end) {
         this.$element.trigger($.support.transition.end)
-        this.cycle(true)
+        this.cycle()
       }
       clearInterval(this.interval)
       this.interval = null
@@ -370,18 +364,9 @@
 
       e = $.Event('slide', {
         relatedTarget: $next[0]
-      , direction: direction
       })
 
       if ($next.hasClass('active')) return
-
-      if (this.$indicators.length) {
-        this.$indicators.find('.active').removeClass('active')
-        this.$element.one('slid', function () {
-          var $nextIndicator = $(that.$indicators.children()[that.getActiveIndex()])
-          $nextIndicator && $nextIndicator.addClass('active')
-        })
-      }
 
       if ($.support.transition && this.$element.hasClass('slide')) {
         this.$element.trigger(e)
@@ -427,7 +412,7 @@
       if (!data) $this.data('carousel', (data = new Carousel(this, options)))
       if (typeof option == 'number') data.to(option)
       else if (action) data[action]()
-      else if (options.interval) data.pause().cycle()
+      else if (options.interval) data.cycle()
     })
   }
 
@@ -450,23 +435,16 @@
  /* CAROUSEL DATA-API
   * ================= */
 
-  $(document).on('click.carousel.data-api', '[data-slide], [data-slide-to]', function (e) {
+  $(document).on('click.carousel.data-api', '[data-slide]', function (e) {
     var $this = $(this), href
       , $target = $($this.attr('data-target') || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '')) //strip for ie7
       , options = $.extend({}, $target.data(), $this.data())
-      , slideIndex
-
     $target.carousel(options)
-
-    if (slideIndex = $this.attr('data-slide-to')) {
-      $target.data('carousel').pause().to(slideIndex).cycle()
-    }
-
     e.preventDefault()
   })
 
 }(window.jQuery);/* =============================================================
- * bootstrap-collapse.js v2.3.1
+ * bootstrap-collapse.js v2.2.2
  * http://twitter.github.com/bootstrap/javascript.html#collapse
  * =============================================================
  * Copyright 2012 Twitter, Inc.
@@ -519,7 +497,7 @@
         , actives
         , hasData
 
-      if (this.transitioning || this.$element.hasClass('in')) return
+      if (this.transitioning) return
 
       dimension = this.dimension()
       scroll = $.camelCase(['scroll', dimension].join('-'))
@@ -539,7 +517,7 @@
 
   , hide: function () {
       var dimension
-      if (this.transitioning || !this.$element.hasClass('in')) return
+      if (this.transitioning) return
       dimension = this.dimension()
       this.reset(this.$element[dimension]())
       this.transition('removeClass', $.Event('hide'), 'hidden')
@@ -596,7 +574,7 @@
     return this.each(function () {
       var $this = $(this)
         , data = $this.data('collapse')
-        , options = $.extend({}, $.fn.collapse.defaults, $this.data(), typeof option == 'object' && option)
+        , options = typeof option == 'object' && option
       if (!data) $this.data('collapse', (data = new Collapse(this, options)))
       if (typeof option == 'string') data[option]()
     })
@@ -632,7 +610,7 @@
   })
 
 }(window.jQuery);/* ============================================================
- * bootstrap-dropdown.js v2.3.1
+ * bootstrap-dropdown.js v2.2.2
  * http://twitter.github.com/bootstrap/javascript.html#dropdowns
  * ============================================================
  * Copyright 2012 Twitter, Inc.
@@ -714,10 +692,7 @@
 
       isActive = $parent.hasClass('open')
 
-      if (!isActive || (isActive && e.keyCode == 27)) {
-        if (e.which == 27) $parent.find(toggle).focus()
-        return $this.click()
-      }
+      if (!isActive || (isActive && e.keyCode == 27)) return $this.click()
 
       $items = $('[role=menu] li:not(.divider):visible a', $parent)
 
@@ -751,9 +726,8 @@
       selector = selector && /#/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') //strip for ie7
     }
 
-    $parent = selector && $(selector)
-
-    if (!$parent || !$parent.length) $parent = $this.parent()
+    $parent = $(selector)
+    $parent.length || ($parent = $this.parent())
 
     return $parent
   }
@@ -789,15 +763,14 @@
    * =================================== */
 
   $(document)
-    .on('click.dropdown.data-api', clearMenus)
-    .on('click.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
-    .on('click.dropdown-menu', function (e) { e.stopPropagation() })
-    .on('click.dropdown.data-api'  , toggle, Dropdown.prototype.toggle)
-    .on('keydown.dropdown.data-api', toggle + ', [role=menu]' , Dropdown.prototype.keydown)
+    .on('click.dropdown.data-api touchstart.dropdown.data-api', clearMenus)
+    .on('click.dropdown touchstart.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
+    .on('touchstart.dropdown.data-api', '.dropdown-menu', function (e) { e.stopPropagation() })
+    .on('click.dropdown.data-api touchstart.dropdown.data-api'  , toggle, Dropdown.prototype.toggle)
+    .on('keydown.dropdown.data-api touchstart.dropdown.data-api', toggle + ', [role=menu]' , Dropdown.prototype.keydown)
 
-}(window.jQuery);
-/* =========================================================
- * bootstrap-modal.js v2.3.1
+}(window.jQuery);/* =========================================================
+ * bootstrap-modal.js v2.2.2
  * http://twitter.github.com/bootstrap/javascript.html#modals
  * =========================================================
  * Copyright 2012 Twitter, Inc.
@@ -858,7 +831,8 @@
             that.$element.appendTo(document.body) //don't move modals dom position
           }
 
-          that.$element.show()
+          that.$element
+            .show()
 
           if (transition) {
             that.$element[0].offsetWidth // force reflow
@@ -936,17 +910,16 @@
         })
       }
 
-    , hideModal: function () {
-        var that = this
-        this.$element.hide()
-        this.backdrop(function () {
-          that.removeBackdrop()
-          that.$element.trigger('hidden')
-        })
+    , hideModal: function (that) {
+        this.$element
+          .hide()
+          .trigger('hidden')
+
+        this.backdrop()
       }
 
     , removeBackdrop: function () {
-        this.$backdrop && this.$backdrop.remove()
+        this.$backdrop.remove()
         this.$backdrop = null
       }
 
@@ -970,8 +943,6 @@
 
           this.$backdrop.addClass('in')
 
-          if (!callback) return
-
           doAnimate ?
             this.$backdrop.one($.support.transition.end, callback) :
             callback()
@@ -980,8 +951,8 @@
           this.$backdrop.removeClass('in')
 
           $.support.transition && this.$element.hasClass('fade')?
-            this.$backdrop.one($.support.transition.end, callback) :
-            callback()
+            this.$backdrop.one($.support.transition.end, $.proxy(this.removeBackdrop, this)) :
+            this.removeBackdrop()
 
         } else if (callback) {
           callback()
@@ -1044,7 +1015,7 @@
 
 }(window.jQuery);
 /* ===========================================================
- * bootstrap-tooltip.js v2.3.1
+ * bootstrap-tooltip.js v2.2.2
  * http://twitter.github.com/bootstrap/javascript.html#tooltips
  * Inspired by the original jQuery.tipsy by Jason Frame
  * ===========================================================
@@ -1083,27 +1054,19 @@
   , init: function (type, element, options) {
       var eventIn
         , eventOut
-        , triggers
-        , trigger
-        , i
 
       this.type = type
       this.$element = $(element)
       this.options = this.getOptions(options)
       this.enabled = true
 
-      triggers = this.options.trigger.split(' ')
-
-      for (i = triggers.length; i--;) {
-        trigger = triggers[i]
-        if (trigger == 'click') {
-          this.$element.on('click.' + this.type, this.options.selector, $.proxy(this.toggle, this))
-        } else if (trigger != 'manual') {
-          eventIn = trigger == 'hover' ? 'mouseenter' : 'focus'
-          eventOut = trigger == 'hover' ? 'mouseleave' : 'blur'
-          this.$element.on(eventIn + '.' + this.type, this.options.selector, $.proxy(this.enter, this))
-          this.$element.on(eventOut + '.' + this.type, this.options.selector, $.proxy(this.leave, this))
-        }
+      if (this.options.trigger == 'click') {
+        this.$element.on('click.' + this.type, this.options.selector, $.proxy(this.toggle, this))
+      } else if (this.options.trigger != 'manual') {
+        eventIn = this.options.trigger == 'hover' ? 'mouseenter' : 'focus'
+        eventOut = this.options.trigger == 'hover' ? 'mouseleave' : 'blur'
+        this.$element.on(eventIn + '.' + this.type, this.options.selector, $.proxy(this.enter, this))
+        this.$element.on(eventOut + '.' + this.type, this.options.selector, $.proxy(this.leave, this))
       }
 
       this.options.selector ?
@@ -1112,7 +1075,7 @@
     }
 
   , getOptions: function (options) {
-      options = $.extend({}, $.fn[this.type].defaults, this.$element.data(), options)
+      options = $.extend({}, $.fn[this.type].defaults, options, this.$element.data())
 
       if (options.delay && typeof options.delay == 'number') {
         options.delay = {
@@ -1125,15 +1088,7 @@
     }
 
   , enter: function (e) {
-      var defaults = $.fn[this.type].defaults
-        , options = {}
-        , self
-
-      this._options && $.each(this._options, function (key, value) {
-        if (defaults[key] != value) options[key] = value
-      }, this)
-
-      self = $(e.currentTarget)[this.type](options).data(this.type)
+      var self = $(e.currentTarget)[this.type](this._options).data(this.type)
 
       if (!self.options.delay || !self.options.delay.show) return self.show()
 
@@ -1158,16 +1113,14 @@
 
   , show: function () {
       var $tip
+        , inside
         , pos
         , actualWidth
         , actualHeight
         , placement
         , tp
-        , e = $.Event('show')
 
       if (this.hasContent() && this.enabled) {
-        this.$element.trigger(e)
-        if (e.isDefaultPrevented()) return
         $tip = this.tip()
         this.setContent()
 
@@ -1179,18 +1132,19 @@
           this.options.placement.call(this, $tip[0], this.$element[0]) :
           this.options.placement
 
+        inside = /in/.test(placement)
+
         $tip
           .detach()
           .css({ top: 0, left: 0, display: 'block' })
+          .insertAfter(this.$element)
 
-        this.options.container ? $tip.appendTo(this.options.container) : $tip.insertAfter(this.$element)
-
-        pos = this.getPosition()
+        pos = this.getPosition(inside)
 
         actualWidth = $tip[0].offsetWidth
         actualHeight = $tip[0].offsetHeight
 
-        switch (placement) {
+        switch (inside ? placement.split(' ')[1] : placement) {
           case 'bottom':
             tp = {top: pos.top + pos.height, left: pos.left + pos.width / 2 - actualWidth / 2}
             break
@@ -1205,56 +1159,11 @@
             break
         }
 
-        this.applyPlacement(tp, placement)
-        this.$element.trigger('shown')
+        $tip
+          .offset(tp)
+          .addClass(placement)
+          .addClass('in')
       }
-    }
-
-  , applyPlacement: function(offset, placement){
-      var $tip = this.tip()
-        , width = $tip[0].offsetWidth
-        , height = $tip[0].offsetHeight
-        , actualWidth
-        , actualHeight
-        , delta
-        , replace
-
-      $tip
-        .offset(offset)
-        .addClass(placement)
-        .addClass('in')
-
-      actualWidth = $tip[0].offsetWidth
-      actualHeight = $tip[0].offsetHeight
-
-      if (placement == 'top' && actualHeight != height) {
-        offset.top = offset.top + height - actualHeight
-        replace = true
-      }
-
-      if (placement == 'bottom' || placement == 'top') {
-        delta = 0
-
-        if (offset.left < 0){
-          delta = offset.left * -2
-          offset.left = 0
-          $tip.offset(offset)
-          actualWidth = $tip[0].offsetWidth
-          actualHeight = $tip[0].offsetHeight
-        }
-
-        this.replaceArrow(delta - width + actualWidth, actualWidth, 'left')
-      } else {
-        this.replaceArrow(actualHeight - height, actualHeight, 'top')
-      }
-
-      if (replace) $tip.offset(offset)
-    }
-
-  , replaceArrow: function(delta, dimension, position){
-      this
-        .arrow()
-        .css(position, delta ? (50 * (1 - delta / dimension) + "%") : '')
     }
 
   , setContent: function () {
@@ -1268,10 +1177,6 @@
   , hide: function () {
       var that = this
         , $tip = this.tip()
-        , e = $.Event('hide')
-
-      this.$element.trigger(e)
-      if (e.isDefaultPrevented()) return
 
       $tip.removeClass('in')
 
@@ -1290,15 +1195,13 @@
         removeWithAnimation() :
         $tip.detach()
 
-      this.$element.trigger('hidden')
-
       return this
     }
 
   , fixTitle: function () {
       var $e = this.$element
       if ($e.attr('title') || typeof($e.attr('data-original-title')) != 'string') {
-        $e.attr('data-original-title', $e.attr('title') || '').attr('title', '')
+        $e.attr('data-original-title', $e.attr('title') || '').removeAttr('title')
       }
     }
 
@@ -1306,12 +1209,11 @@
       return this.getTitle()
     }
 
-  , getPosition: function () {
-      var el = this.$element[0]
-      return $.extend({}, (typeof el.getBoundingClientRect == 'function') ? el.getBoundingClientRect() : {
-        width: el.offsetWidth
-      , height: el.offsetHeight
-      }, this.$element.offset())
+  , getPosition: function (inside) {
+      return $.extend({}, (inside ? {top: 0, left: 0} : this.$element.offset()), {
+        width: this.$element[0].offsetWidth
+      , height: this.$element[0].offsetHeight
+      })
     }
 
   , getTitle: function () {
@@ -1327,10 +1229,6 @@
 
   , tip: function () {
       return this.$tip = this.$tip || $(this.options.template)
-    }
-
-  , arrow: function(){
-      return this.$arrow = this.$arrow || this.tip().find(".tooltip-arrow")
     }
 
   , validate: function () {
@@ -1354,8 +1252,8 @@
     }
 
   , toggle: function (e) {
-      var self = e ? $(e.currentTarget)[this.type](this._options).data(this.type) : this
-      self.tip().hasClass('in') ? self.hide() : self.show()
+      var self = $(e.currentTarget)[this.type](this._options).data(this.type)
+      self[self.tip().hasClass('in') ? 'hide' : 'show']()
     }
 
   , destroy: function () {
@@ -1387,11 +1285,10 @@
   , placement: 'top'
   , selector: false
   , template: '<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
-  , trigger: 'hover focus'
+  , trigger: 'hover'
   , title: ''
   , delay: 0
   , html: false
-  , container: false
   }
 
 
@@ -1403,9 +1300,8 @@
     return this
   }
 
-}(window.jQuery);
-/* ===========================================================
- * bootstrap-popover.js v2.3.1
+}(window.jQuery);/* ===========================================================
+ * bootstrap-popover.js v2.2.2
  * http://twitter.github.com/bootstrap/javascript.html#popovers
  * ===========================================================
  * Copyright 2012 Twitter, Inc.
@@ -1464,8 +1360,8 @@
         , $e = this.$element
         , o = this.options
 
-      content = (typeof o.content == 'function' ? o.content.call($e[0]) :  o.content)
-        || $e.attr('data-content')
+      content = $e.attr('data-content')
+        || (typeof o.content == 'function' ? o.content.call($e[0]) :  o.content)
 
       return content
     }
@@ -1505,7 +1401,7 @@
     placement: 'right'
   , trigger: 'click'
   , content: ''
-  , template: '<div class="popover"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
+  , template: '<div class="popover"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"></div></div></div>'
   })
 
 
@@ -1517,9 +1413,8 @@
     return this
   }
 
-}(window.jQuery);
-/* =============================================================
- * bootstrap-scrollspy.js v2.3.1
+}(window.jQuery);/* =============================================================
+ * bootstrap-scrollspy.js v2.2.2
  * http://twitter.github.com/bootstrap/javascript.html#scrollspy
  * =============================================================
  * Copyright 2012 Twitter, Inc.
@@ -1579,7 +1474,7 @@
               , $href = /^#\w/.test(href) && $(href)
             return ( $href
               && $href.length
-              && [[ $href.position().top + (!$.isWindow(self.$scrollElement.get(0)) && self.$scrollElement.scrollTop()), href ]] ) || null
+              && [[ $href.position().top + self.$scrollElement.scrollTop(), href ]] ) || null
           })
           .sort(function (a, b) { return a[0] - b[0] })
           .each(function () {
@@ -1680,7 +1575,7 @@
   })
 
 }(window.jQuery);/* ========================================================
- * bootstrap-tab.js v2.3.1
+ * bootstrap-tab.js v2.2.2
  * http://twitter.github.com/bootstrap/javascript.html#tabs
  * ========================================================
  * Copyright 2012 Twitter, Inc.
@@ -1823,7 +1718,7 @@
   })
 
 }(window.jQuery);/* =============================================================
- * bootstrap-typeahead.js v2.3.1
+ * bootstrap-typeahead.js v2.2.2
  * http://twitter.github.com/bootstrap/javascript.html#typeahead
  * =============================================================
  * Copyright 2012 Twitter, Inc.
@@ -1996,7 +1891,6 @@
 
   , listen: function () {
       this.$element
-        .on('focus',    $.proxy(this.focus, this))
         .on('blur',     $.proxy(this.blur, this))
         .on('keypress', $.proxy(this.keypress, this))
         .on('keyup',    $.proxy(this.keyup, this))
@@ -2008,7 +1902,6 @@
       this.$menu
         .on('click', $.proxy(this.click, this))
         .on('mouseenter', 'li', $.proxy(this.mouseenter, this))
-        .on('mouseleave', 'li', $.proxy(this.mouseleave, this))
     }
 
   , eventSupported: function(eventName) {
@@ -2082,31 +1975,20 @@
       e.preventDefault()
   }
 
-  , focus: function (e) {
-      this.focused = true
-    }
-
   , blur: function (e) {
-      this.focused = false
-      if (!this.mousedover && this.shown) this.hide()
+      var that = this
+      setTimeout(function () { that.hide() }, 150)
     }
 
   , click: function (e) {
       e.stopPropagation()
       e.preventDefault()
       this.select()
-      this.$element.focus()
     }
 
   , mouseenter: function (e) {
-      this.mousedover = true
       this.$menu.find('.active').removeClass('active')
       $(e.currentTarget).addClass('active')
-    }
-
-  , mouseleave: function (e) {
-      this.mousedover = false
-      if (!this.focused && this.shown) this.hide()
     }
 
   }
@@ -2153,12 +2035,13 @@
   $(document).on('focus.typeahead.data-api', '[data-provide="typeahead"]', function (e) {
     var $this = $(this)
     if ($this.data('typeahead')) return
+    e.preventDefault()
     $this.typeahead($this.data())
   })
 
 }(window.jQuery);
 /* ==========================================================
- * bootstrap-affix.js v2.3.1
+ * bootstrap-affix.js v2.2.2
  * http://twitter.github.com/bootstrap/javascript.html#affix
  * ==========================================================
  * Copyright 2012 Twitter, Inc.
