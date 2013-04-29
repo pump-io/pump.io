@@ -496,6 +496,54 @@ suite.addBatch({
             "it fails correctly": function(err) {
                 assert.ifError(err);
             }
+        },
+        "and a user joins a group they don't have access to": {
+            topic: function() {
+                var callback = this.callback,
+                    creds;
+
+                Step(
+                    function() {
+                        newCredentials("vlana", "culture*actor", this.parallel());
+                        newCredentials("vellix", "another*guy", this.parallel());
+                    },
+                    function(err, vlana, vellix) {
+                        var url, act;
+                        if (err) throw err;
+                        creds = {vlana: vlana, vellix: vellix};
+                        url = "http://localhost:4815/api/user/vlana/feed";
+                        act = {
+                            verb: "create",
+                            object: {
+                                objectType: "group",
+                                displayName: "Partners",
+                                summary: "Partners of Vlana"
+                            }
+                        };
+                        pj(url, creds.vlana, act, this);
+                    },
+                    function(err, createact, resp) {
+                        var url, act;
+                        if (err) throw err;
+                        url = "http://localhost:4815/api/user/vellix/feed";
+                        act = {
+                            verb: "join",
+                            object: createact.object
+                        };
+                        pj(url, creds.vellix, act, this);
+                    },
+                    function(err, joinact, resp) {
+                        if (err) {
+                            callback(null);
+                        } else {
+                            callback(new Error("Unexpected success"));
+                        }
+                    }
+                );
+            },
+            "it fails correctly": function(err) {
+                assert.ifError(err);
+            }
         }
     }
 });
