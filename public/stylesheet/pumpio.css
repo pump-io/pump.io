@@ -66,3 +66,8 @@
     margin-right: auto;
     max-width: 98%;
 }
+.nav > li > a > img {
+    max-height: 35px;
+    max-width: none;
+    width: auto;
+}
