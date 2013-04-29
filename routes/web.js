@@ -65,7 +65,7 @@ var addRoutes = function(app) {
     app.get("/main/register", app.session, principal, showRegister);
     app.post("/main/register", app.session, principal, clientAuth, reqGenerator, createUser);
 
-    app.get("/main/login", app.session, principal, showLogin);
+    app.get("/main/login", app.session, principal, addMessages, showLogin);
     app.post("/main/login", app.session, clientAuth, handleLogin);
 
     app.post("/main/logout", app.session, someReadAuth, handleLogout);
