@@ -152,6 +152,38 @@ suite.addBatch({
                     },
                     "it works": function(err) {
                         assert.ifError(err);
+                    },
+                    "and we wait a few seconds for delivery": {
+                        topic: function() {
+                            var callback = this.callback;
+                            setTimeout(function() { callback(null); }, 2000);
+                        },
+                        "it works": function(err) {
+                            assert.ifError(err);
+                        },
+                        "and we check the group members feed": {
+                            topic: function(createAct, creds) {
+                                var callback = this.callback,
+                                    url = createAct.object.members.url;
+
+                                gj(url, creds.groucho, function(err, feed, resp) {
+                                    callback(err, feed);
+                                });
+                            },
+                            "it works": function(err, feed) {
+                                assert.ifError(err);
+                                validFeed(feed);
+                            },
+                            "it includes our remote users": function(err, feed) {
+                                assert.ifError(err);
+                                assert.isObject(feed);
+                                assert.include(feed, "items");
+                                assert.isArray(feed.items);
+                                assert.greater(feed.items.length, 0);
+                                assert.isObject(_.find(feed.items, function(item) { return item.id == "acct:harpo@photo.localhost"; }));
+                                assert.isObject(_.find(feed.items, function(item) { return item.id == "acct:chico@social.localhost"; }));
+                            }
+                        }
                     }
                 }
             }
