@@ -313,70 +313,148 @@ suite.addBatch({
         "and two users join a group": {
             topic: function() {
                 var callback = this.callback,
-                    creds = {},
+                    creds,
                     group;
 
                 Step(
                     function() {
-                        var group = this.group();
-                        // Create three new users
                         newCredentials("krovas", "grand*master", this.parallel());
-                        newCredentials("fissif", "i*steal*things", this.parallel());
-                        newCredentials("slevyas", "i*steal*things*too", this.parallel());
+                        newCredentials("fissif", "thief*no1", this.parallel());
+                        newCredentials("slevyas", "thief*no2", this.parallel());
                     },
-                    function(err, krovas, fissif, slevyas) {
-                        var url = "http://localhost:4815/api/user/krovas/feed",
-                            act = {
-                                verb: "create",
-                                to: [{
-                                    id: "http://activityschema.org/collection/public",
-                                    objectType: "collection"
-                                }],
-                                object: {
-                                    objectType: "group",
-                                    displayName: "Thieves' Guild",
-                                    summary: "For thieves"
-                                }
-                            };
-                        
+                    function(err, cred1, cred2, cred3) {
+                        var url, act;
                         if (err) throw err;
-
                         creds = {
-                            krovas: krovas,
-                            fissif: fissif,
-                            slevyas: slevyas
+                            krovas: cred1,
+                            fissif: cred2,
+                            slevyas: cred3
                         };
-
-                        // One user creates a group
-
+                        url = "http://localhost:4815/api/user/krovas/feed";
+                        act = {
+                            verb: "create",
+                            to: [{
+                                id: "http://activityschema.org/collection/public",
+                                objectType: "collection"
+                            }],
+                            object: {
+                                objectType: "group",
+                                displayName: "Thieves' Guild",
+                                summary: "For thieves to hang out and help each other steal stuff"
+                            }
+                        };
                         pj(url, creds.krovas, act, this);
                     },
-                    function(err, data, resp) {
-                        var url1 = "http://localhost:4815/api/user/fissif/feed",
-                            url2 = "http://localhost:4815/api/user/slevyas/feed",
-                            act;
+                    function(err, created) {
+                        var url, act;
                         if (err) throw err;
-                        group = data.object;
+                        group = created.object;
+                        url = "http://localhost:4815/api/user/fissif/feed";
                         act = {
                             verb: "join",
                             object: group
                         };
-                        pj(url1, creds.fissif, act, this.parallel());
-                        pj(url2, creds.slevyas, act, this.parallel());
+                        pj(url, creds.fissif, act, this.parallel());
+                        url = "http://localhost:4815/api/user/slevyas/feed";
+                        act = {
+                            verb: "join",
+                            object: group
+                        };
+                        pj(url, creds.slevyas, act, this.parallel());
                     },
                     function(err) {
                         if (err) {
                             callback(err, null, null);
                         } else {
-                            callback(err, creds, group);
+                            callback(null, group, creds);
                         }
                     }
                 );
             },
-            "it works": function(err, creds, group) {
+            "it works": function(err, group, creds) {
                 assert.ifError(err);
-                assert.isObject(creds);
                 validActivityObject(group);
+                assert.isObject(creds);
+            },
+            "and one member posts to the group": {
+                topic: function(group, creds) {
+                    var callback = this.callback,
+                        url = "http://localhost:4815/api/user/fissif/feed",
+                        act = {
+                            verb: "post",
+                            to: [group],
+                            object: {
+                                objectType: "note",
+                                content: "When is the next big caper, guys?"
+                            }
+                        };
+                    pj(url, creds.fissif, act, function(err, data, resp) {
+                        callback(err, data);
+                    });
+                },
+                "it works": function(err, act) {
+                    assert.ifError(err);
+                    validActivity(act);
+                },
+                "and we wait a second for delivery": {
+                    topic: function(act, group, creds) {
+                        var callback = this.callback;
+                        setTimeout(function() {
+                            callback(null);
+                        }, 1000);
+                    },
+                    "it works": function(err) {
+                        assert.ifError(err);
+                    },
+                    "and the other member checks the group's inbox feed": {
+                        topic: function(act, group, creds) {
+                            var callback = this.callback,
+                                url = group.links["activity-inbox"].href;
+                            gj(url, creds.slevyas, function(err, data, resp) {
+                                callback(err, data, act);
+                            });
+                        },
+                        "it works": function(err, feed, act) {
+                            assert.ifError(err);
+                            validFeed(feed);
+                        },
+                        "it includes the posted activity": function(err, feed, act) {
+                            var item;
+                            assert.ifError(err);
+                            assert.isObject(feed);
+                            assert.isNumber(feed.totalItems);
+                            assert.greater(feed.totalItems, 0);
+                            assert.isArray(feed.items);
+                            assert.greater(feed.items.length, 0);
+                            item = _.find(feed.items, function(item) { return item.id == act.id; });
+                            assert.isObject(item);
+                        }
+                    },
+                    "and the other member checks their own inbox feed": {
+                        topic: function(act, group, creds) {
+                            var callback = this.callback,
+                                url = "http://localhost:4815/api/user/slevyas/inbox";
+                            gj(url, creds.slevyas, function(err, data, resp) {
+                                callback(err, data, act);
+                            });
+                        },
+                        "it works": function(err, feed, act) {
+                            assert.ifError(err);
+                            validFeed(feed);
+                        },
+                        "it includes the posted activity": function(err, feed, act) {
+                            var item;
+                            assert.ifError(err);
+                            assert.isObject(feed);
+                            assert.isNumber(feed.totalItems);
+                            assert.greater(feed.totalItems, 0);
+                            assert.isArray(feed.items);
+                            assert.greater(feed.items.length, 0);
+                            item = _.find(feed.items, function(item) { return item.id == act.id; });
+                            assert.isObject(item);
+                        }
+                    }
+                }
             }
         }
     }
