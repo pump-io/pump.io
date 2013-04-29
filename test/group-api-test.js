@@ -456,6 +456,46 @@ suite.addBatch({
                     }
                 }
             }
+        },
+        "and a user joins an unknown group": {
+            topic: function() {
+                var callback = this.callback;
+
+                Step(
+                    function() {
+                        newCredentials("ivrian", "dukes*daughter", this);
+                    },
+                    function(err, cred) {
+                        var url, act;
+                        if (err) throw err;
+                        url = "http://localhost:4815/api/user/ivrian/feed";
+                        act = {
+                            verb: "join",
+                            to: [{
+                                id: "http://activityschema.org/collection/public",
+                                objectType: "collection"
+                            }],
+                            object: {
+                                id: "urn:uuid:bde3d2b4-b0f6-11e2-954a-2c8158efb9e9",
+                                objectType: "group",
+                                displayName: "Girlfriends",
+                                summary: "For girlfriends of dumb adventurers"
+                            }
+                        };
+                        pj(url, cred, act, this);
+                    },
+                    function(err, joinact, resp) {
+                        if (err) {
+                            callback(null);
+                        } else {
+                            callback(new Error("Unexpected success"));
+                        }
+                    }
+                );
+            },
+            "it fails correctly": function(err) {
+                assert.ifError(err);
+            }
         }
     }
 });
