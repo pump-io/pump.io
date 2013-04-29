@@ -39,7 +39,8 @@ var authenticate = function(req, res) {
 
     if (!token) {
         res.render("error", {page: {title: "Error",
-                                    nologin: true},
+                                    nologin: true,
+                                    url: req.originalUrl},
                              status: 400,
                              error: new HTTPError("Must provide an oauth_token", 400)});
     } else {
@@ -84,7 +85,8 @@ var authenticate = function(req, res) {
             function(err, result) {
                 if (err) {
                     res.render("error", {page: {title: "Error",
-                                                nologin: true},
+                                                nologin: true,
+                                                url: req.originalUrl},
                                          status: 400,
                                          error: err});
                     return;
@@ -94,7 +96,8 @@ var authenticate = function(req, res) {
                     authorize(null, req, res, true, rt, application, rt);
                 } else {
                     res.render("authentication", {page: {title: "Authentication",
-                                                         nologin: true},
+                                                         nologin: true,
+                                                         url: req.originalUrl},
                                                   token: token,
                                                   error: false});
                 }
@@ -114,7 +117,8 @@ var authorize = function(err, req, res, authenticated, rt, application) {
     if (err) {
         res.render("authentication", {status: 400,
                                       page: {title: "Authentication",
-                                             nologin: true},
+                                             nologin: true,
+                                             url: req.originalUrl},
                                       token: rt.token,
                                       error: err.message});
         return;
@@ -122,7 +126,8 @@ var authorize = function(err, req, res, authenticated, rt, application) {
 
     if (!authenticated) {
         res.render("authentication", {page: {title: "Authentication",
-                                             nologin: true},
+                                             nologin: true,
+                                             url: req.originalUrl},
                                       token: rt.token,
                                       error: "Incorrect username or password."});
         return;
@@ -161,12 +166,14 @@ var authorize = function(err, req, res, authenticated, rt, application) {
             if (err) {
                 res.render("error", {status: 400,
                                      page: {title: "Error",
-                                            nologin: true},
+                                            nologin: true,
+                                            url: req.originalUrl},
                                      error: err});
             } else if (!ats || ats.length === 0) {
                 // No access tokens yet; show authorization page
                 res.render("authorization", {page: {title: "Authorization",
-                                                    nologin: true},
+                                                    nologin: true,
+                                                    url: req.originalUrl},
                                              token: rt.token,
                                              verifier: rt.verifier,
                                              principalUser: user,
@@ -190,7 +197,8 @@ var authorize = function(err, req, res, authenticated, rt, application) {
 var authorizationFinished = function(err, req, res, rt) {
 
     res.render("authorization-finished", {page: {title: "Authorization Finished",
-                                                 nologin: true},
+                                                 nologin: true,
+                                                 url: req.originalUrl},
                                           token: rt.token,
                                           verifier: rt.verifier});
 };

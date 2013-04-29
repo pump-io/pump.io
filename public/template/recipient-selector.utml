@@ -1,0 +1,19 @@
+<label for="<%- id %>"><%- label %></label>
+<select name="<%- name %>" id="<%- id %>" multiple="" style="width: 80%">
+  <option value="collection:http://activityschema.org/collection/public">Public</option>
+  <option <% if (name == "cc") { %>selected="selected" <% } %> value="collection:<%- principal.followers.url %>">Followers</option>
+  <% if (lists && lists.items && lists.items.length > 0) { %>
+  <optgroup label="Lists">
+    <% _.each(lists.items, function(list) { %>
+    <option value="collection:<%- list.id %>"><%- list.displayName %></option>
+    <% }); %>
+  </optgroup>
+  <% } %>
+  <% if (following && following.items && following.items.length > 0) { %>
+  <optgroup label="People">
+    <% _.each(following.items, function(contact) { %>
+    <option value="<%- contact.objectType %>:<%- contact.id %>"><%- contact.displayName %></option>
+    <% }); %>
+  </optgroup>
+  <% } %>
+</select>

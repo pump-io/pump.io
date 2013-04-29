@@ -197,6 +197,9 @@ suite.addBatch({
                             "it includes our sharer": function(err, feed, sharer) {
                                 assert.ifError(err, feed);
                                 assert.isObject(feed);
+                                assert.include(feed, "totalItems");
+                                assert.isNumber(feed.totalItems);
+                                assert.equal(feed.totalItems, 1);
                                 assert.include(feed, "items");
                                 assert.isArray(feed.items);
                                 assert.lengthOf(feed.items, 1);

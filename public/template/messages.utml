@@ -1,23 +1,21 @@
 <div class="btn-group dropdown" id="messages">
   <button class="btn dropdown-toggle btn-small btn-success
-                 <% if (messages && messages.length <= 0) { %>
+                 <% if (messages.totalItems <= 0) { %>
                  disabled
                  <% } %>"
                  data-toggle="dropdown" href="#">
     <i class="icon-envelope icon-white"></i>
-    <% if (messages && messages.length > 0) { %>
-    <span class="badge badge-important"><%- messages.length %></span>
+    <% if (messages.items.length > 0) { %>
+    <span class="badge badge-important"><%- messages.items.length %></span>
     <% } %>
   </button>
   <ul class="dropdown-menu" role="menu">
-    <% if (_.isArray(messages)) {%>
-    <% _.each(messages, function(activity) { %>
+    <% _.each(messages.items, function(activity) { %>
     <% if (_.isObject(activity)) { %>
     <li>
       <small><%= activity.content %></small>
     </li>
     <% } %>
     <% }); %>
-    <% } %>
   </ul>
 </div>

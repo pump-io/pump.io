@@ -1,7 +1,5 @@
 <ul class="media-list" id="member-stream">
-  <% if (people) { %>
-  <% _.each(people, function(person) { %>
+  <% _.each(people.items, function(person) { %>
   <%= partial("member", {person: person}) %>
   <% }); %>
-  <% } %>
 </ul>

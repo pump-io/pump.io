@@ -20,20 +20,10 @@ var databank = require("databank"),
     _ = require("underscore"),
     Step = require("step"),
     validator = require("validator"),
-    path = require("path"),
-    fs = require("fs"),
-    mkdirp = require("mkdirp"),
     OAuth = require("oauth-evanp").OAuth,
     check = validator.check,
     sanitize = validator.sanitize,
-    FilteredStream = require("../lib/filteredstream").FilteredStream,
     filters = require("../lib/filters"),
-    recipientsOnly = filters.recipientsOnly,
-    publicOnly = filters.publicOnly,
-    objectRecipientsOnly = filters.objectRecipientsOnly,
-    objectPublicOnly = filters.objectPublicOnly,
-    idRecipientsOnly = filters.idRecipientsOnly,
-    idPublicOnly = filters.idPublicOnly,
     version = require("../lib/version").version,
     HTTPError = require("../lib/httperror").HTTPError,
     Stamper = require("../lib/stamper").Stamper,
@@ -42,13 +32,10 @@ var databank = require("databank"),
     ActivitySpam = require("../lib/activityspam"),
     Activity = require("../lib/model/activity").Activity,
     AppError = require("../lib/model/activity").AppError,
-    Collection = require("../lib/model/collection").Collection,
     ActivityObject = require("../lib/model/activityobject").ActivityObject,
     Confirmation = require("../lib/model/confirmation").Confirmation,
     User = require("../lib/model/user").User,
     Person = require("../lib/model/person").Person,
-    Edge = require("../lib/model/edge").Edge,
-    Favorite = require("../lib/model/favorite").Favorite,
     Proxy = require("../lib/model/proxy").Proxy,
     Credentials = require("../lib/model/credentials").Credentials,
     stream = require("../lib/model/stream"),
@@ -63,6 +50,7 @@ var databank = require("databank"),
     finishers = require("../lib/finishers"),
     mm = require("../lib/mimemap"),
     saveUpload = require("../lib/saveupload").saveUpload,
+    streams = require("../lib/streams"),
     reqUser = mw.reqUser,
     reqGenerator = mw.reqGenerator,
     sameUser = mw.sameUser,
@@ -82,49 +70,14 @@ var databank = require("databank"),
     NoSuchThingError = databank.NoSuchThingError,
     AlreadyExistsError = databank.AlreadyExistsError,
     NoSuchItemError = databank.NoSuchItemError,
-    addFollowedFinisher = finishers.addFollowedFinisher,
     addFollowed = finishers.addFollowed,
-    addLikedFinisher = finishers.addLikedFinisher,
     addLiked = finishers.addLiked,
-    addLikersFinisher = finishers.addLikersFinisher,
     addLikers = finishers.addLikers,
-    addSharedFinisher = finishers.addSharedFinisher,
     addShared = finishers.addShared,
-    addProxyFinisher = finishers.addProxyFinisher,
-    addProxy = finishers.addProxy,
-    addProxyObjects = finishers.addProxyObjects,
-    firstFewRepliesFinisher = finishers.firstFewRepliesFinisher,
     firstFewReplies = finishers.firstFewReplies,
-    firstFewSharesFinisher = finishers.firstFewSharesFinisher,
     firstFewShares = finishers.firstFewShares,
-    doFinishers = finishers.doFinishers,
-    typeToClass = mm.typeToClass,
-    typeToExt = mm.typeToExt,
-    extToType = mm.extToType,
     DEFAULT_ITEMS = 20,
-    DEFAULT_ACTIVITIES = DEFAULT_ITEMS,
-    DEFAULT_FAVORITES = DEFAULT_ITEMS,
-    DEFAULT_LIKES = DEFAULT_ITEMS,
-    DEFAULT_REPLIES = DEFAULT_ITEMS,
-    DEFAULT_SHARES = DEFAULT_ITEMS,
-    DEFAULT_FOLLOWERS = DEFAULT_ITEMS,
-    DEFAULT_FOLLOWING = DEFAULT_ITEMS,
-    DEFAULT_MEMBERS = DEFAULT_ITEMS,
-    DEFAULT_USERS = DEFAULT_ITEMS,
-    DEFAULT_LISTS = DEFAULT_ITEMS,
-    DEFAULT_UPLOADS = DEFAULT_ITEMS,
-    MAX_ITEMS = DEFAULT_ITEMS * 10,
-    MAX_ACTIVITIES = MAX_ITEMS,
-    MAX_FAVORITES = MAX_ITEMS,
-    MAX_LIKES = MAX_ITEMS,
-    MAX_REPLIES = MAX_ITEMS,
-    MAX_SHARES = MAX_ITEMS,
-    MAX_FOLLOWERS = MAX_ITEMS,
-    MAX_FOLLOWING = MAX_ITEMS,
-    MAX_MEMBERS = MAX_ITEMS,
-    MAX_USERS = MAX_ITEMS,
-    MAX_LISTS = MAX_ITEMS,
-    MAX_UPLOADS = MAX_ITEMS;
+    MAX_ITEMS = DEFAULT_ITEMS * 10;
 
 // Initialize the app controller
 
@@ -388,166 +341,61 @@ var deleteObject = function(req, res, next) {
     );
 };
 
-var objectLikes = function(req, res, next) {
+var contextEndpoint = function(contextifier, streamCreator) {
 
-    var type = req.type,
-        obj = req[type];
+    return function(req, res, next) {
 
-    var collection = {
-        displayName: "People who like " + obj.displayName,
-        id: URLMaker.makeURL("api/" + type + "/" + obj._uuid + "/likes"),
-        items: []
-    };
+        var args;
 
-    var args;
+        try {
+            args = streamArgs(req, DEFAULT_ITEMS, MAX_ITEMS);
+        } catch (e) {
+            next(e);
+            return;
+        }
 
-    try {
-        args = streamArgs(req, DEFAULT_LIKES, MAX_LIKES);
-    } catch (e) {
-        next(e);
-        return;
-    }
-
-    Step(
-        function() {
-            obj.favoritersCount(this);
-        },
-        function(err, count) {
-            if (err) {
-                if (err.name == "NoSuchThingError") {
-                    collection.totalItems = 0;
-                    res.json(collection);
-                } else {
-                    throw err;
-                }
-            }
-            collection.totalItems = count;
-            obj.getFavoriters(args.start, args.end, this);
-        },
-        function(err, likers) {
+        streamCreator(contextifier(req), req.principal, args, function(err, collection) {
             if (err) {
                 next(err);
             } else {
-                collection.items = likers;
                 res.json(collection);
             }
-        }
-    );
-};
-
-var objectReplies = function(req, res, next) {
-
-    var type = req.type,
-        obj = req[type];
-
-    var collection = {
-        displayName: "Replies to " + ((obj.displayName) ? obj.displayName : obj.id),
-        id: URLMaker.makeURL("api/" + type + "/" + obj._uuid + "/replies"),
-        items: []
+        });
     };
-
-    var args;
-
-    try {
-        args = streamArgs(req, DEFAULT_REPLIES, MAX_REPLIES);
-    } catch (e) {
-        next(e);
-        return;
-    }
-
-    Step(
-        function() {
-            obj.getRepliesStream(this);
-        },
-        function(err, str) {
-            var filtered;
-            if (err) throw err;
-            if (!req.principal) {
-                // XXX: keep a separate stream instead of filtering
-                filtered = new FilteredStream(str, objectPublicOnly);
-            } else {
-                filtered = new FilteredStream(str, objectRecipientsOnly(req.principal));
-            }
-            filtered.count(this.parallel());
-            filtered.getObjects(args.start, args.end, this.parallel());
-        },
-        function(err, count, refs) {
-            var group = this.group();
-            if (err) throw err;
-            collection.totalItems = count;
-            _.each(refs, function(ref) {
-                ActivityObject.getObject(ref.objectType, ref.id, group());
-            });
-        },
-        function(err, objs) {
-            if (err) {
-                next(err);
-            } else {
-                _.each(objs, function(obj) {
-                    obj.sanitize();
-                    delete obj.inReplyTo;
-                });
-                collection.items = objs;
-                res.json(collection);
-            }
-        }
-    );
 };
+
+var objectReplies = contextEndpoint(
+    function(req) {
+        var type = req.type;
+        return {type: type,
+                obj: req[type]};
+    },
+    streams.objectReplies
+);
 
 // Feed of actors (usually persons) who have shared the object
 // It's stored as a stream, so we get those
 
-var objectShares = function(req, res, next) {
+var objectShares = contextEndpoint(
+    function(req) {
+        var type = req.type;
+        return {type: type,
+                obj: req[type]};
+    },
+    streams.objectShares
+);
 
-    var type = req.type,
-        obj = req[type];
+// Feed of actors (usually persons) who have liked the object
+// It's stored as a stream, so we get those
 
-    var collection = {
-        displayName: "Shares of " + ((obj.displayName) ? obj.displayName : obj.id),
-        id: URLMaker.makeURL("api/" + type + "/" + obj._uuid + "/shares"),
-        items: []
-    };
-
-    var args;
-
-    try {
-        args = streamArgs(req, DEFAULT_SHARES, MAX_SHARES);
-    } catch (e) {
-        next(e);
-        return;
-    }
-
-    Step(
-        function() {
-            obj.getSharesStream(this);
-        },
-        function(err, str) {
-            var filtered;
-            if (err) throw err;
-            str.count(this.parallel());
-            str.getObjects(args.start, args.end, this.parallel());
-        },
-        function(err, count, refs) {
-            var group = this.group();
-            if (err) throw err;
-            collection.totalItems = count;
-            _.each(refs, function(ref) {
-                ActivityObject.getObject(ref.objectType, ref.id, group());
-            });
-        },
-        function(err, objs) {
-            if (err) {
-                next(err);
-            } else {
-                _.each(objs, function(obj) {
-                    obj.sanitize();
-                });
-                collection.items = objs;
-                res.json(collection);
-            }
-        }
-    );
-};
+var objectLikes = contextEndpoint(
+    function(req) {
+        var type = req.type;
+        return {type: type,
+                obj: req[type]};
+    },
+    streams.objectLikes
+);
 
 var getUser = function(req, res, next) {
 
@@ -942,16 +790,16 @@ var createUser = function(req, res, next) {
                 // If called as /main/register; see ./web.js
                 // XXX: Bad hack
                 if (req.session) {
-		    setPrincipal(req.session, user.profile, function(err) {
-			if (err) {
-			    next(err);
-			} else {
-			    res.json(user);
-			}
-		    });
+                    setPrincipal(req.session, user.profile, function(err) {
+                        if (err) {
+                            next(err);
+                        } else {
+                            res.json(user);
+                        }
+                    });
                 } else {
                     res.json(user);
-		}
+                }
             }
         }
     );
@@ -977,7 +825,7 @@ var listUsers = function(req, res, next) {
     var args, str;
 
     try {
-        args = streamArgs(req, DEFAULT_USERS, MAX_USERS);
+        args = streamArgs(req, DEFAULT_ITEMS, MAX_ITEMS);
     } catch (e) {
         next(e);
         return;
@@ -1101,50 +949,50 @@ var postToInbox = function(req, res, next) {
 
             var activity = new Activity(props);
 
-	    Step(
-		function() {
-		    // Default verb
+            Step(
+                function() {
+                    // Default verb
 
-		    if (!_(activity).has("verb") || _(activity.verb).isNull()) {
-			activity.verb = "post";
-		    }
+                    if (!_(activity).has("verb") || _(activity.verb).isNull()) {
+                        activity.verb = "post";
+                    }
 
-		    // Add a received timestamp
+                    // Add a received timestamp
 
-		    activity.received = Stamper.stamp();
+                    activity.received = Stamper.stamp();
 
-		    // TODO: return a 202 Accepted here?
+                    // TODO: return a 202 Accepted here?
 
-		    // First, ensure recipients
-		    activity.ensureRecipients(this);
-		},
-		function(err) {
-		    if (err) throw err;
-		    // apply the activity
-		    activity.apply(req.principal, this);
-		},
-		function(err) {
-		    if (err) {
-			if (err.name == "AppError") {
-			    throw new HTTPError(err.message, 400);
-			} else if (err.name == "NoSuchThingError") {
-			    throw new HTTPError(err.message, 400);
-			} else if (err.name == "AlreadyExistsError") {
-			    throw new HTTPError(err.message, 400);
-			} else if (err.name == "NoSuchItemError") {
-			    throw new HTTPError(err.message, 400);
-			} else if (err.name == "NotInStreamError") {
-			    throw new HTTPError(err.message, 400);
-			} else {
-			    throw err;
-			}
-		    }
-		    // ...then persist...
-		    activity.save(this);
-		},
-		callback
-	    );
-	};
+                    // First, ensure recipients
+                    activity.ensureRecipients(this);
+                },
+                function(err) {
+                    if (err) throw err;
+                    // apply the activity
+                    activity.apply(req.principal, this);
+                },
+                function(err) {
+                    if (err) {
+                        if (err.name == "AppError") {
+                            throw new HTTPError(err.message, 400);
+                        } else if (err.name == "NoSuchThingError") {
+                            throw new HTTPError(err.message, 400);
+                        } else if (err.name == "AlreadyExistsError") {
+                            throw new HTTPError(err.message, 400);
+                        } else if (err.name == "NoSuchItemError") {
+                            throw new HTTPError(err.message, 400);
+                        } else if (err.name == "NotInStreamError") {
+                            throw new HTTPError(err.message, 400);
+                        } else {
+                            throw err;
+                        }
+                    }
+                    // ...then persist...
+                    activity.save(this);
+                },
+                callback
+            );
+        };
 
     // Check for actor
 
@@ -1168,31 +1016,31 @@ var postToInbox = function(req, res, next) {
     }
 
     Step(
-	function() {
-	    Activity.get(props.id, this);
-	},
-	function(err, activity) {
-	    if (err && err.name == "NoSuchThingError") {
-		newRemoteActivity(props, this);
-	    } else if (err) {
-		throw err;
-	    } else {
-		if (req.client.webfinger) {
-		    if (ActivityObject.canonicalID(activity.actor.id) != ActivityObject.canonicalID(req.principal.id)) {
-			throw new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400);
-		    }
-		} else if (req.client.hostname) {
-		    if (ActivityObject.canonicalID(activity.actor.id) != "https://"+req.client.hostname + "/" &&
-			ActivityObject.canonicalID(activity.actor.id) != "http://"+req.client.hostname + "/") {
-			throw new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400);
-		    }
-		}
-		this(null, activity);
-	    }
-	},
+        function() {
+            Activity.get(props.id, this);
+        },
+        function(err, activity) {
+            if (err && err.name == "NoSuchThingError") {
+                newRemoteActivity(props, this);
+            } else if (err) {
+                throw err;
+            } else {
+                if (req.client.webfinger) {
+                    if (ActivityObject.canonicalID(activity.actor.id) != ActivityObject.canonicalID(req.principal.id)) {
+                        throw new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400);
+                    }
+                } else if (req.client.hostname) {
+                    if (ActivityObject.canonicalID(activity.actor.id) != "https://"+req.client.hostname + "/" &&
+                        ActivityObject.canonicalID(activity.actor.id) != "http://"+req.client.hostname + "/") {
+                        throw new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400);
+                    }
+                }
+                this(null, activity);
+            }
+        },
         function(err, activity) {
             if (err) throw err;
-	    act = activity;
+            act = activity;
             user.addToInbox(activity, this);
         },
         function(err) {
@@ -1283,574 +1131,76 @@ var newActivity = function(activity, user, callback) {
     );
 };
 
-var filteredFeedRoute = function(urlmaker, titlemaker, streammaker, finisher) {
+var streamEndpoint = function(streamCreator) {
 
     return function(req, res, next) {
 
-        var url = urlmaker(req),
-            collection = {
-                author: req.user.profile,
-                displayName: titlemaker(req),
-                id: url,
-                objectTypes: ["activity"],
-                url: url,
-                links: {
-                    first: {
-                        href: url
-                    },
-                    self: {
-                        href: url
-                    }
-                },
-                items: []
-            };
-
-        var args, str, ids;
+        var args;
 
         try {
-            args = streamArgs(req, DEFAULT_ACTIVITIES, MAX_ACTIVITIES);
+            args = streamArgs(req, DEFAULT_ITEMS, MAX_ITEMS);
         } catch (e) {
             next(e);
             return;
         }
 
-        Step(
-            function() {
-                streammaker(req, this);
-            },
-            function(err, outbox) {
-                if (err) {
-                    if (err.name == "NoSuchThingError") {
-                        collection.totalItems = 0;
-                        res.json(collection);
-                    } else {
-                        throw err;
-                    }
-                } else {
-                    // Skip filtering if remote user == author
-                    if (req.principal && req.principal.id == req.user.profile.id) {
-                        str = outbox;
-                    } else if (!req.principal) {
-                        // XXX: keep a separate stream instead of filtering
-                        str = new FilteredStream(outbox, publicOnly);
-                    } else {
-                        str = new FilteredStream(outbox, recipientsOnly(req.principal));
-                    }
-
-                    getStream(str, args, collection, req.principal, this);
-                }
-            },
-            function(err) {
-                if (err) throw err;
-                if (finisher) {
-                    finisher(req, collection, this);
-                } else {
-                    this(null);
-                }
-            },
-            function(err) {
-                if (err) {
-                    next(err);
-                } else {
-                    collection.items.forEach(function(act) {
-                        delete act.actor;
-                    });
-                    if (_.has(collection, "author")) {
-                        collection.author.sanitize();
-                    }
-                    res.json(collection);
-                }
-            }
-        );
-    };
-};
-
-
-var majorFinishers = doFinishers([addProxyFinisher,
-                                  addLikedFinisher,
-                                  firstFewRepliesFinisher,
-                                  addLikersFinisher,
-                                  addSharedFinisher,
-                                  firstFewSharesFinisher]);
-
-var userStream = filteredFeedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/feed");
-    },
-    function(req) {
-        return "Activities by " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getOutboxStream(callback);
-    },
-    addProxyFinisher
-);
-
-var userMajorStream = filteredFeedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/feed/major");
-    },
-    function(req) {
-        return "Major activities by " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getMajorOutboxStream(callback);
-    },
-    majorFinishers
-);
-
-var userMinorStream = filteredFeedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/feed/minor");
-    },
-    function(req) {
-        return "Minor activities by " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getMinorOutboxStream(callback);
-    },
-    addProxyFinisher
-);
-
-var feedRoute = function(urlmaker, titlemaker, streamgetter, finisher) {
-
-    return function(req, res, next) {
-
-        var url = urlmaker(req),
-            collection = {
-                author: req.user.profile,
-                displayName: titlemaker(req),
-                id: url,
-                objectTypes: ["activity"],
-                url: url,
-                links: {
-                    first: {
-                        href: url
-                    },
-                    self: {
-                        href: url
-                    }
-                },
-                items: []
-            };
-
-        var args, str;
-
-        try {
-            args = streamArgs(req, DEFAULT_ACTIVITIES, MAX_ACTIVITIES);
-        } catch (e) {
-            next(e);
-            return;
-        }
-
-        Step(
-            function() {
-                streamgetter(req, this);
-            },
-            function(err, inbox) {
-                if (err) {
-                    if (err.name == "NoSuchThingError") {
-                        collection.totalItems = 0;
-                        if (_.has(collection, "author")) {
-                            collection.author.sanitize();
-                        }
-                        res.json(collection);
-                    } else {
-                        throw err;
-                    }
-                } else {
-                    getStream(inbox, args, collection, req.principal, this);
-                }
-            },
-            function(err) {
-                if (err) throw err;
-                if (finisher) {
-                    finisher(req, collection, this);
-                } else {
-                    this(null);
-                }
-            },
-            function(err) {
-                if (err) {
-                    next(err);
-                } else {
-                    if (_.has(collection, "author")) {
-                        collection.author.sanitize();
-                    }
-                    res.json(collection);
-                }
-            }
-        );
-    };
-};
-
-var userInbox = feedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox");
-    },
-    function(req) {
-        return "Activities for " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getInboxStream(callback);
-    },
-    addProxyFinisher
-);
-
-var userMajorInbox = feedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox/major");
-    },
-    function(req) {
-        return "Major activities for " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getMajorInboxStream(callback);
-    },
-    majorFinishers
-);
-
-var userMinorInbox = feedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox/minor");
-    },
-    function(req) {
-        return "Minor activities for " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getMinorInboxStream(callback);
-    },
-    addProxyFinisher
-);
-
-var userDirectInbox = feedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox/direct");
-    },
-    function(req) {
-        return "Activities directly for " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getDirectInboxStream(callback);
-    },
-    addProxyFinisher
-);
-
-var userMajorDirectInbox = feedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox/direct/major");
-    },
-    function(req) {
-        return "Major activities directly for " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getMajorDirectInboxStream(callback);
-    },
-    majorFinishers
-);
-
-var userMinorDirectInbox = feedRoute(
-    function(req) {
-        return URLMaker.makeURL("api/user/" + req.user.nickname + "/inbox/direct/minor");
-    },
-    function(req) {
-        return "Minor activities directly for " + (req.user.profile.displayName || req.user.nickname);
-    },
-    function(req, callback) {
-        req.user.getMinorDirectInboxStream(callback);
-    },
-    addProxyFinisher
-);
-
-var getStream = function(str, args, collection, principal, callback) {
-
-    Step(
-        function() {
-            str.count(this);
-        },
-        function(err, totalItems) {
-            if (err) throw err;
-            collection.totalItems = totalItems;
-            if (totalItems === 0) {
-                callback(null);
-                return;
-            }
-            if (_(args).has("before")) {
-                str.getIDsGreaterThan(args.before, args.count, this);
-            } else if (_(args).has("since")) {
-                str.getIDsLessThan(args.since, args.count, this);
-            } else {
-                str.getIDs(args.start, args.end, this);
-            }
-        },
-        function(err, ids) {
+        streamCreator(req.user, req.principal, args, function(err, collection) {
             if (err) {
-                if (err.name == "NotInStreamError") {
-                    throw new HTTPError(err.message, 400);
-                } else {
-                    throw err;
-                }
-            }
-            Activity.readArray(ids, this);
-        },
-        function(err, activities) {
-            if (err) {
-                callback(err);
-            } else {
-                activities.forEach(function(act) {
-                    act.sanitize(principal);
-                });
-                collection.items = activities;
-                if (activities.length > 0) {
-                    collection.links.prev = {
-                        href: collection.url + "?since=" + encodeURIComponent(activities[0].id)
-                    };
-                    if ((_(args).has("start") && args.start + activities.length < collection.totalItems) ||
-                        (_(args).has("before") && activities.length >= args.count) ||
-                        (_(args).has("since"))) {
-                        collection.links.next = {
-                            href: collection.url + "?before=" + encodeURIComponent(activities[activities.length-1].id)
-                        };
-                    }
-                }
-                callback(null);
-            }
-        }
-    );
-};
-
-var userFollowers = function(req, res, next) {
-
-    var collection = {
-        author: req.user.profile,
-        displayName: "Followers for " + (req.user.profile.displayName || req.user.nickname),
-        id: URLMaker.makeURL("api/user/" + req.user.nickname + "/followers"),
-        objectTypes: ["person"],
-        items: []
-    };
-
-    var args, str;
-
-    try {
-        args = streamArgs(req, DEFAULT_FOLLOWERS, MAX_FOLLOWERS);
-    } catch (e) {
-        next(e);
-        return;
-    }
-
-    Step(
-        function() {
-            req.user.followersStream(this);
-        },
-        function(err, results) {
-            if (err) throw err;
-            str = results;
-            str.count(this);
-        },
-        function(err, count) {
-            if (err) {
-                if (err.name == "NoSuchThingError") {
-                    collection.totalItems = 0;
-                    if (_.has(collection, "author")) {
-                        collection.author.sanitize();
-                    }
-                    res.json(collection);
-                } else {
-                    throw err;
-                }
-            } else {
-                collection.totalItems = count;
-                // XXX: short-circuit for empty followers stream
-                if (_(args).has("before")) {
-                    str.getIDsGreaterThan(args.before, args.count, this);
-                } else if (_(args).has("since")) {
-                    str.getIDsLessThan(args.since, args.count, this);
-                } else {
-                    str.getIDs(args.start, args.end, this);
-                }
-            }
-        },
-        function(err, ids) {
-            if (err) throw err;
-            Person.readArray(ids, this);
-        },
-        function(err, people) {
-            if (err) throw err;
-
-            collection.items = people;
-
-            if (!req.principal) {
-                this(null);
-            } else {
-                addFollowed(req.principal, people, this.parallel());
-                if (req.principalUser) {
-                    addProxyObjects(people, this.parallel());
-                }
-            }
-        },
-        function(err) {
-
-            var base = "api/user/" + req.user.nickname + "/followers";
-
-            if (err) {
-
                 next(err);
-
             } else {
-
-                _.each(collection.items, function(person) {
-                    person.sanitize();
-                });
-
-                collection.links = {
-                    self: {
-                        href: URLMaker.makeURL(base, {offset: args.start, count: args.count})
-                    },
-                    current: {
-                        href: URLMaker.makeURL(base)
-                    }
-                };
-
-                if (collection.items.length > 0)  {
-                    collection.links.prev = {
-                        href: URLMaker.makeURL(base, 
-                                               {since: collection.items[0].id})
-                    };
-                    collection.links.next = {
-                        href: URLMaker.makeURL(base, 
-                                               {before: collection.items[collection.items.length - 1].id})
-                    };
-                }
-
-                if (_.has(collection, "author")) {
-                    collection.author.sanitize();
-                }
-
                 res.json(collection);
             }
-        }
-    );
+        });
+    };
 };
 
-var userFollowing = function(req, res, next) {
+var userStream = streamEndpoint(streams.userStream);
+var userMajorStream = streamEndpoint(streams.userMajorStream);
+var userMinorStream = streamEndpoint(streams.userMinorStream);
+var userInbox = streamEndpoint(streams.userInbox);
+var userMajorInbox = streamEndpoint(streams.userMajorInbox);
+var userMinorInbox = streamEndpoint(streams.userMinorInbox);
+var userDirectInbox = streamEndpoint(streams.userDirectInbox);
+var userMajorDirectInbox = streamEndpoint(streams.userMajorDirectInbox);
+var userMinorDirectInbox = streamEndpoint(streams.userMinorDirectInbox);
 
-    var args,
-        collection = {
-            author: req.user.profile,
-            displayName: "People that " + (req.user.profile.displayName || req.user.nickname) + " is following",
-            id: URLMaker.makeURL("api/user/" + req.user.nickname + "/following"),
-            objectTypes: ["person"],
-            items: []
-        },
-        followedFlags = function(people, callback) {
-            if (!req.principal) {
-                // No principal; by definition, none are followed
-                callback(null);
-            } else if (req.principal.id == req.user.profile.id) {
-                // Same user; by definition, all are followed
-                _.each(people, function(person) {
-                    if (!_.has(person, "pump_io")) {
-                        person.pump_io = {};
-                    }
-                    person.pump_io.followed = true;
-                });
-                callback(null);
-            } else {
-                addFollowed(req.principal, people, callback);
-            }
+var userFollowers = contextEndpoint(
+    function(req) {
+        return {user: req.user, author: req.person};
+    },
+    streams.userFollowers
+);
+
+var userFollowing = contextEndpoint(
+    function(req) {
+        return {user: req.user, author: req.person};
+    },
+    streams.userFollowing
+);
+
+var userFavorites = contextEndpoint(
+    function(req) {
+        return {user: req.user, author: req.person};
+    },
+    streams.userFavorites
+);
+
+var userUploads = contextEndpoint(
+    function(req) {
+        return {user: req.user, author: req.person};
+    },
+    streams.userUploads
+);
+
+var userLists = contextEndpoint(
+    function(req) {
+        return {
+            user: req.user,
+            type: req.params.type
         };
-
-    try {
-        args = streamArgs(req, DEFAULT_FOLLOWING, MAX_FOLLOWING);
-    } catch (e) {
-        next(e);
-        return;
-    }
-
-    Step(
-        function() {
-            req.user.followingCount(this);
-        },
-        function(err, count) {
-            if (err) {
-                if (err.name == "NoSuchThingError") {
-                    collection.totalItems = 0;
-                    if (_.has(collection, "author")) {
-                        collection.author.sanitize();
-                    }
-                    res.json(collection);
-                } else {
-                    throw err;
-                }
-            } else {
-                collection.totalItems = count;
-                req.user.followingStream(this);
-            }
-        },
-        function(err, str) {
-            if (err) throw err;
-            if (_(args).has("before")) {
-                str.getIDsGreaterThan(args.before, args.count, this);
-            } else if (_(args).has("since")) {
-                str.getIDsLessThan(args.since, args.count, this);
-            } else {
-                str.getIDs(args.start, args.end, this);
-            }
-        },
-        function(err, ids) {
-            if (err) throw err;
-            Person.readArray(ids, this);
-        },
-        function(err, people) {
-            if (err) throw err;
-
-            collection.items = people;
-            followedFlags(people, this.parallel());
-            if (req.principalUser) {
-                addProxyObjects(people, this.parallel());
-            }
-        },
-        function(err) {
-            var base = "api/user/" + req.user.nickname + "/following";
-            if (err) {
-                next(err);
-            } else {
-
-                _.each(collection.items, function(person) {
-                    person.sanitize();
-                });
-
-                collection.startIndex = args.start;
-                collection.itemsPerPage = args.count;
-
-                collection.links = {
-                    self: {
-                        href: URLMaker.makeURL(base, {offset: args.start, count: args.count})
-                    },
-                    current: {
-                        href: URLMaker.makeURL(base)
-                    }
-                };
-
-                if (collection.items.length > 0)  {
-                    collection.links.prev = {
-                        href: URLMaker.makeURL(base, 
-                                               {since: collection.items[0].id})
-                    };
-                    collection.links.next = {
-                        href: URLMaker.makeURL(base, 
-                                               {before: collection.items[collection.items.length - 1].id})
-                    };
-                }
-
-                if (_.has(collection, "author")) {
-                    collection.author.sanitize();
-                }
-                res.json(collection);
-            }
-        }
-    );
-};
+    },
+    streams.userLists
+);
 
 var newFollow = function(req, res, next) {
     var obj = Scrubber.scrubObject(req.body),
@@ -1874,140 +1224,6 @@ var newFollow = function(req, res, next) {
                 res.json(act.object);
                 d = new Distributor(act);
                 d.distribute(function(err) {});
-            }
-        }
-    );
-};
-
-var userFavorites = function(req, res, next) {
-    var args,
-        stream,
-        collection = {
-            author: req.user.profile,
-            displayName: "Things that " + (req.user.profile.displayName || req.user.nickname) + " has favorited",
-            id: URLMaker.makeURL("api/user/" + req.user.nickname + "/favorites"),
-            items: []
-        },
-        addLikedFlags = function(objects, callback) {
-            if (!req.principal) { 
-                // No user, no liked
-                callback(null);
-            } else if (req.principal.id == req.user.profile.id) {
-                // Same user, all liked (by definition!)
-                _.each(collection.items, function(object) {
-                    object.liked = true;
-                });
-                callback(null);
-            } else {
-                // Different user; check for likes
-                addLiked(req.principal, collection.items, callback);
-            }
-        };
-
-    try {
-        args = streamArgs(req, DEFAULT_FAVORITES, MAX_FAVORITES);
-    } catch (e) {
-        next(e);
-        return;
-    }
-
-    Step(
-        function() {
-            req.user.favoritesStream(this);
-        },
-        function(err, result) {
-            var str;
-            if (err) throw err;
-            stream = result;
-            stream.count(this);
-        },
-        function(err, cnt) {
-            var str;
-            if (err) throw err;
-            collection.totalItems = cnt;
-            if (cnt === 0) {
-                if (_.has(collection, "author")) {
-                    collection.author.sanitize();
-                }
-                res.json(collection);
-                return;
-            }
-            if (req.principal && req.principal.id == req.user.profile.id) {
-                // Same user, don't filter
-                str = stream;
-            } else if (!req.principal) {
-                // Public user, filter
-                str = new FilteredStream(stream, objectPublicOnly);
-            } else {
-                // Registered user, filter
-                str = new FilteredStream(stream, objectRecipientsOnly(req.principal));
-            }
-            str.getObjects(args.start, args.end, this);
-        },
-        function(err, refs) {
-            var group = this.group();
-            if (err) throw err;
-            _.each(refs, function(ref) {
-                // XXX: expand?
-                // XXX: expand feeds, too?
-                ActivityObject.getObject(ref.objectType, ref.id, group());
-            });
-        },
-        function(err, objects) {
-
-            var group = this.group();
-
-            if (err) throw err;
-
-            collection.items = objects;
-
-            _.each(objects, function(object) {
-                object.expandFeeds(group());
-            });
-        },
-        function(err) {
-
-            var profile = req.principal;
-
-            if (err) throw err;
-
-            // Add the first few replies for each object
-
-            firstFewReplies(profile, collection.items, this.parallel());
-
-            // Add the first few replies for each object
-
-            firstFewShares(profile, collection.items, this.parallel());
-
-            // Add the first few "likers" for each object
-
-            addLikers(profile, collection.items, this.parallel());
-
-            // Add the shared flag for each object
-
-            addShared(profile, collection.items, this.parallel());
-
-            // Add the liked flag for each object
-
-            addLikedFlags(collection.items, this.parallel());
-
-            // Add the proxy URLs for each object
-
-            if (req.principalUser) {
-                addProxyObjects(collection.items, this.parallel());
-            }
-        },
-        function(err) {
-            if (err) {
-                next(err);
-            } else {
-                _.each(collection.items, function(object) {
-                    object.sanitize();
-                });
-                if (_.has(collection, "author")) {
-                    collection.author.sanitize();
-                }
-                res.json(collection);
             }
         }
     );
@@ -2040,206 +1256,6 @@ var newFavorite = function(req, res, next) {
     );
 };
 
-var userLists = function(req, res, next) {
-    var type = req.params.type,
-        profile = req.principal,
-        url = URLMaker.makeURL("api/user/" + req.user.nickname + "/lists/" + type),
-        collection = {
-            author: req.user.profile,
-            displayName: "Collections of " + type + "s for " + (req.user.profile.displayName || req.user.nickname),
-            id: url,
-            objectTypes: ["collection"],
-            url: url,
-            links: {
-                first: {
-                    href: url
-                },
-                self: {
-                    href: url
-                }
-            },
-            items: []
-        };
-
-    var args, lists, stream;
-
-    try {
-        args = streamArgs(req, DEFAULT_LISTS, MAX_LISTS);
-    } catch (e) {
-        next(e);
-        return;
-    }
-
-    Step(
-        function() {
-            req.user.getLists(type, this);
-        },
-        function(err, result) {
-            if (err) throw err;
-            stream = result;
-            stream.count(this);
-        },
-        function(err, totalItems) {
-            var filtered;
-            if (err) throw err;
-            collection.totalItems = totalItems;
-            if (totalItems === 0) {
-                if (_.has(collection, "author")) {
-                    collection.author.sanitize();
-                }
-                res.json(collection);
-                return;
-            }
-            if (!profile) {
-                filtered = new FilteredStream(stream, idPublicOnly(Collection.type));
-            } else if (profile.id == req.user.profile.id) {
-                filtered = stream;
-            } else {
-                filtered = new FilteredStream(stream, idRecipientsOnly(profile, Collection.type));
-            }
-
-            if (_(args).has("before")) {
-                filtered.getIDsGreaterThan(args.before, args.count, this);
-            } else if (_(args).has("since")) {
-                filtered.getIDsLessThan(args.since, args.count, this);
-            } else {
-                filtered.getIDs(args.start, args.end, this);
-            }
-        },
-        function(err, ids) {
-            if (err) {
-                if (err.name == "NotInStreamError") {
-                    throw new HTTPError(err.message, 400);
-                } else {
-                    throw err;
-                }
-            }
-            Collection.readArray(ids, this);
-        },
-        function(err, results) {
-            var group = this.group();
-            if (err) throw err;
-            lists = results;
-            _.each(lists, function(list) {
-                list.expandFeeds(group());
-            });
-        },
-        function(err) {
-            if (err) {
-                next(err);
-            } else {
-                _.each(lists, function(item) {
-                    item.sanitize();
-                });
-                collection.items = lists;
-                if (lists.length > 0) {
-                    collection.links.prev = {
-                        href: collection.url + "?since=" + encodeURIComponent(lists[0].id)
-                    };
-                    if ((_(args).has("start") && args.start + lists.length < collection.totalItems) ||
-                        (_(args).has("before") && lists.length >= args.count) ||
-                        (_(args).has("since"))) {
-                        collection.links.next = {
-                            href: collection.url + "?before=" + encodeURIComponent(lists[lists.length-1].id)
-                        };
-                    }
-                }
-                if (_.has(collection, "author")) {
-                    collection.author.sanitize();
-                }
-                res.json(collection);
-            }
-        }
-    );
-};
-
-var userUploads = function(req, res, next) {
-
-    var url = URLMaker.makeURL("api/user/" + req.user.nickname + "/uploads"),
-        collection = {
-            author: req.user.profile,
-            displayName: "Uploads by " + (req.user.profile.displayName || req.user.nickname),
-            id: url,
-            objectTypes: ["file", "image", "audio", "video"],
-            url: url,
-            links: {
-                first: {
-                    href: url
-                },
-                self: {
-                    href: url
-                }
-            },
-            items: []
-        },
-        args,
-        uploads;
-
-    try {
-        args = streamArgs(req, DEFAULT_UPLOADS, MAX_UPLOADS);
-    } catch (e) {
-        next(e);
-        return;
-    }
-
-    Step(
-        function() {
-            req.user.uploadsStream(this);
-        },
-        function(err, stream) {
-            if (err) throw err;
-            uploads = stream;
-            uploads.count(this);
-        },
-        function(err, totalItems) {
-            if (err) throw err;
-            collection.totalItems = totalItems;
-            if (totalItems === 0) {
-                if (_.has(collection, "author")) {
-                    collection.author.sanitize();
-                }
-                res.json(collection);
-                return;
-            }
-            if (_(args).has("before")) {
-                uploads.getObjectsGreaterThan(args.before, args.count, this);
-            } else if (_(args).has("since")) {
-                uploads.getObjectsLessThan(args.since, args.count, this);
-            } else {
-                uploads.getObjects(args.start, args.end, this);
-            }
-        },
-        function(err, refs) {
-            var group;
-            if (err) {
-                if (err.name == "NotInStreamError") {
-                    throw new HTTPError(err.message, 400);
-                } else {
-                    throw err;
-                }
-            }
-            group = this.group();
-            _.each(refs, function(ref) {
-                ActivityObject.getObject(ref.objectType, ref.id, group());
-            });
-        },
-        function(err, objects) {
-            if (err) {
-                next(err);
-            } else {
-                _.each(objects, function(object) {
-                    object.sanitize();
-                });
-                collection.items = objects;
-                if (_.has(collection, "author")) {
-                    collection.author.sanitize();
-                }
-                res.json(collection);
-            }
-        }
-    );
-};
-
 var newUpload = function(req, res, next) {
 
     var user = req.principalUser,
@@ -2262,179 +1278,18 @@ var newUpload = function(req, res, next) {
     );
 };
 
-var collectionMembers = function(req, res, next) {
-
-    var coll = req.collection,
-        profile = req.principal, 
-        base = "/api/collection/"+coll._uuid+"/members",
-        url = URLMaker.makeURL(base),
-        feed = {
-            author: coll.author,
-            displayName: "Members of " + (coll.displayName || "a collection") + " by " + coll.author.displayName,
-            id: url,
-            objectTypes: coll.objectTypes,
-            links: {
-                first: {
-                    href: url
-                }
-            },
-            items: []
-        },
-        args,
-        str,
-        addLikedFlags = function(members, callback) {
-            if (!profile) { 
-                // No user, no liked
-                callback(null);
-            } else {
-                // Different user; check for likes
-                addLiked(profile, feed.items, callback);
-            }
-        };
-
-    try {
-        args = streamArgs(req, DEFAULT_MEMBERS, MAX_MEMBERS);
-    } catch (e) {
-        next(e);
-        return;
-    }
-
-    Step(
-        function() {
-            coll.getStream(this);
-        },
-        function(err, result) {
-            var filtered, type;
-            if (err) throw err;
-            str = result;
-            if (!profile) {
-                filtered = new FilteredStream(str, objectPublicOnly);
-            } else if (profile.id == coll.author.id) {
-                // no filter
-                filtered = str;
-            } else {
-                filtered = new FilteredStream(str, objectRecipientsOnly(profile));
-            }
-            filtered.count(this.parallel());
-            type = (req.query.type) ? req.query.type :
-                (coll.objectTypes.length > 0) ? coll.objectTypes[0] :
-                Person.type;
-            if (_(args).has("before")) {
-                filtered.getObjectsGreaterThan({id: args.before, objectType: type}, args.count, this.parallel());
-            } else if (_(args).has("since")) {
-                filtered.getObjectsLessThan({id: args.since, objectType: type}, args.count, this.parallel());
-            } else {
-                filtered.getObjects(args.start, args.end, this.parallel());
-            }
-        },
-        function(err, count, refs) {
-            var group;
-            if (err) throw err;
-            feed.totalItems = count;
-            // XXX: short-circuit here if count === 0
-            group = this.group();
-            _.each(refs, function(ref) {
-                ActivityObject.getObject(ref.objectType, ref.id, group());
-            });
-        },
-        function(err, objects) {
-
-            var third, followable;
-
-            if (err) throw err;
-
-            feed.items = objects;
-
-            // Add the first few replies for each object
-
-            firstFewReplies(profile, feed.items, this.parallel());
-
-            // Add the first few shares for each object
-
-            firstFewShares(profile, feed.items, this.parallel());
-
-            // Add the first few "likers" for each object
-
-            addLikers(profile, feed.items, this.parallel());
-
-            // Add the first few "likers" for each object
-
-            addLikedFlags(feed.items, this.parallel());
-
-            // Add the followed flag to applicable objects
-
-            followable = _.filter(feed.items, function(obj) {
-                return obj.isFollowable();
-            });
-
-            addFollowed(profile, followable, this.parallel());
-
-            // Add proxy URLs
-
-            if (req.principalUser) {
-                addProxyObjects(feed.items, this.parallel());
-            }
-        },
-        function(err) {
-
-            var nextParams, prevParams;
-
-            if (err) {
-                next(err);
-                return;
-            }
-
-            _.each(feed.items, function(obj) {
-                obj.sanitize();
-            });
-
-            feed.startIndex = args.start;
-            feed.itemsPerPage = args.count;
-
-            feed.links = {
-                self: {
-                    href: URLMaker.makeURL(base, {offset: args.start, count: args.count})
-                },
-                current: {
-                    href: URLMaker.makeURL(base)
-                }
-            };
-
-            if (feed.items.length > 0) {
-
-                prevParams = {since: feed.items[0].id};
-
-                if (!feed.objectTypes ||
-                    feed.objectTypes.length != 1 ||
-                    feed.items[0].objectType != feed.objectTypes[0]) {
-                    prevParams.type = feed.items[0].objectType;
-                }
-                
-                feed.links.prev = {
-                    href: URLMaker.makeURL(base, prevParams)
-                };
-
-                nextParams = {before: feed.items[feed.items.length - 1].id};
-
-                if (!feed.objectTypes ||
-                    feed.objectTypes.length != 1 ||
-                    feed.items[feed.items.length - 1].objectType != feed.objectTypes[0]) {
-                    nextParams.type = feed.items[feed.items.length - 1].objectType;
-                }
-                
-                feed.links.next = {
-                    href: URLMaker.makeURL(base, nextParams)
-                };
-            }
-
-            if (_.has(feed, "author")) {
-                feed.author.sanitize();
-            }
-
-            res.json(feed);
+var collectionMembers = contextEndpoint(
+    function(req) {
+        var context = {collection: req.collection, author: req.collection.author};
+        if (req.query.type) {
+            context.type = req.query.type;
+        } else if (req.collection.objectTypes && req.collection.objectTypes.length > 0) {
+            context.type = req.collection.objectTypes[0];
         }
-    );
-};
+        return context;
+    },
+    streams.collectionMembers
+);
 
 var newMember = function(req, res, next) {
 
@@ -2446,7 +1301,6 @@ var newMember = function(req, res, next) {
             target: coll,
             generator: req.generator
         });
-
 
     Step(
         function() {
@@ -2540,7 +1394,7 @@ var reqProxy = function(req, res, next) {
         function(err, proxies) {
             if (err) {
                 next(err);
-            } else if (!proxies || proxies.length == 0) {
+            } else if (!proxies || proxies.length === 0) {
                 next(new HTTPError("No such proxy", 404));
             } else if (proxies.length > 1) {
                 next(new HTTPError("Too many proxies", 500));

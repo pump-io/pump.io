@@ -28,7 +28,6 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     setupApp = oauthutil.setupApp,
     register = oauthutil.register,
-    accessToken = oauthutil.accessToken,
     newCredentials = oauthutil.newCredentials;
 
 var ignore = function(err) {};
@@ -187,7 +186,6 @@ var validForm = function(count, total) {
         assert.include(doc, "totalItems");
         assert.include(doc, "items");
         assert.include(doc, "displayName");
-        assert.include(doc, "id");
         assert.include(doc, "url");
         if (_(count).isNumber()) {
             assert.equal(doc.items.length, count);

@@ -9,8 +9,8 @@
       <%= partial("profile-nav") %>
     </div>
   </div>
-  <div class="row" id="user-content">
-    <div class="span12">
+  <div class="row">
+    <div class="span12" id="user-content">
       <%= partial("user-content-favorites") %>
     </div>
   </div>

@@ -170,7 +170,7 @@
         favorites: function(nickname) {
             var router = this,
                 user = Pump.User.unique({nickname: nickname}),
-                favorites = Pump.ActivityObjectStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/favorites")});
+                favorites = Pump.ActivityObjectStream.unique({url: Pump.fullURL("/api/user/"+nickname+"/favorites")});
 
             Pump.body.startLoad();
 
@@ -180,24 +180,26 @@
                     Pump.error(err);
                     return;
                 }
-                Pump.body.setContent({
-                    contentView: Pump.FavoritesContent,
-                    userContentView: Pump.FavoritesUserContent,
-                    userContentCollection: favorites,
-                    title: nickname + " favorites",
-                    data: { objects: favorites,
-                            profile: profile }
-                },
-                                     function() {
-                                         Pump.body.endLoad();
-                                     });
+                Pump.body.setContent(
+                    {
+                        contentView: Pump.FavoritesContent,
+                        userContentView: Pump.FavoritesUserContent,
+                        userContentStream: favorites,
+                        title: nickname + " favorites",
+                        data: {favorites: favorites,
+                               profile: profile}
+                    },
+                    function() {
+                        Pump.body.endLoad();
+                    }
+                );
             });
         },
 
         followers: function(nickname) {
             var router = this,
                 user = Pump.User.unique({nickname: nickname}),
-                followers = Pump.PeopleStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/followers")});
+                followers = Pump.PeopleStream.unique({url: Pump.fullURL("/api/user/"+nickname+"/followers")});
 
             Pump.body.startLoad();
 
@@ -209,9 +211,9 @@
                 }
                 Pump.body.setContent({contentView: Pump.FollowersContent,
                                       userContentView: Pump.FollowersUserContent,
-                                      userContentCollection: followers,
+                                      userContentStream: followers,
                                       title: nickname + " followers",
-                                      data: {people: followers,
+                                      data: {followers: followers,
                                              profile: profile}},
                                      function() {
                                          Pump.body.endLoad();
@@ -222,7 +224,7 @@
         following: function(nickname) {
             var router = this,
                 user = Pump.User.unique({nickname: nickname}),
-                following = Pump.PeopleStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/following")});
+                following = Pump.PeopleStream.unique({url: Pump.fullURL("/api/user/"+nickname+"/following")});
 
             // XXX: parallelize this?
 
@@ -236,9 +238,9 @@
                 }
                 Pump.body.setContent({contentView: Pump.FollowingContent,
                                       userContentView: Pump.FollowingUserContent,
-                                      userContentCollection: following,
+                                      userContentStream: following,
                                       title: nickname + " following",
-                                      data: {people: following,
+                                      data: {following: following,
                                              profile: profile}},
                                      function() {
                                          Pump.body.endLoad();
@@ -249,7 +251,7 @@
         lists: function(nickname) {
             var router = this,
                 user = Pump.User.unique({nickname: nickname}),
-                lists = Pump.ListStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/lists/person")});
+                lists = Pump.ListStream.unique({url: Pump.fullURL("/api/user/"+nickname+"/lists/person")});
 
             Pump.body.startLoad();
 
@@ -276,45 +278,40 @@
 
             var router = this,
                 user = Pump.User.unique({nickname: nickname}),
-                lists = Pump.ListStream.unique([], {url: Pump.fullURL("/api/user/"+nickname+"/lists/person")}),
-                list = Pump.List.unique({links: {self: {href: "/api/collection/"+uuid}}});
+                lists = Pump.ListStream.unique({url: Pump.fullURL("/api/user/"+nickname+"/lists/person")}),
+                list = Pump.List.unique({links: {self: {href: "/api/collection/"+uuid}}}),
+                members = Pump.PeopleStream.unique({url: Pump.fullURL("/api/collection/"+uuid+"/members")});
 
             Pump.body.startLoad();
 
-            Pump.fetchObjects([user, lists, list], function(err, objs) {
-
-                var members;
+            Pump.fetchObjects([user, lists, list, members], function(err, objs) {
 
                 if (err) {
                     Pump.error(err);
                     return;
                 }
 
-                members = list.members;
+                var profile = user.profile,
+                    options = {contentView: Pump.ListContent,
+                               userContentView: Pump.ListUserContent,
+                               listContentView: Pump.ListListContent,
+                               title: nickname + " - list -" + list.get("displayName"),
+                               listContentModel: list,
+                               data: {lists: lists,
+                                      list: list,
+                                      profile: profile,
+                                      members: members}};
 
-                Pump.fetchObjects([members], function(err, objs) {
+                if (err) {
+                    Pump.error(err);
+                    return;
+                }
 
-                    var profile = user.profile,
-                        options = {contentView: Pump.ListContent,
-                                   userContentView: Pump.ListUserContent,
-                                   listContentView: Pump.ListListContent,
-                                   title: nickname + " - list -" + list.get("displayName"),
-                                   listContentModel: list,
-                                   data: {lists: lists,
-                                          list: list,
-                                          profile: profile,
-                                          members: members}};
-
-                    if (err) {
-                        Pump.error(err);
-                        return;
-                    }
-
-                    Pump.body.setContent(options, function(view) {
-                        Pump.body.content.userContent.listMenu.$(".active").removeClass("active");
-                        Pump.body.content.userContent.listMenu.$("li[data-list-id='"+list.id+"']").addClass("active");
-                        Pump.body.endLoad();
-                    });
+                Pump.body.setContent(options, function(view) {
+                    var lm = Pump.body.content.userContent.listMenu;
+                    lm.$(".active").removeClass("active");
+                    lm.$("li[data-list-id='"+list.id+"']").addClass("active");
+                    Pump.body.endLoad();
                 });
             });
         },

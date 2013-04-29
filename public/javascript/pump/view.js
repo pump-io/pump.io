@@ -23,7 +23,9 @@
     Pump.templates = {};
 
     Pump.TemplateError = function(template, data, err) {
-        Error.captureStackTrace(this, Pump.TemplateError);
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, Pump.TemplateError);
+        }
         this.name     = "TemplateError";
         this.template = template;
         this.data     = data;
@@ -39,29 +41,36 @@
             var view = this;
 
             if (_.has(view, "model") && _.isObject(view.model)) {
-                view.listenTo(view.model, "change", function(options) {
+                view.listenTo(view.model, "change", function(model, options) {
+                    Pump.debug("Re-rendering " + view.templateName + " #" + view.cid + " based on change to " + view.model.id);
                     // When a change has happened, re-render
                     view.render();
                 });
                 view.listenTo(view.model, "destroy", function(options) {
+                    Pump.debug("Re-rendering " + view.templateName + " based on destroyed " + view.model.id);
                     // When a change has happened, re-render
                     view.remove();
                 });
-            } else if (_.has(view, "collection") && _.isObject(view.collection)) {
-                view.listenTo(view.collection, "add", function(model, collection, options) {
-                    view.showAdded(model);
-                });
-                view.listenTo(view.collection, "remove", function(model, collection, options) {
-                    view.showRemoved(model);
-                });
-                view.listenTo(view.collection, "reset", function(collection, options) {
-                    // When a change has happened, re-render
-                    view.render();
-                });
-                view.listenTo(view.collection, "sort", function(collection, options) {
-                    // When a change has happened, re-render
-                    view.render();
-                });
+                if (_.has(view.model, "items") && _.isObject(view.model.items)) {
+                    view.listenTo(view.model.items, "add", function(model, collection, options) {
+                        Pump.debug("Re-rendering " + view.templateName + " based on addition to " + view.model.id);
+                        view.showAdded(model);
+                    });
+                    view.listenTo(view.model.items, "remove", function(model, collection, options) {
+                        Pump.debug("Re-rendering " + view.templateName + " based on removal from " + view.model.id);
+                        view.showRemoved(model);
+                    });
+                    view.listenTo(view.model.items, "reset", function(collection, options) {
+                        Pump.debug("Re-rendering " + view.templateName + " based on reset of " + view.model.id);
+                        // When a change has happened, re-render
+                        view.render();
+                    });
+                    view.listenTo(view.model.items, "sort", function(collection, options) {
+                        Pump.debug("Re-rendering " + view.templateName + " based on resort of " + view.model.id);
+                        // When a change has happened, re-render
+                        view.render();
+                    });
+                }
             }
         },
         setElement: function(element, delegate) {
@@ -100,7 +109,7 @@
                     return;
                 }
 
-                if (def.idAttr && view.collection) {
+                if (def.idAttr && view.model && view.model.items) {
 
                     if (def.map) {
                         if (!view[def.map]) {
@@ -117,7 +126,7 @@
                             return;
                         }
 
-                        options.model = view.collection.get(id);
+                        options.model = view.model.items.get(id);
 
                         if (!options.model) {
                             return;
@@ -128,7 +137,7 @@
                                 options.data = {};
                                 _.each(def.subOptions.data, function(item) {
                                     if (item == view.modelName) {
-                                        options.data[item] = view.collection || view.model;
+                                        options.data[item] = view.model.items || view.model;
                                     } else {
                                         options.data[item] = data[item];
                                     }
@@ -151,9 +160,6 @@
                 if (def.subOptions) {
                     if (def.subOptions.model) {
                         options.model = data[def.subOptions.model];
-                    }
-                    if (def.subOptions.collection) {
-                        options.collection = data[def.subOptions.collection];
                     }
                     if (def.subOptions.data) {
                         options.data = {};
@@ -235,16 +241,15 @@
                 main = {
                     config: Pump.config,
                     template: {},
-                    page: {}
+                    page: {url: window.location.pathname + window.location.search,
+                           title: window.document.title}
                 },
                 pc,
                 modelName = view.modelName || view.options.modelName || "model",
                 partials = {},
                 cnt;
 
-            if (view.collection) {
-                main[modelName] = view.collection.toJSON();
-            } else if (view.model) {
+            if (view.model) {
                 main[modelName] = (!view.model) ? {} : ((view.model.toJSON) ? view.model.toJSON() : view.model);
             }
 
@@ -270,7 +275,7 @@
                     scoped = main;
                 }
                 if (!_.has(partials, name)) {
-                    console.log("Didn't preload template " + name + " for " + view.templateName + " so fetching sync");
+                    Pump.debug("Didn't preload template " + name + " for " + view.templateName + " so fetching sync");
                     // XXX: Put partials in the parts array of the
                     // view to avoid this shameful sync call
                     partials[name] = getTemplateSync(name);
@@ -383,7 +388,7 @@
                 return;
             }
 
-            if (!view.collection) {
+            if (!view.model || !view.model.items) {
                 return;
             }
 
@@ -447,7 +452,7 @@
         placeSub: function(aview, $el) {
             var view = this,
                 model = aview.model,
-                idx = view.collection.indexOf(model);
+                idx = view.model.items.indexOf(model);
 
             if (idx <= 0) {
                 view.$el.prepend(aview.$el);
@@ -471,7 +476,7 @@
                 return;
             }
 
-            if (!view.collection) {
+            if (!view.model || !view.model.items) {
                 return;
             }
 
@@ -530,14 +535,14 @@
                 attr: "majorStreamView",
                 subView: "MessagesView",
                 subOptions: {
-                    collection: "messages"
+                    model: "messages"
                 }
             },
             "#notifications": {
                 attr: "minorStreamView",
                 subView: "NotificationsView",
                 subOptions: {
-                    collection: "notifications"
+                    model: "notifications"
                 }
             }
         },
@@ -551,15 +556,13 @@
                 lists = profile.lists,
                 following = profile.following;
 
-            following.once("getall", function() {
+            following.getAll(function() {
                 Pump.fetchObjects([lists], function(err, objs) {
                     Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.principalUser,
                                                                lists: lists,
                                                                following: following}});
                 });
             });
-
-            following.getAll();
 
             return false;
         },
@@ -568,15 +571,13 @@
                 lists = profile.lists,
                 following = profile.following;
 
-            following.once("getall", function() {
+            following.getAll(function() {
                 Pump.fetchObjects([lists], function(err, objs) {
                     Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.principalUser,
                                                                   lists: lists,
                                                                   following: following}});
                 });
             });
-
-            following.getAll();
 
             return false;
         },
@@ -631,11 +632,11 @@
         getStreams: function() {
             var view = this,
                 streams = {};
-            if (view.majorStreamView && view.majorStreamView.collection) {
-                streams.messages = view.majorStreamView.collection;
+            if (view.majorStreamView && view.majorStreamView.model) {
+                streams.messages = view.majorStreamView.model;
             }
-            if (view.minorStreamView && view.minorStreamView.collection) {
-                streams.notifications = view.minorStreamView.collection;
+            if (view.minorStreamView && view.minorStreamView.model) {
+                streams.notifications = view.minorStreamView.model;
             }
             return streams;
         }
@@ -741,7 +742,7 @@
                 password = view.$('#password').val();
 
             if (!nickname || !password || nickname.length === 0 || password.length < 8) {  
-              view.$(':submit').attr('disabled', 'disabled');
+                view.$(':submit').attr('disabled', 'disabled');
             } else {
                 view.$(':submit').removeAttr('disabled');
             }
@@ -753,6 +754,7 @@
                 options,
                 continueTo = Pump.getContinueTo(),
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
+                retries = 0,
                 onSuccess = function(data, textStatus, jqXHR) {
                     var objs;
                     Pump.setNickname(data.nickname);
@@ -783,18 +785,26 @@
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     var type, response;
-                    view.stopSpin();
-                    type = jqXHR.getResponseHeader("Content-Type");
-                    if (type && type.indexOf("application/json") !== -1) {
-                        response = JSON.parse(jqXHR.responseText);
-                        view.showError(response.error);
+                    // This happens when our stored OAuth credentials are
+                    // invalid; usually because someone re-installed server software
+                    if (jqXHR.status == 401 && retries === 0 && jqXHR.responseText == "Invalid / used nonce") {
+                        Pump.clearCred();
+                        retries = 1;
+                        Pump.ajax(options);
                     } else {
-                        view.showError(errorThrown);
+                        view.stopSpin();
+                        type = jqXHR.getResponseHeader("Content-Type");
+                        if (type && type.indexOf("application/json") !== -1) {
+                            response = JSON.parse(jqXHR.responseText);
+                            view.showError(response.error);
+                        } else {
+                            view.showError(errorThrown);
+                        }
                     }
                 };
 
             view.startSpin();
-
+            
             options = {
                 contentType: "application/json",
                 data: JSON.stringify(params),
@@ -1003,11 +1013,11 @@
                 streams = {};
             if (view.userContent) {
                 uc = view.userContent;
-                if (uc.majorStreamView && uc.majorStreamView.collection) {
-                    streams.major = uc.majorStreamView.collection;
+                if (uc.majorStreamView && uc.majorStreamView.model) {
+                    streams.major = uc.majorStreamView.model;
                 }
-                if (uc.minorStreamView && uc.minorStreamView.collection) {
-                    streams.minor = uc.minorStreamView.collection;
+                if (uc.minorStreamView && uc.minorStreamView.model) {
+                    streams.minor = uc.minorStreamView.model;
                 }
             }
             return streams;
@@ -1048,7 +1058,7 @@
                 attr: "majorStreamView",
                 subView: "MajorStreamView",
                 subOptions: {
-                    collection: "major",
+                    model: "major",
                     data: ["headless"]
                 }
             },
@@ -1056,7 +1066,7 @@
                 attr: "minorStreamView",
                 subView: "MinorStreamView",
                 subOptions: {
-                    collection: "minor",
+                    model: "minor",
                     data: ["headless"]
                 }
             }
@@ -1065,7 +1075,7 @@
 
     Pump.MajorStreamView = Pump.TemplateView.extend({
         templateName: 'major-stream',
-        modelName: 'major',
+        modelName: 'activities',
         parts: ["major-activity",
                 "responses",
                 "reply",
@@ -1086,7 +1096,7 @@
 
     Pump.MinorStreamView = Pump.TemplateView.extend({
         templateName: 'minor-stream',
-        modelName: 'minor',
+        modelName: 'activities',
         parts: ["minor-activity"],
         subs: {
             ".activity.minor": {
@@ -1123,11 +1133,11 @@
         getStreams: function() {
             var view = this,
                 streams = {};
-            if (view.majorStreamView && view.majorStreamView.collection) {
-                streams.major = view.majorStreamView.collection;
+            if (view.majorStreamView && view.majorStreamView.model) {
+                streams.major = view.majorStreamView.model;
             }
-            if (view.minorStreamView && view.minorStreamView.collection) {
-                streams.minor = view.minorStreamView.collection;
+            if (view.minorStreamView && view.minorStreamView.model) {
+                streams.minor = view.minorStreamView.model;
             }
             return streams;
         },
@@ -1136,7 +1146,7 @@
                 attr: "majorStreamView",
                 subView: "MajorStreamView",
                 subOptions: {
-                    collection: "major",
+                    model: "major",
                     data: ["headless"]
                 }
             },
@@ -1144,7 +1154,7 @@
                 attr: "minorStreamView",
                 subView: "MinorStreamView",
                 subOptions: {
-                    collection: "minor",
+                    model: "minor",
                     data: ["headless"]
                 }
             }
@@ -1179,7 +1189,7 @@
                 attr: "majorStreamView",
                 subView: "MajorStreamView",
                 subOptions: {
-                    collection: "major",
+                    model: "major",
                     data: ["headless"]
                 }
             },
@@ -1187,7 +1197,7 @@
                 attr: "minorStreamView",
                 subView: "MinorStreamView",
                 subOptions: {
-                    collection: "minor",
+                    model: "minor",
                     data: ["headless"]
                 }
             }
@@ -1219,7 +1229,7 @@
                 return;
             }
 
-            view.replyStream = new Pump.ReplyStreamView({el: $el, collection: model.object.replies});
+            view.replyStream = new Pump.ReplyStreamView({el: $el, model: model.object.replies});
         },
         favoriteObject: function() {
             var view = this,
@@ -1325,8 +1335,8 @@
         },
         showAllReplies: function() {
             var view = this,
-                replies = view.collection,
-                full = new Pump.FullReplyStreamView({collection: replies});
+                replies = view.model,
+                full = new Pump.FullReplyStreamView({model: replies});
             
             Pump.body.startLoad();
 
@@ -1337,16 +1347,14 @@
                 Pump.body.endLoad();
             });
 
-            replies.on("getall", function() {
+            replies.getAll(function() {
                 full.render();
             });
-
-            replies.getAll();
         },
         placeSub: function(aview, $el) {
             var view = this,
                 model = aview.model,
-                idx = view.collection.indexOf(model);
+                idx = view.model.items.indexOf(model);
 
             // Invert direction
             if (idx <= 0) {
@@ -1354,7 +1362,7 @@
             } else if (idx >= $el.length) {
                 view.$(".reply-objects").prepend(aview.$el);
             } else {
-                aview.$el.insertBefore($el[view.collection.length - 1 - idx]);
+                aview.$el.insertBefore($el[view.model.length - 1 - idx]);
             }
         }
     });
@@ -1373,7 +1381,7 @@
         placeSub: function(aview, $el) {
             var view = this,
                 model = aview.model,
-                idx = view.collection.indexOf(model);
+                idx = view.model.items.indexOf(model);
 
             // Invert direction
             if (idx <= 0) {
@@ -1381,7 +1389,7 @@
             } else if (idx >= $el.length) {
                 view.$(".reply-objects").prepend(aview.$el);
             } else {
-                aview.$el.insertBefore($el[view.collection.length - 1 - idx]);
+                aview.$el.insertBefore($el[view.model.length - 1 - idx]);
             }
         }
     });
@@ -1458,7 +1466,7 @@
                 return;
             }
 
-            view.replyStream = new Pump.ReplyStreamView({el: $el, collection: model.replies});
+            view.replyStream = new Pump.ReplyStreamView({el: $el, model: model.replies});
         },
         favoriteObject: function() {
             var view = this,
@@ -1612,7 +1620,12 @@
 
     Pump.ProfileBlock = Pump.PersonView.extend({
         templateName: 'profile-block',
-        modelName: 'profile'
+        modelName: 'profile',
+        parts: ["profile-responses"],
+        initialize: function(options) {
+            Pump.debug("Initializing profile-block #" + this.cid);
+            Pump.PersonView.prototype.initialize.apply(this);
+        }
     });
 
     Pump.FavoritesContent = Pump.ContentView.extend({
@@ -1639,7 +1652,7 @@
                 attr: "userContent",
                 subView: "FavoritesUserContent",
                 subOptions: {
-                    collection: "objects",
+                    model: "favorites",
                     data: ["profile"]
                 }
             }
@@ -1648,7 +1661,7 @@
 
     Pump.FavoritesUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-favorites',
-        modelName: "objects",
+        modelName: "favorites",
         parts: ["object-stream",
                 "major-object",
                 "responses",
@@ -1657,7 +1670,7 @@
                 "activity-object-collection"],
         subs: {
             ".object.major": {
-                map: "objects",
+                map: "favorites",
                 subView: "MajorObjectView",
                 idAttr: "data-object-id"
             }
@@ -1684,7 +1697,7 @@
                 attr: "userContent",
                 subView: "FollowersUserContent",
                 subOptions: {
-                    collection: "people",
+                    model: "followers",
                     data: ["profile"]
                 }
             }
@@ -1692,8 +1705,8 @@
         getStreams: function() {
             var view = this,
                 streams = {};
-            if (view.userContent && view.userContent.peopleStreamView && view.userContent.peopleStreamView.collection) {
-                streams.major = view.userContent.collection;
+            if (view.userContent && view.userContent.peopleStreamView && view.userContent.peopleStreamView.model) {
+                streams.major = view.userContent.model;
             }
             return streams;
         }
@@ -1701,6 +1714,7 @@
 
     Pump.FollowersUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-followers',
+        modelName: 'followers',
         parts: ["people-stream",
                 "major-person",
                 "profile-responses"],
@@ -1709,7 +1723,7 @@
                 attr: "peopleStreamView",
                 subView: "PeopleStreamView",
                 subOptions: {
-                    collection: "people"
+                    model: "followers"
                 }
             }
         }
@@ -1748,7 +1762,7 @@
                 attr: "userContent",
                 subView: "FollowingUserContent",
                 subOptions: {
-                    collection: "people",
+                    model: "following",
                     data: ["profile"]
                 }
             }
@@ -1756,8 +1770,8 @@
         getStreams: function() {
             var view = this,
                 streams = {};
-            if (view.userContent && view.userContent.peopleStreamView && view.userContent.peopleStreamView.collection) {
-                streams.major = view.userContent.collection;
+            if (view.userContent && view.userContent.peopleStreamView && view.userContent.peopleStreamView.model) {
+                streams.major = view.userContent.model;
             }
             return streams;
         }
@@ -1765,6 +1779,7 @@
 
     Pump.FollowingUserContent = Pump.TemplateView.extend({
         templateName: 'user-content-following',
+        modelName: 'following',
         parts: ["people-stream",
                 "major-person",
                 "profile-responses"],
@@ -1773,7 +1788,7 @@
                 attr: "peopleStreamView",
                 subView: "PeopleStreamView",
                 subOptions: {
-                    collection: "people"
+                    model: "following"
                 }
             }
         }
@@ -1816,7 +1831,7 @@
                 attr: "listMenu",
                 subView: "ListMenu",
                 subOptions: {
-                    collection: "lists",
+                    model: "lists",
                     data: ["profile", "list"]
                 }
             }
@@ -1889,7 +1904,7 @@
             if (view.userContent &&
                 view.userContent.listContent &&
                 view.userContent.listContent.memberStreamView) {
-                streams.major = view.userContent.listContent.memberStreamView.collection;
+                streams.major = view.userContent.listContent.memberStreamView.model;
             }
 
             return streams;
@@ -1909,7 +1924,7 @@
                 attr: "listMenu",
                 subView: "ListMenu",
                 subOptions: {
-                    collection: "lists",
+                    model: "lists",
                     data: ["profile"]
                 }
             },
@@ -1936,7 +1951,7 @@
                 $el = view.$("#member-stream");
 
             if ($el && list && list.members) {
-                view.memberStreamView = new Pump.MemberStreamView({el: $el, collection: people, data: {list: list}});
+                view.memberStreamView = new Pump.MemberStreamView({el: $el, model: people, data: {list: list}});
             }
         },
         events: {
@@ -1950,15 +1965,13 @@
                 members = view.options.data.members,
                 following = profile.following;
 
-            following.once("getall", function() {
+            following.getAll(function() {
                 Pump.fetchObjects([profile, list], function(err, objs) {
                     Pump.showModal(Pump.ChooseContactModal, {data: {list: list,
                                                                     members: members,
                                                                     people: following}});
                 });
             });
-
-            following.getAll();
 
             return false;
         },
@@ -2082,11 +2095,11 @@
                     return true;
                 }).on("complete", function(event, id, fileName, responseJSON) {
                     var act = new Pump.Activity({
-                            verb: "post",
-                            cc: [{id: "http://activityschema.org/collection/public",
-                                  objectType: "collection"}],
-                            object: responseJSON.obj
-                        });
+                        verb: "post",
+                        cc: [{id: "http://activityschema.org/collection/public",
+                              objectType: "collection"}],
+                        object: responseJSON.obj
+                    });
 
                     Pump.newMajorActivity(act, function(err, act) {
                         if (err) {
@@ -2202,6 +2215,7 @@
         modelName: "object",
         parts: ["responses",
                 "reply",
+                "replies",
                 "activity-object-collection"],
         events: {
             "click .favorite": "favoriteObject",
@@ -2220,7 +2234,7 @@
                 return;
             }
 
-            view.replyStream = new Pump.ReplyStreamView({el: $el, collection: model.replies});
+            view.replyStream = new Pump.ReplyStreamView({el: $el, model: model.replies});
         },
         favoriteObject: function() {
             var view = this,
@@ -2396,7 +2410,7 @@
                     if (err) {
                         view.showError(err);
                     } else {
-                        members.add(person, {at: 0});
+                        members.items.add(person, {at: 0});
                         list.totalItems++;
                         list.trigger("change");
                         Pump.addMinorActivity(act);
@@ -2411,6 +2425,7 @@
         tagName: "div",
         className: "modal-holder",
         templateName: 'post-note',
+        parts: ["recipient-selector"],
         ready: function() {
             var view = this;
             view.$('#note-content').wysihtml5({
@@ -2473,6 +2488,7 @@
         tagName: "div",
         className: "modal-holder",
         templateName: 'post-picture',
+        parts: ["recipient-selector"],
         events: {
             "click #send-picture": "postPicture"
         },
@@ -2696,8 +2712,24 @@
         },
         navigateToHref: function(ev) {
             var el = (ev.srcElement || ev.currentTarget),
-                pathname = el.pathname, // XXX: HTML5
                 here = window.location;
+
+            // This gets fired for children of <a> elements, too. So we navigate
+            // up the DOM tree till we find an element that has a pathname (or
+            // we run out of tree)
+
+            for (el = (ev.srcElement || ev.currentTarget); el; el = el.parentNode) {
+                if (el.pathname) {
+                    break;
+                }
+            }
+
+            // Check for a good value
+
+            if (!el || !el.pathname) {
+                Pump.debug("Silently not navigating to non-existent target.");
+                return false;
+            }
 
             // Bootstrap components; let these through
 
@@ -2711,16 +2743,20 @@
             if ($(el).hasClass('save-continue-to')) {
                 Pump.saveContinueTo();
             }
-            
-            if (!el.host || el.host === here.host) {
+
+            // For local <a>, use the router
+
+            if (!el.host || el.host == here.host) {
                 try {
-                    Pump.router.navigate(pathname, true);
+                    Pump.debug("Navigating to " + el.pathname);
+                    Pump.router.navigate(el.pathname, true);
                 } catch (e) {
                     Pump.error(e);
                 }
                 // Always return false
                 return false;
             } else {
+                Pump.debug("Default anchor handling");
                 return true;
             }
         },
@@ -2746,7 +2782,9 @@
 
             // XXX: double-check this
 
+            Pump.debug("Initializing new " + View.prototype.templateName);
             body.content = new View(options);
+            Pump.debug("Done initializing new " + View.prototype.templateName);
 
             // We try and only update the parts that have changed
 
@@ -2755,10 +2793,17 @@
                 oldContent.profileBlock &&
                 oldContent.profileBlock.model.get("id") == profile.get("id")) {
 
+                if (body.content.profileBlock) {
+                    Pump.debug("Removing profile block #" + body.content.profileBlock.cid + " from " + View.prototype.templateName);
+                    body.content.profileBlock.remove();
+                }
+
+                Pump.debug("Connecting profile block #" + oldContent.profileBlock.cid + " to " + View.prototype.templateName);
+
                 body.content.profileBlock = oldContent.profileBlock;
 
-                if (options.userContentCollection) {
-                    userContentOptions = _.extend({collection: options.userContentCollection}, options);
+                if (options.userContentStream) {
+                    userContentOptions = _.extend({model: options.userContentStream}, options);
                 } else {
                     userContentOptions = options;
                 }
@@ -2768,7 +2813,15 @@
                 if (options.listContentView &&
                     oldContent.userContent.listMenu) {
 
+                    if (body.content.userContent.listMenu) {
+                        Pump.debug("Removing list menu #" + body.content.userContent.listMenu.cid + " from " + View.prototype.templateName);
+                        body.content.userContent.listMenu.remove();
+                    }
+
+                    Pump.debug("Connecting list menu #" + oldContent.userContent.listMenu.cid + " to " + View.prototype.templateName);
+
                     body.content.userContent.listMenu = oldContent.userContent.listMenu;
+
                     if (options.listContentModel) {
                         listContentOptions = _.extend({model: options.listContentModel}, options);
                     } else {
@@ -2782,16 +2835,32 @@
                 } else {
                     parent = "#user-content";
                     newView = body.content.userContent;
+
+                    if (oldContent.userContent.listMenu) {
+                        Pump.debug("Removing list menu #" + oldContent.userContent.listMenu.cid);
+                        oldContent.userContent.listMenu.remove();
+                    }
                 }
             } else {
                 parent = "#content";
                 newView = body.content;
+
+                if (oldContent && oldContent.profileBlock) {
+                    Pump.debug("Removing profile block #" + oldContent.profileBlock.cid);
+                    oldContent.profileBlock.remove();
+                }
+
+                if (oldContent && oldContent.userContent && oldContent.userContent.listMenu) {
+                    Pump.debug("Removing list menu #" + oldContent.userContent.listMenu.cid);
+                    oldContent.userContent.listMenu.remove();
+                }
             }
 
             newView.once("ready", function() {
                 Pump.setTitle(title);
                 body.$(parent).children().replaceWith(newView.$el);
                 Pump.followStreams();
+                window.scrollTo(0, 0);
                 if (callback) {
                     callback();
                 }

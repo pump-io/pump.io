@@ -32,8 +32,6 @@ if (!window.Pump) {
 
     $(document).ready(function() {
 
-        // XXX: set up initial models
-        
         // Set up router
 
         Pump.router   = new Pump.Router();
@@ -176,9 +174,19 @@ if (!window.Pump) {
     // send them here and I'll figure it out.
 
     Pump.error = function(err) {
-        console.log(err);
-        if (err.stack) {
-            console.log(err.stack);
+        if (window.console) {
+            console.log(err);
+            if (err.stack) {
+                console.log(err.stack);
+            }
+        }
+    };
+
+    // For debugging output
+
+    Pump.debug = function(msg) {
+        if (Pump.config.debugClient && window.console) {
+            console.log(msg);
         }
     };
 
@@ -254,19 +262,19 @@ if (!window.Pump) {
 
         _.each(objs, function(obj) {
             try {
-		if (obj.prevLink) {
-		    obj.getPrev(function(err) {
-			if (err) {
-			    onError(null, null, err);
-			} else {
-			    onSuccess();
-			}
-		    });
-		} else {
+                if (_.isFunction(obj.prevLink) && obj.prevLink()) {
+                    obj.getPrev(function(err) {
+                        if (err) {
+                            onError(null, null, err);
+                        } else {
+                            onSuccess();
+                        }
+                    });
+                } else {
                     obj.fetch({update: true,
                                success: onSuccess,
                                error: onError});
-		}
+                }
             } catch (e) {
                 onError(null, null, e);
             }
@@ -354,7 +362,6 @@ if (!window.Pump) {
 
     Pump.clearCaches = function() {
         Pump.Model.clearCache();
-        Pump.Collection.clearCache();
         Pump.User.clearCache();
     };
 
@@ -405,7 +412,7 @@ if (!window.Pump) {
                     streams = Pump.getStreams();
                     if (streams.major && streams.major.nextLink) {
                         Pump.body.startLoad();
-                        streams.major.getNext(function() {
+                        streams.major.getNext(function(err) {
                             Pump.body.endLoad();
                         });
                     }
@@ -451,11 +458,11 @@ if (!window.Pump) {
                                                                           major: Pump.ActivityStream,
                                                                           minor: Pump.ActivityStream}},
                 ".user-favorites": {View: Pump.FavoritesContent, models: {profile: Pump.Person,
-                                                                          objects: Pump.ActivityObjectStream}},
+                                                                          favorites: Pump.ActivityObjectStream}},
                 ".user-followers": {View: Pump.FollowersContent, models: {profile: Pump.Person,
-                                                                          people: Pump.PeopleStream}},
+                                                                          followers: Pump.PeopleStream}},
                 ".user-following": {View: Pump.FollowingContent, models: {profile: Pump.Person,
-                                                                          people: Pump.PeopleStream}},
+                                                                          following: Pump.PeopleStream}},
                 ".user-lists": {View: Pump.ListsContent, models: {profile: Pump.Person,
                                                                   lists: Pump.ActivityObjectStream}},
                 ".user-list": {View: Pump.ListContent, models: {profile: Pump.Person,
@@ -517,7 +524,7 @@ if (!window.Pump) {
     };
 
     Pump.addToStream = function(stream, act, callback) {
-        stream.create(act, {
+        stream.items.create(act, {
             success: function(act) {
                 callback(null, act);
             },

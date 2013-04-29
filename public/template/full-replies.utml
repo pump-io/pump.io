@@ -1,5 +1,5 @@
 <div class="replies full-replies">
-   <% _.each(replies.reverse(), function(reply) { %>
+   <% _.each(replies.items.reverse(), function(reply) { %>
    <%= partial("reply", {reply: reply}) %>
    <% }); %>
 </div>

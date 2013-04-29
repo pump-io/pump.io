@@ -1,11 +1,9 @@
 <ul class="media-list" id="object-stream">
-  <% if (objects) { %>
-  <% _.each(objects, function(object) { %>
+  <% _.each(objects.items, function(object) { %>
   <% try { %>
   <%= partial("major-object", {obj: object}) %>
   <% } catch (err) { %>
   <!-- Error showing object <%- obj.id %>: <%- err.message %> -->
   <% } %>
   <% }); %>
-  <% } %>
 </ul>

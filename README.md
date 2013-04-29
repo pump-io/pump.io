@@ -1,6 +1,6 @@
 # pump.io
 
-Version 0.2.3
+Version 0.3.0-alpha.1
 
 This is pump.io. It's a stream server that does most of what people
 really want from a social network.
@@ -47,11 +47,15 @@ thing much more enjoyable.
 
 ## Installation
 
+### Prerequisites
+
 You'll need three things to get started:
 
 * node.js 0.8.0 or higher
 * npm 1.1.0 or higher
 * A database server (see below)
+
+### Install with npm
 
 The easiest way is to install the software globally using npm, like
 so:
@@ -128,6 +132,9 @@ Here are the main configuration keys.
    the IP of the hostname.
 * *port* Port to listen on. Defaults to 31337, which is no good. You
    should listen on 80 or 443 if you're going to have anyone use this.
+* *urlPort* Port to use for generating URLs. Defaults to the same as `port`,
+  but if you're insisting on proxying behind Apache or whatever despite
+  warnings not to, you can use this. 
 * *secret* A session-generating secret, server-wide password.
 * *noweb* Hide the Web interface. Since it's disabled for this release,
   this shouldn't cause you any problems.
@@ -136,6 +143,8 @@ Here are the main configuration keys.
 * *ownerURL* URL of owning entity, if you want to link to it.
 * *nologger* If you're debugging or whatever, turn off
   logging. Defaults to false (leave logging on).
+* *logfile* Full path to the logfile. Logs are JSON in
+  [https://github.com/trentm/node-bunyan](bunyan) format.
 * *serverUser* If you're listening on a port lower than 1024, you need
   to be root. Set this to the name of a user to change to after the
   server is listening. `daemon` or `nobody` are good choices, or you
@@ -165,6 +174,46 @@ Here are the main configuration keys.
 * *noCDN* Use local copies of the JavaScript libraries instead of the
    ones on the CDN. Good for debugging. Defaults to `false`, meaning
    "use the CDN".
+
+### Web server proxy
+
+pump.io is designed to be a standalone server. You do not need
+to set up an Apache or nginx or lighttpd Web server in front of
+it. In fact, that's going to make things harder for you, and stuff
+like WebSockets is going to work less well.
+
+If you really insist, check the configuration options carefully. If
+you want http://pump.yourdomain.example/ to proxy to the pump.io
+daemon listening on port 8000 on 127.0.0.1, use configuration options
+like this:
+
+   "hostname": "pump.yourdomain.example",
+   "urlPort": 80,
+   "address": "127.0.0.1",
+   "port": 8000
+
+## Running the daemon
+
+You'll probably get a more reliable experience if you use
+[forever](https://npmjs.org/package/forever) to keep the daemon running.
+
+## Making changes
+
+If you're connecting your pump.io site with other software (such as
+federated servers or using Web clients), please note that most of them
+save OAuth keys based on your hostname and listening port. The
+following changes may make your relationships stop working.
+
+* Change of hostname
+* Change of port (from 8000 to 80 or even from HTTP to HTTPS)
+* Clearing your database or clearing some tables
+* Changing user nicknames
+
+I realize that these kind of changes are normal when someone's
+experimenting with new software, and I'm trying to make the software
+more robust in the face of this kind of change without sacrificing
+security, but for now it's a good idea to decide on your "real" domain
+name first before making connections to other sites.
 
 ## Bugs
 
