@@ -485,15 +485,11 @@ suite.addBatch({
                         pj(url, cred, act, this);
                     },
                     function(err, joinact, resp) {
-                        if (err) {
-                            callback(null);
-                        } else {
-                            callback(new Error("Unexpected success"));
-                        }
+                        callback(err);
                     }
                 );
             },
-            "it fails correctly": function(err) {
+            "it works": function(err) {
                 assert.ifError(err);
             }
         },
