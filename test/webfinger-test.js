@@ -105,6 +105,9 @@ suite.addBatch({
             },
             "and we test the webfinger endpoint":
             xrdutil.jrdContext("http://localhost:4815/.well-known/webfinger?resource=alice@localhost",
+                               webfinger),
+            "and we test the webfinger endpoint with an acct: URI":
+            xrdutil.jrdContext("http://localhost:4815/.well-known/webfinger?resource=acct:alice@localhost",
                                webfinger)
         }
     }
