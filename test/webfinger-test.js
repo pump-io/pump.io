@@ -27,6 +27,9 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     xrdutil = require("./lib/xrd"),
     actutil = require("./lib/activity"),
+    pj = httputil.postJSON,
+    gj = httputil.getJSON,
+    validActivity = actutil.validActivity,
     setupApp = oauthutil.setupApp;
 
 var suite = vows.describe("webfinger endpoint test");
@@ -108,7 +111,60 @@ suite.addBatch({
                                webfinger),
             "and we test the webfinger endpoint with an acct: URI":
             xrdutil.jrdContext("http://localhost:4815/.well-known/webfinger?resource=acct:alice@localhost",
-                               webfinger)
+                               webfinger),
+            "and they create a group": {
+                topic: function(cred) {
+                    var url = "http://localhost:4815/api/user/alice/feed",
+                        callback = this.callback,
+                        act = {
+                            verb: "create",
+                            object: {
+                                displayName: "Caterpillars",
+                                objectType: "group"
+                            }
+                        };
+
+                    pj(url, cred, act, function(err, body, resp) {
+                        callback(err, body);
+                    });
+                },
+                "it works": function(err, act) {
+                    assert.ifError(err);
+                    validActivity(act);
+                },
+                "and we test the webfinger endpoint with the group ID": {
+                    topic: function(act, cred) {
+                        var url = "http://localhost:4815/.well-known/webfinger?resource="+act.object.id,
+                            callback = this.callback,
+                            req;
+
+                        req = http.request(url, function(res) {
+                            var body = "";
+                            res.setEncoding("utf8");
+                            res.on("data", function(chunk) {
+                                body = body + chunk;
+                            });
+                            res.on("error", function(err) {
+                                callback(err, null);
+                            });
+                            res.on("end", function() {
+                                var obj = JSON.parse(body);
+                                callback(null, obj);
+                            });
+                        });
+
+                        req.on("error", function(err) {
+                            callback(err, null);
+                        });
+
+                        req.end();
+                    },
+                    "it works": function(err, obj) {
+                        assert.ifError(err);
+                        assert.isObject(obj);
+                    }
+                }
+            }
         }
     }
 });
