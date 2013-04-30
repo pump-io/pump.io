@@ -80,7 +80,23 @@ suite.addBatch({
         "and we get the lrdd endpoint with a Webfinger at some other domain":
         httputil.getfail("/api/lrdd?resource=evan@photo.example", 404),
         "and we get the lrdd endpoint with a Webfinger of a non-existent user":
-        httputil.getfail("/api/lrdd?resource=evan@localhost", 404),
+        httputil.getfail("/api/lrdd?resource=evan@localhost", 404)
+    }
+});
+
+suite.addBatch({
+    "When we set up the app": {
+        topic: function() {
+            setupApp(this.callback);
+        },
+        teardown: function(app) {
+            if (app && app.close) {
+                app.close();
+            }
+        },
+        "it works": function(err, app) {
+            assert.ifError(err);
+        },
         "and we register a client and user": {
             topic: function() {
                 newCredentials("alice", "test+pass", this.callback);
