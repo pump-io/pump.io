@@ -291,8 +291,17 @@ var getfail = function(rel, status) {
     }
     return {
         topic: function() {
-            var callback = this.callback;
-            http.get("http://localhost:4815" + rel, function(res) {
+            var callback = this.callback,
+                req,
+                timeout = setTimeout(function() {
+                    if (req) {
+                        req.abort();
+                    }
+                    callback(new Error("Timeout getting " + rel));
+                }, 10000);
+
+            req = http.get("http://localhost:4815" + rel, function(res) {
+                clearTimeout(timeout);
                 if (res.statusCode !== status) {
                     callback(new Error("Bad status code: " + res.statusCode));
                 } else {
