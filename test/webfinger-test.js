@@ -29,7 +29,7 @@ var assert = require("assert"),
     actutil = require("./lib/activity"),
     setupApp = oauthutil.setupApp;
 
-var suite = vows.describe("host meta test");
+var suite = vows.describe("webfinger/LRDD test");
 
 var webfinger = {
     links: [
