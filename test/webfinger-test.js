@@ -70,7 +70,7 @@ suite.addBatch({
         },
         "and we check the webfinger endpoint": 
         httputil.endpoint("/.well-known/webfinger", ["GET"]),
-        "and we get the lrdd endpoint with a Webfinger of a non-existent user":
+        "and we get the webfinger endpoint with a Webfinger of a non-existent user":
         httputil.getfail("/.well-known/webfinger?resource=evan@localhost", 404),
         "and we get the webfinger endpoint with no uri":
         httputil.getfail("/.well-known/webfinger", 400),
@@ -81,7 +81,23 @@ suite.addBatch({
         "and we get the webfinger endpoint with a Webfinger at some other domain":
         httputil.getfail("/.well-known/webfinger?resource=evan@photo.example", 404),
         "and we get the webfinger endpoint with a Webfinger of a non-existent user":
-        httputil.getfail("/.well-known/webfinger?resource=evan@localhost", 404),
+        httputil.getfail("/.well-known/webfinger?resource=evan@localhost", 404)
+    }
+});
+
+suite.addBatch({
+    "When we set up the app": {
+        topic: function() {
+            setupApp(this.callback);
+        },
+        teardown: function(app) {
+            if (app && app.close) {
+                app.close();
+            }
+        },
+        "it works": function(err, app) {
+            assert.ifError(err);
+        },
         "and we register a client and user": {
             topic: function() {
                 oauthutil.newCredentials("alice", "test+pass", this.callback);
