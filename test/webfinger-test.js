@@ -70,8 +70,6 @@ suite.addBatch({
         },
         "and we check the webfinger endpoint": 
         httputil.endpoint("/.well-known/webfinger", ["GET"]),
-        "and we get the webfinger endpoint with a Webfinger of a non-existent user":
-        httputil.getfail("/.well-known/webfinger?resource=evan@localhost", 404),
         "and we get the webfinger endpoint with no uri":
         httputil.getfail("/.well-known/webfinger", 400),
         "and we get the webfinger endpoint with an empty uri":
