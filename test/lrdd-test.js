@@ -27,6 +27,9 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     xrdutil = require("./lib/xrd"),
     actutil = require("./lib/activity"),
+    pj = httputil.postJSON,
+    gj = httputil.getJSON,
+    validActivity = actutil.validActivity,
     setupApp = oauthutil.setupApp,
     newCredentials = oauthutil.newCredentials;
 
@@ -106,7 +109,69 @@ suite.addBatch({
             },
             "and we test the lrdd endpoint":
             xrdutil.xrdContext("http://localhost:4815/api/lrdd?resource=alice@localhost",
-                               webfinger)
+                               webfinger),
+            "and we test the lrdd endpoint with an acct: URI":
+            xrdutil.xrdContext("http://localhost:4815/api/lrdd?resource=acct:alice@localhost",
+                               webfinger),
+            "and they create a group": {
+                topic: function(cred) {
+                    var url = "http://localhost:4815/api/user/alice/feed",
+                        callback = this.callback,
+                        act = {
+                            verb: "create",
+                            object: {
+                                displayName: "Caterpillars",
+                                objectType: "group"
+                            }
+                        };
+
+                    pj(url, cred, act, function(err, body, resp) {
+                        callback(err, body);
+                    });
+                },
+                "it works": function(err, act) {
+                    assert.ifError(err);
+                    validActivity(act);
+                },
+                "and we test the lrdd endpoint with the group ID": {
+                    topic: function(act, cred) {
+                        var url = "http://localhost:4815/api/lrdd?resource="+act.object.id,
+                            callback = this.callback,
+                            req;
+
+                        req = http.request(url, function(res) {
+                            var body = "";
+                            res.setEncoding("utf8");
+                            res.on("data", function(chunk) {
+                                body = body + chunk;
+                            });
+                            res.on("error", function(err) {
+                                callback(err, null);
+                            });
+                            res.on("end", function() {
+                                var parser = new xml2js.Parser();
+                                parser.parseString(body, function(err, doc) {
+                                    if (err) {
+                                        callback(err, null);
+                                    } else {
+                                        callback(null, doc);
+                                    }
+                                });
+                            });
+                        });
+
+                        req.on("error", function(err) {
+                            callback(err, null);
+                        });
+
+                        req.end();
+                    },
+                    "it works": function(err, obj) {
+                        assert.ifError(err);
+                        assert.isObject(obj);
+                    }
+                }
+            }
         }
     }
 });
