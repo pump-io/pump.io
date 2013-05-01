@@ -103,6 +103,10 @@ suite.addBatch({
                     var url = "http://group.localhost/api/user/groucho/feed",
                         act = {
                             verb: "create",
+                            to: [{
+                                id: "http://activityschema.org/collection/public",
+                                objectType: "collection"
+                            }],
                             object: {
                                 objectType: "group",
                                 displayName: "Marx Brothers"
