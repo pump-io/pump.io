@@ -1068,6 +1068,24 @@ var postToInbox = function(req, res, next) {
     );
 };
 
+var validateGroupRecipient = function(group, act) {
+
+    var props = ["to", "cc", "bto", "bcc"],
+        recipients = [];
+
+    props.forEach(function(prop) {
+        if (_(act).has(prop) && _(act[prop]).isArray()) {
+            recipients = recipients.concat(act[prop]);
+        }
+    });
+
+    if (!_.some(recipients, function(item) { return item.id == group.id && item.objectType == group.objectType; })) {
+        throw new HTTPError("Group " + group.id + " is not a recipient of activity " + act.id, 400);
+    }
+
+    return true;
+};
+
 var postToGroupInbox = function(req, res, next) {
 
     var props = Scrubber.scrubActivity(req.body),
@@ -1082,6 +1100,7 @@ var postToGroupInbox = function(req, res, next) {
 
     try {
         validateActor(req.client, req.principal, props.actor);
+        validateGroupRecipient(req.group, props);
     } catch (err) {
         next(err);
         return;
@@ -1099,6 +1118,7 @@ var postToGroupInbox = function(req, res, next) {
             } else {
                 // throws if invalid
                 validateActor(req.client, req.principal, activity.actor);
+                validateGroupRecipient(req.group, props);
                 this(null, activity);
             }
         },

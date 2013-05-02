@@ -175,6 +175,7 @@ suite.addBatch({
                                 id: "acct:user1@social.localhost",
                                 objectType: "person"
                             },
+                            to: [group],
                             id: "http://social.localhost/activity/1",
                             verb: "post",
                             object: {
@@ -240,6 +241,7 @@ suite.addBatch({
                                         objectType: "person"
                                     },
                                     id: "http://social.localhost/activity/2",
+                                    to: [group],
                                     verb: "post",
                                     object: {
                                         id: "http://social.localhost/note/2",
@@ -285,6 +287,7 @@ suite.addBatch({
                                         objectType: "service"
                                     },
                                     id: "http://social.localhost/activity/3",
+                                    to: [group],
                                     verb: "post",
                                     to: [{objectType: "person",
                                           id: "http://localhost:4815/api/user/louisck"}],
@@ -424,6 +427,54 @@ suite.addBatch({
                             }));
                         }
                     }
+                }
+            },
+            "and we post an activity to the inbox with OAuth credentials for the actor not directed to the group": {
+
+                topic: function(group) {
+                    var callback = this.callback;
+
+                    Step(
+                        function() {
+                            assoc("user4@social.localhost", "VALID1", Date.now(), this);
+                        },
+                        function(err, cl) {
+
+                            if (err) throw err;
+
+                            var url = group.links["activity-inbox"].href,
+                                act = {
+                                    actor: {
+                                        id: "acct:user4@social.localhost",
+                                        objectType: "person"
+                                    },
+                                    id: "http://social.localhost/activity/6",
+                                    verb: "post",
+                                    object: {
+                                        id: "http://social.localhost/note/4",
+                                        objectType: "note",
+                                        content: "Hello again again, world!"
+                                    },
+                                    published: (new Date()).toISOString(),
+                                    updated: (new Date()).toISOString()
+                                },
+                                cred = clientCred(cl);
+
+                            httputil.postJSON(url, cred, act, this);
+                        },
+                        function(err, body, resp) {
+                            if (err && err.statusCode >= 400 && err.statusCode < 500) {
+                                callback(null);
+                            } else if (err) {
+                                callback(err);
+                            } else {
+                                callback(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                "it fails correctly": function(err) {
+                    assert.ifError(err);
                 }
             }
         }
