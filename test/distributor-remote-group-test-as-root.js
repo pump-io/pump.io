@@ -209,6 +209,36 @@ suite.addBatch({
                             "it works": function(err, act) {
                                 assert.ifError(err);
                                 validActivity(act);
+                            },
+                            "and we wait a few seconds for delivery": {
+                                topic: function() {
+                                    var callback = this.callback;
+                                    setTimeout(function() { callback(null); }, 2000);
+                                },
+                                "it works": function(err) {
+                                    assert.ifError(err);
+                                },
+                                "and we check the other user's inbox": {
+                                    topic: function(postAct, createAct, creds) {
+                                        var url = "http://photo.localhost/api/user/harpo/inbox",
+                                            callback = this.callback;
+                                        gj(url, creds.harpo, function(err, feed, resp) {
+                                            callback(err, feed, postAct);
+                                        });
+                                    },
+                                    "it works": function(err, feed, act) {
+                                        assert.ifError(err);
+                                        validFeed(feed);
+                                    },
+                                    "the posted note is in the feed": function(err, feed, act) {
+                                        assert.ifError(err);
+                                        assert.isObject(feed);
+                                        assert.include(feed, "items");
+                                        assert.isArray(feed.items);
+                                        assert.greater(feed.items.length, 0);
+                                        assert.isObject(_.find(feed.items, function(item) { return item.id == act.id; }));
+                                    }
+                                }
                             }
                         }
                     }

@@ -1118,16 +1118,8 @@ var postToGroupInbox = function(req, res, next) {
                 this(null, activity);
             }
         },
-        function(err, activity) {
-            if (err) throw err;
-            act = activity;
-            group.getInboxStream(this);
-        },
-        function(err, str) {
-            if (err) throw err;
-            str.deliver(act.id, this);
-        },
-        function(err) {
+        function(err, act) {
+            var d;
             if (err) {
                 next(err);
             } else {
@@ -1135,6 +1127,10 @@ var postToGroupInbox = function(req, res, next) {
                 // ...then show (possibly modified) results.
                 // XXX: don't distribute
                 res.json(act);
+                d = new Distributor(act);
+                d.toLocalGroup(req.group, function(err) {
+                    req.log.error(err);
+                });
             }
         }
     );
