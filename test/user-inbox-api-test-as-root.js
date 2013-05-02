@@ -2,7 +2,7 @@
 //
 // Test posting to the user inbox
 //
-// Copyright 2012, E14N https://e14n.com/
+// Copyright 2012-2013, E14N https://e14n.com/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,10 +25,12 @@ var assert = require("assert"),
     version = require("../lib/version").version,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    actutil = require("./lib/activity"),
     newCredentials = oauthutil.newCredentials,
     newClient = oauthutil.newClient,
     dialbackApp = require("./lib/dialback").dialbackApp,
-    setupApp = oauthutil.setupApp;
+    setupApp = oauthutil.setupApp,
+    validActivity = actutil.validActivity;
 
 var clientCred = function(cl) {
     return {
@@ -353,6 +355,68 @@ suite.addBatch({
                         assert.isTrue(_.some(feed.items, function(item) {
                             return (_.isObject(item) && item.id == act.id);
                         }));
+                    }
+                }
+            },
+            "and the user joins a remote group": {
+                topic: function(cred) {
+                    var url = "http://localhost:4815/api/user/louisck/feed",
+                        callback = this.callback,
+                        act = {
+                            verb: "join",
+                            object: {
+                                id: "http://social.localhost/group/fathers",
+                                displayName: "Fathers",
+                                objectType: "group"
+                            }
+                        };
+
+                    httputil.postJSON(url, cred, act, function(err, body, resp) {
+                        callback(err, body);
+                    });
+                },
+                "it works": function(err, act) {
+                    assert.ifError(err);
+                    validActivity(act);
+                },
+                "and we post an activity to the inbox with OAuth credentials for the host of the remote group": {
+                    topic: function() {
+                        var callback = this.callback;
+
+                        Step(
+                            function() {
+                                assoc("social.localhost", "VALID2", Date.now(), this);
+                            },
+                            function(err, cl) {
+
+                                if (err) throw err;
+
+                                var url = "http://localhost:4815/api/user/louisck/inbox",
+                                    act = {
+                                        actor: {
+                                            id: "acct:user4@photo.localhost",
+                                            objectType: "person"
+                                        },
+                                        id: "http://social.localhost/activity/6",
+                                        verb: "post",
+                                        to: [{objectType: "group",
+                                              id: "http://social.localhost/group/fathers"}],
+                                        object: {
+                                            id: "http://social.localhost/note/4",
+                                            objectType: "note",
+                                            content: "Hello via the group!"
+                                        }
+                                    },
+                                    cred = clientCred(cl);
+
+                                httputil.postJSON(url, cred, act, this);
+                            },
+                            callback
+                        );
+                    },
+                    "it works": function(err, act, resp) {
+                        assert.ifError(err);
+                        assert.isObject(act);
                     }
                 }
             }
