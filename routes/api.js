@@ -1000,6 +1000,22 @@ var newRemoteActivity = function(principal, props, callback) {
     );
 };
 
+var validActor = function(client, principal, actor) {
+
+    if (client.webfinger) {
+        if (ActivityObject.canonicalID(actor.id) != ActivityObject.canonicalID(principal.id)) {
+            return false;
+        }
+    } else if (client.hostname) {
+        if (ActivityObject.canonicalID(actor.id) != "https://" + client.hostname + "/" &&
+            ActivityObject.canonicalID(actor.id) != "http://" + client.hostname + "/") {
+            return false;
+        }
+    }
+
+    return true;
+};
+
 var postToInbox = function(req, res, next) {
 
     var props = Scrubber.scrubActivity(req.body),
@@ -1014,17 +1030,9 @@ var postToInbox = function(req, res, next) {
 
     // We have slightly looser rules for hostnames
 
-    if (req.client.webfinger) {
-        if (ActivityObject.canonicalID(props.actor.id) != ActivityObject.canonicalID(req.principal.id)) {
-            next(new HTTPError("Actor is invalid since " + props.actor.id + " is not " + req.principal.id, 400));
-            return;
-        }
-    } else if (req.client.hostname) {
-        if (ActivityObject.canonicalID(props.actor.id) != "https://" + req.client.hostname + "/" &&
-            ActivityObject.canonicalID(props.actor.id) != "http://" + req.client.hostname + "/") {
-            next(new HTTPError("Actor is invalid since " + props.actor.id + " is not " + req.principal.id, 400));
-            return;
-        }
+    if (!validActor(req.client, req.principal, props.actor)) {
+        next(new HTTPError("Actor is invalid since " + props.actor.id + " is not " + req.principal.id, 400));
+        return;
     }
 
     Step(
@@ -1037,15 +1045,9 @@ var postToInbox = function(req, res, next) {
             } else if (err) {
                 throw err;
             } else {
-                if (req.client.webfinger) {
-                    if (ActivityObject.canonicalID(activity.actor.id) != ActivityObject.canonicalID(req.principal.id)) {
-                        throw new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400);
-                    }
-                } else if (req.client.hostname) {
-                    if (ActivityObject.canonicalID(activity.actor.id) != "https://"+req.client.hostname + "/" &&
-                        ActivityObject.canonicalID(activity.actor.id) != "http://"+req.client.hostname + "/") {
-                        throw new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400);
-                    }
+                if (!validActor(req.client, req.principal, props.actor)) {
+                    throw new HTTPError("Actor is invalid since " + props.actor.id + " is not " + req.principal.id, 400);
+                    return;
                 }
                 this(null, activity);
             }
@@ -1080,21 +1082,11 @@ var postToGroupInbox = function(req, res, next) {
         next(new HTTPError("Invalid actor", 400));
     }
 
-    // We have slightly looser rules for hostnames
-
-    if (req.client.webfinger) {
-        if (ActivityObject.canonicalID(props.actor.id) != ActivityObject.canonicalID(req.principal.id)) {
-            next(new HTTPError("Actor is invalid since " + props.actor.id + " is not " + req.principal.id, 400));
-            return;
-        }
-    } else if (req.client.hostname) {
-        if (ActivityObject.canonicalID(props.actor.id) != "https://" + req.client.hostname + "/" &&
-            ActivityObject.canonicalID(props.actor.id) != "http://" + req.client.hostname + "/") {
-            next(new HTTPError("Actor is invalid since " + props.actor.id + " is not " + req.principal.id, 400));
-            return;
-        }
+    if (!validActor(req.client, req.principal, props.actor)) {
+        next(new HTTPError("Actor is invalid since " + props.actor.id + " is not " + req.principal.id, 400));
+        return;
     }
-
+    
     Step(
         function() {
             Activity.get(props.id, this);
@@ -1105,15 +1097,9 @@ var postToGroupInbox = function(req, res, next) {
             } else if (err) {
                 throw err;
             } else {
-                if (req.client.webfinger) {
-                    if (ActivityObject.canonicalID(activity.actor.id) != ActivityObject.canonicalID(req.principal.id)) {
-                        throw new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400);
-                    }
-                } else if (req.client.hostname) {
-                    if (ActivityObject.canonicalID(activity.actor.id) != "https://"+req.client.hostname + "/" &&
-                        ActivityObject.canonicalID(activity.actor.id) != "http://"+req.client.hostname + "/") {
-                        throw new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400);
-                    }
+                if (!validActor(req.client, req.principal, activity.actor)) {
+                    throw(new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400));
+                    return;
                 }
                 this(null, activity);
             }
