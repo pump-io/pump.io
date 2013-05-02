@@ -18,47 +18,11 @@
 .media.comment-form {
   background-color: #fff;
 }
-#sidebar {
-  border-radius:6px 0 0 6px;
-  box-shadow: 6px 0 3px -3px rgba(0, 0, 0, 0.2) inset;
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
-}
 #minor-stream.media-list {
   margin-left: 1em;
 }
 #sidebar > h5, #sidebar > h4, #sidebar > h3,#sidebar > h2,#sidebar > h1 {
   margin-left: 0.5em;
-}
-.navbar-fixed-top {
-    background-color: #364A84;
-    border-radius: 0 0 12px 12px;
-    top: 0;
-}
-.navbar-inverse .navbar-inner {
-    background-color: #364A84;
-    background-image: linear-gradient(to bottom, #516499, #364A84);
-    background-repeat: repeat-x;
-    border-color: #777;
-    border-radius: 0 0 12px 12px;
-    box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.5);
-}
-.navbar-inverse .brand {
-    color: #DDDDDD;
-}
-
-.navbar-inverse .brand, .navbar-inverse .nav > li > a {
-    color: #DDDDDD;
-}
-.navbar-inverse .nav li.dropdown.open > .dropdown-toggle, .navbar-inverse .nav li.dropdown.active > .dropdown-toggle, .navbar-inverse .nav li.dropdown.open.active > .dropdown-toggle {
-    background-color: #364A84;
-    color: #FFFFFF;
-}
-.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus, .dropdown-submenu:hover > a, .dropdown-submenu:focus > a {
-    background-color: #516499;
-    background-image: linear-gradient(to bottom, #516499, #364A84);
-    background-repeat: repeat-x;
-    color: #FFFFFF;
-    text-decoration: none;
 }
 .img-polaroid {
     display: block;
