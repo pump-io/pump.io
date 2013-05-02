@@ -187,6 +187,29 @@ suite.addBatch({
                                 assert.isObject(_.find(feed.items, function(item) { return item.id == "acct:harpo@photo.localhost"; }));
                                 assert.isObject(_.find(feed.items, function(item) { return item.id == "acct:chico@social.localhost"; }));
                             }
+                        },
+                        "and one user posts a message to the group": {
+                            topic: function(createAct, creds) {
+                                var callback = this.callback,
+                                    group = createAct.object,
+                                    url = "http://social.localhost/api/user/chico/feed",
+                                    act = {
+                                        verb: "post",
+                                        to: [group],
+                                        object: {
+                                            objectType: "note",
+                                            content: "You there, Pinky?"
+                                        }
+                                    };
+
+                                pj(url, creds.chico, act, function(err, act, resp) {
+                                    callback(err, act);
+                                });
+                            },
+                            "it works": function(err, act) {
+                                assert.ifError(err);
+                                validActivity(act);
+                            }
                         }
                     }
                 }
