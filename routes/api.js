@@ -1000,16 +1000,16 @@ var newRemoteActivity = function(principal, props, callback) {
     );
 };
 
-var validActor = function(client, principal, actor) {
+var validateActor = function(client, principal, actor) {
 
     if (client.webfinger) {
         if (ActivityObject.canonicalID(actor.id) != ActivityObject.canonicalID(principal.id)) {
-            return false;
+            throw new HTTPError("Actor is invalid since " + actor.id + " is not " + principal.id, 400);
         }
     } else if (client.hostname) {
         if (ActivityObject.canonicalID(actor.id) != "https://" + client.hostname + "/" &&
             ActivityObject.canonicalID(actor.id) != "http://" + client.hostname + "/") {
-            return false;
+            throw new HTTPError("Actor is invalid since " + actor.id + " is not " + principal.id, 400);
         }
     }
 
@@ -1028,10 +1028,10 @@ var postToInbox = function(req, res, next) {
         next(new HTTPError("Invalid actor", 400));
     }
 
-    // We have slightly looser rules for hostnames
-
-    if (!validActor(req.client, req.principal, props.actor)) {
-        next(new HTTPError("Actor is invalid since " + props.actor.id + " is not " + req.principal.id, 400));
+    try {
+        validateActor(req.client, req.principal, props.actor);
+    } catch (err) {
+        next(err);
         return;
     }
 
@@ -1045,10 +1045,8 @@ var postToInbox = function(req, res, next) {
             } else if (err) {
                 throw err;
             } else {
-                if (!validActor(req.client, req.principal, props.actor)) {
-                    throw new HTTPError("Actor is invalid since " + props.actor.id + " is not " + req.principal.id, 400);
-                    return;
-                }
+                // throws if invalid
+                validateActor(req.client, req.principal, act.actor);
                 this(null, activity);
             }
         },
@@ -1082,11 +1080,13 @@ var postToGroupInbox = function(req, res, next) {
         next(new HTTPError("Invalid actor", 400));
     }
 
-    if (!validActor(req.client, req.principal, props.actor)) {
-        next(new HTTPError("Actor is invalid since " + props.actor.id + " is not " + req.principal.id, 400));
+    try {
+        validateActor(req.client, req.principal, props.actor);
+    } catch (err) {
+        next(err);
         return;
     }
-    
+
     Step(
         function() {
             Activity.get(props.id, this);
@@ -1097,10 +1097,8 @@ var postToGroupInbox = function(req, res, next) {
             } else if (err) {
                 throw err;
             } else {
-                if (!validActor(req.client, req.principal, activity.actor)) {
-                    throw(new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400));
-                    return;
-                }
+                // throws if invalid
+                validateActor(req.client, req.principal, activity.actor);
                 this(null, activity);
             }
         },
