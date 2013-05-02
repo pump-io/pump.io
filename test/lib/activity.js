@@ -35,8 +35,9 @@ var validActivity = function(act) {
     assert.isString(act.actor.id);
     assert.include(act.actor, "objectType");
     assert.isString(act.actor.objectType);
-    assert.include(act.actor, "displayName");
-    assert.isString(act.actor.displayName);
+    if (_.has(act.actor, "displayName")) {
+        assert.isString(act.actor.displayName);
+    }
     assert.isFalse(_.has(act.actor, "_uuid"));
     assert.include(act, "verb");
     assert.isString(act.verb);
