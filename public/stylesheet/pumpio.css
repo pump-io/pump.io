@@ -18,12 +18,6 @@
 .media.comment-form {
   background-color: #fff;
 }
-#minor-stream.media-list {
-  margin-left: 1em;
-}
-#sidebar > h5, #sidebar > h4, #sidebar > h3,#sidebar > h2,#sidebar > h1 {
-  margin-left: 0.5em;
-}
 .img-polaroid {
     display: block;
     margin-left: auto;
