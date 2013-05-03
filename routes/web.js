@@ -125,8 +125,8 @@ var showInbox = function(req, res, next) {
 
     Step(
         function() {
-            streams.userMajorInbox(user, req.principal, this.parallel());
-            streams.userMinorInbox(user, req.principal, this.parallel());
+            streams.userMajorInbox({user: user}, req.principal, this.parallel());
+            streams.userMinorInbox({user: user}, req.principal, this.parallel());
         },
         function(err, major, minor) {
             if (err) {
@@ -319,8 +319,8 @@ var showStream = function(req, res, next) {
 
     Step(
         function() {
-            streams.userMajorStream(req.user, req.principal, this.parallel());
-            streams.userMinorStream(req.user, req.principal, this.parallel());
+            streams.userMajorStream({user: req.user}, req.principal, this.parallel());
+            streams.userMinorStream({user: req.user}, req.principal, this.parallel());
             addFollowed(principal, [req.user.profile], this.parallel());
             req.user.profile.expandFeeds(this.parallel());
         },
@@ -887,8 +887,8 @@ var addMessages = function(req, res, next) {
 
     Step(
         function() {
-            streams.userMajorDirectInbox(user, req.principal, this.parallel());
-            streams.userMinorDirectInbox(user, req.principal, this.parallel());
+            streams.userMajorDirectInbox({user: user}, req.principal, this.parallel());
+            streams.userMinorDirectInbox({user: user}, req.principal, this.parallel());
         },
         function(err, messages, notifications) {
             if (err) {
