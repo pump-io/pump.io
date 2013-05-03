@@ -171,6 +171,12 @@ var addRoutes = function(app) {
     app.get("/api/collection/:uuid/members", smw, anyReadAuth, requestCollection, authorOrRecipient, collectionMembers);
     app.post("/api/collection/:uuid/members", userWriteOAuth, requestCollection, authorOnly, reqGenerator, newMember);
 
+    // Group feeds (members and inbox)
+
+    app.get("/api/group/:uuid/members", smw, anyReadAuth, requestGroup, authorOrRecipient, groupMembers);
+    app.get("/api/group/:uuid/inbox", smw, anyReadAuth, requestGroup, authorOrRecipient, groupInbox);
+    app.post("/api/group/:uuid/inbox", remoteWriteOAuth, requestGroup, postToGroupInbox);
+
     // Info about yourself
 
     app.get("/api/whoami", smw, userReadAuth, whoami);
@@ -180,6 +186,11 @@ var addRoutes = function(app) {
 
 var requestCollection = function(req, res, next) {
     req.params.type = "collection";
+    requestObject(req, res, next);
+};
+
+var requestGroup = function(req, res, next) {
+    req.params.type = "group";
     requestObject(req, res, next);
 };
 
@@ -940,59 +951,76 @@ var postActivity = function(req, res, next) {
     );
 };
 
+var newRemoteActivity = function(principal, props, callback) {
+
+    var activity = new Activity(props);
+
+    Step(
+        function() {
+            // Default verb
+
+            if (!_(activity).has("verb") || _(activity.verb).isNull()) {
+                activity.verb = "post";
+            }
+
+            // Add a received timestamp
+
+            activity.received = Stamper.stamp();
+
+            // TODO: return a 202 Accepted here?
+
+            // First, ensure recipients
+            activity.ensureRecipients(this);
+        },
+        function(err) {
+            if (err) throw err;
+            // apply the activity
+            activity.apply(principal, this);
+        },
+        function(err) {
+            if (err) {
+                if (err.name == "AppError") {
+                    throw new HTTPError(err.message, 400);
+                } else if (err.name == "NoSuchThingError") {
+                    throw new HTTPError(err.message, 400);
+                } else if (err.name == "AlreadyExistsError") {
+                    throw new HTTPError(err.message, 400);
+                } else if (err.name == "NoSuchItemError") {
+                    throw new HTTPError(err.message, 400);
+                } else if (err.name == "NotInStreamError") {
+                    throw new HTTPError(err.message, 400);
+                } else {
+                    throw err;
+                }
+            }
+            // ...then persist...
+            activity.save(this);
+        },
+        callback
+    );
+};
+
+var validateActor = function(client, principal, actor) {
+
+    if (client.webfinger) {
+        if (ActivityObject.canonicalID(actor.id) != ActivityObject.canonicalID(principal.id)) {
+            throw new HTTPError("Actor is invalid since " + actor.id + " is not " + principal.id, 400);
+        }
+    } else if (client.hostname) {
+        if (ActivityObject.canonicalID(actor.id) != "https://" + client.hostname + "/" &&
+            ActivityObject.canonicalID(actor.id) != "http://" + client.hostname + "/") {
+            throw new HTTPError("Actor is invalid since " + actor.id + " is not " + principal.id, 400);
+        }
+    }
+
+    return true;
+};
+
 var postToInbox = function(req, res, next) {
 
     var props = Scrubber.scrubActivity(req.body),
         act,
-        user = req.user,
-        newRemoteActivity = function(props, callback) {
-
-            var activity = new Activity(props);
-
-            Step(
-                function() {
-                    // Default verb
-
-                    if (!_(activity).has("verb") || _(activity.verb).isNull()) {
-                        activity.verb = "post";
-                    }
-
-                    // Add a received timestamp
-
-                    activity.received = Stamper.stamp();
-
-                    // TODO: return a 202 Accepted here?
-
-                    // First, ensure recipients
-                    activity.ensureRecipients(this);
-                },
-                function(err) {
-                    if (err) throw err;
-                    // apply the activity
-                    activity.apply(req.principal, this);
-                },
-                function(err) {
-                    if (err) {
-                        if (err.name == "AppError") {
-                            throw new HTTPError(err.message, 400);
-                        } else if (err.name == "NoSuchThingError") {
-                            throw new HTTPError(err.message, 400);
-                        } else if (err.name == "AlreadyExistsError") {
-                            throw new HTTPError(err.message, 400);
-                        } else if (err.name == "NoSuchItemError") {
-                            throw new HTTPError(err.message, 400);
-                        } else if (err.name == "NotInStreamError") {
-                            throw new HTTPError(err.message, 400);
-                        } else {
-                            throw err;
-                        }
-                    }
-                    // ...then persist...
-                    activity.save(this);
-                },
-                callback
-            );
-        };
+        user = req.user;
 
     // Check for actor
 
@@ -1000,19 +1028,11 @@ var postToInbox = function(req, res, next) {
         next(new HTTPError("Invalid actor", 400));
     }
 
-    // We have slightly looser rules for hostnames
-
-    if (req.client.webfinger) {
-        if (ActivityObject.canonicalID(props.actor.id) != ActivityObject.canonicalID(req.principal.id)) {
-            next(new HTTPError("Actor is invalid since " + props.actor.id + " is not " + req.principal.id, 400));
-            return;
-        }
-    } else if (req.client.hostname) {
-        if (ActivityObject.canonicalID(props.actor.id) != "https://" + req.client.hostname + "/" &&
-            ActivityObject.canonicalID(props.actor.id) != "http://" + req.client.hostname + "/") {
-            next(new HTTPError("Actor is invalid since " + props.actor.id + " is not " + req.principal.id, 400));
-            return;
-        }
+    try {
+        validateActor(req.client, req.principal, props.actor);
+    } catch (err) {
+        next(err);
+        return;
     }
 
     Step(
@@ -1021,20 +1041,12 @@ var postToInbox = function(req, res, next) {
         },
         function(err, activity) {
             if (err && err.name == "NoSuchThingError") {
-                newRemoteActivity(props, this);
+                newRemoteActivity(req.principal, props, this);
             } else if (err) {
                 throw err;
             } else {
-                if (req.client.webfinger) {
-                    if (ActivityObject.canonicalID(activity.actor.id) != ActivityObject.canonicalID(req.principal.id)) {
-                        throw new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400);
-                    }
-                } else if (req.client.hostname) {
-                    if (ActivityObject.canonicalID(activity.actor.id) != "https://"+req.client.hostname + "/" &&
-                        ActivityObject.canonicalID(activity.actor.id) != "http://"+req.client.hostname + "/") {
-                        throw new HTTPError("Actor is invalid since " + activity.actor.id + " is not " + req.principal.id, 400);
-                    }
-                }
+                // throws if invalid
+                validateActor(req.client, req.principal, act.actor);
                 this(null, activity);
             }
         },
@@ -1051,6 +1063,78 @@ var postToInbox = function(req, res, next) {
                 // ...then show (possibly modified) results.
                 // XXX: don't distribute
                 res.json(act);
+            }
+        }
+    );
+};
+
+var validateGroupRecipient = function(group, act) {
+
+    var props = ["to", "cc", "bto", "bcc"],
+        recipients = [];
+
+    props.forEach(function(prop) {
+        if (_(act).has(prop) && _(act[prop]).isArray()) {
+            recipients = recipients.concat(act[prop]);
+        }
+    });
+
+    if (!_.some(recipients, function(item) { return item.id == group.id && item.objectType == group.objectType; })) {
+        throw new HTTPError("Group " + group.id + " is not a recipient of activity " + act.id, 400);
+    }
+
+    return true;
+};
+
+var postToGroupInbox = function(req, res, next) {
+
+    var props = Scrubber.scrubActivity(req.body),
+        act,
+        group = req.group;
+
+    // Check for actor
+
+    if (!_(props).has("actor")) {
+        next(new HTTPError("Invalid actor", 400));
+    }
+
+    try {
+        validateActor(req.client, req.principal, props.actor);
+        validateGroupRecipient(req.group, props);
+    } catch (err) {
+        next(err);
+        return;
+    }
+
+    Step(
+        function() {
+            Activity.get(props.id, this);
+        },
+        function(err, activity) {
+            if (err && err.name == "NoSuchThingError") {
+                newRemoteActivity(req.principal, props, this);
+            } else if (err) {
+                throw err;
+            } else {
+                // throws if invalid
+                validateActor(req.client, req.principal, activity.actor);
+                validateGroupRecipient(req.group, props);
+                this(null, activity);
+            }
+        },
+        function(err, act) {
+            var d;
+            if (err) {
+                next(err);
+            } else {
+                act.sanitize(req.principal);
+                // ...then show (possibly modified) results.
+                // XXX: don't distribute
+                res.json(act);
+                d = new Distributor(act);
+                d.toLocalGroup(req.group, function(err) {
+                    req.log.error(err);
+                });
             }
         }
     );
@@ -1144,7 +1228,7 @@ var streamEndpoint = function(streamCreator) {
             return;
         }
 
-        streamCreator(req.user, req.principal, args, function(err, collection) {
+        streamCreator({user: req.user}, req.principal, args, function(err, collection) {
             if (err) {
                 next(err);
             } else {
@@ -1289,6 +1373,22 @@ var collectionMembers = contextEndpoint(
         return context;
     },
     streams.collectionMembers
+);
+
+var groupMembers = contextEndpoint(
+    function(req) {
+        var context = {group: req.group, author: req.group.author};
+        return context;
+    },
+    streams.groupMembers
+);
+
+var groupInbox = contextEndpoint(
+    function(req) {
+        var context = {group: req.group};
+        return context;
+    },
+    streams.groupInbox
 );
 
 var newMember = function(req, res, next) {

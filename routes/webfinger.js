@@ -16,7 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var databank = require("databank"),
+var urlparse = require("url").parse,
+    databank = require("databank"),
     _ = require("underscore"),
     Step = require("step"),
     validator = require("validator"),
@@ -24,7 +25,8 @@ var databank = require("databank"),
     sanitize = validator.sanitize,
     HTTPError = require("../lib/httperror").HTTPError,
     URLMaker = require("../lib/urlmaker").URLMaker,
-    User = require("../lib/model/user").User;
+    User = require("../lib/model/user").User,
+    ActivityObject = require("../lib/model/activityobject").ActivityObject;
 
 // Initialize the app controller
 
@@ -121,7 +123,7 @@ var hostMetaJSON = function(req, res, next) {
 };
 
 var lrddUser = function(req, res, next) {
-    var resource;
+    var resource, parts;
 
     if (!_(req).has("query") || !_(req.query).has("resource")) {
         next(new HTTPError("No resource parameter", 400));
@@ -130,31 +132,66 @@ var lrddUser = function(req, res, next) {
 
     resource = req.query.resource;
 
-    var parts = resource.match(/^(.*)@(.*)$/);
-    
+    // Prefix it with acct: if it looks like a bare webfinger
+
+    if (resource.indexOf(":") === -1) {
+        if (resource.indexOf("@") !== -1) {
+            resource = "acct:" + resource;
+        }
+    }
+
+    // This works for acct: URIs, http URIs, and https URIs
+
+    parts = urlparse(resource);
+
     if (!parts) {
         next(new HTTPError("Unrecognized resource parameter", 404));
         return;
     }
 
-    if (parts[2] != URLMaker.hostname) {
+    if (parts.hostname != URLMaker.hostname) {
         next(new HTTPError("Unrecognized host", 404));
         return;
     }
-    
-    User.get(parts[1], function(err, user) {
-        if (err && err.name == "NoSuchThingError") {
-            next(new HTTPError(err.message, 404));
-        } else if (err) {
-            next(err);
-        } else {
-            req.user = user;
-            next();
+
+    switch (parts.protocol) {
+    case "acct:":
+        User.get(parts.auth, function(err, user) {
+            if (err && err.name == "NoSuchThingError") {
+                next(new HTTPError(err.message, 404));
+            } else if (err) {
+                next(err);
+            } else {
+                req.user = user;
+                next();
+            }
+        });
+        break;
+    case "http:":
+    case "https:":
+        // XXX: this is kind of flaky; we should have a better way to turn
+        // an ID into an activity object
+        var match = parts.pathname.match("/api/([^/]*)/");
+        if (!match) {
+            next(new HTTPError("Unknown object type", 404));
+            return;
         }
-    });
+        var type = match[1];
+        ActivityObject.getObject(type, resource, function(err, obj) {
+            if (err && err.name == "NoSuchThingError") {
+                next(new HTTPError(err.message, 404));
+            } else if (err) {
+                next(err);
+            } else {
+                req.obj = obj;
+                next();
+            }
+        });
+        break;
+    }
 };
 
-var lrddLinks = function(user) {
+var userLinks = function(user) {
     return [
         {
             rel: "http://webfinger.net/rel/profile-page",
@@ -176,6 +213,32 @@ var lrddLinks = function(user) {
     ];
 };
 
+var objectLinks = function(obj) {
+
+    var links = [],
+        feeds = ["replies", "likes", "shares",
+                 "members",
+                 "followers", "following", "favorites", "lists"];
+
+    if (obj.links) {
+        _.each(obj.links, function(value, key) {
+            var link = _.clone(value);
+            link.rel = key;
+            links.push(link);
+        });
+    }
+
+    _.each(feeds, function(feed) {
+        var link;
+        if (obj[feed] && obj[feed].url) {
+            link = {rel: feed, href: obj[feed].url};
+            links.push(link);
+        }
+    });
+
+    return links;
+};
+
 var lrdd = function(req, res, next) {
 
     var i, links;
@@ -185,7 +248,11 @@ var lrdd = function(req, res, next) {
         return;
     }
 
-    links = lrddLinks(req.user);
+    if (req.user) {
+        links = userLinks(req.user);
+    } else {
+        links = objectLinks(req.obj);
+    }
 
     res.writeHead(200, {"Content-Type": "application/xrd+xml"});
     res.write("<?xml version='1.0' encoding='UTF-8'?>\n"+
@@ -199,8 +266,14 @@ var lrdd = function(req, res, next) {
 };
 
 var webfinger = function(req, res, next) {
+    var links;
+    if (req.user) {
+        links = userLinks(req.user);
+    } else {
+        links = objectLinks(req.obj);
+    }
     res.json({
-        links: lrddLinks(req.user)
+        links: links
     });
 };
 

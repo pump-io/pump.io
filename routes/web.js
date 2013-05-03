@@ -65,7 +65,7 @@ var addRoutes = function(app) {
     app.get("/main/register", app.session, principal, showRegister);
     app.post("/main/register", app.session, principal, clientAuth, reqGenerator, createUser);
 
-    app.get("/main/login", app.session, principal, showLogin);
+    app.get("/main/login", app.session, principal, addMessages, showLogin);
     app.post("/main/login", app.session, clientAuth, handleLogin);
 
     app.post("/main/logout", app.session, someReadAuth, handleLogout);
@@ -125,8 +125,8 @@ var showInbox = function(req, res, next) {
 
     Step(
         function() {
-            streams.userMajorInbox(user, req.principal, this.parallel());
-            streams.userMinorInbox(user, req.principal, this.parallel());
+            streams.userMajorInbox({user: user}, req.principal, this.parallel());
+            streams.userMinorInbox({user: user}, req.principal, this.parallel());
         },
         function(err, major, minor) {
             if (err) {
@@ -319,8 +319,8 @@ var showStream = function(req, res, next) {
 
     Step(
         function() {
-            streams.userMajorStream(req.user, req.principal, this.parallel());
-            streams.userMinorStream(req.user, req.principal, this.parallel());
+            streams.userMajorStream({user: req.user}, req.principal, this.parallel());
+            streams.userMinorStream({user: req.user}, req.principal, this.parallel());
             addFollowed(principal, [req.user.profile], this.parallel());
             req.user.profile.expandFeeds(this.parallel());
         },
@@ -887,8 +887,8 @@ var addMessages = function(req, res, next) {
 
     Step(
         function() {
-            streams.userMajorDirectInbox(user, req.principal, this.parallel());
-            streams.userMinorDirectInbox(user, req.principal, this.parallel());
+            streams.userMajorDirectInbox({user: user}, req.principal, this.parallel());
+            streams.userMinorDirectInbox({user: user}, req.principal, this.parallel());
         },
         function(err, messages, notifications) {
             if (err) {
