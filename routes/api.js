@@ -1056,6 +1056,19 @@ var postToInbox = function(req, res, next) {
             user.addToInbox(activity, this);
         },
         function(err) {
+            if (err) throw err;
+            act.checkRecipient(user.profile, this);
+        },
+        function(err, isRecipient) {
+            if (err) throw err;
+            if (isRecipient) {
+                // skip
+                this(null);
+            } else {
+                act.addReceived(user.profile, this);
+            }
+        },
+        function(err) {
             if (err) {
                 next(err);
             } else {

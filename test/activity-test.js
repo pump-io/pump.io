@@ -1682,6 +1682,32 @@ suite.addBatch({
                             return (item.id == "acct:gerald@photo.example" && item.objectType == "person");
                         }));
                     }
+                },
+                "and we check to see if the added person is a recipient": {
+                    topic: function(activity) {
+                        var other = {
+                            id: "acct:gerald@photo.example",
+                            objectType: "person"
+                        };
+                        activity.checkRecipient(other, this.callback);
+                    },
+                    "it works": function(err, isRecipient) {
+                        assert.ifError(err);
+                    },
+                    "it is a recipient": function(err, isRecipient) {
+                        assert.ifError(err);
+                        assert.isTrue(isRecipient);
+                    }
+                },
+                "and we get the list of recipients": {
+                    topic: function(activity) {
+                        return activity.recipients();
+                    },
+                    "our added object is a recipient": function(recipients) {
+                        assert.isObject(_.find(recipients, function(item) {
+                            return (item.id == "acct:gerald@photo.example" && item.objectType == "person");
+                        }));
+                    }
                 }
             }
         }
