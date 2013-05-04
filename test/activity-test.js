@@ -1668,6 +1668,20 @@ suite.addBatch({
                 },
                 "it works": function(err) {
                     assert.ifError(err);
+                },
+                "and we examine the activity": {
+                    topic: function(activity) {
+                        return activity;
+                    },
+                    "it has a _received property": function(activity) {
+                        assert.isArray(activity._received);
+                    },
+                    "the _received property contains the value we added": function(activity) {
+                        assert.isArray(activity._received);
+                        assert.isObject(_.find(activity._received, function(item) {
+                            return (item.id == "acct:gerald@photo.example" && item.objectType == "person");
+                        }));
+                    }
                 }
             }
         }
