@@ -47,6 +47,11 @@ var testSchema = {
              "title",
              "url",
              "_uuid",
+             "to",
+             "cc",
+             "bto",
+             "bcc",
+             "_received",
              "updated",
              "verb"],
     indices: ["actor.id", "object.id", "_uuid"]
@@ -279,6 +284,9 @@ suite.addBatch({
             },
             "it has the isMajor() method": function(activity) {
                 assert.isFunction(activity.isMajor);
+            },
+            "it has the addReceived() method": function(activity) {
+                assert.isFunction(activity.addReceived);
             }
         },
         "and we apply() a new post activity": {
@@ -1585,6 +1593,84 @@ suite.addBatch({
                       }
                      },
                      "Lorrie Tynan posted a comment in reply to an image")
+    }
+});
+
+// Test that adding a receiver works
+
+suite.addBatch({
+    "When we get the Activity class": {
+        topic: function() {
+            var cb = this.callback;
+            // Need this to make IDs
+
+            URLMaker.hostname = "example.net";
+
+            // Dummy databank
+
+            tc.params.schema = schema;
+
+            var db = Databank.get(tc.driver, tc.params);
+
+            db.connect({}, function(err) {
+
+                var mod;
+
+                if (err) {
+                    cb(err, null);
+                    return;
+                }
+
+                DatabankObject.bank = db;
+                
+                mod = require("../lib/model/activity");
+
+                if (!mod) {
+                    cb(new Error("No module"), null);
+                    return;
+                }
+
+                cb(null, mod.Activity);
+            });
+        },
+        "it works": function(err, Activity) {
+            assert.ifError(err);
+            assert.isFunction(Activity);
+        },
+        "and we create an activity directed to a list": {
+            topic: function(Activity) {
+                var act = {
+                    actor: {
+                        id: "acct:juan@social.example",
+                        objectType: "person"
+                    },
+                    to: [{objectType: "collection",
+                          id: "http://social.example/api/collection/juan/friends"}],
+                    verb: "post",
+                    object: {
+                        objectType: "note",
+                        content: "Hello, world!"
+                    }
+                };
+
+                Activity.create(act, this.callback);
+            },
+            "it works": function(err, activity) {
+                assert.ifError(err);
+            },
+            "and we add another recipient": {
+                topic: function(activity) {
+                    var other = {
+                        id: "acct:gerald@photo.example",
+                        objectType: "person"
+                    };
+                    activity.addReceived(other, this.callback);
+                },
+                "it works": function(err) {
+                    assert.ifError(err);
+                }
+            }
+        }
     }
 });
 
