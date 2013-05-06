@@ -20,20 +20,24 @@
 
     <% } else { %>
 
-    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.2.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/css/bootstrap.min.css" rel="stylesheet">
     <style>
       body {
       position: relative;
       padding-top: 40px;
       }
     </style>
-    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.2.2/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/css/bootstrap-responsive.min.css" rel="stylesheet">
     <link href="//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.1.1/fineuploader.css" rel="stylesheet">
 
     <% } %>
 
     <link href="/stylesheet/bootstrap-wysihtml5.css" rel="stylesheet">
     <link href="/stylesheet/select2.css" rel="stylesheet">
+
+    <!-- Finally, our own override sheet -->
+
+    <link href="/stylesheet/pumpio.css" rel="stylesheet">
 
     <!--[if lt IE 9]>
         <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -97,6 +101,7 @@
     <script src="/javascript/libs/json2.min.js"></script>
     <script src="/javascript/libs/bootstrap.min.js"></script>
     <script src="/shared/underscore-min.js"></script>
+    <script src="/javascript/libs/backbone-min.js"></script>
     <script src="/javascript/libs/spin.min.js"></script>
     <script src="/javascript/libs/jquery.fineuploader.min.js"></script>
     <script src="/javascript/libs/wysihtml5-0.3.0.min.js"></script>
@@ -107,8 +112,9 @@
     <% } else { %>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.2.2/bootstrap.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.3/underscore-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/spin.js/1.2.7/spin.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.1.1/jquery.fineuploader.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/wysihtml5/0.3.0/wysihtml5.min.js"></script>
@@ -118,7 +124,6 @@
     <% } %>
     <% } %>
     <script src="/javascript/libs/jquery.easydate-0.2.4.min.js"></script>
-    <script src="/javascript/libs/backbone-min.js"></script>
     <script src="/javascript/libs/oauth.min.js"></script>
     <script src="/javascript/libs/sha1.min.js"></script>
     <script src="/javascript/libs/jquery-spin.js"></script>
@@ -142,6 +147,7 @@
           requireEmail: <%- config.requireEmail || false %>,
           disableRegistration: <%- config.disableRegistration || false %>,
           canUpload: <%- config.canUpload || false %>,
+          debugClient: <%- config.debugClient || false %>,
           sockjs: <%- config.sockjs || false %>
       });
 

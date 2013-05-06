@@ -26,7 +26,6 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     setupApp = oauthutil.setupApp,
     register = oauthutil.register,
-    accessToken = oauthutil.accessToken,
     newCredentials = oauthutil.newCredentials,
     newPair = oauthutil.newPair,
     newClient = oauthutil.newClient;

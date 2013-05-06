@@ -27,7 +27,6 @@ var assert = require("assert"),
     setupApp = oauthutil.setupApp,
     newClient = oauthutil.newClient,
     register = oauthutil.register,
-    accessToken = oauthutil.accessToken,
     newCredentials = oauthutil.newCredentials,
     newPair = oauthutil.newPair;
 
@@ -334,11 +333,11 @@ suite.addBatch({
                     "it works": function(err) {
                         assert.ifError(err);
                     },
-                    "and we check their major inbox with same user credentials": 
+                    "and we check their favorites stream with same user credentials": 
                     sameUser("http://localhost:4815/api/user/click/favorites"),
-                    "and we check their major feed with client credentials":
+                    "and we check their favorites feed with client credentials":
                     justClient("http://localhost:4815/api/user/click/favorites"),
-                    "and we check the first user's major feed with different user credentials":
+                    "and we check the first user's favorites feed with different user credentials":
                     otherUser("http://localhost:4815/api/user/click/favorites")
                 }
             }

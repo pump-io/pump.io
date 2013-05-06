@@ -81,11 +81,17 @@ var confirmEmail = function(message, callback) {
     }
 
     http.get(url, function(res) {
-        if (res.statusCode < 200 || res.statusCode >= 300) {
-            callback(new Error("Bad status code: " + res.statusCode));
-        } else {
-            callback(null);
-        }
+        var body = "";
+        res.on("data", function(chunk) {
+            body += chunk;
+        });
+        res.on("end", function() {
+            if (res.statusCode < 200 || res.statusCode >= 300) {
+                callback(new Error("Bad status code " + res.statusCode + ": " + body));
+            } else {
+                callback(null);
+            }
+        });
     }).on('error', function(err) {
         callback(err);
     });

@@ -1,6 +1,6 @@
 // webfinger.js
 //
-// Tests the Webfinger XRD and JRD endpoints
+// Tests the Webfinger JRD endpoints
 // 
 // Copyright 2012 E14N https://e14n.com/
 //
@@ -27,9 +27,12 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     xrdutil = require("./lib/xrd"),
     actutil = require("./lib/activity"),
+    pj = httputil.postJSON,
+    gj = httputil.getJSON,
+    validActivity = actutil.validActivity,
     setupApp = oauthutil.setupApp;
 
-var suite = vows.describe("host meta test");
+var suite = vows.describe("webfinger endpoint test");
 
 var webfinger = {
     links: [
@@ -68,21 +71,9 @@ suite.addBatch({
         "it works": function(err, app) {
             assert.ifError(err);
         },
-        "and we check the lrdd endpoint": 
-        httputil.endpoint("/api/lrdd", ["GET"]),
         "and we check the webfinger endpoint": 
         httputil.endpoint("/.well-known/webfinger", ["GET"]),
-        "and we get the lrdd endpoint with no uri":
-        httputil.getfail("/api/lrdd", 400),
-        "and we get the lrdd endpoint with an empty uri":
-        httputil.getfail("/api/lrdd?resource=", 404),
-        "and we get the lrdd endpoint with an HTTP URI at some other domain":
-        httputil.getfail("/api/lrdd?resource=http://photo.example/evan", 404),
-        "and we get the lrdd endpoint with a Webfinger at some other domain":
-        httputil.getfail("/api/lrdd?resource=evan@photo.example", 404),
-        "and we get the lrdd endpoint with a Webfinger of a non-existent user":
-        httputil.getfail("/.well-known/webfinger?resource=evan@localhost", 404),
-        "and we get the webfinger endpoint with no uri":
+         "and we get the webfinger endpoint with no uri":
         httputil.getfail("/.well-known/webfinger", 400),
         "and we get the webfinger endpoint with an empty uri":
         httputil.getfail("/.well-known/webfinger?resource=", 404),
@@ -91,7 +82,23 @@ suite.addBatch({
         "and we get the webfinger endpoint with a Webfinger at some other domain":
         httputil.getfail("/.well-known/webfinger?resource=evan@photo.example", 404),
         "and we get the webfinger endpoint with a Webfinger of a non-existent user":
-        httputil.getfail("/.well-known/webfinger?resource=evan@localhost", 404),
+        httputil.getfail("/.well-known/webfinger?resource=evan@localhost", 404)
+    }
+});
+
+suite.addBatch({
+    "When we set up the app": {
+        topic: function() {
+            setupApp(this.callback);
+        },
+        teardown: function(app) {
+            if (app && app.close) {
+                app.close();
+            }
+        },
+        "it works": function(err, app) {
+            assert.ifError(err);
+        },
         "and we register a client and user": {
             topic: function() {
                 oauthutil.newCredentials("alice", "test+pass", this.callback);
@@ -99,12 +106,65 @@ suite.addBatch({
             "it works": function(err, cred) {
                 assert.ifError(err);
             },
-            "and we test the lrdd endpoint":
-            xrdutil.xrdContext("http://localhost:4815/api/lrdd?resource=alice@localhost",
-                               webfinger),
             "and we test the webfinger endpoint":
             xrdutil.jrdContext("http://localhost:4815/.well-known/webfinger?resource=alice@localhost",
-                               webfinger)
+                               webfinger),
+            "and we test the webfinger endpoint with an acct: URI":
+            xrdutil.jrdContext("http://localhost:4815/.well-known/webfinger?resource=acct:alice@localhost",
+                               webfinger),
+            "and they create a group": {
+                topic: function(cred) {
+                    var url = "http://localhost:4815/api/user/alice/feed",
+                        callback = this.callback,
+                        act = {
+                            verb: "create",
+                            object: {
+                                displayName: "Caterpillars",
+                                objectType: "group"
+                            }
+                        };
+
+                    pj(url, cred, act, function(err, body, resp) {
+                        callback(err, body);
+                    });
+                },
+                "it works": function(err, act) {
+                    assert.ifError(err);
+                    validActivity(act);
+                },
+                "and we test the webfinger endpoint with the group ID": {
+                    topic: function(act, cred) {
+                        var url = "http://localhost:4815/.well-known/webfinger?resource="+act.object.id,
+                            callback = this.callback,
+                            req;
+
+                        req = http.request(url, function(res) {
+                            var body = "";
+                            res.setEncoding("utf8");
+                            res.on("data", function(chunk) {
+                                body = body + chunk;
+                            });
+                            res.on("error", function(err) {
+                                callback(err, null);
+                            });
+                            res.on("end", function() {
+                                var obj = JSON.parse(body);
+                                callback(null, obj);
+                            });
+                        });
+
+                        req.on("error", function(err) {
+                            callback(err, null);
+                        });
+
+                        req.end();
+                    },
+                    "it works": function(err, obj) {
+                        assert.ifError(err);
+                        assert.isObject(obj);
+                    }
+                }
+            }
         }
     }
 });

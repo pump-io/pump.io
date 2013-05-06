@@ -27,8 +27,7 @@ var assert = require("assert"),
     newCredentials = oauthutil.newCredentials,
     newPair = oauthutil.newPair,
     newClient = oauthutil.newClient,
-    register = oauthutil.register,
-    accessToken = oauthutil.accessToken;
+    register = oauthutil.register;
 
 var ignore = function(err) {};
 var makeCred = function(cl, pair) {

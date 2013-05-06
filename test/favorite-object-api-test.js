@@ -46,7 +46,7 @@ var assertValidList = function(doc, count) {
     assert.include(doc, "totalItems");
     assert.include(doc, "items");
     assert.include(doc, "displayName");
-    assert.include(doc, "id");
+    assert.include(doc, "url");
     if (_(count).isNumber()) {
         assert.equal(doc.totalItems, count);
         assert.lengthOf(doc.items, count);
@@ -146,7 +146,6 @@ suite.addBatch({
                     assert.include(faves, "totalItems");
                     assert.include(faves, "items");
                     assert.include(faves, "displayName");
-                    assert.include(faves, "id");
                     assert.equal(faves.totalItems, 0);
                     assert.lengthOf(faves.items, 0);
                 }
@@ -218,6 +217,7 @@ suite.addBatch({
                     },
                     "it includes the object": function(err, doc, act) {
                         assert.ifError(err);
+                        assert.greater(doc.items.length, 0);
                         assert.equal(doc.items[0].id, act.object.id);
                     }
                 },
@@ -256,12 +256,13 @@ suite.addBatch({
                         assert.include(doc, "totalItems");
                         assert.include(doc, "items");
                         assert.include(doc, "displayName");
-                        assert.include(doc, "id");
+                        assert.include(doc, "url");
                         assert.equal(doc.totalItems, 1);
                         assert.lengthOf(doc.items, 1);
                     },
                     "it includes the actor": function(err, doc, act) {
                         assert.ifError(err);
+                        assert.greater(doc.items.length, 0);
                         assert.equal(doc.items[0].id, act.actor.id);
                     }
                 }
@@ -431,7 +432,7 @@ suite.addBatch({
                         assert.include(doc, "totalItems");
                         assert.include(doc, "items");
                         assert.include(doc, "displayName");
-                        assert.include(doc, "id");
+                        assert.include(doc, "url");
                         assert.equal(doc.totalItems, 0);
                         assert.lengthOf(doc.items, 0);
                     }
@@ -544,6 +545,7 @@ suite.addBatch({
                     },
                     "it includes our object": function(err, doc, act) {
                         assert.ifError(err);
+                        assert.greater(doc.items.length, 0);
                         assert.equal(doc.items[0].id, act.object.id);
                     }
                 }

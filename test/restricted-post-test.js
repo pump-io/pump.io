@@ -25,7 +25,6 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     setupApp = oauthutil.setupApp,
     register = oauthutil.register,
-    accessToken = oauthutil.accessToken,
     newCredentials = oauthutil.newCredentials,
     newPair = oauthutil.newPair,
     newClient = oauthutil.newClient;
@@ -48,6 +47,10 @@ var clientCred = function(cl) {
         consumer_key: cl.client_id,
         consumer_secret: cl.client_secret
     };
+};
+
+var pairOf = function(user) {
+    return {token: user.token, token_secret: user.secret};
 };
 
 // A batch for testing the visibility of bcc and bto addressing
@@ -95,27 +98,18 @@ suite.addBatch({
                             register(cl, "townclown", users.townclown.password, this.parallel());
                         },
                         function(err, user1, user2, user3) {
+                            var url, cred, act;
                             if (err) throw err;
                             users.mrmoose.profile = user1.profile;
                             users.mrbunnyrabbit.profile   = user2.profile;
                             users.townclown.profile = user3.profile;
-                            accessToken(cl, 
-                                        {nickname: "mrmoose", password: users.mrmoose.password}, 
-                                        this.parallel());
-                            accessToken(cl, 
-                                        {nickname: "mrbunnyrabbit", password: users.mrbunnyrabbit.password}, 
-                                        this.parallel());
-                            accessToken(cl, 
-                                        {nickname: "townclown", password: users.townclown.password}, 
-                                        this.parallel());
-                        },
-                        function(err, pair1, pair2, pair3) {
-                            var url, cred, act;
-                            if (err) throw err;
-                            users.mrmoose.pair = pair1;
-                            users.mrbunnyrabbit.pair = pair2;
-                            users.townclown.pair = pair3;
-                            cred = makeCred(cl, pair3);
+
+                            users.mrmoose.pair = pairOf(user1);
+                            users.mrbunnyrabbit.pair = pairOf(user2);
+                            users.townclown.pair = pairOf(user3);
+
+                            cred = makeCred(cl, users.townclown.pair);
+
                             act = {
                                 verb: "follow",
                                 object: {
@@ -604,27 +598,16 @@ suite.addBatch({
                             register(cl, "dancingbear", users.dancingbear.password, this.parallel());
                         },
                         function(err, user1, user2, user3) {
+                            var url, cred, act;
                             if (err) throw err;
                             users.captain.profile = user1.profile;
                             users.mrgreenjeans.profile   = user2.profile;
                             users.dancingbear.profile = user3.profile;
-                            accessToken(cl, 
-                                        {nickname: "captain", password: users.captain.password}, 
-                                        this.parallel());
-                            accessToken(cl, 
-                                        {nickname: "mrgreenjeans", password: users.mrgreenjeans.password}, 
-                                        this.parallel());
-                            accessToken(cl, 
-                                        {nickname: "dancingbear", password: users.dancingbear.password}, 
-                                        this.parallel());
-                        },
-                        function(err, pair1, pair2, pair3) {
-                            var url, cred, act;
-                            if (err) throw err;
-                            users.captain.pair = pair1;
-                            users.mrgreenjeans.pair = pair2;
-                            users.dancingbear.pair = pair3;
-                            cred = makeCred(cl, pair3);
+                            users.captain.pair = pairOf(user1);
+                            users.mrgreenjeans.pair = pairOf(user2);
+                            users.dancingbear.pair = pairOf(user3);
+
+                            cred = makeCred(cl, users.dancingbear.pair);
                             act = {
                                 verb: "follow",
                                 object: {

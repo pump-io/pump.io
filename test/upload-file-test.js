@@ -28,12 +28,12 @@ var assert = require("assert"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     actutil = require("./lib/activity"),
+    validFeed = actutil.validFeed,
     setupAppConfig = oauthutil.setupAppConfig,
     newCredentials = oauthutil.newCredentials,
     newPair = oauthutil.newPair,
     newClient = oauthutil.newClient,
-    register = oauthutil.register,
-    accessToken = oauthutil.accessToken;
+    register = oauthutil.register;
 
 var suite = vows.describe("upload file test");
 
@@ -44,15 +44,6 @@ var makeCred = function(cl, pair) {
         token: pair.token,
         token_secret: pair.token_secret
     };
-};
-
-var assertValidFeed = function(feed) {
-    assert.include(feed, "totalItems");
-    assert.isNumber(feed.totalItems);
-    assert.include(feed, "url");
-    assert.isString(feed.url);
-    assert.include(feed, "items");
-    assert.isArray(feed.items);
 };
 
 suite.addBatch({
@@ -131,7 +122,7 @@ suite.addBatch({
                         "it is correct": function(err, feed) {
                             assert.ifError(err);
                             assert.isObject(feed);
-                            assertValidFeed(feed);
+                            validFeed(feed);
                         },
                         "it is empty": function(err, feed) {
                             assert.ifError(err);
@@ -215,7 +206,7 @@ suite.addBatch({
                                 "it is correct": function(err, feed, doc) {
                                     assert.ifError(err);
                                     assert.isObject(feed);
-                                    assertValidFeed(feed);
+                                    validFeed(feed);
                                 },
                                 "it has our upload": function(err, feed, doc) {
                                     assert.ifError(err);

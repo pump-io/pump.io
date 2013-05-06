@@ -32,9 +32,10 @@ config.port = parseInt(config.port, 10);
 if (cluster.isMaster) {
     worker = cluster.fork();
     worker.on("message", function(msg) {
-         switch (msg.cmd) {
+        switch (msg.cmd) {
         case "error":
         case "listening":
+        case "credkilled":
             process.send(msg);
             break;
         default:
@@ -42,6 +43,13 @@ if (cluster.isMaster) {
         }
     });
     Dispatch.start();
+    process.on("message", function(msg) {
+        switch (msg.cmd) {
+        case "killcred":
+            worker.send(msg);
+            break;
+        }
+    });
 } else {
     Step(
         function() {
@@ -60,4 +68,35 @@ if (cluster.isMaster) {
             }
         }
     );
+
+    // This is to simulate losing the credentials of a remote client
+    // It's hard to do without destroying the database values directly,
+    // so we essentially do that.
+
+    process.on("message", function(msg) {
+        switch (msg.cmd) {
+        case "killcred":
+            Step(
+                function() {
+                    var client = require("../../lib/model/client"),
+                        Client = client.Client;
+                    Client.search({webfinger: msg.webfinger}, this);
+                },
+                function(err, results) {
+                    if (err) throw err;
+                    if (!results || results.length !== 1) {
+                        throw new Error("Bad results");
+                    }
+                    results[0].del(this);
+                },
+                function(err) {
+                    if (err) {
+                        process.send({cmd: "credkilled", error: err.message, webfinger: msg.webfinger});
+                    } else {
+                        process.send({cmd: "credkilled", webfinger: msg.webfinger});
+                    }
+                }
+            );
+        }
+    });
 }

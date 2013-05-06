@@ -28,7 +28,6 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     setupApp = oauthutil.setupApp,
     register = oauthutil.register,
-    accessToken = oauthutil.accessToken,
     newCredentials = oauthutil.newCredentials;
 
 var ignore = function(err) {};
@@ -230,7 +229,7 @@ suite.addBatch({
                         assert.include(feed, "totalItems");
                         assert.include(feed, "items");
                         assert.include(feed, "displayName");
-                        assert.include(feed, "id");
+                        assert.include(feed, "url");
                         assert.include(feed, "objectTypes");
                         assert.include(feed.objectTypes, "activity");
                     },
@@ -274,7 +273,7 @@ suite.addBatch({
                         assert.include(inbox, "totalItems");
                         assert.include(inbox, "items");
                         assert.include(inbox, "displayName");
-                        assert.include(inbox, "id");
+                        assert.include(inbox, "url");
                         assert.include(inbox, "objectTypes");
                         assert.include(inbox.objectTypes, "activity");
                     },

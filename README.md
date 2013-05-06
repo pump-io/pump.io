@@ -143,6 +143,8 @@ Here are the main configuration keys.
 * *ownerURL* URL of owning entity, if you want to link to it.
 * *nologger* If you're debugging or whatever, turn off
   logging. Defaults to false (leave logging on).
+* *logfile* Full path to the logfile. Logs are JSON in
+  [https://github.com/trentm/node-bunyan](bunyan) format.
 * *serverUser* If you're listening on a port lower than 1024, you need
   to be root. Set this to the name of a user to change to after the
   server is listening. `daemon` or `nobody` are good choices, or you

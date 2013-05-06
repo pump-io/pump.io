@@ -1,4 +1,4 @@
-// post-note-api-test.js
+// note-api-test.js
 //
 // Test posting a note
 //
@@ -28,7 +28,6 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     setupApp = oauthutil.setupApp,
     register = oauthutil.register,
-    accessToken = oauthutil.accessToken,
     newCredentials = oauthutil.newCredentials,
     newPair = oauthutil.newPair,
     newClient = oauthutil.newClient;
@@ -44,6 +43,10 @@ var makeCred = function(cl, pair) {
         token: pair.token,
         token_secret: pair.token_secret
     };
+};
+
+var pairOf = function(user) {
+    return {token: user.token, token_secret: user.secret};
 };
 
 // A batch for testing the read access to the API
@@ -83,120 +86,104 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.isObject(user);
                 },
-                "and we get a new access token": {
+                "and we post a note": {
                     topic: function(user, cl) {
-                        var cb = this.callback;
-                        accessToken(cl, {nickname: "frodo", password: "i{heart}sam"}, function(err, pair) {
-                            cb(err, pair);
+                        var cb = this.callback,
+                            pair = pairOf(user),
+                            act = {
+                                verb: "post",
+                                object: {
+                                    objectType: "note",
+                                    content: "I'm so scared!"
+                                }
+                            },
+                            cred = makeCred(cl, pair);
+                        httputil.postJSON("http://localhost:4815/api/user/frodo/feed", cred, act, function(err, act, result) {
+                            cb(err, act);
                         });
                     },
-                    "it works": function(err, pair) {
+                    "it works": function(err, act) {
                         assert.ifError(err);
-                        assert.isObject(pair);
                     },
-                    "and we post a note": {
-                        topic: function(pair, user, cl) {
+                    "results look right": function(err, act) {
+                        assert.isObject(act);
+                        assert.include(act, "id");
+                        assert.isString(act.id);
+                        assert.include(act, "actor");
+                        assert.isObject(act.actor);
+                        assert.include(act.actor, "id");
+                        assert.isString(act.actor.id);
+                        assert.include(act, "verb");
+                        assert.isString(act.verb);
+                        assert.include(act, "object");
+                        assert.isObject(act.object);
+                        assert.include(act.object, "id");
+                        assert.isString(act.object.id);
+                        assert.include(act, "published");
+                        assert.isString(act.published);
+                        assert.include(act, "updated");
+                        assert.isString(act.updated);
+                    },
+                    "results are what we posted": function(err, act) {
+                        assert.equal(act.verb, "post");
+                        assert.equal(act.object.content, "I'm so scared!");
+                        assert.equal(act.object.objectType, "note");
+                    },
+                    "and we check the actor": {
+                        topic: function(act, user, cl) {
+                            return {act: act, user: user};
+                        },
+                        "it matches our user": function(res) {
+                            var act = res.act, user = res.user;
+                            assert.equal(act.actor.id, user.profile.id);
+                        }
+                    },
+                    "and we fetch the posted note": {
+                        topic: function(act, user, cl) {
                             var cb = this.callback,
-                                act = {
-                                    verb: "post",
-                                    object: {
-                                        objectType: "note",
-                                        content: "I'm so scared!"
-                                    }
-                                },
+                                pair = pairOf(user),
                                 cred = makeCred(cl, pair);
-
-                            httputil.postJSON("http://localhost:4815/api/user/frodo/feed", cred, act, function(err, act, result) {
-                                cb(err, act);
+                            // ID == JSON representation URL
+                            httputil.getJSON(act.object.id, cred, function(err, note) {
+                                cb(err, note, act);
                             });
                         },
-                        "it works": function(err, act) {
+                        "it works": function(err, note, act) {
                             assert.ifError(err);
+                            assert.isObject(note);
                         },
-                        "results look right": function(err, act) {
-                            assert.isObject(act);
-                            assert.include(act, "id");
-                            assert.isString(act.id);
-                            assert.include(act, "actor");
-                            assert.isObject(act.actor);
-                            assert.include(act.actor, "id");
-                            assert.isString(act.actor.id);
-                            assert.include(act, "verb");
-                            assert.isString(act.verb);
-                            assert.include(act, "object");
-                            assert.isObject(act.object);
-                            assert.include(act.object, "id");
-                            assert.isString(act.object.id);
-                            assert.include(act, "published");
-                            assert.isString(act.published);
-                            assert.include(act, "updated");
-                            assert.isString(act.updated);
+                        "results look right": function(err, note, act) {
+                            assert.ifError(err);
+                            assert.isObject(note);
+                            assert.include(note, "id");
+                            assert.isString(note.id);
+                            assert.include(note, "published");
+                            assert.isString(note.published);
+                            assert.include(note, "updated");
+                            assert.isString(note.updated);
+                            assert.include(note, "author");
+                            assert.isObject(note.author);
+                            assert.include(note.author, "id");
+                            assert.isString(note.author.id);
+                            assert.include(note.author, "displayName");
+                            assert.isString(note.author.displayName);
+                            assert.include(note.author, "objectType");
+                            assert.isString(note.author.objectType);
                         },
-                        "results are what we posted": function(err, act) {
-                            assert.equal(act.verb, "post");
-                            assert.equal(act.object.content, "I'm so scared!");
-                            assert.equal(act.object.objectType, "note");
+                        "results don't leak private members": function(err, note, act) {
+                            assert.ifError(err);
+                            assert.isObject(note);
+                            assert.isFalse(_.has(note, "_uuid"));
                         },
-                        "and we check the actor": {
-                            topic: function(act, pair, user, cl) {
-                                return {act: act, user: user};
-                            },
-                            "it matches our user": function(res) {
-                                var act = res.act, user = res.user;
-                                assert.equal(act.actor.id, user.profile.id);
-                            }
-                        },
-                        "and we fetch the posted note": {
-                            topic: function(act, pair, user, cl) {
-                                var cb = this.callback,
-                                    cred = {
-                                        consumer_key: cl.client_id,
-                                        consumer_secret: cl.client_secret,
-                                        token: pair.token,
-                                        token_secret: pair.token_secret
-                                    };
-                                // ID == JSON representation URL
-                                httputil.getJSON(act.object.id, cred, function(err, note) {
-                                    cb(err, note, act);
-                                });
-                            },
-                            "it works": function(err, note, act) {
-                                assert.ifError(err);
-                                assert.isObject(note);
-                            },
-                            "results look right": function(err, note, act) {
-                                assert.ifError(err);
-                                assert.isObject(note);
-                                assert.include(note, "id");
-                                assert.isString(note.id);
-                                assert.include(note, "published");
-                                assert.isString(note.published);
-                                assert.include(note, "updated");
-                                assert.isString(note.updated);
-                                assert.include(note, "author");
-                                assert.isObject(note.author);
-                                assert.include(note.author, "id");
-                                assert.isString(note.author.id);
-                                assert.include(note.author, "displayName");
-                                assert.isString(note.author.displayName);
-                                assert.include(note.author, "objectType");
-                                assert.isString(note.author.objectType);
-                            },
-                            "results don't leak private members": function(err, note, act) {
-                                assert.ifError(err);
-                                assert.isObject(note);
-                                assert.isFalse(_.has(note, "_uuid"));
-                            },
-                            "results are what we posted": function(err, note, act) {
-                                assert.equal(note.content, "I'm so scared!");
-                                assert.equal(note.objectType, "note");
-                                assert.equal(note.id, act.object.id);
-                                assert.equal(note.published, act.object.published);
-                                assert.equal(note.updated, act.object.updated);
-                                assert.equal(note.author.id, act.actor.id);
-                                assert.equal(note.author.displayName, act.actor.displayName);
-                                assert.equal(note.author.objectType, act.actor.objectType);
-                            }
+                        "results are what we posted": function(err, note, act) {
+                            assert.equal(note.content, "I'm so scared!");
+                            assert.equal(note.objectType, "note");
+                            assert.equal(note.id, act.object.id);
+                            assert.equal(note.published, act.object.published);
+                            assert.equal(note.updated, act.object.updated);
+                            assert.equal(note.author.id, act.actor.id);
+                            assert.equal(note.author.displayName, act.actor.displayName);
+                            assert.equal(note.author.objectType, act.actor.objectType);
                         }
                     }
                 }
