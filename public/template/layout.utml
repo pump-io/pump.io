@@ -37,7 +37,7 @@
 
     <!-- Finally, our own override sheet -->
 
-    <link href="/stylesheet/pumpio.css" rel="stylesheet">
+<!--    <link href="/stylesheet/pumpio.css" rel="stylesheet">-->
 
     <!--[if lt IE 9]>
         <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
