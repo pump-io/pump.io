@@ -4,14 +4,6 @@
 .replies {
   background-color: #f1f1f1;
 }
-.activity.major,
-.media.object.major {
-  border-top: 1px solid #ccc;
-  border-radius:6px 6px 0 0;
-}
-.reply {
-  border-top: 1px dotted #ddd;
-}
 .media .media {
   margin-top: 0;
 }
