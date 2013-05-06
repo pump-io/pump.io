@@ -1,3 +1,31 @@
-div.replies {
-    background-color: rgb(241, 241, 241)
+.media:first-child {
+  margin-top:1em;
+}
+.replies {
+  background-color: #f1f1f1;
+}
+.activity.major,
+.media.object.major {
+  border-top: 1px solid #ccc;
+  border-radius:6px 6px 0 0;
+}
+.reply {
+  border-top: 1px dotted #ddd;
+}
+.media .media {
+  margin-top: 0;
+}
+.media.comment-form {
+  background-color: #fff;
+}
+.img-polaroid {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 98%;
+}
+.nav > li > a > img {
+  max-height: 35px;
+  max-width: none;
+  width: auto;
 }
