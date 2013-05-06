@@ -1046,7 +1046,7 @@ var postToInbox = function(req, res, next) {
                 throw err;
             } else {
                 // throws if invalid
-                validateActor(req.client, req.principal, act.actor);
+                validateActor(req.client, req.principal, activity.actor);
                 this(null, activity);
             }
         },
@@ -1062,7 +1062,6 @@ var postToInbox = function(req, res, next) {
         function(err, isRecipient) {
             if (err) throw err;
             if (isRecipient) {
-                // skip
                 this(null);
             } else {
                 act.addReceived(user.profile, this);
