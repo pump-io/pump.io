@@ -6,7 +6,7 @@
     <span class="icon-bar"></span>
   </a>
 
-  <a class="brand" href="/"><%- config.site %></a>
+  <img style="float:left;height:38px;" src="/images/logo.png"/><a class="brand" href="/"><%- config.site %></a>
 
   <ul class="nav pull-right">
     <li id="fat-menu" class="dropdown">
@@ -18,6 +18,8 @@
         <b class="caret"></b>
       </a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="profile-dropdown">
+        <li><a tabindex="-1" href="https://static.jpope.org/users.html">Directory</a></li>
+        <li class="divider"></li>
         <li><a tabindex="-1" id="logout" href="#">Log out</a></li>
       </ul>
     </li>

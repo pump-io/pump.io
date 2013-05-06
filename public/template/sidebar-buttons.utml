@@ -1,0 +1,23 @@
+<h4>Love/Hate/Hip</h4>
+<p>
+  <a class="btn btn-mini btn-success" href="https://lurve.jpope.org">&nbsp;&nbsp;&nbsp;&nbsp;<3&nbsp;&nbsp;&nbsp;&nbsp;</a>
+  <a class="btn btn-mini btn-danger" href="https://ih8.it">&nbsp;&nbsp;&nbsp;&nbsp;h8&nbsp;&nbsp;&nbsp;&nbsp;</a>
+  <a class="btn btn-mini btn-primary" href="https://hip2.it">&nbsp;&nbsp;&nbsp;&nbsp;hip&nbsp;&nbsp;&nbsp;&nbsp;</a>
+</p>
+<h4>Pump.io Links</h4>
+<p>
+  <a class="btn btn-mini" href="http://pump.io">home</a>
+  <a class="btn btn-mini" href="https://github.com/e14n/pump.io">github</a>
+  <a class="btn btn-mini" href="https://github.com/e14n/pump.io/issues">issues</a>
+  <a class="btn btn-mini" href="http://pumplive.com/">stats</a>
+</p>
+<h5>pump.jpope.org setup</h5>
+<p>
+  <a class="btn btn-mini" href="https://bin.jpope.org/pumpiojson.json">pump.io.json</a>
+  <a class="btn btn-mini" href="https://bin.jpope.org/pumpnginxconf.nginx">nginx.conf</a>
+  <a class="btn btn-mini" href="https://raw.github.com/jpope777/pump.io-jpope/currentpumpjpopeorg/public/stylesheet/pumpjpopeorg.css">css</a>
+</p>
+<p><small>
+Current commit @<a href="https://github.com/jpope777/pump.io-jpope/commit/edb2b47013b806c256f481c67fb3df8052bb3aee">edb2b47013</a>
+</small></p>
+

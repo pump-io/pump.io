@@ -15,3 +15,7 @@ node_modules
 npm-debug.log
 
 config.js
+
+uploads
+*.utml.*
+*.css.*

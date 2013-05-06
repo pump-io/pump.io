@@ -2871,7 +2871,7 @@
         },
         startLoad: function() {
             var view = this;
-            view.$("a.brand").spin({color: "white"});
+            view.$("a.brand").spin({color: "#268bd2"});
         },
         endLoad: function() {
             var view = this;

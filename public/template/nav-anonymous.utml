@@ -6,7 +6,7 @@
     <span class="icon-bar"></span>
   </a>
   
-  <a class="brand" href="/"><%- config.site %></a>
+  <img style="float:left;height:38px;" src="/images/logo.png"/><a class="brand" href="/"><%- config.site %></a>
   
   <div class="nav-collapse collapse">
     <ul class="nav pull-right">
