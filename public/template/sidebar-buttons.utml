@@ -13,11 +13,11 @@
 </p>
 <h5>pump.jpope.org setup</h5>
 <p>
-  <a class="btn btn-mini" href="https://bin.jpope.org/pumpiojson.json">pump.io.json</a>
-  <a class="btn btn-mini" href="https://bin.jpope.org/pumpnginxconf.nginx">nginx.conf</a>
+  <a class="btn btn-mini" href="https://github.com/jpope777/pump.io/blob/pump.jpope.org/pump.io.json.sample.pumpjpopeorg">pump.io.json</a>
+  <a class="btn btn-mini" href="https://github.com/jpope777/pump.io/blob/pump.jpope.org/nginx.conf.pumpjpopeorg">nginx.conf</a>
   <a class="btn btn-mini" href="https://github.com/jpope777/pump.io/blob/pump.jpope.org/public/stylesheet/pumpjpopeorg.css">css</a>
 </p>
 <p><small>
-Current commit @<a href="https://github.com/jpope777/pump.io/commit/7496b4866710735af38536b6caa06ed53cf494dd">7496b48667</a>
+Current commit @<a href="https://github.com/jpope777/pump.io/commit/50a2d43010120b3888da3d170f0857625ad5848f">50a2d43010</a>
 </small></p>
 
