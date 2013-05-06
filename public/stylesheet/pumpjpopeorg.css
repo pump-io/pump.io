@@ -58,6 +58,17 @@ a {
 .navbar-fixed-top .navbar-inner, .navbar-static-top .navbar-inner {box-shadow: 0 5px 10px rgba(150, 147, 134, 0.5);}
 .navbar-fixed-top .navbar-inner {border-radius: 0 0 16px 16px;}
 .nav-tabs > .active > a, .nav-tabs > .active > a:hover {background-color: #EEE8D5;color: #586E75;}
+.nav > li > a:hover, .nav > li > a:focus, .nav > li > a:active {
+  background-color: #EEE8D5;
+  box-shadow: 0 0 5px #A6A195 inset;
+  text-decoration: none;
+}
+.nav-tabs > li > a:focus {
+  border-color: #EEE8D5;
+}
+.nav-tabs > li > a:hover {
+  border-color: transparent;
+}
 textarea{background:none repeat scroll 0 0 #eee8d5;font-family: "Ubuntu";color:#586e75;}
 textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {background-color: #EEE8D5;border: 1px solid #93a1a1;}
 .input-xlarge {background-color: #EEE8D5;border: 1px solid #AAAAAA;}
