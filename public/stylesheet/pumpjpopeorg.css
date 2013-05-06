@@ -69,6 +69,9 @@ a {
 .nav-tabs > li > a:hover {
   border-color: transparent;
 }
+.navbar .nav > li > a {
+  padding: 5px 5px 15px;
+}
 textarea{background:none repeat scroll 0 0 #eee8d5;font-family: "Ubuntu";color:#586e75;}
 textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {background-color: #EEE8D5;border: 1px solid #93a1a1;}
 .input-xlarge {background-color: #EEE8D5;border: 1px solid #AAAAAA;}
