@@ -11,7 +11,15 @@
 	  high-performance Open Source social engine. It pumps your life
 	  in and out of your friends, family and colleagues.</p>
 
+        <% if (config.disableRegistration) { %>
+
+        <p>No pump.io account yet? <a href="http://pump.io/tryit">Try it</a>!)</p>        
+
+        <% } else { %>
+
         <p><a class="btn primary large" href="/main/register">Get Started &raquo;</a></p>
+
+        <% } %>
 
       </div>
 
