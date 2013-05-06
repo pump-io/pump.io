@@ -5,6 +5,6 @@ newfile=public/template/sidebar-buttons.utml.test
 version=$(git rev-parse HEAD)
 newversion=$(git rev-parse HEAD|cut -c 1-10)
 
-sed "s/^Current.*/Current commit \@\<a href=\"https:\/\/github.com\/jpope777\/pump.io-jpope\/commit\/$version\">$newversion<\/a>/" $file > $newfile
+sed "s/^Current.*/Current commit \@\<a href=\"https:\/\/github.com\/jpope777\/pump.io\/commit\/$version\">$newversion<\/a>/" $file > $newfile
 
 mv $newfile $file
