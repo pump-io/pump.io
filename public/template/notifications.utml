@@ -1,4 +1,4 @@
-<div class="dropdown" id="notifications">
+<div class="dropdown btn-group" id="notifications">
   <button class="btn dropdown-toggle btn-small
                  <% if (notifications.totalItems <= 0) { %>
                  disabled
@@ -9,7 +9,7 @@
     <span class="text-error"><%- notifications.items.length %></span>
     <% } %>
   </button>
-  <ul class="dropdown-menu">
+  <ul class="dropdown-menu" role="menu">
     <% _.each(notifications.items, function(activity) { %>
     <li>
       <small><%= activity.content %></small>

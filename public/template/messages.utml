@@ -1,4 +1,4 @@
-<div class="dropdown" id="messages">
+<div class="dropdown btn-group" id="messages">
   <button class="btn dropdown-toggle btn-small
                  <% if (messages.totalItems <= 0) { %>
                  disabled
