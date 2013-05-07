@@ -19,3 +19,5 @@ config.js
 uploads
 *.utml.*
 *.css.*
+
+*.c9rev*

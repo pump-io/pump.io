@@ -1,15 +1,15 @@
-<div class="btn-group" id="notifications">
-  <button class="btn dropdown-toggle btn-small btn-success
+<div class="dropdown btn-group span1 alpha" id="notifications">
+  <button class="btn dropdown-toggle btn-block
                  <% if (notifications.totalItems <= 0) { %>
                  disabled
                  <% } %>"
                  data-toggle="dropdown" href="#">
-    <i class="icon-exclamation-sign icon-white"></i>
+    <i class="icon-exclamation-sign"></i>
     <% if (notifications.items.length > 0) { %>
-    <span class="badge badge-important"><%- notifications.items.length %></span>
+    <span class="text-error"><%- notifications.items.length %></span>
     <% } %>
   </button>
-  <ul class="dropdown-menu">
+  <ul class="dropdown-menu pull-right" role="menu">
     <% _.each(notifications.items, function(activity) { %>
     <li>
       <small><%= activity.content %></small>
