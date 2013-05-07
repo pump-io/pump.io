@@ -29,16 +29,16 @@
     </li>
   </ul>
 
-  <div class="pull-right">
-    <div class="btn-group">
-    <button type="button" class="btn btn-small primary" id="post-note-button">
+  <div class="span4 pull-right">
+
+    <button type="button" class="btn primary span1 alpha" id="post-note-button">
       <i class="icon-pencil"></i>
     </button>
     <% if (config.canUpload) { %>
-    <button type="button" class="btn btn-small primary" id="post-picture-button">
+    <button type="button" class="btn primary span1 alpha" id="post-picture-button">
       <i class="icon-picture"></i>
     </button>
-    </div><!-- /btn-group -->
+
     <% } %>
     <%= partial("messages", {messages: messages}) %>
     <%= partial("notifications", {notifications: notifications}) %>

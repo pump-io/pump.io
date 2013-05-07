@@ -1,5 +1,5 @@
-<div class="dropdown btn-group" id="messages">
-  <button class="btn dropdown-toggle btn-small
+<div class="dropdown btn-group span1 omega" id="messages">
+  <button class="btn dropdown-toggle btn-block
                  <% if (messages.totalItems <= 0) { %>
                  disabled
                  <% } %>"
