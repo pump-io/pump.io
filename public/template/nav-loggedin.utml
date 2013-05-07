@@ -2,17 +2,6 @@
 
   <img style="float:left;height:38px;" src="/images/logo.png"/><a class="brand" href="/"><%- config.site %></a>
 
-  <div class="btn-group">
-    <button type="button" class="btn btn-small primary" id="post-note-button">
-      <i class="icon-pencil"></i>
-    </button>
-    <% if (config.canUpload) { %>
-    <button type="button" class="btn btn-small primary" id="post-picture-button">
-      <i class="icon-picture"></i>
-    </button>
-    <% } %>
-  </div>
-
   <ul class="nav pull-right">
     <li id="fat-menu" class="dropdown">
       <a href="#" id="profile-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown"> 
@@ -41,6 +30,14 @@
   </ul>
 
   <div class="pull-right btn-group">
+    <button type="button" class="btn btn-small primary" id="post-note-button">
+      <i class="icon-pencil"></i>
+    </button>
+    <% if (config.canUpload) { %>
+    <button type="button" class="btn btn-small primary" id="post-picture-button">
+      <i class="icon-picture"></i>
+    </button>
+    <% } %>
     <%= partial("messages", {messages: messages}) %>
     <%= partial("notifications", {notifications: notifications}) %>
   </div>

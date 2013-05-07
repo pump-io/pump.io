@@ -1,10 +1,10 @@
-<div id="notifications">
-  <button class="btn dropdown-toggle btn-small btn-success
+<div class="dropdown" id="notifications">
+  <button class="btn dropdown-toggle btn-small
                  <% if (notifications.totalItems <= 0) { %>
                  disabled
                  <% } %>"
                  data-toggle="dropdown" href="#">
-    <i class="icon-exclamation-sign icon-white"></i>
+    <i class="icon-exclamation-sign"></i>
     <% if (notifications.items.length > 0) { %>
     <span"><%- notifications.items.length %></span>
     <% } %>
