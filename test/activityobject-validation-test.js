@@ -271,6 +271,32 @@ suite.addBatch({
             "it fails correctly": function(err) {
                 assert.ifError(err);
             }
+        },
+        "and we try to ensureObject with non-string content": {
+            topic: function(ActivityObject) {
+                var callback = this.callback,
+                    props = {
+                        id: "urn:uuid:613ed220-b718-11e2-85f9-2c8158efb9e9",
+                        objectType: "note",
+                        content: {
+                            head: "something",
+                            body: "something else"
+                        }
+                    };
+
+                ActivityObject.ensureObject(props, function(err, obj) {
+                    if (err && err instanceof TypeError) {
+                        callback(null);
+                    } else if (err) {
+                        callback(err);
+                    } else {
+                        callback(new Error("Unexpected success"));
+                    }
+                });
+            },
+            "it fails correctly": function(err) {
+                assert.ifError(err);
+            }
         }
     }
 });
