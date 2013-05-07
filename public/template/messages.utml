@@ -1,4 +1,4 @@
-<div class="btn-group dropdown" id="messages">
+<div class="dropdown" id="messages">
   <button class="btn dropdown-toggle btn-small btn-success
                  <% if (messages.totalItems <= 0) { %>
                  disabled
@@ -6,7 +6,7 @@
                  data-toggle="dropdown" href="#">
     <i class="icon-envelope icon-white"></i>
     <% if (messages.items.length > 0) { %>
-    <span class="badge badge-important"><%- messages.items.length %></span>
+    <span><%- messages.items.length %></span>
     <% } %>
   </button>
   <ul class="dropdown-menu" role="menu">

@@ -4,11 +4,11 @@
 
   <div class="btn-group">
     <button type="button" class="btn btn-small primary" id="post-note-button">
-      Note <i class="icon-pencil"></i>
+      <i class="icon-pencil"></i>
     </button>
     <% if (config.canUpload) { %>
     <button type="button" class="btn btn-small primary" id="post-picture-button">
-      Picture <i class="icon-picture"></i>
+      <i class="icon-picture"></i>
     </button>
     <% } %>
   </div>
@@ -40,7 +40,7 @@
     </li>
   </ul>
 
-  <div class="pull-right">
+  <div class="pull-right btn-group">
     <%= partial("messages", {messages: messages}) %>
     <%= partial("notifications", {notifications: notifications}) %>
   </div>
