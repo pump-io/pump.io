@@ -6,9 +6,12 @@
     <li id="fat-menu" class="dropdown">
       <a href="#" id="profile-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown"> 
         <% if (_(principal).has("image")) { %>
-        <img class="pull-left" src="<%- principal.image.url %>" width="24" height="24" class="img-rounded" />&nbsp;
+        <img class="pull-left" src="<%- principal.image.url %>" width="24" height="24" class="img-rounded" />&nbsp;<span class="displayname">
         <% } %>
         <%- principal.displayName %>
+        <% if (_(principal).has("image")) { %>
+        </span>
+        <% } %>
         <b class="caret"></b>
       </a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="profile-dropdown">

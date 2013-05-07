@@ -9,7 +9,7 @@
     <span class="text-error"><%- notifications.items.length %></span>
     <% } %>
   </button>
-  <ul class="dropdown-menu" role="menu">
+  <ul class="dropdown-menu pull-right" role="menu">
     <% _.each(notifications.items, function(activity) { %>
     <li>
       <small><%= activity.content %></small>

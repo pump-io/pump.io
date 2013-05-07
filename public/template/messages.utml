@@ -9,7 +9,7 @@
     <span class="text-error"><%- messages.items.length %></span>
     <% } %>
   </button>
-  <ul class="dropdown-menu" role="menu">
+  <ul class="dropdown-menu pull-right" role="menu">
     <% _.each(messages.items, function(activity) { %>
     <% if (_.isObject(activity)) { %>
     <li>
