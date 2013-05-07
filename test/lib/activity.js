@@ -20,6 +20,10 @@ var _ = require("underscore"),
     assert = require("assert"),
     vows = require("vows");
 
+var validDate = function(dt) {
+    assert.isString(dt);
+};
+
 var validActivity = function(act) {
     assert.isObject(act);
     assert.isFalse(_.has(act, "_uuid"));
@@ -31,8 +35,9 @@ var validActivity = function(act) {
     assert.isString(act.actor.id);
     assert.include(act.actor, "objectType");
     assert.isString(act.actor.objectType);
-    assert.include(act.actor, "displayName");
-    assert.isString(act.actor.displayName);
+    if (_.has(act.actor, "displayName")) {
+        assert.isString(act.actor.displayName);
+    }
     assert.isFalse(_.has(act.actor, "_uuid"));
     assert.include(act, "verb");
     assert.isString(act.verb);
@@ -49,4 +54,81 @@ var validActivity = function(act) {
     assert.isString(act.updated);
 };
 
-exports.validActivity = validActivity;
+var validActivityObject = function(obj) {
+    assert.isObject(obj);
+    assert.isFalse(_.has(obj, "_uuid"));
+    assert.include(obj, "id");
+    assert.isString(obj.id);
+    assert.include(obj, "objectType");
+    assert.isString(obj.objectType);
+    assert.include(obj, "displayName");
+    assert.isString(obj.displayName);
+    assert.include(obj, "published");
+    validDate(obj.published);
+    if (_.has(obj, "attachments")) {
+        assert.isArray(obj.attachments);
+        _.each(obj.attachments, function(attachment) {
+            validActivityObject(attachment);
+        });
+    }
+    if (_.has(obj, "author")) {
+        validActivityObject(obj.author);
+    }
+    if (_.has(obj, "content")) {
+        assert.isString(obj.content);
+    }
+    if (_.has(obj, "downstreamDuplicates")) {
+        assert.isArray(obj.downstreamDuplicates);
+        _.each(obj.downstreamDuplicates, function(url) {
+            assert.isString(url);
+        });
+    }
+    if (_.has(obj, "image")) {
+        validMediaLink(obj.image);
+    }
+    if (_.has(obj, "summary")) {
+        assert.isString(obj.summary);
+    }
+    if (_.has(obj, "upstreamDuplicates")) {
+        assert.isArray(obj.upstreamDuplicates);
+        _.each(obj.upstreamDuplicates, function(url) {
+            assert.isString(url);
+        });
+    }
+    if (_.has(obj, "updated")) {
+        validDate(obj.updated);
+    }
+    if (_.has(obj, "url")) {
+        assert.isString(obj.url);
+    }
+};
+
+var validMediaLink = function(ml) {
+    assert.isObject(ml);
+    assert.include(ml, "url");
+    assert.isString(ml.url);
+    if (_.has(ml, "width")) {
+        assert.isNumber(ml.width);
+    }
+    if (_.has(ml, "height")) {
+        assert.isNumber(ml.height);
+    }
+    if (_.has(ml, "duration")) {
+        assert.isNumber(ml.duration);
+    }
+};
+
+var validFeed = function(feed) {
+    assert.include(feed, "url");
+    assert.isString(feed.url);
+    assert.include(feed, "totalItems");
+    assert.isNumber(feed.totalItems);
+    if (_.has(feed, "items")) {
+        assert.isArray(feed.items);
+    }
+};
+
+exports.validActivity       = validActivity;
+exports.validActivityObject = validActivityObject;
+exports.validMediaLink      = validMediaLink;
+exports.validFeed           = validFeed;
