@@ -81,6 +81,26 @@ suite.addBatch({
                 assert.ifError(err);
             }
         },
+        "and we try to ensureObject with no ID": {
+            topic: function(ActivityObject) {
+                var callback = this.callback,
+                    props = {
+                        objectType: "note",
+                        content: "gar gar gar"
+                    };
+
+                ActivityObject.ensureObject(props, function(err, obj) {
+                    if (err) {
+                        callback(err);
+                    } else {
+                        callback(null);
+                    }
+                });
+            },
+            "it works": function(err) {
+                assert.ifError(err);
+            }
+        },
         "and we try to ensureObject with a non-string objectType": {
             topic: function(ActivityObject) {
                 var callback = this.callback,
