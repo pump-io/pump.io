@@ -6,7 +6,7 @@
                  data-toggle="dropdown" href="#">
     <i class="icon-exclamation-sign"></i>
     <% if (notifications.items.length > 0) { %>
-    <span"><%- notifications.items.length %></span>
+    <span class="text-error"><%- notifications.items.length %></span>
     <% } %>
   </button>
   <ul class="dropdown-menu">

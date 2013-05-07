@@ -6,7 +6,7 @@
                  data-toggle="dropdown" href="#">
     <i class="icon-envelope"></i>
     <% if (messages.items.length > 0) { %>
-    <span><%- messages.items.length %></span>
+    <span class="text-error"><%- messages.items.length %></span>
     <% } %>
   </button>
   <ul class="dropdown-menu" role="menu">
