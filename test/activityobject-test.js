@@ -342,8 +342,6 @@ suite.addBatch({
                 },
                 "it has the right auto-created attributes": function(err, group) {
                     assert.isString(group.id);
-                    assert.isString(group.published);
-                    assert.isString(group.updated);
                 }
             },
             "and we ensure an existing activityobject object": {
@@ -1288,6 +1286,29 @@ suite.addBatch({
                 "it works": function(err, str) {
                     assert.ifError(err);
                     assert.isObject(str);
+                }
+            },
+            "and we get the string of an object with no id": {
+                topic: function(ActivityObject) {
+                    var Game = require("../lib/model/game").Game,
+                        game = new Game({objectType: "game"});
+
+                    return game.toString();
+                },
+                "it looks correct": function(str) {
+                    assert.equal("[game]", str);
+                }
+            },
+            "and we get the string of an object with an id": {
+                topic: function(ActivityObject) {
+                    var Game = require("../lib/model/game").Game,
+                        game = new Game({objectType: "game",
+                                         id: "urn:uuid:c52b69b6-b717-11e2-9d1e-2c8158efb9e9"});
+
+                    return game.toString();
+                },
+                "it looks correct": function(str) {
+                    assert.equal("[game urn:uuid:c52b69b6-b717-11e2-9d1e-2c8158efb9e9]", str);
                 }
             }
         }
