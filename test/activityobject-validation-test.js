@@ -396,6 +396,32 @@ suite.addBatch({
             "it fails correctly": function(err) {
                 assert.ifError(err);
             }
+        },
+        "and we try to ensureObject with an invalid image property": {
+            topic: function(ActivityObject) {
+                var callback = this.callback,
+                    props = {
+                        id: "urn:uuid:05ee5280-b71b-11e2-8bb8-2c8158efb9e9",
+                        objectType: "note",
+                        image: {
+                            left: 1,
+                            right: 2
+                        }
+                    };
+
+                ActivityObject.ensureObject(props, function(err, obj) {
+                    if (err && err instanceof TypeError) {
+                        callback(null);
+                    } else if (err) {
+                        callback(err);
+                    } else {
+                        callback(new Error("Unexpected success"));
+                    }
+                });
+            },
+            "it fails correctly": function(err) {
+                assert.ifError(err);
+            }
         }
     }
 });
