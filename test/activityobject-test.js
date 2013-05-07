@@ -342,8 +342,6 @@ suite.addBatch({
                 },
                 "it has the right auto-created attributes": function(err, group) {
                     assert.isString(group.id);
-                    assert.isString(group.published);
-                    assert.isString(group.updated);
                 }
             },
             "and we ensure an existing activityobject object": {
