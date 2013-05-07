@@ -555,6 +555,33 @@ suite.addBatch({
                 assert.ifError(err);
             }
         },
+        "and we try to ensureObject with a non-string updated property": {
+            topic: function(ActivityObject) {
+                var callback = this.callback,
+                    props = {
+                        id: "urn:uuid:cf1bd0fe-b72c-11e2-8d5b-2c8158efb9e9",
+                        objectType: "note",
+                        updated: {
+                            year: 2013,
+                            month: 10,
+                            day: 14
+                        }
+                    };
+
+                ActivityObject.ensureObject(props, function(err, obj) {
+                    if (err && err instanceof TypeError) {
+                        callback(null);
+                    } else if (err) {
+                        callback(err);
+                    } else {
+                        callback(new Error("Unexpected success"));
+                    }
+                });
+            },
+            "it fails correctly": function(err) {
+                assert.ifError(err);
+            }
+        },
         "and we try to ensureObject with a non-string summary property": {
             topic: function(ActivityObject) {
                 var callback = this.callback,
