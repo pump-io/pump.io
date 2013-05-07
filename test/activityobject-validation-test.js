@@ -374,6 +374,56 @@ suite.addBatch({
                 assert.ifError(err);
             }
         },
+        "and we try to ensureObject with non-array upstreamDuplicates": {
+            topic: function(ActivityObject) {
+                var callback = this.callback,
+                    props = {
+                        id: "urn:uuid:dabbdfa2-b72d-11e2-b49d-2c8158efb9e9",
+                        objectType: "note",
+                        upstreamDuplicates: "http://example.net/note/1"
+                    };
+
+                ActivityObject.ensureObject(props, function(err, obj) {
+                    if (err && err instanceof TypeError) {
+                        callback(null);
+                    } else if (err) {
+                        callback(err);
+                    } else {
+                        callback(new Error("Unexpected success"));
+                    }
+                });
+            },
+            "it fails correctly": function(err) {
+                assert.ifError(err);
+            }
+        },
+        "and we try to ensureObject with non-string member of upstreamDuplicates": {
+            topic: function(ActivityObject) {
+                var callback = this.callback,
+                    props = {
+                        id: "urn:uuid:e65dc726-b72d-11e2-9997-2c8158efb9e9",
+                        objectType: "note",
+                        upstreamDuplicates: [
+                            {
+                                id: "http://example.net/note/1"
+                            }
+                        ]
+                    };
+
+                ActivityObject.ensureObject(props, function(err, obj) {
+                    if (err && err instanceof TypeError) {
+                        callback(null);
+                    } else if (err) {
+                        callback(err);
+                    } else {
+                        callback(new Error("Unexpected success"));
+                    }
+                });
+            },
+            "it fails correctly": function(err) {
+                assert.ifError(err);
+            }
+        },
         "and we try to ensureObject with non-object image property": {
             topic: function(ActivityObject) {
                 var callback = this.callback,
