@@ -294,7 +294,7 @@ if (!window.Pump) {
                 "</div>" +
                 "<div class='btn-group'>" +
                 "<a class='btn' data-wysihtml5-command='formatBlock' title='Preformatted' data-wysihtml5-command-value='pre'><code>P</code></a>" +
-                "<a class='btn' data-wysihtml5-command='formatBlock' title='Header' data-wysihtml5-command-value='h3'><b>H</b></a>" +
+                "<a class='btn' data-wysihtml5-command='formatBlock' title='Header' data-wysihtml5-command-value='h4'><b>H</b></a>" +
                 "</div>" +
                 "</li>";
         }
