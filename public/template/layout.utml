@@ -135,6 +135,7 @@
     <script src="/javascript/pump/router.js"></script>
     <script src="/javascript/pump/socket.js"></script>
     <script src="/javascript/pump/view.js"></script>
+    <script src="/javascript/scrolltop.js"></script>
     <script>
       if (!Pump) {
           Pump = {};
@@ -170,7 +171,7 @@
       <% } %>
 
     </script>
-    <button onclick="scrollToTop(&quot;top&quot;)" title="back to top" id="scrolltop" class="btn" style="display: block;"><i class="icon-arrow-up"></i></button>
+    <button onclick="scrollToTop(&quot;top&quot;)" title="back to top" id="scrolltop" class="btn"><i class="icon-arrow-up"></i></button>
 </body>
 
 </html>
