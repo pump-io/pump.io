@@ -44,7 +44,7 @@
     <![endif]-->
   </head>
 
-  <body>
+  <body id="top">
 
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
@@ -170,6 +170,7 @@
       <% } %>
 
     </script>
-  </body>
+    <button onclick="scrollToTop(&quot;top&quot;)" title="back to top" id="scrolltop" class="btn" style="display: block;"><i class="icon-arrow-up"></i></button>
+</body>
 
 </html>
