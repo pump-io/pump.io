@@ -59,7 +59,7 @@ You first Submit a Contribution to Us, whichever is earlier.
 
 ## 2. Grant of Rights ##
 
-### 2.1 Copyright License ###
+2.1 Copyright License. 
 
 (a) You retain ownership of the Copyright in Your Contribution and
 have the same rights to use or license the Contribution which You
@@ -71,43 +71,10 @@ irrevocable license under the Copyright covering the Contribution,
 with the right to sublicense such rights through multiple tiers of
 sublicensees, to reproduce, modify, display, perform and distribute
 the Contribution as part of the Material; provided that this license
-is conditioned upon compliance with Section 2.3.  2.1 Copyright
-Assignment
+is conditioned upon compliance with Section 2.3.
 
-(a) At the time the Contribution is Submitted, You assign to Us all
-right, title, and interest worldwide in all Copyright covering the
-Contribution; provided that this transfer is conditioned upon
-compliance with Section 2.3.
-
-(b) To the extent that any of the rights in Section 2.1(a) cannot be
-assigned by You to Us, You grant to Us a perpetual, worldwide,
-exclusive, royalty-free, transferable, irrevocable license under such
-non-assigned rights, with rights to sublicense through multiple tiers
-of sublicensees, to practice such non-assigned rights, including, but
-not limited to, the right to reproduce, modify, display, perform and
-distribute the Contribution; provided that this license is conditioned
-upon compliance with Section 2.3.
-
-(c) To the extent that any of the rights in Section 2.1(a) can neither
-be assigned nor licensed by You to Us, You irrevocably waive and agree
-never to assert such rights against Us, any of our successors in
-interest, or any of our licensees, either direct or indirect; provided
-that this agreement not to assert is conditioned upon compliance with
-Section 2.3.
-
-(d) Upon such transfer of rights to Us, to the maximum extent
-possible, We immediately grant to You a perpetual, worldwide,
-non-exclusive, royalty-free, transferable, irrevocable license under
-such rights covering the Contribution, with rights to sublicense
-through multiple tiers of sublicensees, to reproduce, modify, display,
-perform, and distribute the Contribution. The intention of the parties
-is that this license will be as broad as possible and to provide You
-with rights as similar as possible to the owner of the rights that You
-transferred. This license back is limited to the Contribution and does
-not provide any rights to the Material.  2.2 Patent License
-
-For patent claims including, without limitation, method, process, and
-apparatus claims which You  own, control or have
+2.2 Patent License. For patent claims including, without limitation,
+method, process, and apparatus claims which You own, control or have
 the right to grant, now or in the future, You grant to Us a perpetual,
 worldwide, non-exclusive, transferable, royalty-free, irrevocable
 patent license, with the right to sublicense these rights to multiple
@@ -116,45 +83,13 @@ import and otherwise transfer the Contribution and the Contribution in
 combination with the Material (and portions of such combination). This
 license is granted only to the extent that the exercise of the
 licensed rights infringes such patent claims; and provided that this
-license is conditioned upon compliance with Section 2.3.  2.3 Outbound
-License
+license is conditioned upon compliance with Section 2.3.
 
-(Option One) As a condition on the grant of rights in Sections 2.1 and
-2.2, We agree to license the Contribution only under the terms of the
-license or licenses which We are using on the Submission Date for the
-Material (including any rights to adopt any future version of a
-license if permitted).
-
-(Option Two) As a condition on the grant of rights in Sections 2.1 and
-2.2, We agree to license the Contribution only under the terms of the
-license or licenses which We are using on the Submission Date for the
-Material (including any right to adopt any future version of a license
-if permitted).
-
-(Option Three) As a condition on the grant of rights in Sections 2.1
-and 2.2, We agree to license the Contribution only under the terms of
-the license or licenses which We are using on the Submission Date for
-the Material or any licenses which are approved by the Open Source
-Initiative on or after the Effective Date, including both permissive
-and copyleft licenses, whether or not such licenses are subsequently
-disapproved (including any right to adopt any future version of a
-license if permitted).
-
-(Option Four) As a condition on the grant of rights in Sections 2.1
-and 2.2, We agree to license the Contribution only under the terms of
-the license or licenses which We are using on the Submission Date for
-the Material or any licenses on the Free Software Foundation's list of
-"Recommended copyleft licenses" on or after the Effective Date,
-whether or not such licenses are subsequently disapproved (including
-any right to adopt any future version of a license if permitted).
-
-(Option Five) Based on the grant of rights in Sections 2.1 and 2.2, if
-We include Your Contribution in a Material, We may license the
-Contribution under any license, including copyleft, permissive,
-commercial, or proprietary licenses. As a condition on the exercise of
-this right, We agree to also license the Contribution under the terms
-of the license or licenses which We are using for the Material on the
-Submission Date.
+2.3 Outbound License. As a condition on the grant of rights in
+Sections 2.1 and 2.2, We agree to license the Contribution only under
+the terms of the license or licenses which We are using on the
+Submission Date for the Material (including any rights to adopt any
+future version of a license if permitted).
 
 In addition, We may use the following licenses for Media in the
 Contribution: Creative Commons Attribution 3.0 Unported (including any
@@ -214,7 +149,7 @@ CLAIM IS BASED.
 ## 6. Miscellaneous ##
 
 6.1 This Agreement will be governed by and construed in accordance
-with the laws of [JURISDICTION] excluding its conflicts of law
+with the laws of Quebec excluding its conflicts of law
 provisions. Under certain circumstances, the governing law in this
 section might be superseded by the United Nations Convention on
 Contracts for the International Sale of Goods ("UN Convention") and
