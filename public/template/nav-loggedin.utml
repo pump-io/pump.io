@@ -2,16 +2,24 @@
 
   <img style="float:left;height:38px;" src="/images/logo.png"/><a class="brand" href="/"><%- config.site %></a>
 
+  <div class="btn-group">
+    <button type="button" class="btn btn-small primary" id="post-note-button">
+      Note <i class="icon-pencil"></i>
+    </button>
+    <% if (config.canUpload) { %>
+    <button type="button" class="btn btn-small primary" id="post-picture-button">
+      Picture <i class="icon-picture"></i>
+    </button>
+    <% } %>
+  </div>
+
   <ul class="nav pull-right">
     <li id="fat-menu" class="dropdown">
       <a href="#" id="profile-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown"> 
         <% if (_(principal).has("image")) { %>
-        <img class="pull-left" src="<%- principal.image.url %>" width="24" height="24" class="img-rounded" />&nbsp;<span class="displayname">
+        <img class="pull-left" src="<%- principal.image.url %>" width="24" height="24" class="img-rounded" />&nbsp;
         <% } %>
         <%- principal.displayName %>
-        <% if (_(principal).has("image")) { %>
-        </span>
-        <% } %>
         <b class="caret"></b>
       </a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="profile-dropdown">
@@ -32,20 +40,9 @@
     </li>
   </ul>
 
-  <div class="span4 pull-right">
-
-    <button type="button" class="btn primary span1 alpha" id="post-note-button">
-      <i class="icon-pencil"></i>
-    </button>
-    <% if (config.canUpload) { %>
-    <button type="button" class="btn primary span1 alpha" id="post-picture-button">
-      <i class="icon-picture"></i>
-    </button>
-
-    <% } %>
+  <div class="pull-right">
     <%= partial("messages", {messages: messages}) %>
     <%= partial("notifications", {notifications: notifications}) %>
-
-  </div><!-- /pull-right -->
+  </div>
 
 </div>

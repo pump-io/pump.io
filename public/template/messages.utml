@@ -1,15 +1,15 @@
-<div class="dropdown btn-group span1 omega" id="messages">
-  <button class="btn dropdown-toggle btn-block
+<div class="btn-group dropdown" id="messages">
+  <button class="btn dropdown-toggle btn-small btn-success
                  <% if (messages.totalItems <= 0) { %>
                  disabled
                  <% } %>"
                  data-toggle="dropdown" href="#">
-    <i class="icon-envelope"></i>
+    <i class="icon-envelope icon-white"></i>
     <% if (messages.items.length > 0) { %>
-    <span class="text-error"><%- messages.items.length %></span>
+    <span class="badge badge-important"><%- messages.items.length %></span>
     <% } %>
   </button>
-  <ul class="dropdown-menu pull-right" role="menu">
+  <ul class="dropdown-menu" role="menu">
     <% _.each(messages.items, function(activity) { %>
     <% if (_.isObject(activity)) { %>
     <li>
