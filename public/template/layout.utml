@@ -37,16 +37,14 @@
 
     <!-- Finally, our own override sheet -->
 
-<!--    <link href="/stylesheet/pumpio.css" rel="stylesheet">-->
+    <link href="/stylesheet/pumpio.css" rel="stylesheet">
 
     <!--[if lt IE 9]>
         <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <link rel="shortcut icon" href="/images/favicon.ico" type="image/vnd.microsoft.icon" />
-    <link href="/stylesheet/pumpjpopeorg.min.css" rel="stylesheet">
   </head>
 
-  <body id="top">
+  <body>
 
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
@@ -137,7 +135,6 @@
     <script src="/javascript/pump/router.js"></script>
     <script src="/javascript/pump/socket.js"></script>
     <script src="/javascript/pump/view.js"></script>
-    <script src="/javascript/scrolltop.js"></script>
     <script>
       if (!Pump) {
           Pump = {};
@@ -173,7 +170,6 @@
       <% } %>
 
     </script>
-    <button onclick="scrollToTop(&quot;top&quot;)" title="back to top" id="scrolltop" class="btn"><i class="icon-arrow-up"></i></button>
   </body>
 
 </html>

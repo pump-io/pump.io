@@ -2913,7 +2913,7 @@
         },
         startLoad: function() {
             var view = this;
-            view.$("a.brand").spin({color: "#268bd2"});
+            view.$("a.brand").spin({color: "white"});
         },
         endLoad: function() {
             var view = this;

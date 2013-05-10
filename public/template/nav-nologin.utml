@@ -1,3 +1,3 @@
 <div class="container">
-  <img style="float:left;height:38px;" src="/images/logo.png"/><a class="brand" href="/"><%- config.site %></a>
+  <a class="brand" href="/"><%- config.site %></a>
 </div> <!-- /container -->

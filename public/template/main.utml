@@ -3,7 +3,7 @@
 
     <div class="row">
 
-      <div class="span10">
+      <div class="span6">
 
         <h1><%- config.site %></h1>
 
@@ -12,9 +12,11 @@
 	  in and out of your friends, family and colleagues.</p>
 
         <p><a class="btn primary large" href="/main/register">Get Started &raquo;</a></p>
-        <p><a class="btn primary large" href="/main/login">Login &raquo;</a></p>
-        <p><a class="btn primary large" href="https://static.jpope.org/users.html">Directory &raquo;</a></p>
 
+      </div>
+
+      <div class="span4">
+        <img src="images/somefriends.jpg" width="340" height="235" class="img-rounded" />
       </div>
 
     </div>

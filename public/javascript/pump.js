@@ -292,10 +292,6 @@ if (!window.Pump) {
                 "<a class='btn' data-wysihtml5-command='italic' title='"+locale.emphasis.italic+"'><i class='icon-italic'></i></a>" +
                 "<a class='btn' data-wysihtml5-command='underline' title='"+locale.emphasis.underline+"'>_</a>" +
                 "</div>" +
-                "<div class='btn-group'>" +
-                "<a class='btn' data-wysihtml5-command='formatBlock' title='Preformatted' data-wysihtml5-command-value='pre'><code>P</code></a>" +
-                "<a class='btn' data-wysihtml5-command='formatBlock' title='Header' data-wysihtml5-command-value='h4'><b>H</b></a>" +
-                "</div>" +
                 "</li>";
         }
     };
@@ -307,7 +303,6 @@ if (!window.Pump) {
         // Set wysiwyg defaults
 
         $.fn.wysihtml5.defaultOptions["font-styles"] = false;
-        $.fn.wysihtml5.defaultOptions["html"] = false;
         $.fn.wysihtml5.defaultOptions["image"] = false;
         $.fn.wysihtml5.defaultOptions["customTemplates"] = Pump.wysihtml5Tmpl;
     };

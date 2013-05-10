@@ -4,8 +4,7 @@
       <%= partial("major-stream", {headless: false}) %>
     </div>
     <div class="span3" id="sidebar">
-      <%= partial("sidebar-buttons", {headless: false}) %>
-      <h4>Meanwhile...</h4>
+      <h3>Meanwhile...</h3>
       <%= partial("minor-stream", {headless: false}) %>
     </div>
   </div>
