@@ -173,8 +173,7 @@
       <% } %>
 
     </script>
-<!--    <img src="/images/uparrow.png" onclick="scrollToTop(&quot;top&quot;)" title="back to top" alt="back to top" id="scrolltop" style="display: inline; opacity: 0.5;"/>-->
-        <button onclick="scrollToTop(&quot;top&quot;)" title="back to top" id="scrolltop" class="btn" style="display: block;"><i class="icon-arrow-up"></i></button>
+    <button onclick="scrollToTop(&quot;top&quot;)" title="back to top" id="scrolltop" class="btn"><i class="icon-arrow-up"></i></button>
   </body>
 
 </html>
