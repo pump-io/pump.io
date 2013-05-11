@@ -1217,7 +1217,8 @@
             "click .unfavorite": "unfavoriteObject",
             "click .share": "shareObject",
             "click .unshare": "unshareObject",
-            "click .comment": "openComment"
+            "click .comment": "openComment",
+            "click .object-image": "openImage"
         },
         setupSubs: function() {
             var view = this,
@@ -1315,6 +1316,28 @@
                     view.$(".replies").append(form.$el);
                 });
                 form.render();
+            }
+        },
+        openImage: function() {
+            var view = this,
+                model = view.model,
+                object = view.model.object,
+                modalView;
+            
+            if (object && object.get("fullImage")) {
+
+                modalView = new Pump.LightboxModal({data: {object: object}});
+
+                // When it's ready, show immediately
+
+                modalView.on("ready", function() {
+                    $("body").append(modalView.el);
+                    $("#fullImageLightbox").lightbox();
+                });
+
+                // render it (will fire "ready")
+
+                modalView.render();
             }
         }
     });
@@ -2700,6 +2723,12 @@
 
             callback(null, false);
         }
+    });
+
+    Pump.LightboxModal = Pump.TemplateView.extend({
+        tagName: "div",
+        className: "modal-holder",
+        templateName: "lightbox-modal"
     });
 
     Pump.BodyView = Backbone.View.extend({
