@@ -1331,7 +1331,10 @@
                 // When it's ready, show immediately
 
                 modalView.on("ready", function() {
-                    $("body").append(modalView.el);
+                    $(view.el).append(modalView.el);
+                    $(modalView.el).on("hidden", function() {
+                        $(modalView.el).remove();
+                    });
                     $("#fullImageLightbox").lightbox();
                 });
 
