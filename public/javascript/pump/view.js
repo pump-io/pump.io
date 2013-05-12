@@ -1584,7 +1584,49 @@
 
     Pump.ReplyView = Pump.TemplateView.extend({
         templateName: 'reply',
-        modelName: 'reply'
+        modelName: 'reply',
+        events: {
+            "click .favorite": "favoriteObject",
+            "click .unfavorite": "unfavoriteObject"
+        },
+        favoriteObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "favorite",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMinorActivity(act, function(err, act) {
+                view.$(".favorite")
+                    .removeClass("favorite")
+                    .addClass("unfavorite")
+                    .html("Unlike <i class=\"icon-thumbs-down\"></i>");
+                Pump.addMinorActivity(act);
+            });
+            
+            return false;
+        },
+        unfavoriteObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "unfavorite",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".unfavorite")
+                        .removeClass("unfavorite")
+                        .addClass("favorite")
+                        .html("Like <i class=\"icon-thumbs-up\"></i>");
+                    Pump.addMinorActivity(act);
+                }
+            });
+            
+            return false;
+        }
     });
 
     Pump.MinorActivityView = Pump.TemplateView.extend({
