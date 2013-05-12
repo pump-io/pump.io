@@ -2092,7 +2092,7 @@
             if (view.$("#avatar-fineupload").length > 0) {
                 view.$("#avatar-fineupload").fineUploader({
                     request: {
-                        endpoint: "/main/upload"
+                        endpoint: "/main/upload-avatar"
                     },
                     text: {
                         uploadButton: '<i class="icon-upload icon-white"></i> Avatar file'
@@ -2132,7 +2132,7 @@
                             view.showError(err);
                             view.stopSpin();
                         } else {
-                            view.saveProfile(act.object.get("fullImage"));
+                            view.saveProfile(act.object.get("image"));
                         }
                     });
                 }).on("error", function(event, id, fileName, reason) {
