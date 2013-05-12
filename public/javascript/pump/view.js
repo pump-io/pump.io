@@ -2174,7 +2174,7 @@
                             view.showError(err);
                             view.stopSpin();
                         } else {
-                            view.saveProfile(act.object.get("image"));
+                            view.saveProfile(act.object);
                         }
                     });
                 }).on("error", function(event, id, fileName, reason) {
@@ -2192,7 +2192,10 @@
                          "summary": view.$('#bio').val()};
 
             if (img) {
-                props.image = img;
+                props.image = img.get("image");
+                props.pump_io = {
+                    fullImage: img.get("fullImage")
+                };
             }
 
             profile.save(props,
