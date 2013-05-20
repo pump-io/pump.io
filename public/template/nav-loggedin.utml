@@ -7,8 +7,8 @@
       <span class="hidden-phone">Note </span><i class="icon-pencil"></i>
     </button>
     <% if (config.canUpload) { %>
-    <button type="button" class="btn btn-small primary" id="post-picture-button">
-      Picture <i class="icon-picture"></i>
+    <button type="button" class="btn btn-small primary" id="post-picture-button" title="Post a picture">
+      <span class="hidden-phone">Picture </span><i class="icon-picture"></i>
     </button>
     <% } %>
   </div>
