@@ -17,5 +17,9 @@
     </li>
     <% } %>
     <% }); %>
+    <% if (messages.items.length > 0) { %>
+    <li class="divider"></li>
+    <% } %>
+    <li><a tabindex="-1" href="/main/messages">All messages</a></li>
   </ul>
 </div>
