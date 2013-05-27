@@ -237,7 +237,7 @@ var requestActivity = function(req, res, next) {
 
     Step(
         function() {
-            Activity.search({"uuid": req.params.uuid}, this);
+            Activity.search({"_uuid": req.params.uuid}, this);
         },
         function(err, activities) {
             if (err) throw err;
