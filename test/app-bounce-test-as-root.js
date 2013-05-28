@@ -29,6 +29,8 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     xrdutil = require("./lib/xrd");
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 var suite = vows.describe("bounce 80 to 443 app interface");
 
 var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
