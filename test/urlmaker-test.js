@@ -16,7 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require("assert"),
+var _ = require("underscore"),
+    assert = require("assert"),
     vows = require("vows"),
     parseURL = require("url").parse;
 
@@ -74,7 +75,8 @@ vows.describe("urlmaker module interface").addBatch({
                 "its parts are correct": function(url) {
                     var parts = parseURL(url);
                     assert.equal(parts.hostname, "example.com");
-                    assert.isNull(parts.port);
+                    // undefined in 0.8.x, null in 0.10.x
+                    assert.isTrue(_.isNull(parts.port) || _.isUndefined(parts.port));
                     assert.equal(parts.host, "example.com"); // NOT example.com:80
                     assert.equal(parts.path, "/login");
                 }
