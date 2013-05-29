@@ -31,8 +31,7 @@ var testSchema = {
     fields: ["nonce",
              "consumer_key",
              "access_token",
-             "timestamp"],
-    indices: ["consumer_key"]
+             "timestamp"]
 };
 
 var testData = {

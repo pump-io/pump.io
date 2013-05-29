@@ -246,6 +246,7 @@ suite.addBatch({
                 "and we authorize the request token": {
                     topic: function(rt, host, app, dbapp) {
                         var callback = this.callback,
+                            browser = new Browser({runScripts: false, waitFor: 60000}),
                             cl;
 
                         Step(
@@ -259,30 +260,28 @@ suite.addBatch({
                             },
                             function(err, user) {
                                 if (err) throw err;
-                                var browser, proto;
-                                browser = new Browser({runScripts: false, waitFor: 60000});
                                 browser.visit(host.authorizeURL(rt), this);
                             },
-                            function(err, br) {
+                            function(err) {
                                 if (err) throw err;
-                                if (!br.success) throw new Error("Browser fail");
-                                br.fill("username", "seth", this);
+                                if (!browser.success) throw new Error("Browser fail");
+                                browser.fill("username", "seth", this);
                             },
-                            function(err, br) {
+                            function(err) {
                                 if (err) throw err;
-                                if (!br.success) throw new Error("Browser fail");
-                                br.fill("password", "Aegh0eex", this);
+                                if (!browser.success) throw new Error("Browser fail");
+                                browser.fill("password", "Aegh0eex", this);
                             },
-                            function(err, br) {
+                            function(err) {
                                 if (err) throw err;
-                                if (!br.success) throw new Error("Browser fail");
-                                br.pressButton("#authenticate", this);
+                                if (!browser.success) throw new Error("Browser fail");
+                                browser.pressButton("#authenticate", this);
                             },
-                            function(err, br) {
+                            function(err) {
                                 if (err) throw err;
-                                if (!br.success) throw new Error("Browser fail");
+                                if (!browser.success) throw new Error("Browser fail");
                                 dbapp.setAuthCB(this.parallel());
-                                br.pressButton("Authorize", this.parallel());
+                                browser.pressButton("Authorize", this.parallel());
                             },
                             function(err, verifier, br) {
                                 callback(err, verifier);

@@ -353,12 +353,12 @@ suite.addBatch({
                         br.pressButton("#authenticate", this);
                     },
                     function(err) {
-                        if (err) {
-                            callback(err);
-                        } else if (br.statusCode < 400 || br.statusCode > 499) {
-                            callback(new Error("Bad status code: " + br.statusCode));
-                        } else {
+                        if (err && br.statusCode >= 400 && br.statusCode < 500) {
                             callback(null);
+                        } else if (err) {
+                            callback(err);
+                        } else {
+                            callback(new Error("Unexpected success"));
                         }
                     }
                 );
@@ -401,12 +401,12 @@ suite.addBatch({
                         br.pressButton("#authenticate", this);
                     },
                     function(err) {
-                        if (err) {
-                            callback(err);
-                        } else if (br.statusCode < 400 || br.statusCode > 499) {
-                            callback(new Error("Bad status code: " + br.statusCode));
-                        } else {
+                        if (err && br.statusCode >= 400 && br.statusCode < 500) {
                             callback(null);
+                        } else if (err) {
+                            callback(err);
+                        } else {
+                            callback(new Error("Unexpected success"));
                         }
                     }
                 );
