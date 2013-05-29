@@ -70,7 +70,7 @@ var addRoutes = function(app) {
 
     app.post("/main/logout", app.session, someReadAuth, handleLogout);
 
-    app.post("/main/renew", app.session, userAuth, principal, renewSession);
+    app.post("/main/renew", app.session, userAuth, renewSession);
 
     app.get("/main/remote", app.session, principal, showRemote);
     app.post("/main/remote", app.session, handleRemote);
@@ -692,7 +692,8 @@ var showObject = function(req, res, next) {
 
 var renewSession = function(req, res, next) {
 
-    var principal = req.principal;
+    var principal = req.principal,
+        user = req.principalUser;
 
     Step(
         function() {
@@ -703,8 +704,8 @@ var renewSession = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                principal.sanitize();
-                res.json(principal);
+                // principalUser is sanitized by userAuth()
+                res.json(user);
             }
         }
     );
