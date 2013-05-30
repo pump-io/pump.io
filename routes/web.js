@@ -21,10 +21,13 @@ var databank = require("databank"),
     _ = require("underscore"),
     validator = require("validator"),
     check = validator.check,
+    Mailer = require("../lib/mailer"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
     filters = require("../lib/filters"),
     Activity = require("../lib/model/activity").Activity,
     ActivityObject = require("../lib/model/activityobject").ActivityObject,
     User = require("../lib/model/user").User,
+    Recovery = require("../lib/model/recovery").Recovery,
     Collection = require("../lib/model/collection").Collection,
     RemoteRequestToken = require("../lib/model/remoterequesttoken").RemoteRequestToken,
     RemoteAccessToken = require("../lib/model/remoteaccesstoken").RemoteAccessToken,
@@ -101,6 +104,12 @@ var addRoutes = function(app) {
     app.get("/:nickname/:type/:uuid", app.session, principal, addMessages, requestObject, reqUser, userIsAuthor, principalAuthorOrRecipient, showObject);
 
     app.post("/main/proxy", app.session, principal, principalNotUser, proxyActivity);
+
+    if (app.config.haveEmail) {
+        app.get("/main/recover", app.session, principal, showRecover);
+        app.post("/main/recover", app.session, principal, handleRecover);
+        app.get("/main/recover/:code", app.session, principal, recoveryCode, recoverPassword);
+    }
 };
 
 var loginRedirect = function(rel) {
@@ -898,6 +907,140 @@ var addMessages = function(req, res, next) {
                 res.local("messages", messages);
                 res.local("notifications", notifications);
                 next();
+            }
+        }
+    );
+};
+
+var showRecover = function(req, res, next) {
+    res.render("recover", {page: {title: "Recover your password"}});
+};
+
+var handleRecover = function(req, res, next) {
+
+    var user = null,
+        recovery,
+        nickname = req.body.nickname,
+        force = req.body.force;
+
+    Step( 
+        function () { 
+            User.get(nickname, this);
+        },
+        function(err, result) {
+            if (err) throw err;
+            user = result;
+            if (!user.email) {
+                // Done
+                res.json(400, {noEmail: true});
+                return;
+            }
+            if (force) {
+                this(null, []);
+            } else {
+                // Do they have any outstanding recovery requests?
+                Recovery.search({nickname: nickname, recovered: false}, this);
+            }
+        },
+        function(err, recoveries) {
+            var stillValid;
+            if (err) throw err;
+            if (!recoveries || recoveries.length === 0) {
+                this(null);
+                return;
+            } 
+            stillValid = _.filter(recoveries, function(reco) { return Date.now() - Date.parse(reco.timestamp) < Recovery.TIMEOUT; });
+            if (stillValid.length > 0) {
+                // Done
+                res.json(409, {existing: true});
+            } else {
+                this(null);
+            }
+        },
+        function(err) {
+            if (err) throw err;
+            Recovery.create({nickname: nickname}, this);
+        },
+        function(err, recovery) {
+            var recoveryURL;
+            if (err) throw err;
+            recoveryURL = URLMaker.makeURL("/main/recovery/" + recovery.code);
+            res.render("recovery-email-html",
+                       {principal: user.profile,
+                        principalUser: user,
+                        recovery: recovery,
+                        recoveryURL: recoveryURL,
+                        layout: false},
+                       this.parallel());
+            res.render("recovery-email-text",
+                       {principal: user.profile,
+                        principalUser: user,
+                        recovery: recovery,
+                        recoveryURL: recoveryURL,
+                        layout: false},
+                       this.parallel());
+        },
+        function(err, html, text) {
+            if (err) throw err;
+            Mailer.sendEmail({to: user.email,
+                              subject: "Recover password for " + req.app.config.site,
+                              text: text,
+                              attachment: {data: html,
+                                           type: "text/html",
+                                           alternative: true}},
+                             this);
+        },
+        function(err) {
+            if (err) {
+                next(err);
+            } else {
+                res.json({sent: true});
+            }
+        }
+    );
+};
+
+var recoveryCode = function(req, res, next) {
+    var code = req.params.code;
+
+    Step(
+        function() {
+            Recovery.get(code, this);
+        },
+        function(err, recovery) {
+            if (err) {
+                next(err);
+            } else if (recovery.recovered) {
+                next(new Error("This recovery code was already used."));
+            }
+            if (Date.now() - Date.parse(recovery.timestamp) > Recovery.TIMEOUT) {
+                next(new Error("This recovery code is too old."));
+            } else {
+                req.recovery = recovery;
+                next();
+            }
+        }
+    );
+};
+
+var recoverPassword = function(req, res, next) {
+    var user = null,
+        recovery = req.recovery;
+
+    Step( 
+        function() { 
+            User.get(recovery.nickname, this);
+        },
+        function(err, results) {
+            if (err) throw err;
+            user = results;
+            req.principalUser = user;
+            req.principal     = user.profile;
+            setPrincipal(req.session, user.profile, this);
+        },
+        function(err) {
+            if (err) {
+                next(err);
             }
         }
     );
