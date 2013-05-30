@@ -48,7 +48,7 @@ suite.addBatch({
                           hostname: "localhost",
                           driver: tc.driver,
                           params: tc.params,
-                          nologger: true,
+                          logger: false,
                           sockjs: false
                          },
                 makeApp = require("../lib/app").makeApp;

@@ -141,8 +141,8 @@ Here are the main configuration keys.
 * *site* Name of the server, like "My great social service".
 * *owner* Name of owning entity, if you want to link to it.
 * *ownerURL* URL of owning entity, if you want to link to it.
-* *nologger* If you're debugging or whatever, turn off
-  logging. Defaults to false (leave logging on).
+* *logger* If you're debugging or whatever, turn on
+  logging. Defaults to true (leave logging on).
 * *logfile* Full path to the logfile. Logs are JSON in
   [https://github.com/trentm/node-bunyan](bunyan) format.
 * *serverUser* If you're listening on a port lower than 1024, you need
@@ -171,9 +171,9 @@ Here are the main configuration keys.
 * *spamclientsecret* oauth pair for spam server.
 * *disableRegistration* default false. Disables registering new users on the
   site through the Web or the API.
-* *noCDN* Use local copies of the JavaScript libraries instead of the
+* *useCDN* Use local copies of the JavaScript libraries instead of the
    ones on the CDN. Good for debugging. Defaults to `false`, meaning
-   "use the CDN".
+   "don't use the CDN".
 
 ### Web server proxy
 

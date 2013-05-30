@@ -44,7 +44,7 @@ suite.addBatch({
                           cert: path.join(__dirname, "data", "bounce.localhost.crt"),
                           driver: tc.driver,
                           params: tc.params,
-                          nologger: true,
+                          logger: false,
                           bounce: true,
                           sockjs: false
                          },

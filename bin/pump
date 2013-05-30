@@ -123,7 +123,7 @@ var setupLog = function(config) {
 
     if (config.logfile) {
         logParams.streams = [{path: config.logfile}];
-    } else if (config.nologger) {
+    } else if (!config.logger) {
         logParams.streams = [{path: "/dev/null"}];
     } else {
         logParams.streams = [{stream: process.stderr}];
