@@ -78,6 +78,14 @@ var addRoutes = function(app) {
     app.get("/main/remote", app.session, principal, showRemote);
     app.post("/main/remote", app.session, handleRemote);
 
+    if (app.config.haveEmail) {
+        app.get("/main/recover", app.session, showRecover);
+        app.get("/main/recover-sent", app.session, showRecoverSent);
+        app.post("/main/recover", app.session, handleRecover);
+        app.get("/main/recover/:code", app.session, recoverCode);
+        app.post("/main/redeem-code", app.session, clientAuth, redeemCode);
+    }
+
     app.get("/main/authorized/:hostname", app.session, reqHost, reqToken, authorized);
     
     if (app.config.uploaddir) {
@@ -99,17 +107,13 @@ var addRoutes = function(app) {
     app.get("/main/account", loginRedirect("/main/account"));
     app.get("/main/messages", loginRedirect("/main/messages"));
 
+    app.post("/main/proxy", app.session, principal, principalNotUser, proxyActivity);
+
+    // These are catchalls and should go at the end to prevent conflicts
+
     app.get("/:nickname/activity/:uuid", app.session, principal, addMessages, requestActivity, reqUser, userIsActor, principalActorOrRecipient, showActivity);
 
     app.get("/:nickname/:type/:uuid", app.session, principal, addMessages, requestObject, reqUser, userIsAuthor, principalAuthorOrRecipient, showObject);
-
-    app.post("/main/proxy", app.session, principal, principalNotUser, proxyActivity);
-
-    if (app.config.haveEmail) {
-        app.get("/main/recover", app.session, principal, showRecover);
-        app.post("/main/recover", app.session, principal, handleRecover);
-        app.get("/main/recover/:code", app.session, principal, recoveryCode, recoverPassword);
-    }
 };
 
 var loginRedirect = function(rel) {
@@ -916,6 +920,10 @@ var showRecover = function(req, res, next) {
     res.render("recover", {page: {title: "Recover your password"}});
 };
 
+var showRecoverSent = function(req, res, next) {
+    res.render("recover-sent", {page: {title: "Recovery email sent"}});
+};
+
 var handleRecover = function(req, res, next) {
 
     var user = null,
@@ -928,11 +936,20 @@ var handleRecover = function(req, res, next) {
             User.get(nickname, this);
         },
         function(err, result) {
-            if (err) throw err;
+            if (err) {
+                if (err.name == "NoSuchThingError") {
+                    res.status(400);
+                    res.json({sent: false, noSuchUser: true, error: "There is no user with that nickname."});
+                    return;
+                } else {
+                    throw err;
+                }
+            }
             user = result;
             if (!user.email) {
                 // Done
-                res.json(400, {noEmail: true});
+                res.status(400);
+                res.json({sent: false, noEmail: true, error: "This user account has no email address."});
                 return;
             }
             if (force) {
@@ -952,7 +969,8 @@ var handleRecover = function(req, res, next) {
             stillValid = _.filter(recoveries, function(reco) { return Date.now() - Date.parse(reco.timestamp) < Recovery.TIMEOUT; });
             if (stillValid.length > 0) {
                 // Done
-                res.json(409, {existing: true});
+                res.status(409);
+                res.json({sent: false, existing: true, error: "You already requested a password recovery."});
             } else {
                 this(null);
             }
@@ -964,7 +982,7 @@ var handleRecover = function(req, res, next) {
         function(err, recovery) {
             var recoveryURL;
             if (err) throw err;
-            recoveryURL = URLMaker.makeURL("/main/recovery/" + recovery.code);
+            recoveryURL = URLMaker.makeURL("/main/recover/" + recovery.code);
             res.render("recovery-email-html",
                        {principal: user.profile,
                         principalUser: user,
@@ -1000,47 +1018,73 @@ var handleRecover = function(req, res, next) {
     );
 };
 
-var recoveryCode = function(req, res, next) {
+var recoverCode = function(req, res, next) {
+    
     var code = req.params.code;
+
+    res.render("recover-code", {page: {title: "One moment please"},
+                                code: code});
+};
+
+var redeemCode = function(req, res, next) {
+
+    var code = req.body.code,
+        recovery,
+        user;
 
     Step(
         function() {
             Recovery.get(code, this);
         },
-        function(err, recovery) {
-            if (err) {
-                next(err);
-            } else if (recovery.recovered) {
-                next(new Error("This recovery code was already used."));
+        function(err, results) {
+            if (err) throw err;
+            recovery = results;
+
+            if (recovery.recovered) {
+                throw new Error("This recovery code was already used.");
             }
+
             if (Date.now() - Date.parse(recovery.timestamp) > Recovery.TIMEOUT) {
-                next(new Error("This recovery code is too old."));
-            } else {
-                req.recovery = recovery;
-                next();
+                throw new Error("This recovery code is too old.");
             }
-        }
-    );
-};
 
-var recoverPassword = function(req, res, next) {
-    var user = null,
-        recovery = req.recovery;
-
-    Step( 
-        function() { 
             User.get(recovery.nickname, this);
         },
         function(err, results) {
             if (err) throw err;
             user = results;
-            req.principalUser = user;
-            req.principal     = user.profile;
             setPrincipal(req.session, user.profile, this);
         },
         function(err) {
+            if (err) throw err;
+            user.expand(this);
+        },
+        function(err) {
+            if (err) throw err;
+            user.profile.expandFeeds(this);
+        },
+        function(err) {
+            if (err) throw err;
+            req.app.provider.newTokenPair(req.client, user, this);
+        },
+        function(err, pair) {
+            if (err) throw err;
+
+            user.token = pair.access_token;
+            user.secret = pair.token_secret;
+
+            // Now that we're done, mark this recovery code as done
+
+            recovery.recovered = true;
+            recovery.save(this);
+        },
+        function(err) {
             if (err) {
-                next(err);
+                req.log.error(err);
+                res.status(400);
+                res.json({error: err.message});
+            } else {
+                res.json(user);
             }
         }
     );

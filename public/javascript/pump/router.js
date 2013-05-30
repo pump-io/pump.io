@@ -36,7 +36,10 @@
             "main/account":           "account",
             "main/register":          "register",
             "main/login":             "login",
-            "main/remote":            "remote"
+            "main/remote":            "remote",
+            "main/recover":           "recover",
+            "main/recover-sent":      "recoverSent",
+            "main/recover/:code":      "recoverCode"
         },
 
         register: function() {
@@ -71,6 +74,33 @@
             Pump.body.startLoad();
             Pump.body.setContent({contentView: Pump.RemoteContent,
                                   title: "Remote login"},
+                                 function() {
+                                     Pump.body.endLoad();
+                                 });
+        },
+
+        recover: function() {
+            Pump.body.startLoad();
+            Pump.body.setContent({contentView: Pump.RecoverContent,
+                                  title: "Recover your password"},
+                                 function() {
+                                     Pump.body.endLoad();
+                                 });
+        },
+
+        recoverSent: function() {
+            Pump.body.startLoad();
+            Pump.body.setContent({contentView: Pump.RecoverSentContent,
+                                  title: "Recovery email sent"},
+                                 function() {
+                                     Pump.body.endLoad();
+                                 });
+        },
+
+        recoverCode: function(code) {
+            Pump.body.startLoad();
+            Pump.body.setContent({contentView: Pump.RecoverCodeContent,
+                                  title: "Recovery code"},
                                  function() {
                                      Pump.body.endLoad();
                                  });

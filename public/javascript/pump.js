@@ -169,6 +169,14 @@ if (!window.Pump) {
                 }
             });
         }
+
+        // If there's anything queued up in our onReady array, run it
+
+        if (Pump.onReady) {
+            _.each(Pump.onReady, function(f) {
+                f();
+            });
+        }
     });
 
     // Renew the cookie session
@@ -471,6 +479,9 @@ if (!window.Pump) {
                 "#main": {View: Pump.MainContent},
                 "#loginpage": {View: Pump.LoginContent},
                 "#registerpage": {View: Pump.RegisterContent},
+                "#recoverpage": {View: Pump.RecoverContent},
+                "#recoversentpage": {View: Pump.RecoverSentContent},
+                "#recover-code": {View: Pump.RecoverCodeContent},
                 "#inbox": {View: Pump.InboxContent, models: {major: Pump.ActivityStream, minor: Pump.ActivityStream}},
                 ".object-page": {View: Pump.ObjectContent, models: {object: Pump.ActivityObject}},
                 ".major-activity-page": {View: Pump.ActivityContent, models: {activity: Pump.Activity}},
