@@ -74,10 +74,30 @@ if (!window.Pump) {
                                                   messages: Pump.principalUser.majorDirectInbox,
                                                   notifications: Pump.principalUser.minorDirectInbox
                                               }});
+            // If we're on a login page, go to the main page or whatever
+            switch (window.location.pathname) {
+            case "/main/login":
+            case "/main/register":
+            case "/main/remote":
+                Pump.router.navigate(Pump.getContinueTo(), true);
+                break;
+            default:
+                break;
+            }
         } else if (Pump.principal) {
             Pump.principal = Pump.Person.unique(Pump.principal);
             Pump.body.nav = new Pump.RemoteNav({el: Pump.body.$(".navbar-inner .container"),
                                                 model: Pump.principal});
+            // If we're on a login page, go to the main page or whatever
+            switch (window.location.pathname) {
+            case "/main/login":
+            case "/main/register":
+            case "/main/remote":
+                Pump.router.navigate(Pump.getContinueTo(), true);
+                break;
+            default:
+                break;
+            }
         } else {
             // Check if we have stored OAuth credentials
 
