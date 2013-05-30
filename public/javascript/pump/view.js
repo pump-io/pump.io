@@ -891,14 +891,30 @@
                         makeRequest(options);
                         retries = 1;
                     } else {
-                        view.stopSpin();
-                        type = jqXHR.getResponseHeader("Content-Type");
-                        if (type && type.indexOf("application/json") !== -1) {
-                            response = JSON.parse(jqXHR.responseText);
-                            view.showError(response.error);
-                        } else {
-                            view.showError(errorThrown);
-                        }
+			view.stopSpin();
+			type = jqXHR.getResponseHeader("Content-Type");
+			if (type && type.indexOf("application/json") !== -1) {
+			    response = JSON.parse(jqXHR.responseText);
+			    view.showError(response.error);
+			} else if (type && type.indexOf("text/plain") !== -1) {
+			    view.showError(errorThrown + ": " + jqXHR.responseText);
+			} else if (type && type.indexOf("text/html") !== -1) {
+			    // We take a bet here, and assume a short
+			    // descriptive text for the error is in the title
+			    // field of the page, as seen in [0].
+			    // http://www.anyexample.com/webdev/ajax/ajax_example__get_page_title.xml
+			    // XXX: This is sometimes redundant with the error
+			    // code, but we err on the side of TMI
+			    var re_title = new RegExp("<title>[\n\r\s]*(.*)[\n\r\s]*</title>", "gmi");
+			    var title = re_title.exec(jqXHR.responseText);
+			    if (title) {
+				view.showError(errorThrown + ": " + title[1]);
+			    } else {
+				view.showError(errorThrown + ": " + jqXHR.responseText);
+			    }
+			} else {
+			    view.showError(errorThrown);
+			}
                     }
                 };
 
