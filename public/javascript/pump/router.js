@@ -50,12 +50,21 @@
         },
 
         login: function() {
-            Pump.body.startLoad();
-            Pump.body.setContent({contentView: Pump.LoginContent,
-                                  title: "Login"},
-                                 function() {
-                                     Pump.body.endLoad();
-                                 });
+            var continueTo = Pump.getContinueTo();
+            if (Pump.principalUser) {
+                Pump.router.navigate(continueTo, true);
+                Pump.clearContinueTo();
+            } else if (Pump.principal) {
+                Pump.router.navigate(continueTo, true);
+                Pump.clearContinueTo();
+            } else {
+                Pump.body.startLoad();
+                Pump.body.setContent({contentView: Pump.LoginContent,
+                                      title: "Login"},
+                                     function() {
+                                         Pump.body.endLoad();
+                                     });
+            }
         },
 
         remote: function() {
