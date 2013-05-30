@@ -31,10 +31,11 @@ var suite = vows.describe("user module interface");
 var testSchema = {
     "pkey": "nickname",
     "fields": ["_passwordHash",
+               "email",
                "published",
                "updated",
                "profile"],
-    "indices": ["profile.id"]};
+    "indices": ["profile.id", "email"]};
 
 var testData = {
     "create": {
