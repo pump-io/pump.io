@@ -247,7 +247,7 @@ var postFile = function(serverUrl, cred, fileName, mimeType, callback) {
                 oa.post(serverUrl,
                         cred.token,
                         cred.token_secret,
-                        data.toString('binary'),
+                        data,
                         mimeType,
                         this);
             }
