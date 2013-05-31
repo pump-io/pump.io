@@ -43,10 +43,13 @@ suite.addBatch({
         },
         "and we visit the root URL": {
             topic: function() {
-                var browser;
+                var browser,
+                    callback = this.callback;
                 browser = new Browser();
 
-                browser.visit("http://localhost:4815/main/register", this.callback);
+                browser.visit("http://localhost:4815/main/register", function(err, br) {
+                    callback(err, br);
+                });
             },
             "it works": function(err, br) {
                 assert.ifError(err);
@@ -54,47 +57,49 @@ suite.addBatch({
             },
             "and we check the content": {
                 topic: function(br) {
-                    return br;
+                    var callback = this.callback;
+                    callback(null, br);
                 },
-                "it includes a registration div": function(br) {
-                    assert.ok(br.query("div#register"));
+                "it includes a registration div": function(err, br) {
+                    assert.ok(br.query("div#registerpage"));
                 },
-                "it includes a registration form": function(br) {
-                    assert.ok(br.query("div#register form"));
+                "it includes a registration form": function(err, br) {
+                    assert.ok(br.query("div#registerpage form"));
                 },
-                "the registration form has a nickname field": function(br) {
-                    assert.ok(br.query("div#register form input[name=\"nickname\"]"));
+                "the registration form has a nickname field": function(err, br) {
+                    assert.ok(br.query("div#registerpage form input[name=\"nickname\"]"));
                 },
-                "the registration form has a password field": function(br) {
-                    assert.ok(br.query("div#register form input[name=\"password\"]"));
+                "the registration form has a password field": function(err, br) {
+                    assert.ok(br.query("div#registerpage form input[name=\"password\"]"));
                 },
-                "the registration form has a password repeat field": function(br) {
-                    assert.ok(br.query("div#register form input[name=\"repeat\"]"));
+                "the registration form has a password repeat field": function(err, br) {
+                    assert.ok(br.query("div#registerpage form input[name=\"repeat\"]"));
                 },
-                "the registration form has a submit button": function(br) {
-                    assert.ok(br.query("div#register form button[type=\"submit\"]"));
+                "the registration form has a submit button": function(err, br) {
+                    assert.ok(br.query("div#registerpage form button[type=\"submit\"]"));
                 },
-                "and we submit the form": {
-                    topic: function(br) {
-                        var callback = this.callback;
+            "and we submit the form": {
+                topic: function() {
+                    var callback = this.callback,
+                        br = arguments[0];
 
                         Step(
                             function() {
                                 br.fill("nickname", "sparks", this);
                             },
-                            function(err, br) {
+                            function(err) {
                                 if (err) throw err;
                                 br.fill("password", "redplainsrider1", this);
                             },
-                            function(err, br) {
+                            function(err) {
                                 if (err) throw err;
                                 br.fill("repeat", "redplainsrider1", this);
                             },
-                            function(err, br) {
+                            function(err) {
                                 if (err) throw err;
                                 br.pressButton("button[type=\"submit\"]", this);
                             },
-                            function(err, br) {
+                            function(err) {
                                 if (err) {
                                     callback(err, null);
                                 } else {

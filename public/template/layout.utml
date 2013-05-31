@@ -147,6 +147,7 @@
       }
       _.extend(Pump.config, {
           site: "<%- config.site %>",
+          haveEmail: <%- config.haveEmail || false %>,
           requireEmail: <%- config.requireEmail || false %>,
           disableRegistration: <%- config.disableRegistration || false %>,
           canUpload: <%- config.canUpload || false %>,

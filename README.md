@@ -178,6 +178,21 @@ Here are the main configuration keys.
 * *noCDN* Use local copies of the JavaScript libraries instead of the
    ones on the CDN. Good for debugging. Defaults to `false`, meaning
    "use the CDN".
+* *requireEmail* Require an email address to register. Should be ignored if email
+  server isn't configured. Default `false`.
+* *smtpserver* Server to use for sending transactional email. If it's not set up,
+  no email is sent and features like password recovery and email notification won't
+  work. Defaults to `undefined`.
+* *smtpport* Port to connect to on SMTP server. Defaults to `25` which is really the only
+  sane value.
+* *smtpuser* Username to use to connect to SMTP server. Might not be necessary for some
+  servers. Defaults to `undefined`.
+* *smtppass* Password to use to connect to SMTP server. Might not be necessary for some
+  servers. Defaults to `undefined`.
+* *smtpusetls* Try to negotiate using SSL with the SMTP server. Defaults to `true`, because
+  it's a smart idea.
+* *smtpusessl* Only use SSL with the SMTP server. Defaults to `false`. You may need to change
+  the `smtpport` value if you set this.
 
 ### Web server proxy
 
