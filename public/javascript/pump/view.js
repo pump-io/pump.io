@@ -1373,7 +1373,8 @@
             "click .unfavorite": "unfavoriteObject",
             "click .share": "shareObject",
             "click .unshare": "unshareObject",
-            "click .comment": "openComment"
+            "click .comment": "openComment",
+            "click .object-image": "openImage"
         },
         setupSubs: function() {
             var view = this,
@@ -1471,6 +1472,31 @@
                     view.$(".replies").append(form.$el);
                 });
                 form.render();
+            }
+        },
+        openImage: function() {
+            var view = this,
+                model = view.model,
+                object = view.model.object,
+                modalView;
+            
+            if (object && object.get("fullImage")) {
+
+                modalView = new Pump.LightboxModal({data: {object: object}});
+
+                // When it's ready, show immediately
+
+                modalView.on("ready", function() {
+                    $(view.el).append(modalView.el);
+                    $(modalView.el).on("hidden", function() {
+                        $(modalView.el).remove();
+                    });
+                    $("#fullImageLightbox").lightbox();
+                });
+
+                // render it (will fire "ready")
+
+                modalView.render();
             }
         }
     });
@@ -2264,7 +2290,7 @@
             if (view.$("#avatar-fineupload").length > 0) {
                 view.$("#avatar-fineupload").fineUploader({
                     request: {
-                        endpoint: "/main/upload"
+                        endpoint: "/main/upload-avatar"
                     },
                     text: {
                         uploadButton: '<i class="icon-upload icon-white"></i> Avatar file'
@@ -2304,7 +2330,7 @@
                             view.showError(err);
                             view.stopSpin();
                         } else {
-                            view.saveProfile(act.object.get("fullImage"));
+                            view.saveProfile(act.object);
                         }
                     });
                 }).on("error", function(event, id, fileName, reason) {
@@ -2322,7 +2348,10 @@
                          "summary": view.$('#bio').val()};
 
             if (img) {
-                props.image = img;
+                props.image = img.get("image");
+                props.pump_io = {
+                    fullImage: img.get("fullImage")
+                };
             }
 
             profile.save(props,
@@ -2898,6 +2927,12 @@
 
             callback(null, false);
         }
+    });
+
+    Pump.LightboxModal = Pump.TemplateView.extend({
+        tagName: "div",
+        className: "modal-holder",
+        templateName: "lightbox-modal"
     });
 
     Pump.BodyView = Backbone.View.extend({

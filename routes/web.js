@@ -38,7 +38,9 @@ var databank = require("databank"),
     he = require("../lib/httperror"),
     Scrubber = require("../lib/scrubber"),
     finishers = require("../lib/finishers"),
-    saveUpload = require("../lib/saveupload").saveUpload,
+    su = require("../lib/saveupload"),
+    saveUpload = su.saveUpload,
+    saveAvatar = su.saveAvatar,
     streams = require("../lib/streams"),
     api = require("./api"),
     HTTPError = he.HTTPError,
@@ -90,6 +92,7 @@ var addRoutes = function(app) {
     
     if (app.config.uploaddir) {
         app.post("/main/upload", app.session, principal, principalUserOnly, uploadFile);
+        app.post("/main/upload-avatar", app.session, principal, principalUserOnly, uploadAvatar);
     }
 
     app.get("/:nickname", app.session, principal, addMessages, reqUser, showStream);
@@ -564,56 +567,66 @@ var showList = function(req, res, next) {
     );
 };
 
-var uploadFile = function(req, res, next) {
+// uploadFile and uploadAvatar are almost identical except for the function
+// they use to save the file. So, this generator makes the two functions
 
-    var user = req.principalUser,
-        uploadDir = req.app.config.uploaddir,
-        mimeType,
-        fileName,
-        params = {};
+// XXX: if they diverge any more, make them separate functions
 
-    if (req.xhr) {
-        if (_.has(req.headers, "x-mime-type")) {
-            mimeType = req.headers["x-mime-type"];
-        } else {
-            mimeType = req.uploadMimeType;
-        }
-        fileName = req.uploadFile;
-        if (_.has(req.query, "title")) {
-            params.title = req.query.title;
-        }
-        if (_.has(req.query, "description")) {
-            params.description = Scrubber.scrub(req.query.description);
-        }
-    } else {
-        mimeType = req.files.qqfile.type;
-        fileName = req.files.qqfile.path;
-    }
+var uploader = function(saver) {
+    return function(req, res, next) {
 
-    req.log.info("Uploading " + fileName + " of type " + mimeType);
+        var user = req.principalUser,
+            uploadDir = req.app.config.uploaddir,
+            mimeType,
+            fileName,
+            params = {};
 
-    Step(
-        function() {
-            saveUpload(user, mimeType, fileName, uploadDir, params, this);
-        },
-        function(err, obj) {
-            var data;
-            if (err) {
-                req.log.error(err);
-                data = {"success": false,
-                        "error": "error message to display"};
-                res.send(JSON.stringify(data), {"Content-Type": "text/plain"}, 500);
+        if (req.xhr) {
+            if (_.has(req.headers, "x-mime-type")) {
+                mimeType = req.headers["x-mime-type"];
             } else {
-                req.log.info("Upload successful");
-                obj.sanitize();
-                req.log.info(obj);
-                data = {success: true,
-                        obj: obj};
-                res.send(JSON.stringify(data), {"Content-Type": "text/plain"}, 200);
+                mimeType = req.uploadMimeType;
             }
+            fileName = req.uploadFile;
+            if (_.has(req.query, "title")) {
+                params.title = req.query.title;
+            }
+            if (_.has(req.query, "description")) {
+                params.description = Scrubber.scrub(req.query.description);
+            }
+        } else {
+            mimeType = req.files.qqfile.type;
+            fileName = req.files.qqfile.path;
         }
-    );
+
+        req.log.info("Uploading " + fileName + " of type " + mimeType);
+
+        Step(
+            function() {
+                saver(user, mimeType, fileName, uploadDir, params, this);
+            },
+            function(err, obj) {
+                var data;
+                if (err) {
+                    req.log.error(err);
+                    data = {"success": false,
+                            "error": err.message};
+                    res.send(JSON.stringify(data), {"Content-Type": "text/plain"}, 500);
+                } else {
+                    req.log.info("Upload successful");
+                    obj.sanitize();
+                    req.log.info(obj);
+                    data = {success: true,
+                            obj: obj};
+                    res.send(JSON.stringify(data), {"Content-Type": "text/plain"}, 200);
+                }
+            }
+        );
+    };
 };
+
+var uploadFile = uploader(saveUpload);
+var uploadAvatar = uploader(saveAvatar);
 
 var userIsAuthor = function(req, res, next) {
     var user = req.user,

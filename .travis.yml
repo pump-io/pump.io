@@ -3,6 +3,8 @@ node_js:
   - "0.8"
   - "0.10"
 script: "./node_modules/.bin/vows --spec test/*-test.js"
-before_script: 
+before_script:
   - "./test/hosts.sh"
-
+before_install:
+ - sudo apt-get update -qq
+ - sudo apt-get install -qq graphicsmagick
