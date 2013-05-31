@@ -33,9 +33,13 @@ var testSchema = {
              "image",
              "fullImage",
              "published",
-             "summary",
+             "content",
              "updated",
-             "url"]
+             "url",
+             "_uuid",
+             "_slug",
+             "_fslug"],
+    indices: ["_uuid", "_slug", "_fslug", "image.url", "fullImage.url"]
 };
 
 var testData = {
