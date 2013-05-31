@@ -1,4 +1,4 @@
-<div id="register">
+<div id="registerpage">
   <form id="registration" class="form-horizontal">
     <legend>Register for a new account</legend>
     <p class="text-error" id="error"></p>

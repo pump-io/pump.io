@@ -43,6 +43,7 @@ var databank = require("databank"),
     NotInStreamError = stream.NotInStreamError,
     URLMaker = require("../lib/urlmaker").URLMaker,
     Distributor = require("../lib/distributor"),
+    Schlock = require("schlock"),
     mw = require("../lib/middleware"),
     authc = require("../lib/authc"),
     omw = require("../lib/objectmiddleware"),
@@ -951,6 +952,58 @@ var postActivity = function(req, res, next) {
     );
 };
 
+
+var remotes = new Schlock();
+
+var ensureRemoteActivity = function(principal, props, retries, callback) {
+
+    var act,
+        lastErr;
+
+    if (!callback) {
+        callback = retries;
+        retries  = 0;
+    }
+
+    Step(
+        function() {
+            remotes.writeLock(props.id, this);
+        },
+        function(err) {
+            if (err) {
+                // If we can't lock, leave here
+                callback(err);
+                return;
+            }
+            Activity.get(props.id, this);
+        },
+        function(err, activity) {
+            if (err && err.name == "NoSuchThingError") {
+                newRemoteActivity(principal, props, this);
+            } else if (!err) {
+                this(null, activity);
+            }
+        },
+        function(err, activity) {
+            lastErr = err;
+            act = activity;
+            remotes.writeUnlock(props.id, this);
+        },
+        function(err) {
+            // Ignore err; unlock errors don't matter
+            if (lastErr) {
+                if (retries === 0) {
+                    ensureRemoteActivity(principal, props, retries + 1, callback);
+                } else {
+                    callback(lastErr, null);
+                }
+            } else {
+                callback(null, act);
+            }
+        }
+    );
+};
+
 var newRemoteActivity = function(principal, props, callback) {
 
     var activity = new Activity(props);
@@ -1037,23 +1090,26 @@ var postToInbox = function(req, res, next) {
 
     Step(
         function() {
-            Activity.get(props.id, this);
-        },
-        function(err, activity) {
-            if (err && err.name == "NoSuchThingError") {
-                newRemoteActivity(req.principal, props, this);
-            } else if (err) {
-                throw err;
-            } else {
-                // throws if invalid
-                validateActor(req.client, req.principal, act.actor);
-                this(null, activity);
-            }
+            ensureRemoteActivity(req.principal, props, this);
         },
         function(err, activity) {
             if (err) throw err;
             act = activity;
+            // throws on mismatch
+            validateActor(req.client, req.principal, act.actor);
             user.addToInbox(activity, this);
+        },
+        function(err) {
+            if (err) throw err;
+            act.checkRecipient(user.profile, this);
+        },
+        function(err, isRecipient) {
+            if (err) throw err;
+            if (isRecipient) {
+                this(null);
+            } else {
+                act.addReceived(user.profile, this);
+            }
         },
         function(err) {
             if (err) {
@@ -1108,19 +1164,13 @@ var postToGroupInbox = function(req, res, next) {
 
     Step(
         function() {
-            Activity.get(props.id, this);
+            ensureRemoteActivity(req.principal, props, this);
         },
         function(err, activity) {
-            if (err && err.name == "NoSuchThingError") {
-                newRemoteActivity(req.principal, props, this);
-            } else if (err) {
-                throw err;
-            } else {
-                // throws if invalid
-                validateActor(req.client, req.principal, activity.actor);
-                validateGroupRecipient(req.group, props);
-                this(null, activity);
-            }
+            // These throw on invalid input
+            validateActor(req.client, req.principal, activity.actor);
+            validateGroupRecipient(req.group, activity);
+            this(null, activity);
         },
         function(err, act) {
             var d;

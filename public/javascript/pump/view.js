@@ -967,6 +967,162 @@
         }
     });
 
+    Pump.RecoverContent = Pump.ContentView.extend({
+        templateName: 'recover',
+        events: {
+            "submit #recover": "doRecover",
+            "keyup #nickname": "onKey"
+        },
+        ready: function() {
+            var view = this;
+            // setup subViews
+            view.setupSubs();
+            // Initialize state of recover button
+            view.onKey();
+        },
+        "onKey": function(event) {
+            var view = this,
+                nickname = view.$('#nickname').val();
+
+            if (!nickname || nickname.length === 0) {  
+                view.$(':submit').attr('disabled', 'disabled');
+            } else {
+                view.$(':submit').removeAttr('disabled');
+            }
+        },
+        "doRecover": function() {
+            var view = this,
+                params = {nickname: view.$('#recover input[name="nickname"]').val()},
+                options,
+                continueTo = Pump.getContinueTo(),
+                NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
+                retries = 0,
+                onSuccess = function(data, textStatus, jqXHR) {
+                    Pump.router.navigate("/main/recover-sent", true);
+                },
+                onError = function(jqXHR, textStatus, errorThrown) {
+                    var type, response;
+                    // This happens when our stored OAuth credentials are
+                    // invalid; usually because someone re-installed server software
+                    if (jqXHR.status == 401 && retries === 0 && jqXHR.responseText == "Invalid / used nonce") {
+                        Pump.clearCred();
+                        retries = 1;
+                        Pump.ajax(options);
+                    } else {
+                        view.stopSpin();
+                        type = jqXHR.getResponseHeader("Content-Type");
+                        if (type && type.indexOf("application/json") !== -1) {
+                            response = JSON.parse(jqXHR.responseText);
+                            view.showError(response.error);
+                        } else {
+                            view.showError(errorThrown);
+                        }
+                    }
+                };
+
+            view.startSpin();
+            
+            options = {
+                contentType: "application/json",
+                data: JSON.stringify(params),
+                dataType: "json",
+                type: "POST",
+                url: "/main/recover",
+                success: onSuccess,
+                error: onError
+            };
+
+            Pump.ajax(options);
+
+            return false;
+        }
+    });
+
+    Pump.RecoverSentContent = Pump.ContentView.extend({
+        templateName: 'recover-sent'
+    });
+
+    Pump.RecoverCodeContent = Pump.ContentView.extend({
+        templateName: 'recover-code',
+        ready: function() {
+            var view = this;
+            // setup subViews
+            view.setupSubs();
+            // Initialize state of recover button
+            view.redeemCode();
+        },
+        "redeemCode": function() {
+            var view = this,
+                params = {code: view.$el.data('code')},
+                options,
+                retries = 0,
+                onSuccess = function(data, textStatus, jqXHR) {
+                    var objs;
+                    Pump.setNickname(data.nickname);
+                    Pump.setUserCred(data.token, data.secret);
+                    Pump.clearCaches();
+                    Pump.principalUser = Pump.User.unique(data);
+                    Pump.principal = Pump.principalUser.profile;
+                    objs = [Pump.principalUser,
+                            Pump.principalUser.majorDirectInbox,
+                            Pump.principalUser.minorDirectInbox];
+                    Pump.fetchObjects(objs, function(err, objs) {
+                        Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
+                                                          model: Pump.principalUser,
+                                                          data: {
+                                                              messages: Pump.principalUser.majorDirectInbox,
+                                                              notifications: Pump.principalUser.minorDirectInbox
+                                                          }});
+                        Pump.body.nav.render();
+                    });
+                    if (Pump.config.sockjs) {
+                        // Request a new challenge
+                        Pump.setupSocket();
+                    }
+                    // XXX: reload current data
+                    view.stopSpin();
+                    Pump.router.navigate("/main/account", true);
+                },
+                onError = function(jqXHR, textStatus, errorThrown) {
+                    var type, response;
+                    // This happens when our stored OAuth credentials are
+                    // invalid; usually because someone re-installed server software
+                    if (jqXHR.status == 401 && retries === 0 && jqXHR.responseText == "Invalid / used nonce") {
+                        Pump.clearCred();
+                        retries = 1;
+                        Pump.ajax(options);
+                    } else {
+                        view.stopSpin();
+                        type = jqXHR.getResponseHeader("Content-Type");
+                        if (type && type.indexOf("application/json") !== -1) {
+                            response = JSON.parse(jqXHR.responseText);
+                            view.showError(response.error);
+                        } else {
+                            view.showError(errorThrown);
+                        }
+                    }
+                };
+
+            view.startSpin();
+
+            console.log(params);
+
+            options = {
+                contentType: "application/json",
+                data: JSON.stringify(params),
+                dataType: "json",
+                type: "POST",
+                url: "/main/redeem-code",
+                success: onSuccess,
+                error: onError
+            };
+
+            Pump.ajax(options);
+
+            return false;
+        }
+    });
+
     Pump.ConfirmEmailInstructionsContent = Pump.ContentView.extend({
         templateName: 'confirm-email-instructions'
     });
@@ -1558,7 +1714,49 @@
 
     Pump.ReplyView = Pump.TemplateView.extend({
         templateName: 'reply',
-        modelName: 'reply'
+        modelName: 'reply',
+        events: {
+            "click .favorite": "favoriteObject",
+            "click .unfavorite": "unfavoriteObject"
+        },
+        favoriteObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "favorite",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMinorActivity(act, function(err, act) {
+                view.$(".favorite")
+                    .removeClass("favorite")
+                    .addClass("unfavorite")
+                    .html("Unlike <i class=\"icon-thumbs-down\"></i>");
+                Pump.addMinorActivity(act);
+            });
+            
+            return false;
+        },
+        unfavoriteObject: function() {
+            var view = this,
+                act = new Pump.Activity({
+                    verb: "unfavorite",
+                    object: view.model.toJSON()
+                });
+
+            Pump.newMinorActivity(act, function(err, act) {
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".unfavorite")
+                        .removeClass("unfavorite")
+                        .addClass("favorite")
+                        .html("Like <i class=\"icon-thumbs-up\"></i>");
+                    Pump.addMinorActivity(act);
+                }
+            });
+            
+            return false;
+        }
     });
 
     Pump.MinorActivityView = Pump.TemplateView.extend({
