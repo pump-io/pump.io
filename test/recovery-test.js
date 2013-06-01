@@ -1,6 +1,6 @@
-// image-test.js
+// recovery-test.js
 //
-// Test the image module
+// Test the recovery module
 //
 // Copyright 2012, E14N https://e14n.com/
 //
@@ -24,44 +24,46 @@ var assert = require("assert"),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var suite = vows.describe("image module interface");
+var suite = vows.describe("recovery module interface");
 
 var testSchema = {
-    pkey: "id",
-    fields: ["author",
-             "displayName",
-             "image",
-             "fullImage",
-             "published",
-             "content",
-             "updated",
-             "url",
-             "_uuid",
-             "_slug",
-             "_fslug"],
-    indices: ["_uuid", "_slug", "_fslug", "image.url", "fullImage.url"]
+    pkey: "code",
+    fields: ["nickname",
+             "recovered",
+             "timestamp"],
+    indices: ["nickname"]
 };
 
 var testData = {
     "create": {
-        displayName: "At the Beach",
-        summary: "Us at the beach last year.",
-        image: {
-            url: "http://example.com/images/thumbnails/at-the-beach.png",
-            height: 150,
-            width: 150
-        },
-        fullImage: {
-            url: "http://example.com/images/at-the-beach.jpeg",
-            height: 1500,
-            width: 1500
-        }
+        nickname: "dogbert"
     },
     "update": {
-        displayName: "Us at the Beach"
+        recovered: true
     }
 };
 
-suite.addBatch(modelBatch("image", "Image", testSchema, testData));
+var mb = modelBatch("recovery", "Recovery", testSchema, testData);
+
+mb["When we require the recovery module"]
+  ["and we get its Recovery class export"]
+  ["and we create a recovery instance"]
+  ["auto-generated fields are there"] = function(err, created) {
+      assert.ifError(err);
+      assert.isString(created.code);
+      assert.isString(created.timestamp);
+      assert.isFalse(created.recovered);
+};
+
+mb["When we require the recovery module"]
+["and we get its Recovery class export"]
+["and we create a recovery instance"]
+["and we modify it"]
+["it is modified"] = function(err, updated) {
+    assert.ifError(err);
+    assert.isTrue(updated.recovered);
+};
+
+suite.addBatch(mb);
 
 suite["export"](module);

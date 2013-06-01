@@ -22,7 +22,7 @@
 		      "dateformat": "1.x",
 		      "databank": "~0.18.1",
                       "step": "0.0.x",
-                      "oauth-evanp": "0.9.x",
+                      "oauth-evanp": "~0.9.10-evanp.2",
                       "optimist": "0.3.x",
                       "validator": "0.4.x",
                       "webfinger": "~0.4.1",
@@ -34,7 +34,8 @@
                       "mkdirp": "0.3.x",
 		      "connect-databank": "0.8.x",
                       "sockjs": "0.3.x",
-                      "dialback-client": "~0.1.5"
+                      "dialback-client": "~0.1.5",
+		      "gm": "1.9.x"
 		    },
     "bin": {
         "pump": "./bin/pump",

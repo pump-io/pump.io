@@ -77,6 +77,14 @@ var uploadedFile = function(req, res, next) {
         function(err, objs) {
             if (err) throw err;
             if (!objs || objs.length !== 1) {
+                Cls.search({_fslug: slug}, this);
+            } else {
+                this(null, objs);
+            }
+        },
+        function(err, objs) {
+            if (err) throw err;
+            if (!objs || objs.length !== 1) {
                 throw new Error("Bad number of records for uploads");
             }
             obj = objs[0];
