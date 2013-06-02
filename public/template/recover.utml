@@ -1,0 +1,16 @@
+<div id="recoverpage">
+  <form id="recover" class="form-horizontal">
+    <legend>Recover your password</legend>
+    <div class="control-group" id="nickname-group">
+      <label class="control-label" for="nickname">Nickname</label>
+      <div class="controls">
+        <input type="text" id="nickname" name="nickname" size="16">
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="controls">
+        <button type="submit" class="btn btn-primary" disabled="disabled">Recover</button>
+      </div>
+    </div>
+  </form>
+</div>
