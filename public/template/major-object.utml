@@ -16,7 +16,7 @@
         <% if (obj.location) { %> in <a href="<%- obj.location.url %>"><%- obj.location.displayName %></a><% } %>
     </small></p>
     <% if (obj.image && obj.image.url) { %>
-    <p><img src="<%- (obj.image.pump_io && obj.image.pump_io.proxyURL) ? obj.image.pump_io.proxyURL : obj.image.url %>" class="img-polaroid" /></p>
+    <p><img src="<%- (obj.image.pump_io && obj.image.pump_io.proxyURL) ? obj.image.pump_io.proxyURL : obj.image.url %>" class="img-polaroid object-image" /></p>
     <% } %>
     <div class="object-content">
       <%= obj.content %>

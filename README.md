@@ -49,11 +49,15 @@ thing much more enjoyable.
 
 ### Prerequisites
 
-You'll need three things to get started:
+You'll need four things to get started:
 
 * node.js 0.8.0 or higher
 * npm 1.1.0 or higher
 * A database server (see below)
+* The `graphicsmagick` package with the `gm` command
+
+Note that the requirement to have `gm` available is new for 0.3.0; if
+you're upgrading, you need to install it.
 
 ### Install with npm
 
@@ -70,7 +74,7 @@ If you want to set up the software in its own directory, you can clone
 the git repository, so:
 
     git clone https://github.com/e14n/pump.io.git
-    
+
 You can then install the dependencies using `npm`:
 
     cd pump.io
@@ -79,7 +83,7 @@ You can then install the dependencies using `npm`:
 To test the install, run:
 
     npm test
-    
+
 ### Database setup
 
 pump.io uses [databank](https://github.com/evanp/databank)
@@ -134,7 +138,7 @@ Here are the main configuration keys.
    should listen on 80 or 443 if you're going to have anyone use this.
 * *urlPort* Port to use for generating URLs. Defaults to the same as `port`,
   but if you're insisting on proxying behind Apache or whatever despite
-  warnings not to, you can use this. 
+  warnings not to, you can use this.
 * *secret* A session-generating secret, server-wide password.
 * *noweb* Hide the Web interface. Since it's disabled for this release,
   this shouldn't cause you any problems.
@@ -154,7 +158,7 @@ Here are the main configuration keys.
 * *cert* If you're using SSL, the path to the server cert, like
    "/etc/ssl/private/myserver.crt".
 * *uploaddir* If you want to enable file uploads, set this to the
-  full path of a local directory. It should be writeable and readable by the 
+  full path of a local directory. It should be writeable and readable by the
   'serverUser'.
 * *debugClient* For developers, if you're debugging the Web interface
   and you want to use the non-minified version of the JavaScript libraries,
@@ -174,6 +178,21 @@ Here are the main configuration keys.
 * *noCDN* Use local copies of the JavaScript libraries instead of the
    ones on the CDN. Good for debugging. Defaults to `false`, meaning
    "use the CDN".
+* *requireEmail* Require an email address to register. Should be ignored if email
+  server isn't configured. Default `false`.
+* *smtpserver* Server to use for sending transactional email. If it's not set up,
+  no email is sent and features like password recovery and email notification won't
+  work. Defaults to `undefined`.
+* *smtpport* Port to connect to on SMTP server. Defaults to `25` which is really the only
+  sane value.
+* *smtpuser* Username to use to connect to SMTP server. Might not be necessary for some
+  servers. Defaults to `undefined`.
+* *smtppass* Password to use to connect to SMTP server. Might not be necessary for some
+  servers. Defaults to `undefined`.
+* *smtpusetls* Try to negotiate using SSL with the SMTP server. Defaults to `true`, because
+  it's a smart idea.
+* *smtpusessl* Only use SSL with the SMTP server. Defaults to `false`. You may need to change
+  the `smtpport` value if you set this.
 
 ### Web server proxy
 

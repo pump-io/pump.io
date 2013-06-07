@@ -36,7 +36,7 @@
         <% } %>
     </small></p>
     <% if (object.image && object.image.url) { %>
-    <p><img src="<%- (object.image.pump_io && object.image.pump_io.proxyURL) ? object.image.pump_io.proxyURL : object.image.url %>" class="img-polaroid" /></p>
+    <p><img src="<%- (object.image.pump_io && object.image.pump_io.proxyURL) ? object.image.pump_io.proxyURL : object.image.url %>" class="img-polaroid object-image" /></p>
     <% } %>
     <div class="activity-content">
       <%= object.content %>
