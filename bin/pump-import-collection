@@ -20,6 +20,7 @@
 
 var fs = require("fs"),
     path = require("path"),
+    urlparse = require("url").parse,
     Step = require("step"),
     _ = require("underscore"),
     Logger = require("bunyan"),
@@ -27,8 +28,13 @@ var fs = require("fs"),
     databank = require("databank"),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
+    randomString = require("../lib/randomstring").randomString,
+    Distributor = require("../lib/distributor").Distributor,
     schema = require("../lib/schema").schema,
     Activity = require("../lib/model/activity").Activity,
+    Stream = require("../lib/model/stream").Stream,
+    ActivityObject = require("../lib/model/activityobject").ActivityObject,
+    URLMaker = require("../lib/urlmaker").URLMaker,
     User = require("../lib/model/user").User,
     argv = require("optimist")
         .usage("Usage: $0 -f <collection file>")
@@ -38,7 +44,7 @@ var fs = require("fs"),
         .argv,
     fname = argv.f;
 
-var QUEUE_MAX = 128;
+var QUEUE_MAX = 1;
 
 // Connect to databank and start importing activities
 
@@ -47,8 +53,10 @@ var main = function() {
         q = new Queue(QUEUE_MAX),
         log = setupLogger(config);
 
-
     log.info("Initializing pump.io");
+
+    URLMaker.hostname = config.hostname;
+    URLMaker.port     = (config.urlPort) ? config.urlPort : config.port;
 
     Step(
         function() {
@@ -75,7 +83,12 @@ var main = function() {
             log.info({count: collection.items.length}, "Importing activities");
             group = this.group();
             _.each(collection.items, function(item) {
-                q.enqueue(importActivity, [item, log], group());
+                // Do registration separately
+                if (isRegistration(item)) {
+                    q.enqueue(registerUser, [item, log], group());
+                } else {
+                    q.enqueue(importActivity, [item, log], group());
+                }
             });
         },
         function(err) {
@@ -179,6 +192,14 @@ var importActivity = function(props, log, callback) {
 
     Step(
         function() {
+            log.info({actor: activity.actor.id, object: activity.object.id, verb: activity.verb}, "Localizing objects");
+            maybeLocalize(activity.actor, this.parallel());
+            maybeLocalize(activity.object, this.parallel());
+        },
+        function(err, actor, object) {
+            if (err) throw err;
+            activity.actor = actor;
+            activity.object = object;
             log.info({activity: activity.id}, "Ensuring recipients");
             // First, ensure recipients
             activity.ensureRecipients(this);
@@ -218,6 +239,185 @@ var importActivity = function(props, log, callback) {
                 callback(null, activity);
             }
         }
+    );
+};
+
+var isRegistration = function(activity) {
+    return (activity.actor &&
+            activity.actor.objectType == ActivityObject.PERSON &&
+            activity.verb &&
+            activity.verb == Activity.JOIN &&
+            activity.object &&
+            activity.object.objectType == ActivityObject.SERVICE &&
+            activity.object.url &&
+            urlparse(activity.object.url).hostname == URLMaker.hostname);
+};
+
+var registerUser = function(activity, log, callback) {
+
+    var user,
+        profile = activity.actor,
+        defaultLists = function(user, callback) {
+            Step(
+                function(err, str) {
+                    var lists = ["Friends", "Family", "Acquaintances", "Coworkers"],
+                        group = this.group();
+
+                    if (err) throw err;
+
+                    _.each(lists, function(list) {
+                        var act = new Activity({
+                            actor: user.profile,
+                            verb: Activity.CREATE,
+                            to: [{objectType: ActivityObject.COLLECTION,
+                                  id: user.profile.followers.url}],
+                            object: {
+                                objectType: ActivityObject.COLLECTION,
+                                displayName: list,
+                                objectTypes: ["person"]
+                            }
+                        });
+                        act.fire(group());
+                    });
+                },
+                callback
+            );
+        },
+        props;
+
+    if (profile && profile.portablecontacts_net && profile.portablecontacts_net.preferredUsername) {
+        props = {
+            nickname: profile.portablecontacts_net.preferredUsername
+        };
+    } else {
+        callback(new Error("No discernable nickname"), null);
+        return;
+    }
+
+    log.info(props, "Registering user");
+
+    Step(
+        function() {
+            randomString(16, this);
+        },
+        function(err, str) {
+            if (err) throw err;
+            props.password = str;
+            User.create(props, this);
+        },
+        function(err, value) {
+            if (err) throw err;
+            user = value;
+            usersStream(this);
+        },
+        function(err, str) {
+            if (err) throw err;
+            str.deliver(user.nickname, this);
+        },
+        function(err) {
+            if (err) throw err;
+            // copy stuff that's not auto-generated into the profile
+            _.defaults(user.profile, profile);
+            if (!user.profile.upstreamDuplicates) {
+                user.profile.upstreamDuplicates = [];
+            }
+            user.profile.upstreamDuplicates.push(profile.id);
+            user.profile.save(this);
+        },
+        function(err) {
+            if (err) throw err;
+            user.expand(this);
+        },
+        function(err) {
+            var svc;
+            if (err) throw err;
+            defaultLists(user, this);
+        },
+        function(err) {
+            if (err) throw err;
+            activity.actor = user.profile;
+            importActivity(activity, log, this);
+        },
+        callback
+    );
+};
+
+var usersStream = function(callback) {
+    
+    Step(
+        function() {
+            Stream.get("user:all", this);
+        },
+        function(err, str) {
+            if (err) {
+                if (err.name == "NoSuchThingError") {
+                    Stream.create({name: "user:all"}, this);
+                } else {
+                    throw err;
+                }
+            } else {
+                callback(null, str);
+            }
+        },
+        function(err, str) {
+            if (err) {
+                if (err.name == "AlreadyExistsError") {
+                    Stream.get("user:all", callback);
+                } else {
+                    callback(err);
+                }
+            } else {
+                callback(null, str);
+            }
+        }
+    );
+};
+
+var maybeLocalize = function(object, callback) {
+    if (object.objectType == ActivityObject.PERSON) {
+        maybeLocalizePerson(object, callback);
+    } else {
+        callback(null, object);
+    }
+};
+
+// Given a person, check if they're a user
+
+var maybeLocalizePerson = function(person, callback) {
+
+    var nickname,
+        domain,
+        id;
+
+    if (person.portablecontacts_net && person.portablecontacts_net.preferredUsername) {
+        nickname = person.portablecontacts_net.preferredUsername;
+    } else {
+        callback(null, person);
+        return;
+    }
+
+    if (person.url && urlparse(person.url).hostname == URLMaker.hostname) {
+        domain = URLMaker.hostname;
+    } else {
+        callback(null, person);
+        return;
+    }
+
+    id = "acct:"+nickname+"@"+domain;
+
+    Step(
+        function() {
+            User.fromPerson(id, this);
+        },
+        function(err, user) {
+            if (err) throw err;
+            if (!user) {
+                this(null, person);
+            } else {
+                this(null, user.profile);
+            }
+        },
+        callback
     );
 };
 
