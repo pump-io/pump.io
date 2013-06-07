@@ -94,8 +94,10 @@ var main = function() {
         function(err) {
             if (err) {
                 log.error(err);
+                process.exit(1);
             } else {
                 log.info("Done.");
+                process.exit(0);
             }
         }
     );
@@ -224,7 +226,7 @@ var importActivity = function(props, log, callback) {
             if (err) throw err;
             if (!user) {
                 log.info({actor: activity.actor.id}, "Not a user");
-                this(null);
+                this(null, activity);
                 return;
             }
             log.info({actor: activity.actor.id, activity: activity.id}, "Adding to outbox");
@@ -234,7 +236,10 @@ var importActivity = function(props, log, callback) {
         },
         function(err) {
             if (err) {
-                callback(err, null);
+                log.error(err);
+                // skip the error
+                // XXX are there errors we shouldn't skip...?
+                callback(null, null);
             } else {
                 callback(null, activity);
             }
@@ -396,7 +401,8 @@ var maybeLocalizePerson = function(person, callback) {
         return;
     }
 
-    if (person.url && urlparse(person.url).hostname == URLMaker.hostname) {
+    if ((person.url && urlparse(person.url).hostname == URLMaker.hostname) || 
+        (person.id && urlparse(person.id).hostname == URLMaker.hostname)) {
         domain = URLMaker.hostname;
     } else {
         callback(null, person);
