@@ -85,15 +85,24 @@ var requestToken = function(cl, hostname, port, cb) {
     });
 };
 
-var newClient = function(hostname, port, cb) {
+var newClient = function(hostname, port, path, cb) {
 
-    if (!port) {
-        cb = hostname;
+    var rel = "/api/client/register";
+
+    // newClient(hostname, port, cb)
+    if (!cb) {
+	cb = path;
+	path = "";
+    }
+
+    // newClient(cb)
+    if (!cb) {
+	cb = hostname;
         hostname = "localhost";
         port = 4815;
     }
 
-    httputil.post(hostname, port, "/api/client/register", {type: "client_associate"}, function(err, res, body) {
+    httputil.post(hostname, port, (path) ? path + "/" + rel : rel, {type: "client_associate"}, function(err, res, body) {
         var cl;
         if (err) {
             cb(err, null);

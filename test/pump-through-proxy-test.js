@@ -106,7 +106,16 @@ suite.addBatch({
 		assert.include(res.headers, "content-type");
 		assert.equal("text/html", res.headers["content-type"].substr(0, "text/html".length));
             }
-        }
+        },
+	"and we register a client": {
+	    topic: function() {
+		oauthutil.newClient("localhost", 2342, "pumpio", this.callback);
+	    },
+	    "it works": function(err, cl) {
+		assert.ifError(err);
+		assert.isObject(cl);
+	    }
+	}
     }
 });
 
