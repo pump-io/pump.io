@@ -329,6 +329,9 @@ var registerUser = function(activity, log, callback) {
                 user.profile.upstreamDuplicates = [];
             }
             user.profile.upstreamDuplicates.push(profile.id);
+            if (profile.displayName) {
+                user.profile.displayName = profile.displayName;
+            }
             user.profile.save(this);
         },
         function(err) {
