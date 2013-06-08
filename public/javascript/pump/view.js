@@ -1374,7 +1374,8 @@
             "click .share": "shareObject",
             "click .unshare": "unshareObject",
             "click .comment": "openComment",
-            "click .object-image": "openImage"
+            "click .object-image": "openImage",
+            "click .delete": "deleteObject"
         },
         setupSubs: function() {
             var view = this,
@@ -1498,7 +1499,33 @@
 
                 modalView.render();
             }
-        }
+        },
+        deleteObject: function() {
+			var view = this,
+                model = view.model,
+                act = new Pump.Activity({
+                    verb: "delete",
+                    object: view.model.object.toJSON()
+                });
+
+			Pump.areYouSure("Delete this post?", function(err, sure) {
+                if (sure) {
+                    Pump.newMinorActivity(act, function(err, act) {
+						if (err) {
+							view.showError(err);
+						} else {
+							view.$(".delete")
+								.html("Delete <i class=\"icon-remove\"></i>");
+							Pump.addMinorActivity(act);
+							
+							// Remove the model from the client-side collection
+							
+							model.collection.remove(model.id);
+						}
+					});
+                }
+            });
+		}
     });
 
     Pump.ReplyStreamView = Pump.TemplateView.extend({
