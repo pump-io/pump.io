@@ -103,7 +103,25 @@ vows.describe("urlmaker module interface").addBatch({
                     assert.include(parts.query, "count");
                     assert.equal(parts.query.count, 30);
                 }
-            }
+            },
+            "and we include a prefix path": {
+                topic: function(URLMaker) {
+                    URLMaker.hostname = "example.com";
+                    URLMaker.port     = 3001;
+		    URLMaker.path     = "pumpio";
+                    return URLMaker.makeURL("login");
+                },
+                "it exists": function(url) {
+                    assert.isString(url);
+                },
+                "its parts are correct": function(url) {
+                    var parts = parseURL(url);
+                    assert.equal(parts.hostname, "example.com");
+                    assert.equal(parts.port, 3001);
+                    assert.equal(parts.host, "example.com:3001");
+                    assert.equal(parts.path, "/pumpio/login");
+                }
+            },
         }
     }
 })["export"](module);
