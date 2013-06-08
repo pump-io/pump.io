@@ -15,6 +15,7 @@
     <% if (object.displayName) { %>
     <h4 class="media-heading"><%- object.displayName %></h4>
     <% } %>
+    <button type="button" class="delete-button" data-dismiss="modal" aria-hidden="true">&times;</button>
     <p class="muted">
       <small>
         <% if (!headless || (activity.verb == "share" && author)) { %><a href="<%- author.url %>"><%- author.displayName %></a> at <% } %>

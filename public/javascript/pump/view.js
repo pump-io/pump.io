@@ -1375,7 +1375,7 @@
             "click .unshare": "unshareObject",
             "click .comment": "openComment",
             "click .object-image": "openImage",
-            "click .delete": "deleteObject"
+            "click .delete-button": "deleteObject"
         },
         setupSubs: function() {
             var view = this,
