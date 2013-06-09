@@ -21,7 +21,9 @@ var _ = require("underscore"),
     vows = require("vows"),
     parseURL = require("url").parse;
 
-vows.describe("urlmaker module interface").addBatch({
+var suite = vows.describe("urlmaker module interface");
+
+suite.addBatch({
     "When we require the urlmaker module": {
         topic: function() { 
             return require("../lib/urlmaker");
@@ -45,84 +47,134 @@ vows.describe("urlmaker module interface").addBatch({
             "it has a makeURL method": function(URLMaker) {
                 assert.include(URLMaker, "makeURL");
                 assert.isFunction(URLMaker.makeURL);
-            },
-            "and we make an URL": {
-                topic: function(URLMaker) {
-                    URLMaker.hostname = "example.com";
-                    URLMaker.port     = 3001;
-                    return URLMaker.makeURL("login");
-                },
-                "it exists": function(url) {
-                    assert.isString(url);
-                },
-                "its parts are correct": function(url) {
-                    var parts = parseURL(url);
-                    assert.equal(parts.hostname, "example.com");
-                    assert.equal(parts.port, 3001);
-                    assert.equal(parts.host, "example.com:3001");
-                    assert.equal(parts.path, "/login");
-                }
-            },
-            "and we set its properties to default port": {
-                topic: function(URLMaker) {
-                    URLMaker.hostname = "example.com";
-                    URLMaker.port     = 80;
-                    return URLMaker.makeURL("login");
-                },
-                "it exists": function(url) {
-                    assert.isString(url);
-                },
-                "its parts are correct": function(url) {
-                    var parts = parseURL(url);
-                    assert.equal(parts.hostname, "example.com");
-                    // undefined in 0.8.x, null in 0.10.x
-                    assert.isTrue(_.isNull(parts.port) || _.isUndefined(parts.port));
-                    assert.equal(parts.host, "example.com"); // NOT example.com:80
-                    assert.equal(parts.path, "/login");
-                }
-            },
-            "and we include parameters": {
-                topic: function(URLMaker) {
-                    URLMaker.hostname = "example.com";
-                    URLMaker.port     = 2342;
-                    return URLMaker.makeURL("/users", {offset: 10, count: 30});
-                },
-                "it exists": function(url) {
-                    assert.isString(url);
-                },
-                "its parts are correct": function(url) {
-                    // parse query params too
-                    var parts = parseURL(url, true);
-                    assert.equal(parts.hostname, "example.com");
-                    assert.equal(parts.port, 2342);
-                    assert.equal(parts.host, "example.com:2342");
-                    assert.equal(parts.pathname, "/users");
-                    assert.isObject(parts.query);
-                    assert.include(parts.query, "offset");
-                    assert.equal(parts.query.offset, 10);
-                    assert.include(parts.query, "count");
-                    assert.equal(parts.query.count, 30);
-                }
-            },
-            "and we include a prefix path": {
-                topic: function(URLMaker) {
-                    URLMaker.hostname = "example.com";
-                    URLMaker.port     = 3001;
-		    URLMaker.path     = "pumpio";
-                    return URLMaker.makeURL("login");
-                },
-                "it exists": function(url) {
-                    assert.isString(url);
-                },
-                "its parts are correct": function(url) {
-                    var parts = parseURL(url);
-                    assert.equal(parts.hostname, "example.com");
-                    assert.equal(parts.port, 3001);
-                    assert.equal(parts.host, "example.com:3001");
-                    assert.equal(parts.path, "/pumpio/login");
-                }
-            },
+            }
         }
     }
-})["export"](module);
+});
+
+suite.addBatch({
+    "When we set up the URLMaker": {
+        topic: function() { 
+            var URLMaker = require("../lib/urlmaker").URLMaker;
+            URLMaker.hostname = "example.com";
+            URLMaker.port     = 3001;
+            return URLMaker;
+        },
+        "it works": function(URLMaker) {
+            assert.isObject(URLMaker);
+        },
+        "and we make an URL": {
+            topic: function(URLMaker) {
+                return URLMaker.makeURL("login");
+            },
+            "it exists": function(url) {
+                assert.isString(url);
+            },
+            "its parts are correct": function(url) {
+                var parts = parseURL(url);
+                assert.equal(parts.hostname, "example.com");
+                assert.equal(parts.port, 3001);
+                assert.equal(parts.host, "example.com:3001");
+                assert.equal(parts.path, "/login");
+            }
+        }
+    }
+});
+
+suite.addBatch({
+    "When we set up the URLMaker with the default port": {
+        topic: function() { 
+            var URLMaker = require("../lib/urlmaker").URLMaker;
+            URLMaker.hostname = "example.com";
+            URLMaker.port     = 80;
+            return URLMaker;
+        },
+        "it works": function(URLMaker) {
+            assert.isObject(URLMaker);
+        },
+        "and we set its properties to default port": {
+            topic: function(URLMaker) {
+                return URLMaker.makeURL("login");
+            },
+            "it exists": function(url) {
+                assert.isString(url);
+            },
+            "its parts are correct": function(url) {
+                var parts = parseURL(url);
+                assert.equal(parts.hostname, "example.com");
+                // undefined in 0.8.x, null in 0.10.x
+                assert.isTrue(_.isNull(parts.port) || _.isUndefined(parts.port));
+                assert.equal(parts.host, "example.com"); // NOT example.com:80
+                assert.equal(parts.path, "/login");
+            }
+        }
+    }
+});
+
+suite.addBatch({
+    "When we set up the URLMaker": {
+        topic: function() { 
+            var URLMaker = require("../lib/urlmaker").URLMaker;
+            URLMaker.hostname = "example.com";
+            URLMaker.port     = 2342;
+            return URLMaker;
+        },
+        "it works": function(URLMaker) {
+            assert.isObject(URLMaker);
+        },
+        "and we include parameters": {
+            topic: function(URLMaker) {
+                return URLMaker.makeURL("/users", {offset: 10, count: 30});
+            },
+            "it exists": function(url) {
+                assert.isString(url);
+            },
+            "its parts are correct": function(url) {
+                // parse query params too
+                var parts = parseURL(url, true);
+                assert.equal(parts.hostname, "example.com");
+                assert.equal(parts.port, 2342);
+                assert.equal(parts.host, "example.com:2342");
+                assert.equal(parts.pathname, "/users");
+                assert.isObject(parts.query);
+                assert.include(parts.query, "offset");
+                assert.equal(parts.query.offset, 10);
+                assert.include(parts.query, "count");
+                assert.equal(parts.query.count, 30);
+            }
+        }
+    }
+});
+
+suite.addBatch({
+    "When we set up the URLMaker with a prefix path": {
+        topic: function() { 
+            var URLMaker = require("../lib/urlmaker").URLMaker;
+            URLMaker.hostname = "example.com";
+            URLMaker.port     = 3001;
+	    URLMaker.path     = "pumpio";
+            return URLMaker;
+        },
+        "it works": function(URLMaker) {
+            assert.isObject(URLMaker);
+        },
+        "and we make an URL": {
+            topic: function(URLMaker) {
+                return URLMaker.makeURL("login");
+            },
+            "it exists": function(url) {
+                assert.isString(url);
+            },
+            "its parts are correct": function(url) {
+                var parts = parseURL(url);
+                assert.equal(parts.hostname, "example.com");
+                assert.equal(parts.port, 3001);
+                assert.equal(parts.host, "example.com:3001");
+                assert.equal(parts.path, "/pumpio/login");
+            }
+        }
+    }
+});
+
+suite["export"](module);
 
