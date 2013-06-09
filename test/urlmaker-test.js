@@ -63,6 +63,11 @@ suite.addBatch({
         "it works": function(URLMaker) {
             assert.isObject(URLMaker);
         },
+        teardown: function(URLMaker) {
+            URLMaker.hostname = null;
+            URLMaker.port = null;
+            URLMaker.path = null;
+        },
         "and we make an URL": {
             topic: function(URLMaker) {
                 return URLMaker.makeURL("login");
@@ -91,6 +96,11 @@ suite.addBatch({
         },
         "it works": function(URLMaker) {
             assert.isObject(URLMaker);
+        },
+        teardown: function(URLMaker) {
+            URLMaker.hostname = null;
+            URLMaker.port = null;
+            URLMaker.path = null;
         },
         "and we set its properties to default port": {
             topic: function(URLMaker) {
@@ -121,6 +131,11 @@ suite.addBatch({
         },
         "it works": function(URLMaker) {
             assert.isObject(URLMaker);
+        },
+        teardown: function(URLMaker) {
+            URLMaker.hostname = null;
+            URLMaker.port = null;
+            URLMaker.path = null;
         },
         "and we include parameters": {
             topic: function(URLMaker) {
@@ -158,6 +173,11 @@ suite.addBatch({
         "it works": function(URLMaker) {
             assert.isObject(URLMaker);
         },
+        teardown: function(URLMaker) {
+            URLMaker.hostname = null;
+            URLMaker.port = null;
+            URLMaker.path = null;
+        },
         "and we make an URL": {
             topic: function(URLMaker) {
                 return URLMaker.makeURL("login");
@@ -176,5 +196,59 @@ suite.addBatch({
     }
 });
 
-suite["export"](module);
+suite.addBatch({
+    "When we set up the URLMaker": {
+        topic: function() { 
+            var URLMaker = require("../lib/urlmaker").URLMaker;
+            URLMaker.hostname = "example.com";
+            URLMaker.port     = 3001;
+            return URLMaker;
+        },
+        "it works": function(URLMaker) {
+            assert.isObject(URLMaker);
+        },
+        teardown: function(URLMaker) {
+            URLMaker.hostname = null;
+            URLMaker.port = null;
+            URLMaker.path = null;
+        },
+        "and we make URLs with and without initial slash": {
+            topic: function(URLMaker) {
+                return {without: URLMaker.makeURL("login"), with: URLMaker.makeURL("/login")};
+            },
+            "they are equal": function(urls) {
+                assert.equal(urls['with'], urls.without);
+            }
+        }
+    }
+});
 
+suite.addBatch({
+    "When we set up the URLMaker with a prefix path": {
+        topic: function() { 
+            var URLMaker = require("../lib/urlmaker").URLMaker;
+            URLMaker.hostname = "example.com";
+            URLMaker.port     = 3001;
+	    URLMaker.path     = "pumpio";
+            return URLMaker;
+        },
+        "it works": function(URLMaker) {
+            assert.isObject(URLMaker);
+        },
+        teardown: function(URLMaker) {
+            URLMaker.hostname = null;
+            URLMaker.port = null;
+            URLMaker.path = null;
+        },
+        "and we make URLs with and without initial slash": {
+            topic: function(URLMaker) {
+                return {without: URLMaker.makeURL("login"), with: URLMaker.makeURL("/login")};
+            },
+            "they are equal": function(urls) {
+                assert.equal(urls['with'], urls.without);
+            }
+        }
+    }
+});
+
+suite["export"](module);
