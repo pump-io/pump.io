@@ -369,7 +369,7 @@
                 }
                 Pump.body.setContent({contentView: Pump.ObjectContent,
                                       model: obj,
-                                      title: obj.displayName || obj.objectType + "by" + nickname},
+                                      title: obj.get("displayName") || (obj.get("objectType") + " by " + nickname)},
                                      function() {
                                          Pump.body.endLoad();
                                      });

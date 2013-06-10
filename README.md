@@ -193,6 +193,8 @@ Here are the main configuration keys.
   it's a smart idea.
 * *smtpusessl* Only use SSL with the SMTP server. Defaults to `false`. You may need to change
   the `smtpport` value if you set this.
+* *compress* Use gzip or deflate to compress text output. This can cut down on network
+  transfers considerably at the expense of memory and CPU on the server. Defaults to `false`.
 
 ### Web server proxy
 
