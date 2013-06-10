@@ -21,3 +21,7 @@
   max-width: none;
   width: auto;
 }
+
+#messages ul.dropdown-menu {
+  padding: 1em;
+}
