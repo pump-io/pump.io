@@ -28,7 +28,9 @@ var assert = require("assert"),
     https = require("https"),
     urlparse = require("url").parse,
     httputil = require("./lib/http"),
-    oauthutil = require("./lib/oauth");
+    oauthutil = require("./lib/oauth"),
+    activity = require("./lib/activity"),
+    validUser = activity.validUser;
 
 var suite = vows.describe("proxy pump through another server");
 
@@ -114,6 +116,15 @@ suite.addBatch({
 	    "it works": function(err, cl) {
 		assert.ifError(err);
 		assert.isObject(cl);
+	    },
+	    "and we register a user": {
+		topic: function(cl) {
+		    oauthutil.register(cl, "paulrevere", "1ifbyland2ifbysea", "localhost", 2342, "/pumpio", this.callback);
+		},
+		"it works": function(err, user) {
+		    assert.ifError(err);
+		    validUser(user);
+		}
 	    }
 	}
     }
