@@ -30,9 +30,19 @@ var assert = require("assert"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     activity = require("./lib/activity"),
-    validUser = activity.validUser;
+    validUser = activity.validUser,
+    validFeed = activity.validFeed;
 
 var suite = vows.describe("proxy pump through another server");
+
+var makeUserCred = function(cl, user) {
+    return {
+        consumer_key: cl.client_id,
+        consumer_secret: cl.client_secret,
+        token: user.token,
+        token_secret: user.secret
+    };
+};
 
 var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 
@@ -124,6 +134,21 @@ suite.addBatch({
 		"it works": function(err, user) {
 		    assert.ifError(err);
 		    validUser(user);
+		},
+		"and we get the user's inbox": {
+		    topic: function(user, cl) {
+			var callback = this.callback,
+			    cred = makeUserCred(cl, user),
+			    url = "http://localhost:2342/pumpio/api/user/paulrevere/inbox";
+
+			httputil.getJSON(url, cred, function(err, body, resp) {
+			    callback(err, body);
+			});
+		    },
+		    "it works": function(err, body) {
+			assert.ifError(err);
+			validFeed(body);
+		    }
 		}
 	    }
 	}
