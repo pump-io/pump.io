@@ -87,7 +87,8 @@ var requestToken = function(cl, hostname, port, cb) {
 
 var newClient = function(hostname, port, path, cb) {
 
-    var rel = "/api/client/register";
+    var rel = "/api/client/register",
+        full;
 
     // newClient(hostname, port, cb)
     if (!cb) {
@@ -102,9 +103,16 @@ var newClient = function(hostname, port, path, cb) {
         port = 4815;
     }
 
-    httputil.post(hostname, port, (path) ? path + "/" + rel : rel, {type: "client_associate"}, function(err, res, body) {
+    if (path) {
+	full = path + rel;
+    } else {
+	full = rel;
+    }
+
+    httputil.post(hostname, port, full, {type: "client_associate"}, function(err, res, body) {
         var cl;
         if (err) {
+	    console.dir({error: err, res: res, body: body});
             cb(err, null);
         } else {
             try {

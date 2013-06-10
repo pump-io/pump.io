@@ -109,7 +109,7 @@ suite.addBatch({
         },
 	"and we register a client": {
 	    topic: function() {
-		oauthutil.newClient("localhost", 2342, "pumpio", this.callback);
+		oauthutil.newClient("localhost", 2342, "/pumpio", this.callback);
 	    },
 	    "it works": function(err, cl) {
 		assert.ifError(err);
