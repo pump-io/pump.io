@@ -60,7 +60,7 @@ suite.addBatch({
                          };
 
             process.env.NODE_ENV = "test";
-	    
+
 	    Step(
 		function() {
 		    oauthutil.setupAppConfig(config, this.parallel());
@@ -140,6 +140,71 @@ suite.addBatch({
 			var callback = this.callback,
 			    cred = makeUserCred(cl, user),
 			    url = "http://localhost:2342/pumpio/api/user/paulrevere/inbox";
+
+			httputil.getJSON(url, cred, function(err, body, resp) {
+			    callback(err, body);
+			});
+		    },
+		    "it works": function(err, body) {
+			assert.ifError(err);
+			validFeed(body);
+		    }
+		}
+	    }
+	},
+        "and we GET the root directly": {
+            topic: function() {
+                var callback = this.callback,
+                req;
+
+                req = http.get("http://localhost:4815/", function(res) {
+		    var body = "";
+		    res.on("data", function(chunk) {
+			body = body + chunk;
+		    });
+		    res.on("end", function() {
+			callback(null, res, body);
+		    });
+		    res.on("error", function(err) {
+			callback(err, null, null);
+		    });
+                });
+                req.on("error", function(err) {
+                    callback(err, null);
+                });
+            },
+            "it works": function(err, res, body) {
+                assert.ifError(err);
+            },
+            "it has the correct results": function(err, res, body) {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 200);
+		assert.isObject(res.headers);
+		assert.include(res.headers, "content-type");
+		assert.equal("text/html", res.headers["content-type"].substr(0, "text/html".length));
+            }
+        },
+	"and we register a client directly": {
+	    topic: function() {
+		oauthutil.newClient("localhost", 4815, this.callback);
+	    },
+	    "it works": function(err, cl) {
+		assert.ifError(err);
+		assert.isObject(cl);
+	    },
+	    "and we register a user directly": {
+		topic: function(cl) {
+		    oauthutil.register(cl, "samueladams", "liberty*guys", "localhost", 4815, this.callback);
+		},
+		"it works": function(err, user) {
+		    assert.ifError(err);
+		    validUser(user);
+		},
+		"and we get the user's inbox": {
+		    topic: function(user, cl) {
+			var callback = this.callback,
+			    cred = makeUserCred(cl, user),
+			    url = "http://localhost:4815/api/user/samueladams/inbox";
 
 			httputil.getJSON(url, cred, function(err, body, resp) {
 			    callback(err, body);
