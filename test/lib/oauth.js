@@ -85,17 +85,34 @@ var requestToken = function(cl, hostname, port, cb) {
     });
 };
 
-var newClient = function(hostname, port, cb) {
+var newClient = function(hostname, port, path, cb) {
 
-    if (!port) {
-        cb = hostname;
+    var rel = "/api/client/register",
+        full;
+
+    // newClient(hostname, port, cb)
+    if (!cb) {
+	cb = path;
+	path = "";
+    }
+
+    // newClient(cb)
+    if (!cb) {
+	cb = hostname;
         hostname = "localhost";
         port = 4815;
     }
 
-    httputil.post(hostname, port, "/api/client/register", {type: "client_associate"}, function(err, res, body) {
+    if (path) {
+	full = path + rel;
+    } else {
+	full = rel;
+    }
+
+    httputil.post(hostname, port, full, {type: "client_associate"}, function(err, res, body) {
         var cl;
         if (err) {
+	    console.dir({error: err, res: res, body: body});
             cb(err, null);
         } else {
             try {
@@ -207,10 +224,18 @@ var accessToken = function(cl, user, hostname, port, cb) {
     );
 };
 
-var register = function(cl, nickname, password, hostname, port, callback) {
-    var proto;
+var register = function(cl, nickname, password, hostname, port, path, callback) {
+    var proto, full, rel = "/api/users";
 
-    if (!port) {
+    // register(cl, nickname, hostname, port, callback)
+
+    if (!callback) {
+	callback = path;
+	path = null;
+    }
+
+    // register(cl, nickname, callback)
+    if (!callback) {
         callback = hostname;
         hostname = "localhost";
         port = 4815;
@@ -218,7 +243,13 @@ var register = function(cl, nickname, password, hostname, port, callback) {
 
     proto = (port === 443) ? "https" : "http";
 
-    httputil.postJSON(proto+"://"+hostname+":"+port+"/api/users", 
+    if (path) {
+	full = path + rel;
+    } else {
+	full = rel;
+    }
+
+    httputil.postJSON(proto+"://"+hostname+":"+port+full, 
                       {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
                       {nickname: nickname, password: password},
                       function(err, body, res) {
