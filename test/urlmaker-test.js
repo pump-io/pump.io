@@ -25,7 +25,7 @@ var suite = vows.describe("urlmaker module interface");
 
 suite.addBatch({
     "When we require the urlmaker module": {
-        topic: function() { 
+        topic: function() {
             return require("../lib/urlmaker");
         },
         "it exists": function(urlmaker) {
@@ -54,7 +54,7 @@ suite.addBatch({
 
 suite.addBatch({
     "When we set up the URLMaker": {
-        topic: function() { 
+        topic: function() {
             var URLMaker = require("../lib/urlmaker").URLMaker;
             URLMaker.hostname = "example.com";
             URLMaker.port     = 3001;
@@ -88,7 +88,7 @@ suite.addBatch({
 
 suite.addBatch({
     "When we set up the URLMaker with the default port": {
-        topic: function() { 
+        topic: function() {
             var URLMaker = require("../lib/urlmaker").URLMaker;
             URLMaker.hostname = "example.com";
             URLMaker.port     = 80;
@@ -123,7 +123,7 @@ suite.addBatch({
 
 suite.addBatch({
     "When we set up the URLMaker": {
-        topic: function() { 
+        topic: function() {
             var URLMaker = require("../lib/urlmaker").URLMaker;
             URLMaker.hostname = "example.com";
             URLMaker.port     = 2342;
@@ -163,7 +163,7 @@ suite.addBatch({
 
 suite.addBatch({
     "When we set up the URLMaker with a prefix path": {
-        topic: function() { 
+        topic: function() {
             var URLMaker = require("../lib/urlmaker").URLMaker;
             URLMaker.hostname = "example.com";
             URLMaker.port     = 3001;
@@ -198,7 +198,7 @@ suite.addBatch({
 
 suite.addBatch({
     "When we set up the URLMaker": {
-        topic: function() { 
+        topic: function() {
             var URLMaker = require("../lib/urlmaker").URLMaker;
             URLMaker.hostname = "example.com";
             URLMaker.port     = 3001;
@@ -225,7 +225,7 @@ suite.addBatch({
 
 suite.addBatch({
     "When we set up the URLMaker with a prefix path": {
-        topic: function() { 
+        topic: function() {
             var URLMaker = require("../lib/urlmaker").URLMaker;
             URLMaker.hostname = "example.com";
             URLMaker.port     = 3001;
@@ -253,7 +253,7 @@ suite.addBatch({
 
 suite.addBatch({
     "When we set up URLMaker": {
-        topic: function() { 
+        topic: function() {
             var URLMaker = require("../lib/urlmaker").URLMaker;
             URLMaker.hostname = "example.com";
             URLMaker.port     = 3001;
@@ -303,6 +303,52 @@ suite.addBatch({
             URLMaker.port = null;
             URLMaker.path = null;
         }
+    }
+});
+
+suite.addBatch({
+    "When we set up URLMaker": {
+        topic: function() {
+            var URLMaker = require("../lib/urlmaker").URLMaker;
+            URLMaker.hostname = "example.com";
+            URLMaker.port     = 3001;
+	    return URLMaker;
+	},
+	"it works": function(URLMaker) {
+	    assert.isObject(URLMaker);
+	},
+	"and we make a default host": {
+	    topic: function(URLMaker) {
+		return URLMaker.makeHost();
+	    },
+            "it works": function(host) {
+		assert.equal(host, "example.com:3001");
+	    }
+	},
+	"and we make a host with the default port": {
+	    topic: function(URLMaker) {
+		return URLMaker.makeHost("example.net", 80);
+	    },
+            "it works": function(host) {
+		assert.equal(host, "example.net");
+	    }
+	},
+	"and we make a host with the default SSL port": {
+	    topic: function(URLMaker) {
+		return URLMaker.makeHost("example.net", 443);
+	    },
+            "it works": function(host) {
+		assert.equal(host, "example.net");
+	    }
+	},
+	"and we make a host with a non-default port": {
+	    topic: function(URLMaker) {
+		return URLMaker.makeHost("example.net", 8080);
+	    },
+            "it works": function(host) {
+		assert.equal(host, "example.net:8080");
+	    }
+	}
     }
 });
 
