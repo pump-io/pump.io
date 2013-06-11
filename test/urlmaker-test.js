@@ -352,4 +352,36 @@ suite.addBatch({
     }
 });
 
+suite.addBatch({
+    "When we set up URLMaker": {
+        topic: function() {
+            var URLMaker = require("../lib/urlmaker").URLMaker;
+            URLMaker.hostname = "example.com";
+            URLMaker.port     = 3001;
+	    return URLMaker;
+	},
+	"it works": function(URLMaker) {
+	    assert.isObject(URLMaker);
+	},
+	"and we make a path": {
+	    topic: function(URLMaker) {
+		URLMaker.path = null;
+		return URLMaker.makePath("login");
+	    },
+            "it works": function(path) {
+		assert.equal(path, "/login");
+	    }
+	},
+	"and we make a path with a prefix": {
+	    topic: function(URLMaker) {
+		URLMaker.path = "pumpio";
+		return URLMaker.makePath("login");
+	    },
+            "it works": function(path) {
+		assert.equal(path, "/pumpio/login");
+	    }
+	}
+    }
+});
+
 suite["export"](module);
