@@ -251,4 +251,59 @@ suite.addBatch({
     }
 });
 
+suite.addBatch({
+    "When we set up URLMaker": {
+        topic: function() { 
+            var URLMaker = require("../lib/urlmaker").URLMaker;
+            URLMaker.hostname = "example.com";
+            URLMaker.port     = 3001;
+	    return URLMaker;
+	},
+	"it works": function(URLMaker) {
+	    assert.isObject(URLMaker);
+	},
+	"and we have a slash before the path": {
+	    topic: function(URLMaker) {
+		URLMaker.path     = "/pumpio";
+		return URLMaker.makeURL("/login");
+	    },
+            "it works": function(url) {
+		assert.equal(parseURL(url).path, "/pumpio/login");
+	    }
+	},
+	"and we have a slash after the path": {
+	    topic: function(URLMaker) {
+		URLMaker.path     = "pumpio/";
+		return URLMaker.makeURL("/login");
+	    },
+            "it works": function(url) {
+		assert.equal(parseURL(url).path, "/pumpio/login");
+	    }
+	},
+	"and we have a slash on both sides of the path": {
+	    topic: function(URLMaker) {
+		URLMaker.path = "/pumpio/";
+		return URLMaker.makeURL("/login");
+	    },
+            "it works": function(url) {
+		assert.equal(parseURL(url).path, "/pumpio/login");
+	    }
+	},
+	"and we have no slashes in the path": {
+	    topic: function(URLMaker) {
+		URLMaker.path = "pumpio";
+		return URLMaker.makeURL("/login");
+	    },
+            "it works": function(url) {
+		assert.equal(parseURL(url).path, "/pumpio/login");
+	    }
+	},
+        teardown: function(URLMaker) {
+            URLMaker.hostname = null;
+            URLMaker.port = null;
+            URLMaker.path = null;
+        }
+    }
+});
+
 suite["export"](module);
