@@ -179,11 +179,16 @@ var modelBatch = function(typeName, className, testSchema, testData) {
         },
         "and we modify it": {
             topic: function(created) {
-                created.update(testData.update, this.callback);
+                var callback = this.callback;
+                // Wait 2000 ms so modified != updated
+                setTimeout(function() {
+                    created.update(testData.update, callback);
+                }, 2000);
             },
             "it is modified": function(err, updated) {
                 assert.ifError(err);
                 assert.isString(updated.updated);
+                assert.notEqual(updated.created, updated.updated);
             },
             "modified fields are modified": function(err, updated) {
                 var prop;
