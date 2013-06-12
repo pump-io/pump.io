@@ -173,9 +173,9 @@ var importDirectory = function(directoryName, log, callback) {
                      if (err) throw err;
                      log.info({activity: activity.id}, "Importing activities");
                      if (isRegistration(activity)) {
-                         q.enqueue(registerUser, [activity, log], this);
+                         registerUser(activity, log, this);
                      } else {
-                         q.enqueue(importActivity, [activity, log], this);
+                         importActivity(activity, log, this);
                      }
                  },
                  callback
