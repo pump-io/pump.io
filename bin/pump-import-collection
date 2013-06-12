@@ -120,37 +120,68 @@ var importCollectionFile = function(fname, log, callback) {
     );
 };
 
-var walk = function(fname, onFile) {
+var walk = function(fname, onFile, callback) {
 
-    var q = new Queue(32),
-        stats;
+    var onDir = function(callback) {
+        Step(
+            function() {
+                fs.readdir(fname, this);
+            },
+            function(err, files) {
+                var wm = function(i, cb) {
+                    var full;
+                    if (i >= files.length) {
+                        cb(null);
+                    } else {
+                        full = path.join(fname, files[i]);
+                        
+                        walk(full,
+                             onFile,
+                             function(err) {
+                                 if (err) {
+                                     cb(err);
+                                 } else {
+                                     wm(++i, cb);
+                                 }
+                             });
+                    }
+                };
+                if (err) throw err;
+                files = files.sort();
+                wm(0, this);
+            },
+            callback
+        );
+    };
 
-    stats = fs.statSync(fname, this);
-
-    if (stats.isDirectory()) {
-        var files = fs.readdirSync(fname);
-        files = files.sort();
-        _.each(files, function(rel) {
-            walk(path.join(fname, rel), onFile);
-        });
-    } else {
-        onFile(fname);
-    }
+    Step(
+        function() {
+            fs.lstat(fname, this);
+        },
+        function(err, stats) {
+            if (stats.isDirectory()) {
+                onDir(this);
+            } else if (stats.isFile()) {
+                onFile(fname, this);
+            } else {
+                this(null);
+            }
+        },
+        callback
+    );
 };
 
 var importDirectory = function(directoryName, log, callback) {
 
-    var q = new Queue(QUEUE_MAX),
-        cnt = 0,
-        done = 0;
+    var q = new Queue(QUEUE_MAX);
 
     log.info({directory: directoryName}, "Importing directory");
 
     walk(directoryName,
-         function(fname) {
-             cnt++;
-             q.enqueue(importActivityFile, [fname, log], function(err) { if (err) { log.error(err); } });
-         });
+         function(fname, callback) {
+             q.enqueue(importActivityFile, [fname, log], callback);
+         },
+         callback);
 };
 
 var importActivityFile = function(fname, log, callback) {
