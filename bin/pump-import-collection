@@ -120,65 +120,74 @@ var importCollectionFile = function(fname, log, callback) {
     );
 };
 
-var walk = function(fname, onFile) {
+var walk = function(fname, onFile, callback) {
 
-    var q = new Queue(32),
-        stats;
+    var q = new Queue(32);
 
-    stats = fs.statSync(fname, this);
-
-    if (stats.isDirectory()) {
-        var files = fs.readdirSync(fname);
-        files = files.sort();
-        _.each(files, function(rel) {
-            walk(path.join(fname, rel), onFile);
-        });
-    } else {
-        onFile(fname);
-    }
-};
-
-var importDirectory = function(directoryName, log, callback) {
-
-    var q = new Queue(QUEUE_MAX),
-        cnt = 0,
-        done = 0;
-
-    log.info({directory: directoryName}, "Importing directory");
-
-    walk(directoryName,
-         function(fname) {
-             cnt++;
-             q.enqueue(importActivityFile, [fname, log], function(err) { if (err) { log.error(err); } });
-         });
-};
-
-var importActivityFile = function(fname, log, callback) {
     Step(
         function() {
-            log.info({fname: fname}, "Reading activitystrea.ms file");
-            fs.readFile(fname, {encoding: "utf8"}, this);
+            fs.stat(fname, this);
         },
-        function(err, data) {
+        function(err, stats) {
             if (err) throw err;
-            log.info({fname: fname}, "Parsing activitystrea.ms file");
-            try {
-                this(null, JSON.parse(data));
-            } catch (e) {
-                this(e, null);
-            }
-        },
-        function(err, activity) {
-            if (err) throw err;
-            log.info({activity: activity.id}, "Importing activities");
-            if (isRegistration(activity)) {
-                registerUser(activity, log, this);
+            if (stats.isDirectory()) {
+                Step(
+                    function() {
+                        fs.readdir(fname, this);
+                    },
+                    function(err, files) {
+                        var group = this.group();
+                        if (err) throw err;
+                        files = files.sort();
+                        _.each(files, function(rel) {
+                            q.enqueue(walk, [path.join(fname, rel), onFile], group());
+                        });
+                    },
+                    this
+                );
             } else {
-                importActivity(activity, log, this);
+                q.enqueue(onFile, [fname], this);
             }
         },
         callback
     );
+};
+
+var importDirectory = function(directoryName, log, callback) {
+
+    var q = new Queue(QUEUE_MAX);
+
+    log.info({directory: directoryName}, "Importing directory");
+
+    walk(directoryName,
+         function(fname, callback) {
+             Step(
+                 function() {
+                     log.info({fname: fname}, "Reading activitystrea.ms file");
+                     fs.readFile(fname, {encoding: "utf8"}, this);
+                 },
+                 function(err, data) {
+                     if (err) throw err;
+                     log.info({fname: fname}, "Parsing activitystrea.ms file");
+                     try {
+                         this(null, JSON.parse(data));
+                     } catch (e) {
+                         this(e, null);
+                     }
+                 },
+                 function(err, activity) {
+                     if (err) throw err;
+                     log.info({activity: activity.id}, "Importing activities");
+                     if (isRegistration(activity)) {
+                         registerUser(activity, log, this);
+                     } else {
+                         importActivity(activity, log, this);
+                     }
+                 },
+                 callback
+             );
+         },
+         callback);
 };
 
 // Gets the configuration vars for this server from config files
