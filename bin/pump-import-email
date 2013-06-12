@@ -1,0 +1,199 @@
+#!/usr/bin/env node
+
+// -*- mode: javascript -*-
+
+// import an activitystreams JSON collection
+//
+// Copyright 2013, E14N https://e14n.com/
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+var fs = require("fs"),
+    path = require("path"),
+    urlparse = require("url").parse,
+    Step = require("step"),
+    _ = require("underscore"),
+    Logger = require("bunyan"),
+    Queue = require("jankyqueue"),
+    databank = require("databank"),
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject,
+    randomString = require("../lib/randomstring").randomString,
+    Distributor = require("../lib/distributor").Distributor,
+    schema = require("../lib/schema").schema,
+    Activity = require("../lib/model/activity").Activity,
+    Stream = require("../lib/model/stream").Stream,
+    ActivityObject = require("../lib/model/activityobject").ActivityObject,
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    User = require("../lib/model/user").User,
+    argv = require("optimist")
+        .usage("Usage: $0 -f <email file>")
+        .demand(["f"])
+        .alias("f", "file")
+        .describe("f", "Comma-separated file for email addresses")
+        .argv,
+    fname = argv.f;
+
+var QUEUE_MAX = 1;
+
+// Connect to databank and start importing activities
+
+var main = function() {
+    var config = getConfig(argv.c),
+        q = new Queue(QUEUE_MAX),
+        log = setupLogger(config);
+
+    log.info("Initializing pump.io");
+
+    URLMaker.hostname = config.hostname;
+    URLMaker.port     = (config.urlPort) ? config.urlPort : config.port;
+
+    Step(
+        function() {
+            log.info("Connecting to databank");
+            connectDatabank(config, this);
+        },
+        function(err, db) {
+            if (err) throw err;
+            log.info({fname: fname}, "Reading activitystrea.ms file");
+            fs.readFile(fname, {encoding: "utf8"}, this);
+        },
+        function(err, data) {
+            var lines, group = this.group();
+            if (err) throw err;
+            lines = data.split("\n");
+            _.each(lines, function(line) {
+                var parts;
+                line.trim();
+                if (line.length !== 0) {
+                    parts = line.split("\t");
+                    q.enqueue(setEmail, [parts[0], parts[1], log], group());
+                }
+            });
+        },
+        function(err) {
+            if (err) {
+                log.error(err);
+                process.exit(1);
+            } else {
+                log.info("Done.");
+                process.exit(0);
+            }
+        }
+    );
+};
+
+// Gets the configuration vars for this server from config files
+
+var getConfig = function(filename) {
+    var files,
+        config = {},
+        i,
+        raw,
+        parsed;
+
+    if (filename) {
+        files = [filename];
+    } else {
+        files = ['/etc/pump.io.json',
+                 path.join(process.env.HOME, ".pump.io.json")];
+    }   
+
+    // This is all sync
+    for (i = 0; i < files.length; i++) {
+        if (fs.existsSync(files[i])) {
+            raw = fs.readFileSync(files[i]);
+            try {
+                parsed = JSON.parse(raw);
+                _.extend(config, parsed);
+            } catch (err) {
+                console.log(err);
+                process.exit(1);
+            }
+        }
+    }
+
+    return config;
+};
+
+var connectDatabank = function(config, callback) {
+
+    var params,
+        db;
+
+    if (_(config).has("params")) {
+        params = config.params;
+    } else {
+        params = {};
+    }
+
+    if (_(params).has("schema")) {
+        _.extend(params.schema, schema);
+    } else {
+        params.schema = schema;
+    }
+
+    db = Databank.get(config.driver, params);
+
+    // Connect...
+
+    db.connect({}, function(err) {
+        if (err) {
+            callback(err, null);
+            return;
+        }
+
+        DatabankObject.bank = db;
+        callback(null, db);
+    });
+};
+
+var setupLogger = function(config) {
+    var log,
+        logParams = {
+            name: "pump.io",
+            component: "pump-import-collection"
+        };
+
+    if (config.logfile) {
+        logParams.streams = [{path: config.logfile}];
+    } else if (config.nologger) {
+        logParams.streams = [{path: "/dev/null"}];
+    } else {
+        logParams.streams = [{stream: process.stderr}];
+    }
+
+    log = new Logger(logParams);
+
+    return log;
+};
+
+var setEmail = function(nickname, email, log, callback) {
+
+    log.info({nickname: nickname, email: email}, "Setting email");
+
+    Step(
+        function() {
+            User.get(nickname, this);
+        },
+        function(err, user) {
+            if (err) throw err;
+            if (!user) throw new Error("no user");
+            user.email = email;
+            user.save(this);
+        },
+        callback
+    );
+};
+
+main();
