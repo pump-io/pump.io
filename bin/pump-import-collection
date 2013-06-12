@@ -69,6 +69,8 @@ var main = function(argv) {
                 importCollectionFile(argv.f, log, this);
             } else if (argv.d) {
                 importDirectory(argv.d, log, this);
+            } else {
+                throw new Error("No file or directory argument even though I totally asked for one.");
             }
         },
         function(err) {
@@ -152,6 +154,8 @@ var walk = function(fname, onFile, callback) {
 var importDirectory = function(directoryName, log, callback) {
 
     var q = new Queue(QUEUE_MAX);
+
+    log.info({directory: directoryName}, "Importing directory");
 
     walk(directoryName,
          function(fname, callback) {
