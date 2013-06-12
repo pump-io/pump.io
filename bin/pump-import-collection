@@ -37,20 +37,20 @@ var fs = require("fs"),
     URLMaker = require("../lib/urlmaker").URLMaker,
     User = require("../lib/model/user").User,
     argv = require("optimist")
-        .usage("Usage: $0 -f <collection file>")
-        .demand(["f"])
+        .usage("Usage: $0 -f <collection file> or $0 -d <divided directory>")
         .alias("f", "file")
+        .alias("d", "directory")
         .describe("f", "File in Activity Streams JSON collection format")
-        .argv,
-    fname = argv.f;
+        .describe("d", "Recursive directory of files, one activity per, like divider makes")
+        .check(function(argv) { if (!argv.f & !argv.d) { throw new Error("Must have one of -f or -d");  } })
+        .argv;
 
 var QUEUE_MAX = 1;
 
 // Connect to databank and start importing activities
 
-var main = function() {
+var main = function(argv) {
     var config = getConfig(argv.c),
-        q = new Queue(QUEUE_MAX),
         log = setupLogger(config);
 
     log.info("Initializing pump.io");
@@ -65,6 +65,29 @@ var main = function() {
         },
         function(err, db) {
             if (err) throw err;
+            if (argv.f) {
+                importCollectionFile(argv.f, log, this);
+            } else if (argv.d) {
+                importDirectory(argv.d, log, this);
+            }
+        },
+        function(err) {
+            if (err) {
+                log.error(err);
+                process.exit(1);
+            } else {
+                log.info("Done.");
+                process.exit(0);
+            }
+        }
+    );
+};
+
+var importCollectionFile = function(fname, log, callback) {
+    var q = new Queue(QUEUE_MAX);
+
+    Step(
+        function() {
             log.info({fname: fname}, "Reading activitystrea.ms file");
             fs.readFile(fname, {encoding: "utf8"}, this);
         },
@@ -91,16 +114,74 @@ var main = function() {
                 }
             });
         },
-        function(err) {
-            if (err) {
-                log.error(err);
-                process.exit(1);
-            } else {
-                log.info("Done.");
-                process.exit(0);
-            }
-        }
+        callback
     );
+};
+
+var walk = function(fname, onFile, callback) {
+
+    Step(
+        function() {
+            fs.stat(fname, this);
+        },
+        function(err, stats) {
+            if (err) throw err;
+            if (stats.isDirectory()) {
+                Step(
+                    function() {
+                        fs.readdir(fname, this);
+                    },
+                    function(err, files) {
+                        var group = this.group();
+                        if (err) throw err;
+                        files = files.sort();
+                        _.each(files, function(rel) {
+                            walk(path.join(fname, rel), onFile, group());
+                        });
+                    },
+                    this
+                );
+            } else {
+                onFile(fname, this);
+            }
+        },
+        callback
+    );
+};
+
+var importDirectory = function(directoryName, log, callback) {
+
+    var q = new Queue(QUEUE_MAX);
+
+    walk(directoryName,
+         function(fname, callback) {
+             Step(
+                 function() {
+                     log.info({fname: fname}, "Reading activitystrea.ms file");
+                     fs.readFile(fname, {encoding: "utf8"}, this);
+                 },
+                 function(err, data) {
+                     if (err) throw err;
+                     log.info({fname: fname}, "Parsing activitystrea.ms file");
+                     try {
+                         this(null, JSON.parse(data));
+                     } catch (e) {
+                         this(e, null);
+                     }
+                 },
+                 function(err, activity) {
+                     if (err) throw err;
+                     log.info({activity: activity.id}, "Importing activities");
+                     if (isRegistration(activity)) {
+                         q.enqueue(registerUser, [activity, log], this);
+                     } else {
+                         q.enqueue(importActivity, [activity, log], this);
+                     }
+                 },
+                 callback
+             );
+         },
+         callback);
 };
 
 // Gets the configuration vars for this server from config files
@@ -434,4 +515,4 @@ var maybeLocalizePerson = function(person, callback) {
 
 // Run the main function
 
-main();
+main(argv);
