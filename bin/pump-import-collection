@@ -134,7 +134,7 @@ var walk = function(fname, onFile, callback) {
                         cb(null);
                     } else {
                         full = path.join(fname, files[i]);
-                        
+
                         walk(full,
                              onFile,
                              function(err) {
@@ -265,7 +265,7 @@ var getConfig = function(filename) {
     } else {
         files = ['/etc/pump.io.json',
                  path.join(process.env.HOME, ".pump.io.json")];
-    }   
+    }
 
     // This is all sync
     for (i = 0; i < files.length; i++) {
@@ -457,7 +457,8 @@ var registerUser = function(activity, log, callback) {
         },
         function(err, str) {
             if (err) throw err;
-            props.password = str;
+            // Always add a number
+            props.password = str +  Math.floor((Math.random()*10000)+1);
             User.create(props, this);
         },
         function(err, value) {
@@ -501,7 +502,7 @@ var registerUser = function(activity, log, callback) {
 };
 
 var usersStream = function(callback) {
-    
+
     Step(
         function() {
             Stream.get("user:all", this);
@@ -554,7 +555,7 @@ var maybeLocalizePerson = function(person, callback) {
         return;
     }
 
-    if ((person.url && urlparse(person.url).hostname == URLMaker.hostname) || 
+    if ((person.url && urlparse(person.url).hostname == URLMaker.hostname) ||
         (person.id && urlparse(person.id).hostname == URLMaker.hostname)) {
         domain = URLMaker.hostname;
     } else {
