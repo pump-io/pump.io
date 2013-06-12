@@ -122,6 +122,8 @@ var importCollectionFile = function(fname, log, callback) {
 
 var walk = function(fname, onFile, callback) {
 
+    var q = new Queue(32);
+
     Step(
         function() {
             fs.stat(fname, this);
@@ -138,13 +140,13 @@ var walk = function(fname, onFile, callback) {
                         if (err) throw err;
                         files = files.sort();
                         _.each(files, function(rel) {
-                            walk(path.join(fname, rel), onFile, group());
+                            q.enqueue(walk, [path.join(fname, rel), onFile], group());
                         });
                     },
                     this
                 );
             } else {
-                onFile(fname, this);
+                q.enqueue(onFile, [fname], this);
             }
         },
         callback
