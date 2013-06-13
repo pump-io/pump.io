@@ -17,9 +17,9 @@
     <li id="fat-menu" class="dropdown">
       <a href="#" id="profile-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown"> 
         <% if (_(principal).has("image")) { %>
-        <img class="pull-left" src="<%- principal.image.url %>" width="24" height="24" class="img-rounded" />
+        <img class="pull-left img-rounded" src="<%- principal.image.url %>" width="24" height="24" class="img-rounded" />
         <% } else { %>
-        <img class="pull-left" src="/images/default.png" width="24" height="24" class="img-rounded" />
+        <img class="pull-left img-rounded" src="/images/default.png" width="24" height="24" class="img-rounded" />
         <% } %>
         &nbsp;<span class="hidden-phone"><%- principal.displayName %> </span><b class="caret"></b>
       </a>
