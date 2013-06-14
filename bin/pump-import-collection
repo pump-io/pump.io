@@ -120,65 +120,135 @@ var importCollectionFile = function(fname, log, callback) {
     );
 };
 
-var walk = function(fname, onFile) {
+var walk = function(fname, onFile, callback) {
 
-    var q = new Queue(32),
-        stats;
+    var onDir = function(callback) {
+        Step(
+            function() {
+                fs.readdir(fname, this);
+            },
+            function(err, files) {
+                var wm = function(i, cb) {
+                    var full;
+                    if (i >= files.length) {
+                        cb(null);
+                    } else {
+                        full = path.join(fname, files[i]);
 
-    stats = fs.statSync(fname, this);
+                        walk(full,
+                             onFile,
+                             function(err) {
+                                 if (err) {
+                                     cb(err);
+                                 } else {
+                                     wm(++i, cb);
+                                 }
+                             });
+                    }
+                };
+                if (err) throw err;
+                files = files.sort();
+                wm(0, this);
+            },
+            callback
+        );
+    };
 
-    if (stats.isDirectory()) {
-        var files = fs.readdirSync(fname);
-        files = files.sort();
-        _.each(files, function(rel) {
-            walk(path.join(fname, rel), onFile);
-        });
-    } else {
-        onFile(fname);
-    }
+    Step(
+        function() {
+            fs.lstat(fname, this);
+        },
+        function(err, stats) {
+            if (stats.isDirectory()) {
+                onDir(this);
+            } else if (stats.isFile()) {
+                onFile(fname, this);
+            } else {
+                this(null);
+            }
+        },
+        callback
+    );
 };
 
 var importDirectory = function(directoryName, log, callback) {
 
-    var q = new Queue(QUEUE_MAX),
-        cnt = 0,
-        done = 0;
+    var q = new Queue(QUEUE_MAX);
 
     log.info({directory: directoryName}, "Importing directory");
 
     walk(directoryName,
-         function(fname) {
-             cnt++;
-             q.enqueue(importActivityFile, [fname, log], function(err) { if (err) { log.error(err); } });
-         });
+         function(fname, callback) {
+             q.enqueue(importActivityFile, [fname, log], callback);
+         },
+         callback);
 };
 
 var importActivityFile = function(fname, log, callback) {
     Step(
         function() {
-            log.info({fname: fname}, "Reading activitystrea.ms file");
-            fs.readFile(fname, {encoding: "utf8"}, this);
+            fs.stat(fname, this);
         },
-        function(err, data) {
+        function(err, stats) {
             if (err) throw err;
-            log.info({fname: fname}, "Parsing activitystrea.ms file");
-            try {
-                this(null, JSON.parse(data));
-            } catch (e) {
-                this(e, null);
-            }
-        },
-        function(err, activity) {
-            if (err) throw err;
-            log.info({activity: activity.id}, "Importing activities");
-            if (isRegistration(activity)) {
-                registerUser(activity, log, this);
+            if (stats.isDirectory()) {
+                Step(
+                    function() {
+                        fs.readdir(fname, this);
+                    },
+                    function(err, files) {
+                        var group = this.group();
+                        if (err) throw err;
+                        files = files.sort();
+                        _.each(files, function(rel) {
+                            walk(path.join(fname, rel), onFile, group());
+                        });
+                    },
+                    this
+                );
             } else {
-                importActivity(activity, log, this);
+                onFile(fname, this);
             }
         },
         callback
     );
+};
+
+var importDirectory = function(directoryName, log, callback) {
+
+    var q = new Queue(QUEUE_MAX);
+
+    log.info({directory: directoryName}, "Importing directory");
+
+    walk(directoryName,
+         function(fname, callback) {
+             Step(
+                 function() {
+                     log.info({fname: fname}, "Reading activitystrea.ms file");
+                     fs.readFile(fname, {encoding: "utf8"}, this);
+                 },
+                 function(err, data) {
+                     if (err) throw err;
+                     log.info({fname: fname}, "Parsing activitystrea.ms file");
+                     try {
+                         this(null, JSON.parse(data));
+                     } catch (e) {
+                         this(e, null);
+                     }
+                 },
+                 function(err, activity) {
+                     if (err) throw err;
+                     log.info({activity: activity.id}, "Importing activities");
+                     if (isRegistration(activity)) {
+                         registerUser(activity, log, this);
+                     } else {
+                         importActivity(activity, log, this);
+                     }
+                 },
+                 callback
+             );
+         },
+         callback);
 };
 
 // Gets the configuration vars for this server from config files
@@ -195,7 +265,7 @@ var getConfig = function(filename) {
     } else {
         files = ['/etc/pump.io.json',
                  path.join(process.env.HOME, ".pump.io.json")];
-    }   
+    }
 
     // This is all sync
     for (i = 0; i < files.length; i++) {
@@ -387,7 +457,8 @@ var registerUser = function(activity, log, callback) {
         },
         function(err, str) {
             if (err) throw err;
-            props.password = str;
+            // Always add a number
+            props.password = str +  Math.floor((Math.random()*10000)+1);
             User.create(props, this);
         },
         function(err, value) {
@@ -431,7 +502,7 @@ var registerUser = function(activity, log, callback) {
 };
 
 var usersStream = function(callback) {
-    
+
     Step(
         function() {
             Stream.get("user:all", this);
@@ -484,7 +555,7 @@ var maybeLocalizePerson = function(person, callback) {
         return;
     }
 
-    if ((person.url && urlparse(person.url).hostname == URLMaker.hostname) || 
+    if ((person.url && urlparse(person.url).hostname == URLMaker.hostname) ||
         (person.id && urlparse(person.id).hostname == URLMaker.hostname)) {
         domain = URLMaker.hostname;
     } else {
