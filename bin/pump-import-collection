@@ -311,9 +311,13 @@ var importActivity = function(props, log, callback) {
                 log.info({activity: activity.id, verb: activity.verb, actor: activity.actor.id, object: activity.object.id},
                          "skipping invalid graph activity");
                 callback(null, null);
+                return;
             } else {
                 // Auto-create activity content
                 delete activity.content;
+                if (activity.id == object.id) {
+                    activity.id = betterID(activity);
+                }
                 log.info({activity: activity.id}, "Ensuring recipients");
                 // First, ensure recipients
                 activity.ensureRecipients(this);
@@ -564,6 +568,13 @@ var isUser = function(object) {
     }
 
     return (p[2] == URLMaker.hostname);
+};
+
+var betterID = function(activity) {
+    var dt = new Date(activity.published),
+        tagDate = dt.toISOString().substr(0, 10);
+
+    return "tag:"+URLMaker.hostname+","+tagDate+":"+activity.verb+":"+activity.object.id;
 };
 
 // Run the main function
