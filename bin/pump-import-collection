@@ -179,49 +179,6 @@ var importDirectory = function(directoryName, log, callback) {
 
     walk(directoryName,
          function(fname, callback) {
-             q.enqueue(importActivityFile, [fname, log], callback);
-         },
-         callback);
-};
-
-var importActivityFile = function(fname, log, callback) {
-    Step(
-        function() {
-            fs.stat(fname, this);
-        },
-        function(err, stats) {
-            if (err) throw err;
-            if (stats.isDirectory()) {
-                Step(
-                    function() {
-                        fs.readdir(fname, this);
-                    },
-                    function(err, files) {
-                        var group = this.group();
-                        if (err) throw err;
-                        files = files.sort();
-                        _.each(files, function(rel) {
-                            walk(path.join(fname, rel), onFile, group());
-                        });
-                    },
-                    this
-                );
-            } else {
-                onFile(fname, this);
-            }
-        },
-        callback
-    );
-};
-
-var importDirectory = function(directoryName, log, callback) {
-
-    var q = new Queue(QUEUE_MAX);
-
-    log.info({directory: directoryName}, "Importing directory");
-
-    walk(directoryName,
-         function(fname, callback) {
              Step(
                  function() {
                      log.info({fname: fname}, "Reading activitystrea.ms file");
@@ -238,7 +195,7 @@ var importDirectory = function(directoryName, log, callback) {
                  },
                  function(err, activity) {
                      if (err) throw err;
-                     log.info({activity: activity.id}, "Importing activities");
+                     log.info({activity: activity.id, fname: fname}, "Importing activity");
                      if (isRegistration(activity)) {
                          registerUser(activity, log, this);
                      } else {
@@ -350,11 +307,17 @@ var importActivity = function(props, log, callback) {
             if (err) throw err;
             activity.actor = actor;
             activity.object = object;
-            // Auto-create activity content
-            delete activity.content;
-            log.info({activity: activity.id}, "Ensuring recipients");
-            // First, ensure recipients
-            activity.ensureRecipients(this);
+            if (badGraphActivity(activity)) {
+                log.info({activity: activity.id, verb: activity.verb, actor: activity.actor.id, object: activity.object.id},
+                         "skipping invalid graph activity");
+                callback(null, null);
+            } else {
+                // Auto-create activity content
+                delete activity.content;
+                log.info({activity: activity.id}, "Ensuring recipients");
+                // First, ensure recipients
+                activity.ensureRecipients(this);
+            }
         },
         function(err) {
             if (err) throw err;
@@ -579,6 +542,28 @@ var maybeLocalizePerson = function(person, callback) {
         },
         callback
     );
+};
+
+var badGraphActivity = function(activity) {
+    return ((activity.verb == Activity.FOLLOW || activity.verb == Activity.STOP_FOLLOWING) &&
+        (!isUser(activity.actor) || !isUser(activity.object)));
+};
+
+var isUser = function(object) {
+    var id = object.id,
+        p;
+    
+    if (!id) {
+        return false;
+    }
+
+    p = id.match(/^acct:(.*?)@(.*)$/);
+
+    if (!p) {
+        return false;
+    }
+
+    return (p[2] == URLMaker.hostname);
 };
 
 // Run the main function
