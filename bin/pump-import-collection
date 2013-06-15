@@ -318,6 +318,9 @@ var importActivity = function(props, log, callback) {
                 if (activity.id == object.id) {
                     activity.id = betterID(activity);
                 }
+                if (activity.url == object.url) {
+                    delete activity.url;
+                }
                 log.info({activity: activity.id}, "Ensuring recipients");
                 // First, ensure recipients
                 activity.ensureRecipients(this);
