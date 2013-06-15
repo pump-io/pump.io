@@ -458,6 +458,9 @@ var registerUser = function(activity, log, callback) {
             if (profile.displayName) {
                 user.profile.displayName = profile.displayName;
             }
+            if (profile.portablecontacts_net && profile.portablecontacts_net.note) {
+                user.profile.summary = profile.portablecontacts_net.note;
+            }
             user.profile.save(this);
         },
         function(err) {
