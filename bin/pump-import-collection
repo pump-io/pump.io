@@ -33,6 +33,7 @@ var fs = require("fs"),
     schema = require("../lib/schema").schema,
     Activity = require("../lib/model/activity").Activity,
     Stream = require("../lib/model/stream").Stream,
+    Person = require("../lib/model/person").Person,
     ActivityObject = require("../lib/model/activityobject").ActivityObject,
     URLMaker = require("../lib/urlmaker").URLMaker,
     User = require("../lib/model/user").User,
@@ -257,6 +258,10 @@ var connectDatabank = function(config, callback) {
     } else {
         params.schema = schema;
     }
+
+    // Add an index on upstream duplicates
+
+    params.schema['person'].indices.push("upstreamDuplicates.0");
 
     db = Databank.get(config.driver, params);
 
@@ -548,6 +553,11 @@ var maybeLocalizePerson = function(person, callback) {
         domain,
         id;
 
+    if (!person.portablecontacts_net) {
+        personByOldID(person, callback);
+        return;
+    }
+
     if (person.portablecontacts_net && person.portablecontacts_net.preferredUsername) {
         nickname = person.portablecontacts_net.preferredUsername;
     } else {
@@ -580,6 +590,25 @@ var maybeLocalizePerson = function(person, callback) {
         callback
     );
 };
+
+var personByOldID = function(person, callback) {
+
+    Step(
+        function() {
+            Person.search({"upstreamDuplicates.0": person.id}, this);
+        },
+        function(err, people) {
+            if (err) throw err;
+            if (people && people.count == 1) {
+                this(null, people[0]);
+            } else {
+                this(null, person);
+            }
+        },
+        callback
+    );
+};
+
 
 var badGraphActivity = function(activity) {
     return ((activity.verb == Activity.FOLLOW || activity.verb == Activity.STOP_FOLLOWING) &&
