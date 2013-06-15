@@ -302,8 +302,9 @@ var importActivity = function(props, log, callback) {
             log.info({actor: activity.actor.id, object: activity.object.id, verb: activity.verb}, "Localizing objects");
             maybeLocalize(activity.actor, this.parallel());
             maybeLocalize(activity.object, this.parallel());
+            var t = this;
             _.each(["to", "cc", "bto", "bcc"], function(arr) {
-                maybeLocalizeArray(arr, this.parallel());
+                maybeLocalizeArray(arr, t.parallel());
             });
         },
         function(err, actor, object, to, cc, bto, bcc) {
