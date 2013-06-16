@@ -33,6 +33,7 @@ var fs = require("fs"),
     schema = require("../lib/schema").schema,
     Activity = require("../lib/model/activity").Activity,
     Stream = require("../lib/model/stream").Stream,
+    Person = require("../lib/model/person").Person,
     ActivityObject = require("../lib/model/activityobject").ActivityObject,
     URLMaker = require("../lib/urlmaker").URLMaker,
     User = require("../lib/model/user").User,
@@ -179,49 +180,6 @@ var importDirectory = function(directoryName, log, callback) {
 
     walk(directoryName,
          function(fname, callback) {
-             q.enqueue(importActivityFile, [fname, log], callback);
-         },
-         callback);
-};
-
-var importActivityFile = function(fname, log, callback) {
-    Step(
-        function() {
-            fs.stat(fname, this);
-        },
-        function(err, stats) {
-            if (err) throw err;
-            if (stats.isDirectory()) {
-                Step(
-                    function() {
-                        fs.readdir(fname, this);
-                    },
-                    function(err, files) {
-                        var group = this.group();
-                        if (err) throw err;
-                        files = files.sort();
-                        _.each(files, function(rel) {
-                            walk(path.join(fname, rel), onFile, group());
-                        });
-                    },
-                    this
-                );
-            } else {
-                onFile(fname, this);
-            }
-        },
-        callback
-    );
-};
-
-var importDirectory = function(directoryName, log, callback) {
-
-    var q = new Queue(QUEUE_MAX);
-
-    log.info({directory: directoryName}, "Importing directory");
-
-    walk(directoryName,
-         function(fname, callback) {
              Step(
                  function() {
                      log.info({fname: fname}, "Reading activitystrea.ms file");
@@ -238,7 +196,7 @@ var importDirectory = function(directoryName, log, callback) {
                  },
                  function(err, activity) {
                      if (err) throw err;
-                     log.info({activity: activity.id}, "Importing activities");
+                     log.info({activity: activity.id, fname: fname}, "Importing activity");
                      if (isRegistration(activity)) {
                          registerUser(activity, log, this);
                      } else {
@@ -301,6 +259,10 @@ var connectDatabank = function(config, callback) {
         params.schema = schema;
     }
 
+    // Add an index on upstream duplicates
+
+    params.schema['person'].indices.push("upstreamDuplicates.0");
+
     db = Databank.get(config.driver, params);
 
     // Connect...
@@ -345,16 +307,37 @@ var importActivity = function(props, log, callback) {
             log.info({actor: activity.actor.id, object: activity.object.id, verb: activity.verb}, "Localizing objects");
             maybeLocalize(activity.actor, this.parallel());
             maybeLocalize(activity.object, this.parallel());
+            var t = this;
+            _.each(["to", "cc", "bto", "bcc"], function(name) {
+                maybeLocalizeArray(activity[name], t.parallel());
+            });
         },
-        function(err, actor, object) {
+        function(err, actor, object, to, cc, bto, bcc) {
             if (err) throw err;
             activity.actor = actor;
             activity.object = object;
-            // Auto-create activity content
-            delete activity.content;
-            log.info({activity: activity.id}, "Ensuring recipients");
-            // First, ensure recipients
-            activity.ensureRecipients(this);
+            activity.to = to;
+            activity.cc = cc;
+            activity.bto = bto;
+            activity.bcc = bcc;
+            if (badGraphActivity(activity)) {
+                log.info({activity: activity.id, verb: activity.verb, actor: activity.actor.id, object: activity.object.id},
+                         "skipping invalid graph activity");
+                callback(null, null);
+                return;
+            } else {
+                // Auto-create activity content
+                delete activity.content;
+                if (activity.id == object.id) {
+                    activity.id = betterID(activity);
+                }
+                if (activity.url == object.url) {
+                    delete activity.url;
+                }
+                log.info({activity: activity.id}, "Ensuring recipients");
+                // First, ensure recipients
+                activity.ensureRecipients(this);
+            }
         },
         function(err) {
             if (err) throw err;
@@ -481,6 +464,9 @@ var registerUser = function(activity, log, callback) {
             if (profile.displayName) {
                 user.profile.displayName = profile.displayName;
             }
+            if (profile.portablecontacts_net && profile.portablecontacts_net.note) {
+                user.profile.summary = profile.portablecontacts_net.note;
+            }
             user.profile.save(this);
         },
         function(err) {
@@ -540,6 +526,25 @@ var maybeLocalize = function(object, callback) {
     }
 };
 
+var maybeLocalizeArray = function(arr, callback) {
+
+    Step(
+        function() {
+            var group = this.group();
+            _.each(arr, function(object) {
+                maybeLocalize(object, group());
+            });
+        },
+        function(err, results) {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, results);
+            }
+        }
+    );
+};
+
 // Given a person, check if they're a user
 
 var maybeLocalizePerson = function(person, callback) {
@@ -547,6 +552,11 @@ var maybeLocalizePerson = function(person, callback) {
     var nickname,
         domain,
         id;
+
+    if (!person.portablecontacts_net) {
+        personByOldID(person, callback);
+        return;
+    }
 
     if (person.portablecontacts_net && person.portablecontacts_net.preferredUsername) {
         nickname = person.portablecontacts_net.preferredUsername;
@@ -579,6 +589,54 @@ var maybeLocalizePerson = function(person, callback) {
         },
         callback
     );
+};
+
+var personByOldID = function(person, callback) {
+
+    Step(
+        function() {
+            Person.search({"upstreamDuplicates.0": person.id}, this);
+        },
+        function(err, people) {
+            if (err) throw err;
+            if (people && people.count == 1) {
+                this(null, people[0]);
+            } else {
+                this(null, person);
+            }
+        },
+        callback
+    );
+};
+
+
+var badGraphActivity = function(activity) {
+    return ((activity.verb == Activity.FOLLOW || activity.verb == Activity.STOP_FOLLOWING) &&
+        (!isUser(activity.actor) || !isUser(activity.object)));
+};
+
+var isUser = function(object) {
+    var id = object.id,
+        p;
+    
+    if (!id) {
+        return false;
+    }
+
+    p = id.match(/^acct:(.*?)@(.*)$/);
+
+    if (!p) {
+        return false;
+    }
+
+    return (p[2] == URLMaker.hostname);
+};
+
+var betterID = function(activity) {
+    var dt = new Date(activity.published),
+        tagDate = dt.toISOString().substr(0, 10);
+
+    return "tag:"+URLMaker.hostname+","+tagDate+":"+activity.verb+":"+activity.object.id;
 };
 
 // Run the main function
