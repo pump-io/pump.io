@@ -316,10 +316,18 @@ var importActivity = function(props, log, callback) {
             if (err) throw err;
             activity.actor = actor;
             activity.object = object;
-            activity.to = to;
-            activity.cc = cc;
-            activity.bto = bto;
-            activity.bcc = bcc;
+            if (to && to.length > 0) {
+                activity.to = to;
+            }
+            if (cc && cc.length > 0) {
+                activity.cc = cc;
+            }
+            if (bto && bto.length > 0) {
+                activity.bto = bto;
+            }
+            if (bcc && bcc.length > 0) {
+                activity.bcc = bcc;
+            }
             if (badGraphActivity(activity)) {
                 log.info({activity: activity.id, verb: activity.verb, actor: activity.actor.id, object: activity.object.id},
                          "skipping invalid graph activity");
@@ -333,6 +341,9 @@ var importActivity = function(props, log, callback) {
                 }
                 if (activity.url == object.url) {
                     delete activity.url;
+                }
+                if (activity.object.objectType == "note" && _.isObject(activity.object.inReplyTo)) {
+                    activity.object.objectType = "comment";
                 }
                 log.info({activity: activity.id}, "Ensuring recipients");
                 // First, ensure recipients
