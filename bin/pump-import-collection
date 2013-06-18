@@ -813,11 +813,9 @@ var personByOldID = function(person, callback) {
         },
         function(err, people) {
             if (err) throw err;
-            if (people && people.count == 1) {
-                console.dir({person: person.id, localID: localID, message: "FOUND"});
+            if (people && people.length == 1) {
                 this(null, people[0]);
             } else {
-                console.dir({person: person.id, localID: localID, message: "NOT FOUND"});
                 this(null, person);
             }
         },
