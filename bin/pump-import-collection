@@ -29,11 +29,14 @@ var fs = require("fs"),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
     randomString = require("../lib/randomstring").randomString,
+    IDMaker = require("../lib/idmaker").IDMaker,
     Distributor = require("../lib/distributor").Distributor,
     schema = require("../lib/schema").schema,
     Activity = require("../lib/model/activity").Activity,
     Stream = require("../lib/model/stream").Stream,
     Person = require("../lib/model/person").Person,
+    Group = require("../lib/model/group").Group,
+    Collection = require("../lib/model/collection").Collection,
     ActivityObject = require("../lib/model/activityobject").ActivityObject,
     URLMaker = require("../lib/urlmaker").URLMaker,
     User = require("../lib/model/user").User,
@@ -530,10 +533,23 @@ var usersStream = function(callback) {
 };
 
 var maybeLocalize = function(object, callback) {
-    if (object.objectType == ActivityObject.PERSON) {
-        maybeLocalizePerson(object, callback);
-    } else {
+    // OK to call this with null
+    if (!object) {
         callback(null, object);
+        return;
+    }
+    switch (object.objectType) {
+    case ActivityObject.PERSON:
+        maybeLocalizePerson(object, callback);
+        break;
+    case ActivityObject.GROUP:
+        maybeLocalizeGroup(object, callback);
+        break;
+    case ActivityObject.COLLECTION:
+        maybeLocalizeCollection(object, callback);
+        break;
+    default:
+        maybeLocalizeObject(object, callback);
     }
 };
 
@@ -600,6 +616,167 @@ var maybeLocalizePerson = function(person, callback) {
         },
         callback
     );
+};
+
+var maybeLocalizeObject = function(object, callback) {
+
+    var type;
+
+    if ((object.id && urlparse(object.id).hostname == URLMaker.hostname)) {
+
+        Step(
+            function() {
+                ActivityObject.getObject(object.objectType, object.id, this);
+            },
+            function(err, results) {
+                if (err && err.name == "NoSuchThingError") {
+                    object._uuid = IDMaker.makeID();
+
+                    if (!_.has(object, "links")) {
+                        object.links = {};
+                    }
+
+                    object.links.self = {
+                        href: URLMaker.makeURL("api/" + type + "/" + object._uuid)
+                    };
+
+                    object.likes = {
+                        url: URLMaker.makeURL("api/" + type + "/" + object._uuid + "/likes")
+                    };
+
+                    object.replies = {
+                        url: URLMaker.makeURL("api/" + type + "/" + object._uuid + "/replies")
+                    };
+
+                    object.shares = {
+                        url: URLMaker.makeURL("api/" + type + "/" + object._uuid + "/shares")
+                    };
+                    
+                    Step(
+                        function() {
+                            maybeLocalize(object.inReplyTo, this.parallel());
+                            maybeLocalize(object.author, this.parallel());
+                        },
+                        function(err, inReplyTo, author) {
+                            if (err) {
+                                callback(err, null);
+                            } else {
+                                if (inReplyTo) {
+                                    object.inReplyTo = inReplyTo;
+                                }
+                                if (author) {
+                                    object.author = author;
+                                }
+                                callback(null, object);
+                            }
+                        }
+                    );
+                } else if (err) {
+                    callback(err, null);
+                } else {
+                    callback(null, results);
+                }
+            }
+        );
+    } else {
+        callback(null, object);
+    }
+};
+
+var maybeLocalizeGroup = function(group, callback) {
+
+    var type;
+
+    if ((group.id && urlparse(group.id).hostname == URLMaker.hostname)) {
+
+        Step(
+            function() {
+                Group.get(group.id, this);
+            },
+            function(err, results) {
+                if (err && err.name == "NoSuchThingError") {
+                    group._uuid = IDMaker.makeID();
+
+                    if (!_.has(group, "links")) {
+                        group.links = {};
+                    }
+
+                    group.links["activity-inbox"] = {
+                        href: URLMaker.makeURL("api/group/" + group._uuid + "/inbox")
+                    };
+
+                    Step(
+                        function() {
+                            maybeLocalize(group.author, this);
+                        },
+                        function(err, author) {
+                            if (err) {
+                                callback(err, null);
+                            } else {
+                                if (author) {
+                                    group.author = author;
+                                }
+                                callback(null, group);
+                            }
+                        }
+                    );
+
+                } else if (err) {
+                    callback(err, null);
+                } else {
+                    callback(null, results);
+                }
+            }
+        );
+    } else {
+        callback(null, group);
+    }
+};
+
+var maybeLocalizeCollection = function(coll, callback) {
+
+    var type;
+
+    if ((coll.id && urlparse(coll.id).hostname == URLMaker.hostname)) {
+
+        Step(
+            function() {
+                Collection.get(coll.id, this);
+            },
+            function(err, results) {
+                if (err && err.name == "NoSuchThingError") {
+                    coll._uuid = IDMaker.makeID();
+
+                    if (!_.has(coll, "links")) {
+                        coll.links = {};
+                    }
+
+                    Step(
+                        function() {
+                            maybeLocalize(coll.author, this);
+                        },
+                        function(err, author) {
+                            if (err) {
+                                callback(err, null);
+                            } else {
+                                if (author) {
+                                    coll.author = author;
+                                }
+                                callback(null, coll);
+                            }
+                        }
+                    );
+
+                } else if (err) {
+                    callback(err, null);
+                } else {
+                    callback(null, results);
+                }
+            }
+        );
+    } else {
+        callback(null, coll);
+    }
 };
 
 var personByOldID = function(person, callback) {
