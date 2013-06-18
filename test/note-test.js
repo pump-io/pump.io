@@ -30,9 +30,14 @@ var testSchema = {
     pkey: "id",
     fields: ["author",
              "content",
+             "downstreamDuplicates",
              "published",
              "updated",
-             "url"]
+             "upstreamDuplicates",
+             "url",
+             "_uuid"
+    ],
+    indices: ["_uuid"]
 };
 
 var testData = {
