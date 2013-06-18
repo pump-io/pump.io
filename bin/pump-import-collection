@@ -262,9 +262,13 @@ var connectDatabank = function(config, callback) {
         params.schema = schema;
     }
 
-    // Add an index on upstream duplicates
+    // Add indices that help us
 
     params.schema['person'].indices.push("upstreamDuplicates.0");
+    params.schema['person'].indices.push("status_net.profile_info.local_id");
+
+    params.schema['note'].indices.push("status_net.notice_id");
+    params.schema['note'].indices.push("status_net.message_id");
 
     db = Databank.get(config.driver, params);
 
@@ -349,6 +353,7 @@ var importActivity = function(props, log, callback) {
                     activity.object.objectType = "comment";
                 }
                 log.info({activity: activity.id}, "Ensuring recipients");
+                activity._uuid = IDMaker.makeID();
                 // First, ensure recipients
                 activity.ensureRecipients(this);
             }
@@ -468,6 +473,7 @@ var registerUser = function(activity, log, callback) {
             str.deliver(user.nickname, this);
         },
         function(err) {
+            var localID;
             if (err) throw err;
             // copy stuff that's not auto-generated into the profile
             _.defaults(user.profile, profile);
@@ -480,6 +486,17 @@ var registerUser = function(activity, log, callback) {
             }
             if (profile.portablecontacts_net && profile.portablecontacts_net.note) {
                 user.profile.summary = profile.portablecontacts_net.note;
+            }
+            // Add a local ID so we can find it
+            localID = personLocalID(profile);
+            if (localID) {
+                if (!user.profile.status_net) {
+                    user.profile.status_net = {};
+                }
+                if (!user.profile.status_net.profile_info) {
+                    user.profile.status_net.profile_info = {};
+                }
+                user.profile.status_net.profile_info.local_id = localID;
             }
             user.profile.save(this);
         },
@@ -554,6 +571,13 @@ var maybeLocalize = function(object, callback) {
 };
 
 var maybeLocalizeArray = function(arr, callback) {
+    
+    // skip if it's null or empty
+
+    if (!arr) {
+        callback(null, arr);
+        return;
+    }
 
     Step(
         function() {
@@ -620,7 +644,7 @@ var maybeLocalizePerson = function(person, callback) {
 
 var maybeLocalizeObject = function(object, callback) {
 
-    var type;
+    var type = object.objectType;
 
     if ((object.id && urlparse(object.id).hostname == URLMaker.hostname)) {
 
@@ -781,22 +805,25 @@ var maybeLocalizeCollection = function(coll, callback) {
 
 var personByOldID = function(person, callback) {
 
+    var localID = personLocalID(person);
+
     Step(
         function() {
-            Person.search({"upstreamDuplicates.0": person.id}, this);
+            Person.search({"status_net.profile_info.local_id": localID}, this);
         },
         function(err, people) {
             if (err) throw err;
             if (people && people.count == 1) {
+                console.dir({person: person.id, localID: localID, message: "FOUND"});
                 this(null, people[0]);
             } else {
+                console.dir({person: person.id, localID: localID, message: "NOT FOUND"});
                 this(null, person);
             }
         },
         callback
     );
 };
-
 
 var badGraphActivity = function(activity) {
     return ((activity.verb == Activity.FOLLOW || activity.verb == Activity.STOP_FOLLOWING) &&
@@ -825,6 +852,15 @@ var betterID = function(activity) {
         tagDate = dt.toISOString().substr(0, 10);
 
     return "tag:"+URLMaker.hostname+","+tagDate+":"+activity.verb+":"+activity.object.id;
+};
+
+var personLocalID = function(person) {
+    var parts = person.id.match(/\/(\d+)$/);
+    if (parts) {
+        return parts[1];
+    } else {
+        return null;
+    }
 };
 
 // Run the main function
