@@ -438,7 +438,7 @@ if (!window.Pump) {
                 didScroll = false;
                 if ($(window).scrollTop() >= $(document).height() - $(window).height() - 10) {
                     streams = Pump.getStreams();
-                    if (streams.major && streams.major.nextLink) {
+                    if (streams.major && streams.major.nextLink()) {
                         Pump.body.startLoad();
                         streams.major.getNext(function(err) {
                             Pump.body.endLoad();
