@@ -156,16 +156,25 @@ var lrddUser = function(req, res, next) {
 
     switch (parts.protocol) {
     case "acct:":
-        User.get(parts.auth, function(err, user) {
-            if (err && err.name == "NoSuchThingError") {
-                next(new HTTPError(err.message, 404));
-            } else if (err) {
-                next(err);
-            } else {
+        Step(
+            function() {
+                User.get(parts.auth, this);
+            },
+            function(err, user) {
+                if (err) throw err;
                 req.user = user;
-                next();
+                user.expand(this);
+            },
+            function(err) {
+                if (err && err.name == "NoSuchThingError") {
+                    next(new HTTPError(err.message, 404));
+                } else if (err) {
+                    next(err);
+                } else {
+                    next();
+                }
             }
-        });
+        );
         break;
     case "http:":
     case "https:":
@@ -192,25 +201,19 @@ var lrddUser = function(req, res, next) {
 };
 
 var userLinks = function(user) {
-    return [
+    var links = [
         {
             rel: "http://webfinger.net/rel/profile-page",
             type: "text/html",
             href: URLMaker.makeURL("/" + user.nickname)
         },
         {
-            rel: "activity-inbox",
-            href: URLMaker.makeURL("/api/user/" + user.nickname + "/inbox")
-        },
-        {
-            rel: "activity-outbox",
-            href: URLMaker.makeURL("/api/user/" + user.nickname + "/feed")
-        },
-        {
             rel: "dialback",
             href: URLMaker.makeURL("/api/dialback")
         }
     ];
+
+    return links.concat(objectLinks(user.profile));
 };
 
 var objectLinks = function(obj) {
