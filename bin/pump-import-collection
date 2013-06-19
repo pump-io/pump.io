@@ -352,6 +352,10 @@ var importActivity = function(props, log, callback) {
                 if (activity.object.objectType == "note" && _.isObject(activity.object.inReplyTo)) {
                     activity.object.objectType = "comment";
                 }
+                // Add a date to the object if it's not there
+                if (activity.verb == "post" && !activity.object.published) {
+                    activity.object.published = activity.published;
+                }
                 log.info({activity: activity.id}, "Ensuring recipients");
                 activity._uuid = IDMaker.makeID();
                 // First, ensure recipients
