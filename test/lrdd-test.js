@@ -43,6 +43,14 @@ var webfinger = {
             href: "http://localhost:4815/alice"
         },
         {
+            rel: "dialback",
+            href: "http://localhost:4815/api/dialback"
+        },
+        {
+            rel: "self",
+            href: "http://localhost:4815/api/user/alice/profile"
+        },
+        {
             rel: "activity-inbox",
             href: "http://localhost:4815/api/user/alice/inbox"
         },
@@ -51,8 +59,20 @@ var webfinger = {
             href: "http://localhost:4815/api/user/alice/feed"
         },
         {
-            rel: "dialback",
-            href: "http://localhost:4815/api/dialback"
+            rel: "followers",
+            href: "http://localhost:4815/api/user/alice/followers"
+        },
+        {
+            rel: "following",
+            href: "http://localhost:4815/api/user/alice/following"
+        },
+        {
+            rel: "favorites",
+            href: "http://localhost:4815/api/user/alice/favorites"
+        },
+        {
+            rel: "lists",
+            href: "http://localhost:4815/api/user/alice/lists/person"
         }
     ]
 };
