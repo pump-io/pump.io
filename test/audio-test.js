@@ -29,6 +29,7 @@ var suite = vows.describe("audio module interface");
 var testSchema = {
     pkey: "id",
     fields: ["_created",
+             "_slug",
              "_uuid",
              "author",
              "content",
@@ -49,7 +50,7 @@ var testSchema = {
              "updated",
              "upstreamDuplicates",
              "url"],
-    indices: ["_uuid"]
+    indices: ["_uuid", "_slug"]
 };
 
 var testData = {
