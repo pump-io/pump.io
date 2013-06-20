@@ -29,14 +29,27 @@ var suite = vows.describe("collection module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ["author",
+    fields: ["_created",
+             "_uuid",
+             "author",
+             "content",
              "displayName",
+             "downstreamDuplicates",
+             "id",
              "image",
+             "likes",
+             "links",
+             "members",
+             "objectType",
              "objectTypes",
              "published",
+             "replies",
+             "shares",
              "summary",
              "updated",
-             "url"]
+             "upstreamDuplicates",
+             "url"],
+    indices: ["_uuid"]
 };
 
 var testData = {
