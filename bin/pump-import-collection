@@ -264,11 +264,14 @@ var connectDatabank = function(config, callback) {
 
     // Add indices that help us
 
-    params.schema['person'].indices.push("upstreamDuplicates.0");
-    params.schema['person'].indices.push("status_net.profile_info.local_id");
+    params.schema.person.indices.push("upstreamDuplicates.0");
+    params.schema.person.indices.push("status_net.profile_info.local_id");
 
-    params.schema['note'].indices.push("status_net.notice_id");
-    params.schema['note'].indices.push("status_net.message_id");
+    params.schema.note.indices.push("status_net.notice_id");
+    params.schema.note.indices.push("status_net.message_id");
+
+    params.schema.group.indices.push("upstreamDuplicates.0");
+    params.schema.person.indices.push("status_net.profile_info.local_id");
 
     db = Databank.get(config.driver, params);
 
@@ -335,14 +338,22 @@ var importActivity = function(props, log, callback) {
             if (bcc && bcc.length > 0) {
                 activity.bcc = bcc;
             }
-            if (badGraphActivity(activity)) {
-                log.info({activity: activity.id, verb: activity.verb, actor: activity.actor.id, object: activity.object.id},
-                         "skipping invalid graph activity");
-                callback(null, null);
-                return;
-            } else {
+            activity._uuid = IDMaker.makeID();
+            delete activity.content;
+            // Specific fixups for different verbs
+            switch (activity.verb) {
+            case Activity.FOLLOW:
+            case Activity.STOP_FOLLOWING:
+                if (badGraphActivity(activity)) {
+                    log.info({activity: activity.id, verb: activity.verb, actor: activity.actor.id, object: activity.object.id},
+                             "skipping invalid graph activity");
+                    callback(null);
+                } else {
+                    this(null);
+                }
+                break;
+            case Activity.POST:
                 // Auto-create activity content
-                delete activity.content;
                 if (activity.id == object.id) {
                     activity.id = betterID(activity);
                 }
@@ -356,11 +367,20 @@ var importActivity = function(props, log, callback) {
                 if (activity.verb == "post" && !activity.object.published) {
                     activity.object.published = activity.published;
                 }
-                log.info({activity: activity.id}, "Ensuring recipients");
-                activity._uuid = IDMaker.makeID();
-                // First, ensure recipients
-                activity.ensureRecipients(this);
+                this(null);
+                break;
+            case Activity.JOIN:
+                log.info({activity: activity.id}, "Checking join");
+                checkJoin(activity, log, this);
+                break;
+            default:
+                this(null);
+                break;
             }
+        },
+        function(err) {
+            if (err) throw err;
+            activity.ensureRecipients(this);
         },
         function(err) {
             if (err) throw err;
@@ -719,7 +739,7 @@ var maybeLocalizeGroup = function(group, callback) {
 
         Step(
             function() {
-                Group.get(group.id, this);
+                Group.search({"upstreamDuplicates.0": group.id}, this);
             },
             function(err, results) {
                 if (err && err.name == "NoSuchThingError") {
@@ -863,6 +883,45 @@ var personLocalID = function(person) {
     } else {
         return null;
     }
+};
+
+var checkJoin = function(activity, log, callback) {
+    
+    Step(
+        function() {
+            ActivityObject.getObject(ActivityObject.GROUP, activity.object.id, this);
+        },
+        function(err, group) {
+            var newGroup;
+            if (err && err.name != "NoSuchThingError") {
+                throw err;
+            } else if (err && err.name == "NoSuchThingError") {
+                newGroup = _.clone(activity.object);
+                delete newGroup.id;
+                newGroup.upstreamDuplicates = [activity.object.id];
+                importActivity({actor: activity.actor,
+                                verb: "create",
+                                object: newGroup}, 
+                               log,
+                               this);
+            } else if (!err) {
+                callback(null, activity);
+            }
+        },
+        function(err, created) {
+            if (err) throw err;
+            activity.object = created.object;
+            this(null, activity);
+        },
+        function(err, activity) {
+            if (err) {
+                log.error(err);
+                process.exit(-1);
+            } else {
+                callback(null, activity);
+            }
+        }
+    );
 };
 
 // Run the main function
