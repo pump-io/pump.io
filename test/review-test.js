@@ -28,13 +28,28 @@ var suite = vows.describe("review module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ["author",
+    fields: ["_created",
+             "_uuid",
+             "attachments",
+             "author",
              "content",
              "displayName",
+             "downstreamDuplicates",
+             "id",
+             "image",
+             "inReplyTo",
+             "likes",
+             "links",
+             "objectType",
              "published",
              "rating",
+             "replies",
+             "shares",
+             "summary",
              "updated",
-             "url"]
+             "upstreamDuplicates",
+             "url"],
+    indices: ["_uuid"]
 };
 
 var testData = {
