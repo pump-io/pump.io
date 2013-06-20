@@ -1363,6 +1363,20 @@ suite.addBatch({
                     assert.deepEqual(sub.indices, base.indices);
                     assert.deepEqual(sub.fields, _.union(_.without(base.fields, "attachments"), "members"));
                 }
+            },
+            "and we get a sub-schema with index arguments": {
+                topic: function(ActivityObject) {
+                    return [ActivityObject.subSchema(null, null, ["_slug"]), ActivityObject];
+                },
+                "it looks correct": function(parts) {
+                    var sub = parts[0],
+                        ActivityObject = parts[1],
+                        base = ActivityObject.baseSchema;
+
+                    assert.deepEqual(sub.pkey, base.pkey);
+                    assert.deepEqual(sub.indices, _.union(base.indices, ["_slug"]));
+                    assert.deepEqual(sub.fields, base.fields);
+                }
             }
         }
     }
