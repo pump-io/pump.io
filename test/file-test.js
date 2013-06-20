@@ -28,13 +28,30 @@ var suite = vows.describe("file module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ["author",
+    fields: ["_created",
+             "_slug",
+             "_uuid",
+             "attachments",
+             "author",
+             "content",
              "displayName",
+             "downstreamDuplicates",
              "fileUrl",
-             "published",
+             "id",
+             "image",
+             "inReplyTo",
+             "likes",
+             "links",
              "mimeType",
+             "objectType",
+             "published",
+             "replies",
+             "shares",
+             "summary",
              "updated",
-             "url"]
+             "upstreamDuplicates",
+             "url"],
+    indices: ["_slug", "_uuid"]
 };
 
 var testData = {
