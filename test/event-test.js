@@ -28,18 +28,33 @@ var suite = vows.describe("event module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ["attending",
+    fields: ["_created",
+             "_uuid",
+             "attachments",
+             "attending",
              "author",
+             "content",
              "displayName",
+             "downstreamDuplicates",
              "endTime",
+             "id",
+             "image",
+             "inReplyTo",
+             "likes",
+             "links",
              "location",
              "maybeAttending",
              "notAttending",
+             "objectType",
              "published",
+             "replies",
+             "shares",
              "startTime",
              "summary",
              "updated",
-             "url"]
+             "upstreamDuplicates",
+             "url"],
+    indices: ["_uuid"]
 };
 
 var testData = {
