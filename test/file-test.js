@@ -29,6 +29,7 @@ var suite = vows.describe("file module interface");
 var testSchema = {
     pkey: "id",
     fields: ["_created",
+             "_slug",
              "_uuid",
              "attachments",
              "author",
@@ -50,7 +51,7 @@ var testSchema = {
              "updated",
              "upstreamDuplicates",
              "url"],
-    indices: ["_uuid"]
+    indices: ["_slug", "_uuid"]
 };
 
 var testData = {
