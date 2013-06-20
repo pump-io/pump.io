@@ -28,21 +28,26 @@ var suite = vows.describe("alert module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ["attachments",
+    fields: ["_created",
+             "_uuid",
+             "attachments",
              "author",
              "content",
              "displayName",
              "downstreamDuplicates",
              "id",
              "image",
+             "inReplyTo",
+             "likes",
+             "links",
              "objectType",
              "published",
+             "replies",
+             "shares",
              "summary",
              "updated",
              "upstreamDuplicates",
-             "url",
-             "_uuid"
-    ],
+             "url"],
     indices: ["_uuid"]
 };
 
