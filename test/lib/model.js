@@ -31,7 +31,7 @@ var assert = require("assert"),
 var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "config.json")));
 
 var modelBatch = function(typeName, className, testSchema, testData) {
-    
+
     var batch = {};
     var typeKey = "When we require the "+typeName+" module";
     var classKey = "and we get its "+className+" class export";
@@ -44,7 +44,7 @@ var modelBatch = function(typeName, className, testSchema, testData) {
     }
 
     batch[typeKey] = {
-        topic: function() { 
+        topic: function() {
 
             var cb = this.callback;
             // Need this to make IDs
@@ -61,7 +61,7 @@ var modelBatch = function(typeName, className, testSchema, testData) {
                 var mod;
 
                 DatabankObject.bank = db;
-                
+
                 mod = require("../../lib/model/"+typeName) || null;
 
                 cb(null, mod);
@@ -74,7 +74,7 @@ var modelBatch = function(typeName, className, testSchema, testData) {
             assert.includes(mod, className);
         }
     };
-    
+
     batch[typeKey][classKey] = {
         topic: function(mod) {
             return mod[className] || null;
@@ -173,13 +173,14 @@ var modelBatch = function(typeName, className, testSchema, testData) {
                         assert.deepEqual(created[prop][key], value);
                     });
                 } else {
-                    assert.deepEqual(created[prop], testData.create[prop]); 
+                    assert.deepEqual(created[prop], testData.create[prop]);
                 }
             }
         },
         "and we modify it": {
             topic: function(created) {
-                created.update(testData.update, this.callback);
+                var callback = this.callback;
+                created.update(testData.update, callback);
             },
             "it is modified": function(err, updated) {
                 assert.ifError(err);
@@ -188,7 +189,7 @@ var modelBatch = function(typeName, className, testSchema, testData) {
             "modified fields are modified": function(err, updated) {
                 var prop;
                 for (prop in testData.update) {
-                    assert.deepEqual(updated[prop], testData.update[prop]); 
+                    assert.deepEqual(updated[prop], testData.update[prop]);
                 }
             },
             "and we delete it": {

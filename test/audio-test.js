@@ -28,13 +28,29 @@ var suite = vows.describe("audio module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ["author",
+    fields: ["_created",
+             "_slug",
+             "_uuid",
+             "author",
+             "content",
              "displayName",
+             "downstreamDuplicates",
              "embedCode",
+             "id",
+             "image",
+             "inReplyTo",
+             "likes",
+             "links",
+             "objectType",
              "published",
+             "replies",
+             "shares",
              "stream",
              "summary",
-             "updated"]
+             "updated",
+             "upstreamDuplicates",
+             "url"],
+    indices: ["_uuid", "_slug"]
 };
 
 var testData = {

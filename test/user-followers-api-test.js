@@ -690,10 +690,9 @@ suite.addBatch({
                         assert.ifError(err);
                         assertValidList(feed, 100, 100);
                     },
-                    "it has a next link": function(err, feed) {
+                    "it has no next link": function(err, feed) {
                         assert.ifError(err);
-                        assert.include(feed.links, "next");
-                        assert.include(feed.links.next, "href");
+                        assert.isFalse(_.has(feed.links, "next"));
                     },
                     "it has a prev link": function(err, feed) {
                         assert.ifError(err);
@@ -908,10 +907,9 @@ suite.addBatch({
                         assert.ifError(err);
                         assertValidList(feed, 50, 50);
                     },
-                    "it has a next link": function(err, feed) {
+                    "it has no next link": function(err, feed) {
                         assert.ifError(err);
-                        assert.include(feed.links, "next");
-                        assert.include(feed.links.next, "href");
+                        assert.isFalse(_.has(feed.links, "next"));
                     },
                     "it has a prev link": function(err, feed) {
                         assert.ifError(err);

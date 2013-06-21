@@ -1,8 +1,8 @@
-// alert.js
+// test/lib/plugin.js
 //
-// data object representing an alert
+// Test plugin
 //
-// Copyright 2012, E14N https://e14n.com/
+// Copyright 2013, E14N https://e14n.com/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +16,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var _ = require("underscore"),
-    DatabankObject = require("databank").DatabankObject,
-    ActivityObject = require("./activityobject").ActivityObject;
-
-var Alert = DatabankObject.subClass("alert", ActivityObject);
-
-Alert.schema = ActivityObject.subSchema();
-
-exports.Alert = Alert;
+module.exports = {
+    called: {log: false, schema: false, app: false},
+    initializeLog: function(schema) {
+        this.called.log = true;
+    },
+    initializeSchema: function(schema) {
+        this.called.schema = true;
+    },
+    initializeApp: function(log) {
+        this.called.app = true;
+    }
+}

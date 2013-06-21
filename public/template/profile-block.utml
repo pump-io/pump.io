@@ -7,6 +7,9 @@
     <% } %>
   </span>
   <div class="media-body">
+  <div class="pull-right">
+    <%= partial("profile-responses", {person: profile}) %>
+  </div>
     <h1 class="media-header"><%- profile.displayName %> 
       <small>
         <% if (profile.id && profile.id.substr(0, 5) == 'acct:') { %>
@@ -23,9 +26,6 @@
     <p class="summary"><%- profile.summary %></p>
     <% } %>
     <% /* TODO: HOME PAGE HERE */ %>
-  </div>
-  <div class="pull-right">
-    <%= partial("profile-responses", {person: profile}) %>
   </div>
 </div>
 

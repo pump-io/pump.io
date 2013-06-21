@@ -1,23 +1,275 @@
+/* general */
+
+body {
+  padding-top: 60px;
+}
+
+/*  navbar */
+
+.navbar .btn-group {
+  margin: 7px 0;
+}
+
+.navbar .badge-important {
+  background-color: #87E61F;
+  padding-top: 1px;
+  padding-bottom: 1px;
+}
+
+.navbar .nav > li > a {
+  padding: 8px 15px 8px;
+  line-height: 24px;
+}
+
+.nav > li > a > img {
+  max-height: 26px;
+  max-width: none;
+  width: auto;
+}
+
+.navbar .nav .dropdown-toggle .caret {
+  margin-top: 10px;
+}
+
+.navbar .btn-group .dropdown-menu {
+  margin-top: 8px;
+  right: 0px;
+  left: auto;
+}
+
+.navbar .btn-group .dropdown-menu:after {
+  position: absolute;
+  top: -6px;
+  right: 13px;
+  display: inline-block;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid #fff;
+  border-left: 6px solid transparent;
+  content: '';
+}
+
+.navbar ul.nav .dropdown-menu {
+  margin-top: 0px;
+}
+
+.dropdown-menu > li > small {
+  display: inline-block;
+  padding: 4px 20px;
+  line-height: 15px;
+}
+
+/* modals */
+
+.modal-body {
+  max-height: 510px;
+}
+
+/* media */
+
 .media:first-child {
   margin-top:1em;
 }
-.replies {
-  background-color: #f1f1f1;
-}
+
 .media .media {
   margin-top: 0;
 }
-.media.comment-form {
-  background-color: #fff;
+
+#major-stream .media {
+  margin-top: 25px;
+  border-bottom: 1px dotted #EEE;
+  padding-bottom: 20px;
 }
+
+#major-stream .media:first-child {
+  margin-top: 1em;
+}
+
+.media-body p.muted:first-child {
+  line-height: 14px;
+  margin-bottom: 8px;
+}
+
+.activity-content p:last-child {
+  margin-bottom: 0;
+}
+
+.responses {
+  margin: 5px 0 0 0;
+  font-size: 85%;
+}
+
+.responses a {
+  margin-right: 6px;
+}
+
+.responses + p.muted {
+  margin: 8px 0 0 0;
+  line-height: 15px;
+}
+
+.responses p.muted + p.muted {
+  margin: 2px 0 0 0;
+  line-height: 15px;
+}
+
+.show-all-replies {
+  font-size: 85%;
+  margin-top: 5px;
+  display: inline-block;
+}
+
+.replies .media, #major-stream .replies .media {
+  margin-top: 5px;
+  border-bottom: none;
+  border-left: 10px solid #f1f1f1;
+  background: #fafafa;
+  padding: 5px 0 5px 10px;
+}
+
+.replies .media:first-child, #major-stream .replies .media:first-child {
+  margin-top: 10px;
+}
+
+.replies .media:last-child {
+  margin-bottom: 5px;
+}
+
+.replies .media p {
+  margin-bottom: 0;
+}
+
+.replies .pull-left img {
+  margin-top: 4px;
+}
+
+.replies .media.comment-form, #major-stream .replies .media.comment-form {
+  background-color: #fff;
+  border-left: none;
+  padding-left: 20px;
+}
+
+.replies .responses {
+  margin-top: 0;
+}
+
+.replies p.muted {
+  margin-top: 0;
+}
+
 .img-polaroid {
   display: block;
   margin-left: auto;
   margin-right: auto;
   max-width: 98%;
+  margin: 25px auto;
 }
-.nav > li > a > img {
-  max-height: 35px;
-  max-width: none;
-  width: auto;
+
+.object-page .media-body > p.muted {
+  margin-bottom: 8px;
+}
+
+.object-page .responses {
+  margin-top: 10px;
+}
+
+/* sidebar */
+
+#sidebar > h3 {
+  margin-top: 3px;
+}
+
+#sidebar .media {
+  margin-top: 25px;
+}
+
+#sidebar .media:first-child {
+  margin-top: 1em;
+}
+
+#sidebar .media-body {
+  line-height: 15px;
+}
+
+/* user pages */
+
+#profile-block  h1.media-header, #people-stream h4.media-heading {
+  margin: 0 0 5px 0;
+  float: left;
+}
+
+#profile-block p, #people-stream p {
+  clear: left;
+}
+
+#profile-block p.location {
+  font-style: italic;
+  margin-bottom: 5px;
+}
+
+#profile-block .person-responses {
+  margin: 4px 0 10px 10px;
+}
+
+.user .nav-tabs {
+  margin-top: 10px;
+}
+
+#people-stream p.location {
+  font-style: italic;
+  margin-bottom: 3px;
+}
+
+#people-stream .media {
+  margin-top: 25px;
+}
+
+#user-content-lists #list-content .lists + p {
+  margin-top: 10px;
+}
+
+#user-content-lists #add-list-member {
+  margin-top: 10px;
+}
+
+#choose-contact {
+  margin-top: 20px;
+}
+
+/* responsive */
+
+@media (max-width: 979px) {
+  body {
+    padding-top: 0px;
+  }
+  .modal {
+    position: absolute;
+  }
+}
+
+@media (max-width: 767px) {
+  body {
+    padding-top: 0;
+  }
+  .navbar {
+  position: relative;
+  }
+  .navbar .pull-right .btn-group {
+    position: static;
+  }
+  .navbar .btn-group .dropdown-menu {
+    top: 100%;
+    right: 15px;
+    margin-top: -6px; /* XXX */
+    max-width: 90%;
+    white-space: normal;
+  }
+  .navbar .btn-group .dropdown-menu:after {
+    border: none;
+  }
+  #major-stream a.pull-left, #minor-stream a.pull-left {
+    float: left;
+  }
+  #major-stream .media-body {
+    display: inline;
+  }
 }

@@ -1310,6 +1310,73 @@ suite.addBatch({
                 "it looks correct": function(str) {
                     assert.equal("[game urn:uuid:c52b69b6-b717-11e2-9d1e-2c8158efb9e9]", str);
                 }
+            },
+            "and we get a sub-schema with no arguments": {
+                topic: function(ActivityObject) {
+                    return [ActivityObject.subSchema(), ActivityObject];
+                },
+                "it looks correct": function(parts) {
+                    var sub = parts[0],
+                        ActivityObject = parts[1];
+
+                    assert.deepEqual(sub, ActivityObject.baseSchema);
+                }
+            },
+            "and we get a sub-schema with removal arguments": {
+                topic: function(ActivityObject) {
+                    return [ActivityObject.subSchema(["attachments"]), ActivityObject];
+                },
+                "it looks correct": function(parts) {
+                    var sub = parts[0],
+                        ActivityObject = parts[1],
+                        base = ActivityObject.baseSchema;
+
+                    assert.deepEqual(sub.pkey, base.pkey);
+                    assert.deepEqual(sub.indices, base.indices);
+                    assert.deepEqual(sub.fields, _.without(base.fields, "attachments"));
+                }
+            },
+            "and we get a sub-schema with add arguments": {
+                topic: function(ActivityObject) {
+                    return [ActivityObject.subSchema(null, ["members"]), ActivityObject];
+                },
+                "it looks correct": function(parts) {
+                    var sub = parts[0],
+                        ActivityObject = parts[1],
+                        base = ActivityObject.baseSchema;
+
+                    assert.deepEqual(sub.pkey, base.pkey);
+                    assert.deepEqual(sub.indices, base.indices);
+                    assert.deepEqual(sub.fields, _.union(base.fields, "members"));
+                }
+            },
+            "and we get a sub-schema with remove and add arguments": {
+                topic: function(ActivityObject) {
+                    return [ActivityObject.subSchema(["attachments"], ["members"]), ActivityObject];
+                },
+                "it looks correct": function(parts) {
+                    var sub = parts[0],
+                        ActivityObject = parts[1],
+                        base = ActivityObject.baseSchema;
+
+                    assert.deepEqual(sub.pkey, base.pkey);
+                    assert.deepEqual(sub.indices, base.indices);
+                    assert.deepEqual(sub.fields, _.union(_.without(base.fields, "attachments"), "members"));
+                }
+            },
+            "and we get a sub-schema with index arguments": {
+                topic: function(ActivityObject) {
+                    return [ActivityObject.subSchema(null, null, ["_slug"]), ActivityObject];
+                },
+                "it looks correct": function(parts) {
+                    var sub = parts[0],
+                        ActivityObject = parts[1],
+                        base = ActivityObject.baseSchema;
+
+                    assert.deepEqual(sub.pkey, base.pkey);
+                    assert.deepEqual(sub.indices, _.union(base.indices, ["_slug"]));
+                    assert.deepEqual(sub.fields, base.fields);
+                }
             }
         }
     }

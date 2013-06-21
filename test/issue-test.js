@@ -28,22 +28,27 @@ var suite = vows.describe("issue module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ["attachments",
+    fields: ["_created",
+             "_uuid",
+             "attachments",
              "author",
              "content",
              "displayName",
              "downstreamDuplicates",
              "id",
              "image",
+             "inReplyTo",
+             "likes",
+             "links",
              "objectType",
              "published",
+             "replies",
+             "shares",
              "summary",
+             "types",
              "updated",
              "upstreamDuplicates",
-             "url",
-             "_uuid",
-             "types"
-    ],
+             "url"],
     indices: ["_uuid"]
 };
 

@@ -129,7 +129,14 @@ var validFeed = function(feed) {
     }
 };
 
+var validUser = function(user) {
+    assert.isString(user.nickname);
+    assert.isObject(user.profile);
+    validActivityObject(user.profile);
+};
+
 exports.validActivity       = validActivity;
 exports.validActivityObject = validActivityObject;
 exports.validMediaLink      = validMediaLink;
 exports.validFeed           = validFeed;
+exports.validUser           = validUser;
