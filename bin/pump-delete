@@ -1,0 +1,59 @@
+#!/usr/bin/env node
+
+// -*- mode: javascript -*-
+
+// pump-delete.js
+//
+// delete an object
+//
+// Copyright 2013, E14N https://e14n.com/
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+var _ = require("underscore"),
+    Step = require("step"),
+    url = require("url"),
+    common = require("../lib/pumpclient"),
+    userCred = common.userCred,
+    postJSON = common.postJSON,
+    delJSON = common.delJSON,
+    argv = require("optimist")
+        .usage("Usage: $0 -u <username> -n <your note>")
+        .demand(["u", "i"])
+        .alias("u", "username")
+        .alias("i", "id")
+        .describe("u", "User nickname")
+        .describe("i", "ID of the object (http URL of the API endpoint)")
+        .argv,
+    username = argv.u,
+    server = argv.s,
+    id = argv.i,
+    port = argv.P;
+
+Step(
+    function() {
+        var parsed = url.parse(id);
+        userCred(username, parsed.hostname, this);
+    },
+    function(err, cred) {
+        if (err) throw err;
+        delJSON(id, cred, this);
+    },
+    function(err, body, resp) {
+        if (err) {
+            console.error(err);
+        } else {
+            console.log("OK");
+        }
+    }
+);
