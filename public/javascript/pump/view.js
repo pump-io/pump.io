@@ -1929,7 +1929,7 @@
             var view = this,
                 streams = {};
             if (view.userContent && view.userContent.peopleStreamView && view.userContent.peopleStreamView.model) {
-                streams.major = view.userContent.model;
+                streams.major = view.userContent.peopleStreamView.model;
             }
             return streams;
         }
@@ -1996,7 +1996,7 @@
             var view = this,
                 streams = {};
             if (view.userContent && view.userContent.peopleStreamView && view.userContent.peopleStreamView.model) {
-                streams.major = view.userContent.model;
+                streams.major = view.userContent.peopleStreamView.model;
             }
             return streams;
         }
