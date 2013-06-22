@@ -1921,8 +1921,7 @@
                 attr: "userContent",
                 subView: "FollowersUserContent",
                 subOptions: {
-                    model: "followers",
-                    data: ["profile"]
+                    data: ["profile", "followers"]
                 }
             }
         },
@@ -1962,9 +1961,12 @@
                 subView: "MajorPersonView",
                 idAttr: "data-person-id"
             }
+        },
+        initialize: function(options) {
+            Pump.debug(options);
+            Pump.PersonView.prototype.initialize.apply(this);
         }
     });
-
 
     Pump.FollowingContent = Pump.ContentView.extend({
         templateName: 'following',
@@ -1986,8 +1988,7 @@
                 attr: "userContent",
                 subView: "FollowingUserContent",
                 subOptions: {
-                    model: "following",
-                    data: ["profile"]
+                    data: ["profile", "following"]
                 }
             }
         },
