@@ -314,6 +314,21 @@ var importActivity = function(props, log, callback) {
 
     Step(
         function() {
+            log.info({activity: activity.id}, "Checking for duplicates");
+            Activity.get(activity.id, this);
+        },
+        function(err) {
+            if (err && err.name == "NoSuchThingError") {
+                this(null);
+            } else if (err) {
+                this(err);
+            } else {
+                log.info({activity: activity.id}, "Already imported; skipping.");
+                callback(null);
+            }
+        },
+        function(err) {
+            if (err) throw err;
             log.info({actor: activity.actor.id, object: activity.object.id, verb: activity.verb}, "Localizing objects");
             maybeLocalize(activity.actor, this.parallel());
             maybeLocalize(activity.object, this.parallel());
@@ -479,6 +494,19 @@ var registerUser = function(activity, log, callback) {
 
     Step(
         function() {
+            User.get(props.nickname, this);
+        },
+        function(err, user) {
+            if (err && err.name == "NoSuchThingError") {
+                this(null);
+            } else if (err) {
+                throw err;
+            } else {
+                log.info({nickname: props.nickname}, "Skipping existing user.");
+                callback(null);
+            }
+        },
+        function(err) {
             randomString(16, this);
         },
         function(err, str) {
@@ -896,24 +924,16 @@ var checkJoin = function(activity, log, callback) {
             if (err && err.name != "NoSuchThingError") {
                 throw err;
             } else if (err && err.name == "NoSuchThingError") {
-                newGroup = _.clone(activity.object);
-                delete newGroup.id;
-                newGroup.upstreamDuplicates = [activity.object.id];
                 importActivity({actor: activity.actor,
                                 verb: "create",
-                                object: newGroup}, 
+                                object: activity.object},
                                log,
                                this);
             } else if (!err) {
                 callback(null, activity);
             }
         },
-        function(err, created) {
-            if (err) throw err;
-            activity.object = created.object;
-            this(null, activity);
-        },
-        function(err, activity) {
+        function(err) {
             if (err) {
                 log.error(err);
                 process.exit(-1);

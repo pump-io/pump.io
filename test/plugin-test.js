@@ -16,10 +16,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var assert = require("assert"),
+var Step = require("step"),
+    _ = require("underscore"),
+    assert = require("assert"),
     vows = require("vows"),
     fs = require("fs"),
-    path = require("path");
+    path = require("path"),
+    oauthutil = require("./lib/oauth"),
+    httputil = require("./lib/http");
 
 var ignore = function(err) {};
 
@@ -76,6 +80,52 @@ suite.addBatch({
             var plugin = require("./lib/plugin");
             assert.ifError(err);
             assert.isTrue(plugin.called.app);
+        },
+        "and we run the app": {
+            topic: function(app) {
+                app.run(this.callback);
+            },
+            "it works": function(err) {
+                assert.ifError(err);
+            },
+            "teardown": function(app) {
+                if (app && app.close) {
+                    app.close(function(err) {});
+                }
+            },
+            "and we create an activity": {
+                topic: function() {
+                    var callback = this.callback;
+                    Step(
+                        function() {
+                            oauthutil.newCredentials("aang", "air*bender", this);
+                        },
+                        function(err, cred) {
+                            var url,
+                                activity;
+                            if (err) throw err;
+                            url = "http://localhost:4815/api/user/aang/feed";                        
+                            activity = {
+                                verb: "post",
+                                object: {
+                                    objectType: "note",
+                                    content: "Hello, world."
+                                }
+                            };
+
+                            httputil.postJSON(url, cred, activity, this);
+                        },
+                        function(err) {
+                            callback(err);
+                        }
+                    );
+                },
+                "the plugin distributor endpoint was called": function(err, app) {
+                    var plugin = require("./lib/plugin");
+                    assert.ifError(err);
+                    assert.isTrue(plugin.called.distribute);
+                }
+            }
         }
     }
 });
