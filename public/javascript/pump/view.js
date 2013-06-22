@@ -1965,7 +1965,6 @@
         }
     });
 
-
     Pump.FollowingContent = Pump.ContentView.extend({
         templateName: 'following',
         parts: ["profile-block",
