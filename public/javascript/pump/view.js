@@ -1921,8 +1921,7 @@
                 attr: "userContent",
                 subView: "FollowersUserContent",
                 subOptions: {
-                    model: "followers",
-                    data: ["profile"]
+                    data: ["profile", "followers"]
                 }
             }
         },
@@ -1930,7 +1929,7 @@
             var view = this,
                 streams = {};
             if (view.userContent && view.userContent.peopleStreamView && view.userContent.peopleStreamView.model) {
-                streams.major = view.userContent.model;
+                streams.major = view.userContent.peopleStreamView.model;
             }
             return streams;
         }
@@ -1962,9 +1961,12 @@
                 subView: "MajorPersonView",
                 idAttr: "data-person-id"
             }
+        },
+        initialize: function(options) {
+            Pump.debug(options);
+            Pump.PersonView.prototype.initialize.apply(this);
         }
     });
-
 
     Pump.FollowingContent = Pump.ContentView.extend({
         templateName: 'following',
@@ -1986,8 +1988,7 @@
                 attr: "userContent",
                 subView: "FollowingUserContent",
                 subOptions: {
-                    model: "following",
-                    data: ["profile"]
+                    data: ["profile", "following"]
                 }
             }
         },
@@ -1995,7 +1996,7 @@
             var view = this,
                 streams = {};
             if (view.userContent && view.userContent.peopleStreamView && view.userContent.peopleStreamView.model) {
-                streams.major = view.userContent.model;
+                streams.major = view.userContent.peopleStreamView.model;
             }
             return streams;
         }
