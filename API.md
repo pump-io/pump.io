@@ -229,7 +229,7 @@ Collection URLs take the following params:
    collection immediately before the specified activity (not
    inclusive). A good way to "scroll back" in a collection.
 * *since*. An activity ID. Will get activities that went into the
-   collection immediately before the specified activity (not
+   collection immediately after the specified activity (not
    inclusive). A good way to get what's new in a collection since you
    last polled it.
 
