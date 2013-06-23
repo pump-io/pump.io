@@ -33,7 +33,7 @@
     <![endif]-->
   </head>
 
-  <body>
+  <body id="top">
 
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
@@ -126,6 +126,7 @@
     <script src="/javascript/pump/router.js"></script>
     <script src="/javascript/pump/socket.js"></script>
     <script src="/javascript/pump/view.js"></script>
+    <script src="/javascript/scrolltop.js"></script>
     <script>
       if (!Pump) {
           Pump = {};
@@ -162,6 +163,7 @@
       <% } %>
 
     </script>
-  </body>
+    <button onclick="scrollToTop(&quot;top&quot;)" title="back to top" id="scrolltop" class="btn"><i class="icon-arrow-up"></i></button>
+</body>
 
 </html>
