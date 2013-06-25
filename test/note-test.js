@@ -28,11 +28,23 @@ var suite = vows.describe("note module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ["author",
+    fields: ["_created",
+             "_uuid",
+             "author",
              "content",
+             "downstreamDuplicates",
+             "id",
+             "inReplyTo",
+             "likes",
+             "links",
+             "objectType",
              "published",
+             "replies",
+             "shares",
              "updated",
-             "url"]
+             "upstreamDuplicates",
+             "url"],
+    indices: ["_uuid"]
 };
 
 var testData = {
