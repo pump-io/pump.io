@@ -31,9 +31,21 @@ var assert = require("assert"),
     validActivityObject = actutil.validActivityObject,
     validFeed = actutil.validFeed,
     setupApp = oauthutil.setupApp,
-    newCredentials = oauthutil.newCredentials;
+    newCredentials = oauthutil.newCredentials,
+    newClient = oauthutil.newClient,
+    newPair = oauthutil.newPair;
 
 var suite = vows.describe("Group API test");
+
+var makeCred = function(cl, pair) {
+    return {
+        consumer_key: cl.client_id,
+        consumer_secret: cl.client_secret,
+        token: pair.token,
+        token_secret: pair.token_secret,
+	user: pair.user
+    };
+};
 
 // A batch for manipulating groups API
 
@@ -560,7 +572,115 @@ suite.addBatch({
             "it fails correctly": function(err) {
                 assert.ifError(err);
             }
-        }
+        },
+        "and we make some users": {
+            topic: function() {
+		var callback = this.callback,
+		    cl;
+
+                Step(
+		    function() {
+			newClient(this);
+		    },
+		    function(err, results) {
+			var group = this.group(), i;
+			cl = results;
+			for (i = 0; i < 7; i++) {
+                            newPair(cl, "priest"+i, "dark*watcher*"+i, group());
+			}
+                    },
+                    function(err, pairs) {
+                        if (err) {
+			    callback(err, null);
+			} else {
+			    callback(null, _.map(pairs, function(pair) { return makeCred(cl, pair); }));
+			}
+                    }
+                );
+            },
+            "it works": function(err, creds) {
+                assert.ifError(err);
+		assert.isArray(creds);
+            },
+	    "and they all join a group": {
+		topic: function(creds) {
+		    var callback = this.callback,
+			priests = _.map(creds, function(cred) { return cred.user.profile; }),
+			group;
+
+		    Step(
+			function() {
+			    var url = "http://localhost:4815/api/user/priest0/feed",
+				act = {
+				    verb: "create",
+				    to: priests,
+				    object: {
+					objectType: "group",
+					displayName: "Black Priests",
+					summary: "Defenders of truth and justice"
+				    }
+				};
+			    pj(url, creds[0], act, this);
+			},
+			function(err, act) {
+			    var gr = this.group();
+			    if (err) throw err;
+			    group = act.object;
+			    _.times(7, function(i) {
+				var url = "http://localhost:4815/api/user/priest"+i+"/feed",
+				    act = {
+					verb: "join",
+					object: group
+				    };
+
+				pj(url, creds[i], act, gr());
+			    });
+			},
+			function(err, joins) {
+			    if (err) {
+				callback(err, null);
+			    } else {
+				callback(err, group);
+			    }
+			}
+		    );
+		},
+		"it works": function(err, group) {
+		    assert.ifError(err);
+		    validActivityObject(group);
+		},
+		"and the creator adds a document": {
+		    topic: function(group, creds) {
+			var callback = this.callback,
+			    url = "http://localhost:4815/api/user/priest0/feed",
+			    act = {
+				verb: "add",
+				object: {
+				    objectType: "image",
+				    displayName: "Group photo",
+				    url: "http://photo.example/priest0/photos/the-whole-gang.jpg"
+				},
+				target: {
+				    objectType: "collection",
+				    id: group.documents.url
+				}
+			    };
+
+			Step(
+			    function() {
+				pj(url, creds[0], act, this);
+			    },
+			    function(err, added) {
+				callback(err);
+			    }
+			);
+		    },
+		    "it works": function(err) {
+			assert.ifError(err);
+		    }
+		}
+	    }
+	}
     }
 });
 
