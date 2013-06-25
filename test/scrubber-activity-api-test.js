@@ -27,6 +27,7 @@ var assert = require("assert"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     actutil = require("./lib/activity"),
+    validActivity = actutil.validActivity,
     setupApp = oauthutil.setupApp,
     newCredentials = oauthutil.newCredentials,
     newPair = oauthutil.newPair,
@@ -56,7 +57,7 @@ var postActivity = function(act) {
         },
         "it works": function(err, result, response) {
             assert.ifError(err);
-            assert.isObject(result);
+            validActivity(result);
         }
     };
 };
@@ -274,6 +275,7 @@ suite.addBatch({
                               content: "Hello, world."
                           },
                           provider: {
+                              id: "urn:uuid:1c67eb00-ddba-11e2-a6c9-2c8158efb9e9",
                               objectType: "service",
                               summary: HARMLESS
                           }
@@ -286,6 +288,7 @@ suite.addBatch({
                               content: "Hello, world."
                           },
                           provider: {
+                              id: "urn:uuid:1c687b10-ddba-11e2-a136-2c8158efb9e9",
                               objectType: "service",
                               summary: DANGEROUS
                           }
@@ -298,6 +301,7 @@ suite.addBatch({
                               content: "Hello, world."
                           },
                           context: {
+                              id: "urn:uuid:1c6908aa-ddba-11e2-bbcb-2c8158efb9e9",
                               objectType: "event",
                               summary: HARMLESS
                           }
@@ -310,6 +314,7 @@ suite.addBatch({
                               content: "Hello, world."
                           },
                           context: {
+                              id: "urn:uuid:1c699310-ddba-11e2-b3b3-2c8158efb9e9",
                               objectType: "event",
                               summary: DANGEROUS
                           }
@@ -322,6 +327,7 @@ suite.addBatch({
                               content: "Hello, world."
                           },
                           source: {
+                             id: "urn:uuid:5b9f1672-ddba-11e2-aa23-2c8158efb9e9",
                               objectType: "collection",
                               summary: HARMLESS
                           }
@@ -334,6 +340,7 @@ suite.addBatch({
                              content: "Hello, world."
                          },
                          source: {
+                             id: "urn:uuid:5b9e88c4-ddba-11e2-ade4-2c8158efb9e9",
                              objectType: "collection",
                              summary: DANGEROUS
                          }
