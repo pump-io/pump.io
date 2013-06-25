@@ -61,8 +61,9 @@ var validActivityObject = function(obj) {
     assert.isString(obj.id);
     assert.include(obj, "objectType");
     assert.isString(obj.objectType);
-    assert.include(obj, "displayName");
-    assert.isString(obj.displayName);
+    if (_.has(obj, "displayName")) {
+	assert.isString(obj.displayName);
+    }
     if (_.has(obj, "published")) {
         validDate(obj.published);
     }
