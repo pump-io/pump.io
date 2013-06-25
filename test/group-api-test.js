@@ -100,12 +100,13 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.isObject(group);
                         assert.include(group, "members");
-                        assert.isObject(group.members);
-                        assert.include(group.members, "url");
-                        assert.isString(group.members.url);
-                        assert.include(group.members, "totalItems");
-                        assert.isNumber(group.members.totalItems);
-                        assert.equal(group.members.totalItems, 0);
+			validFeed(group.members);
+                    },
+                    "it has a documents feed": function(err, group) {
+                        assert.ifError(err);
+                        assert.isObject(group);
+                        assert.include(group, "documents");
+			validFeed(group.documents);
                     },
                     "it has an inbox feed": function(err, group) {
                         assert.ifError(err);
