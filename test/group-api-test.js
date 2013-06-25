@@ -137,6 +137,25 @@ suite.addBatch({
                             assert.isTrue(!_.has(feed, "items") || (_.isArray(feed.items) && feed.items.length === 0));
                         }
                     },
+                    "and we get the documents feed": {
+                        topic: function(group, act, cred) {
+                            var callback = this.callback,
+                                url = group.documents.url;
+
+                            gj(url, cred, function(err, data, resp) {
+                                callback(err, data);
+                            });
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                            validFeed(feed);
+                        },
+                        "it's empty": function(err, feed) {
+                            assert.ifError(err);
+                            assert.equal(feed.totalItems, 0);
+                            assert.isTrue(!_.has(feed, "items") || (_.isArray(feed.items) && feed.items.length === 0));
+                        }
+                    },
                     "and we get the group inbox feed": {
                         topic: function(group, act, cred) {
                             var callback = this.callback,

@@ -145,7 +145,7 @@ var addRoutes = function(app) {
         app.get("/api/user/:nickname/uploads", smw, userReadAuth, reqUser, sameUser, userUploads);
         app.post("/api/user/:nickname/uploads", userWriteOAuth, reqUser, sameUser, fileContent, newUpload);
     }
-    
+
     // Activities
 
     app.get("/api/activity/:uuid", smw, anyReadAuth, reqActivity, actorOrRecipient, getActivity);
@@ -176,6 +176,7 @@ var addRoutes = function(app) {
 
     app.get("/api/group/:uuid/members", smw, anyReadAuth, requestGroup, authorOrRecipient, groupMembers);
     app.get("/api/group/:uuid/inbox", smw, anyReadAuth, requestGroup, authorOrRecipient, groupInbox);
+    app.get("/api/group/:uuid/documents", smw, anyReadAuth, requestGroup, authorOrRecipient, groupDocuments);
     app.post("/api/group/:uuid/inbox", remoteWriteOAuth, requestGroup, postToGroupInbox);
 
     // Info about yourself
@@ -226,7 +227,7 @@ var userOnly = function(req, res, next) {
     var person = req.person,
         principal = req.principal;
 
-    if (person && principal && person.id === principal.id && principal.objectType === "person") { 
+    if (person && principal && person.id === principal.id && principal.objectType === "person") {
         next();
     } else {
         next(new HTTPError("Only the user can modify this profile.", 403));
@@ -264,7 +265,7 @@ var actorOrRecipient = function(req, res, next) {
 };
 
 var getObject = function(req, res, next) {
-    
+
     var type = req.type,
         obj = req[type],
         profile = req.principal;
@@ -552,7 +553,7 @@ var delActivity = function(req, res, next) {
 // Get the stream of all users
 
 var usersStream = function(callback) {
-    
+
     Step(
         function() {
             Stream.get("user:all", this);
@@ -931,7 +932,7 @@ var postActivity = function(req, res, next) {
     if (!_(activity).has("verb") || _(activity.verb).isNull()) {
         activity.verb = "post";
     }
-    
+
     Step(
         function() {
             newActivity(activity, req.user, this);
@@ -1441,6 +1442,14 @@ var groupInbox = contextEndpoint(
     streams.groupInbox
 );
 
+var groupDocuments = contextEndpoint(
+    function(req) {
+        var context = {group: req.group, author: req.group.author};
+        return context;
+    },
+    streams.groupDocuments
+);
+
 var newMember = function(req, res, next) {
 
     var coll = req.collection,
@@ -1592,7 +1601,7 @@ var proxyRequest = function(req, res, next) {
                            "HMAC-SHA1",
                            null, // nonce size; use default
                            headers);
-            
+
             oa.get(proxy.url, null, null, this);
         },
         function(err, pbody, pres) {
