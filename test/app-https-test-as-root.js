@@ -92,6 +92,14 @@ var webfinger = {
             href: "https://secure.localhost/caterpillar"
         },
         {
+            rel: "dialback",
+            href: "https://secure.localhost/api/dialback"
+        },
+        {
+            rel: "self",
+            href: "https://secure.localhost/api/user/caterpillar/profile"
+        },
+        {
             rel: "activity-inbox",
             href: "https://secure.localhost/api/user/caterpillar/inbox"
         },
@@ -100,8 +108,20 @@ var webfinger = {
             href: "https://secure.localhost/api/user/caterpillar/feed"
         },
         {
-            rel: "dialback",
-            href: "https://secure.localhost/api/dialback"
+            rel: "followers",
+            href: "https://secure.localhost/api/user/caterpillar/followers"
+        },
+        {
+            rel: "following",
+            href: "https://secure.localhost/api/user/caterpillar/following"
+        },
+        {
+            rel: "favorites",
+            href: "https://secure.localhost/api/user/caterpillar/favorites"
+        },
+        {
+            rel: "lists",
+            href: "https://secure.localhost/api/user/caterpillar/lists/person"
         }
     ]
 };
