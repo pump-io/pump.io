@@ -905,6 +905,11 @@ var betterID = function(activity) {
 };
 
 var personLocalID = function(person) {
+
+    if (!person || !person.id) {
+        return null;
+    }
+
     var parts = person.id.match(/\/(\d+)$/);
     if (parts) {
         return parts[1];
