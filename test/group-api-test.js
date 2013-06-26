@@ -119,7 +119,7 @@ suite.addBatch({
                         assert.isObject(group);
                         assert.include(group, "documents");
 			validFeed(group.documents);
-                    },
+		    },
                     "it has an inbox feed": function(err, group) {
                         assert.ifError(err);
                         assert.isObject(group);
@@ -653,21 +653,22 @@ suite.addBatch({
 		    topic: function(group, creds) {
 			var callback = this.callback,
 			    url = "http://localhost:4815/api/user/priest0/feed",
-			    image = {
-				objectType: "image",
-				displayName: "Group photo",
-				url: "http://photo.example/priest0/photos/the-whole-gang.jpg"
+			    act = {
+				verb: "post",
+				object: {
+				    id: "http://photo.example/priest0/photos/the-whole-gang",
+				    objectType: "image",
+				    displayName: "Group photo",
+				    url: "http://photo.example/priest0/photos/the-whole-gang.jpg"
+				},
+				target: group
 			    };
 
 			Step(
 			    function() {
-				pj(url, creds[0], {verb: "post", to: [group], object: image}, this);
+				pj(url, creds[0], act, this);
 			    },
-			    function(err, created) {
-				if (err) throw err;
-				pj(url, creds[0], {verb: "add", object: created.object, target: group}, this);
-			    },
-			    function(err, added) {
+			    function(err, body) {
 				callback(err);
 			    }
 			);
@@ -692,6 +693,7 @@ suite.addBatch({
                             assert.ifError(err);
                             assert.isTrue(feed.totalItems > 0);
 			    assert.isArray(feed.items);
+                            assert.isTrue(feed.items.length > 0);
 			    assert.isObject(_.find(feed.items, function(item) { return item.url == "http://photo.example/priest0/photos/the-whole-gang.jpg"; }));
                         }
 		    },
@@ -712,7 +714,78 @@ suite.addBatch({
                             assert.ifError(err);
                             assert.isTrue(feed.totalItems > 0);
 			    assert.isArray(feed.items);
+                            assert.isTrue(feed.items.length > 0);
 			    assert.isObject(_.find(feed.items, function(item) { return item.url == "http://photo.example/priest0/photos/the-whole-gang.jpg"; }));
+                        }
+		    }
+		},
+		"and another member adds a document": {
+		    topic: function(group, creds) {
+			var callback = this.callback,
+			    url = "http://localhost:4815/api/user/priest1/feed",
+			    act = {
+				verb: "post",
+				object: {
+				    id: "http://docs.example/priest1/files/action-plan",
+				    objectType: "file",
+				    displayName: "Action Plan",
+				    url: "http://docs.example/priest1/files/action-plan.docx"
+				},
+				target: group
+			    };
+
+			Step(
+			    function() {
+				pj(url, creds[1], act, this);
+			    },
+			    function(err, body) {
+				callback(err);
+			    }
+			);
+		    },
+		    "it works": function(err) {
+			assert.ifError(err);
+		    },
+		    "and the creator reads the document feed": {
+			topic: function(group, creds) {
+                            var callback = this.callback,
+                                url = group.documents.url;
+
+                            gj(url, creds[1], function(err, data, resp) {
+                                callback(err, data);
+                            });
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                            validFeed(feed);
+                        },
+                        "it has the added object": function(err, feed) {
+                            assert.ifError(err);
+                            assert.isTrue(feed.totalItems > 0);
+			    assert.isArray(feed.items);
+                            assert.isTrue(feed.items.length > 0);
+			    assert.isObject(_.find(feed.items, function(item) { return item.url == "http://docs.example/priest1/files/action-plan.docx"; }));
+                        }
+		    },
+		    "and another member reads the document feed": {
+			topic: function(group, creds) {
+                            var callback = this.callback,
+                                url = group.documents.url;
+
+                            gj(url, creds[5], function(err, data, resp) {
+                                callback(err, data);
+                            });
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                            validFeed(feed);
+                        },
+                        "it has the added object": function(err, feed) {
+                            assert.ifError(err);
+                            assert.isTrue(feed.totalItems > 0);
+			    assert.isArray(feed.items);
+                            assert.isTrue(feed.items.length > 0);
+			    assert.isObject(_.find(feed.items, function(item) { return item.url == "http://docs.example/priest1/files/action-plan.docx"; }));
                         }
 		    }
 		}
