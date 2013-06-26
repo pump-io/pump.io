@@ -884,6 +884,46 @@ suite.addBatch({
 		    "it fails correctly": function(err) {
 			assert.ifError(err);
 		    }
+		},
+		"and a member adds and removes a document": {
+		    topic: function(group, creds) {
+			var callback = this.callback,
+			    url = "http://localhost:4815/api/user/priest2/feed";
+
+			Step(
+			    function() {
+				var act = {
+				    verb: "post",
+				    object: {
+					id: "http://photo.example/priest2/photos/my-vacation-2006",
+					objectType: "image",
+					displayName: "Vacation photo",
+					url: "http://photo.example/priest2/photos/my-vacation-2006.jpg"
+				    },
+				    target: group
+				};
+				pj(url, creds[2], act, this);
+			    },
+			    function(err, posted) {
+				if (err) throw err;
+				var act = {
+				    verb: "remove",
+				    object: {
+					id: "http://photo.example/priest2/photos/my-vacation-2006",
+					objectType: "image"
+				    },
+				    target: group
+				};
+				pj(url, creds[2], act, this);
+			    },
+			    function(err, body) {
+				callback(err);
+			    }
+			);
+		    },
+		    "it works": function(err) {
+			assert.ifError(err);
+		    }
 		}
 	    }
 	}
