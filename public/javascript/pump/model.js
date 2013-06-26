@@ -437,11 +437,17 @@
                             stream.items = new stream.itemsClass(data.items);
                         }
                     }
-                    if (data.links && data.links.next && data.links.next.href) {
-                        if (stream.has('links')) {
-                            stream.get('links').next = data.links.next;
+                    if (data.links) {
+                        if (data.links.next && data.links.next.href) {
+                            if (stream.has('links')) {
+                                stream.get('links').next = data.links.next;
+                            } else {
+                                stream.set('links', data.links);
+                            }
                         } else {
-                            stream.set('links', data.links);
+                            if (stream.has('links')) {
+                                delete stream.get('links').next;
+                            }
                         }
                     }
                     if (_.isFunction(callback)) {

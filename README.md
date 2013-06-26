@@ -195,6 +195,7 @@ Here are the main configuration keys.
   the `smtpport` value if you set this.
 * *compress* Use gzip or deflate to compress text output. This can cut down on network
   transfers considerably at the expense of memory and CPU on the server. Defaults to `false`.
+* *children* Number of children to run. Defaults to 1 for some kinds of DBs, number of CPUS - 1 for others.
 
 ### Web server proxy
 

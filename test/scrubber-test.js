@@ -462,6 +462,7 @@ vows.describe("scrubber module interface").addBatch({
                             content: "Hello, world!"
                         },
                         target: {
+			    id: "urn:uuid:b9b0a2b4-96b8-463a-8941-708210ef202b",
                             objectType: "collection",
                             summary: HARMLESS
                         }
@@ -489,6 +490,7 @@ vows.describe("scrubber module interface").addBatch({
                             content: "Hello, world!"
                         },
                         target: {
+			    id: "urn:uuid:90528c00-ec91-4d27-880b-46ae3c374619",
                             objectType: "collection",
                             summary: DANGEROUS
                         }
@@ -1101,4 +1103,3 @@ vows.describe("scrubber module interface").addBatch({
         }
     }
 })["export"](module);
-

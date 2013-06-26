@@ -314,6 +314,21 @@ var importActivity = function(props, log, callback) {
 
     Step(
         function() {
+            log.info({activity: activity.id}, "Checking for duplicates");
+            Activity.get(activity.id, this);
+        },
+        function(err) {
+            if (err && err.name == "NoSuchThingError") {
+                this(null);
+            } else if (err) {
+                this(err);
+            } else {
+                log.info({activity: activity.id}, "Already imported; skipping.");
+                callback(null);
+            }
+        },
+        function(err) {
+            if (err) throw err;
             log.info({actor: activity.actor.id, object: activity.object.id, verb: activity.verb}, "Localizing objects");
             maybeLocalize(activity.actor, this.parallel());
             maybeLocalize(activity.object, this.parallel());
@@ -479,6 +494,19 @@ var registerUser = function(activity, log, callback) {
 
     Step(
         function() {
+            User.get(props.nickname, this);
+        },
+        function(err, user) {
+            if (err && err.name == "NoSuchThingError") {
+                this(null);
+            } else if (err) {
+                throw err;
+            } else {
+                log.info({nickname: props.nickname}, "Skipping existing user.");
+                callback(null);
+            }
+        },
+        function(err) {
             randomString(16, this);
         },
         function(err, str) {
@@ -628,21 +656,21 @@ var maybeLocalizePerson = function(person, callback) {
         domain,
         id;
 
-    if (!person.portablecontacts_net) {
+    if ((person.url && urlparse(person.url).hostname == URLMaker.hostname) ||
+        (person.id && urlparse(person.id).hostname == URLMaker.hostname)) {
+        domain = URLMaker.hostname;
+    } else {
         personByOldID(person, callback);
+        return;
+    }
+
+    if (!person.portablecontacts_net) {
+        personByLocalID(person, callback);
         return;
     }
 
     if (person.portablecontacts_net && person.portablecontacts_net.preferredUsername) {
         nickname = person.portablecontacts_net.preferredUsername;
-    } else {
-        callback(null, person);
-        return;
-    }
-
-    if ((person.url && urlparse(person.url).hostname == URLMaker.hostname) ||
-        (person.id && urlparse(person.id).hostname == URLMaker.hostname)) {
-        domain = URLMaker.hostname;
     } else {
         callback(null, person);
         return;
@@ -829,6 +857,25 @@ var maybeLocalizeCollection = function(coll, callback) {
 
 var personByOldID = function(person, callback) {
 
+    Step(
+        function() {
+            Person.get(person.id, this);
+        },
+        function(err, found) {
+            if (err && err.name == "NoSuchThingError") {
+                this(null, person);
+            } else if (err) {
+                this(err, null);
+            } else {
+                this(null, found);
+            }
+        },
+        callback
+    );
+};
+
+var personByLocalID = function(person, callback) {
+
     var localID = personLocalID(person);
 
     Step(
@@ -877,7 +924,13 @@ var betterID = function(activity) {
 };
 
 var personLocalID = function(person) {
+
+    if (!person || !person.id) {
+        return null;
+    }
+
     var parts = person.id.match(/\/(\d+)$/);
+
     if (parts) {
         return parts[1];
     } else {
@@ -896,24 +949,16 @@ var checkJoin = function(activity, log, callback) {
             if (err && err.name != "NoSuchThingError") {
                 throw err;
             } else if (err && err.name == "NoSuchThingError") {
-                newGroup = _.clone(activity.object);
-                delete newGroup.id;
-                newGroup.upstreamDuplicates = [activity.object.id];
                 importActivity({actor: activity.actor,
                                 verb: "create",
-                                object: newGroup}, 
+                                object: activity.object},
                                log,
                                this);
             } else if (!err) {
                 callback(null, activity);
             }
         },
-        function(err, created) {
-            if (err) throw err;
-            activity.object = created.object;
-            this(null, activity);
-        },
-        function(err, activity) {
+        function(err) {
             if (err) {
                 log.error(err);
                 process.exit(-1);
