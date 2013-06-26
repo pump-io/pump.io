@@ -923,6 +923,25 @@ suite.addBatch({
 		    },
 		    "it works": function(err) {
 			assert.ifError(err);
+		    },
+		    "and the poster checks the documents feed": {
+			topic: function(group, creds) {
+                            var callback = this.callback,
+                                url = group.documents.url;
+
+                            gj(url, creds[2], function(err, data, resp) {
+                                callback(err, data);
+                            });
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                            validFeed(feed);
+                        },
+                        "it does not have the object": function(err, feed) {
+                            assert.ifError(err);
+			    assert.isArray(feed.items);
+			    assert.isEmpty(_.find(feed.items, function(item) { return item.id == "http://photo.example/priest2/photos/my-vacation-2006"; }));
+                        }
 		    }
 		}
 	    }
