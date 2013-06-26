@@ -661,8 +661,8 @@ suite.addBatch({
 				    url: "http://photo.example/priest0/photos/the-whole-gang.jpg"
 				},
 				target: {
-				    objectType: "collection",
-				    id: group.documents.url
+				    objectType: "group",
+				    id: group.id
 				}
 			    };
 
