@@ -869,7 +869,8 @@ var personByOldID = function(person, callback) {
             } else {
                 this(null, found);
             }
-        }
+        },
+        callback
     );
 };
 
