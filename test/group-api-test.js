@@ -940,7 +940,7 @@ suite.addBatch({
                         "it does not have the object": function(err, feed) {
                             assert.ifError(err);
 			    assert.isArray(feed.items);
-			    assert.isEmpty(_.find(feed.items, function(item) { return item.id == "http://photo.example/priest2/photos/my-vacation-2006"; }));
+			    assert.isUndefined(_.find(feed.items, function(item) { return item.id == "http://photo.example/priest2/photos/my-vacation-2006"; }));
                         }
 		    }
 		}
