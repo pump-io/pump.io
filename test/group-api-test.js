@@ -653,22 +653,19 @@ suite.addBatch({
 		    topic: function(group, creds) {
 			var callback = this.callback,
 			    url = "http://localhost:4815/api/user/priest0/feed",
-			    act = {
-				verb: "add",
-				object: {
-				    objectType: "image",
-				    displayName: "Group photo",
-				    url: "http://photo.example/priest0/photos/the-whole-gang.jpg"
-				},
-				target: {
-				    objectType: "group",
-				    id: group.id
-				}
+			    image = {
+				objectType: "image",
+				displayName: "Group photo",
+				url: "http://photo.example/priest0/photos/the-whole-gang.jpg"
 			    };
 
 			Step(
 			    function() {
-				pj(url, creds[0], act, this);
+				pj(url, creds[0], {verb: "post", to: [group], object: image}, this);
+			    },
+			    function(err, created) {
+				if (err) throw err;
+				pj(url, creds[0], {verb: "add", object: created.object, target: group}, this);
 			    },
 			    function(err, added) {
 				callback(err);
@@ -677,6 +674,46 @@ suite.addBatch({
 		    },
 		    "it works": function(err) {
 			assert.ifError(err);
+		    },
+		    "and the creator reads the document feed": {
+			topic: function(group, creds) {
+                            var callback = this.callback,
+                                url = group.documents.url;
+
+                            gj(url, creds[0], function(err, data, resp) {
+                                callback(err, data);
+                            });
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                            validFeed(feed);
+                        },
+                        "it has the added object": function(err, feed) {
+                            assert.ifError(err);
+                            assert.isTrue(feed.totalItems > 0);
+			    assert.isArray(feed.items);
+			    assert.isObject(_.find(feed.items, function(item) { return item.url == "http://photo.example/priest0/photos/the-whole-gang.jpg"; }));
+                        }
+		    },
+		    "and another member reads the document feed": {
+			topic: function(group, creds) {
+                            var callback = this.callback,
+                                url = group.documents.url;
+
+                            gj(url, creds[6], function(err, data, resp) {
+                                callback(err, data);
+                            });
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                            validFeed(feed);
+                        },
+                        "it has the added object": function(err, feed) {
+                            assert.ifError(err);
+                            assert.isTrue(feed.totalItems > 0);
+			    assert.isArray(feed.items);
+			    assert.isObject(_.find(feed.items, function(item) { return item.url == "http://photo.example/priest0/photos/the-whole-gang.jpg"; }));
+                        }
 		    }
 		}
 	    }
