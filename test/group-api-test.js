@@ -788,6 +788,62 @@ suite.addBatch({
 			    assert.isObject(_.find(feed.items, function(item) { return item.url == "http://docs.example/priest1/files/action-plan.docx"; }));
                         }
 		    }
+		},
+		"and a non-member tries to read the document feed": {
+		    topic: function(group, creds) {
+                        var callback = this.callback,
+                            url = group.documents.url;
+
+			Step(
+			    function() {
+				newCredentials("theduke", "total*sadist", this);
+			    },
+			    function(err, cred) {
+				if (err) throw err;
+				gj(url, cred, this);
+			    },
+			    function(err, body, response) {
+				if (err && err.statusCode == 403) {
+				    callback(null);
+				} else if (err) {
+				    callback(err);
+				} else {
+				    callback(new Error("Unexpected success!"));
+				}
+			    }
+			);
+                    },
+		    "it fails correctly": function(err) {
+			assert.ifError(err);
+		    }
+		},
+		"and a non-member tries to read the members feed": {
+		    topic: function(group, creds) {
+                        var callback = this.callback,
+                            url = group.members.url;
+
+			Step(
+			    function() {
+				newCredentials("atya", "scraw*scraw", this);
+			    },
+			    function(err, cred) {
+				if (err) throw err;
+				gj(url, cred, this);
+			    },
+			    function(err, body, response) {
+				if (err && err.statusCode == 403) {
+				    callback(null);
+				} else if (err) {
+				    callback(err);
+				} else {
+				    callback(new Error("Unexpected success!"));
+				}
+			    }
+			);
+                    },
+		    "it fails correctly": function(err) {
+			assert.ifError(err);
+		    }
 		}
 	    }
 	}
