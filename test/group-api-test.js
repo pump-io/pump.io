@@ -817,6 +817,46 @@ suite.addBatch({
 			assert.ifError(err);
 		    }
 		},
+		"and a non-member tries to add a document": {
+		    topic: function(group, creds) {
+                        var callback = this.callback,
+                            url = group.documents.url;
+
+			Step(
+			    function() {
+				newCredentials("ohmphal", "a*thief's*skull", this);
+			    },
+			    function(err, cred) {
+				var url, act;
+				if (err) throw err;
+				url = "http://localhost:4815/api/user/ohmphal/feed";
+				act = {
+				    verb: "post",
+				    object: {
+					id: "urn:uuid:5245d4e2-60b1-42b8-b24d-032e92a86ac7",
+					objectType: "audio",
+					displayName: "Scary moan",
+					url: "http://sound.example/ohmphal/scary-moan.flac"
+				    },
+				    target: group
+				};
+				pj(url, cred, act, this);
+			    },
+			    function(err, body, response) {
+				if (err && err.statusCode == 400) {
+				    callback(null);
+				} else if (err) {
+				    callback(err);
+				} else {
+				    callback(new Error("Unexpected success!"));
+				}
+			    }
+			);
+                    },
+		    "it fails correctly": function(err) {
+			assert.ifError(err);
+		    }
+		},
 		"and a non-member tries to read the members feed": {
 		    topic: function(group, creds) {
                         var callback = this.callback,
