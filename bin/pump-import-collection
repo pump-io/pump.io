@@ -319,6 +319,7 @@ var importActivity = function(props, log, callback) {
         },
         function(err) {
             if (err && err.name == "NoSuchThingError") {
+                log.info({activity: activity.id}, "Unseen activity.");
                 this(null);
             } else if (err) {
                 this(err);
@@ -494,10 +495,12 @@ var registerUser = function(activity, log, callback) {
 
     Step(
         function() {
+            log.info({nickname: props.nickname}, "Checking for duplicate user");
             User.get(props.nickname, this);
         },
         function(err, user) {
             if (err && err.name == "NoSuchThingError") {
+                log.info({nickname: props.nickname}, "Unseen user.");
                 this(null);
             } else if (err) {
                 throw err;
@@ -698,7 +701,7 @@ var maybeLocalizeObject = function(object, callback) {
 
     var type = object.objectType;
 
-    if ((object.id && urlparse(object.id).hostname == URLMaker.hostname)) {
+    if (isLocalObjectID(object.id)) {
 
         Step(
             function() {
@@ -763,7 +766,7 @@ var maybeLocalizeGroup = function(group, callback) {
 
     var type;
 
-    if ((group.id && urlparse(group.id).hostname == URLMaker.hostname)) {
+    if (isLocalObjectID(group.id)) {
 
         Step(
             function() {
@@ -813,7 +816,7 @@ var maybeLocalizeCollection = function(coll, callback) {
 
     var type;
 
-    if ((coll.id && urlparse(coll.id).hostname == URLMaker.hostname)) {
+    if (isLocalObjectID(coll.id)) {
 
         Step(
             function() {
@@ -939,7 +942,12 @@ var personLocalID = function(person) {
 };
 
 var checkJoin = function(activity, log, callback) {
-    
+
+    if (!isLocalObjectID(activity.object.id)) {
+        callback(null);
+        return;
+    }
+
     Step(
         function() {
             ActivityObject.getObject(ActivityObject.GROUP, activity.object.id, this);
@@ -955,7 +963,7 @@ var checkJoin = function(activity, log, callback) {
                                log,
                                this);
             } else if (!err) {
-                callback(null, activity);
+                callback(null);
             }
         },
         function(err) {
@@ -963,10 +971,14 @@ var checkJoin = function(activity, log, callback) {
                 log.error(err);
                 process.exit(-1);
             } else {
-                callback(null, activity);
+                callback(null);
             }
         }
     );
+};
+
+var isLocalObjectID = function(id) {
+    return (id && urlparse(id).hostname == URLMaker.hostname);
 };
 
 // Run the main function
