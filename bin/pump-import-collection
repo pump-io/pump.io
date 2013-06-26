@@ -656,21 +656,21 @@ var maybeLocalizePerson = function(person, callback) {
         domain,
         id;
 
-    if (!person.portablecontacts_net) {
+    if ((person.url && urlparse(person.url).hostname == URLMaker.hostname) ||
+        (person.id && urlparse(person.id).hostname == URLMaker.hostname)) {
+        domain = URLMaker.hostname;
+    } else {
         personByOldID(person, callback);
+        return;
+    }
+
+    if (!person.portablecontacts_net) {
+        personByLocalID(person, callback);
         return;
     }
 
     if (person.portablecontacts_net && person.portablecontacts_net.preferredUsername) {
         nickname = person.portablecontacts_net.preferredUsername;
-    } else {
-        callback(null, person);
-        return;
-    }
-
-    if ((person.url && urlparse(person.url).hostname == URLMaker.hostname) ||
-        (person.id && urlparse(person.id).hostname == URLMaker.hostname)) {
-        domain = URLMaker.hostname;
     } else {
         callback(null, person);
         return;
@@ -857,6 +857,24 @@ var maybeLocalizeCollection = function(coll, callback) {
 
 var personByOldID = function(person, callback) {
 
+    Step(
+        function() {
+            Person.get(person.id, this);
+        },
+        function(err, found) {
+            if (err && err.name == "NoSuchThingError") {
+                this(null, person);
+            } else if (err) {
+                this(err, null);
+            } else {
+                this(null, found);
+            }
+        }
+    );
+};
+
+var personByLocalID = function(person, callback) {
+
     var localID = personLocalID(person);
 
     Step(
@@ -911,6 +929,7 @@ var personLocalID = function(person) {
     }
 
     var parts = person.id.match(/\/(\d+)$/);
+
     if (parts) {
         return parts[1];
     } else {
