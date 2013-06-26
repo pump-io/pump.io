@@ -102,7 +102,7 @@ var updateActivity = function(act, update) {
                     if (err) throw err;
                     copied = _.extend(posted, update);
                     url = posted.links.self.href;
-                    httputil.putJSON(url, cred, copied, this); 
+                    httputil.putJSON(url, cred, copied, this);
                 },
                 function(err, updated) {
                     if (err) {
@@ -180,7 +180,7 @@ suite.addBatch({
                 assert.ifError(err);
                 assert.isObject(cred);
             },
-            "and we post an activity with good content": 
+            "and we post an activity with good content":
             goodActivity({verb: "post",
                           content: HARMLESS,
                           object: {
@@ -189,7 +189,7 @@ suite.addBatch({
                           }
                          },
                          "content"),
-            "and we post an activity with bad content": 
+            "and we post an activity with bad content":
             badActivity({verb: "post",
                          content: DANGEROUS,
                          object: {
@@ -198,7 +198,7 @@ suite.addBatch({
                          }
                         },
                         "content"),
-            "and we post an activity with good object content": 
+            "and we post an activity with good object content":
             goodActivity({verb: "post",
                           object: {
                               objectType: "note",
@@ -206,7 +206,7 @@ suite.addBatch({
                           }
                          },
                          "object.content"),
-            "and we post an activity with bad object content": 
+            "and we post an activity with bad object content":
             badActivity({verb: "post",
                          object: {
                              objectType: "note",
@@ -214,25 +214,27 @@ suite.addBatch({
                          }
                         },
                         "object.content"),
-            "and we post an activity with good target summary": 
+            "and we post an activity with good target summary":
             goodActivity({verb: "post",
                           object: {
                               objectType: "note",
                               content: "Hello, world."
                           },
                           target: {
+			      id: "urn:uuid:1a749377-5b7d-41d9-a4f7-2a3a4ca3e630",
                               objectType: "collection",
                               summary: HARMLESS
                           }
                          },
                          "target.summary"),
-            "and we post an activity with bad target summary": 
+            "and we post an activity with bad target summary":
             badActivity({verb: "post",
                           object: {
                               objectType: "note",
                               content: "Hello, world."
                           },
                           target: {
+			      id: "urn:uuid:5ead821a-f418-4429-b4fa-e6ab0290f8da",
                               objectType: "collection",
                               summary: DANGEROUS
                           }
@@ -268,7 +270,7 @@ suite.addBatch({
                     }
                 }
             },
-            "and we post an activity with good provider summary": 
+            "and we post an activity with good provider summary":
             goodActivity({verb: "post",
                           object: {
                               objectType: "note",
@@ -281,7 +283,7 @@ suite.addBatch({
                           }
                          },
                          "provider.summary"),
-            "and we post an activity with bad provider summary": 
+            "and we post an activity with bad provider summary":
             badActivity({verb: "post",
                           object: {
                               objectType: "note",
@@ -294,7 +296,7 @@ suite.addBatch({
                           }
                          },
                          "provider.summary"),
-            "and we post an activity with good context summary": 
+            "and we post an activity with good context summary":
             goodActivity({verb: "post",
                           object: {
                               objectType: "note",
@@ -307,7 +309,7 @@ suite.addBatch({
                           }
                          },
                          "context.summary"),
-            "and we post an activity with bad context summary": 
+            "and we post an activity with bad context summary":
             badActivity({verb: "post",
                           object: {
                               objectType: "note",
@@ -320,7 +322,7 @@ suite.addBatch({
                           }
                          },
                          "context.summary"),
-            "and we post an activity with good source summary": 
+            "and we post an activity with good source summary":
             goodActivity({verb: "post",
                           object: {
                               objectType: "note",
@@ -333,7 +335,7 @@ suite.addBatch({
                           }
                          },
                          "source.summary"),
-            "and we post an activity with bad source summary": 
+            "and we post an activity with bad source summary":
             badActivity({verb: "post",
                          object: {
                              objectType: "note",
@@ -346,7 +348,7 @@ suite.addBatch({
                          }
                         },
                         "source.summary"),
-            "and we update an activity with good content": 
+            "and we update an activity with good content":
             goodUpdate({verb: "post",
                         object: {
                             objectType: "note",
@@ -355,7 +357,7 @@ suite.addBatch({
                        },
                        {content: HARMLESS},
                        "content"),
-            "and we update an activity with bad content": 
+            "and we update an activity with bad content":
             badUpdate({verb: "post",
                        object: {
                            objectType: "note",
@@ -364,7 +366,7 @@ suite.addBatch({
                       },
                       {content: DANGEROUS},
                       "content"),
-            "and we update an activity with a private member": 
+            "and we update an activity with a private member":
             privateUpdate({verb: "post",
                            object: {
                                objectType: "note",
