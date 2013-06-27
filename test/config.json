@@ -1,5 +1,5 @@
 {
-    "driver": "memory",
+    "driver": "mongodb",
     "params": {}
 }
 
