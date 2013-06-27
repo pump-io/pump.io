@@ -354,6 +354,11 @@ var importActivity = function(props, log, callback) {
                 activity.bcc = bcc;
             }
             activity._uuid = IDMaker.makeID();
+
+            if (activity.provider && !activity.provider.id && activity.provider.url) {
+                activity.provider.id = activity.provider.url;
+            }
+
             delete activity.content;
             // Specific fixups for different verbs
             switch (activity.verb) {
