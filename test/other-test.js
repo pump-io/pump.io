@@ -28,27 +28,21 @@ var suite = vows.describe("other module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ["_created",
-             "_uuid",
-             "attachments",
+    fields: ["attachments",
              "author",
              "content",
              "displayName",
              "downstreamDuplicates",
-             "id",
+             "fullImage",
              "image",
-             "inReplyTo",
-             "likes",
-             "links",
              "objectType",
              "published",
-             "replies",
-             "shares",
              "summary",
              "updated",
              "upstreamDuplicates",
-             "url"],
-    indices: ["_uuid", "url"]
+             "url",
+             "_uuid"],
+    indices: ["_uuid"]
 };
 
 var testData = {
