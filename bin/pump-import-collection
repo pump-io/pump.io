@@ -22,7 +22,7 @@ var fs = require("fs"),
     path = require("path"),
     urlparse = require("url").parse,
     Step = require("step"),
-    _ = require("underscore"),
+    _ = require("underscore-contrib"),
     Logger = require("bunyan"),
     Queue = require("jankyqueue"),
     databank = require("databank"),
@@ -333,15 +333,29 @@ var importActivity = function(props, log, callback) {
             log.info({actor: activity.actor.id, object: activity.object.id, verb: activity.verb}, "Localizing objects");
             maybeLocalize(activity.actor, this.parallel());
             maybeLocalize(activity.object, this.parallel());
-            var t = this;
-            _.each(["to", "cc", "bto", "bcc"], function(name) {
-                maybeLocalizeArray(activity[name], t.parallel());
-            });
         },
-        function(err, actor, object, to, cc, bto, bcc) {
+        function(err, actor, object) {
             if (err) throw err;
             activity.actor = actor;
             activity.object = object;
+            var t = this,
+                origF = _.getPath(props, ["actor", "followers", "url"]),
+                newF = _.getPath(activity, ["actor", "followers", "url"]);
+
+            _.each(["to", "cc", "bto", "bcc"], function(name) {
+                if (origF && newF && origF != newF) {
+                    _.each(activity[name], function(addr) {
+                        if (addr.id == origF) {
+                            log.info({original: origF, new: newF}, "Replacing followers URL in addresses");
+                            addr.id = newF;
+                        }
+                    });
+                }
+                maybeLocalizeArray(activity[name], t.parallel());
+            });
+        },
+        function(err, to, cc, bto, bcc) {
+            if (err) throw err;
             if (to && to.length > 0) {
                 activity.to = to;
             }
@@ -375,10 +389,10 @@ var importActivity = function(props, log, callback) {
                 break;
             case Activity.POST:
                 // Auto-create activity content
-                if (activity.id == object.id) {
+                if (activity.id == activity.object.id) {
                     activity.id = betterID(activity);
                 }
-                if (activity.url == object.url) {
+                if (activity.url == activity.object.url) {
                     delete activity.url;
                 }
                 if (activity.object.objectType == "note" && _.isObject(activity.object.inReplyTo)) {
