@@ -172,6 +172,10 @@ suite.addBatch({
                       type: "client_associate",
                       application_type: "native"
                      }),
+        "and we register to associate with contacts as an array":
+        assocFail({application_name: "Bad Contact",
+                   type: "client_associate",
+                   contacts: ["john@example.com", "sue@example.net"]}),
         "and we register to associate with non-email contacts set":
         assocFail({application_name: "Bad Contact",
                    type: "client_associate",
