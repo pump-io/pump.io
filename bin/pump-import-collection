@@ -358,7 +358,7 @@ var importActivity = function(props, log, callback) {
             if (activity.provider && !activity.provider.id && activity.provider.url) {
                 activity.provider.id = activity.provider.url;
             }
-
+            
             delete activity.content;
             // Specific fixups for different verbs
             switch (activity.verb) {
@@ -955,7 +955,15 @@ var personLocalID = function(person) {
 };
 
 var checkJoin = function(activity, log, callback) {
-    
+
+    if (activity.verb != Activity.JOIN ||
+        !activity.object ||
+        activity.object.objectType != ActivityObject.GROUP) {
+        log.info({object: activity.object}, "skipping localized join for non-group");
+        callback(null);
+        return;
+    }
+
     Step(
         function() {
             ActivityObject.getObject(ActivityObject.GROUP, activity.object.id, this);
