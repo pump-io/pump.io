@@ -396,14 +396,13 @@ var importActivity = function(props, log, callback) {
             case Activity.SHARE:
                 var shared = activity.object;
                 if (shared.verb) {
-                    log.info({activity: activity.id}, "Changing shared activity to shared object");
+                    log.info({activity: activity.id, sharedActivity: shared.id}, "Changing shared activity to shared object");
                     if (shared.verb == Activity.POST) {
                         activity.object = shared.object;
                         activity.object.author = shared.actor;
                     }
-                } else {
-                    this(null);
                 }
+		this(null);
                 break;
             default:
                 this(null);
@@ -962,12 +961,13 @@ var checkJoin = function(activity, log, callback) {
             ActivityObject.getObject(ActivityObject.GROUP, activity.object.id, this);
         },
         function(err, group) {
-            var newGroup;
             if (err && err.name != "NoSuchThingError") {
                 throw err;
             } else if (err && err.name == "NoSuchThingError") {
                 importActivity({actor: activity.actor,
                                 verb: "create",
+                                to: [{objectType: ActivityObject.COLLECTION,
+                                      id: Collection.PUBLIC}],
                                 object: activity.object},
                                log,
                                this);
