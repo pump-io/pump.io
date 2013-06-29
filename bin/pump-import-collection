@@ -393,6 +393,18 @@ var importActivity = function(props, log, callback) {
                 log.info({activity: activity.id}, "Checking join");
                 checkJoin(activity, log, this);
                 break;
+            case Activity.SHARE:
+                var shared = activity.object;
+                if (shared.verb) {
+                    log.info({activity: activity.id}, "Changing shared activity to shared object");
+                    if (shared.verb == Activity.POST) {
+                        activity.object = shared.object;
+                        activity.object.author = shared.actor;
+                    }
+                } else {
+                    this(null);
+                }
+                break;
             default:
                 this(null);
                 break;
