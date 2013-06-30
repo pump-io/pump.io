@@ -22,7 +22,7 @@ var fs = require("fs"),
     path = require("path"),
     urlparse = require("url").parse,
     Step = require("step"),
-    _ = require("underscore"),
+    _ = require("underscore-contrib"),
     Logger = require("bunyan"),
     Queue = require("jankyqueue"),
     databank = require("databank"),
@@ -271,7 +271,6 @@ var connectDatabank = function(config, callback) {
     params.schema.note.indices.push("status_net.message_id");
 
     params.schema.group.indices.push("upstreamDuplicates.0");
-    params.schema.person.indices.push("status_net.profile_info.local_id");
 
     db = Databank.get(config.driver, params);
 
@@ -333,12 +332,28 @@ var importActivity = function(props, log, callback) {
             log.info({actor: activity.actor.id, object: activity.object.id, verb: activity.verb}, "Localizing objects");
             maybeLocalize(activity.actor, this.parallel());
             maybeLocalize(activity.object, this.parallel());
-            var t = this;
+        },
+        function(err, actor, object) {
+            if (err) throw err;
+            activity.actor = actor;
+            activity.object = object;
+            var t = this,
+                origF = _.getPath(props, ["actor", "followers", "url"]),
+                newF = _.getPath(activity, ["actor", "followers", "url"]);
+
             _.each(["to", "cc", "bto", "bcc"], function(name) {
+                if (origF && newF && origF != newF) {
+                    _.each(activity[name], function(addr) {
+                        if (addr.id == origF) {
+                            log.info({original: origF, new: newF}, "Replacing followers URL in addresses");
+                            addr.id = newF;
+                        }
+                    });
+                }
                 maybeLocalizeArray(activity[name], t.parallel());
             });
         },
-        function(err, actor, object, to, cc, bto, bcc) {
+        function(err, to, cc, bto, bcc) {
             if (err) throw err;
             activity.actor = actor;
             activity.object = object;
@@ -789,16 +804,15 @@ var maybeLocalizeGroup = function(group, callback) {
                 Group.search({"upstreamDuplicates.0": group.id}, this);
             },
             function(err, results) {
-                if (err && err.name == "NoSuchThingError") {
-                    group._uuid = IDMaker.makeID();
+                if (err) {
+                    throw err;
+                } else if (!results || results.length == 0) {
 
-                    if (!_.has(group, "links")) {
-                        group.links = {};
-                    }
+                    group.upstreamDuplicates = [
+                        group.id
+                    ];
 
-                    group.links["activity-inbox"] = {
-                        href: URLMaker.makeURL("api/group/" + group._uuid + "/inbox")
-                    };
+                    delete group.id;
 
                     Step(
                         function() {
@@ -815,11 +829,8 @@ var maybeLocalizeGroup = function(group, callback) {
                             }
                         }
                     );
-
-                } else if (err) {
-                    callback(err, null);
                 } else {
-                    callback(null, results);
+                    callback(null, results[0]);
                 }
             }
         );
@@ -959,7 +970,8 @@ var personLocalID = function(person) {
 
 var checkJoin = function(activity, log, callback) {
 
-    if (!isLocalObjectID(activity.object.id)) {
+    if (!isLocalObjectID(activity.object.id) ||
+        activity.object.objectType != ActivityObject.GROUP) {
         callback(null);
         return;
     }
