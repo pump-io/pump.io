@@ -271,7 +271,6 @@ var connectDatabank = function(config, callback) {
     params.schema.note.indices.push("status_net.message_id");
 
     params.schema.group.indices.push("upstreamDuplicates.0");
-    params.schema.person.indices.push("status_net.profile_info.local_id");
 
     db = Databank.get(config.driver, params);
 
@@ -803,16 +802,15 @@ var maybeLocalizeGroup = function(group, callback) {
                 Group.search({"upstreamDuplicates.0": group.id}, this);
             },
             function(err, results) {
-                if (err && err.name == "NoSuchThingError") {
-                    group._uuid = IDMaker.makeID();
+                if (err) {
+                    throw err;
+                } else if (!results || results.length == 0) {
 
-                    if (!_.has(group, "links")) {
-                        group.links = {};
-                    }
+                    group.upstreamDuplicates = [
+                        group.id
+                    ];
 
-                    group.links["activity-inbox"] = {
-                        href: URLMaker.makeURL("api/group/" + group._uuid + "/inbox")
-                    };
+                    delete group.id;
 
                     Step(
                         function() {
@@ -829,11 +827,8 @@ var maybeLocalizeGroup = function(group, callback) {
                             }
                         }
                     );
-
-                } else if (err) {
-                    callback(err, null);
                 } else {
-                    callback(null, results);
+                    callback(null, results[0]);
                 }
             }
         );
