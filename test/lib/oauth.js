@@ -29,11 +29,11 @@ var cp = require("child_process"),
 
 var OAuthError = function(obj) {
     Error.captureStackTrace(this, OAuthError);
-    this.name = "OAuthError";  
+    this.name = "OAuthError";
     _.extend(this, obj);
 };
 
-OAuthError.prototype = new Error();  
+OAuthError.prototype = new Error();
 OAuthError.prototype.constructor = OAuthError;
 
 OAuthError.prototype.toString = function() {
@@ -249,8 +249,8 @@ var register = function(cl, nickname, password, hostname, port, path, callback) 
 	full = rel;
     }
 
-    httputil.postJSON(proto+"://"+hostname+":"+port+full, 
-                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
+    httputil.postJSON(proto+"://"+hostname+":"+port+full,
+                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
                       {nickname: nickname, password: password},
                       function(err, body, res) {
                           callback(err, body);
@@ -268,8 +268,8 @@ var registerEmail = function(cl, nickname, password, email, hostname, port, call
 
     proto = (port === 443) ? "https" : "http";
 
-    httputil.postJSON(proto+"://"+hostname+":"+port+"/api/users", 
-                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
+    httputil.postJSON(proto+"://"+hostname+":"+port+"/api/users",
+                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
                       {nickname: nickname, password: password, email: email},
                       function(err, body, res) {
                           callback(err, body);
@@ -285,7 +285,7 @@ var newCredentials = function(nickname, password, hostname, port, cb) {
         hostname = "localhost";
         port = 4815;
     }
-    
+
     Step(
         function() {
             newClient(hostname, port, this);
@@ -370,13 +370,13 @@ var setupApp = function(port, hostname, callback) {
 
 var setupAppConfig = function(config, callback) {
 
-    var prop, args = [], credwait = {}; 
+    var prop, args = [], credwait = {};
 
     config.port = config.port || 4815;
     config.hostname = config.hostname || "localhost";
 
     for (prop in config) {
-        args.push(prop + "=" + config[prop]);
+        args.push(prop + "=" + JSON.stringify(config[prop]));
     }
 
     var child = cp.fork(path.join(__dirname, "app.js"), args);
