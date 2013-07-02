@@ -120,6 +120,21 @@ vows.describe("provider module interface").addBatch({
                         assert.isString(client.consumer_key);
                         assert.isString(client.secret);
                     }
+                },
+                "and we use applicationByConsumerKey() on a configured key": {
+                    topic: function(provider) {
+			var callback = this.callback;
+			provider.applicationByConsumerKey("AAAAAAAAAA", callback);
+		    },
+                    "it works": function(err, client) {
+                        assert.ifError(err);
+                        assert.isObject(client);
+                    },
+                    "it has the right fields": function(err, client) {
+                        assert.ifError(err);
+                        assert.isString(client.consumer_key);
+                        assert.isString(client.secret);
+                    }
                 }
 	    }
         }
