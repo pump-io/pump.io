@@ -21,6 +21,7 @@ var assert = require("assert"),
     Step = require("step"),
     _ = require("underscore"),
     httputil = require("./lib/http"),
+    gj = httputil.getJSON,
     oauthutil = require("./lib/oauth"),
     setupAppConfig = oauthutil.setupAppConfig;
 
@@ -45,7 +46,22 @@ suite.addBatch({
         },
         "it works": function(err, app) {
             assert.ifError(err);
-        }
+        },
+	"and we request the user stream with the configured client credentials": {
+	    topic: function() {
+		var callback = this.callback,
+		    cred = {
+			consumer_key: CLIENT_ID_1,
+			consumer_secret: CLIENT_SECRET_1
+		    };
+
+		gj("http://localhost:4815/api/users", cred, callback);
+	    },
+	    "it works": function(err, body, resp) {
+		assert.ifError(err);
+		assert.isObject(body);
+	    }
+	}
     }
 });
 
