@@ -16,6 +16,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Adds to globals
+require("set-immediate");
+
 var databank = require("databank"),
     _ = require("underscore"),
     Step = require("step"),
@@ -272,18 +275,7 @@ var getObject = function(req, res, next) {
 
     Step(
         function() {
-            obj.expandFeeds(this);
-        },
-        function(err) {
-            if (err) throw err;
-            addLiked(profile, [obj], this.parallel());
-            addLikers(profile, [obj], this.parallel());
-            addShared(profile, [obj], this.parallel());
-            firstFewReplies(profile, [obj], this.parallel());
-            firstFewShares(profile, [obj], this.parallel());
-            if (obj.isFollowable()) {
-                addFollowed(profile, [obj], this.parallel());
-            }
+            finishObject(profile, obj, this);
         },
         function(err) {
             if (err) {
@@ -908,7 +900,34 @@ var listUsers = function(req, res, next) {
 var postActivity = function(req, res, next) {
 
     var props = Scrubber.scrubActivity(req.body),
-        activity = new Activity(props);
+        activity = new Activity(props),
+        finishAndSend = function(profile, activity, callback) {
+            
+            var dupe = new Activity(_.clone(activity));
+
+            Step(
+                function() {
+                    finishProperty(profile, dupe, "object", this.parallel());
+                    finishProperty(profile, dupe, "target", this.parallel());
+                },
+                function(err, object, target) {
+                    if (err) {
+                        callback(err);
+                    } else {
+                        dupe.sanitize(req.principal);
+                        // ...then show (possibly modified) results.
+                        res.json(dupe);
+                        callback(null);
+                    }
+                }
+            );
+        },
+        distributeActivity = function(activity, callback) {
+            var dupe = new Activity(_.clone(activity)),
+                d = new Distributor(dupe);
+
+            d.distribute(callback);
+        };
 
     // Add a default actor
 
@@ -937,17 +956,17 @@ var postActivity = function(req, res, next) {
         function() {
             newActivity(activity, req.user, this);
         },
-        function(err, activity) {
-            var d;
+        function(err, results) {
+            if (err) throw err;
+            activity = results;
+            finishAndSend(req.principal, activity, this.parallel());
+            distributeActivity(activity, this.parallel());
+        },
+        function(err) {
             if (err) {
                 next(err);
             } else {
-                activity.sanitize(req.principal);
-                // ...then show (possibly modified) results.
-                res.json(activity);
-                // ...then distribute.
-                d = new Distributor(activity);
-                d.distribute(function(err) {});
+                // Done!
             }
         }
     );
@@ -1633,6 +1652,45 @@ var proxyRequest = function(req, res, next) {
                 req.log.info({headers: pres.headers}, "Received object");
                 res.send(pbody);
             }
+        }
+    );
+};
+
+var finishProperty = function(profile, obj, prop, callback) {
+    if (!obj[prop]) {
+        setImmediate(function() {
+            callback(null);
+        });
+        return;
+    }
+
+    Step(
+        function() {
+            finishObject(profile, obj[prop], this);
+        },
+        callback
+    );
+};
+
+var finishObject = function(profile, obj, callback) {
+
+    Step(
+        function() {
+            obj.expandFeeds(this);
+        },
+        function(err) {
+            if (err) throw err;
+            addLiked(profile, [obj], this.parallel());
+            addLikers(profile, [obj], this.parallel());
+            addShared(profile, [obj], this.parallel());
+            firstFewReplies(profile, [obj], this.parallel());
+            firstFewShares(profile, [obj], this.parallel());
+            if (obj.isFollowable()) {
+                addFollowed(profile, [obj], this.parallel());
+            }
+        },
+        function(err) {
+            callback(err);
         }
     );
 };
