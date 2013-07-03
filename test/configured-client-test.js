@@ -22,8 +22,12 @@ var assert = require("assert"),
     _ = require("underscore"),
     httputil = require("./lib/http"),
     gj = httputil.getJSON,
+    pj = httputil.postJSON,
     oauthutil = require("./lib/oauth"),
-    setupAppConfig = oauthutil.setupAppConfig;
+    actutil = require("./lib/activity"),
+    validActivity = actutil.validActivity,
+    setupAppConfig = oauthutil.setupAppConfig,
+    newPair = oauthutil.newPair;
 
 var CLIENT_ID_1 = "AAAAAAAAAAAAAAAAAAAA",
     CLIENT_SECRET_1 = "BBBBBBBBBBBBBBBBBBBB";
@@ -60,6 +64,44 @@ suite.addBatch({
 	    "it works": function(err, body, resp) {
 		assert.ifError(err);
 		assert.isObject(body);
+	    }
+	},
+	"and we register a user with the configured client credentials": {
+	    topic: function() {
+		var callback = this.callback,
+		    cred = {
+			client_id: CLIENT_ID_1,
+			client_secret: CLIENT_SECRET_1
+		    };
+
+		newPair(cred, "maude", "grumpy*666", callback);
+	    },
+	    "it works": function(err, pair) {
+		assert.ifError(err);
+		assert.isObject(pair);
+	    },
+	    "and we post a new activity with those credentials": {
+		topic: function(pair) {
+		    var callback = this.callback,
+			cred = _.extend({
+			    consumer_key: CLIENT_ID_1,
+			    consumer_secret: CLIENT_SECRET_1
+			}, pair),
+			url = "http://localhost:4815/api/user/maude/feed",
+			act = {
+			    verb: "post",
+			    object: {
+				objectType: "note",
+				content: "Hello, world."
+			    }
+			};
+
+		    pj(url, cred, act, callback);
+		},
+		"it works": function(err, body) {
+		    assert.ifError(err);
+		    validActivity(body);
+		}
 	    }
 	}
     }
