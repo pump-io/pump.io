@@ -33,17 +33,21 @@ var _ = require("underscore"),
         .alias("n", "note")
         .alias("s", "server")
         .alias("P", "port")
+        .alias("p", "public")
         .describe("u", "User nickname")
         .describe("n", "Text of note to post (HTML OK)")
         .describe("s", "Server name (default 'localhost')")
         .describe("P", "Port (default 80)")
+        .describe("p", "Set note to be Public")
         .default("P", 80)
         .default("s", "localhost")
+        .default("p", false)
         .argv,
     username = argv.u,
     server = argv.s,
     note = argv.n,
     port = argv.P;
+    isPublic = argv.p;
 
 Step(
     function() {
@@ -51,13 +55,27 @@ Step(
     },
     function(err, cred) {
         if (err) throw err;
-        var activity = {
-            "verb": "post",
-            "object": {
-	        "objectType": "note",
-	        "content": note
-            }
-        };
+        if (isPublic) {
+            var activity = {
+                "to":[
+                    {"objectType":"collection",
+                    "id":"http://activityschema.org/collection/public"}
+                ],
+                "verb": "post",
+                "object": {
+                "objectType": "note",
+                "content": note
+                }
+            };
+        } else {
+            var activity = {
+                "verb": "post",
+                "object": {
+                "objectType": "note",
+                "content": note
+                }
+            };
+        }
         var endpoint = url.format({
             protocol: ((port == 443) ? "https" : "http"),
             host: ((port == 80) ? server : server + ":" + port),
