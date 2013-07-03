@@ -134,7 +134,7 @@ Here are the main configuration keys.
    OK for most systems. Use this if you've got some kind of
    load-balancer or NAS or whatever and your local IP doesn't map to
    the IP of the hostname.
-* *port* Port to listen on. Defaults to 31337, which is no good. You
+* *port* Port to listen on. Defaults to 8000, which is no good. You
    should listen on 80 or 443 if you're going to have anyone use this.
 * *urlPort* Port to use for generating URLs. Defaults to the same as `port`,
   but if you're insisting on proxying behind Apache or whatever despite
