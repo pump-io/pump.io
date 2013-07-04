@@ -22,7 +22,7 @@ var fs = require("fs"),
     path = require("path"),
     urlparse = require("url").parse,
     Step = require("step"),
-    _ = require("underscore"),
+    _ = require("underscore-contrib"),
     Logger = require("bunyan"),
     Queue = require("jankyqueue"),
     databank = require("databank"),
@@ -271,7 +271,6 @@ var connectDatabank = function(config, callback) {
     params.schema.note.indices.push("status_net.message_id");
 
     params.schema.group.indices.push("upstreamDuplicates.0");
-    params.schema.person.indices.push("status_net.profile_info.local_id");
 
     db = Databank.get(config.driver, params);
 
@@ -333,15 +332,29 @@ var importActivity = function(props, log, callback) {
             log.info({actor: activity.actor.id, object: activity.object.id, verb: activity.verb}, "Localizing objects");
             maybeLocalize(activity.actor, this.parallel());
             maybeLocalize(activity.object, this.parallel());
-            var t = this;
-            _.each(["to", "cc", "bto", "bcc"], function(name) {
-                maybeLocalizeArray(activity[name], t.parallel());
-            });
         },
-        function(err, actor, object, to, cc, bto, bcc) {
+        function(err, actor, object) {
             if (err) throw err;
             activity.actor = actor;
             activity.object = object;
+            var t = this,
+                origF = _.getPath(props, ["actor", "followers", "url"]),
+                newF = _.getPath(activity, ["actor", "followers", "url"]);
+
+            _.each(["to", "cc", "bto", "bcc"], function(name) {
+                if (origF && newF && origF != newF) {
+                    _.each(activity[name], function(addr) {
+                        if (addr.id == origF) {
+                            log.info({original: origF, new: newF}, "Replacing followers URL in addresses");
+                            addr.id = newF;
+                        }
+                    });
+                }
+                maybeLocalizeArray(activity[name], t.parallel());
+            });
+        },
+        function(err, to, cc, bto, bcc) {
+            if (err) throw err;
             if (to && to.length > 0) {
                 activity.to = to;
             }
@@ -355,6 +368,11 @@ var importActivity = function(props, log, callback) {
                 activity.bcc = bcc;
             }
             activity._uuid = IDMaker.makeID();
+
+            if (activity.provider && !activity.provider.id && activity.provider.url) {
+                activity.provider.id = activity.provider.url;
+            }
+
             delete activity.content;
             // Specific fixups for different verbs
             switch (activity.verb) {
@@ -370,10 +388,10 @@ var importActivity = function(props, log, callback) {
                 break;
             case Activity.POST:
                 // Auto-create activity content
-                if (activity.id == object.id) {
+                if (activity.id == activity.object.id) {
                     activity.id = betterID(activity);
                 }
-                if (activity.url == object.url) {
+                if (activity.url == activity.object.url) {
                     delete activity.url;
                 }
                 if (activity.object.objectType == "note" && _.isObject(activity.object.inReplyTo)) {
@@ -388,6 +406,17 @@ var importActivity = function(props, log, callback) {
             case Activity.JOIN:
                 log.info({activity: activity.id}, "Checking join");
                 checkJoin(activity, log, this);
+                break;
+            case Activity.SHARE:
+                var shared = activity.object;
+                if (shared.verb) {
+                    log.info({activity: activity.id, sharedActivity: shared.id}, "Changing shared activity to shared object");
+                    if (shared.verb == Activity.POST) {
+                        activity.object = shared.object;
+                        activity.object.author = shared.actor;
+                    }
+                }
+		this(null);
                 break;
             default:
                 this(null);
@@ -569,7 +598,12 @@ var registerUser = function(activity, log, callback) {
             activity.actor = user.profile;
             importActivity(activity, log, this);
         },
-        callback
+        function(err) {
+            if (err) {
+                log.error(err);
+            }
+            callback(null);
+        }
     );
 };
 
@@ -626,7 +660,7 @@ var maybeLocalize = function(object, callback) {
 };
 
 var maybeLocalizeArray = function(arr, callback) {
-    
+
     // skip if it's null or empty
 
     if (!arr) {
@@ -659,21 +693,21 @@ var maybeLocalizePerson = function(person, callback) {
         domain,
         id;
 
-    if (!person.portablecontacts_net) {
+    if ((person.url && urlparse(person.url).hostname == URLMaker.hostname) ||
+        (person.id && urlparse(person.id).hostname == URLMaker.hostname)) {
+        domain = URLMaker.hostname;
+    } else {
         personByOldID(person, callback);
+        return;
+    }
+
+    if (!person.portablecontacts_net) {
+        personByLocalID(person, callback);
         return;
     }
 
     if (person.portablecontacts_net && person.portablecontacts_net.preferredUsername) {
         nickname = person.portablecontacts_net.preferredUsername;
-    } else {
-        callback(null, person);
-        return;
-    }
-
-    if ((person.url && urlparse(person.url).hostname == URLMaker.hostname) ||
-        (person.id && urlparse(person.id).hostname == URLMaker.hostname)) {
-        domain = URLMaker.hostname;
     } else {
         callback(null, person);
         return;
@@ -730,7 +764,7 @@ var maybeLocalizeObject = function(object, callback) {
                     object.shares = {
                         url: URLMaker.makeURL("api/" + type + "/" + object._uuid + "/shares")
                     };
-                    
+
                     Step(
                         function() {
                             maybeLocalize(object.inReplyTo, this.parallel());
@@ -773,16 +807,15 @@ var maybeLocalizeGroup = function(group, callback) {
                 Group.search({"upstreamDuplicates.0": group.id}, this);
             },
             function(err, results) {
-                if (err && err.name == "NoSuchThingError") {
-                    group._uuid = IDMaker.makeID();
+                if (err) {
+                    throw err;
+                } else if (!results || results.length == 0) {
 
-                    if (!_.has(group, "links")) {
-                        group.links = {};
-                    }
+                    group.upstreamDuplicates = [
+                        group.id
+                    ];
 
-                    group.links["activity-inbox"] = {
-                        href: URLMaker.makeURL("api/group/" + group._uuid + "/inbox")
-                    };
+                    delete group.id;
 
                     Step(
                         function() {
@@ -799,11 +832,8 @@ var maybeLocalizeGroup = function(group, callback) {
                             }
                         }
                     );
-
-                } else if (err) {
-                    callback(err, null);
                 } else {
-                    callback(null, results);
+                    callback(null, results[0]);
                 }
             }
         );
@@ -860,6 +890,25 @@ var maybeLocalizeCollection = function(coll, callback) {
 
 var personByOldID = function(person, callback) {
 
+    Step(
+        function() {
+            Person.get(person.id, this);
+        },
+        function(err, found) {
+            if (err && err.name == "NoSuchThingError") {
+                this(null, person);
+            } else if (err) {
+                this(err, null);
+            } else {
+                this(null, found);
+            }
+        },
+        callback
+    );
+};
+
+var personByLocalID = function(person, callback) {
+
     var localID = personLocalID(person);
 
     Step(
@@ -886,7 +935,7 @@ var badGraphActivity = function(activity) {
 var isUser = function(object) {
     var id = object.id,
         p;
-    
+
     if (!id) {
         return false;
     }
@@ -908,7 +957,13 @@ var betterID = function(activity) {
 };
 
 var personLocalID = function(person) {
+
+    if (!person || !person.id) {
+        return null;
+    }
+
     var parts = person.id.match(/\/(\d+)$/);
+
     if (parts) {
         return parts[1];
     } else {
@@ -918,7 +973,8 @@ var personLocalID = function(person) {
 
 var checkJoin = function(activity, log, callback) {
 
-    if (!isLocalObjectID(activity.object.id)) {
+    if (!isLocalObjectID(activity.object.id) ||
+        activity.object.objectType != ActivityObject.GROUP) {
         callback(null);
         return;
     }
@@ -928,12 +984,13 @@ var checkJoin = function(activity, log, callback) {
             ActivityObject.getObject(ActivityObject.GROUP, activity.object.id, this);
         },
         function(err, group) {
-            var newGroup;
             if (err && err.name != "NoSuchThingError") {
                 throw err;
             } else if (err && err.name == "NoSuchThingError") {
                 importActivity({actor: activity.actor,
                                 verb: "create",
+                                to: [{objectType: ActivityObject.COLLECTION,
+                                      id: Collection.PUBLIC}],
                                 object: activity.object},
                                log,
                                this);

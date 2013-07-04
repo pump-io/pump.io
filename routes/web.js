@@ -337,7 +337,7 @@ var showStream = function(req, res, next) {
         function() {
             streams.userMajorStream({user: req.user}, req.principal, this.parallel());
             streams.userMinorStream({user: req.user}, req.principal, this.parallel());
-            addFollowed(principal, [req.user.profile], this.parallel());
+            addFollowed(req.principal, [req.user.profile], this.parallel());
             req.user.profile.expandFeeds(this.parallel());
         },
         function(err, major, minor) {

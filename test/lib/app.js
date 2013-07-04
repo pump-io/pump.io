@@ -24,7 +24,7 @@ process.env.NODE_ENV = "test";
 
 for (i = 2; i < process.argv.length; i++) {
     parts = process.argv[i].split("=");
-    config[parts[0]] = parts[1];
+    config[parts[0]] = JSON.parse(parts[1]);
 }
 
 config.port = parseInt(config.port, 10);
