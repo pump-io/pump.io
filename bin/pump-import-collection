@@ -355,6 +355,8 @@ var importActivity = function(props, log, callback) {
         },
         function(err, to, cc, bto, bcc) {
             if (err) throw err;
+            activity.actor = actor;
+            activity.object = object;
             if (to && to.length > 0) {
                 activity.to = to;
             }
@@ -388,10 +390,10 @@ var importActivity = function(props, log, callback) {
                 break;
             case Activity.POST:
                 // Auto-create activity content
-                if (activity.id == activity.object.id) {
+                if (activity.id == object.id) {
                     activity.id = betterID(activity);
                 }
-                if (activity.url == activity.object.url) {
+                if (activity.url == object.url) {
                     delete activity.url;
                 }
                 if (activity.object.objectType == "note" && _.isObject(activity.object.inReplyTo)) {
