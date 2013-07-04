@@ -598,7 +598,12 @@ var registerUser = function(activity, log, callback) {
             activity.actor = user.profile;
             importActivity(activity, log, this);
         },
-        callback
+        function(err) {
+            if (err) {
+                log.error(err);
+            }
+            callback(null);
+        }
     );
 };
 
