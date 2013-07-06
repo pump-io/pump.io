@@ -196,6 +196,10 @@ Here are the main configuration keys.
 * *compress* Use gzip or deflate to compress text output. This can cut down on network
   transfers considerably at the expense of memory and CPU on the server. Defaults to `false`.
 * *children* Number of children to run. Defaults to 1 for some kinds of DBs, number of CPUS - 1 for others.
+* *clients*. You can pre-configure some OAuth credentials if you want to have a replicable
+  configuration (say, for test scripts or development environments). This setting is
+  an array of objects, each of which has a 'client_id' and 'client_secret' property, and
+  an optional 'title' and 'description' object. Most people don't need this. Default is an empty list.
 
 ### Web server proxy
 
