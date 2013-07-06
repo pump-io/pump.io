@@ -25,7 +25,7 @@ var assert = require("assert"),
     setupAppConfig = oauthutil.setupAppConfig,
     newCredentials = oauthutil.newCredentials;
 
-var suite = vows.describe("layout test");
+var suite = vows.describe("login web UI test");
 
 // A batch to test some of the layout basics
 
