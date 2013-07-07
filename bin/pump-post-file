@@ -1,0 +1,132 @@
+#!/usr/bin/env node
+
+// -*- mode: javascript -*-
+
+// postnote.js
+//
+// Post an image with optional description
+//
+// Copyright 2011-2013, E14N https://e14n.com/
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+var fs = require("fs"),
+    path = require("path"),
+    _ = require("underscore"),
+    Step = require("step"),
+    url = require("url"),
+    common = require("../lib/pumpclient"),
+    userCred = common.userCred,
+    postJSON = common.postJSON,
+    postData = common.postData,
+    argv = require("optimist")
+        .usage("Usage: $0 -u <username> -f <filename>")
+        .demand(["u", "f"])
+        .alias("u", "username")
+        .alias("s", "server")
+        .alias("f", "file")
+        .alias("P", "port")
+        .describe("u", "User nickname")
+        .describe("f", "file to post")
+        .describe("s", "Server name (default 'localhost')")
+        .describe("P", "Port (default 80)")
+        .default("P", 80)
+        .default("s", "localhost")
+        .argv,
+    username = argv.u,
+    server = argv.s,
+    fname = argv.f,
+    description = argv.d,
+    port = argv.P,
+    data,
+    cred;
+
+// Replicated from lib/mimemap.js
+// XXX: figure out how to share this module between client and server
+
+var type2ext = {
+    "audio/flac": "flac",
+    "audio/mpeg": "mp3",
+    "audio/ogg": "ogg",
+    "audio/x-wav": "wav",
+
+    "image/gif": "gif",
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/svg+xml": "svg",
+
+    "video/3gpp": "3gp",
+    "video/mpeg": "mpg",
+    "video/mp4": "mp4",
+    "video/quicktime": "mov",
+    "video/ogg": "ogv",
+    "video/webm": "webm",
+    "video/x-msvideo": "avi"
+};
+
+var ext2type = _.invert(type2ext);
+
+var mimeType = function(ext) {
+    if (ext) {
+        ext = ext.toLowerCase();
+        if (ext[0] === ".") {
+            ext = ext.slice(1);
+        }
+    }
+    return (_.has(ext2type, ext)) ? ext2type[ext] : "application/octet-stream";
+};
+
+Step(
+    function() {
+        // XXX: read by chunks
+        fs.readFile(fname, this);
+    },
+    function(err, results) {
+        if (err) throw err;
+        data = results;
+        userCred(username, server, this);
+    },
+    function(err, results) {
+        var endpoint, type;
+        if (err) throw err;
+        cred = results;
+        endpoint = url.format({
+            protocol: ((port == 443) ? "https" : "http"),
+            host: ((port == 80 || port == 443) ? server : server + ":" + port),
+            pathname: "/api/user/"+username+"/uploads"
+        });
+        type = mimeType(path.extname(fname));
+        postData(endpoint, cred, data, type, this);
+    },
+    function(err, results) {
+        var activity, endpoint;
+        if (err) throw err;
+        activity = {
+            "verb": "post",
+            object: results
+        };
+        endpoint = url.format({
+            protocol: ((port == 443) ? "https" : "http"),
+            host: ((port == 80 || port == 443) ? server : server + ":" + port),
+            pathname: "/api/user/"+username+"/feed"
+        });
+        postJSON(endpoint, cred, activity, this);
+    },
+    function(err, body, resp) {
+        if (err) {
+            console.error(err);
+        } else {
+            console.log(body.object.url);
+        }
+    }
+);
