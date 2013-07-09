@@ -31,7 +31,7 @@ var suite = vows.describe("app module interface");
 
 suite.addBatch({
     "When we get the app module": {
-        topic: function() { 
+        topic: function() {
             return require("../lib/app");
         },
         "there is one": function(mod) {
@@ -98,15 +98,23 @@ suite.addBatch({
                     var callback = this.callback;
                     Step(
                         function() {
-                            oauthutil.newCredentials("aang", "air*bender", this);
+                            oauthutil.newCredentials("aang", "air*bender", this.parallel());
+                            oauthutil.newCredentials("katara", "water*bender", this.parallel());
                         },
-                        function(err, cred) {
+                        function(err, cred, cred2) {
                             var url,
                                 activity;
                             if (err) throw err;
-                            url = "http://localhost:4815/api/user/aang/feed";                        
+                            url = "http://localhost:4815/api/user/aang/feed";
                             activity = {
                                 verb: "post",
+				to: [
+				    cred2.user.profile
+				],
+				cc: [{
+				    objectType: "collection",
+				    id: cred.user.profile.followers.url
+				}],
                                 object: {
                                     objectType: "note",
                                     content: "Hello, world."
@@ -124,6 +132,11 @@ suite.addBatch({
                     var plugin = require("./lib/plugin");
                     assert.ifError(err);
                     assert.isTrue(plugin.called.distribute);
+                },
+                "the plugin distributeActivityToUser endpoint was called": function(err, app) {
+                    var plugin = require("./lib/plugin");
+                    assert.ifError(err);
+                    assert.isTrue(plugin.called.touser);
                 }
             }
         }
