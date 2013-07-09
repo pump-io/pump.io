@@ -86,6 +86,11 @@ suite.addBatch({
                             verb: "like",
                             object: {
                                 id: "urn:uuid:484e5278-8675-11e2-bd8f-70f1a154e1aa",
+                                links: {
+                                    self: {
+                                        href: "http://somewhereelse.example/note/1"
+                                    }
+                                },
                                 objectType: "note"
                             }
                         };
@@ -102,6 +107,11 @@ suite.addBatch({
                             verb: "like",
                             object: {
                                 id: "urn:uuid:484e5278-8675-11e2-bd8f-70f1a154e1aa",
+                                links: {
+                                    self: {
+                                        href: "http://somewhereelse.example/note/1"
+                                    }
+                                },
                                 objectType: "note",
                                 content: "Hello, world!"
                             }
