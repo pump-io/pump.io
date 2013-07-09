@@ -138,4 +138,3 @@ suite.addBatch({
 });
 
 suite["export"](module);
-
