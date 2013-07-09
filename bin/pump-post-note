@@ -32,6 +32,7 @@ var _ = require("underscore"),
         .alias("u", "username")
         .alias("n", "note")
         .alias("s", "server")
+        .alias("p", "public")
         .alias("P", "port")
         .describe("u", "User nickname")
         .describe("n", "Text of note to post (HTML OK)")
@@ -43,6 +44,7 @@ var _ = require("underscore"),
     username = argv.u,
     server = argv.s,
     note = argv.n,
+    public = argv.p,
     port = argv.P;
 
 Step(
@@ -58,6 +60,12 @@ Step(
 	        "content": note
             }
         };
+        if (public) {
+            activity.to =  [{
+                    "objectType": "collection",
+                    "id": "http://activityschema.org/collection/public" 
+                }];
+        }
         var endpoint = url.format({
             protocol: ((port == 443) ? "https" : "http"),
             host: ((port == 80) ? server : server + ":" + port),
