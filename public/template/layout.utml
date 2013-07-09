@@ -126,6 +126,11 @@
     <script src="/javascript/pump/router.js"></script>
     <script src="/javascript/pump/socket.js"></script>
     <script src="/javascript/pump/view.js"></script>
+
+    <% _.each(config.scripts, function(script) { %>
+    <script src="<%= script %>"></script>
+    <% }); %>
+
     <script>
       if (!Pump) {
           Pump = {};

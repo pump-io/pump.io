@@ -17,7 +17,7 @@
 // limitations under the License.
 
 module.exports = {
-    called: {log: false, schema: false, app: false, distribute: false},
+    called: {log: false, schema: false, app: false, distribute: false, touser: false},
     initializeLog: function(schema) {
         this.called.log = true;
     },
@@ -30,5 +30,9 @@ module.exports = {
     distributeActivity: function(activity, callback) {
         this.called.distribute = true;
         callback(null);
+    },
+    distributeActivityToUser: function(activity, callback) {
+        this.called.touser = true;
+        callback(null);
     }
-}
+};
