@@ -61,7 +61,9 @@ var databank = require("databank"),
     firstFewReplies = finishers.firstFewReplies,
     firstFewShares = finishers.firstFewShares,
     addFollowed = finishers.addFollowed,
-    requestObject = omw.requestObject;
+    requestObject = omw.requestObject,
+    principalActorOrRecipient = omw.principalActorOrRecipient,
+    principalAuthorOrRecipient = omw.principalAuthorOrRecipient;
 
 var addRoutes = function(app) {
 
@@ -288,31 +290,6 @@ var userIsActor = function(req, res, next) {
     } else {
         next(new HTTPError("No " + type + " by " + user.nickname + " with uuid " + obj._uuid, 404));
         return;
-    }
-};
-
-var principalActorOrRecipient = function(req, res, next) {
-
-    var person = req.principal,
-        activity = req.activity;
-
-    if (activity && activity.actor && person && activity.actor.id == person.id) {
-        next();
-    } else {
-        Step(
-            function() {
-                activity.checkRecipient(person, this);
-            },
-            function(err, isRecipient) {
-                if (err) {
-                    next(err);
-                } else if (isRecipient) {
-                    next();
-                } else {
-                    next(new HTTPError("Only the author and recipients can view this activity.", 403));
-                }
-            }
-        );
     }
 };
 
@@ -640,36 +617,6 @@ var userIsAuthor = function(req, res, next) {
     } else {
         next(new HTTPError("No " + type + " by " + user.nickname + " with uuid " + obj._uuid, 404));
         return;
-    }
-};
-
-var principalAuthorOrRecipient = function(req, res, next) {
-
-    var type = req.type,
-        obj = req[type],
-        person = req.principal;
-
-    if (obj && obj.author && person && obj.author.id == person.id) {
-        next();
-    } else {
-        Step(
-            function() {
-                Activity.postOf(obj, this);
-            },
-            function(err, act) {
-                if (err) throw err;
-                act.checkRecipient(person, this);
-            },
-            function(err, isRecipient) {
-                if (err) {
-                    next(err);
-                } else if (isRecipient) {
-                    next();
-                } else {
-                    next(new HTTPError("Only the author and recipients can view this object.", 403));
-                }
-            }
-        );
     }
 };
 
