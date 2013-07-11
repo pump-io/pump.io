@@ -297,7 +297,7 @@
                 unique;
 
             if (_.isArray(props)) {
-                Pump.debug("Merging items of " + items.url() + "of length " + items.length + " with array of length " + props.length);
+                Pump.debug("Merging items of " + items.url() + " of length " + items.length + " with array of length " + props.length);
                 unique = props.map(function(item) {
                     return items.model.unique(item);
                 });
@@ -384,7 +384,7 @@
                 dataType: "json",
                 url: prevLink,
                 success: function(data) {
-                    if (data.items) {
+                    if (data.items && data.items.length > 0) {
                         if (stream.items) {
                             stream.items.add(data.items, {at: 0});
                         } else {
