@@ -2158,7 +2158,7 @@
                 subView: "ListListContent",
                 subOptions: {
                     model: "list",
-                    data: ["profile", "members", "lists"]
+                    data: ["profile", "members", "lists", "list"]
                 }
             }
         }
@@ -2175,9 +2175,9 @@
                 people = view.options.data.members,
                 $el = view.$("#member-stream");
 
-            if ($el && list && list.members) {
-                view.memberStreamView = new Pump.MemberStreamView({el: $el, model: people, data: {list: list}});
-            }
+            view.memberStreamView = new Pump.MemberStreamView({el: $el, 
+                                                               model: people, 
+                                                               data: {list: list}});
         },
         events: {
             "click #add-list-member": "addListMember",
