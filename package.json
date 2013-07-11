@@ -31,7 +31,7 @@
                       "jankyqueue": "0.1.x",
                       "schlock": "~0.2.1",
                       "bunyan": "0.16.x",
-                      "nodemailer": "0.5.x",
+                      "emailjs": "0.3.x",
                       "mkdirp": "0.3.x",
 		      "connect-databank": "0.9.x",
                       "sockjs": "0.3.x",
