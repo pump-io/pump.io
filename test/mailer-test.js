@@ -107,6 +107,29 @@ var suite = vows.describe("mailer module interface").addBatch({
                         assert.ifError(err);
                         assert.isObject(received);
                         assert.isObject(sent);
+                    },
+                    "and we send a bunch of email messages": {
+                        topic: function(received, sent, Mailer, smtp) {
+                            var callback = this.callback,
+                                message = {
+                                    to: "456@fakestreet.example",
+                                    subject: "Have you seen the perp?",
+                                    text: "We sent an email and the perp ran."
+                                };
+
+                            Step(
+                                function() {
+                                    oneEmail(smtp, message.to, this.parallel());
+                                    Mailer.sendEmail(message, this.parallel());
+                                },
+                                callback
+                            );
+                        },
+                        "it works": function(err, received, sent) {
+                            assert.ifError(err);
+                            assert.isObject(received);
+                            assert.isObject(sent);
+                        }
                     }
                 }
             }
