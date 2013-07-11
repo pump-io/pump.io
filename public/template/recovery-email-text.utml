@@ -1,4 +1,4 @@
-Someone has requested a new password for <%= principal.displayName %> on <%= config.site %>.
+Someone has requested a new password for <%= principalUser.nickname %> on <%= config.site %>.
 
 To complete the password recovery, click on the following URL.
 
