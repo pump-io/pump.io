@@ -974,7 +974,9 @@ var handleRecover = function(req, res, next) {
             Mailer.sendEmail({to: user.email,
                               subject: "Recover password for " + req.app.config.site,
                               text: text,
-                              html: html},
+                              attachment: {data: html,
+                                           type: "text/html",
+                                           alternative: true}},
                              this);
         },
         function(err) {
