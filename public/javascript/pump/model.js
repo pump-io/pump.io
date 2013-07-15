@@ -397,7 +397,7 @@
                         if (stream.has('links')) {
                             stream.get('links').prev = data.links.prev;
                         } else {
-                            stream.set('links', {"pref": {"href": data.links.prev.href}});
+                            stream.set('links', {"prev": {"href": data.links.prev.href}});
                         }
                     }
                     if (_.isFunction(callback)) {
