@@ -509,6 +509,7 @@ if (!window.Pump) {
                                                                   lists: Pump.ActivityObjectStream}},
                 ".user-list": {View: Pump.ListContent, models: {profile: Pump.Person,
                                                                 lists: Pump.ActivityObjectStream,
+                                                                members: Pump.PeopleStream,
                                                                 list: Pump.ActivityObject}}
             },
             selector,
