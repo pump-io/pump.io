@@ -158,6 +158,7 @@ var modelBatch = function(typeName, className, testSchema, testData) {
             assert.isObject(created);
         },
         "auto-generated fields are there": function(err, created) {
+            assert.ifError(err);
             assert.isString(created.objectType);
             assert.equal(created.objectType, typeName);
             assert.isString(created.id);
@@ -166,6 +167,7 @@ var modelBatch = function(typeName, className, testSchema, testData) {
         },
         "passed-in fields are there": function(err, created) {
             var prop, aprop;
+            assert.ifError(err);
             for (prop in testData.create) {
                 // Author may have auto-created properties
                 if (_.contains(["author", "inReplyTo"], prop)) {

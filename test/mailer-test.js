@@ -31,6 +31,10 @@ var suite = vows.describe("mailer module interface").addBatch({
             var callback = this.callback,
                 smtp = simplesmtp.createServer({disableDNSValidation: true});
 
+            if (_.isFunction(smtp.setMaxListeners)) {
+                smtp.setMaxListeners(100);
+            }
+
             smtp.listen(1623, function(err) {
                 if (err) {
                     callback(err, null);
@@ -107,6 +111,37 @@ var suite = vows.describe("mailer module interface").addBatch({
                         assert.ifError(err);
                         assert.isObject(received);
                         assert.isObject(sent);
+                    },
+                    "and we send a bunch of email messages": {
+                        topic: function(received, sent, Mailer, smtp) {
+                            var callback = this.callback;
+
+                            Step(
+                                function() {
+                                    var i,
+                                        rgroup = this.group(),
+                                        sgroup = this.group(),
+                                        to, 
+                                        message;
+                                    for (i = 1; i < 51; i++) {
+                                        to = (123+i) + "@fakestreet.example";
+                                        message = {
+                                            to: to,
+                                            subject: "Have you seen the perp?",
+                                            text: "We sent an email and the perp ran."
+                                        };
+                                        oneEmail(smtp, to, rgroup());
+                                        Mailer.sendEmail(message, sgroup());
+                                    }
+                                },
+                                callback
+                            );
+                        },
+                        "it works": function(err, receiveds, sents) {
+                            assert.ifError(err);
+                            assert.isArray(receiveds);
+                            assert.isArray(sents);
+                        }
                     }
                 }
             }
