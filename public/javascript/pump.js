@@ -295,7 +295,18 @@ if (!window.Pump) {
                         if (err) {
                             onError(null, null, err);
                         } else {
-                            onSuccess();
+                            if (obj.items.length < 20 &&
+                                _.isFunction(obj.nextLink) && obj.nextLink()) {
+                                obj.getNext(function(err) {
+                                    if (err) {
+                                        onError(null, null, err);
+                                    } else {
+                                        onSuccess();
+                                    }
+                                });
+                            } else {
+                                onSuccess();
+                            }
                         }
                     });
                 } else {
@@ -498,6 +509,7 @@ if (!window.Pump) {
                                                                   lists: Pump.ActivityObjectStream}},
                 ".user-list": {View: Pump.ListContent, models: {profile: Pump.Person,
                                                                 lists: Pump.ActivityObjectStream,
+                                                                members: Pump.PeopleStream,
                                                                 list: Pump.ActivityObject}}
             },
             selector,

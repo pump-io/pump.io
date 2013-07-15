@@ -532,11 +532,11 @@ var showList = function(req, res, next) {
                                     profile: req.user.profile,
                                     lists: lists,
                                     list: list,
-                                    members: list.members.items,
+                                    members: list.members,
                                     data: {
                                         profile: req.user.profile,
                                         lists: lists,
-                                        members: list.members.items,
+                                        members: list.members,
                                         list: list}
                                    });
             }
