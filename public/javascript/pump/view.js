@@ -2169,15 +2169,15 @@
         modelName: "list",
         parts: ["member-stream",
                 "member"],
-        setupSubs: function() {
-            var view = this,
-                list = view.model,
-                people = view.options.data.members,
-                $el = view.$("#member-stream");
-
-            view.memberStreamView = new Pump.MemberStreamView({el: $el, 
-                                                               model: people, 
-                                                               data: {list: list}});
+        subs: {
+            "#member-stream": {
+                attr: "memberStreamView",
+                subView: "MemberStreamView",
+                subOptions: {
+                    model: "members",
+                    data: ["profile", "lists", "list"]
+                }
+            }
         },
         events: {
             "click #add-list-member": "addListMember",
@@ -2229,7 +2229,7 @@
                 subView: "MemberView",
                 idAttr: "data-person-id",
                 subOptions: {
-                    data: ["list", "people"]
+                    data: ["list"]
                 }
             }
         }
