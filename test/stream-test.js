@@ -269,7 +269,7 @@ suite.addBatch({
                         function() {
                             var i, group = this.group();
                             for (i = 0; i < 5000; i++) {
-                                stream.deliver("http://example.net/api/object/"+i, group());
+                                stream.deliver("tag:pump.io,2012:stream-test:object:"+i, group());
                             }
                         },
                         function(err) {
@@ -286,7 +286,7 @@ suite.addBatch({
                 },
                 "and we remove one": {
                     topic: function(stream, Stream) {
-                        stream.remove("http://example.net/api/object/2500", this.callback);
+                        stream.remove("tag:pump.io,2012:stream-test:object:2500", this.callback);
                     },
                     "it works": function(err) {
                         assert.ifError(err);
@@ -303,7 +303,7 @@ suite.addBatch({
                             assert.equal(ids.length, 4999); // 5000 - 1
                         },
                         "removed ID is missing": function(err, ids) {
-                            assert.equal(ids.indexOf("http://example.net/api/object/2500"), -1);
+                            assert.equal(ids.indexOf("tag:pump.io,2012:stream-test:object:2500"), -1);
                         }
                     },
                     "and we get the count": {
@@ -329,7 +329,7 @@ suite.addBatch({
                     if (err) {
                         cb(err);
                     } else {
-                        stream.remove("http://example.net/api/object/6000", function(err) {
+                        stream.remove("tag:pump.io,2012:stream-test:object:6000", function(err) {
                             if (err) {
                                 cb(null);
                             } else {
@@ -357,7 +357,7 @@ suite.addBatch({
                         if (err) throw err;
                         stream = results;
                         for (i = 0; i < 5000; i++) {
-                            stream.deliver("http://example.net/api/object/"+i, group());
+                            stream.deliver("tag:pump.io,2012:stream-test:object:"+i, group());
                         }
                     },
                     function(err) {
@@ -365,7 +365,7 @@ suite.addBatch({
                             cb(err);
                         } else {
                             // 6666 > 5000
-                            stream.remove("http://example.net/api/object/6666", function(err) {
+                            stream.remove("tag:pump.io,2012:stream-test:object:6666", function(err) {
                                 if (err) {
                                     cb(null);
                                 } else {
@@ -836,7 +836,7 @@ suite.addBatch({
         "and we get IDs greater than an ID not in the stream": {
             topic: function(stream) {
                 var cb = this.callback;
-                stream.getIDsGreaterThan("http://example.org/nonexistent", 20, function(err, ids) {
+                stream.getIDsGreaterThan("tag:pump.io,2012:nonexistent", 20, function(err, ids) {
                     if (err) {
                         cb(null);
                     } else {
@@ -851,7 +851,7 @@ suite.addBatch({
         "and we get IDs less than an ID not in the stream": {
             topic: function(stream) {
                 var cb = this.callback;
-                stream.getIDsLessThan("http://example.org/nonexistent", 20, function(err, ids) {
+                stream.getIDsLessThan("tag:pump.io,2012:nonexistent", 20, function(err, ids) {
                     if (err) {
                         cb(null);
                     } else {
@@ -866,7 +866,7 @@ suite.addBatch({
         "and we get zero IDs greater than an ID not in the stream": {
             topic: function(stream) {
                 var cb = this.callback;
-                stream.getIDsGreaterThan("http://example.org/nonexistent", 0, function(err, ids) {
+                stream.getIDsGreaterThan("tag:pump.io,2012:nonexistent", 0, function(err, ids) {
                     if (err) {
                         cb(null);
                     } else {
@@ -881,7 +881,7 @@ suite.addBatch({
         "and we get zero IDs less than an ID not in the stream": {
             topic: function(stream) {
                 var cb = this.callback;
-                stream.getIDsLessThan("http://example.org/nonexistent", 0, function(err, ids) {
+                stream.getIDsLessThan("tag:pump.io,2012:nonexistent", 0, function(err, ids) {
                     if (err) {
                         cb(null);
                     } else {

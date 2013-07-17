@@ -695,10 +695,7 @@ suite.addBatch({
                             var url = "http://localhost:4815/api/user/mrrandolph/feed",
                                 act = {
                                     verb: "follow",
-                                    object: {
-                                        objectType: "person",
-                                        id: "http://localhost:4815/api/user/paula"
-                                    }
+                                    object: pairs.paula.user.profile
                                 };
 
                             var cred = makeCred(cl, pairs.mrrandolph);
