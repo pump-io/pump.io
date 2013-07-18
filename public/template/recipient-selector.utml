@@ -21,4 +21,5 @@
     <option value="<%- contact.objectType %>:<%- contact.id %>"><%- contact.nickname %></option>
     <% }); %>
   </optgroup>
+  <% } %>
 </select>
