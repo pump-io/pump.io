@@ -10,10 +10,15 @@
   </optgroup>
   <% } %>
   <% if (following && following.items && following.items.length > 0) { %>
-  <optgroup label="People">
+  <optgroup label="People by name">
     <% _.each(following.items, function(contact) { %>
     <option value="<%- contact.objectType %>:<%- contact.id %>"><%- contact.displayName %></option>
     <% }); %>
   </optgroup>
   <% } %>
+  <optgroup label="People by username">
+    <% _.each(following.items, function(contact) { %>
+    <option value="<%- contact.objectType %>:<%- contact.id %>"><%- contact.nickname %></option>
+    <% }); %>
+  </optgroup>
 </select>
