@@ -81,6 +81,7 @@ var badActivity = function(act, property) {
     context["it is defanged"] = function(err, result, response) {
         assert.ifError(err);
         assert.isObject(result);
+        console.log(result.content);
         assert.equal(deepProperty(result, property).indexOf("<script>"), -1);
     };
 
@@ -214,6 +215,15 @@ suite.addBatch({
                          }
                         },
                         "object.content"),
+            "and we post an activity with bad object displayName":
+            badActivity({verb: "post",
+                         object: {
+                             objectType: "article",
+                             displayName: DANGEROUS,
+                             content: "Hello, world"
+                         }
+                        },
+                        "content"),
             "and we post an activity with good target summary":
             goodActivity({verb: "post",
                           object: {
