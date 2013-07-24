@@ -81,7 +81,6 @@ var badActivity = function(act, property) {
     context["it is defanged"] = function(err, result, response) {
         assert.ifError(err);
         assert.isObject(result);
-        console.log(result.content);
         assert.equal(deepProperty(result, property).indexOf("<script>"), -1);
     };
 
