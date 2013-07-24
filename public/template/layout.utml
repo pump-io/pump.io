@@ -146,19 +146,19 @@
       });
 
       <% if (data) { %>
-      Pump.initialData = <%= JSON.stringify(data) %>;
+      Pump.initialData = <%= JSON.stringify(defang(data)) %>;
       <% } else { %>
       Pump.initialData = null;
       <% } %>
 
       <% if (principal) { %>
-      Pump.principal = <%= JSON.stringify(principal) %>;
+      Pump.principal = <%= JSON.stringify(defang(principal)) %>;
       <% } else { %>
       Pump.principal = null;
       <% } %>
 
       <% if (principalUser) { %>
-      Pump.principalUser = <%= JSON.stringify(principalUser) %>;
+      Pump.principalUser = <%= JSON.stringify(defang(principalUser)) %>;
       <% } else { %>
       Pump.principalUser = null;
       <% } %>
