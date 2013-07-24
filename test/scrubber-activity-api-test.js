@@ -214,7 +214,16 @@ suite.addBatch({
                          }
                         },
                         "object.content"),
-            "and we post an activity with good target summary": 
+            "and we post an activity with bad object displayName":
+            badActivity({verb: "post",
+                         object: {
+                             objectType: "article",
+                             displayName: DANGEROUS,
+                             content: "Hello, world"
+                         }
+                        },
+                        "content"),
+            "and we post an activity with good target summary":
             goodActivity({verb: "post",
                           object: {
                               objectType: "note",
