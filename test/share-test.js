@@ -61,6 +61,7 @@ mb["When we require the share module"]
 ["and we get its Share class export"]
 ["and we create a share instance"]
 ["auto-generated fields are there"] = function(err, created) {
+    assert.ifError(err);
     assert.isString(created.id);
     assert.isString(created.published);
     assert.isString(created.updated);

@@ -117,7 +117,7 @@ Here is a example HTTP request to create a new activity:
     Authorization: OAuth oauth_consumer_key="[...]",
         oauth_token="[...]", [...]
     Content-Type: application/json
-    
+
     {
         "verb": "follow",
         "object": {
@@ -229,7 +229,7 @@ Collection URLs take the following params:
    collection immediately before the specified activity (not
    inclusive). A good way to "scroll back" in a collection.
 * *since*. An activity ID. Will get activities that went into the
-   collection immediately before the specified activity (not
+   collection immediately after the specified activity (not
    inclusive). A good way to get what's new in a collection since you
    last polled it.
 
@@ -438,6 +438,12 @@ straightforward, with the following endpoints:
 I can barely understand OAuth 1.0 and I can't figure out OAuth 2.0 at
 all, so I'm sticking with 1.0.
 
+To get profile data on the authenticated user, use the endpoint at:
+
+* `/api/whoami` - returns an an activity object for the registered
+  user. Uses a redirect to the canonical endpoint, so you should
+  follow that.
+
 ### 2-legged OAuth
 
 The following endpoints only require 2-legged authentication; you
@@ -561,4 +567,3 @@ method. In rough outline:
    host.
 4. It POSTs the activity to the person's activity inbox endpoint, with
    the OAuth credentials.
-

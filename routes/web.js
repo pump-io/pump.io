@@ -21,10 +21,13 @@ var databank = require("databank"),
     _ = require("underscore"),
     validator = require("validator"),
     check = validator.check,
+    Mailer = require("../lib/mailer"),
+    URLMaker = require("../lib/urlmaker").URLMaker,
     filters = require("../lib/filters"),
     Activity = require("../lib/model/activity").Activity,
     ActivityObject = require("../lib/model/activityobject").ActivityObject,
     User = require("../lib/model/user").User,
+    Recovery = require("../lib/model/recovery").Recovery,
     Collection = require("../lib/model/collection").Collection,
     RemoteRequestToken = require("../lib/model/remoterequesttoken").RemoteRequestToken,
     RemoteAccessToken = require("../lib/model/remoteaccesstoken").RemoteAccessToken,
@@ -35,7 +38,9 @@ var databank = require("databank"),
     he = require("../lib/httperror"),
     Scrubber = require("../lib/scrubber"),
     finishers = require("../lib/finishers"),
-    saveUpload = require("../lib/saveupload").saveUpload,
+    su = require("../lib/saveupload"),
+    saveUpload = su.saveUpload,
+    saveAvatar = su.saveAvatar,
     streams = require("../lib/streams"),
     api = require("./api"),
     HTTPError = he.HTTPError,
@@ -56,7 +61,9 @@ var databank = require("databank"),
     firstFewReplies = finishers.firstFewReplies,
     firstFewShares = finishers.firstFewShares,
     addFollowed = finishers.addFollowed,
-    requestObject = omw.requestObject;
+    requestObject = omw.requestObject,
+    principalActorOrRecipient = omw.principalActorOrRecipient,
+    principalAuthorOrRecipient = omw.principalAuthorOrRecipient;
 
 var addRoutes = function(app) {
 
@@ -70,15 +77,24 @@ var addRoutes = function(app) {
 
     app.post("/main/logout", app.session, someReadAuth, handleLogout);
 
-    app.post("/main/renew", app.session, userAuth, principal, renewSession);
+    app.post("/main/renew", app.session, userAuth, renewSession);
 
     app.get("/main/remote", app.session, principal, showRemote);
     app.post("/main/remote", app.session, handleRemote);
+
+    if (app.config.haveEmail) {
+        app.get("/main/recover", app.session, showRecover);
+        app.get("/main/recover-sent", app.session, showRecoverSent);
+        app.post("/main/recover", app.session, handleRecover);
+        app.get("/main/recover/:code", app.session, recoverCode);
+        app.post("/main/redeem-code", app.session, clientAuth, redeemCode);
+    }
 
     app.get("/main/authorized/:hostname", app.session, reqHost, reqToken, authorized);
     
     if (app.config.uploaddir) {
         app.post("/main/upload", app.session, principal, principalUserOnly, uploadFile);
+        app.post("/main/upload-avatar", app.session, principal, principalUserOnly, uploadAvatar);
     }
 
     app.get("/:nickname", app.session, principal, addMessages, reqUser, showStream);
@@ -96,11 +112,13 @@ var addRoutes = function(app) {
     app.get("/main/account", loginRedirect("/main/account"));
     app.get("/main/messages", loginRedirect("/main/messages"));
 
+    app.post("/main/proxy", app.session, principal, principalNotUser, proxyActivity);
+
+    // These are catchalls and should go at the end to prevent conflicts
+
     app.get("/:nickname/activity/:uuid", app.session, principal, addMessages, requestActivity, reqUser, userIsActor, principalActorOrRecipient, showActivity);
 
     app.get("/:nickname/:type/:uuid", app.session, principal, addMessages, requestObject, reqUser, userIsAuthor, principalAuthorOrRecipient, showObject);
-
-    app.post("/main/proxy", app.session, principal, principalNotUser, proxyActivity);
 };
 
 var loginRedirect = function(rel) {
@@ -237,7 +255,7 @@ var requestActivity = function(req, res, next) {
 
     Step(
         function() {
-            Activity.search({"uuid": req.params.uuid}, this);
+            Activity.search({"_uuid": req.params.uuid}, this);
         },
         function(err, activities) {
             if (err) throw err;
@@ -275,31 +293,6 @@ var userIsActor = function(req, res, next) {
     }
 };
 
-var principalActorOrRecipient = function(req, res, next) {
-
-    var person = req.principal,
-        activity = req.activity;
-
-    if (activity && activity.actor && person && activity.actor.id == person.id) {
-        next();
-    } else {
-        Step(
-            function() {
-                activity.checkRecipient(person, this);
-            },
-            function(err, isRecipient) {
-                if (err) {
-                    next(err);
-                } else if (isRecipient) {
-                    next();
-                } else {
-                    next(new HTTPError("Only the author and recipients can view this activity.", 403));
-                }
-            }
-        );
-    }
-};
-
 var showActivity = function(req, res, next) {
 
     var activity = req.activity;
@@ -321,7 +314,7 @@ var showStream = function(req, res, next) {
         function() {
             streams.userMajorStream({user: req.user}, req.principal, this.parallel());
             streams.userMinorStream({user: req.user}, req.principal, this.parallel());
-            addFollowed(principal, [req.user.profile], this.parallel());
+            addFollowed(req.principal, [req.user.profile], this.parallel());
             req.user.profile.expandFeeds(this.parallel());
         },
         function(err, major, minor) {
@@ -539,11 +532,11 @@ var showList = function(req, res, next) {
                                     profile: req.user.profile,
                                     lists: lists,
                                     list: list,
-                                    members: list.members.items,
+                                    members: list.members,
                                     data: {
                                         profile: req.user.profile,
                                         lists: lists,
-                                        members: list.members.items,
+                                        members: list.members,
                                         list: list}
                                    });
             }
@@ -551,56 +544,66 @@ var showList = function(req, res, next) {
     );
 };
 
-var uploadFile = function(req, res, next) {
+// uploadFile and uploadAvatar are almost identical except for the function
+// they use to save the file. So, this generator makes the two functions
 
-    var user = req.principalUser,
-        uploadDir = req.app.config.uploaddir,
-        mimeType,
-        fileName,
-        params = {};
+// XXX: if they diverge any more, make them separate functions
 
-    if (req.xhr) {
-        if (_.has(req.headers, "x-mime-type")) {
-            mimeType = req.headers["x-mime-type"];
-        } else {
-            mimeType = req.uploadMimeType;
-        }
-        fileName = req.uploadFile;
-        if (_.has(req.query, "title")) {
-            params.title = req.query.title;
-        }
-        if (_.has(req.query, "description")) {
-            params.description = Scrubber.scrub(req.query.description);
-        }
-    } else {
-        mimeType = req.files.qqfile.type;
-        fileName = req.files.qqfile.path;
-    }
+var uploader = function(saver) {
+    return function(req, res, next) {
 
-    req.log.info("Uploading " + fileName + " of type " + mimeType);
+        var user = req.principalUser,
+            uploadDir = req.app.config.uploaddir,
+            mimeType,
+            fileName,
+            params = {};
 
-    Step(
-        function() {
-            saveUpload(user, mimeType, fileName, uploadDir, params, this);
-        },
-        function(err, obj) {
-            var data;
-            if (err) {
-                req.log.error(err);
-                data = {"success": false,
-                        "error": "error message to display"};
-                res.send(JSON.stringify(data), {"Content-Type": "text/plain"}, 500);
+        if (req.xhr) {
+            if (_.has(req.headers, "x-mime-type")) {
+                mimeType = req.headers["x-mime-type"];
             } else {
-                req.log.info("Upload successful");
-                obj.sanitize();
-                req.log.info(obj);
-                data = {success: true,
-                        obj: obj};
-                res.send(JSON.stringify(data), {"Content-Type": "text/plain"}, 200);
+                mimeType = req.uploadMimeType;
             }
+            fileName = req.uploadFile;
+            if (_.has(req.query, "title")) {
+                params.title = req.query.title;
+            }
+            if (_.has(req.query, "description")) {
+                params.description = Scrubber.scrub(req.query.description);
+            }
+        } else {
+            mimeType = req.files.qqfile.type;
+            fileName = req.files.qqfile.path;
         }
-    );
+
+        req.log.info("Uploading " + fileName + " of type " + mimeType);
+
+        Step(
+            function() {
+                saver(user, mimeType, fileName, uploadDir, params, this);
+            },
+            function(err, obj) {
+                var data;
+                if (err) {
+                    req.log.error(err);
+                    data = {"success": false,
+                            "error": err.message};
+                    res.send(JSON.stringify(data), {"Content-Type": "text/plain"}, 500);
+                } else {
+                    req.log.info("Upload successful");
+                    obj.sanitize();
+                    req.log.info(obj);
+                    data = {success: true,
+                            obj: obj};
+                    res.send(JSON.stringify(data), {"Content-Type": "text/plain"}, 200);
+                }
+            }
+        );
+    };
 };
+
+var uploadFile = uploader(saveUpload);
+var uploadAvatar = uploader(saveAvatar);
 
 var userIsAuthor = function(req, res, next) {
     var user = req.user,
@@ -614,36 +617,6 @@ var userIsAuthor = function(req, res, next) {
     } else {
         next(new HTTPError("No " + type + " by " + user.nickname + " with uuid " + obj._uuid, 404));
         return;
-    }
-};
-
-var principalAuthorOrRecipient = function(req, res, next) {
-
-    var type = req.type,
-        obj = req[type],
-        person = req.principal;
-
-    if (obj && obj.author && person && obj.author.id == person.id) {
-        next();
-    } else {
-        Step(
-            function() {
-                Activity.postOf(obj, this);
-            },
-            function(err, act) {
-                if (err) throw err;
-                act.checkRecipient(person, this);
-            },
-            function(err, isRecipient) {
-                if (err) {
-                    next(err);
-                } else if (isRecipient) {
-                    next();
-                } else {
-                    next(new HTTPError("Only the author and recipients can view this object.", 403));
-                }
-            }
-        );
     }
 };
 
@@ -692,7 +665,8 @@ var showObject = function(req, res, next) {
 
 var renewSession = function(req, res, next) {
 
-    var principal = req.principal;
+    var principal = req.principal,
+        user = req.principalUser;
 
     Step(
         function() {
@@ -703,8 +677,8 @@ var renewSession = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                principal.sanitize();
-                res.json(principal);
+                // principalUser is sanitized by userAuth()
+                res.json(user);
             }
         }
     );
@@ -897,6 +871,192 @@ var addMessages = function(req, res, next) {
                 res.local("messages", messages);
                 res.local("notifications", notifications);
                 next();
+            }
+        }
+    );
+};
+
+var showRecover = function(req, res, next) {
+    res.render("recover", {page: {title: "Recover your password"}});
+};
+
+var showRecoverSent = function(req, res, next) {
+    res.render("recover-sent", {page: {title: "Recovery email sent"}});
+};
+
+var handleRecover = function(req, res, next) {
+
+    var user = null,
+        recovery,
+        nickname = req.body.nickname,
+        force = req.body.force;
+
+    Step( 
+        function () { 
+            req.log.info({nickname: nickname}, "checking for user to recover");
+            User.get(nickname, this);
+        },
+        function(err, result) {
+            if (err) {
+                if (err.name == "NoSuchThingError") {
+                    req.log.info({nickname: nickname}, "No such user, can't recover");
+                    res.status(400);
+                    res.json({sent: false, noSuchUser: true, error: "There is no user with that nickname."});
+                    return;
+                } else {
+                    throw err;
+                }
+            }
+            user = result;
+            if (!user.email) {
+                req.log.info({nickname: nickname}, "User has no email address; can't recover.");
+                // Done
+                res.status(400);
+                res.json({sent: false, noEmail: true, error: "This user account has no email address."});
+                return;
+            }
+            if (force) {
+                req.log.info({nickname: nickname}, "Forcing recovery regardless of existing recovery records.");
+                this(null, []);
+            } else {
+                req.log.info({nickname: nickname}, "Checking for existing recovery records.");
+                // Do they have any outstanding recovery requests?
+                Recovery.search({nickname: nickname, recovered: false}, this);
+            }
+        },
+        function(err, recoveries) {
+            var stillValid;
+            if (err) throw err;
+            if (!recoveries || recoveries.length === 0) {
+                req.log.info({nickname: nickname}, "No existing recovery records; continuing.");
+                this(null);
+                return;
+            } 
+            stillValid = _.filter(recoveries, function(reco) { return Date.now() - Date.parse(reco.timestamp) < Recovery.TIMEOUT; });
+            if (stillValid.length > 0) {
+                req.log.info({nickname: nickname, count: stillValid.length}, "Have an existing, valid recovery record.");
+                // Done
+                res.status(409);
+                res.json({sent: false, existing: true, error: "You already requested a password recovery."});
+            } else {
+                req.log.info({nickname: nickname}, "Have old recovery records but they're timed out.");
+                this(null);
+            }
+        },
+        function(err) {
+            if (err) throw err;
+            req.log.info({nickname: nickname}, "Creating a new recovery record.");
+            Recovery.create({nickname: nickname}, this);
+        },
+        function(err, recovery) {
+            var recoveryURL;
+            if (err) throw err;
+            req.log.info({nickname: nickname}, "Generating recovery email output.");
+            recoveryURL = URLMaker.makeURL("/main/recover/" + recovery.code);
+            res.render("recovery-email-html",
+                       {principal: user.profile,
+                        principalUser: user,
+                        recovery: recovery,
+                        recoveryURL: recoveryURL,
+                        layout: false},
+                       this.parallel());
+            res.render("recovery-email-text",
+                       {principal: user.profile,
+                        principalUser: user,
+                        recovery: recovery,
+                        recoveryURL: recoveryURL,
+                        layout: false},
+                       this.parallel());
+        },
+        function(err, html, text) {
+            if (err) throw err;
+            req.log.info({nickname: nickname}, "Sending recovery email.");
+            Mailer.sendEmail({to: user.email,
+                              subject: "Recover password for " + req.app.config.site,
+                              text: text,
+                              attachment: {data: html,
+                                           type: "text/html",
+                                           alternative: true}},
+                             this);
+        },
+        function(err) {
+            if (err) {
+                next(err);
+            } else {
+                req.log.info({nickname: nickname}, "Finished with recovery");
+                res.json({sent: true});
+            }
+        }
+    );
+};
+
+var recoverCode = function(req, res, next) {
+    
+    var code = req.params.code;
+
+    res.render("recover-code", {page: {title: "One moment please"},
+                                code: code});
+};
+
+var redeemCode = function(req, res, next) {
+
+    var code = req.body.code,
+        recovery,
+        user;
+
+    Step(
+        function() {
+            Recovery.get(code, this);
+        },
+        function(err, results) {
+            if (err) throw err;
+            recovery = results;
+
+            if (recovery.recovered) {
+                throw new Error("This recovery code was already used.");
+            }
+
+            if (Date.now() - Date.parse(recovery.timestamp) > Recovery.TIMEOUT) {
+                throw new Error("This recovery code is too old.");
+            }
+
+            User.get(recovery.nickname, this);
+        },
+        function(err, results) {
+            if (err) throw err;
+            user = results;
+            setPrincipal(req.session, user.profile, this);
+        },
+        function(err) {
+            if (err) throw err;
+            user.expand(this);
+        },
+        function(err) {
+            if (err) throw err;
+            user.profile.expandFeeds(this);
+        },
+        function(err) {
+            if (err) throw err;
+            req.app.provider.newTokenPair(req.client, user, this);
+        },
+        function(err, pair) {
+            if (err) throw err;
+
+            user.token = pair.access_token;
+            user.secret = pair.token_secret;
+
+            // Now that we're done, mark this recovery code as done
+
+            recovery.recovered = true;
+            recovery.save(this);
+        },
+        function(err) {
+            if (err) {
+                req.log.error(err);
+                res.status(400);
+                res.json({error: err.message});
+            } else {
+                res.json(user);
             }
         }
     );

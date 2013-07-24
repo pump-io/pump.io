@@ -69,6 +69,10 @@ var clientReg = function(req, res, next) {
     }
 
     if (_(params).has("contacts")) {
+        if (!_.isString(params.contacts)) {
+            next(new HTTPError("contacts must be a string of space-separated email addresses.", 400));
+            return;
+        }
         props.contacts = params.contacts.split(" ");
         if (!props.contacts.every(function(contact) {
                 try {

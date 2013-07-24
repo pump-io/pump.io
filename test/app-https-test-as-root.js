@@ -29,6 +29,8 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     xrdutil = require("./lib/xrd");
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 var suite = vows.describe("smoke test app interface over https");
 
 var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
@@ -90,6 +92,14 @@ var webfinger = {
             href: "https://secure.localhost/caterpillar"
         },
         {
+            rel: "dialback",
+            href: "https://secure.localhost/api/dialback"
+        },
+        {
+            rel: "self",
+            href: "https://secure.localhost/api/user/caterpillar/profile"
+        },
+        {
             rel: "activity-inbox",
             href: "https://secure.localhost/api/user/caterpillar/inbox"
         },
@@ -98,8 +108,20 @@ var webfinger = {
             href: "https://secure.localhost/api/user/caterpillar/feed"
         },
         {
-            rel: "dialback",
-            href: "https://secure.localhost/api/dialback"
+            rel: "followers",
+            href: "https://secure.localhost/api/user/caterpillar/followers"
+        },
+        {
+            rel: "following",
+            href: "https://secure.localhost/api/user/caterpillar/following"
+        },
+        {
+            rel: "favorites",
+            href: "https://secure.localhost/api/user/caterpillar/favorites"
+        },
+        {
+            rel: "lists",
+            href: "https://secure.localhost/api/user/caterpillar/lists/person"
         }
     ]
 };

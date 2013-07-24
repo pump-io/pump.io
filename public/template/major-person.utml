@@ -16,14 +16,14 @@
         <% } %>
       </small>
     </h4>
+    <div class="pull-right">
+      <%= partial("profile-responses", {person: person}) %>
+    </div>
     <% if (person.location) { %>
     <p class="location"><%- person.location.displayName %></p>
     <% } %>
     <% if (person.summary) { %>
     <p class="summary"><%- person.summary %></p>
     <% } %>
-    <div class="pull-right">
-      <%= partial("profile-responses", {person: person}) %>
-    </div>
   </div>
 </li>

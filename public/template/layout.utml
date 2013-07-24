@@ -9,30 +9,19 @@
     <% if (config.noCDN) { %>
 
     <link href="/stylesheet/bootstrap.min.css" rel="stylesheet">
-    <style>
-      body {
-      position: relative;
-      padding-top: 40px;
-      }
-    </style>
     <link href="/stylesheet/bootstrap-responsive.min.css" rel="stylesheet">
     <link href="/stylesheet/fineuploader.css" rel="stylesheet">
 
     <% } else { %>
 
-    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-      body {
-      position: relative;
-      padding-top: 40px;
-      }
-    </style>
-    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.min.css" rel="stylesheet">
     <link href="//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.1.1/fineuploader.css" rel="stylesheet">
 
     <% } %>
 
     <link href="/stylesheet/bootstrap-wysihtml5.css" rel="stylesheet">
+    <link href="/stylesheet/bootstrap-lightbox.min.css" rel="stylesheet">
     <link href="/stylesheet/select2.css" rel="stylesheet">
 
     <!-- Finally, our own override sheet -->
@@ -92,6 +81,7 @@
     <script src="/javascript/libs/wysihtml5-0.3.0.js"></script>
     <script src="/javascript/libs/bootstrap-wysihtml5.js"></script>
     <script src="/javascript/libs/select2.js"></script>
+    <script src="/javascript/libs/bootstrap-lightbox.js"></script>
     <% if (config.sockjs) { %>
     <script src="/javascript/libs/sockjs.js"></script>
     <% } %>
@@ -112,7 +102,7 @@
     <% } else { %>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/spin.js/1.2.7/spin.min.js"></script>
@@ -128,6 +118,7 @@
     <script src="/javascript/libs/sha1.min.js"></script>
     <script src="/javascript/libs/jquery-spin.js"></script>
     <script src="/javascript/libs/bootstrap-wysihtml5.js"></script>
+    <script src="/javascript/libs/bootstrap-lightbox.min.js"></script>
     <% } %>
     <script src="/javascript/pump.js"></script>
     <script src="/javascript/pump/auth.js"></script>
@@ -135,6 +126,11 @@
     <script src="/javascript/pump/router.js"></script>
     <script src="/javascript/pump/socket.js"></script>
     <script src="/javascript/pump/view.js"></script>
+
+    <% _.each(config.scripts, function(script) { %>
+    <script src="<%= script %>"></script>
+    <% }); %>
+
     <script>
       if (!Pump) {
           Pump = {};
@@ -144,6 +140,7 @@
       }
       _.extend(Pump.config, {
           site: "<%- config.site %>",
+          haveEmail: <%- config.haveEmail || false %>,
           requireEmail: <%- config.requireEmail || false %>,
           disableRegistration: <%- config.disableRegistration || false %>,
           canUpload: <%- config.canUpload || false %>,
@@ -152,19 +149,19 @@
       });
 
       <% if (data) { %>
-      Pump.initialData = <%= JSON.stringify(data) %>;
+      Pump.initialData = <%= JSON.stringify(defang(data)) %>;
       <% } else { %>
       Pump.initialData = null;
       <% } %>
 
       <% if (principal) { %>
-      Pump.principal = <%= JSON.stringify(principal) %>;
+      Pump.principal = <%= JSON.stringify(defang(principal)) %>;
       <% } else { %>
       Pump.principal = null;
       <% } %>
 
       <% if (principalUser) { %>
-      Pump.principalUser = <%= JSON.stringify(principalUser) %>;
+      Pump.principalUser = <%= JSON.stringify(defang(principalUser)) %>;
       <% } else { %>
       Pump.principalUser = null;
       <% } %>

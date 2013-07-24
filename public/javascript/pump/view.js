@@ -967,6 +967,162 @@
         }
     });
 
+    Pump.RecoverContent = Pump.ContentView.extend({
+        templateName: 'recover',
+        events: {
+            "submit #recover": "doRecover",
+            "keyup #nickname": "onKey"
+        },
+        ready: function() {
+            var view = this;
+            // setup subViews
+            view.setupSubs();
+            // Initialize state of recover button
+            view.onKey();
+        },
+        "onKey": function(event) {
+            var view = this,
+                nickname = view.$('#nickname').val();
+
+            if (!nickname || nickname.length === 0) {  
+                view.$(':submit').attr('disabled', 'disabled');
+            } else {
+                view.$(':submit').removeAttr('disabled');
+            }
+        },
+        "doRecover": function() {
+            var view = this,
+                params = {nickname: view.$('#recover input[name="nickname"]').val()},
+                options,
+                continueTo = Pump.getContinueTo(),
+                NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
+                retries = 0,
+                onSuccess = function(data, textStatus, jqXHR) {
+                    Pump.router.navigate("/main/recover-sent", true);
+                },
+                onError = function(jqXHR, textStatus, errorThrown) {
+                    var type, response;
+                    // This happens when our stored OAuth credentials are
+                    // invalid; usually because someone re-installed server software
+                    if (jqXHR.status == 401 && retries === 0 && jqXHR.responseText == "Invalid / used nonce") {
+                        Pump.clearCred();
+                        retries = 1;
+                        Pump.ajax(options);
+                    } else {
+                        view.stopSpin();
+                        type = jqXHR.getResponseHeader("Content-Type");
+                        if (type && type.indexOf("application/json") !== -1) {
+                            response = JSON.parse(jqXHR.responseText);
+                            view.showError(response.error);
+                        } else {
+                            view.showError(errorThrown);
+                        }
+                    }
+                };
+
+            view.startSpin();
+            
+            options = {
+                contentType: "application/json",
+                data: JSON.stringify(params),
+                dataType: "json",
+                type: "POST",
+                url: "/main/recover",
+                success: onSuccess,
+                error: onError
+            };
+
+            Pump.ajax(options);
+
+            return false;
+        }
+    });
+
+    Pump.RecoverSentContent = Pump.ContentView.extend({
+        templateName: 'recover-sent'
+    });
+
+    Pump.RecoverCodeContent = Pump.ContentView.extend({
+        templateName: 'recover-code',
+        ready: function() {
+            var view = this;
+            // setup subViews
+            view.setupSubs();
+            // Initialize state of recover button
+            view.redeemCode();
+        },
+        "redeemCode": function() {
+            var view = this,
+                params = {code: view.$el.data('code')},
+                options,
+                retries = 0,
+                onSuccess = function(data, textStatus, jqXHR) {
+                    var objs;
+                    Pump.setNickname(data.nickname);
+                    Pump.setUserCred(data.token, data.secret);
+                    Pump.clearCaches();
+                    Pump.principalUser = Pump.User.unique(data);
+                    Pump.principal = Pump.principalUser.profile;
+                    objs = [Pump.principalUser,
+                            Pump.principalUser.majorDirectInbox,
+                            Pump.principalUser.minorDirectInbox];
+                    Pump.fetchObjects(objs, function(err, objs) {
+                        Pump.body.nav = new Pump.UserNav({el: ".navbar-inner .container",
+                                                          model: Pump.principalUser,
+                                                          data: {
+                                                              messages: Pump.principalUser.majorDirectInbox,
+                                                              notifications: Pump.principalUser.minorDirectInbox
+                                                          }});
+                        Pump.body.nav.render();
+                    });
+                    if (Pump.config.sockjs) {
+                        // Request a new challenge
+                        Pump.setupSocket();
+                    }
+                    // XXX: reload current data
+                    view.stopSpin();
+                    Pump.router.navigate("/main/account", true);
+                },
+                onError = function(jqXHR, textStatus, errorThrown) {
+                    var type, response;
+                    // This happens when our stored OAuth credentials are
+                    // invalid; usually because someone re-installed server software
+                    if (jqXHR.status == 401 && retries === 0 && jqXHR.responseText == "Invalid / used nonce") {
+                        Pump.clearCred();
+                        retries = 1;
+                        Pump.ajax(options);
+                    } else {
+                        view.stopSpin();
+                        type = jqXHR.getResponseHeader("Content-Type");
+                        if (type && type.indexOf("application/json") !== -1) {
+                            response = JSON.parse(jqXHR.responseText);
+                            view.showError(response.error);
+                        } else {
+                            view.showError(errorThrown);
+                        }
+                    }
+                };
+
+            view.startSpin();
+
+            console.log(params);
+
+            options = {
+                contentType: "application/json",
+                data: JSON.stringify(params),
+                dataType: "json",
+                type: "POST",
+                url: "/main/redeem-code",
+                success: onSuccess,
+                error: onError
+            };
+
+            Pump.ajax(options);
+
+            return false;
+        }
+    });
+
     Pump.ConfirmEmailInstructionsContent = Pump.ContentView.extend({
         templateName: 'confirm-email-instructions'
     });
@@ -1217,7 +1373,8 @@
             "click .unfavorite": "unfavoriteObject",
             "click .share": "shareObject",
             "click .unshare": "unshareObject",
-            "click .comment": "openComment"
+            "click .comment": "openComment",
+            "click .object-image": "openImage"
         },
         setupSubs: function() {
             var view = this,
@@ -1315,6 +1472,31 @@
                     view.$(".replies").append(form.$el);
                 });
                 form.render();
+            }
+        },
+        openImage: function() {
+            var view = this,
+                model = view.model,
+                object = view.model.object,
+                modalView;
+            
+            if (object && object.get("fullImage")) {
+
+                modalView = new Pump.LightboxModal({data: {object: object}});
+
+                // When it's ready, show immediately
+
+                modalView.on("ready", function() {
+                    $(view.el).append(modalView.el);
+                    $(modalView.el).on("hidden", function() {
+                        $(modalView.el).remove();
+                    });
+                    $("#fullImageLightbox").lightbox();
+                });
+
+                // render it (will fire "ready")
+
+                modalView.render();
             }
         }
     });
@@ -1739,8 +1921,7 @@
                 attr: "userContent",
                 subView: "FollowersUserContent",
                 subOptions: {
-                    model: "followers",
-                    data: ["profile"]
+                    data: ["profile", "followers"]
                 }
             }
         },
@@ -1748,7 +1929,7 @@
             var view = this,
                 streams = {};
             if (view.userContent && view.userContent.peopleStreamView && view.userContent.peopleStreamView.model) {
-                streams.major = view.userContent.model;
+                streams.major = view.userContent.peopleStreamView.model;
             }
             return streams;
         }
@@ -1780,9 +1961,12 @@
                 subView: "MajorPersonView",
                 idAttr: "data-person-id"
             }
+        },
+        initialize: function(options) {
+            Pump.debug(options);
+            Pump.PersonView.prototype.initialize.apply(this);
         }
     });
-
 
     Pump.FollowingContent = Pump.ContentView.extend({
         templateName: 'following',
@@ -1804,8 +1988,7 @@
                 attr: "userContent",
                 subView: "FollowingUserContent",
                 subOptions: {
-                    model: "following",
-                    data: ["profile"]
+                    data: ["profile", "following"]
                 }
             }
         },
@@ -1813,7 +1996,7 @@
             var view = this,
                 streams = {};
             if (view.userContent && view.userContent.peopleStreamView && view.userContent.peopleStreamView.model) {
-                streams.major = view.userContent.model;
+                streams.major = view.userContent.peopleStreamView.model;
             }
             return streams;
         }
@@ -1975,7 +2158,7 @@
                 subView: "ListListContent",
                 subOptions: {
                     model: "list",
-                    data: ["profile", "members", "lists"]
+                    data: ["profile", "members", "lists", "list"]
                 }
             }
         }
@@ -1986,14 +2169,14 @@
         modelName: "list",
         parts: ["member-stream",
                 "member"],
-        setupSubs: function() {
-            var view = this,
-                list = view.model,
-                people = view.options.data.members,
-                $el = view.$("#member-stream");
-
-            if ($el && list && list.members) {
-                view.memberStreamView = new Pump.MemberStreamView({el: $el, model: people, data: {list: list}});
+        subs: {
+            "#member-stream": {
+                attr: "memberStreamView",
+                subView: "MemberStreamView",
+                subOptions: {
+                    model: "members",
+                    data: ["profile", "lists", "list"]
+                }
             }
         },
         events: {
@@ -2046,7 +2229,7 @@
                 subView: "MemberView",
                 idAttr: "data-person-id",
                 subOptions: {
-                    data: ["list", "people"]
+                    data: ["list"]
                 }
             }
         }
@@ -2108,7 +2291,7 @@
             if (view.$("#avatar-fineupload").length > 0) {
                 view.$("#avatar-fineupload").fineUploader({
                     request: {
-                        endpoint: "/main/upload"
+                        endpoint: "/main/upload-avatar"
                     },
                     text: {
                         uploadButton: '<i class="icon-upload icon-white"></i> Avatar file'
@@ -2148,7 +2331,7 @@
                             view.showError(err);
                             view.stopSpin();
                         } else {
-                            view.saveProfile(act.object.get("fullImage"));
+                            view.saveProfile(act.object);
                         }
                     });
                 }).on("error", function(event, id, fileName, reason) {
@@ -2166,7 +2349,10 @@
                          "summary": view.$('#bio').val()};
 
             if (img) {
-                props.image = img;
+                props.image = img.get("image");
+                props.pump_io = {
+                    fullImage: img.get("fullImage")
+                };
             }
 
             profile.save(props,
@@ -2742,6 +2928,12 @@
 
             callback(null, false);
         }
+    });
+
+    Pump.LightboxModal = Pump.TemplateView.extend({
+        tagName: "div",
+        className: "modal-holder",
+        templateName: "lightbox-modal"
     });
 
     Pump.BodyView = Backbone.View.extend({

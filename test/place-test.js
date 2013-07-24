@@ -28,12 +28,28 @@ var suite = vows.describe("place module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ["displayName",
-             "position",
+    fields: ["_created",
+             "_uuid",
              "address",
+             "author",
+             "content",
+             "displayName",
+             "downstreamDuplicates",
+             "id",
+             "image",
+             "inReplyTo",
+             "likes",
+             "links",
+             "objectType",
+             "position",
              "published",
+             "replies",
+             "shares",
+             "summary",
              "updated",
-             "url"]
+             "upstreamDuplicates",
+             "url"],
+    indices: ["_uuid", "url"]
 };
 
 var testData = {

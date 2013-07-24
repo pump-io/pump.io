@@ -30,7 +30,8 @@ var assert = require("assert"),
     register = oauthutil.register,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair,
-    newCredentials = oauthutil.newCredentials;
+    newCredentials = oauthutil.newCredentials,
+    validActivityObject = actutil.validActivityObject;
 
 var suite = vows.describe("Update object test");
 
@@ -86,6 +87,11 @@ suite.addBatch({
                             verb: "like",
                             object: {
                                 id: "urn:uuid:484e5278-8675-11e2-bd8f-70f1a154e1aa",
+                                links: {
+                                    self: {
+                                        href: "http://somewhereelse.example/note/1"
+                                    }
+                                },
                                 objectType: "note"
                             }
                         };
@@ -102,6 +108,11 @@ suite.addBatch({
                             verb: "like",
                             object: {
                                 id: "urn:uuid:484e5278-8675-11e2-bd8f-70f1a154e1aa",
+                                links: {
+                                    self: {
+                                        href: "http://somewhereelse.example/note/1"
+                                    }
+                                },
                                 objectType: "note",
                                 content: "Hello, world!"
                             }
@@ -133,9 +144,83 @@ suite.addBatch({
                 assert.isObject(act.object);
                 assert.equal(act.object.content, "Hello, world!");
             }
+        },
+        "and we get more information about a locally-created object": {
+            topic: function() {
+                var callback = this.callback,
+                    cl,
+                    pair1,
+                    pair2,
+                    posted,
+                    liked;
+
+                Step(
+                    function() {
+                        newClient(this);
+                    },
+                    function(err, results) {
+                        if (err) throw err;
+                        cl = results;
+                        newPair(cl, "johnc", "i-heart-dragets", this.parallel());
+                        newPair(cl, "johnl", "jwbooth4life", this.parallel());
+                    },
+                    function(err, results1, results2) {
+                        var act;
+                        if (err) throw err;
+                        pair1 = results1;
+                        pair2 = results2;
+                        act = {
+                            verb: "post",
+                            object: {
+                                objectType: "note",
+                                content: "Hello, world."
+                            }
+                        };
+                        httputil.postJSON("http://localhost:4815/api/user/johnc/feed",
+                                          makeCred(cl, pair1),
+                                          act,
+                                          this);
+                    },
+                    function(err, results1) {
+                        var act;
+                        if (err) throw err;
+                        posted = results1;
+                        act = {
+                            verb: "like",
+                            object: {
+                                id: posted.object.id,
+                                objectType: posted.object.objectType,
+                                content: "Hello, buttheads."
+                            }
+                        };
+                        httputil.postJSON("http://localhost:4815/api/user/johnl/feed",
+                                          makeCred(cl, pair2),
+                                          act,
+                                          this);
+                    },
+                    function(err, results2) {
+                        if (err) throw err;
+                        liked = results2;
+                        httputil.getJSON(posted.object.links.self.href,
+                                         makeCred(cl, pair1),
+                                         this);
+                    },
+                    function(err, results1, response) {
+                        callback(err, results1);
+                    }
+                );
+            },
+            "it works": function(err, note) {
+                assert.ifError(err);
+                assert.isObject(note);
+            },
+            "object has not been updated": function(err, note) {
+                assert.ifError(err);
+                validActivityObject(note);
+                assert.equal(note.content, "Hello, world.");
+            }
         }
     }
 });
 
 suite["export"](module);
-

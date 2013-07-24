@@ -29,29 +29,34 @@ var suite = vows.describe("task module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ["attachments",
+    fields: ["_created",
+             "_uuid",
+             "actor",
+             "attachments",
              "author",
+             "by",
              "content",
              "displayName",
              "downstreamDuplicates",
              "id",
              "image",
+             "inReplyTo",
+             "likes",
+             "links",
+             "object",
              "objectType",
+             "prerequisites",
              "published",
+             "replies",
+             "required",
+             "shares",
              "summary",
+             "supersedes",
              "updated",
              "upstreamDuplicates",
              "url",
-             "_uuid",
-             "actor",
-             "by",
-             "object",
-             "prerequisites",
-             "required",
-             "supersedes",
-             "verb"
-    ],
-    indices: ["_uuid"]
+             "verb"],
+    indices: ["_uuid", "url"]
 };
 
 var testData = {

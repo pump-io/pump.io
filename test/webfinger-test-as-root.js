@@ -40,6 +40,14 @@ var webfinger = {
             href: "http://social.localhost/whiterabbit"
         },
         {
+            rel: "dialback",
+            href: "http://social.localhost/api/dialback"
+        },
+        {
+            rel: "self",
+            href: "http://social.localhost/api/user/whiterabbit/profile"
+        },
+        {
             rel: "activity-inbox",
             href: "http://social.localhost/api/user/whiterabbit/inbox"
         },
@@ -48,8 +56,20 @@ var webfinger = {
             href: "http://social.localhost/api/user/whiterabbit/feed"
         },
         {
-            rel: "dialback",
-            href: "http://social.localhost/api/dialback"
+            rel: "followers",
+            href: "http://social.localhost/api/user/whiterabbit/followers"
+        },
+        {
+            rel: "following",
+            href: "http://social.localhost/api/user/whiterabbit/following"
+        },
+        {
+            rel: "favorites",
+            href: "http://social.localhost/api/user/whiterabbit/favorites"
+        },
+        {
+            rel: "lists",
+            href: "http://social.localhost/api/user/whiterabbit/lists/person"
         }
     ]
 };

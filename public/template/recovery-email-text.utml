@@ -1,0 +1,9 @@
+Someone has requested a new password for <%= principalUser.nickname %> on <%= config.site %>.
+
+To complete the password recovery, click on the following URL.
+
+<%= recoveryURL %>
+
+If you think you received this email in error, you can safely ignore it.
+
+

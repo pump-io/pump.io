@@ -66,6 +66,7 @@ var testData = {
         },
         verb: "post",
         object: {
+            id: "urn:uuid:9c9bbb2e-ddb7-11e2-abe4-2c8158efb9e9",
             objectType: "note",
             content: "Feeling groovy."
         }

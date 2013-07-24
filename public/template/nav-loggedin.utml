@@ -3,12 +3,12 @@
   <a class="brand" href="/"><%- config.site %></a>
 
   <div class="btn-group">
-    <button type="button" class="btn btn-small primary" id="post-note-button">
-      Note <i class="icon-pencil"></i>
+    <button type="button" class="btn btn-small primary" id="post-note-button" title="Post a note">
+      <span class="hidden-phone">Note </span><i class="icon-pencil"></i>
     </button>
     <% if (config.canUpload) { %>
-    <button type="button" class="btn btn-small primary" id="post-picture-button">
-      Picture <i class="icon-picture"></i>
+    <button type="button" class="btn btn-small primary" id="post-picture-button" title="Post a picture">
+      <span class="hidden-phone">Picture </span><i class="icon-picture"></i>
     </button>
     <% } %>
   </div>
@@ -17,10 +17,11 @@
     <li id="fat-menu" class="dropdown">
       <a href="#" id="profile-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown"> 
         <% if (_(principal).has("image")) { %>
-        <img class="pull-left" src="<%- principal.image.url %>" width="24" height="24" class="img-rounded" />&nbsp;
+        <img class="pull-left img-rounded" src="<%- principal.image.url %>" width="24" height="24" class="img-rounded" />
+        <% } else { %>
+        <img class="pull-left img-rounded" src="/images/default.png" width="24" height="24" class="img-rounded" />
         <% } %>
-        <%- principal.displayName %>
-        <b class="caret"></b>
+        &nbsp;<span class="hidden-phone"><%- principal.displayName %> </span><b class="caret"></b>
       </a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="profile-dropdown">
         <li><a tabindex="-1" href="/<%- principalUser.nickname %>">Activity</a></li>
@@ -28,8 +29,6 @@
         <li><a tabindex="-1" href="/<%- principalUser.nickname %>/followers">Followers</a></li>
         <li><a tabindex="-1" href="/<%- principalUser.nickname %>/following">Following</a></li>
         <li><a tabindex="-1" href="/<%- principalUser.nickname %>/lists">Lists</a></li>
-        <li class="divider"></li>
-        <li><a tabindex="-1" href="/main/messages">Messages</a></li>
         <li class="divider"></li>
         <li><a tabindex="-1" href="/main/settings">Settings</a></li>
         <li><a tabindex="-1" href="/main/account">Account</a></li>

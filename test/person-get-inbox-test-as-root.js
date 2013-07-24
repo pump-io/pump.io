@@ -35,7 +35,8 @@ var assert = require("assert"),
     dialbackApp = require("./lib/dialback").dialbackApp,
     setupAppConfig = oauthutil.setupAppConfig,
     Databank = databank.Databank,
-    DatabankObject = databank.DatabankObject;
+    DatabankObject = databank.DatabankObject,
+    URLMaker = require("../lib/urlmaker").URLMaker;
 
 var suite = vows.describe("test discovery of endpoint for a user");
 
@@ -45,6 +46,9 @@ suite.addBatch({
     "When we set up the app": {
         topic: function() {
             var db = Databank.get(tc.driver, tc.params);
+            // Need this to make IDs
+
+            URLMaker.hostname = "example.net";
             Step(
                 function() {
                     db.connect({}, this);

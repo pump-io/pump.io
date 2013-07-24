@@ -297,7 +297,7 @@
                 unique;
 
             if (_.isArray(props)) {
-                Pump.debug("Merging items of " + items.url() + "of length " + items.length + " with array of length " + props.length);
+                Pump.debug("Merging items of " + items.url() + " of length " + items.length + " with array of length " + props.length);
                 unique = props.map(function(item) {
                     return items.model.unique(item);
                 });
@@ -353,6 +353,8 @@
             var str = this;
             if (str.has('links') && _.has(str.get('links'), 'next')) {
                 return str.get('links').next.href;
+            } else if (str.items && str.items.length > 0) {
+                return str.url() + "?before=" + str.items.at(str.items.length-1).id;
             } else {
                 return null;
             }
@@ -384,7 +386,7 @@
                 dataType: "json",
                 url: prevLink,
                 success: function(data) {
-                    if (data.items) {
+                    if (data.items && data.items.length > 0) {
                         if (stream.items) {
                             stream.items.add(data.items, {at: 0});
                         } else {
@@ -395,7 +397,7 @@
                         if (stream.has('links')) {
                             stream.get('links').prev = data.links.prev;
                         } else {
-                            stream.set('links', data.links);
+                            stream.set('links', {"prev": {"href": data.links.prev.href}});
                         }
                     }
                     if (_.isFunction(callback)) {
@@ -437,11 +439,17 @@
                             stream.items = new stream.itemsClass(data.items);
                         }
                     }
-                    if (data.links && data.links.next && data.links.next.href) {
-                        if (stream.has('links')) {
-                            stream.get('links').next = data.links.next;
+                    if (data.links) {
+                        if (data.links.next && data.links.next.href) {
+                            if (stream.has('links')) {
+                                stream.get('links').next = data.links.next;
+                            } else {
+                                stream.set('links', {"next": {"href": data.links.next.href}});
+                            }
                         } else {
-                            stream.set('links', data.links);
+                            if (stream.has('links')) {
+                                delete stream.get('links').next;
+                            }
                         }
                     }
                     if (_.isFunction(callback)) {
@@ -706,7 +714,27 @@
     });
 
     Pump.PeopleStream = Pump.ActivityObjectStream.extend({
-        itemsClass: Pump.PeopleItems
+        itemsClass: Pump.PeopleItems,
+        nextLink: function() {
+            var str = this;
+            if (str.has('links') && _.has(str.get('links'), 'next')) {
+                return str.get('links').next.href;
+            } else if (str.items && str.items.length > 0) {
+                return str.url() + "?before=" + str.items.at(str.items.length-1).id + "&type=person";
+            } else {
+                return null;
+            }
+        },
+        prevLink: function() {
+            var str = this;
+            if (str.has('links') && _.has(str.get('links'), 'prev')) {
+                return str.get('links').prev.href;
+            } else if (str.items && str.items.length > 0) {
+                return str.url() + "?since=" + str.items.at(0).id + "&type=person";
+            } else {
+                return null;
+            }
+        },
     });
 
     Pump.User = Pump.Model.extend({

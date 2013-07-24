@@ -28,14 +28,28 @@ var suite = vows.describe("product module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ["author",
+    fields: ["_created",
+             "_uuid",
+             "attachments",
+             "author",
+             "content",
              "displayName",
+             "downstreamDuplicates",
              "fullImage",
+             "id",
              "image",
+             "inReplyTo",
+             "likes",
+             "links",
+             "objectType",
              "published",
+             "replies",
+             "shares",
              "summary",
              "updated",
-             "url"]
+             "upstreamDuplicates",
+             "url"],
+    indices: ["_uuid", "url"]
 };
 
 var testData = {

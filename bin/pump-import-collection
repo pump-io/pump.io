@@ -1,0 +1,1018 @@
+#!/usr/bin/env node
+
+// -*- mode: javascript -*-
+
+// import an activitystreams JSON collection
+//
+// Copyright 2013, E14N https://e14n.com/
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+var fs = require("fs"),
+    path = require("path"),
+    urlparse = require("url").parse,
+    Step = require("step"),
+    _ = require("underscore-contrib"),
+    Logger = require("bunyan"),
+    Queue = require("jankyqueue"),
+    databank = require("databank"),
+    Databank = databank.Databank,
+    DatabankObject = databank.DatabankObject,
+    randomString = require("../lib/randomstring").randomString,
+    IDMaker = require("../lib/idmaker").IDMaker,
+    Distributor = require("../lib/distributor").Distributor,
+    schema = require("../lib/schema").schema,
+    Activity = require("../lib/model/activity").Activity,
+    Stream = require("../lib/model/stream").Stream,
+    Person = require("../lib/model/person").Person,
+    Group = require("../lib/model/group").Group,
+    Collection = require("../lib/model/collection").Collection,
+    ActivityObject = require("../lib/model/activityobject").ActivityObject,
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    User = require("../lib/model/user").User,
+    argv = require("optimist")
+        .usage("Usage: $0 -f <collection file> or $0 -d <divided directory>")
+        .alias("f", "file")
+        .alias("d", "directory")
+        .describe("f", "File in Activity Streams JSON collection format")
+        .describe("d", "Recursive directory of files, one activity per, like divider makes")
+        .check(function(argv) { if (!argv.f & !argv.d) { throw new Error("Must have one of -f or -d");  } })
+        .argv;
+
+var QUEUE_MAX = 1;
+
+// Connect to databank and start importing activities
+
+var main = function(argv) {
+    var config = getConfig(argv.c),
+        log = setupLogger(config);
+
+    log.info("Initializing pump.io");
+
+    URLMaker.hostname = config.hostname;
+    URLMaker.port     = (config.urlPort) ? config.urlPort : config.port;
+
+    Step(
+        function() {
+            log.info("Connecting to databank");
+            connectDatabank(config, this);
+        },
+        function(err, db) {
+            if (err) throw err;
+            if (argv.f) {
+                importCollectionFile(argv.f, log, this);
+            } else if (argv.d) {
+                importDirectory(argv.d, log, this);
+            } else {
+                throw new Error("No file or directory argument even though I totally asked for one.");
+            }
+        },
+        function(err) {
+            if (err) {
+                log.error(err);
+                process.exit(1);
+            } else {
+                log.info("Done.");
+                process.exit(0);
+            }
+        }
+    );
+};
+
+var importCollectionFile = function(fname, log, callback) {
+    var q = new Queue(QUEUE_MAX);
+
+    Step(
+        function() {
+            log.info({fname: fname}, "Reading activitystrea.ms file");
+            fs.readFile(fname, {encoding: "utf8"}, this);
+        },
+        function(err, data) {
+            if (err) throw err;
+            log.info({fname: fname}, "Parsing activitystrea.ms file");
+            try {
+                this(null, JSON.parse(data));
+            } catch (e) {
+                this(e, null);
+            }
+        },
+        function(err, collection) {
+            var group;
+            if (err) throw err;
+            log.info({count: collection.items.length}, "Importing activities");
+            group = this.group();
+            _.each(collection.items, function(item) {
+                // Do registration separately
+                if (isRegistration(item)) {
+                    q.enqueue(registerUser, [item, log], group());
+                } else {
+                    q.enqueue(importActivity, [item, log], group());
+                }
+            });
+        },
+        callback
+    );
+};
+
+var walk = function(fname, onFile, callback) {
+
+    var onDir = function(callback) {
+        Step(
+            function() {
+                fs.readdir(fname, this);
+            },
+            function(err, files) {
+                var wm = function(i, cb) {
+                    var full;
+                    if (i >= files.length) {
+                        cb(null);
+                    } else {
+                        full = path.join(fname, files[i]);
+
+                        walk(full,
+                             onFile,
+                             function(err) {
+                                 if (err) {
+                                     cb(err);
+                                 } else {
+                                     wm(++i, cb);
+                                 }
+                             });
+                    }
+                };
+                if (err) throw err;
+                files = files.sort();
+                wm(0, this);
+            },
+            callback
+        );
+    };
+
+    Step(
+        function() {
+            fs.lstat(fname, this);
+        },
+        function(err, stats) {
+            if (stats.isDirectory()) {
+                onDir(this);
+            } else if (stats.isFile()) {
+                onFile(fname, this);
+            } else {
+                this(null);
+            }
+        },
+        callback
+    );
+};
+
+var importDirectory = function(directoryName, log, callback) {
+
+    var q = new Queue(QUEUE_MAX);
+
+    log.info({directory: directoryName}, "Importing directory");
+
+    walk(directoryName,
+         function(fname, callback) {
+             Step(
+                 function() {
+                     log.info({fname: fname}, "Reading activitystrea.ms file");
+                     fs.readFile(fname, {encoding: "utf8"}, this);
+                 },
+                 function(err, data) {
+                     if (err) throw err;
+                     log.info({fname: fname}, "Parsing activitystrea.ms file");
+                     try {
+                         this(null, JSON.parse(data));
+                     } catch (e) {
+                         this(e, null);
+                     }
+                 },
+                 function(err, activity) {
+                     if (err) throw err;
+                     log.info({activity: activity.id, fname: fname}, "Importing activity");
+                     if (isRegistration(activity)) {
+                         registerUser(activity, log, this);
+                     } else {
+                         importActivity(activity, log, this);
+                     }
+                 },
+                 callback
+             );
+         },
+         callback);
+};
+
+// Gets the configuration vars for this server from config files
+
+var getConfig = function(filename) {
+    var files,
+        config = {},
+        i,
+        raw,
+        parsed;
+
+    if (filename) {
+        files = [filename];
+    } else {
+        files = ['/etc/pump.io.json',
+                 path.join(process.env.HOME, ".pump.io.json")];
+    }
+
+    // This is all sync
+    for (i = 0; i < files.length; i++) {
+        if (fs.existsSync(files[i])) {
+            raw = fs.readFileSync(files[i]);
+            try {
+                parsed = JSON.parse(raw);
+                _.extend(config, parsed);
+            } catch (err) {
+                console.log(err);
+                process.exit(1);
+            }
+        }
+    }
+
+    return config;
+};
+
+var connectDatabank = function(config, callback) {
+
+    var params,
+        db;
+
+    if (_(config).has("params")) {
+        params = config.params;
+    } else {
+        params = {};
+    }
+
+    if (_(params).has("schema")) {
+        _.extend(params.schema, schema);
+    } else {
+        params.schema = schema;
+    }
+
+    // Add indices that help us
+
+    params.schema.person.indices.push("upstreamDuplicates.0");
+    params.schema.person.indices.push("status_net.profile_info.local_id");
+
+    params.schema.note.indices.push("status_net.notice_id");
+    params.schema.note.indices.push("status_net.message_id");
+
+    params.schema.group.indices.push("upstreamDuplicates.0");
+
+    db = Databank.get(config.driver, params);
+
+    // Connect...
+
+    db.connect({}, function(err) {
+        if (err) {
+            callback(err, null);
+            return;
+        }
+
+        DatabankObject.bank = db;
+        callback(null, db);
+    });
+};
+
+var setupLogger = function(config) {
+    var log,
+        logParams = {
+            name: "pump.io",
+            component: "pump-import-collection"
+        };
+
+    if (config.logfile) {
+        logParams.streams = [{path: config.logfile}];
+    } else if (config.nologger) {
+        logParams.streams = [{path: "/dev/null"}];
+    } else {
+        logParams.streams = [{stream: process.stderr}];
+    }
+
+    log = new Logger(logParams);
+
+    return log;
+};
+
+var importActivity = function(props, log, callback) {
+
+    var activity = new Activity(props);
+
+    Step(
+        function() {
+            log.info({activity: activity.id}, "Checking for duplicates");
+            Activity.get(activity.id, this);
+        },
+        function(err) {
+            if (err && err.name == "NoSuchThingError") {
+                log.info({activity: activity.id}, "Unseen activity.");
+                this(null);
+            } else if (err) {
+                this(err);
+            } else {
+                log.info({activity: activity.id}, "Already imported; skipping.");
+                callback(null);
+            }
+        },
+        function(err) {
+            if (err) throw err;
+            log.info({actor: activity.actor.id, object: activity.object.id, verb: activity.verb}, "Localizing objects");
+            maybeLocalize(activity.actor, this.parallel());
+            maybeLocalize(activity.object, this.parallel());
+        },
+        function(err, actor, object) {
+            if (err) throw err;
+            activity.actor = actor;
+            activity.object = object;
+            var t = this,
+                origF = _.getPath(props, ["actor", "followers", "url"]),
+                newF = _.getPath(activity, ["actor", "followers", "url"]);
+
+            _.each(["to", "cc", "bto", "bcc"], function(name) {
+                if (origF && newF && origF != newF) {
+                    _.each(activity[name], function(addr) {
+                        if (addr.id == origF) {
+                            log.info({original: origF, new: newF}, "Replacing followers URL in addresses");
+                            addr.id = newF;
+                        }
+                    });
+                }
+                maybeLocalizeArray(activity[name], t.parallel());
+            });
+        },
+        function(err, to, cc, bto, bcc) {
+            if (err) throw err;
+            if (to && to.length > 0) {
+                activity.to = to;
+            }
+            if (cc && cc.length > 0) {
+                activity.cc = cc;
+            }
+            if (bto && bto.length > 0) {
+                activity.bto = bto;
+            }
+            if (bcc && bcc.length > 0) {
+                activity.bcc = bcc;
+            }
+            activity._uuid = IDMaker.makeID();
+
+            if (activity.provider && !activity.provider.id && activity.provider.url) {
+                activity.provider.id = activity.provider.url;
+            }
+            
+            delete activity.content;
+            // Specific fixups for different verbs
+            switch (activity.verb) {
+            case Activity.FOLLOW:
+            case Activity.STOP_FOLLOWING:
+                if (badGraphActivity(activity)) {
+                    log.info({activity: activity.id, verb: activity.verb, actor: activity.actor.id, object: activity.object.id},
+                             "skipping invalid graph activity");
+                    callback(null);
+                } else {
+                    this(null);
+                }
+                break;
+            case Activity.POST:
+                // Auto-create activity content
+                if (activity.id == activity.object.id) {
+                    activity.id = betterID(activity);
+                }
+                if (activity.url == activity.object.url) {
+                    delete activity.url;
+                }
+                if (activity.object.objectType == "note" && _.isObject(activity.object.inReplyTo)) {
+                    activity.object.objectType = "comment";
+                }
+                // Add a date to the object if it's not there
+                if (activity.verb == "post" && !activity.object.published) {
+                    activity.object.published = activity.published;
+                }
+                this(null);
+                break;
+            case Activity.JOIN:
+                log.info({activity: activity.id}, "Checking join");
+                checkJoin(activity, log, this);
+                break;
+            case Activity.SHARE:
+                var shared = activity.object;
+                if (shared.verb) {
+                    log.info({activity: activity.id, sharedActivity: shared.id}, "Changing shared activity to shared object");
+                    if (shared.verb == Activity.POST) {
+                        activity.object = shared.object;
+                        activity.object.author = shared.actor;
+                    }
+                }
+		this(null);
+                break;
+            default:
+                this(null);
+                break;
+            }
+        },
+        function(err) {
+            if (err) throw err;
+            activity.ensureRecipients(this);
+        },
+        function(err) {
+            if (err) throw err;
+            log.info({activity: activity}, "Applying activity");
+            activity.apply(null, this);
+        },
+        function(err) {
+            if (err) throw err;
+            log.info({activity: activity}, "Saving activity");
+            activity.save(this);
+        },
+        function(err, saved) {
+            if (err) throw err;
+            activity = saved;
+            log.info({actor: activity.actor.id}, "Checking for user");
+            User.fromPerson(activity.actor.id, this);
+        },
+        function(err, user) {
+            if (err) throw err;
+            if (!user) {
+                log.info({actor: activity.actor.id}, "Not a user");
+                this(null, activity);
+                return;
+            }
+            log.info({actor: activity.actor.id, activity: activity.id}, "Adding to outbox");
+            user.addToOutbox(activity, this.parallel());
+            log.info({actor: activity.actor.id, activity: activity.id}, "Adding to inbox");
+            user.addToInbox(activity, this.parallel());
+        },
+        function(err) {
+            if (err) {
+                log.error(err);
+                // skip the error
+                // XXX are there errors we shouldn't skip...?
+                callback(null, null);
+            } else {
+                callback(null, activity);
+            }
+        }
+    );
+};
+
+var isRegistration = function(activity) {
+    return (activity.actor &&
+            activity.actor.objectType == ActivityObject.PERSON &&
+            activity.verb &&
+            activity.verb == Activity.JOIN &&
+            activity.object &&
+            activity.object.objectType == ActivityObject.SERVICE &&
+            activity.object.url &&
+            urlparse(activity.object.url).hostname == URLMaker.hostname);
+};
+
+var registerUser = function(activity, log, callback) {
+
+    var user,
+        profile = activity.actor,
+        defaultLists = function(user, callback) {
+            Step(
+                function(err, str) {
+                    var lists = ["Friends", "Family", "Acquaintances", "Coworkers"],
+                        group = this.group();
+
+                    if (err) throw err;
+
+                    _.each(lists, function(list) {
+                        var act = new Activity({
+                            actor: user.profile,
+                            verb: Activity.CREATE,
+                            to: [{objectType: ActivityObject.COLLECTION,
+                                  id: user.profile.followers.url}],
+                            object: {
+                                objectType: ActivityObject.COLLECTION,
+                                displayName: list,
+                                objectTypes: ["person"]
+                            }
+                        });
+                        act.fire(group());
+                    });
+                },
+                callback
+            );
+        },
+        props;
+
+    if (profile && profile.portablecontacts_net && profile.portablecontacts_net.preferredUsername) {
+        props = {
+            nickname: profile.portablecontacts_net.preferredUsername
+        };
+    } else {
+        callback(new Error("No discernable nickname"), null);
+        return;
+    }
+
+    log.info(props, "Registering user");
+
+    Step(
+        function() {
+            log.info({nickname: props.nickname}, "Checking for duplicate user");
+            User.get(props.nickname, this);
+        },
+        function(err, user) {
+            if (err && err.name == "NoSuchThingError") {
+                log.info({nickname: props.nickname}, "Unseen user.");
+                this(null);
+            } else if (err) {
+                throw err;
+            } else {
+                log.info({nickname: props.nickname}, "Skipping existing user.");
+                callback(null);
+            }
+        },
+        function(err) {
+            randomString(16, this);
+        },
+        function(err, str) {
+            if (err) throw err;
+            // Always add a number
+            props.password = str +  Math.floor((Math.random()*10000)+1);
+            User.create(props, this);
+        },
+        function(err, value) {
+            if (err) throw err;
+            user = value;
+            usersStream(this);
+        },
+        function(err, str) {
+            if (err) throw err;
+            str.deliver(user.nickname, this);
+        },
+        function(err) {
+            var localID;
+            if (err) throw err;
+            // copy stuff that's not auto-generated into the profile
+            _.defaults(user.profile, profile);
+            if (!user.profile.upstreamDuplicates) {
+                user.profile.upstreamDuplicates = [];
+            }
+            user.profile.upstreamDuplicates.push(profile.id);
+            if (profile.displayName) {
+                user.profile.displayName = profile.displayName;
+            }
+            if (profile.portablecontacts_net && profile.portablecontacts_net.note) {
+                user.profile.summary = profile.portablecontacts_net.note;
+            }
+            // Add a local ID so we can find it
+            localID = personLocalID(profile);
+            if (localID) {
+                if (!user.profile.status_net) {
+                    user.profile.status_net = {};
+                }
+                if (!user.profile.status_net.profile_info) {
+                    user.profile.status_net.profile_info = {};
+                }
+                user.profile.status_net.profile_info.local_id = localID;
+            }
+            user.profile.save(this);
+        },
+        function(err) {
+            if (err) throw err;
+            user.expand(this);
+        },
+        function(err) {
+            var svc;
+            if (err) throw err;
+            defaultLists(user, this);
+        },
+        function(err) {
+            if (err) throw err;
+            activity.actor = user.profile;
+            importActivity(activity, log, this);
+        },
+        function(err) {
+            if (err) {
+                log.error(err);
+            }
+            callback(null);
+        }
+    );
+};
+
+var usersStream = function(callback) {
+
+    Step(
+        function() {
+            Stream.get("user:all", this);
+        },
+        function(err, str) {
+            if (err) {
+                if (err.name == "NoSuchThingError") {
+                    Stream.create({name: "user:all"}, this);
+                } else {
+                    throw err;
+                }
+            } else {
+                callback(null, str);
+            }
+        },
+        function(err, str) {
+            if (err) {
+                if (err.name == "AlreadyExistsError") {
+                    Stream.get("user:all", callback);
+                } else {
+                    callback(err);
+                }
+            } else {
+                callback(null, str);
+            }
+        }
+    );
+};
+
+var maybeLocalize = function(object, callback) {
+    // OK to call this with null
+    if (!object) {
+        callback(null, object);
+        return;
+    }
+    switch (object.objectType) {
+    case ActivityObject.PERSON:
+        maybeLocalizePerson(object, callback);
+        break;
+    case ActivityObject.GROUP:
+        maybeLocalizeGroup(object, callback);
+        break;
+    case ActivityObject.COLLECTION:
+        maybeLocalizeCollection(object, callback);
+        break;
+    default:
+        maybeLocalizeObject(object, callback);
+    }
+};
+
+var maybeLocalizeArray = function(arr, callback) {
+    
+    // skip if it's null or empty
+
+    if (!arr) {
+        callback(null, arr);
+        return;
+    }
+
+    Step(
+        function() {
+            var group = this.group();
+            _.each(arr, function(object) {
+                maybeLocalize(object, group());
+            });
+        },
+        function(err, results) {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, results);
+            }
+        }
+    );
+};
+
+// Given a person, check if they're a user
+
+var maybeLocalizePerson = function(person, callback) {
+
+    var nickname,
+        domain,
+        id;
+
+    if ((person.url && urlparse(person.url).hostname == URLMaker.hostname) ||
+        (person.id && urlparse(person.id).hostname == URLMaker.hostname)) {
+        domain = URLMaker.hostname;
+    } else {
+        personByOldID(person, callback);
+        return;
+    }
+
+    if (!person.portablecontacts_net) {
+        personByLocalID(person, callback);
+        return;
+    }
+
+    if (person.portablecontacts_net && person.portablecontacts_net.preferredUsername) {
+        nickname = person.portablecontacts_net.preferredUsername;
+    } else {
+        callback(null, person);
+        return;
+    }
+
+    id = "acct:"+nickname+"@"+domain;
+
+    Step(
+        function() {
+            User.fromPerson(id, this);
+        },
+        function(err, user) {
+            if (err) throw err;
+            if (!user) {
+                this(null, person);
+            } else {
+                this(null, user.profile);
+            }
+        },
+        callback
+    );
+};
+
+var maybeLocalizeObject = function(object, callback) {
+
+    var type = object.objectType;
+
+    if (isLocalObjectID(object.id)) {
+
+        Step(
+            function() {
+                ActivityObject.getObject(object.objectType, object.id, this);
+            },
+            function(err, results) {
+                if (err && err.name == "NoSuchThingError") {
+                    object._uuid = IDMaker.makeID();
+
+                    if (!_.has(object, "links")) {
+                        object.links = {};
+                    }
+
+                    object.links.self = {
+                        href: URLMaker.makeURL("api/" + type + "/" + object._uuid)
+                    };
+
+                    object.likes = {
+                        url: URLMaker.makeURL("api/" + type + "/" + object._uuid + "/likes")
+                    };
+
+                    object.replies = {
+                        url: URLMaker.makeURL("api/" + type + "/" + object._uuid + "/replies")
+                    };
+
+                    object.shares = {
+                        url: URLMaker.makeURL("api/" + type + "/" + object._uuid + "/shares")
+                    };
+                    
+                    Step(
+                        function() {
+                            maybeLocalize(object.inReplyTo, this.parallel());
+                            maybeLocalize(object.author, this.parallel());
+                        },
+                        function(err, inReplyTo, author) {
+                            if (err) {
+                                callback(err, null);
+                            } else {
+                                if (inReplyTo) {
+                                    object.inReplyTo = inReplyTo;
+                                }
+                                if (author) {
+                                    object.author = author;
+                                }
+                                callback(null, object);
+                            }
+                        }
+                    );
+                } else if (err) {
+                    callback(err, null);
+                } else {
+                    callback(null, results);
+                }
+            }
+        );
+    } else {
+        callback(null, object);
+    }
+};
+
+var maybeLocalizeGroup = function(group, callback) {
+
+    var type;
+
+    if (isLocalObjectID(group.id)) {
+
+        Step(
+            function() {
+                Group.search({"upstreamDuplicates.0": group.id}, this);
+            },
+            function(err, results) {
+                if (err) {
+                    throw err;
+                } else if (!results || results.length == 0) {
+
+                    group.upstreamDuplicates = [
+                        group.id
+                    ];
+
+                    delete group.id;
+
+                    Step(
+                        function() {
+                            maybeLocalize(group.author, this);
+                        },
+                        function(err, author) {
+                            if (err) {
+                                callback(err, null);
+                            } else {
+                                if (author) {
+                                    group.author = author;
+                                }
+                                callback(null, group);
+                            }
+                        }
+                    );
+                } else {
+                    callback(null, results[0]);
+                }
+            }
+        );
+    } else {
+        callback(null, group);
+    }
+};
+
+var maybeLocalizeCollection = function(coll, callback) {
+
+    var type;
+
+    if (isLocalObjectID(coll.id)) {
+
+        Step(
+            function() {
+                Collection.get(coll.id, this);
+            },
+            function(err, results) {
+                if (err && err.name == "NoSuchThingError") {
+                    coll._uuid = IDMaker.makeID();
+
+                    if (!_.has(coll, "links")) {
+                        coll.links = {};
+                    }
+
+                    Step(
+                        function() {
+                            maybeLocalize(coll.author, this);
+                        },
+                        function(err, author) {
+                            if (err) {
+                                callback(err, null);
+                            } else {
+                                if (author) {
+                                    coll.author = author;
+                                }
+                                callback(null, coll);
+                            }
+                        }
+                    );
+
+                } else if (err) {
+                    callback(err, null);
+                } else {
+                    callback(null, results);
+                }
+            }
+        );
+    } else {
+        callback(null, coll);
+    }
+};
+
+var personByOldID = function(person, callback) {
+
+    Step(
+        function() {
+            Person.get(person.id, this);
+        },
+        function(err, found) {
+            if (err && err.name == "NoSuchThingError") {
+                this(null, person);
+            } else if (err) {
+                this(err, null);
+            } else {
+                this(null, found);
+            }
+        },
+        callback
+    );
+};
+
+var personByLocalID = function(person, callback) {
+
+    var localID = personLocalID(person);
+
+    Step(
+        function() {
+            Person.search({"status_net.profile_info.local_id": localID}, this);
+        },
+        function(err, people) {
+            if (err) throw err;
+            if (people && people.length == 1) {
+                this(null, people[0]);
+            } else {
+                this(null, person);
+            }
+        },
+        callback
+    );
+};
+
+var badGraphActivity = function(activity) {
+    return ((activity.verb == Activity.FOLLOW || activity.verb == Activity.STOP_FOLLOWING) &&
+        (!isUser(activity.actor) || !isUser(activity.object)));
+};
+
+var isUser = function(object) {
+    var id = object.id,
+        p;
+    
+    if (!id) {
+        return false;
+    }
+
+    p = id.match(/^acct:(.*?)@(.*)$/);
+
+    if (!p) {
+        return false;
+    }
+
+    return (p[2] == URLMaker.hostname);
+};
+
+var betterID = function(activity) {
+    var dt = new Date(activity.published),
+        tagDate = dt.toISOString().substr(0, 10);
+
+    return "tag:"+URLMaker.hostname+","+tagDate+":"+activity.verb+":"+activity.object.id;
+};
+
+var personLocalID = function(person) {
+
+    if (!person || !person.id) {
+        return null;
+    }
+
+    var parts = person.id.match(/\/(\d+)$/);
+
+    if (parts) {
+        return parts[1];
+    } else {
+        return null;
+    }
+};
+
+var checkJoin = function(activity, log, callback) {
+
+    if (!isLocalObjectID(activity.object.id) ||
+        activity.object.objectType != ActivityObject.GROUP) {
+        callback(null);
+        return;
+    }
+
+    Step(
+        function() {
+            ActivityObject.getObject(ActivityObject.GROUP, activity.object.id, this);
+        },
+        function(err, group) {
+            if (err && err.name != "NoSuchThingError") {
+                throw err;
+            } else if (err && err.name == "NoSuchThingError") {
+                importActivity({actor: activity.actor,
+                                verb: "create",
+                                to: [{objectType: ActivityObject.COLLECTION,
+                                      id: Collection.PUBLIC}],
+                                object: activity.object},
+                               log,
+                               this);
+            } else if (!err) {
+                callback(null);
+            }
+        },
+        function(err) {
+            if (err) {
+                log.error(err);
+                process.exit(-1);
+            } else {
+                callback(null);
+            }
+        }
+    );
+};
+
+var isLocalObjectID = function(id) {
+    return (id && urlparse(id).hostname == URLMaker.hostname);
+};
+
+// Run the main function
+
+main(argv);

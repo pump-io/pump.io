@@ -16,6 +16,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Adds to globals
+require("set-immediate");
+
 var databank = require("databank"),
     _ = require("underscore"),
     Step = require("step"),
@@ -43,6 +46,7 @@ var databank = require("databank"),
     NotInStreamError = stream.NotInStreamError,
     URLMaker = require("../lib/urlmaker").URLMaker,
     Distributor = require("../lib/distributor"),
+    Schlock = require("schlock"),
     mw = require("../lib/middleware"),
     authc = require("../lib/authc"),
     omw = require("../lib/objectmiddleware"),
@@ -144,7 +148,7 @@ var addRoutes = function(app) {
         app.get("/api/user/:nickname/uploads", smw, userReadAuth, reqUser, sameUser, userUploads);
         app.post("/api/user/:nickname/uploads", userWriteOAuth, reqUser, sameUser, fileContent, newUpload);
     }
-    
+
     // Activities
 
     app.get("/api/activity/:uuid", smw, anyReadAuth, reqActivity, actorOrRecipient, getActivity);
@@ -175,6 +179,7 @@ var addRoutes = function(app) {
 
     app.get("/api/group/:uuid/members", smw, anyReadAuth, requestGroup, authorOrRecipient, groupMembers);
     app.get("/api/group/:uuid/inbox", smw, anyReadAuth, requestGroup, authorOrRecipient, groupInbox);
+    app.get("/api/group/:uuid/documents", smw, anyReadAuth, requestGroup, authorOrRecipient, groupDocuments);
     app.post("/api/group/:uuid/inbox", remoteWriteOAuth, requestGroup, postToGroupInbox);
 
     // Info about yourself
@@ -225,7 +230,7 @@ var userOnly = function(req, res, next) {
     var person = req.person,
         principal = req.principal;
 
-    if (person && principal && person.id === principal.id && principal.objectType === "person") { 
+    if (person && principal && person.id === principal.id && principal.objectType === "person") {
         next();
     } else {
         next(new HTTPError("Only the user can modify this profile.", 403));
@@ -263,25 +268,14 @@ var actorOrRecipient = function(req, res, next) {
 };
 
 var getObject = function(req, res, next) {
-    
+
     var type = req.type,
         obj = req[type],
         profile = req.principal;
 
     Step(
         function() {
-            obj.expandFeeds(this);
-        },
-        function(err) {
-            if (err) throw err;
-            addLiked(profile, [obj], this.parallel());
-            addLikers(profile, [obj], this.parallel());
-            addShared(profile, [obj], this.parallel());
-            firstFewReplies(profile, [obj], this.parallel());
-            firstFewShares(profile, [obj], this.parallel());
-            if (obj.isFollowable()) {
-                addFollowed(profile, [obj], this.parallel());
-            }
+            finishObject(profile, obj, this);
         },
         function(err) {
             if (err) {
@@ -551,7 +545,7 @@ var delActivity = function(req, res, next) {
 // Get the stream of all users
 
 var usersStream = function(callback) {
-    
+
     Step(
         function() {
             Stream.get("user:all", this);
@@ -906,7 +900,34 @@ var listUsers = function(req, res, next) {
 var postActivity = function(req, res, next) {
 
     var props = Scrubber.scrubActivity(req.body),
-        activity = new Activity(props);
+        activity = new Activity(props),
+        finishAndSend = function(profile, activity, callback) {
+            
+            var dupe = new Activity(_.clone(activity));
+
+            Step(
+                function() {
+                    finishProperty(profile, dupe, "object", this.parallel());
+                    finishProperty(profile, dupe, "target", this.parallel());
+                },
+                function(err, object, target) {
+                    if (err) {
+                        callback(err);
+                    } else {
+                        dupe.sanitize(req.principal);
+                        // ...then show (possibly modified) results.
+                        res.json(dupe);
+                        callback(null);
+                    }
+                }
+            );
+        },
+        distributeActivity = function(activity, callback) {
+            var dupe = new Activity(_.clone(activity)),
+                d = new Distributor(dupe);
+
+            d.distribute(callback);
+        };
 
     // Add a default actor
 
@@ -930,22 +951,74 @@ var postActivity = function(req, res, next) {
     if (!_(activity).has("verb") || _(activity.verb).isNull()) {
         activity.verb = "post";
     }
-    
+
     Step(
         function() {
             newActivity(activity, req.user, this);
         },
-        function(err, activity) {
-            var d;
+        function(err, results) {
+            if (err) throw err;
+            activity = results;
+            finishAndSend(req.principal, activity, this.parallel());
+            distributeActivity(activity, this.parallel());
+        },
+        function(err) {
             if (err) {
                 next(err);
             } else {
-                activity.sanitize(req.principal);
-                // ...then show (possibly modified) results.
-                res.json(activity);
-                // ...then distribute.
-                d = new Distributor(activity);
-                d.distribute(function(err) {});
+                // Done!
+            }
+        }
+    );
+};
+
+
+var remotes = new Schlock();
+
+var ensureRemoteActivity = function(principal, props, retries, callback) {
+
+    var act,
+        lastErr;
+
+    if (!callback) {
+        callback = retries;
+        retries  = 0;
+    }
+
+    Step(
+        function() {
+            remotes.writeLock(props.id, this);
+        },
+        function(err) {
+            if (err) {
+                // If we can't lock, leave here
+                callback(err);
+                return;
+            }
+            Activity.get(props.id, this);
+        },
+        function(err, activity) {
+            if (err && err.name == "NoSuchThingError") {
+                newRemoteActivity(principal, props, this);
+            } else if (!err) {
+                this(null, activity);
+            }
+        },
+        function(err, activity) {
+            lastErr = err;
+            act = activity;
+            remotes.writeUnlock(props.id, this);
+        },
+        function(err) {
+            // Ignore err; unlock errors don't matter
+            if (lastErr) {
+                if (retries === 0) {
+                    ensureRemoteActivity(principal, props, retries + 1, callback);
+                } else {
+                    callback(lastErr, null);
+                }
+            } else {
+                callback(null, act);
             }
         }
     );
@@ -1037,22 +1110,13 @@ var postToInbox = function(req, res, next) {
 
     Step(
         function() {
-            Activity.get(props.id, this);
-        },
-        function(err, activity) {
-            if (err && err.name == "NoSuchThingError") {
-                newRemoteActivity(req.principal, props, this);
-            } else if (err) {
-                throw err;
-            } else {
-                // throws if invalid
-                validateActor(req.client, req.principal, activity.actor);
-                this(null, activity);
-            }
+            ensureRemoteActivity(req.principal, props, this);
         },
         function(err, activity) {
             if (err) throw err;
             act = activity;
+            // throws on mismatch
+            validateActor(req.client, req.principal, act.actor);
             user.addToInbox(activity, this);
         },
         function(err) {
@@ -1120,19 +1184,13 @@ var postToGroupInbox = function(req, res, next) {
 
     Step(
         function() {
-            Activity.get(props.id, this);
+            ensureRemoteActivity(req.principal, props, this);
         },
         function(err, activity) {
-            if (err && err.name == "NoSuchThingError") {
-                newRemoteActivity(req.principal, props, this);
-            } else if (err) {
-                throw err;
-            } else {
-                // throws if invalid
-                validateActor(req.client, req.principal, activity.actor);
-                validateGroupRecipient(req.group, props);
-                this(null, activity);
-            }
+            // These throw on invalid input
+            validateActor(req.client, req.principal, activity.actor);
+            validateGroupRecipient(req.group, activity);
+            this(null, activity);
         },
         function(err, act) {
             var d;
@@ -1403,6 +1461,14 @@ var groupInbox = contextEndpoint(
     streams.groupInbox
 );
 
+var groupDocuments = contextEndpoint(
+    function(req) {
+        var context = {group: req.group, author: req.group.author};
+        return context;
+    },
+    streams.groupDocuments
+);
+
 var newMember = function(req, res, next) {
 
     var coll = req.collection,
@@ -1554,7 +1620,7 @@ var proxyRequest = function(req, res, next) {
                            "HMAC-SHA1",
                            null, // nonce size; use default
                            headers);
-            
+
             oa.get(proxy.url, null, null, this);
         },
         function(err, pbody, pres) {
@@ -1586,6 +1652,45 @@ var proxyRequest = function(req, res, next) {
                 req.log.info({headers: pres.headers}, "Received object");
                 res.send(pbody);
             }
+        }
+    );
+};
+
+var finishProperty = function(profile, obj, prop, callback) {
+    if (!obj[prop]) {
+        setImmediate(function() {
+            callback(null);
+        });
+        return;
+    }
+
+    Step(
+        function() {
+            finishObject(profile, obj[prop], this);
+        },
+        callback
+    );
+};
+
+var finishObject = function(profile, obj, callback) {
+
+    Step(
+        function() {
+            obj.expandFeeds(this);
+        },
+        function(err) {
+            if (err) throw err;
+            addLiked(profile, [obj], this.parallel());
+            addLikers(profile, [obj], this.parallel());
+            addShared(profile, [obj], this.parallel());
+            firstFewReplies(profile, [obj], this.parallel());
+            firstFewShares(profile, [obj], this.parallel());
+            if (obj.isFollowable()) {
+                addFollowed(profile, [obj], this.parallel());
+            }
+        },
+        function(err) {
+            callback(err);
         }
     );
 };

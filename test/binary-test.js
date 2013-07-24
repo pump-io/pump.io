@@ -28,27 +28,33 @@ var suite = vows.describe("binary module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ["attachments",
+    fields: ["_created",
+             "_uuid",
+             "attachments",
              "author",
+             "compression",
              "content",
+             "data",
              "displayName",
              "downstreamDuplicates",
+             "fileUrl",
              "id",
              "image",
+             "inReplyTo",
+             "length",
+             "likes",
+             "links",
+             "md5",
+             "mimeType",
              "objectType",
              "published",
+             "replies",
+             "shares",
              "summary",
              "updated",
              "upstreamDuplicates",
-             "url",
-             "_uuid",
-             "compression",
-             "data",
-             "fileUrl",
-             "length",
-             "md5",
-             "mimeType"],
-    indices: ["_uuid"]
+             "url"],
+    indices: ["_uuid", "url"]
 };
 
 var testData = {

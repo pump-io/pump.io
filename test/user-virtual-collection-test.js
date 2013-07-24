@@ -136,7 +136,7 @@ suite.addBatch({
                 "it has the right members": function(err, coll) {
                     assert.ifError(err);
                     assert.isObject(coll);
-                    assert.equal(coll.id, URLMaker.makeURL("api/user/jared/following"));
+                    assert.equal(coll.id, URLMaker.makeURL("/api/user/jared/following"));
                     assert.equal(coll.url, URLMaker.makeURL("/jared/following"));
                     assert.equal(coll.displayName, "Following");
                     assert.equal(coll.links.self.href, URLMaker.makeURL("/api/user/jared/following"));

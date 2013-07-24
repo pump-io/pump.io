@@ -23,6 +23,8 @@ var http = require("http"),
     _ = require("underscore"),
     Step = require("step"),
     fs = require("fs"),
+    express = require("express"),
+    util = require("util"),
     version = require("../../lib/version").version,
     OAuth = require("oauth-evanp").OAuth,
     urlparse = require("url").parse;
@@ -247,7 +249,7 @@ var postFile = function(serverUrl, cred, fileName, mimeType, callback) {
                 oa.post(serverUrl,
                         cred.token,
                         cred.token_secret,
-                        data.toString('binary'),
+                        data,
                         mimeType,
                         this);
             }
@@ -360,6 +362,47 @@ var dialbackPost = function(endpoint, id, token, ts, requestBody, contentType, c
     req.end();
 };
 
+var proxy = function(options, callback) {
+
+    var server = express.createServer(),
+        front = _.defaults(options.front || {}, {hostname: "localhost",
+						 port: 2342,
+						 path: "/pumpio"}),
+        back = _.defaults(options.back || {}, {hostname: "localhost",
+					       port: 4815,
+					       path: ""});
+
+    server.all(front.path + "/*", function(req, res, next) {
+	var full = req.originalUrl,
+	    rel = full.substr(front.path.length + 1),
+	    options = {
+		hostname: back.hostname,
+		port: back.port,
+		method: req.route.method.toUpperCase(),
+		path: back.path + "/" + rel,
+		headers: _.extend(req.headers, {"Via": "pump.io-test-proxy/0.1.0"})
+	    };
+
+	breq = http.request(options, function(bres) {
+	    res.status(bres.statusCode);
+	    _.each(bres.headers, function(value, name) {
+		res.header(name, value);
+	    });
+	    util.pump(bres, res);
+	});
+	breq.on("error", function(err) {
+	    next(err);
+	});
+	util.pump(req, breq);
+    });
+
+    // XXX: need to call callback on an error
+
+    server.listen(front.port, front.hostname, function() {
+	callback(null, server);
+    });
+};
+
 exports.options = options;
 exports.post = post;
 exports.head = head;
@@ -372,3 +415,4 @@ exports.endpoint = endpoint;
 exports.getfail = getfail;
 exports.dialbackPost = dialbackPost;
 exports.newOAuth = newOAuth;
+exports.proxy = proxy;

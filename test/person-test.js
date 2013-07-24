@@ -35,13 +35,28 @@ var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 
 var testSchema = {
     pkey: "id",
-    fields: ["displayName",
+    fields: ["_created",
+             "_uuid",
+             "content",
+             "displayName",
+             "downstreamDuplicates",
+             "favorites",
+             "followers",
+             "following",
+             "id",
              "image",
+             "likes",
+             "links",
+             "lists",
+             "objectType",
              "published",
+             "replies",
+             "shares",
+             "summary",
              "updated",
-             "url",
-             "_uuid"],
-    indices: ["_uuid"]
+             "upstreamDuplicates",
+             "url"],
+    indices: ["_uuid", "url", "image.url"]
 };
 
 var testData = {

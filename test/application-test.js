@@ -28,22 +28,25 @@ var suite = vows.describe("application module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ["attachments",
+    fields: ["_created",
+             "_uuid",
              "author",
              "content",
              "displayName",
              "downstreamDuplicates",
              "id",
              "image",
+             "likes",
+             "links",
              "objectType",
              "published",
+             "replies",
+             "shares",
              "summary",
              "updated",
              "upstreamDuplicates",
-             "url",
-             "_uuid"
-    ],
-    indices: ["_uuid"]
+             "url"],
+    indices: ["_uuid", "url"]
 };
 
 var testData = {

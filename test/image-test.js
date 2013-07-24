@@ -28,14 +28,29 @@ var suite = vows.describe("image module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ["author",
+    fields: ["_created",
+             "_fslug",
+             "_slug",
+             "_uuid",
+             "author",
+             "content",
              "displayName",
-             "image",
+             "downstreamDuplicates",
              "fullImage",
+             "id",
+             "image",
+             "inReplyTo",
+             "likes",
+             "links",
+             "objectType",
              "published",
+             "replies",
+             "shares",
              "summary",
              "updated",
-             "url"]
+             "upstreamDuplicates",
+             "url"],
+    indices: ["_uuid", "_slug", "_fslug", "image.url", "fullImage.url", "url"]
 };
 
 var testData = {

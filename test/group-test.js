@@ -28,11 +28,26 @@ var suite = vows.describe("group module interface");
 
 var testSchema = {
     pkey: "id",
-    fields: ["author",
+    fields: ["_created",
+             "_uuid",
+             "author",
+             "content",
              "displayName",
+             "downstreamDuplicates",
+             "id",
+             "image",
+             "likes",
+             "links",
+             "members",
+             "objectType",
              "published",
+             "replies",
+             "shares",
+             "summary",
              "updated",
-             "url"]
+             "upstreamDuplicates",
+             "url"],
+    indices: ["_uuid", "url"]
 };
 
 var testData = {

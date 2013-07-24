@@ -74,10 +74,30 @@ if (!window.Pump) {
                                                   messages: Pump.principalUser.majorDirectInbox,
                                                   notifications: Pump.principalUser.minorDirectInbox
                                               }});
+            // If we're on a login page, go to the main page or whatever
+            switch (window.location.pathname) {
+            case "/main/login":
+            case "/main/register":
+            case "/main/remote":
+                Pump.router.navigate(Pump.getContinueTo(), true);
+                break;
+            default:
+                break;
+            }
         } else if (Pump.principal) {
             Pump.principal = Pump.Person.unique(Pump.principal);
             Pump.body.nav = new Pump.RemoteNav({el: Pump.body.$(".navbar-inner .container"),
                                                 model: Pump.principal});
+            // If we're on a login page, go to the main page or whatever
+            switch (window.location.pathname) {
+            case "/main/login":
+            case "/main/register":
+            case "/main/remote":
+                Pump.router.navigate(Pump.getContinueTo(), true);
+                break;
+            default:
+                break;
+            }
         } else {
             // Check if we have stored OAuth credentials
 
@@ -147,6 +167,14 @@ if (!window.Pump) {
                         });
                     });
                 }
+            });
+        }
+
+        // If there's anything queued up in our onReady array, run it
+
+        if (Pump.onReady) {
+            _.each(Pump.onReady, function(f) {
+                f();
             });
         }
     });
@@ -267,7 +295,18 @@ if (!window.Pump) {
                         if (err) {
                             onError(null, null, err);
                         } else {
-                            onSuccess();
+                            if (obj.items.length < 20 &&
+                                _.isFunction(obj.nextLink) && obj.nextLink()) {
+                                obj.getNext(function(err) {
+                                    if (err) {
+                                        onError(null, null, err);
+                                    } else {
+                                        onSuccess();
+                                    }
+                                });
+                            } else {
+                                onSuccess();
+                            }
                         }
                     });
                 } else {
@@ -410,7 +449,7 @@ if (!window.Pump) {
                 didScroll = false;
                 if ($(window).scrollTop() >= $(document).height() - $(window).height() - 10) {
                     streams = Pump.getStreams();
-                    if (streams.major && streams.major.nextLink) {
+                    if (streams.major && streams.major.nextLink()) {
                         Pump.body.startLoad();
                         streams.major.getNext(function(err) {
                             Pump.body.endLoad();
@@ -450,7 +489,10 @@ if (!window.Pump) {
             selectorToView = {
                 "#main": {View: Pump.MainContent},
                 "#loginpage": {View: Pump.LoginContent},
-                "#register": {View: Pump.RegisterContent},
+                "#registerpage": {View: Pump.RegisterContent},
+                "#recoverpage": {View: Pump.RecoverContent},
+                "#recoversentpage": {View: Pump.RecoverSentContent},
+                "#recover-code": {View: Pump.RecoverCodeContent},
                 "#inbox": {View: Pump.InboxContent, models: {major: Pump.ActivityStream, minor: Pump.ActivityStream}},
                 ".object-page": {View: Pump.ObjectContent, models: {object: Pump.ActivityObject}},
                 ".major-activity-page": {View: Pump.ActivityContent, models: {activity: Pump.Activity}},
@@ -467,6 +509,7 @@ if (!window.Pump) {
                                                                   lists: Pump.ActivityObjectStream}},
                 ".user-list": {View: Pump.ListContent, models: {profile: Pump.Person,
                                                                 lists: Pump.ActivityObjectStream,
+                                                                members: Pump.PeopleStream,
                                                                 list: Pump.ActivityObject}}
             },
             selector,
@@ -567,7 +610,8 @@ if (!window.Pump) {
     };
 
     Pump.setTitle = function(title) {
-        $("title").html(title + " - " + Pump.config.site);
+        // We don't accept HTML in title or site name; just text
+        $("title").text(title + " - " + Pump.config.site);
     };
 
 })(window._, window.$, window.Backbone, window.Pump);

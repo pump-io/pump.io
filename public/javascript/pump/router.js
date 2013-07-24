@@ -36,7 +36,10 @@
             "main/account":           "account",
             "main/register":          "register",
             "main/login":             "login",
-            "main/remote":            "remote"
+            "main/remote":            "remote",
+            "main/recover":           "recover",
+            "main/recover-sent":      "recoverSent",
+            "main/recover/:code":      "recoverCode"
         },
 
         register: function() {
@@ -50,18 +53,54 @@
         },
 
         login: function() {
-            Pump.body.startLoad();
-            Pump.body.setContent({contentView: Pump.LoginContent,
-                                  title: "Login"},
-                                 function() {
-                                     Pump.body.endLoad();
-                                 });
+            var continueTo = Pump.getContinueTo();
+            if (Pump.principalUser) {
+                Pump.router.navigate(continueTo, true);
+                Pump.clearContinueTo();
+            } else if (Pump.principal) {
+                Pump.router.navigate(continueTo, true);
+                Pump.clearContinueTo();
+            } else {
+                Pump.body.startLoad();
+                Pump.body.setContent({contentView: Pump.LoginContent,
+                                      title: "Login"},
+                                     function() {
+                                         Pump.body.endLoad();
+                                     });
+            }
         },
 
         remote: function() {
             Pump.body.startLoad();
             Pump.body.setContent({contentView: Pump.RemoteContent,
                                   title: "Remote login"},
+                                 function() {
+                                     Pump.body.endLoad();
+                                 });
+        },
+
+        recover: function() {
+            Pump.body.startLoad();
+            Pump.body.setContent({contentView: Pump.RecoverContent,
+                                  title: "Recover your password"},
+                                 function() {
+                                     Pump.body.endLoad();
+                                 });
+        },
+
+        recoverSent: function() {
+            Pump.body.startLoad();
+            Pump.body.setContent({contentView: Pump.RecoverSentContent,
+                                  title: "Recovery email sent"},
+                                 function() {
+                                     Pump.body.endLoad();
+                                 });
+        },
+
+        recoverCode: function(code) {
+            Pump.body.startLoad();
+            Pump.body.setContent({contentView: Pump.RecoverCodeContent,
+                                  title: "Recovery code"},
                                  function() {
                                      Pump.body.endLoad();
                                  });
@@ -330,7 +369,7 @@
                 }
                 Pump.body.setContent({contentView: Pump.ObjectContent,
                                       model: obj,
-                                      title: obj.displayName || obj.objectType + "by" + nickname},
+                                      title: obj.get("displayName") || (obj.get("objectType") + " by " + nickname)},
                                      function() {
                                          Pump.body.endLoad();
                                      });
