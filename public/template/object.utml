@@ -27,8 +27,8 @@
 
       <% if (!object.likes || object.likes.totalItems === 0) { %>
       <% } else if (object.likes.totalItems === 1) { %>
-      <% if (principal && principal.id == object.id) { %>
-      <p class="muted"><small><%= partial("activity-object-collection", {author: reply.author, coll: reply.likes}) %> like this.</small></p>
+      <% if (principal && principal.id === object.likes.items[0].id) { %>
+      <p class="muted"><small><%= partial("activity-object-collection", {author: object.author, coll: object.likes}) %> like this.</small></p>
       <% } else { %>
       <p class="muted"><small><%= partial("activity-object-collection", {author: object.author, coll: object.likes}) %> likes this.</small></p>
       <% } %>
