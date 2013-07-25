@@ -72,7 +72,7 @@ suite.addBatch({
                 db.disconnect(function(err) {});
             }
         },
-        "and we get a profile with incorrectly-added feeds": {
+        "and we get a profile with bad standard feeds": {
             topic: function(db) {
                 var user;
                 Step(
@@ -112,6 +112,44 @@ suite.addBatch({
                 assert.equal(urlparse(person.replies.url).hostname, "example.net");
                 assert.equal(urlparse(person.likes.url).hostname, "example.net");
                 assert.equal(urlparse(person.shares.url).hostname, "example.net");
+            }
+        },
+        "and we get a profile with missing links": {
+            topic: function(db) {
+                var user;
+                Step(
+                    function() {
+                        var props = {
+                            nickname: "harold",
+                            password: "bad-haircut-4"
+                        };
+                        User.create(props, this);
+                    },
+                    function(err, results) {
+                        var profile;
+                        if (err) throw err;
+                        user = results;
+                        profile = user.profile;
+                        delete profile.links["activity-inbox"];
+                        delete profile.links["activity-outbox"];
+                        // Note: we're routing around the Person 
+                        db.update("person", profile.id, profile, this);
+                    },
+                    function(err, results) {
+                        if (err) throw err;
+                        Person.get(results.id, this);
+                    },
+                    this.callback
+                );
+            },
+            "the feeds are automatically corrected": function(err, person) {
+                assert.ifError(err);
+                assert.isObject(person);
+                assert.isObject(person.links);
+                assert.isObject(person.links["activity-inbox"]);
+                assert.equal(urlparse(person.links["activity-inbox"].href).hostname, "example.net");
+                assert.isObject(person.links["activity-outbox"]);
+                assert.equal(urlparse(person.links["activity-outbox"].href).hostname, "example.net");
             }
         }
     }
