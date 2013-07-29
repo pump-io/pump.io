@@ -22,6 +22,6 @@
     </form>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-primary" id="send-picture">Send</button>
+    <button type="submit" class="btn btn-primary" id="send-picture">Send</button>
   </div>
 </div>
