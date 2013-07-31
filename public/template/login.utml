@@ -24,8 +24,4 @@
   </form>
   <p><a href="/main/register">New user?</a></p>
   <p><a href="/main/remote">Account on another server?</a></p>
-  <p><b>NOTE</b> All passwords were reset after the conversion to
-  pump.io. If you are logging into this server for the first time
-  since the conversion, you <i>must</i> use <a
-  href="/main/recover">password recovery</a> to get a new one.</p>
 </div>
