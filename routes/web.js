@@ -251,11 +251,12 @@ var handleRemote = function(req, res, next) {
 
 var requestActivity = function(req, res, next) {
 
-    var uuid = req.params.uuid;
+    var uuid = req.params.uuid,
+        activity;
 
     Step(
         function() {
-            Activity.search({"_uuid": req.params.uuid}, this);
+            Activity.search({"_uuid": uuid}, this);
         },
         function(err, activities) {
             if (err) throw err;
@@ -263,11 +264,12 @@ var requestActivity = function(req, res, next) {
                 throw new NoSuchThingError("activity", uuid);
             }
             if (activities.length > 1) {
-                throw new Error("Too many activities with ID = " + req.params.uuid);
+                throw new Error("Too many activities with ID = " + uuid);
             }
-            activities[0].expand(this);
+            activity = activities[0];
+            activity.expand(this);
         },
-        function(err, activity) {
+        function(err) {
             if (err) {
                 next(err);
             } else {
@@ -283,12 +285,19 @@ var userIsActor = function(req, res, next) {
     var user = req.user,
         person = req.person,
         activity = req.activity,
-        actor = activity.actor;
+        actor;
+
+    if (!activity || !activity.actor) {
+        next(new HTTPError("No such activity", 404));
+        return;
+    }
+
+    actor = activity.actor;
 
     if (person && actor && person.id == actor.id) {
         next();
     } else {
-        next(new HTTPError("No " + type + " by " + user.nickname + " with uuid " + obj._uuid, 404));
+        next(new HTTPError("person " + person.id + " is not the actor of " + activity.id, 404));
         return;
     }
 };
