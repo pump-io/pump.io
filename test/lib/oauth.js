@@ -112,7 +112,6 @@ var newClient = function(hostname, port, path, cb) {
     httputil.post(hostname, port, full, {type: "client_associate"}, function(err, res, body) {
         var cl;
         if (err) {
-	    console.dir({error: err, res: res, body: body});
             cb(err, null);
         } else {
             try {
@@ -370,7 +369,7 @@ var setupApp = function(port, hostname, callback) {
 
 var setupAppConfig = function(config, callback) {
 
-    var prop, args = [], credwait = {};
+    var prop, args = [], credwait = {}, objwait = {};
 
     config.port = config.port || 4815;
     config.hostname = config.hostname || "localhost";
@@ -391,21 +390,44 @@ var setupAppConfig = function(config, callback) {
             }, 30000);
             credwait[webfinger] = {callback: callback, timeout: timeout};
             child.send({cmd: "killcred", webfinger: webfinger});
+        },
+        changeObject: function(obj, callback) {
+            var timeout = setTimeout(function() {
+                callback(new Error("Timed out waiting for object change."));
+            }, 30000);
+            objwait[obj.id] = {callback: callback, timeout: timeout};
+            child.send({cmd: "changeobject", object: obj});
         }
     };
 
+    child.on("error", function(err) {
+        callback(err, null);
+    });
+
     child.on("message", function(msg) {
-        if (msg.cmd == "listening") {
+        switch (msg.cmd) {
+        case "listening":
             callback(null, dummy);
-        } else if (msg.cmd == "error") {
+            break;
+        case "error":
             callback(msg.value, null);
-        } else if (msg.cmd == "credkilled") {
+            break;
+        case "credkilled":
             clearTimeout(credwait[msg.webfinger].timeout);
             if (msg.error) {
                 credwait[msg.webfinger].callback(new Error(msg.error));
             } else {
                 credwait[msg.webfinger].callback(null);
             }
+            break;
+        case "objectchanged":
+            clearTimeout(objwait[msg.id].timeout);
+            if (msg.error) {
+                objwait[msg.id].callback(new Error(msg.error));
+            } else {
+                objwait[msg.id].callback(null);
+            }
+            break;
         }
     });
 };
