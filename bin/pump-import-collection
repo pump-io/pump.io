@@ -355,6 +355,8 @@ var importActivity = function(props, log, callback) {
         },
         function(err, to, cc, bto, bcc) {
             if (err) throw err;
+            activity.actor = actor;
+            activity.object = object;
             if (to && to.length > 0) {
                 activity.to = to;
             }
@@ -372,7 +374,7 @@ var importActivity = function(props, log, callback) {
             if (activity.provider && !activity.provider.id && activity.provider.url) {
                 activity.provider.id = activity.provider.url;
             }
-            
+
             delete activity.content;
             // Specific fixups for different verbs
             switch (activity.verb) {
@@ -388,10 +390,10 @@ var importActivity = function(props, log, callback) {
                 break;
             case Activity.POST:
                 // Auto-create activity content
-                if (activity.id == activity.object.id) {
+                if (activity.id == object.id) {
                     activity.id = betterID(activity);
                 }
-                if (activity.url == activity.object.url) {
+                if (activity.url == object.url) {
                     delete activity.url;
                 }
                 if (activity.object.objectType == "note" && _.isObject(activity.object.inReplyTo)) {
@@ -660,7 +662,7 @@ var maybeLocalize = function(object, callback) {
 };
 
 var maybeLocalizeArray = function(arr, callback) {
-    
+
     // skip if it's null or empty
 
     if (!arr) {
@@ -764,7 +766,7 @@ var maybeLocalizeObject = function(object, callback) {
                     object.shares = {
                         url: URLMaker.makeURL("api/" + type + "/" + object._uuid + "/shares")
                     };
-                    
+
                     Step(
                         function() {
                             maybeLocalize(object.inReplyTo, this.parallel());
@@ -935,7 +937,7 @@ var badGraphActivity = function(activity) {
 var isUser = function(object) {
     var id = object.id,
         p;
-    
+
     if (!id) {
         return false;
     }
