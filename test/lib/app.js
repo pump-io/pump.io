@@ -36,6 +36,7 @@ if (cluster.isMaster) {
         case "error":
         case "listening":
         case "credkilled":
+        case "objectchanged":
             process.send(msg);
             break;
         default:
@@ -46,6 +47,7 @@ if (cluster.isMaster) {
     process.on("message", function(msg) {
         switch (msg.cmd) {
         case "killcred":
+        case "changeobject":
             worker.send(msg);
             break;
         }
@@ -69,13 +71,12 @@ if (cluster.isMaster) {
         }
     );
 
-    // This is to simulate losing the credentials of a remote client
-    // It's hard to do without destroying the database values directly,
-    // so we essentially do that.
-
     process.on("message", function(msg) {
         switch (msg.cmd) {
         case "killcred":
+            // This is to simulate losing the credentials of a remote client
+            // It's hard to do without destroying the database values directly,
+            // so we essentially do that.
             Step(
                 function() {
                     var client = require("../../lib/model/client"),
@@ -97,6 +98,25 @@ if (cluster.isMaster) {
                     }
                 }
             );
+            break;
+        case "changeobject":
+            // we break an object
+            var DatabankObject = require("databank").DatabankObject,
+                db = DatabankObject.bank,
+                object = msg.object;
+            Step(
+                function() {
+                    db.update(object.objectType, object.id, object, this);
+                },
+                function(err) {
+                    if (err) {
+                        process.send({cmd: "objectchanged", error: err.message, id: object.id});
+                    } else {
+                        process.send({cmd: "objectchanged", id: object.id});
+                    }
+                }
+            );
+            break;
         }
     });
 }
