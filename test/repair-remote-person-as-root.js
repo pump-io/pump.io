@@ -164,7 +164,6 @@ suite.addBatch({
                         },
                         "it works": function(err, body) {
                             assert.ifError(err);
-                            console.dir(body.object);
                             validActivity(body);
                         },
                         "the self link is correct": testLink("self"),
