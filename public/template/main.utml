@@ -5,50 +5,29 @@
 
       <div class="span6">
 
-        <h1>Doing more with less.</h1>
+        <h1><%- config.site %></h1>
 
-        <p>E14N is a software company in Montreal creating activity stream servers for the social Web.</p>
+        <p>This site runs <a href="http://pump.io/">pump.io</a>, the
+	  high-performance Open Source social engine. It pumps your life
+	  in and out of your friends, family and colleagues.</p>
+
+        <% if (config.disableRegistration) { %>
+
+        <p>No pump.io account yet? <a href="http://pump.io/tryit">Try it</a>!)</p>        
+
+        <% } else { %>
+
+        <p><a class="btn primary large" href="/main/register">Get Started &raquo;</a></p>
+
+        <% } %>
 
       </div>
 
       <div class="span4">
-        <img src="/images/e14n.png" width="340" height="229" class="img-rounded" />
+        <img src="images/somefriends.jpg" width="340" height="235" class="img-rounded" />
       </div>
 
     </div>
-
+    
   </div>
-
-  <div class="row">
-
-    <div class="span4">
-      <h2>Software</h2>
-      <ul>
-        <li><a href="http://pump.io/">pump.io</a> is our activity streams server.</li>
-        <li><a href="http://spamicity.info/">spamicity.info</a> is a spam filter for the social Web.</li>
-        <li><a href="http://openfarmgame.com/">Open Farm Game</a> is a pump.io-aware farm game.</li>
-        <li><a href="http://status.net/">StatusNet</a> is our older social network software.</li>
-      </ul>
-    </div>
-
-    <div class="span4">
-      <h2>People</h2>
-      <ul>
-        <li><a href="/evan">Evan Prodromou</a></li>
-      </ul>
-    </div>
-
-    <div class="span4">
-      <h2>Contact</h2>
-      <p>E14N Inc.<br />
-        4690 rue Pontiac <br />
-        Montreal, Quebec H2J 2T5 <br />
-        Canada <br />
-        +1-855-946-3675<br />
-        <a href="mailto:info@e14n.com">info@e14n.com</a>
-      </p>
-    </div>
-
-  </div>
-      
 </div>
