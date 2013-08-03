@@ -154,6 +154,26 @@ suite.addBatch({
                     },
                     "it works": function(err) {
                         assert.ifError(err);
+                    },
+                    "and we fetch the follow activity": {
+                        topic: function(follow, cred1, cred2, social) {
+                            var callback = this.callback;
+                            gj(follow.links.self.href, cred1, function(err, body, resp) {
+                                callback(err, body);
+                            });
+                        },
+                        "it works": function(err, body) {
+                            assert.ifError(err);
+                            console.dir(body.object);
+                            validActivity(body);
+                        },
+                        "the self link is correct": testLink("self"),
+                        "the activity-inbox link is correct": testLink("activity-inbox"),
+                        "the activity-outbox link is correct": testLink("activity-outbox"),
+                        "the following feed is correct": testFeed("following"),
+                        "the favorites feed is correct": testFeed("favorites"),
+                        "the followers feed is correct": testFeed("followers"),
+                        "the lists feed is correct": testFeed("lists")
                     }
                 }
             }
