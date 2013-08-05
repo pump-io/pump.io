@@ -81,7 +81,8 @@ var launchApps = function(config) {
     var cnt,
         i,
         unclustered = ["memory", "disk", "leveldb"],
-        log = setupLog(config);
+        log = setupLog(config),
+        clusterLog = log.child({component: "cluster"});
 
     if (_(config).has("children")) {
         cnt = config.children;
@@ -101,13 +102,27 @@ var launchApps = function(config) {
         for (i = 0; i < cnt; i++) {
             cluster.fork();
         }
+
+        // Restart child processes when they die
+
+        cluster.on('exit', function(worker, code, signal) {
+            var exitCode = worker.process.exitCode;
+            clusterLog.info('worker ' + worker.process.pid + ' died ('+exitCode+'). restarting...');
+            cluster.fork();
+        });
+
     } else {
         makeApp(config, function(err, app) {
             if (err) {
-                console.log(err);
+                console.error(err);
                 process.exit(1);
             } else {
-                app.run(function(err) {});
+                app.run(function(err) {
+                    if (err) {
+                        console.error(err);
+                        process.exit(1);
+                    }
+                });
             }
         });
     }
