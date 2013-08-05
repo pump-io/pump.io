@@ -33,7 +33,7 @@
                       "bunyan": "0.16.x",
                       "emailjs": "0.3.x",
                       "mkdirp": "0.3.x",
-		      "connect-databank": "~0.12.1",
+		      "connect-databank": "~0.12.4",
                       "sockjs": "0.3.x",
                       "dialback-client": "~0.1.5",
 		      "gm": "1.9.x",
