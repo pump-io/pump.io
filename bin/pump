@@ -32,6 +32,7 @@ var cluster = require("cluster"),
         .describe("c", "Configuration file (default: /etc/pump.io.json and ~/.pump.io.json)")
         .argv,
     Dispatch = require("../lib/dispatch"),
+    defaults = require("../lib/defaults"),
     makeApp = require("../lib/app").makeApp;
 
 // We first get config files, then launch some cluster apps
@@ -44,6 +45,7 @@ var main = function() {
 // Gets the configuration vars for this server from config files
 
 var getConfig = function(filename) {
+
     var files,
         config = {},
         i,
@@ -70,6 +72,10 @@ var getConfig = function(filename) {
             }
         }
     }
+
+    // Fill in defaults if they're not there
+
+    config = _.defaults(config, defaults);
 
     return config;
 };
