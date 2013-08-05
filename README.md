@@ -140,8 +140,8 @@ Here are the main configuration keys.
   but if you're insisting on proxying behind Apache or whatever despite
   warnings not to, you can use this.
 * *secret* A session-generating secret, server-wide password.
-* *noweb* Hide the Web interface. Since it's disabled for this release,
-  this shouldn't cause you any problems.
+* *noweb* Hide the Web interface. Defaults to `false`. Set this to something
+  truthy to disable the Web interface.
 * *site* Name of the server, like "My great social service".
 * *owner* Name of owning entity, if you want to link to it.
 * *ownerURL* URL of owning entity, if you want to link to it.
@@ -193,6 +193,10 @@ Here are the main configuration keys.
   it's a smart idea.
 * *smtpusessl* Only use SSL with the SMTP server. Defaults to `false`. You may need to change
   the `smtpport` value if you set this.
+* *smtptimeout* Timeout for connecting to the SMTP server in milliseconds. Defaults to `30000`.
+  Change this if... I dunno. I see no reason to change this.
+* *smtpfrom* Email address to use in the "From:" header of outgoing notifications. Defaults to 'no-reply@'
+  plus the site hostname.
 * *compress* Use gzip or deflate to compress text output. This can cut down on network
   transfers considerably at the expense of memory and CPU on the server. Defaults to `false`.
 * *children* Number of children to run. Defaults to 1 for some kinds of DBs, number of CPUS - 1 for others.
