@@ -206,6 +206,10 @@ Here are the main configuration keys.
   an optional 'title' and 'description' object. Most people don't need this. Default is an empty list.
 * *sockjs* Use [SockJS-node](https://github.com/sockjs/sockjs-node) to provide a realtime connection. Defaults
   to `true`.
+* *cleanupSession* Time interval to clean up sessions (in ms). These are staggered a bit if you have
+  more than one child process running, to spread them out a bit. Defaults to 1200000, or 20 minutes.
+* *cleanupNonce* Time interval to clean up OAuth nonces (in ms). Staggered.
+  Defaults to 1200000, or 20 minutes.
 
 ### Web server proxy
 
