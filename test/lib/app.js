@@ -2,7 +2,6 @@ var _ = require("underscore"),
     Step = require("step"),
     cluster = require("cluster"),
     mod = require("../../lib/app"),
-    defaults = require("../../lib/defaults"),
     fs = require("fs"),
     path = require("path"),
     Dispatch = require("../../lib/dispatch"),
@@ -30,8 +29,6 @@ for (i = 2; i < process.argv.length; i++) {
 }
 
 config.port = parseInt(config.port, 10);
-
-config = _.defaults(config, defaults);
 
 if (cluster.isMaster) {
     worker = cluster.fork();
