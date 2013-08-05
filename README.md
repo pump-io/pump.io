@@ -204,6 +204,8 @@ Here are the main configuration keys.
   configuration (say, for test scripts or development environments). This setting is
   an array of objects, each of which has a 'client_id' and 'client_secret' property, and
   an optional 'title' and 'description' object. Most people don't need this. Default is an empty list.
+* *sockjs* Use [SockJS-node](https://github.com/sockjs/sockjs-node) to provide a realtime connection. Defaults
+  to `true`.
 
 ### Web server proxy
 
