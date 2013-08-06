@@ -19,5 +19,5 @@
       </div>
     </div>
   </form>
-  <p><a href="/main/login">Have an account here?</a></p>
+  <p><a href="/main/login" class="add-continue">Have an account here?</a></p>
 </div>

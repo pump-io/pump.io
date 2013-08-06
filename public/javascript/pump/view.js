@@ -2976,6 +2976,8 @@
 
             if ($(el).hasClass('save-continue-to')) {
                 Pump.saveContinueTo();
+            } else if ($(el).hasClass('add-continue')) {
+                Pump.continueTo = Pump.getContinueTo();
             }
 
             // For local <a>, use the router
