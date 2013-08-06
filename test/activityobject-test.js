@@ -95,8 +95,14 @@ suite.addBatch({
             "it has a compressProperty member": function(ActivityObject) {
                 assert.isFunction(ActivityObject.compressProperty);
             },
+            "it has an ensureProperty member": function(ActivityObject) {
+                assert.isFunction(ActivityObject.ensureProperty);
+            },
             "it has an expandProperty member": function(ActivityObject) {
                 assert.isFunction(ActivityObject.expandProperty);
+            },
+            "it has an ensureArray member": function(ActivityObject) {
+                assert.isFunction(ActivityObject.ensureArray);
             },
             "it has a getObjectStream member": function(ActivityObject) {
                 assert.isFunction(ActivityObject.getObjectStream);
@@ -413,6 +419,44 @@ suite.addBatch({
                 "it has the right class": function(err, spoon) {
                     assert.instanceOf(spoon, require("../lib/model/other").Other);
                     assert.equal(spoon.objectType, "http://utensil.example/type/spoon");
+                }
+            },
+            "and we ensure an existing object property of an object": {
+                topic: function(ActivityObject) {
+                    var cb = this.callback,
+                        Image = require("../lib/model/image").Image,
+                        Person = require("../lib/model/person").Person,
+                        image = new Image({
+                            author: {
+                                id: "urn:uuid:c3a7bd6e-fecb-11e2-ae9d-32b36b1a1850",
+                                displayName: "Glen Miller",
+                                objectType: "person"
+                            },
+                            url: "http://example.net/images/2.jpg"
+                        });
+                    ActivityObject.ensureProperty(image, "author", function(err) {
+                        if (err) {
+                            cb(err, null);
+                        } else {
+                            cb(null, image);
+                        }
+                    });
+                },
+                "it works": function(err, image) {
+                    assert.ifError(err);
+                },
+                "the property is ensured": function(err, image) {
+                    assert.ifError(err);
+                    assert.include(image, "author");
+                    assert.isObject(image.author);
+                    assert.instanceOf(image.author, require("../lib/model/person").Person);
+                    assert.include(image.author, "id");
+                    assert.isString(image.author.id);
+                    assert.equal(image.author.id, "urn:uuid:c3a7bd6e-fecb-11e2-ae9d-32b36b1a1850");
+                    assert.include(image.author, "objectType");
+                    assert.isString(image.author.objectType);
+                    assert.equal(image.author.objectType, "person");
+                    assert.equal(image.author.displayName, "Glen Miller");
                 }
             },
             "and we compress an existing object property of an object": {
