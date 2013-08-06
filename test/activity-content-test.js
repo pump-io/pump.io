@@ -196,7 +196,7 @@ suite.addBatch({
                          {objectType: "image",
                           id: "urn:uuid:9f535cb0-fec7-11e2-9637-32b36b1a1850",
                           displayName: "La Giocanda"},
-                         "Endicott Pettibone liked La Giocanda.")
+                         "Endicott Pettibone liked La Giocanda")
         },
         "and we create an image": {
             topic: function(Activity) {
@@ -218,7 +218,7 @@ suite.addBatch({
                          "like",
                          {id: "urn:uuid:1731d374-fec8-11e2-87ba-32b36b1a1850",
                           objectType: "image"},
-                         "Catherine Hawk liked John the Baptist.")
+                         "Catherine Hawk liked John the Baptist")
         },
         "and we create an article": {
             topic: function(Activity) {
@@ -245,7 +245,7 @@ suite.addBatch({
                               objectType: "article"
                           }
                          },
-                         "Zee Modem posted a comment in reply to The End of History.")
+                         "Zee Modem posted a comment in reply to The End of History")
         }
     }
 });
