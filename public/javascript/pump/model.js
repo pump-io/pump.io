@@ -781,6 +781,17 @@
         },
         url: function() {
             return Pump.fullURL("/api/user/" + this.get("nickname"));
+        },
+        prefetch: function(callback) {
+            var user = this,
+                followers = Pump.PeopleStream.unique({url: Pump.fullURL("/api/user/"+user.get("nickname")+"/followers")}),
+                lists = Pump.ListStream.unique({url: Pump.fullURL("/api/user/"+user.get("nickname")+"/lists/person")});
+
+            Pump.fetchObjects([user, followers, lists], function(err, objs) {
+                if (callback) {
+                    callback(err);
+                }
+            });
         }
     },
     {

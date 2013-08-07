@@ -74,6 +74,8 @@ if (!window.Pump) {
                                                   messages: Pump.principalUser.majorDirectInbox,
                                                   notifications: Pump.principalUser.minorDirectInbox
                                               }});
+            // Prefetch some feeds so they're there more quickly
+            Pump.principalUser.prefetch();
             // If we're on a login page, go to the main page or whatever
             switch (window.location.pathname) {
             case "/main/login":
@@ -128,6 +130,10 @@ if (!window.Pump) {
 
                         user = Pump.principalUser = Pump.User.unique(data);
                         Pump.principal = Pump.principalUser.profile;
+
+                        // Prefetch some feeds so they're there more quickly
+
+                        Pump.principalUser.prefetch();
 
                         major = user.majorDirectInbox;
                         minor = user.minorDirectInbox;
