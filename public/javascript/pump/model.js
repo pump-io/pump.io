@@ -465,11 +465,41 @@
 
             Pump.ajax(options);
         },
+        getAllNext: function(callback) {
+            var stream = this;
+
+            stream.getNext(function(err, data) {
+                if (err) {
+                    callback(err);
+                } else if (data.items && data.items.length > 0) {
+                    // recurse
+                    stream.getNext(callback);
+                } else {
+                    callback(null);
+                }
+            });
+        },
+        getAllPrev: function(callback) {
+            var stream = this;
+
+            stream.getPrev(function(err, data) {
+                if (err) {
+                    callback(err);
+                } else if (data.items && data.items.length > 0) {
+                    // recurse
+                    stream.getPrev(callback);
+                } else {
+                    callback(null);
+                }
+            });
+        },
         getAll: function(callback) { // Get stuff later than the current group
             var stream = this,
                 url = stream.url(),
                 count,
-                options;
+                options,
+                nl,
+                pl;
 
             if (!url) {
                 if (_.isFunction(callback)) {
@@ -478,46 +508,78 @@
                 return;
             }
 
-            if (_.isNumber(stream.get('totalItems'))) {
-                count = Math.min(stream.get('totalItems'), 200);
-            } else {
-                count = 200;
-            }
+            pl = stream.prevLink();
+            nl = stream.nextLink();
 
-            options = {
-                type: "GET",
-                dataType: "json",
-                url: url + "?count=" + count,
-                success: function(data) {
-                    if (data.items) {
-                        if (stream.items) {
-                            stream.items.add(data.items);
-                        } else {
-                            stream.items = new stream.itemsClass(data.items);
-                        }
-                    }
-                    if (data.links && data.links.next && data.links.next.href) {
-                        if (stream.has('links')) {
-                            stream.get('links').next = data.links.next;
-                        } else {
-                            stream.set('links', data.links);
-                        }
+            if (nl || pl) {
+                var ndone = false,
+                    pdone = false;
+
+                stream.getAllNext(function(err) {
+                    if (err) {
+                        callback(err);
                     } else {
-                        // XXX: end-of-collection indicator?
+                        ndone = true;
+                        if (pdone) {
+                            callback(null);
+                        }
                     }
-                    stream.trigger("getall");
-                    if (_.isFunction(callback)) {
-                        callback(null, data);
-                    }
-                },
-                error: function(jqxhr) {
-                    if (_.isFunction(callback)) {
-                        callback(new Error("Failed getting all items for " + stream.url()), null);
-                    }
-                }
-            };
+                });
 
-            Pump.ajax(options);
+                stream.getAllPrev(function(err) {
+                    if (err) {
+                        callback(err);
+                    } else {
+                        pdone = true;
+                        if (ndone) {
+                            callback(null);
+                        }
+                    }
+                });
+
+            } else {
+                
+                if (_.isNumber(stream.get('totalItems'))) {
+                    count = Math.min(stream.get('totalItems'), 200);
+                } else {
+                    count = 200;
+                }
+
+                options = {
+                    type: "GET",
+                    dataType: "json",
+                    url: url + "?count=" + count,
+                    success: function(data) {
+                        if (data.items) {
+                            if (stream.items) {
+                                stream.items.add(data.items);
+                            } else {
+                                stream.items = new stream.itemsClass(data.items);
+                            }
+                        }
+                        if (data.links && data.links.next && data.links.next.href) {
+                            if (stream.has('links')) {
+                                stream.get('links').next = data.links.next;
+                            } else {
+                                stream.set('links', data.links);
+                            }
+                        } else {
+                            // XXX: end-of-collection indicator?
+                        }
+                        stream.trigger("getall");
+                        if (_.isFunction(callback)) {
+                            callback(null, data);
+                        }
+                    },
+                    error: function(jqxhr) {
+                        if (_.isFunction(callback)) {
+                            callback(new Error("Failed getting all items for " + stream.url()), null);
+                        }
+                    }
+                };
+
+                Pump.ajax(options);
+            }
         },
         toJSONRef: function() {
             var str = this;
