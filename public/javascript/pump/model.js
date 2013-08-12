@@ -941,10 +941,10 @@
         },
         prefetch: function(callback) {
             var user = this,
-                followers = Pump.PeopleStream.unique({url: Pump.fullURL("/api/user/"+user.get("nickname")+"/followers")}),
+                following = Pump.PeopleStream.unique({url: Pump.fullURL("/api/user/"+user.get("nickname")+"/following")}),
                 lists = Pump.ListStream.unique({url: Pump.fullURL("/api/user/"+user.get("nickname")+"/lists/person")});
 
-            Pump.fetchObjects([user, followers, lists], function(err, objs) {
+            Pump.fetchObjects([user, following, lists], function(err, objs) {
                 if (callback) {
                     callback(err);
                 }
