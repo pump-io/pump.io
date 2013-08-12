@@ -473,7 +473,7 @@
                     callback(err);
                 } else if (data.items && data.items.length > 0) {
                     // recurse
-                    stream.getNext(callback);
+                    stream.getAllNext(callback);
                 } else {
                     callback(null);
                 }
@@ -487,7 +487,7 @@
                     callback(err);
                 } else if (data.items && data.items.length > 0) {
                     // recurse
-                    stream.getPrev(callback);
+                    stream.getAllPrev(callback);
                 } else {
                     callback(null);
                 }
