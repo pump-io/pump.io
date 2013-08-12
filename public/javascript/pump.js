@@ -574,6 +574,7 @@ if (!window.Pump) {
 
     Pump.addToStream = function(stream, act, callback) {
         stream.items.create(act, {
+            wait: true,
             success: function(act) {
                 callback(null, act);
             },
