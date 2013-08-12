@@ -349,30 +349,60 @@
                 return str.get('url');
             }
         },
-        nextLink: function() {
-            var str = this;
+        nextLink: function(count) {
+            var str = this,
+                url;
+
+            if (_.isUndefined(count)) {
+                count = 20;
+            }
             if (str.has('links') && _.has(str.get('links'), 'next')) {
-                return str.get('links').next.href;
+                url = str.get('links').next.href;
             } else if (str.items && str.items.length > 0) {
-                return str.url() + "?before=" + str.items.at(str.items.length-1).id;
+                url = str.url() + "?before=" + str.items.at(str.items.length-1).id;
             } else {
-                return null;
+                url = null;
             }
+
+            if (url && count != 20) {
+                url = url + "&count=" + count;
+            }
+            
+            return url;
         },
-        prevLink: function() {
-            var str = this;
+        prevLink: function(count) {
+            var str = this,
+                url;
+
+            if (_.isUndefined(count)) {
+                count = 20;
+            }
             if (str.has('links') && _.has(str.get('links'), 'prev')) {
-                return str.get('links').prev.href;
+                url = str.get('links').prev.href;
             } else if (str.items && str.items.length > 0) {
-                return str.url() + "?since=" + str.items.at(0).id;
+                url = str.url() + "?since=" + str.items.at(0).id;
             } else {
-                return null;
+                url = null;
             }
+
+            if (url && count != 20) {
+                url = url + "&count=" + count;
+            }
+            
+            return url;
         },
-        getPrev: function(callback) { // Get stuff later than the current group
+        getPrev: function(count, callback) { // Get stuff later than the current group
             var stream = this,
-                prevLink = stream.prevLink(),
+                prevLink,
                 options;
+
+            if (!callback) {
+                // This can also be undefined, btw
+                callback = count;
+                count    = 20;
+            }
+
+            prevLink = stream.prevLink(count);
 
             if (!prevLink) {
                 if (_.isFunction(callback)) {
@@ -414,10 +444,18 @@
             Pump.ajax(options);
 
         },
-        getNext: function(callback) { // Get stuff earlier than the current group
+        getNext: function(count, callback) { // Get stuff earlier than the current group
             var stream = this,
-                nextLink = stream.nextLink(),
+                nextLink,
                 options;
+
+            if (!callback) {
+                // This can also be undefined, btw
+                callback = count;
+                count    = 20;
+            }
+
+            nextLink = stream.nextLink(count);
 
             if (!nextLink) {
                 if (_.isFunction(callback)) {
@@ -468,7 +506,7 @@
         getAllNext: function(callback) {
             var stream = this;
 
-            stream.getNext(function(err, data) {
+            stream.getNext(stream.maxCount(), function(err, data) {
                 if (err) {
                     callback(err);
                 } else if (data.items && data.items.length > 0) {
@@ -482,7 +520,7 @@
         getAllPrev: function(callback) {
             var stream = this;
 
-            stream.getPrev(function(err, data) {
+            stream.getPrev(stream.maxCount(), function(err, data) {
                 if (err) {
                     callback(err);
                 } else if (data.items && data.items.length > 0) {
@@ -539,11 +577,7 @@
 
             } else {
                 
-                if (_.isNumber(stream.get('totalItems'))) {
-                    count = Math.min(stream.get('totalItems'), 200);
-                } else {
-                    count = 200;
-                }
+                count = stream.maxCount();
 
                 options = {
                     type: "GET",
@@ -580,6 +614,19 @@
 
                 Pump.ajax(options);
             }
+        },
+        maxCount: function() {
+            var stream = this,
+                count,
+                total = stream.get('totalItems');
+
+            if (_.isNumber(total)) {
+                count = Math.min(total, 200);
+            } else {
+                count = 200;
+            }
+
+            return count;
         },
         toJSONRef: function() {
             var str = this;
@@ -828,25 +875,23 @@
     Pump.PeopleStream = Pump.ActivityObjectStream.extend({
         itemsClass: Pump.PeopleItems,
         nextLink: function() {
-            var str = this;
-            if (str.has('links') && _.has(str.get('links'), 'next')) {
-                return str.get('links').next.href;
-            } else if (str.items && str.items.length > 0) {
-                return str.url() + "?before=" + str.items.at(str.items.length-1).id + "&type=person";
-            } else {
-                return null;
+            var str = this,
+                url;
+            url = Pump.ActivityObjectStream.prototype.nextLink.apply(str, arguments);
+            if (url && url.indexOf("&type=person") == -1) {
+                url = url + "&type=person";
             }
+            return url;
         },
         prevLink: function() {
-            var str = this;
-            if (str.has('links') && _.has(str.get('links'), 'prev')) {
-                return str.get('links').prev.href;
-            } else if (str.items && str.items.length > 0) {
-                return str.url() + "?since=" + str.items.at(0).id + "&type=person";
-            } else {
-                return null;
+            var str = this,
+                url;
+            url = Pump.ActivityObjectStream.prototype.prevLink.apply(str, arguments);
+            if (url && url.indexOf("&type=person") == -1) {
+                url = url + "&type=person";
             }
-        },
+            return url;
+        }
     });
 
     Pump.User = Pump.Model.extend({
