@@ -123,7 +123,7 @@ suite.addBatch({
                         topic: function(pair, cl) {
                             var callback = this.callback,
                                 cred = makeCred(cl, pair),
-                                url = "http://localhost:4815/api/user/staggerlee/feed?q=billy";
+                                url = "http://localhost:4815/api/user/staggerlee/following?q=billy";
 
                             gj(url, cred, function(err, body, resp) {
                                 callback(err, body);
