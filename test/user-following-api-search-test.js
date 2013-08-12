@@ -141,6 +141,26 @@ suite.addBatch({
                                 assert.ok(_.some(feed.items, function(item) { return item.preferredUsername == ("billy"+i); }));
                             }
                         }
+                    },
+                    "and we request the following stream with a non-matching search parameter": {
+                        topic: function(pair, cl) {
+                            var callback = this.callback,
+                                cred = makeCred(cl, pair),
+                                url = "http://localhost:4815/api/user/staggerlee/following?q=thereisnomatchforthis";
+
+                            gj(url, cred, function(err, body, resp) {
+                                callback(err, body);
+                            });
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                        },
+                        "it is empty": function(err, feed) {
+                            var i;
+                            assert.ifError(err);
+                            validFeed(feed);
+                            assert.equal(feed.items.length, 0);
+                        }
                     }
                 }
             }
