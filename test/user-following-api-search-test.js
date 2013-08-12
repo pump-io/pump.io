@@ -1,6 +1,6 @@
-// user-stream-api-search-test.js
+// user-following-api-search-test.js
 //
-// Test user streams search
+// Test searching the following endpoint
 //
 // Copyright 2013, E14N https://e14n.com/
 //
