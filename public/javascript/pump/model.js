@@ -614,6 +614,7 @@
                 options.at = 0;
             }
             Backbone.Collection.prototype.add.apply(this, [models, options]);
+            this.applyChanges(models);
         },
         comparator: function(first, second) {
             var d1 = first.pubDate(),
@@ -625,6 +626,55 @@
             } else {
                 return 0;
             }
+        },
+        applyChanges: function(models) {
+            var items = this;
+            if (!_.isArray(models)) {
+                models = [models];
+            }
+            _.each(models, function(act) {
+                if (!(act instanceof Pump.Activity)) {
+                    act = Pump.Activity.unique(act);
+                }
+                switch (act.get("verb")) {
+                case "post":
+                case "create":                    
+                    if (act.object.inReplyTo) {
+                        if (!act.object.author) {
+                            act.object.author = act.actor;
+                        }
+                        if (!act.object.inReplyTo.replies.items) {
+                            act.object.inReplyTo.replies.items = new Pump.ActivityObjectItems();
+                        }
+                        act.object.inReplyTo.replies.items.add(act.object);
+                    }
+                    break;
+                case "like":
+                case "favorite":
+                    if (!act.object.likes.items) {
+                        act.object.likes.items = new Pump.ActivityObjectItems();
+                    }
+                    act.object.likes.items.add(act.actor);
+                    break;
+                case "unlike":
+                case "unfavorite":
+                    if (act.object.likes.items) {
+                        act.object.likes.items.remove(act.actor);
+                    }
+                    break;
+                case "share":
+                    if (!act.object.shares.items) {
+                        act.object.shares.items = new Pump.ActivityObjectItems();
+                    }
+                    act.object.shares.items.add(act.actor);
+                    break;
+                case "unshare":
+                    if (act.object.shares.items) {
+                        act.object.shares.items.remove(act.actor);
+                    }
+                    break;
+                }
+            });
         }
     });
 
