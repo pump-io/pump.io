@@ -1552,6 +1552,10 @@ var streamArgs = function(req, defaultCount, maxCount) {
             args.end = args.start + args.count;
         }
 
+        if (_.has(req.query, "q")) {
+            args.q = req.query.q;
+        }
+
         return args;
     } catch (e) {
         throw new HTTPError(e.message, 400);
