@@ -11,18 +11,19 @@
     <link href="/stylesheet/bootstrap.min.css" rel="stylesheet">
     <link href="/stylesheet/bootstrap-responsive.min.css" rel="stylesheet">
     <link href="/stylesheet/fineuploader.css" rel="stylesheet">
+    <link href="/stylesheet/select2.css" rel="stylesheet">
 
     <% } else { %>
 
     <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.min.css" rel="stylesheet">
     <link href="//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.1.1/fineuploader.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/select2/3.4.1/select2.min.css" rel="stylesheet">
 
     <% } %>
 
     <link href="/stylesheet/bootstrap-wysihtml5.css" rel="stylesheet">
     <link href="/stylesheet/bootstrap-lightbox.min.css" rel="stylesheet">
-    <link href="/stylesheet/select2.css" rel="stylesheet">
 
     <!-- Finally, our own override sheet -->
 
@@ -108,7 +109,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/spin.js/1.2.7/spin.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.1.1/jquery.fineuploader.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/wysihtml5/0.3.0/wysihtml5.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.2/select2.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.4.1/select2.min.js"></script>
     <% if (config.sockjs) { %>
     <script src="//cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.2/sockjs-min.js"></script>
     <% } %>
