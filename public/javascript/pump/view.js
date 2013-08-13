@@ -1529,8 +1529,12 @@
                 Pump.body.endLoad();
             });
 
-            replies.getAll(function() {
-                full.render();
+            replies.getAll(function(err, data) {
+                if (err) {
+                    Pump.error(err);
+                } else {
+                    full.render();
+                }
             });
         },
         placeSub: function(aview, $el) {
