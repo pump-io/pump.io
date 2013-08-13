@@ -3160,6 +3160,8 @@
     Pump.selectOpts = function() {
         var user = Pump.principalUser;
         return {
+            width: "90%",
+            multiple: true,
             placeholder: "Search for a user",
             minimumInputLength: 2,
             ajax: {
