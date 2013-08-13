@@ -723,7 +723,8 @@
                 options.at = 0;
             }
             Backbone.Collection.prototype.add.apply(this, [models, options]);
-            this.applyChanges(models);
+            // Don't apply changes yet.
+            // this.applyChanges(models);
         },
         comparator: function(first, second) {
             var d1 = first.pubDate(),
