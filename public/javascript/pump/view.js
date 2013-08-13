@@ -1583,15 +1583,21 @@
         events: {
             "submit .post-comment": "saveComment"
         },
+        ready: function() {
+            var view = this;
+            view.$('textarea[name="content"]').wysihtml5({
+                customTemplates: Pump.wysihtml5Tmpl
+            });
+        },
         saveComment: function() {
             var view = this,
-                text = view.$('textarea[name="content"]').val(),
+                html = view.$('textarea[name="content"]').val(),
                 orig = view.options.original,
                 act = new Pump.Activity({
                     verb: "post",
                     object: {
                         objectType: "comment",
-                        content: Pump.htmlEncode(text)
+                        content: html
                     }
                 });
 
