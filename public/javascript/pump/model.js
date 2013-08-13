@@ -752,6 +752,10 @@
                         if (!act.object.author) {
                             act.object.author = act.actor;
                         }
+                        if (!act.object.inReplyTo.replies) {
+                            act.object.inReplyTo.replies = new Pump.ActivityObjectStream();
+                        }
+
                         if (!act.object.inReplyTo.replies.items) {
                             act.object.inReplyTo.replies.items = new Pump.ActivityObjectItems();
                         }
@@ -760,6 +764,9 @@
                     break;
                 case "like":
                 case "favorite":
+                    if (!act.object.likes) {
+                        act.object.likes = new Pump.ActivityObjectStream();
+                    }
                     if (!act.object.likes.items) {
                         act.object.likes.items = new Pump.ActivityObjectItems();
                     }
@@ -767,18 +774,21 @@
                     break;
                 case "unlike":
                 case "unfavorite":
-                    if (act.object.likes.items) {
+                    if (act.object.likes && act.object.likes.items) {
                         act.object.likes.items.remove(act.actor);
                     }
                     break;
                 case "share":
+                    if (!act.object.shares) {
+                        act.object.shares = new Pump.ActivityObjectStream();
+                    }
                     if (!act.object.shares.items) {
                         act.object.shares.items = new Pump.ActivityObjectItems();
                     }
                     act.object.shares.items.add(act.actor);
                     break;
                 case "unshare":
-                    if (act.object.shares.items) {
+                    if (act.object.shares && act.object.shares.items) {
                         act.object.shares.items.remove(act.actor);
                     }
                     break;
