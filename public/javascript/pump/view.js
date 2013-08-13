@@ -553,30 +553,22 @@
         },
         postNoteModal: function() {
             var profile = Pump.principal,
-                lists = profile.lists,
-                following = profile.following;
+                lists = profile.lists;
 
-            following.getAll(function() {
-                Pump.fetchObjects([lists], function(err, objs) {
-                    Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.principalUser,
-                                                               lists: lists,
-                                                               following: following}});
-                });
+            Pump.fetchObjects([lists], function(err, objs) {
+                Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.principalUser,
+                                                           lists: lists}});
             });
 
             return false;
         },
         postPictureModal: function() {
             var profile = Pump.principal,
-                lists = profile.lists,
-                following = profile.following;
+                lists = profile.lists;
 
-            following.getAll(function() {
-                Pump.fetchObjects([lists], function(err, objs) {
-                    Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.principalUser,
-                                                                  lists: lists,
-                                                                  following: following}});
-                });
+            Pump.fetchObjects([lists], function(err, objs) {
+                Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.principalUser,
+                                                              lists: lists}});
             });
 
             return false;
@@ -2655,12 +2647,14 @@
         templateName: 'post-note',
         parts: ["recipient-selector"],
         ready: function() {
-            var view = this;
+            var view = this,
+                opts = Pump.selectOpts();
+
             view.$('#note-content').wysihtml5({
                 customTemplates: Pump.wysihtml5Tmpl
             });
-            view.$("#note-to").select2();
-            view.$("#note-cc").select2();
+            view.$("#note-to").select2(opts);
+            view.$("#note-cc").select2(opts);
         },
         events: {
             "click #send-note": "postNote"
@@ -2721,10 +2715,11 @@
             "click #send-picture": "postPicture"
         },
         ready: function() {
-            var view = this;
+            var view = this,
+                opts = Pump.selectOpts();
 
-            view.$("#picture-to").select2();
-            view.$("#picture-cc").select2();
+            view.$("#picture-to").select2(opts);
+            view.$("#picture-cc").select2(opts);
 
             view.$('#picture-description').wysihtml5({
                 customTemplates: Pump.wysihtml5Tmpl
@@ -3160,6 +3155,30 @@
         Pump.showModal(Pump.AreYouSureModal,
                        {data: {question: question},
                         callback: callback});
+    };
+
+    Pump.selectOpts = function() {
+        var user = Pump.principalUser;
+        return {
+            placeholder: "Search for a user",
+            minimumInputLength: 2,
+            ajax: {
+                url: Pump.fullURL("/api/user/"+user.get("nickname")+"/following"),
+                dataType: "json",
+                data: function(term, page) {
+                    return {q: term};
+                },
+                results: function(data, page) {
+                    var results = _.map(data.items, function(item) {
+                        return {id: item.objectType + ":" + item.id,
+                                text: item.displayName};
+                    });
+                    return {results: results,
+                            more: false,
+                            context: null};
+                }
+            }
+        };
     };
 
 })(window._, window.$, window.Backbone, window.Pump);
