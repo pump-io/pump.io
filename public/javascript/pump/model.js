@@ -551,13 +551,18 @@
 
             if (nl || pl) {
                 var ndone = false,
-                    pdone = false;
+                    nerror = false,
+                    pdone = false,
+                    perror = false;
 
                 stream.getAllNext(function(err) {
+                    ndone = true;
                     if (err) {
-                        callback(err);
+                        nerror = true;
+                        if (!perror) {
+                            callback(err);
+                        }
                     } else {
-                        ndone = true;
                         if (pdone) {
                             callback(null);
                         }
@@ -565,10 +570,13 @@
                 });
 
                 stream.getAllPrev(function(err) {
+                    pdone = true;
                     if (err) {
-                        callback(err);
+                        perror = true;
+                        if (!nerror) {
+                            callback(err);
+                        }
                     } else {
-                        pdone = true;
                         if (ndone) {
                             callback(null);
                         }
