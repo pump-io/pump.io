@@ -513,7 +513,7 @@
             stream.getNext(stream.maxCount(), function(err, data) {
                 if (err) {
                     callback(err);
-                } else if (data.items && data.items.length > 0) {
+                } else if (data.items && data.items.length > 0 && stream.items.length < stream.get("totalItems")) {
                     // recurse
                     stream.getAllNext(callback);
                 } else {
@@ -527,7 +527,7 @@
             stream.getPrev(stream.maxCount(), function(err, data) {
                 if (err) {
                     callback(err);
-                } else if (data.items && data.items.length > 0) {
+                } else if (data.items && data.items.length > 0 && stream.items.length < stream.get("totalItems")) {
                     // recurse
                     stream.getAllPrev(callback);
                 } else {
