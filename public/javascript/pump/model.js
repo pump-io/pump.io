@@ -351,7 +351,8 @@
         },
         nextLink: function(count) {
             var str = this,
-                url;
+                url,
+                item;
 
             if (_.isUndefined(count)) {
                 count = 20;
@@ -359,7 +360,8 @@
             if (str.has('links') && _.has(str.get('links'), 'next')) {
                 url = str.get('links').next.href;
             } else if (str.items && str.items.length > 0) {
-                url = str.url() + "?before=" + str.items.at(str.items.length-1).id;
+                item = str.items.at(str.items.length-1);
+                url = str.url() + "?before=" + item.id + "&type=" + item.get("objectType");
             } else {
                 url = null;
             }
@@ -372,7 +374,8 @@
         },
         prevLink: function(count) {
             var str = this,
-                url;
+                url,
+                item;
 
             if (_.isUndefined(count)) {
                 count = 20;
@@ -380,7 +383,8 @@
             if (str.has('links') && _.has(str.get('links'), 'prev')) {
                 url = str.get('links').prev.href;
             } else if (str.items && str.items.length > 0) {
-                url = str.url() + "?since=" + str.items.at(0).id;
+                item = str.items.at(0);
+                url = str.url() + "?since=" + item.id + "&type=" + item.get("objectType");
             } else {
                 url = null;
             }
