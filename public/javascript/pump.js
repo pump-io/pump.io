@@ -208,10 +208,34 @@ if (!window.Pump) {
     // send them here and I'll figure it out.
 
     Pump.error = function(err) {
-        if (window.console) {
-            console.log(err);
+        var msg;
+
+        if (_.isString(err)) {
+            msg = err;
+        } else if (_.isObject(err)) {
+            msg = err.message;
             if (err.stack) {
                 console.log(err.stack);
+            }
+        } else {
+            msg = "An error occurred.";
+        }
+
+        console.log(msg);
+        
+        if (Pump.body && Pump.body.nav) {
+            var $nav = Pump.body.nav.$el,
+                $alert = $("#error-popup");
+
+            if ($alert.length === 0) {
+                $alert = $('<div id="error-popup" class="alert-error" style="display: none; margin-top: 0px; text-align: center">'+
+                           '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
+                           '<span class="error-message">'+msg+'</span>'+
+                           '</div>');
+                $nav.after($alert);
+                $alert.slideDown('fast');
+            } else {
+                $(".error-message", $alert).text(msg);
             }
         }
     };
