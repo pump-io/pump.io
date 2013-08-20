@@ -557,31 +557,75 @@
             "click #post-picture-button": "postPictureModal"
         },
         postNoteModal: function() {
-            var profile = Pump.principal,
+            var view = this,
+                profile = Pump.principal,
                 lists = profile.lists,
-                following = profile.following;
+                following = profile.following,
+                startSpin = function() {
+                    view.$('#post-note-button').prop('disabled', true).spin(true);
+                },
+                stopSpin = function() {
+                    view.$('#post-note-button').prop('disabled', false).spin(false);
+                };
 
-            following.getAll(function() {
-                Pump.fetchObjects([lists], function(err, objs) {
-                    Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.principalUser,
-                                                               lists: lists,
-                                                               following: following}});
-                });
+            startSpin();
+
+            following.getAll(function(err) {
+                if (err) {
+                    view.showError(err);
+                    stopSpin();
+                } else {
+                    Pump.fetchObjects([lists], function(err, objs) {
+                        if (err) {
+                            view.showError(err);
+                            stopSpin();
+                        } else {
+                            Pump.showModal(Pump.PostNoteModal, {ready: function() {
+                                                                   stopSpin();
+                                                                },
+                                                                data: {user: Pump.principalUser,
+                                                                       lists: lists,
+                                                                       following: following}});
+                        }
+                    });
+                }
             });
 
             return false;
         },
         postPictureModal: function() {
-            var profile = Pump.principal,
+            var view = this,
+                profile = Pump.principal,
                 lists = profile.lists,
-                following = profile.following;
+                following = profile.following,
+                startSpin = function() {
+                    view.$('#post-picture-button').prop('disabled', true).spin(true);
+                },
+                stopSpin = function() {
+                    view.$('#post-picture-button').prop('disabled', false).spin(false);
+                };
 
-            following.getAll(function() {
-                Pump.fetchObjects([lists], function(err, objs) {
-                    Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.principalUser,
-                                                                  lists: lists,
-                                                                  following: following}});
-                });
+            startSpin();
+
+            following.getAll(function(err) {
+                if (err) {
+                    view.showError(err);
+                    stopSpin();
+                } else {
+                    Pump.fetchObjects([lists], function(err, objs) {
+                        if (err) {
+                            view.showError(err);
+                            stopSpin();
+                        } else {
+                            Pump.showModal(Pump.PostPictureModal, {ready: function() {
+                                                                   stopSpin();
+                                                                },
+                                                                data: {user: Pump.principalUser,
+                                                                       lists: lists,
+                                                                       following: following}});
+                        }
+                    });
+                }
             });
 
             return false;
@@ -3159,6 +3203,9 @@
         modalView.on("ready", function() {
             $("body").append(modalView.el);
             modalView.$el.modal('show');
+            if (options.ready) {
+                options.ready();
+            }
         });
 
         // render it (will fire "ready")
