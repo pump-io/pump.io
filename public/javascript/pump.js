@@ -108,7 +108,7 @@ if (!window.Pump) {
                 var nickname, pair;
 
                 if (err) {
-                    Pump.error(err.message);
+                    Pump.error(err);
                     return;
                 }
 
