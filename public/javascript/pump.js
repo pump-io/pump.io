@@ -645,4 +645,15 @@ if (!window.Pump) {
         $("title").text(title + " - " + Pump.config.site);
     };
 
+    Pump.ajaxError = function(jqXHR, textStatus, errorThrown) {
+        var type = jqXHR.getResponseHeader("Content-Type"),
+            response;
+        if (type && type.indexOf("application/json") !== -1) {
+            response = JSON.parse(jqXHR.responseText);
+            Pump.error(response.error);
+        } else {
+            Pump.error(errorThrown);
+        }
+    };
+
 })(window._, window.$, window.Backbone, window.Pump);
