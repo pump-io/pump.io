@@ -602,14 +602,14 @@ if (!window.Pump) {
             success: function(act) {
                 callback(null, act);
             },
-            error: function(jqXHR, textStatus, errorThrown) {
+            error: function(model, xhr, options) {
                 var type, response;
-                type = jqXHR.getResponseHeader("Content-Type");
+                type = xhr.getResponseHeader("Content-Type");
                 if (type && type.indexOf("application/json") !== -1) {
-                    response = JSON.parse(jqXHR.responseText);
+                    response = JSON.parse(xhr.responseText);
                     callback(new Error(response.error), null);
                 } else {
-                    callback(new Error(errorThrown), null);
+                    callback(new Error("Error saving activity: " + model.id), null);
                 }
             }
         });
