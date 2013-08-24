@@ -22,6 +22,8 @@ var assert = require("assert"),
     Browser = require("zombie"),
     Step = require("step"),
     http = require("http"),
+    fs = require("fs"),
+    path = require("path"),
     setupApp = oauthutil.setupApp,
     setupAppConfig = oauthutil.setupAppConfig,
     newCredentials = oauthutil.newCredentials;
@@ -75,6 +77,35 @@ suite.addBatch({
                 assert.isObject(body);
                 assert.instanceOf(body, Buffer);
                 assert.greater(body.length, 0);
+            },
+            "and we get our default favicon": {
+                topic: function(body) {
+                    var callback = this.callback;
+                    
+                    fs.readFile(path.resolve(__dirname, "../public/images/favicon.ico"), function(err, data) {
+                        if (err) {
+                            callback(err, null, null);
+                        } else {
+                            callback(null, data, body);
+                        }
+                    });
+                },
+                "it works": function(err, data, body) {
+                    assert.ifError(err);
+                    assert.isObject(data);
+                    assert.instanceOf(data, Buffer);
+                    assert.greater(data.length, 0);
+                },
+                "the buffers are the same": function(err, data, body) {
+                    var i;
+                    assert.ifError(err);
+                    assert.ok(Buffer.isBuffer(data));
+                    assert.ok(Buffer.isBuffer(body));
+                    assert.equal(data.length, body.length);
+                    for (i = 0; i < data.length; i++) {
+                        assert.equal(data[i], body[i]);
+                    }
+                }
             }
         }
     }
