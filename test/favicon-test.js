@@ -111,4 +111,69 @@ suite.addBatch({
     }
 });
 
+suite.addBatch({
+    "When we set up the app with a custom favicon": {
+        topic: function() {
+            var fname = path.resolve(__dirname, "data/all-black-favicon.ico");
+            setupAppConfig({favicon: fname, site: "h4X0r h4v3n"}, this.callback);
+        },
+        teardown: function(app) {
+            if (app && app.close) {
+                app.close();
+            }
+        },
+        "it works": function(err, app) {
+            assert.ifError(err);
+        },
+        "and we retrieve the favicon": {
+            topic: function() {
+                httpGet("http://localhost:4815/favicon.ico", this.callback);
+            },
+            "it works": function(err, body, resp) {
+                assert.ifError(err);
+                assert.isObject(body);
+                assert.instanceOf(body, Buffer);
+                assert.isObject(resp);
+                assert.instanceOf(resp, http.IncomingMessage);
+                assert.equal(resp.statusCode, 200);
+            },
+            "buffer is not empty": function(err, body, resp) {
+                assert.ifError(err);
+                assert.isObject(body);
+                assert.instanceOf(body, Buffer);
+                assert.greater(body.length, 0);
+            },
+            "and we get our configured favicon": {
+                topic: function(body) {
+                    var callback = this.callback;
+                    
+                    fs.readFile(path.resolve(__dirname, "data/all-black-favicon.ico"), function(err, data) {
+                        if (err) {
+                            callback(err, null, null);
+                        } else {
+                            callback(null, data, body);
+                        }
+                    });
+                },
+                "it works": function(err, data, body) {
+                    assert.ifError(err);
+                    assert.isObject(data);
+                    assert.instanceOf(data, Buffer);
+                    assert.greater(data.length, 0);
+                },
+                "the buffers are the same": function(err, data, body) {
+                    var i;
+                    assert.ifError(err);
+                    assert.ok(Buffer.isBuffer(data));
+                    assert.ok(Buffer.isBuffer(body));
+                    assert.equal(data.length, body.length);
+                    for (i = 0; i < data.length; i++) {
+                        assert.equal(data[i], body[i]);
+                    }
+                }
+            }
+        }
+    }
+});
+
 suite["export"](module);
