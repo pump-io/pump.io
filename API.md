@@ -471,8 +471,10 @@ discover it in the host-meta file with link-rel
 The client registration will accept some of the parameters that OpenID
 does. Here's what it supports:
 
-* *type*
-* *client_id*, *client_secret*: only for updates
+* *type*: one of the values `client_associate` (when registering a client)
+  or `client_update` (when updating the details of a previously-registered
+  client)
+* *client_id*, *client_secret*: only when `type` is set to `client_update`.
 * *contacts*
 * *application_type*
 * *application_name*
