@@ -371,9 +371,13 @@ var contextEndpoint = function(contextifier, streamCreator) {
 
 var objectReplies = contextEndpoint(
     function(req) {
-        var type = req.type;
-        return {type: type,
-                obj: req[type]};
+        var objectType = req.type,
+            context = {objectType: objectType,
+                       obj: req[objectType]};
+        if (req.query && req.query.type) {
+            context.type = req.query.type;
+        }
+        return context;
     },
     streams.objectReplies
 );

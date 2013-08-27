@@ -351,7 +351,8 @@
         },
         nextLink: function(count) {
             var str = this,
-                url;
+                url,
+                item;
 
             if (_.isUndefined(count)) {
                 count = 20;
@@ -359,7 +360,8 @@
             if (str.has('links') && _.has(str.get('links'), 'next')) {
                 url = str.get('links').next.href;
             } else if (str.items && str.items.length > 0) {
-                url = str.url() + "?before=" + str.items.at(str.items.length-1).id;
+                item = str.items.at(str.items.length-1);
+                url = str.url() + "?before=" + item.id + "&type=" + item.get("objectType");
             } else {
                 url = null;
             }
@@ -372,7 +374,8 @@
         },
         prevLink: function(count) {
             var str = this,
-                url;
+                url,
+                item;
 
             if (_.isUndefined(count)) {
                 count = 20;
@@ -380,7 +383,8 @@
             if (str.has('links') && _.has(str.get('links'), 'prev')) {
                 url = str.get('links').prev.href;
             } else if (str.items && str.items.length > 0) {
-                url = str.url() + "?since=" + str.items.at(0).id;
+                item = str.items.at(0);
+                url = str.url() + "?since=" + item.id + "&type=" + item.get("objectType");
             } else {
                 url = null;
             }
@@ -509,7 +513,7 @@
             stream.getNext(stream.maxCount(), function(err, data) {
                 if (err) {
                     callback(err);
-                } else if (data.items && data.items.length > 0) {
+                } else if (data.items && data.items.length > 0 && stream.items.length < stream.get("totalItems")) {
                     // recurse
                     stream.getAllNext(callback);
                 } else {
@@ -523,7 +527,7 @@
             stream.getPrev(stream.maxCount(), function(err, data) {
                 if (err) {
                     callback(err);
-                } else if (data.items && data.items.length > 0) {
+                } else if (data.items && data.items.length > 0 && stream.items.length < stream.get("totalItems")) {
                     // recurse
                     stream.getAllPrev(callback);
                 } else {
@@ -551,13 +555,18 @@
 
             if (nl || pl) {
                 var ndone = false,
-                    pdone = false;
+                    nerror = false,
+                    pdone = false,
+                    perror = false;
 
                 stream.getAllNext(function(err) {
+                    ndone = true;
                     if (err) {
-                        callback(err);
+                        nerror = true;
+                        if (!perror) {
+                            callback(err);
+                        }
                     } else {
-                        ndone = true;
                         if (pdone) {
                             callback(null);
                         }
@@ -565,10 +574,13 @@
                 });
 
                 stream.getAllPrev(function(err) {
+                    pdone = true;
                     if (err) {
-                        callback(err);
+                        perror = true;
+                        if (!nerror) {
+                            callback(err);
+                        }
                     } else {
-                        pdone = true;
                         if (ndone) {
                             callback(null);
                         }
@@ -723,7 +735,8 @@
                 options.at = 0;
             }
             Backbone.Collection.prototype.add.apply(this, [models, options]);
-            this.applyChanges(models);
+            // Don't apply changes yet.
+            // this.applyChanges(models);
         },
         comparator: function(first, second) {
             var d1 = first.pubDate(),
@@ -752,6 +765,10 @@
                         if (!act.object.author) {
                             act.object.author = act.actor;
                         }
+                        if (!act.object.inReplyTo.replies) {
+                            act.object.inReplyTo.replies = new Pump.ActivityObjectStream();
+                        }
+
                         if (!act.object.inReplyTo.replies.items) {
                             act.object.inReplyTo.replies.items = new Pump.ActivityObjectItems();
                         }
@@ -760,6 +777,9 @@
                     break;
                 case "like":
                 case "favorite":
+                    if (!act.object.likes) {
+                        act.object.likes = new Pump.ActivityObjectStream();
+                    }
                     if (!act.object.likes.items) {
                         act.object.likes.items = new Pump.ActivityObjectItems();
                     }
@@ -767,18 +787,21 @@
                     break;
                 case "unlike":
                 case "unfavorite":
-                    if (act.object.likes.items) {
+                    if (act.object.likes && act.object.likes.items) {
                         act.object.likes.items.remove(act.actor);
                     }
                     break;
                 case "share":
+                    if (!act.object.shares) {
+                        act.object.shares = new Pump.ActivityObjectStream();
+                    }
                     if (!act.object.shares.items) {
                         act.object.shares.items = new Pump.ActivityObjectItems();
                     }
                     act.object.shares.items.add(act.actor);
                     break;
                 case "unshare":
-                    if (act.object.shares.items) {
+                    if (act.object.shares && act.object.shares.items) {
                         act.object.shares.items.remove(act.actor);
                     }
                     break;

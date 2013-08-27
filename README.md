@@ -210,6 +210,8 @@ Here are the main configuration keys.
   more than one child process running, to spread them out a bit. Defaults to 1200000, or 20 minutes.
 * *cleanupNonce* Time interval to clean up OAuth nonces (in ms). Staggered.
   Defaults to 1200000, or 20 minutes.
+* *favicon* Local filesystem path to the favicon.ico file to use. This will be served as "/favicon.ico"
+  by the server. By default, uses public/images/favicon.ico.
 
 ### Web server proxy
 

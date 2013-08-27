@@ -357,7 +357,12 @@
             view.$(".alert").alert();
         },
         showError: function(msg) {
-            this.showAlert(msg, "error");
+            var view = this;
+            if (view.$(".alert").length > 0) {
+                view.showAlert(msg, "error");
+            } else {
+                Pump.error(msg);
+            }
         },
         showSuccess: function(msg) {
             this.showAlert(msg, "success");
@@ -552,23 +557,51 @@
             "click #post-picture-button": "postPictureModal"
         },
         postNoteModal: function() {
-            var profile = Pump.principal,
-                lists = profile.lists;
+            var view = this,
+                profile = Pump.principal,
+                lists = profile.lists,
+                following = profile.following,
+                startSpin = function() {
+                    view.$('#post-note-button').prop('disabled', true).spin(true);
+                },
+                stopSpin = function() {
+                    view.$('#post-note-button').prop('disabled', false).spin(false);
+                };
+
+            startSpin();
 
             Pump.fetchObjects([lists], function(err, objs) {
-                Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.principalUser,
-                                                           lists: lists}});
+               if (err) {
+                    view.showError(err);
+                    stopSpin();
+                } else {
+ 	                Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.principalUser,
+                }                                         lists: lists}});
             });
 
             return false;
         },
         postPictureModal: function() {
-            var profile = Pump.principal,
-                lists = profile.lists;
+            var view = this,
+                profile = Pump.principal,
+                lists = profile.lists,
+                following = profile.following,
+                startSpin = function() {
+                    view.$('#post-picture-button').prop('disabled', true).spin(true);
+                },
+                stopSpin = function() {
+                    view.$('#post-picture-button').prop('disabled', false).spin(false);
+                };
+
+            startSpin();
 
             Pump.fetchObjects([lists], function(err, objs) {
-                Pump.showModal(Pump.PostPictureModal, {data: {user: Pump.principalUser,
-                                                              lists: lists}});
+                if (err) {
+                    view.showError(err);
+                    stopSpin();
+                } else {
+                    Pump.showModal(Pump.PostPictureModal, {ready: function() {
+                }
             });
 
             return false;
@@ -601,12 +634,6 @@
                         // Go home
                         Pump.router.navigate("/", true);
                     }
-                },
-                onError = function(jqXHR, textStatus, errorThrown) {
-                    showError(errorThrown);
-                },
-                showError = function(msg) {
-                    Pump.error(msg);
                 };
 
             options = {
@@ -616,7 +643,7 @@
                 type: "POST",
                 url: "/main/logout",
                 success: onSuccess,
-                error: onError
+                error: Pump.ajaxError
             };
 
             Pump.ajax(options);
@@ -665,12 +692,6 @@
                         // Go home
                         Pump.router.navigate("/", true);
                     }
-                },
-                onError = function(jqXHR, textStatus, errorThrown) {
-                    showError(errorThrown);
-                },
-                showError = function(msg) {
-                    Pump.error(msg);
                 };
 
             options = {
@@ -680,7 +701,7 @@
                 type: "POST",
                 url: "/main/logout",
                 success: onSuccess,
-                error: onError
+                error: Pump.ajaxError
             };
 
             // Don't use Pump.ajax; it uses client auth
@@ -785,13 +806,7 @@
                         Pump.ajax(options);
                     } else {
                         view.stopSpin();
-                        type = jqXHR.getResponseHeader("Content-Type");
-                        if (type && type.indexOf("application/json") !== -1) {
-                            response = JSON.parse(jqXHR.responseText);
-                            view.showError(response.error);
-                        } else {
-                            view.showError(errorThrown);
-                        }
+                        Pump.ajaxError(jqXHR, textStatus, errorThrown);
                     }
                 };
 
@@ -830,6 +845,7 @@
                 makeRequest = function(options) {
                     Pump.ensureCred(function(err, cred) {
                         if (err) {
+                            view.stopSpin();
                             view.showError("Couldn't get OAuth credentials. :(");
                         } else {
                             options.consumerKey = cred.clientID;
@@ -884,13 +900,7 @@
                         retries = 1;
                     } else {
                         view.stopSpin();
-                        type = jqXHR.getResponseHeader("Content-Type");
-                        if (type && type.indexOf("application/json") !== -1) {
-                            response = JSON.parse(jqXHR.responseText);
-                            view.showError(response.error);
-                        } else {
-                            view.showError(errorThrown);
-                        }
+                        Pump.ajaxError(jqXHR, textStatus, errorThrown);
                     }
                 };
 
@@ -1002,13 +1012,7 @@
                         Pump.ajax(options);
                     } else {
                         view.stopSpin();
-                        type = jqXHR.getResponseHeader("Content-Type");
-                        if (type && type.indexOf("application/json") !== -1) {
-                            response = JSON.parse(jqXHR.responseText);
-                            view.showError(response.error);
-                        } else {
-                            view.showError(errorThrown);
-                        }
+                        Pump.ajaxError(jqXHR, textStatus, errorThrown);
                     }
                 };
 
@@ -1085,13 +1089,7 @@
                         Pump.ajax(options);
                     } else {
                         view.stopSpin();
-                        type = jqXHR.getResponseHeader("Content-Type");
-                        if (type && type.indexOf("application/json") !== -1) {
-                            response = JSON.parse(jqXHR.responseText);
-                            view.showError(response.error);
-                        } else {
-                            view.showError(errorThrown);
-                        }
+                        Pump.ajaxError(jqXHR, textStatus, errorThrown);
                     }
                 };
 
@@ -1421,8 +1419,11 @@
                     object: view.model.object.toJSON()
                 });
 
+            view.startSpin();
+
             Pump.newMajorActivity(act, function(err, act) {
                 if (err) {
+                    view.stopSpin();
                     view.showError(err);
                 } else {
                     view.$(".share")
@@ -1440,8 +1441,11 @@
                     object: view.model.object.toJSON()
                 });
 
+            view.startSpin();
+
             Pump.newMinorActivity(act, function(err, act) {
                 if (err) {
+                    view.stopSpin();
                     view.showError(err);
                 } else {
                     view.$(".unshare")
@@ -1521,8 +1525,12 @@
                 Pump.body.endLoad();
             });
 
-            replies.getAll(function() {
-                full.render();
+            replies.getAll(function(err, data) {
+                if (err) {
+                    Pump.error(err);
+                } else {
+                    full.render();
+                }
             });
         },
         placeSub: function(aview, $el) {
@@ -1575,15 +1583,21 @@
         events: {
             "submit .post-comment": "saveComment"
         },
+        ready: function() {
+            var view = this;
+            view.$('textarea[name="content"]').wysihtml5({
+                customTemplates: Pump.wysihtml5Tmpl
+            });
+        },
         saveComment: function() {
             var view = this,
-                text = view.$('textarea[name="content"]').val(),
+                html = view.$('textarea[name="content"]').val(),
                 orig = view.options.original,
                 act = new Pump.Activity({
                     verb: "post",
                     object: {
                         objectType: "comment",
-                        content: Pump.htmlEncode(text)
+                        content: html
                     }
                 });
 
@@ -1593,6 +1607,7 @@
 
             Pump.newMinorActivity(act, function(err, act) {
                 if (err) {
+                    view.stopSpin();
                     view.showError(err);
                 } else {
                     var object = act.object,
@@ -1649,12 +1664,19 @@
                     object: view.model.toJSON()
                 });
 
+            view.startSpin();
+
             Pump.newMinorActivity(act, function(err, act) {
-                view.$(".favorite")
-                    .removeClass("favorite")
-                    .addClass("unfavorite")
-                    .html("Unlike <i class=\"icon-thumbs-down\"></i>");
-                Pump.addMinorActivity(act);
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".favorite")
+                        .removeClass("favorite")
+                        .addClass("unfavorite")
+                        .html("Unlike <i class=\"icon-thumbs-down\"></i>");
+                    Pump.addMinorActivity(act);
+                }
+                view.stopSpin();
             });
         },
         unfavoriteObject: function() {
@@ -1663,6 +1685,8 @@
                     verb: "unfavorite",
                     object: view.model.toJSON()
                 });
+
+            view.startSpin();
 
             Pump.newMinorActivity(act, function(err, act) {
                 if (err) {
@@ -1674,6 +1698,7 @@
                         .html("Like <i class=\"icon-thumbs-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
+                view.stopSpin();
             });
         },
         shareObject: function() {
@@ -1683,6 +1708,7 @@
                     object: view.model.toJSON()
                 });
 
+            view.startSpin();
             Pump.newMajorActivity(act, function(err, act) {
                 if (err) {
                     view.showError(err);
@@ -1693,6 +1719,7 @@
                         .html("Unshare <i class=\"icon-remove\"></i>");
                     Pump.addMajorActivity(act);
                 }
+                view.stopSpin();
             });
         },
         unshareObject: function() {
@@ -1702,6 +1729,7 @@
                     object: view.model.toJSON()
                 });
 
+            view.startSpin();
             Pump.newMinorActivity(act, function(err, act) {
                 if (err) {
                     view.showError(err);
@@ -1712,6 +1740,7 @@
                         .html("Share <i class=\"icon-share-alt\"></i>");
                     Pump.addMinorActivity(act);
                 }
+                view.stopSpin();
             });
         },
         openComment: function() {
@@ -1744,12 +1773,18 @@
                     object: view.model.toJSON()
                 });
 
+            view.startSpin();
             Pump.newMinorActivity(act, function(err, act) {
-                view.$(".favorite")
-                    .removeClass("favorite")
-                    .addClass("unfavorite")
-                    .html("Unlike <i class=\"icon-thumbs-down\"></i>");
-                Pump.addMinorActivity(act);
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".favorite")
+                        .removeClass("favorite")
+                        .addClass("unfavorite")
+                        .html("Unlike <i class=\"icon-thumbs-down\"></i>");
+                    Pump.addMinorActivity(act);
+                }
+                view.stopSpin();
             });
             
             return false;
@@ -1761,6 +1796,7 @@
                     object: view.model.toJSON()
                 });
 
+            view.startSpin();
             Pump.newMinorActivity(act, function(err, act) {
                 if (err) {
                     view.showError(err);
@@ -1771,6 +1807,7 @@
                         .html("Like <i class=\"icon-thumbs-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
+                view.stopSpin();
             });
             
             return false;
@@ -1794,6 +1831,7 @@
                     object: view.model.toJSON()
                 };
 
+            view.startSpin();
             Pump.newMinorActivity(act, function(err, act) {
                 if (err) {
                     view.showError(err);
@@ -1805,6 +1843,7 @@
                         .html("Stop following");
                     Pump.addMinorActivity(act);
                 }
+                view.stopSpin();
             });
         },
         stopFollowingProfile: function() {
@@ -1814,6 +1853,7 @@
                     object: view.model.toJSON()
                 };
 
+            view.startSpin();
             Pump.newMinorActivity(act, function(err, act) {
                 if (err) {
                     view.showError(err);
@@ -1825,6 +1865,7 @@
                         .html("Follow");
                     Pump.addMinorActivity(act);
                 }
+                view.stopSpin();
             });
         }
     });
@@ -1953,10 +1994,6 @@
                 subView: "MajorPersonView",
                 idAttr: "data-person-id"
             }
-        },
-        initialize: function(options) {
-            Pump.debug(options);
-            Pump.PersonView.prototype.initialize.apply(this);
         }
     });
 
@@ -2200,7 +2237,9 @@
                 person = Pump.principal;
 
             Pump.areYouSure("Delete the list '"+list.get("displayName")+"'?", function(err, sure) {
-                if (sure) {
+                if (err) {
+                    view.showError(err);
+                } else if (sure) {
                     Pump.router.navigate("/"+user.get("nickname")+"/lists", true);
                     list.destroy({success: function() {
                         lists.remove(list.id);
@@ -2256,6 +2295,8 @@
                     }
                 };
 
+            view.startSpin();
+
             Pump.newMinorActivity(act, function(err, act) {
                 if (err) {
                     view.showError(err);
@@ -2265,6 +2306,7 @@
                     list.trigger("change");
                     Pump.addMinorActivity(act);
                 }
+                view.stopSpin();
             });
         }
     });
@@ -2463,12 +2505,19 @@
                     object: view.model.toJSON()
                 });
 
+            view.startSpin();
+
             Pump.newMinorActivity(act, function(err, act) {
-                view.$(".favorite")
-                    .removeClass("favorite")
-                    .addClass("unfavorite")
-                    .html("Unlike <i class=\"icon-thumbs-down\"></i>");
-                Pump.addMinorActivity(act);
+                if (err) {
+                    view.showError(err);
+                } else {
+                    view.$(".favorite")
+                        .removeClass("favorite")
+                        .addClass("unfavorite")
+                        .html("Unlike <i class=\"icon-thumbs-down\"></i>");
+                    Pump.addMinorActivity(act);
+                }
+                view.stopSpin();
             });
         },
         unfavoriteObject: function() {
@@ -2477,6 +2526,8 @@
                     verb: "unfavorite",
                     object: view.model.toJSON()
                 });
+
+            view.startSpin();
 
             Pump.newMinorActivity(act, function(err, act) {
                 if (err) {
@@ -2488,6 +2539,7 @@
                         .html("Like <i class=\"icon-thumbs-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
+                view.stopSpin();
             });
         },
         shareObject: function() {
@@ -2496,6 +2548,8 @@
                     verb: "share",
                     object: view.model.toJSON()
                 });
+
+            view.startSpin();
 
             Pump.newMajorActivity(act, function(err, act) {
                 if (err) {
@@ -2507,6 +2561,7 @@
                         .html("Unshare <i class=\"icon-remove\"></i>");
                     Pump.addMajorActivity(act);
                 }
+                view.stopSpin();
             });
         },
         unshareObject: function() {
@@ -2515,6 +2570,8 @@
                     verb: "unshare",
                     object: view.model.toJSON()
                 });
+
+            view.startSpin();
 
             Pump.newMinorActivity(act, function(err, act) {
                 if (err) {
@@ -2526,6 +2583,7 @@
                         .html("Share <i class=\"icon-share-alt\"></i>");
                     Pump.addMinorActivity(act);
                 }
+                view.stopSpin();
             });
         },
         openComment: function() {
@@ -2694,9 +2752,10 @@
             Pump.newMajorActivity(act, function(err, act) {
                 if (err) {
                     view.showError(err);
-                } else {
-                    view.$el.modal('hide');
                     view.stopSpin();
+                } else {
+                    view.stopSpin();
+                    view.$el.modal('hide');
                     Pump.resetWysihtml5(view.$('#note-content'));
                     // Reload the current page
                     Pump.addMajorActivity(act);
@@ -2779,6 +2838,7 @@
                     Pump.newMajorActivity(act, function(err, act) {
                         if (err) {
                             view.showError(err);
+                            view.stopSpin();
                         } else {
                             view.$el.modal('hide');
                             view.stopSpin();
@@ -2862,6 +2922,7 @@
                 Pump.newMinorActivity(act, function(err, act) {
                     var aview;
                     if (err) {
+                        view.stopSpin();
                         view.showError(err);
                     } else {
 
@@ -3123,6 +3184,9 @@
         modalView.on("ready", function() {
             $("body").append(modalView.el);
             modalView.$el.modal('show');
+            if (options.ready) {
+                options.ready();
+            }
         });
 
         // render it (will fire "ready")

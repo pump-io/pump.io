@@ -108,7 +108,7 @@ if (!window.Pump) {
                 var nickname, pair;
 
                 if (err) {
-                    Pump.error(err.message);
+                    Pump.error(err);
                     return;
                 }
 
@@ -208,10 +208,34 @@ if (!window.Pump) {
     // send them here and I'll figure it out.
 
     Pump.error = function(err) {
-        if (window.console) {
-            console.log(err);
+        var msg;
+
+        if (_.isString(err)) {
+            msg = err;
+        } else if (_.isObject(err)) {
+            msg = err.message;
             if (err.stack) {
                 console.log(err.stack);
+            }
+        } else {
+            msg = "An error occurred.";
+        }
+
+        console.log(msg);
+        
+        if (Pump.body && Pump.body.nav) {
+            var $nav = Pump.body.nav.$el,
+                $alert = $("#error-popup");
+
+            if ($alert.length === 0) {
+                $alert = $('<div id="error-popup" class="alert-error" style="display: none; margin-top: 0px; text-align: center">'+
+                           '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
+                           '<span class="error-message">'+msg+'</span>'+
+                           '</div>');
+                $nav.after($alert);
+                $alert.slideDown('fast');
+            } else {
+                $(".error-message", $alert).text(msg);
             }
         }
     };
@@ -578,14 +602,14 @@ if (!window.Pump) {
             success: function(act) {
                 callback(null, act);
             },
-            error: function(jqXHR, textStatus, errorThrown) {
+            error: function(model, xhr, options) {
                 var type, response;
-                type = jqXHR.getResponseHeader("Content-Type");
+                type = xhr.getResponseHeader("Content-Type");
                 if (type && type.indexOf("application/json") !== -1) {
-                    response = JSON.parse(jqXHR.responseText);
+                    response = JSON.parse(xhr.responseText);
                     callback(new Error(response.error), null);
                 } else {
-                    callback(new Error(errorThrown), null);
+                    callback(new Error("Error saving activity: " + model.id), null);
                 }
             }
         });
@@ -619,6 +643,17 @@ if (!window.Pump) {
     Pump.setTitle = function(title) {
         // We don't accept HTML in title or site name; just text
         $("title").text(title + " - " + Pump.config.site);
+    };
+
+    Pump.ajaxError = function(jqXHR, textStatus, errorThrown) {
+        var type = jqXHR.getResponseHeader("Content-Type"),
+            response;
+        if (type && type.indexOf("application/json") !== -1) {
+            response = JSON.parse(jqXHR.responseText);
+            Pump.error(response.error);
+        } else {
+            Pump.error(errorThrown);
+        }
     };
 
 })(window._, window.$, window.Backbone, window.Pump);

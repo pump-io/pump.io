@@ -13,7 +13,7 @@
 
         <% if (config.disableRegistration) { %>
 
-        <p>No pump.io account yet? <a href="http://pump.io/tryit">Try it</a>!)</p>        
+        <p>(No pump.io account yet? <a href="http://pump.io/tryit">Try it</a>!)</p>        
 
         <% } else { %>
 
