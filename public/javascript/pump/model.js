@@ -961,17 +961,6 @@
         },
         url: function() {
             return Pump.fullURL("/api/user/" + this.get("nickname"));
-        },
-        prefetch: function(callback) {
-            var user = this,
-                following = Pump.PeopleStream.unique({url: Pump.fullURL("/api/user/"+user.get("nickname")+"/following")}),
-                lists = Pump.ListStream.unique({url: Pump.fullURL("/api/user/"+user.get("nickname")+"/lists/person")});
-
-            Pump.fetchObjects([user, following, lists], function(err, objs) {
-                if (callback) {
-                    callback(err);
-                }
-            });
         }
     },
     {
