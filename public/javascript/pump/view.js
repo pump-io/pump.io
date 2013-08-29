@@ -557,74 +557,36 @@
             "click #post-picture-button": "postPictureModal"
         },
         postNoteModal: function() {
-            var view = this,
-                profile = Pump.principal,
-                lists = profile.lists,
-                following = profile.following,
-                startSpin = function() {
-                    view.$('#post-note-button').prop('disabled', true).spin(true);
-                },
-                stopSpin = function() {
-                    view.$('#post-note-button').prop('disabled', false).spin(false);
-                };
-
-            startSpin();
-
-            following.getAll(function(err) {
-                if (err) {
-                    view.showError(err);
-                    stopSpin();
-                } else {
-                    Pump.fetchObjects([lists], function(err, objs) {
-                        if (err) {
-                            view.showError(err);
-                            stopSpin();
-                        } else {
-                            Pump.showModal(Pump.PostNoteModal, {ready: function() {
-                                                                   stopSpin();
-                                                                },
-                                                                data: {user: Pump.principalUser,
-                                                                       lists: lists,
-                                                                       following: following}});
-                        }
-                    });
-                }
-            });
-
-            return false;
+            var view = this;
+            view.showPostingModal('#post-note-button', Pump.PostNoteModal);
         },
         postPictureModal: function() {
+            var view = this;
+            view.showPostingModal('#post-picture-button', Pump.PostPictureModal);
+        },
+        showPostingModal: function(btn, Cls) {
             var view = this,
                 profile = Pump.principal,
                 lists = profile.lists,
-                following = profile.following,
                 startSpin = function() {
-                    view.$('#post-picture-button').prop('disabled', true).spin(true);
+                    view.$(btn).prop('disabled', true).spin(true);
                 },
                 stopSpin = function() {
-                    view.$('#post-picture-button').prop('disabled', false).spin(false);
+                    view.$(btn).prop('disabled', false).spin(false);
                 };
 
             startSpin();
 
-            following.getAll(function(err) {
+            Pump.fetchObjects([lists], function(err, objs) {
                 if (err) {
                     view.showError(err);
                     stopSpin();
                 } else {
-                    Pump.fetchObjects([lists], function(err, objs) {
-                        if (err) {
-                            view.showError(err);
-                            stopSpin();
-                        } else {
-                            Pump.showModal(Pump.PostPictureModal, {ready: function() {
-                                                                   stopSpin();
-                                                                },
-                                                                data: {user: Pump.principalUser,
-                                                                       lists: lists,
-                                                                       following: following}});
-                        }
-                    });
+                    Pump.showModal(Cls, {data: {user: Pump.principalUser,
+                                                lists: lists},
+                                         ready: function() {
+                                             stopSpin();
+                                         }});
                 }
             });
 
@@ -1643,7 +1605,9 @@
                     repl = new Pump.ReplyView({model: object});
 
                     repl.on("ready", function() {
+
                         view.stopSpin();
+
                         view.$el.replaceWith(repl.$el);
                     });
 
@@ -2727,12 +2691,14 @@
         templateName: 'post-note',
         parts: ["recipient-selector"],
         ready: function() {
-            var view = this;
+            var view = this,
+                opts = Pump.selectOpts();
+
             view.$('#note-content').wysihtml5({
                 customTemplates: Pump.wysihtml5Tmpl
             });
-            view.$("#note-to").select2();
-            view.$("#note-cc").select2();
+            view.$("#note-to").select2(opts);
+            view.$("#note-cc").select2(opts);
         },
         events: {
             "click #send-note": "postNote"
@@ -2794,10 +2760,11 @@
             "click #send-picture": "postPicture"
         },
         ready: function() {
-            var view = this;
+            var view = this,
+                opts = Pump.selectOpts();
 
-            view.$("#picture-to").select2();
-            view.$("#picture-cc").select2();
+            view.$("#picture-to").select2(opts);
+            view.$("#picture-cc").select2(opts);
 
             view.$('#picture-description').wysihtml5({
                 customTemplates: Pump.wysihtml5Tmpl
@@ -3238,6 +3205,69 @@
         Pump.showModal(Pump.AreYouSureModal,
                        {data: {question: question},
                         callback: callback});
+    };
+
+    Pump.selectOpts = function() {
+        var user = Pump.principalUser,
+            lists = Pump.principal.lists,
+            followersUrl = Pump.principal.followers.url;
+
+        return {
+            width: "90%",
+            multiple: true,
+            placeholder: "Search for a user or list",
+            minimumInputLength: 2,
+            query: function(options) {
+                var term = options.term.toLowerCase(),
+                    lmatch = lists.items.filter(function(item) {
+                        return item.get("displayName").toLowerCase().indexOf(term) != -1;
+                    });
+
+                Pump.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: Pump.fullURL("/api/user/"+user.get("nickname")+"/following?q="+term),
+                    success: function(data) {
+                        var people = _.map(data.items, function(item) {
+                            return {id: item.objectType + ":" + item.id,
+                                    text: item.displayName};
+                        }),
+                            results = [];
+
+
+                        if ("Public".toLowerCase().indexOf(term) != -1) {
+                            results.push({id: "collection:http://activityschema.org/collection/public",
+                                          text: "Public"});
+                        }
+
+                        if ("Followers".toLowerCase().indexOf(term) != -1) {
+                            results.push({id: "collection:"+followersUrl,
+                                          text: "Followers"});
+                        }
+
+                        if (people.length > 0) {
+                            results.push({ text: "People", children: people });
+                        }
+
+                        if (lmatch.length > 0) {
+                            results.push({ text: "Lists",
+                                           children: _.map(lmatch, function(list) {
+                                               return {id: list.get("objectType") + ":" + list.id,
+                                                       text: list.get("displayName")};
+                                           })
+                                         });
+                        }
+
+                        options.callback({
+                            results: results
+                        });
+                    },
+                    error: function(jqxhr) {
+                        options.callback([]);
+                    }
+                });
+            }
+        };
     };
 
 })(window._, window.$, window.Backbone, window.Pump);
