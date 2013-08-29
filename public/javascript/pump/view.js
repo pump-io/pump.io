@@ -557,40 +557,22 @@
             "click #post-picture-button": "postPictureModal"
         },
         postNoteModal: function() {
-            var view = this,
-                profile = Pump.principal,
-                lists = profile.lists,
-                following = profile.following,
-                startSpin = function() {
-                    view.$('#post-note-button').prop('disabled', true).spin(true);
-                },
-                stopSpin = function() {
-                    view.$('#post-note-button').prop('disabled', false).spin(false);
-                };
-
-            startSpin();
-
-            Pump.fetchObjects([lists], function(err, objs) {
-               if (err) {
-                    view.showError(err);
-                    stopSpin();
-                } else {
- 	                Pump.showModal(Pump.PostNoteModal, {data: {user: Pump.principalUser,
-                }                                         lists: lists}});
-            });
-
-            return false;
+            var view = this;
+            view.showPostingModal('#post-note-button', Pump.PostNoteModal);
         },
         postPictureModal: function() {
+            var view = this;
+            view.showPostingModal('#post-picture-button', Pump.PostPictureModal);
+        },
+        showPostingModal: function(btn, Cls) {
             var view = this,
                 profile = Pump.principal,
                 lists = profile.lists,
-                following = profile.following,
                 startSpin = function() {
-                    view.$('#post-picture-button').prop('disabled', true).spin(true);
+                    view.$(btn).prop('disabled', true).spin(true);
                 },
                 stopSpin = function() {
-                    view.$('#post-picture-button').prop('disabled', false).spin(false);
+                    view.$(btn).prop('disabled', false).spin(false);
                 };
 
             startSpin();
@@ -600,7 +582,11 @@
                     view.showError(err);
                     stopSpin();
                 } else {
-                    Pump.showModal(Pump.PostPictureModal, {ready: function() {
+                    Pump.showModal(Cls, {data: {user: Pump.principalUser,
+                                                lists: lists},
+                                         ready: function() {
+                                             stopSpin();
+                                         }});
                 }
             });
 
@@ -3222,27 +3208,64 @@
     };
 
     Pump.selectOpts = function() {
-        var user = Pump.principalUser;
+        var user = Pump.principalUser,
+            lists = Pump.principal.lists,
+            followersUrl = Pump.principal.followers.url;
+
         return {
             width: "90%",
             multiple: true,
-            placeholder: "Search for a user",
+            placeholder: "Search for a user or list",
             minimumInputLength: 2,
-            ajax: {
-                url: Pump.fullURL("/api/user/"+user.get("nickname")+"/following"),
-                dataType: "json",
-                data: function(term, page) {
-                    return {q: term};
-                },
-                results: function(data, page) {
-                    var results = _.map(data.items, function(item) {
-                        return {id: item.objectType + ":" + item.id,
-                                text: item.displayName};
+            query: function(options) {
+                var term = options.term.toLowerCase(),
+                    lmatch = lists.items.filter(function(item) {
+                        return item.get("displayName").toLowerCase().indexOf(term) != -1;
                     });
-                    return {results: results,
-                            more: false,
-                            context: null};
-                }
+
+                Pump.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: Pump.fullURL("/api/user/"+user.get("nickname")+"/following?q="+term),
+                    success: function(data) {
+                        var people = _.map(data.items, function(item) {
+                            return {id: item.objectType + ":" + item.id,
+                                    text: item.displayName};
+                        }),
+                            results = [];
+
+
+                        if ("Public".toLowerCase().indexOf(term) != -1) {
+                            results.push({id: "collection:http://activityschema.org/collection/public",
+                                          text: "Public"});
+                        }
+
+                        if ("Followers".toLowerCase().indexOf(term) != -1) {
+                            results.push({id: "collection:"+followersUrl,
+                                          text: "Followers"});
+                        }
+
+                        if (people.length > 0) {
+                            results.push({ text: "People", children: people });
+                        }
+
+                        if (lmatch.length > 0) {
+                            results.push({ text: "Lists",
+                                           children: _.map(lmatch, function(list) {
+                                               return {id: list.get("objectType") + ":" + list.id,
+                                                       text: list.get("displayName")};
+                                           })
+                                         });
+                        }
+
+                        options.callback({
+                            results: results
+                        });
+                    },
+                    error: function(jqxhr) {
+                        options.callback([]);
+                    }
+                });
             }
         };
     };
