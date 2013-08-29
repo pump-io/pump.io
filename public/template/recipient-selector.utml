@@ -1,2 +1,2 @@
 <label for="<%- id %>"><%- label %></label>
-<input type="hidden" name="<%- name %>" id="<%- id %>">
+<input type="hidden" name="<%- name %>" id="<%- id %>" <% if (name == "cc") { %>value="collection:<%- principal.followers.url %>"<% } %>>

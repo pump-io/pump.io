@@ -2725,6 +2725,14 @@
                     });
                 };
 
+            if (_.isString(to)) {
+                to = to.split(",");
+            }
+
+            if (_.isString(cc)) {
+                cc = cc.split(",");
+            }
+
             if (to && to.length > 0) {
                 act.to = new Pump.ActivityObjectBag(_.map(to, strToObj));
             }
@@ -2812,6 +2820,14 @@
                             verb: "post",
                             object: responseJSON.obj
                         });
+
+                    if (_.isString(to)) {
+                        to = to.split(",");
+                    }
+
+                    if (_.isString(cc)) {
+                        cc = cc.split(",");
+                    }
 
                     if (to && to.length > 0) {
                         act.to = new Pump.ActivityObjectBag(_.map(to, strToObj));
@@ -3210,13 +3226,40 @@
     Pump.selectOpts = function() {
         var user = Pump.principalUser,
             lists = Pump.principal.lists,
-            followersUrl = Pump.principal.followers.url;
+            followersUrl = Pump.principal.followers.url();
 
         return {
             width: "90%",
             multiple: true,
             placeholder: "Search for a user or list",
             minimumInputLength: 2,
+            initSelection: function(element, callback) {
+                var val = element.val(),
+                    strToObj = function(str) {
+                    var colon = str.indexOf(":"),
+                        type = str.substr(0, colon),
+                        id = str.substr(colon+1);
+                    return new Pump.ActivityObject({
+                        id: id,
+                        objectType: type
+                    });
+                },
+                    selection = [],
+                    obj = (val && val.length > 0) ? strToObj(val) : null;
+
+                if (obj) {
+                    if (obj.id == "http://activityschema.org/collection/public") {
+                        selection.push({id: "collection:http://activityschema.org/collection/public",
+                                        text: "Public"});
+                    } else if (obj.id == followersUrl) {
+                        selection.push({id: "collection:" + followersUrl,
+                                        text: "Followers"});
+                    } else {
+                        // XXX: Get the object remotely
+                    }
+                }
+                callback(selection);
+            },
             query: function(options) {
                 var term = options.term.toLowerCase(),
                     lmatch = lists.items.filter(function(item) {
