@@ -11,7 +11,12 @@
       <% if (object.displayName) { %>
       <h2 class="media-heading"><%- object.displayName %></h2>
       <% } %>
-      <p class="muted"><small> at <a href="<%- object.url %>"><%- object.published %></a><% if (object.location) { %> in <a href="<%- object.location.url %>"><%- object.location.displayName %></a><% } %></small></p>
+      <p class="muted">
+        <small> 
+        <% if (object.author) { %><a href="<%- object.author.url %>"><%- object.author.displayName %></a> at <% } %>
+        <a href="<%- object.url %>"><%- object.published %></a>
+        <% if (object.location) { %> in <a href="<%- object.location.url %>"><%- object.location.displayName %></a><% } %></small>
+      </p>
 
       <% if (object.image && object.image.url) { %>
       <p><img src="<%- object.image.url %>" class="img-polaroid" /></p>
