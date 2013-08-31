@@ -1483,31 +1483,31 @@
             }
         },
         deleteObject: function() {
-	    var view = this,
+            var view = this,
                 model = view.model,
                 act = new Pump.Activity({
                     verb: "delete",
                     object: view.model.object.toJSON()
                 });
 
-	    Pump.areYouSure("Delete this post?", function(err, sure) {
+            Pump.areYouSure("Delete this post?", function(err, sure) {
                 if (sure) {
                     Pump.newMinorActivity(act, function(err, act) {
-			if (err) {
-			    view.showError(err);
-			} else {
-			    view.$(".delete")
-				.html("Delete <i class=\"icon-remove\"></i>");
-			    Pump.addMinorActivity(act);
-			    
-			    // Remove the model from the client-side collection
-			    
-			    model.collection.remove(model.id);
-			}
-		    });
+                        if (err) {
+                            view.showError(err);
+                        } else {
+                            view.$(".delete")
+                                .html("Delete <i class=\"icon-remove\"></i>");
+                            Pump.addMinorActivity(act);
+                            
+                            // Remove the model from the client-side collection
+                            
+                            model.collection.remove(model.id);
+                        }
+                    });
                 }
             });
-	}
+        }
     });
 
     Pump.ReplyStreamView = Pump.TemplateView.extend({
