@@ -440,7 +440,7 @@
                 },
                 error: function(jqxhr) {
                     if (_.isFunction(callback)) {
-                        callback(new Error("Failed getting more items for " + stream.url()), null);
+                        callback(Pump.jqxhrError(jqxhr), null);
                     }
                 }
             };
@@ -500,7 +500,7 @@
                 },
                 error: function(jqxhr) {
                     if (_.isFunction(callback)) {
-                        callback(new Error("Failed getting more items for " + stream.url()), null);
+                        callback(Pump.jqxhrError(jqxhr), null);
                     }
                 }
             };
@@ -619,7 +619,7 @@
                     },
                     error: function(jqxhr) {
                         if (_.isFunction(callback)) {
-                            callback(new Error("Failed getting all items for " + stream.url()), null);
+                            callback(Pump.jqxhrError(jqxhr), null);
                         }
                     }
                 };

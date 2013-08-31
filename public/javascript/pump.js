@@ -640,17 +640,21 @@ if (!window.Pump) {
     };
 
     Pump.ajaxError = function(jqXHR, textStatus, errorThrown) {
-        var type = jqXHR.getResponseHeader("Content-Type"),
+        Pump.error(Pump.jqxhrError(jqXHR));
+    };
+
+    Pump.jqxhrError = function(jqxhr) {
+        var type = jqxhr.getResponseHeader("Content-Type"),
             response;
         if (type && type.indexOf("application/json") !== -1) {
             try {
-                response = JSON.parse(jqXHR.responseText);
+                response = JSON.parse(jqxhr.responseText);
                 Pump.error(new Error(response.error));
             } catch (err) {
-                Pump.error(new Error(errorThrown));
+                Pump.error(new Error(jqxhr.status + ": " + jqxhr.statusText));
             }
         } else {
-            Pump.error(new Error(errorThrown));
+            Pump.error(new Error(jqxhr.status + ": " + jqxhr.statusText));
         }
     };
 
