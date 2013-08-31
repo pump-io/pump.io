@@ -643,10 +643,14 @@ if (!window.Pump) {
         var type = jqXHR.getResponseHeader("Content-Type"),
             response;
         if (type && type.indexOf("application/json") !== -1) {
-            response = JSON.parse(jqXHR.responseText);
-            Pump.error(response.error);
+            try {
+                response = JSON.parse(jqXHR.responseText);
+                Pump.error(new Error(response.error));
+            } catch (err) {
+                Pump.error(new Error(errorThrown));
+            }
         } else {
-            Pump.error(errorThrown);
+            Pump.error(new Error(errorThrown));
         }
     };
 
