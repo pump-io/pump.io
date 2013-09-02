@@ -68,7 +68,7 @@
     </div> <!-- .container -->
 
     <% if (config.debugClient) { %>
-    <script src="/javascript/libs/jquery-1.8.3.js"></script>
+    <script src="/javascript/libs/jquery-1.10.2.js"></script>
     <script src="/javascript/libs/jquery.easydate-0.2.4.js"></script>
     <script src="/javascript/libs/json2.js"></script>
     <script src="/javascript/libs/bootstrap.js"></script>
@@ -88,7 +88,7 @@
     <% } %>
     <% } else { %>
     <% if (config.noCDN) { %>
-    <script src="/javascript/libs/jquery-1.8.3.min.js"></script>
+    <script src="/javascript/libs/jquery-1.10.2.min.js"></script>
     <script src="/javascript/libs/json2.min.js"></script>
     <script src="/javascript/libs/bootstrap.min.js"></script>
     <script src="/shared/underscore-min.js"></script>
@@ -101,7 +101,7 @@
     <script src="/javascript/libs/sockjs.min.js"></script>
     <% } %>
     <% } else { %>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script>
