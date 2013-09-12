@@ -2717,14 +2717,14 @@
         templateName: 'post-note',
         parts: ["recipient-selector"],
         ready: function() {
-            var view = this,
-                opts = Pump.selectOpts();
+            var view = this;
 
             view.$('#note-content').wysihtml5({
                 customTemplates: Pump.wysihtml5Tmpl
             });
-            view.$("#note-to").select2(opts);
-            view.$("#note-cc").select2(opts);
+
+            view.$("#note-to").select2(Pump.selectOpts());
+            view.$("#note-cc").select2(Pump.selectOpts());
         },
         events: {
             "click #send-note": "postNote"
@@ -2794,11 +2794,10 @@
             "click #send-picture": "postPicture"
         },
         ready: function() {
-            var view = this,
-                opts = Pump.selectOpts();
+            var view = this;
 
-            view.$("#picture-to").select2(opts);
-            view.$("#picture-cc").select2(opts);
+            view.$("#picture-to").select2(Pump.selectOpts());
+            view.$("#picture-cc").select2(Pump.selectOpts());
 
             view.$('#picture-description').wysihtml5({
                 customTemplates: Pump.wysihtml5Tmpl
@@ -3252,7 +3251,8 @@
     Pump.selectOpts = function() {
         var user = Pump.principalUser,
             lists = Pump.principal.lists,
-            followersUrl = Pump.principal.followers.url();
+            followersUrl = Pump.principal.followers.url(),
+            lastSearch = null;
 
         return {
             width: "90%",
@@ -3292,6 +3292,13 @@
                         return item.get("displayName").toLowerCase().indexOf(term) != -1;
                     });
 
+                // Abort if something's already running
+
+                if (lastSearch) {
+                    lastSearch.abort();
+                    lastSearch = null;
+                }
+
                 Pump.ajax({
                     type: "GET",
                     dataType: "json",
@@ -3303,6 +3310,7 @@
                         }),
                             results = [];
 
+                        lastSearch = null;
 
                         if ("Public".toLowerCase().indexOf(term) != -1) {
                             results.push({id: "collection:http://activityschema.org/collection/public",
@@ -3332,7 +3340,11 @@
                         });
                     },
                     error: function(jqxhr) {
+                        lastSearch = null;
                         options.callback([]);
+                    },
+                    started: function(jqxhr) {
+                        lastSearch = jqxhr;
                     }
                 });
             }
