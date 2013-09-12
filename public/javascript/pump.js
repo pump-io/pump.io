@@ -429,9 +429,13 @@ if (!window.Pump) {
     };
 
     Pump.ajax = function(options) {
+        var jqxhr;
         // For remote users, we use session auth
         if (Pump.principal && !Pump.principalUser && options.type == "GET") {
-            $.ajax(options);
+            jqxhr = $.ajax(options);
+            if (_.isFunction(options.started)) {
+                options.started(jqxhr);
+            }
         } else {
             Pump.ensureCred(function(err, cred) {
                 var pair;
@@ -448,7 +452,10 @@ if (!window.Pump) {
                     }
 
                     options = Pump.oauthify(options);
-                    $.ajax(options);
+                    jqxhr = $.ajax(options);
+                    if (_.isFunction(options.started)) {
+                        options.started(jqxhr);
+                    }
                 }
             });
         }
