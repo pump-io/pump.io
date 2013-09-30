@@ -1340,7 +1340,7 @@ suite.addBatch({
                     return game.toString();
                 },
                 "it looks correct": function(str) {
-                    assert.equal("[game]", str);
+                    assert.equal(str, "[game Undefined]");
                 }
             },
             "and we get the string of an object with an id": {
