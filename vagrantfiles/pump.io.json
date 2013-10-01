@@ -1,0 +1,17 @@
+{
+    "driver":  "mongodb",
+    "params":  {"dir": "/tmp/pumpio/"},
+    "secret":  "my dog has fleas",
+    "noweb":  false,
+    "site":  "Awesome Sauce",
+    "owner":  "Awesome Inc.",
+    "ownerURL":  "http://example.com/",
+    "port":  8000,
+    "hostname":  "localhost",
+    "address":  "0.0.0.0",
+    "nologger":  false,
+    "serverUser":  "vagrant",
+    "uploaddir": "/var/local/pump.io/uploads",
+    "debugClient": false,
+    "firehose": "localhost"
+}
