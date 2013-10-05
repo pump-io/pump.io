@@ -196,6 +196,29 @@ suite.addBatch({
                         assert.equal(feed.totalItems, 0);
                         assert.isTrue(!_.has(feed, "items") || (_.isArray(feed.items) && feed.items.length === 0));
                     }
+                },
+                "and we GET the group documents feed": {
+                    topic: function(act, cred) {
+                        var cb = this.callback;
+                        Step(
+                            function() {
+                                var url = "http://localhost:4815/api/group/documents?id=tag:pump.io,2012:test:group:1";
+                                httputil.getJSON(url, cred, this);
+                            },
+                            function(err, doc, response) {
+                                cb(err, doc);
+                            }
+                        );
+                    },
+                    "it works": function(err, feed) {
+                        assert.ifError(err);
+                        validFeed(feed);
+                    },
+                    "it's empty": function(err, feed) {
+                        assert.ifError(err);
+                        assert.equal(feed.totalItems, 0);
+                        assert.isTrue(!_.has(feed, "items") || (_.isArray(feed.items) && feed.items.length === 0));
+                    }
                 }
             }
         }

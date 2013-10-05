@@ -181,6 +181,7 @@ var addRoutes = function(app) {
 
     app.get("/api/group/members", smw, anyReadAuth, requestGroupByID, authorOrRecipient, groupMembers);
     app.get("/api/group/inbox", smw, anyReadAuth, requestGroupByID, authorOrRecipient, groupInbox);
+    app.get("/api/group/documents", smw, anyReadAuth, requestGroupByID, authorOrRecipient, groupDocuments);
 
     // Other objects
 
