@@ -180,6 +180,7 @@ var addRoutes = function(app) {
     // Group feeds with foreign ID
 
     app.get("/api/group/members", smw, anyReadAuth, requestGroupByID, authorOrRecipient, groupMembers);
+    app.get("/api/group/inbox", smw, anyReadAuth, requestGroupByID, authorOrRecipient, groupInbox);
 
     // Other objects
 
