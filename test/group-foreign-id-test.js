@@ -65,6 +65,52 @@ suite.addBatch({
                 assert.ifError(err);
                 assert.isObject(cred);
             },
+            "and we GET the group endpoint with no ID parameter": {
+                topic: function(cred) {
+                    var cb = this.callback;
+                    Step(
+                        function() {
+                            var url = "http://localhost:4815/api/group";
+                            httputil.getJSON(url, cred, this);
+                        },
+                        function(err, doc, response) {
+                            if (err && err.statusCode == 400) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                "it fails correctly": function(err, group) {
+                    assert.ifError(err);
+                }
+            },
+            "and we GET the group endpoint with an ID that doesn't exist": {
+                topic: function(cred) {
+                    var cb = this.callback;
+                    Step(
+                        function() {
+                            var url = "http://localhost:4815/api/group?id=tag:pump.io,2012:test:group:non-existent";
+                            httputil.getJSON(url, cred, this);
+                        },
+                        function(err, doc, response) {
+                            if (err && err.statusCode == 404) {
+                                cb(null);
+                            } else if (err) {
+                                cb(err);
+                            } else {
+                                cb(new Error("Unexpected success"));
+                            }
+                        }
+                    );
+                },
+                "it fails correctly": function(err, group) {
+                    assert.ifError(err);
+                }
+            },
             "and we create a new group with a foreign ID": {
                 topic: function(cred) {
                     var cb = this.callback;
