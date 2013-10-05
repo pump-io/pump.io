@@ -27,7 +27,9 @@ var assert = require("assert"),
     setupApp = oauthutil.setupApp,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair,
-    validActivity = actutil.validActivity;
+    newCredentials = oauthutil.newCredentials,
+    validActivity = actutil.validActivity,
+    validActivityObject = actutil.validActivityObject;
 
 var makeCred = function(cl, pair) {
     return {
@@ -55,25 +57,20 @@ suite.addBatch({
         "it works": function(err, app) {
             assert.ifError(err);
         },
-        "and we register a client": {
+        "and we register a user": {
             topic: function() {
-                newClient(this.callback);
+                newCredentials("walter", "he1s3nbe4g", this.callback);
             },
-            "it works": function(err, cl) {
+            "it works": function(err, cred) {
                 assert.ifError(err);
-                assert.isObject(cl);
+                assert.isObject(cred);
             },
             "and we create a new group with a foreign ID": {
-                topic: function(cl) {
+                topic: function(cred) {
                     var cb = this.callback;
                     Step(
                         function() {
-                            newPair(cl, "walter", "he1s3nbe4g", this);
-                        },
-                        function(err, pair) {
-                            if (err) throw err;
-                            var cred = makeCred(cl, pair),
-                                url = "http://localhost:4815/api/user/walter/feed",
+                            var url = "http://localhost:4815/api/user/walter/feed",
                                 activity = {
                                     "verb": "create",
                                     "object": {
@@ -94,6 +91,27 @@ suite.addBatch({
                 "it looks correct": function(err, activity) {
                     assert.ifError(err);
                     validActivity(activity);
+                },
+                "and we GET the group": {
+                    topic: function(act, cred) {
+                        var cb = this.callback;
+                        Step(
+                            function() {
+                                var url = "http://localhost:4815/api/group?id=tag:pump.io,2012:test:group:1";
+                                httputil.getJSON(url, cred, this);
+                            },
+                            function(err, doc, response) {
+                                cb(err, doc);
+                            }
+                        );
+                    },
+                    "it works": function(err, group) {
+                        assert.ifError(err);
+                    },
+                    "it looks correct": function(err, group) {
+                        assert.ifError(err);
+                        validActivityObject(group);
+                    }
                 }
             }
         }

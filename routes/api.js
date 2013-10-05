@@ -69,6 +69,7 @@ var databank = require("databank"),
     setPrincipal = authc.setPrincipal,
     fileContent = mw.fileContent,
     requestObject = omw.requestObject,
+    requestObjectByID = omw.requestObjectByID,
     authorOnly = omw.authorOnly,
     authorOrRecipient = omw.authorOrRecipient,
     NoSuchThingError = databank.NoSuchThingError,
@@ -185,6 +186,10 @@ var addRoutes = function(app) {
     // Info about yourself
 
     app.get("/api/whoami", smw, userReadAuth, whoami);
+
+    // With foreign IDs; needs to be late for better matches
+
+    app.get("/api/:type", smw, anyReadAuth, requestObjectByID, authorOrRecipient, getObject);
 };
 
 // XXX: use a common function instead of faking up params
