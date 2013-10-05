@@ -177,6 +177,10 @@ var addRoutes = function(app) {
     app.get("/api/group/:uuid/documents", smw, anyReadAuth, requestGroup, authorOrRecipient, groupDocuments);
     app.post("/api/group/:uuid/inbox", remoteWriteOAuth, requestGroup, postToGroupInbox);
 
+    // Group feeds with foreign ID
+
+    app.get("/api/group/members", smw, anyReadAuth, requestGroupByID, authorOrRecipient, groupMembers);
+
     // Other objects
 
     app.get("/api/:type/:uuid", smw, anyReadAuth, requestObject, authorOrRecipient, getObject);
@@ -202,6 +206,11 @@ var requestCollection = function(req, res, next) {
 var requestGroup = function(req, res, next) {
     req.params.type = "group";
     requestObject(req, res, next);
+};
+
+var requestGroupByID = function(req, res, next) {
+    req.params.type = "group";
+    requestObjectByID(req, res, next);
 };
 
 var personType = function(req, res, next) {
