@@ -220,6 +220,67 @@ suite.addBatch({
                         assert.isTrue(!_.has(feed, "items") || (_.isArray(feed.items) && feed.items.length === 0));
                     }
                 }
+            },
+            "and we create another group with a foreign ID and join it": {
+                topic: function(cred) {
+                    var cb = this.callback,
+                        url = "http://localhost:4815/api/user/walter/feed";
+                    Step(
+                        function() {
+                            var activity = {
+                                    "verb": "create",
+                                    "object": {
+                                        "objectType": "group",
+                                        "id": "tag:pump.io,2012:test:group:2"
+                                    }
+                                };
+                            httputil.postJSON(url, cred, activity, this);
+                        },
+                        function(err, doc, response) {
+                            if (err) throw err;
+                            var activity = {
+                                    "verb": "join",
+                                    "object": {
+                                        "objectType": "group",
+                                        "id": "tag:pump.io,2012:test:group:2"
+                                    }
+                                };
+                            httputil.postJSON(url, cred, activity, this);
+                        },
+                        function(err, doc, response) {
+                            cb(err, doc);
+                        }
+                    );
+                },
+                "it works": function(err, activity) {
+                    assert.ifError(err);
+                },
+                "it looks correct": function(err, activity) {
+                    assert.ifError(err);
+                    validActivity(activity);
+                },
+                "and we GET the group members": {
+                    topic: function(act, cred) {
+                        var cb = this.callback;
+                        Step(
+                            function() {
+                                var url = "http://localhost:4815/api/group/members?id=tag:pump.io,2012:test:group:2";
+                                httputil.getJSON(url, cred, this);
+                            },
+                            function(err, doc, response) {
+                                cb(err, doc);
+                            }
+                        );
+                    },
+                    "it works": function(err, feed) {
+                        assert.ifError(err);
+                        validFeed(feed);
+                    },
+                    "it's got one member": function(err, feed) {
+                        assert.ifError(err);
+                        assert.equal(feed.totalItems, 1);
+                    }
+                }
             }
         }
     }
