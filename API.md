@@ -413,6 +413,41 @@ generate the appropriate activity with default addresses.
 * `members`. The collection of members of the collection (yes, it's
   weirdly recursive).
 
+"group" objects have these properties:
+
+* `members`. The members of the group.
+* `inbox`. The activities that have been posted with this group as a recipient.
+* `documents`. The objects that have been posted with this group as a target.
+
+### Foreign IDs
+
+You can create objects with a foreign ID -- an ID that you make
+up. This can make it a lot easier to store objects that mirror
+external objects; for example, a document in an exterior database.
+
+Your foreign IDs should be URIs, and you should make sure they're
+unique. [tag URIs](http://tools.ietf.org/html/rfc4151) are great if
+you're matching an external namespace. For example, if you have an
+application with a SQL database with an auto-incrementing primary key,
+you could have tag URIs like
+
+    tag:yourapp.example,2013:image:2342
+
+[UUID URNs](http://tools.ietf.org/html/rfc4122) are great for random
+values or for hashes of values you don't want to expose or that are
+too long.
+
+If you use objects with foreign IDs, you can get the data for that
+object from an endpoint like:
+
+    `http://<hostname>/api/<objectType>?id=<the-object-id>`
+
+Group objects have feed endpoints that can be accessed this way as well:
+
+    `http://<hostname>/api/group/members?id=<the-object-id>`
+    `http://<hostname>/api/group/inbox?id=<the-object-id>`
+    `http://<hostname>/api/group/documents?id=<the-object-id>`
+
 ## Activity endpoints
 
 Every activity also has a REST endpoint, usually `http://<hostname>/api/activity/<uuid>`.
