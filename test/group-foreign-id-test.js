@@ -113,7 +113,8 @@ suite.addBatch({
                                     "verb": "create",
                                     "object": {
                                         "objectType": "group",
-                                        "id": "tag:pump.io,2012:test:group:1"
+                                        "id": "tag:pump.io,2012:test:group:1",
+                                        "displayName": "Friends"
                                     }
                                 };
                             httputil.postJSON(url, cred, activity, this);
@@ -228,23 +229,24 @@ suite.addBatch({
                     Step(
                         function() {
                             var activity = {
-                                    "verb": "create",
-                                    "object": {
-                                        "objectType": "group",
-                                        "id": "tag:pump.io,2012:test:group:2"
-                                    }
-                                };
+                                "verb": "create",
+                                "object": {
+                                    "objectType": "group",
+                                    "id": "tag:pump.io,2012:test:group:2",
+                                    "displayName": "Family"
+                                }
+                            };
                             httputil.postJSON(url, cred, activity, this);
                         },
                         function(err, doc, response) {
                             if (err) throw err;
                             var activity = {
-                                    "verb": "join",
-                                    "object": {
-                                        "objectType": "group",
-                                        "id": "tag:pump.io,2012:test:group:2"
-                                    }
-                                };
+                                "verb": "join",
+                                "object": {
+                                    "objectType": "group",
+                                    "id": "tag:pump.io,2012:test:group:2"
+                                }
+                            };
                             httputil.postJSON(url, cred, activity, this);
                         },
                         function(err, doc, response) {
@@ -281,10 +283,78 @@ suite.addBatch({
                         assert.equal(feed.totalItems, 1);
                     }
                 }
+            },
+            "and we create another group with a foreign ID and post to it": {
+                topic: function(cred) {
+                    var cb = this.callback,
+                        url = "http://localhost:4815/api/user/walter/feed";
+                    Step(
+                        function() {
+                            var activity = {
+                                "verb": "create",
+                                "object": {
+                                    "objectType": "group",
+                                    "id": "tag:pump.io,2012:test:group:3",
+                                    "displayName": "Enemies"
+                                }
+                            };
+                            httputil.postJSON(url, cred, activity, this);
+                        },
+                        function(err, doc, response) {
+                            if (err) throw err;
+                            var activity = {
+                                "verb": "post",
+                                "to": [{
+                                    "objectType": "group",
+                                    "id": "tag:pump.io,2012:test:group:3"
+                                }],
+                                "object": {
+                                    "objectType": "note",
+                                    "content": "I am the one who knocks."
+                                }
+                            };
+                            httputil.postJSON(url, cred, activity, this);
+                        },
+                        function(err, doc, response) {
+                            cb(err, doc);
+                        }
+                    );
+                },
+                "it works": function(err, activity) {
+                    assert.ifError(err);
+                },
+                "it looks correct": function(err, activity) {
+                    assert.ifError(err);
+                    validActivity(activity);
+                },
+                "and we GET the group inbox": {
+                    topic: function(act, cred) {
+                        var cb = this.callback;
+                        Step(
+                            function() {
+                                var url = "http://localhost:4815/api/group/inbox?id=tag:pump.io,2012:test:group:3";
+                                httputil.getJSON(url, cred, this);
+                            },
+                            function(err, doc, response) {
+                                cb(err, doc, act);
+                            }
+                        );
+                    },
+                    "it works": function(err, feed, act) {
+                        assert.ifError(err);
+                        validFeed(feed);
+                    },
+                    "it's got our activity": function(err, feed, act) {
+                        assert.ifError(err);
+                        assert.equal(feed.totalItems, 1);
+                        assert.equal(feed.items.length, 1);
+                        assert.isObject(feed.items[0]);
+                        assert.equal(feed.items[0].id, act.id);
+                    }
+                }
             }
         }
     }
 });
 
 suite["export"](module);
-
