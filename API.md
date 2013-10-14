@@ -442,6 +442,12 @@ object from an endpoint like:
 
     `http://<hostname>/api/<objectType>?id=<the-object-id>`
 
+The main object feeds be accessed this way as well:
+
+    `http://<hostname>/api/<type>/likes?id=<the-object-id>`
+    `http://<hostname>/api/<type>/replies?id=<the-object-id>`
+    `http://<hostname>/api/<type>/shares?id=<the-object-id>`
+
 Group objects have feed endpoints that can be accessed this way as well:
 
     `http://<hostname>/api/group/members?id=<the-object-id>`
