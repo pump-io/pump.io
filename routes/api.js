@@ -183,6 +183,12 @@ var addRoutes = function(app) {
     app.get("/api/group/inbox", smw, anyReadAuth, requestGroupByID, authorOrRecipient, groupInbox);
     app.get("/api/group/documents", smw, anyReadAuth, requestGroupByID, authorOrRecipient, groupDocuments);
 
+    // Object feeds with foreign ID
+
+    app.get("/api/:type/likes", smw, anyReadAuth, requestObjectByID, authorOrRecipient, objectLikes);
+    app.get("/api/:type/replies", smw, anyReadAuth, requestObjectByID, authorOrRecipient, objectReplies);
+    app.get("/api/:type/shares", smw, anyReadAuth, requestObjectByID, authorOrRecipient, objectShares);
+
     // Other objects
 
     app.get("/api/:type/:uuid", smw, anyReadAuth, requestObject, authorOrRecipient, getObject);
