@@ -135,6 +135,18 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.equal(activity.object.links.self.href, "http://localhost:4815/api/image?id="+encodeURIComponent("tag:pump.io,2012:test:image:1"));
                 },
+                "its likes feed uses the foreign ID format": function(err, activity) {
+                    assert.ifError(err);
+                    assert.equal(activity.object.likes.url, "http://localhost:4815/api/image/likes?id="+encodeURIComponent("tag:pump.io,2012:test:image:1"));
+                },
+                "its replies feed uses the foreign ID format": function(err, activity) {
+                    assert.ifError(err);
+                    assert.equal(activity.object.replies.url, "http://localhost:4815/api/image/replies?id="+encodeURIComponent("tag:pump.io,2012:test:image:1"));
+                },
+                "its shares feed uses the foreign ID format": function(err, activity) {
+                    assert.ifError(err);
+                    assert.equal(activity.object.shares.url, "http://localhost:4815/api/image/shares?id="+encodeURIComponent("tag:pump.io,2012:test:image:1"));
+                },
                 "and we GET the image": {
                     topic: function(act, cred) {
                         var cb = this.callback;
