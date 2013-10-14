@@ -131,6 +131,10 @@ suite.addBatch({
                     assert.ifError(err);
                     validActivity(activity);
                 },
+                "its self-link uses the foreign ID format": function(err, activity) {
+                    assert.ifError(err);
+                    assert.equal(activity.object.links.self.href, "http://localhost:4815/api/image?id="+encodeURIComponent("tag:pump.io,2012:test:image:1"));
+                },
                 "and we GET the image": {
                     topic: function(act, cred) {
                         var cb = this.callback;
