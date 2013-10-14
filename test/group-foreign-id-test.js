@@ -131,6 +131,22 @@ suite.addBatch({
                     assert.ifError(err);
                     validActivity(activity);
                 },
+                "its self-link uses the foreign ID format": function(err, activity) {
+                    assert.ifError(err);
+                    assert.equal(activity.object.links.self.href, "http://localhost:4815/api/group?id="+encodeURIComponent("tag:pump.io,2012:test:group:1"));
+                },
+                "its members feed uses the foreign ID format": function(err, activity) {
+                    assert.ifError(err);
+                    assert.equal(activity.object.members.url, "http://localhost:4815/api/group/members?id="+encodeURIComponent("tag:pump.io,2012:test:group:1"));
+                },
+                "its inbox feed uses the foreign ID format": function(err, activity) {
+                    assert.ifError(err);
+                    assert.equal(activity.object.links["activity-inbox"].href, "http://localhost:4815/api/group/inbox?id="+encodeURIComponent("tag:pump.io,2012:test:group:1"));
+                },
+                "its documents feed uses the foreign ID format": function(err, activity) {
+                    assert.ifError(err);
+                    assert.equal(activity.object.documents.url, "http://localhost:4815/api/group/documents?id="+encodeURIComponent("tag:pump.io,2012:test:group:1"));
+                },
                 "and we GET the group": {
                     topic: function(act, cred) {
                         var cb = this.callback;
