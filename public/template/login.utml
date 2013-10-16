@@ -22,6 +22,16 @@
       </div>
     </div>
   </form>
+  
+  <% if (config.disableRegistration) { %>
+  
+  <p class="text-warning">Registrations disabled for new users.</p>
+  
+  <% } else { %>
+  
   <p><a class="add-continue" href="/main/register">New user?</a></p>
+  
+  <% } %>
+  
   <p><a class="add-continue" href="/main/remote">Account on another server?</a></p>
 </div>
