@@ -54,8 +54,10 @@ var getConfig = function(filename) {
     if (filename) {
         files = [filename];
     } else {
-        files = ['/etc/pump.io.json',
-                 path.join(process.env.HOME, ".pump.io.json")];
+        files = ['/etc/pump.io.json'];
+        if (process.env.HOME) {
+            files.push(path.join(process.env.HOME, ".pump.io.json"))
+        }
     }   
 
     // This is all sync
