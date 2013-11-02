@@ -105,18 +105,9 @@ You can find other drivers like so:
 
     npm search databank
 
-One tricky bit is that the driver you use has to be available to the
-`databank` package. There are two ways to make that work.
+You can install in the `pump.io` directory as a normal dependency.
+For example, the databank driver for MongoDB:
 
-First, you can install globally. For example:
-
-    npm install -g databank-mongodb
-
-Use this if you installed the pump.io package globally.
-
-Second, you can install in the `databank` directory.
-
-    cd pump.io/node_modules/databank
     npm install databank-mongodb
 
 Note that you also need to install and configure your database server.
