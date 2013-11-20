@@ -940,6 +940,7 @@
             user.majorDirectInbox = userStream("/inbox/direct/major");
             user.minorDirectInbox = userStream("/inbox/direct/minor");
             user.stream =           userStream("/feed");
+            user.publicStream =     userStream("/feed/public");
             user.majorStream =      userStream("/feed/major");
             user.minorStream =      userStream("/feed/minor");
 
@@ -951,6 +952,7 @@
                 user.majorDirectInbox.url = streamUrl("/inbox/direct/major");
                 user.minorDirectInbox.url = streamUrl("/inbox/direct/minor");
                 user.stream.url           = streamUrl("/feed");
+                user.publicStream.url     = streamUrl("/feed/public");
                 user.majorStream.url      = streamUrl("/feed/major");
                 user.minorStream.url      = streamUrl("/feed/minor");
             });

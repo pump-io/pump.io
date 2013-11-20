@@ -107,6 +107,8 @@ var addRoutes = function(app) {
     app.get("/api/user/:nickname/feed", smw, anyReadAuth, reqUser, userStream);
     app.post("/api/user/:nickname/feed", userWriteOAuth, reqUser, sameUser, reqGenerator, postActivity);
 
+    app.get("/api/user/:nickname/feed/public", smw, reqUser, userPublicStream);
+
     app.get("/api/user/:nickname/feed/major", smw, anyReadAuth, reqUser, userMajorStream);
     app.get("/api/user/:nickname/feed/minor", smw, anyReadAuth, reqUser, userMinorStream);
 
@@ -1335,6 +1337,7 @@ var streamEndpoint = function(streamCreator) {
 };
 
 var userStream = streamEndpoint(streams.userStream);
+var userPublicStream = streamEndpoint(streams.userPublicStream);
 var userMajorStream = streamEndpoint(streams.userMajorStream);
 var userMinorStream = streamEndpoint(streams.userMinorStream);
 var userInbox = streamEndpoint(streams.userInbox);
