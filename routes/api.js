@@ -1619,7 +1619,7 @@ var proxyRequest = function(req, res, next) {
     var principal = req.principal,
         proxy = req.proxy;
 
-    req.log.info({url: proxy.url, principal: principal.id}, "Getting object through proxy.");
+    req.log.debug({url: proxy.url, principal: principal.id}, "Getting object through proxy.");
 
     // XXX: check local cache first
 
@@ -1679,7 +1679,7 @@ var proxyRequest = function(req, res, next) {
                     res.setHeader("Cache-Control", pres.headers["cache-control"]);
                 }
                 // XXX: save to local cache
-                req.log.info({headers: pres.headers}, "Received object");
+                req.log.debug({headers: pres.headers}, "Received object");
                 res.send(pbody);
             }
         }

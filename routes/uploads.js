@@ -68,7 +68,7 @@ var uploadedFile = function(req, res, next) {
         profile = req.principal,
         obj;
 
-    req.log.info({profile: profile, slug: slug}, "Checking permissions");
+    req.log.debug({profile: profile, slug: slug}, "Checking permissions");
 
     Step(
         function() {
