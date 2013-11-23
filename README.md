@@ -198,7 +198,7 @@ Here are the main configuration keys.
 * *smtpfrom* Email address to use in the "From:" header of outgoing notifications. Defaults to 'no-reply@'
   plus the site hostname.
 * *compress* Use gzip or deflate to compress text output. This can cut down on network
-  transfers considerably at the expense of memory and CPU on the server. Defaults to `false`.
+  transfers considerably at the expense of memory and CPU on the server. Defaults to `true`.
 * *children* Number of children to run. Defaults to 1 for some kinds of DBs, number of CPUS - 1 for others.
 * *clients*. You can pre-configure some OAuth credentials if you want to have a replicable
   configuration (say, for test scripts or development environments). This setting is
