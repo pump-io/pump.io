@@ -294,7 +294,7 @@ There are four types of address supported:
    to the public will be delivered to all followers, and will be
    visible to anyone -- even unauthenticated users.
 * *Followers*. A user's own followers can be addressed with an object
-   with `objectType` equal to the follower stream URL of the user --
+   with `objectType` equal to "collection" and `id` equal to the follower stream URL of the user --
    usually
    `http://<hostname>/api/user/<nickname>/followers`. Activities
    addressed to followers will be delivered to all followers, and will
