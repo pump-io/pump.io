@@ -122,7 +122,7 @@
                                 clientSecret: data.client_secret});
             });
             Pump.credReq.error(function() {
-                callback(new Error("error getting credentials"), null);
+                callback(new Error(gettext("error getting credentials")), null);
             });
         } else {
             Pump.credReq = $.post("/api/client/register",
@@ -142,7 +142,7 @@
                                   },
                                   "json");
             Pump.credReq.error(function() {
-                callback(new Error("error getting credentials"), null);
+                callback(new Error(gettext("error getting credentials")), null);
             });
         }
     };

@@ -45,7 +45,7 @@
         register: function() {
             Pump.body.startLoad();
             Pump.body.setContent({contentView: Pump.RegisterContent,
-                                  title: "Register"},
+                                  title: gettext("Register")},
                                  function() {
                                      Pump.body.endLoad();
                                  }
@@ -63,7 +63,7 @@
             } else {
                 Pump.body.startLoad();
                 Pump.body.setContent({contentView: Pump.LoginContent,
-                                      title: "Login"},
+                                      title: gettext("Login")},
                                      function() {
                                          Pump.body.endLoad();
                                      });
@@ -73,7 +73,7 @@
         remote: function() {
             Pump.body.startLoad();
             Pump.body.setContent({contentView: Pump.RemoteContent,
-                                  title: "Remote login"},
+                                  title: gettext("Remote login")},
                                  function() {
                                      Pump.body.endLoad();
                                  });
@@ -82,7 +82,7 @@
         recover: function() {
             Pump.body.startLoad();
             Pump.body.setContent({contentView: Pump.RecoverContent,
-                                  title: "Recover your password"},
+                                  title: gettext("Recover your password")},
                                  function() {
                                      Pump.body.endLoad();
                                  });
@@ -91,7 +91,7 @@
         recoverSent: function() {
             Pump.body.startLoad();
             Pump.body.setContent({contentView: Pump.RecoverSentContent,
-                                  title: "Recovery email sent"},
+                                  title: gettext("Recovery email sent")},
                                  function() {
                                      Pump.body.endLoad();
                                  });
@@ -100,7 +100,7 @@
         recoverCode: function(code) {
             Pump.body.startLoad();
             Pump.body.setContent({contentView: Pump.RecoverCodeContent,
-                                  title: "Recovery code"},
+                                  title: gettext("Recovery code")},
                                  function() {
                                      Pump.body.endLoad();
                                  });
@@ -110,7 +110,7 @@
             Pump.body.startLoad();
             Pump.body.setContent({contentView: Pump.SettingsContent,
                                   model: Pump.principal,
-                                  title: "Settings"},
+                                  title: gettext("Settings")},
                                  function() {
                                      Pump.body.endLoad();
                                  });
@@ -120,7 +120,7 @@
             Pump.body.startLoad();
             Pump.body.setContent({contentView: Pump.AccountContent,
                                   model: Pump.principalUser,
-                                  title: "Account"},
+                                  title: gettext("Account")},
                                  function() {
                                      Pump.body.endLoad();
                                  });
@@ -141,7 +141,7 @@
                                       data: {major: major,
                                              minor: minor,
                                              headless: false},
-                                      title: "Messages"},
+                                      title: gettext("Messages")},
                                      function() {
                                          Pump.body.endLoad();
                                      });
@@ -166,14 +166,14 @@
                                           data: {major: major,
                                                  minor: minor,
                                                  headless: false},
-                                          title: "Home"},
+                                          title: gettext("Home")},
                                          function() {
                                              Pump.body.endLoad();
                                          });
                 });
             } else {
                 Pump.body.setContent({contentView: Pump.MainContent,
-                                      title: "Welcome"},
+                                      title: gettext("Welcome")},
                                      function() {
                                          Pump.body.endLoad();
                                      });
@@ -224,7 +224,7 @@
                         contentView: Pump.FavoritesContent,
                         userContentView: Pump.FavoritesUserContent,
                         userContentStream: favorites,
-                        title: nickname + " favorites",
+                        title: nickname + " " + gettext("favorites"),
                         data: {favorites: favorites,
                                profile: profile}
                     },
@@ -251,7 +251,7 @@
                 Pump.body.setContent({contentView: Pump.FollowersContent,
                                       userContentView: Pump.FollowersUserContent,
                                       userContentStream: followers,
-                                      title: nickname + " followers",
+                                      title: nickname + " " + gettext("followers"),
                                       data: {followers: followers,
                                              profile: profile}},
                                      function() {
@@ -278,7 +278,7 @@
                 Pump.body.setContent({contentView: Pump.FollowingContent,
                                       userContentView: Pump.FollowingUserContent,
                                       userContentStream: following,
-                                      title: nickname + " following",
+                                      title: nickname + " " + gettext("following"),
                                       data: {following: following,
                                              profile: profile}},
                                      function() {
@@ -303,7 +303,7 @@
                 Pump.body.setContent({contentView: Pump.ListsContent,
                                       userContentView: Pump.ListsUserContent,
                                       listContentView: Pump.ListsListContent,
-                                      title: nickname + " lists",
+                                      title: nickname + " " + gettext("lists"),
                                       data: {lists: lists,
                                              list: null,
                                              profile: profile}},
@@ -334,7 +334,7 @@
                     options = {contentView: Pump.ListContent,
                                userContentView: Pump.ListUserContent,
                                listContentView: Pump.ListListContent,
-                               title: nickname + " - list -" + list.get("displayName"),
+                               title: nickname + " - " + gettext("list") + " - " + list.get("displayName"),
                                listContentModel: list,
                                data: {lists: lists,
                                       list: list,
@@ -369,7 +369,7 @@
                 }
                 Pump.body.setContent({contentView: Pump.ObjectContent,
                                       model: obj,
-                                      title: obj.get("displayName") || (obj.get("objectType") + " by " + nickname)},
+                                      title: obj.get("displayName") || (obj.get("objectType") + " " + gettext("by") + " " + nickname)},
                                      function() {
                                          Pump.body.endLoad();
                                      });

@@ -133,7 +133,7 @@ var showMain = function(req, res, next) {
         showInbox(req, res, next);
     } else {
         req.log.debug({msg: "Showing welcome page"});
-        res.render("main", {page: {title: "Welcome", url: req.originalUrl}});
+        res.render("main", {page: {title: req.gettext("Welcome"), url: req.originalUrl}});
     }
 };
 
@@ -150,7 +150,7 @@ var showInbox = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("inbox", {page: { title: "Home", url: req.originalUrl },
+                res.render("inbox", {page: { title: req.gettext("Home"), url: req.originalUrl },
                                      major: major,
                                      minor: minor,
                                      user: user,
@@ -168,14 +168,14 @@ var showRegister = function(req, res, next) {
     if (req.principal) {
         res.redirect("/");
     } else if (req.app.config.disableRegistration) {
-        next(new HTTPError("No registration allowed.", 403));
-    } else {
-        res.render("register", {page: {title: "Register", url: req.originalUrl}});
+        next(new HTTPError(req.gettext("No registration allowed."), 403));
+    } else {      
+        res.render("register", {page: {title: req.gettext("Register"), url: req.originalUrl}});
     }
 };
 
 var showLogin = function(req, res, next) {
-    res.render("login", {page: {title: "Login", url: req.originalUrl}});
+    res.render("login", {page: {title: req.gettext("Login"), url: req.originalUrl}});   
 };
 
 var handleLogout = function(req, res, next) {
@@ -197,7 +197,7 @@ var handleLogout = function(req, res, next) {
 };
 
 var showRemote = function(req, res, next) {
-    res.render("remote", {page: {title: "Remote login", url: req.originalUrl}});
+    res.render("remote", {page: {title: req.gettext("Remote login"), url: req.originalUrl}});
 };
 
 var handleRemote = function(req, res, next) {
@@ -224,7 +224,7 @@ var handleRemote = function(req, res, next) {
     parts = webfinger.split("@", 2);
 
     if (parts.length < 2) {
-        next(new HTTPError("Bad format for webfinger", 400));
+        next(new HTTPError(req.gettext("Bad format for webfinger"), 400));
         return;
     }
 
@@ -264,7 +264,7 @@ var requestActivity = function(req, res, next) {
                 throw new NoSuchThingError("activity", uuid);
             }
             if (activities.length > 1) {
-                throw new Error("Too many activities with ID = " + uuid);
+                throw new Error(req.gettext("Too many activities with ID = ") + uuid);
             }
             activity = activities[0];
             activity.expand(this);
@@ -288,7 +288,7 @@ var userIsActor = function(req, res, next) {
         actor;
 
     if (!activity || !activity.actor) {
-        next(new HTTPError("No such activity", 404));
+        next(new HTTPError(req.gettext("No such activity"), 404));
         return;
     }
 
@@ -297,7 +297,7 @@ var userIsActor = function(req, res, next) {
     if (person && actor && person.id == actor.id) {
         next();
     } else {
-        next(new HTTPError("person " + person.id + " is not the actor of " + activity.id, 404));
+        next(new HTTPError(req.gettext("person") + " " + person.id + " " + req.gettext("is not the actor of") + " " + activity.id, 404));
         return;
     }
 };
@@ -358,7 +358,7 @@ var showFavorites = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("favorites", {page: {title: req.user.nickname + " favorites", url: req.originalUrl},
+                res.render("favorites", {page: {title: req.user.nickname + " " + req.gettext("favorites"), url: req.originalUrl},
                                          favorites: objects,
                                          profile: req.user.profile,
                                          data: {
@@ -383,7 +383,7 @@ var showFollowers = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("followers", {page: {title: req.user.nickname + " followers", url: req.originalUrl},
+                res.render("followers", {page: {title: req.user.nickname + " " + req.gettext("followers"), url: req.originalUrl},
                                          followers: followers,
                                          profile: req.user.profile,
                                          data: {
@@ -408,7 +408,7 @@ var showFollowing = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("following", {page: {title: req.user.nickname + " following", url: req.originalUrl},
+                res.render("following", {page: {title: req.user.nickname + " " + req.gettext("following"), url: req.originalUrl},
                                          following: following,
                                          profile: req.user.profile,
                                          data: {
@@ -431,7 +431,7 @@ var handleLogin = function(req, res, next) {
         function(err, result) {
             if (err) throw err;
             if (!result) {
-                throw new HTTPError("Incorrect username or password", 401);
+                throw new HTTPError(req.gettext("Incorrect username or password"), 401);
             }
             user = result;
             setPrincipal(req.session, user.profile, this);
@@ -476,7 +476,7 @@ var showLists = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("lists", {page: {title: req.user.profile.displayName + " - Lists",
+                res.render("lists", {page: {title: req.user.profile.displayName + " - " + req.gettext("Lists"),
                                             url: req.originalUrl},
                                      profile: req.user.profile,
                                      list: null,
@@ -504,11 +504,11 @@ var showList = function(req, res, next) {
                 },
                 function(err, results) {
                     if (err) throw err;
-                    if (results.length === 0) throw new HTTPError("Not found", 404);
-                    if (results.length > 1) throw new HTTPError("Too many lists", 500);
+                    if (results.length === 0) throw new HTTPError(req.gettext("Not found"), 404);
+                    if (results.length > 1) throw new HTTPError(req.gettext("Too many lists"), 500);
                     list = results[0];
                     if (list.author.id != user.profile.id) {
-                        throw new HTTPError("User " + user.nickname + " is not author of " + list.id, 400);
+                        throw new HTTPError(req.gettext("User") + " " + user.nickname + " " + req.gettext("is not author of") + " " + list.id, 400);
                     }
                     // Make it a real object
                     list.author = user.profile;
@@ -536,7 +536,7 @@ var showList = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("list", {page: {title: req.user.profile.displayName + " - Lists",
+                res.render("list", {page: {title: req.user.profile.displayName + " - " + req.gettext("Lists"),
                                            url: req.originalUrl},
                                     profile: req.user.profile,
                                     lists: lists,
@@ -585,7 +585,7 @@ var uploader = function(saver) {
             fileName = req.files.qqfile.path;
         }
 
-        req.log.debug("Uploading " + fileName + " of type " + mimeType);
+        req.log.info(req.gettext("Uploading") + " " + fileName + " " + req.gettext("of type") + " " + mimeType);
 
         Step(
             function() {
@@ -624,7 +624,7 @@ var userIsAuthor = function(req, res, next) {
     if (person && author && person.id == author.id) {
         next();
     } else {
-        next(new HTTPError("No " + type + " by " + user.nickname + " with uuid " + obj._uuid, 404));
+        next(new HTTPError(req.gettext("No") + " " + type + " " + req.gettext("by") + " " + user.nickname + " " + req.gettext("with uuid") + " " + obj._uuid, 404));
         return;
     }
 };
@@ -659,7 +659,7 @@ var showObject = function(req, res, next) {
                 if (obj.displayName) {
                     title = obj.displayName;
                 } else {
-                    title = type + " by " + person.displayName;
+                    title = type + " " + req.gettext("by") + " " + person.displayName;
                 }
                 res.render("object", {page: {title: title, url: req.originalUrl},
                                       object: obj,
@@ -786,9 +786,9 @@ var authorized = function(req, res, next) {
 
 var principalNotUser = function(req, res, next) {
     if (!req.principal) {
-        next(new HTTPError("No principal", 401));
+        next(new HTTPError(req.gettext("No principal"), 401));
     } else if (req.principalUser) {
-        next(new HTTPError("Only for remote users", 401));
+        next(new HTTPError(req.gettext("Only for remote users"), 401));
     } else {
         next();
     }
@@ -810,7 +810,7 @@ var proxyActivity = function(req, res, next) {
     if (!_.has(principal, "links") ||
         !_.has(principal.links, "activity-outbox") ||
         !_.has(principal.links["activity-outbox"], "href")) {
-        next(new Error("No activity outbox endpoint for " + principal.id, 400));
+        next(new Error(req.gettext("No activity outbox endpoint for") + " " + principal.id, 400));
         return;
     }
 
@@ -842,7 +842,7 @@ var proxyActivity = function(req, res, next) {
             var act;
             if (err) {
                 if (err.statusCode) {
-                    next(new Error("Remote OAuth error code " + err.statusCode + ": " + err.data));
+                    next(new Error(req.gettext("Remote OAuth error code") + " " + err.statusCode + ": " + err.data));
                 } else {
                     next(err);
                 }
@@ -886,11 +886,11 @@ var addMessages = function(req, res, next) {
 };
 
 var showRecover = function(req, res, next) {
-    res.render("recover", {page: {title: "Recover your password"}});
+    res.render("recover", {page: {title: req.gettext("Recover your password")}});
 };
 
 var showRecoverSent = function(req, res, next) {
-    res.render("recover-sent", {page: {title: "Recovery email sent"}});
+    res.render("recover-sent", {page: {title: req.gettext("Recovery email sent")}});
 };
 
 var handleRecover = function(req, res, next) {
@@ -910,7 +910,7 @@ var handleRecover = function(req, res, next) {
                 if (err.name == "NoSuchThingError") {
                     req.log.debug({nickname: nickname}, "No such user, can't recover");
                     res.status(400);
-                    res.json({sent: false, noSuchUser: true, error: "There is no user with that nickname."});
+                    res.json({sent: false, noSuchUser: true, error: req.gettext("There is no user with that nickname.")});
                     return;
                 } else {
                     throw err;
@@ -946,7 +946,7 @@ var handleRecover = function(req, res, next) {
                 req.log.debug({nickname: nickname, count: stillValid.length}, "Have an existing, valid recovery record.");
                 // Done
                 res.status(409);
-                res.json({sent: false, existing: true, error: "You already requested a password recovery."});
+                res.json({sent: false, existing: true, error: req.gettext("You already requested a password recovery.")});
             } else {
                 req.log.debug({nickname: nickname}, "Have old recovery records but they're timed out.");
                 this(null);
@@ -981,7 +981,7 @@ var handleRecover = function(req, res, next) {
             if (err) throw err;
             req.log.debug({nickname: nickname}, "Sending recovery email.");
             Mailer.sendEmail({to: user.email,
-                              subject: "Recover password for " + req.app.config.site,
+                              subject: req.gettext("Recover password for ") + req.app.config.site,
                               text: text,
                               attachment: {data: html,
                                            type: "text/html",
@@ -1003,7 +1003,7 @@ var recoverCode = function(req, res, next) {
     
     var code = req.params.code;
 
-    res.render("recover-code", {page: {title: "One moment please"},
+    res.render("recover-code", {page: {title: req.gettext("One moment please")},
                                 code: code});
 };
 
@@ -1022,11 +1022,11 @@ var redeemCode = function(req, res, next) {
             recovery = results;
 
             if (recovery.recovered) {
-                throw new Error("This recovery code was already used.");
+                throw new Error(req.gettext("This recovery code was already used."));
             }
 
             if (Date.now() - Date.parse(recovery.timestamp) > Recovery.TIMEOUT) {
-                throw new Error("This recovery code is too old.");
+                throw new Error(req.gettext("This recovery code is too old."));
             }
 
             User.get(recovery.nickname, this);

@@ -13,7 +13,7 @@
       <% } %>
       <p class="muted">
         <small> 
-        <% if (object.author) { %><a href="<%- object.author.url %>"><%- object.author.displayName %></a> at <% } %>
+        <% if (object.author) { %><a href="<%- object.author.url %>"><%- object.author.displayName %></a> <%= gettext('at') %>  <% } %>
         <a href="<%- object.url %>"><%- object.published %></a>
         <% if (object.location) { %> in <a href="<%- object.location.url %>"><%- object.location.displayName %></a><% } %></small>
       </p>
@@ -32,15 +32,15 @@
 
       <% if (!object.likes || object.likes.totalItems === 0) { %>
       <% } else if (object.likes.totalItems === 1) { %>
-      <p class="muted"><small><%= partial("activity-object-collection", {author: object.author, coll: object.likes}) %> likes this.</small></p>
+      <p class="muted"><small><%= partial("activity-object-collection", {author: object.author, coll: object.likes}) %> <%= gettext('likes this.') %> </small></p>
       <% } else { %>
-      <p class="muted"><small><%= partial("activity-object-collection", {author: object.author, coll: object.likes}) %> like this.</small></p>
+      <p class="muted"><small><%= partial("activity-object-collection", {author: object.author, coll: object.likes}) %> <%= gettext('like this.') %> </small></p>
       <% } %>
       <% if (!object.shares || object.shares.totalItems === 0) { %>
       <% } else if (object.shares.totalItems === 1) { %>
-      <p class="muted"><small><%= partial("activity-object-collection", {author: object.author, coll: object.shares}) %> shared this.</small></p>
+      <p class="muted"><small><%= partial("activity-object-collection", {author: object.author, coll: object.shares}) %> <%= gettext('shared this.') %> </small></p>
       <% } else { %>
-      <p class="muted"><small><%= partial("activity-object-collection", {author: object.author, coll: object.shares}) %> shared this.</small></p>
+      <p class="muted"><small><%= partial("activity-object-collection", {author: object.author, coll: object.shares}) %> <%= gettext('shared this.') %> </small></p>
       <% } %>
       <%= partial("replies", {replies: object.replies}) %>
     </div>

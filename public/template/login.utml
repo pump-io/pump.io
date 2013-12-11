@@ -1,27 +1,27 @@
 <div id="loginpage">
   <form id="login" class="form-horizontal">
-    <legend>Login to your account</legend>
+    <legend><%= gettext('Login to your account') %> </legend>
     <div class="control-group" id="nickname-group">
-      <label class="control-label" for="nickname">Nickname</label>
+      <label class="control-label" for="nickname"><%= gettext('Nickname') %> </label>
       <div class="controls">
         <input type="text" id="nickname" name="nickname" size="16">
       </div>
     </div>
     <div class="control-group" id="password-group">
-      <label class="control-label" for="password">Password</label>
+      <label class="control-label" for="password"><%= gettext('Password') %> </label>
       <div class="controls">
         <input type="password" id="password" name="password" size="16">
         <% if (config.haveEmail) { %>
-        <a href="/main/recover">Forgot your password?</a>
+        <a href="/main/recover"><%= gettext('Forgot your password?') %> </a>
         <% } %>
       </div>
     </div>
     <div class="control-group">
       <div class="controls">
-        <button type="submit" class="btn btn-primary" disabled="disabled">Login</button>
+        <button type="submit" class="btn btn-primary" disabled="disabled"><%= gettext('Login') %> </button>
       </div>
     </div>
   </form>
-  <p><a class="add-continue" href="/main/register">New user?</a></p>
-  <p><a class="add-continue" href="/main/remote">Account on another server?</a></p>
+  <p><a class="add-continue" href="/main/register"><%= gettext('New user?') %> </a></p>
+  <p><a class="add-continue" href="/main/remote"><%= gettext('Account on another server?') %></a></p>
 </div>

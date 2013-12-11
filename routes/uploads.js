@@ -99,7 +99,7 @@ var uploadedFile = function(req, res, next) {
         function(err, post) {
             if (err) throw err;
             if (!post) {
-                throw new HTTPError("Not allowed", 403);
+                throw new HTTPError(req.gettext("Not allowed"), 403);
             }
             post.checkRecipient(profile, this);
         },
@@ -107,7 +107,7 @@ var uploadedFile = function(req, res, next) {
             if (err) {
                 next(err);
             } else if (!flag) {
-                next(new HTTPError("Not allowed", 403));
+                next(new HTTPError(req.gettext("Not allowed"), 403));
             } else {
                 send(req, res, next, {path: slug, root: req.app.config.uploaddir});
             }

@@ -8,22 +8,22 @@
   </a>
   <div class="media-body">
     <%= reply.content %>
-    <p><small><a href="<%- reply.author.url %>"><%- reply.author.displayName %></a> at <a href="<%- reply.url %>"><abbr title="<%- reply.published %>" class="easydate"><%- reply.published %></abbr></a><% if (reply.location) { %> in <a href="<%- reply.location.url %>"><%- reply.location.displayName %></a><% } %></small></p>
+    <p><small><a href="<%- reply.author.url %>"><%- reply.author.displayName %></a> <%= gettext('at') %> <a href="<%- reply.url %>"><abbr title="<%- reply.published %>" class="easydate"><%- reply.published %></abbr></a><% if (reply.location) { %> <%= gettext('in') %> <a href="<%- reply.location.url %>"><%- reply.location.displayName %></a><% } %></small></p>
 
     <% if (principal) { %>
     <div class="responses">
     <% if (reply.liked) { %>
-    <a class="unfavorite" href="#">Unlike <i class="icon-thumbs-down"></i></a>
+    <a class="unfavorite" href="#"><%= gettext('Unlike') %> <i class="icon-thumbs-down"></i></a>
     <% } else { %>
-    <a class="favorite" href="#">Like <i class="icon-thumbs-up"></i></a>
+    <a class="favorite" href="#"><%= gettext('Like') %> <i class="icon-thumbs-up"></i></a>
     <% } %>
     </div>
     <% } %>
     <% if (!reply.likes || reply.likes.totalItems === 0) { %>
     <% } else if (reply.likes.totalItems === 1) { %>
-    <p class="muted"><small><%= partial("activity-object-collection", {author: reply.author, coll: reply.likes}) %> likes this.</small></p>
+    <p class="muted"><small><%= partial("activity-object-collection", {author: reply.author, coll: reply.likes}) %> <%= gettext('likes this.') %></small></p>
     <% } else { %>
-    <p class="muted"><small><%= partial("activity-object-collection", {author: reply.author, coll: reply.likes}) %> like this.</small></p>
+    <p class="muted"><small><%= partial("activity-object-collection", {author: reply.author, coll: reply.likes}) %> <%= gettext('like this.') %></small></p>
     <% } %>
 
   </div>

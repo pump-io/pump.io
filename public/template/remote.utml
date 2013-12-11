@@ -2,22 +2,22 @@
 
   <form id="remote" class="form-horizontal" action="/main/remote" method="post">
 
-    <legend>Login to a remote account</legend>
+    <legend><%= gettext('Login to a remote account') %></legend>
 
-    <p>Login with your pump.io account to get started. (No pump.io account yet? <a href="http://pump.io/tryit">Try it</a>!)</p>
+    <p><%= gettext('Login with your pump.io account to get started. (No pump.io account yet? <a href="http://pump.io/tryit">Try it</a>!)') %></p>
 
     <div class="control-group" id="nickname-group">
-      <label class="control-label" for="webfinger">Webfinger ID</label>
+      <label class="control-label" for="webfinger"><%= gettext('Webfinger ID') %></label>
       <div class="controls">
-        <input type="email" id="webfinger" name="webfinger" size="30" placeholder="username@example.com">
-        <span class="help-block">Enter your ID on your pump.io site. It looks like an email address, with your nickname then &quot;@&quot; then your server</span>
+        <input type="email" id="webfinger" name="webfinger" size="30" placeholder="<%= gettext('username@example.com') %>">
+        <span class="help-block"><%= gettext('Enter your ID on your pump.io site. It looks like an email address, with your nickname then &quot;@&quot; then your server') %></span>
       </div>
     </div>
     <div class="control-group">
       <div class="controls">
-        <button type="submit" class="btn btn-primary">Login</button>
+        <button type="submit" class="btn btn-primary"><%= gettext('Login') %></button>
       </div>
     </div>
   </form>
-  <p><a href="/main/login" class="add-continue">Have an account here?</a></p>
+  <p><a href="/main/login" class="add-continue"><%= gettext('Have an account here?') %></a></p>
 </div>

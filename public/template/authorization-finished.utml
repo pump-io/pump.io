@@ -1,13 +1,13 @@
-<h1>Authorization Complete</h1> 
+<h1><%= gettext('Authorization Complete') %> </h1> 
 
 <p>
-Your authorization is complete, but the program you are using does not
+<%= gettext('Your authorization is complete, but the program you are using does not
 take the authorization tokens directly. Check the program or service&apos;s
-documentation for details on how to input these 
+documentation for details on how to input these ') %> 
 </p>
 
 <table>            
-  <tr><td>Token</td><td id="token"><%- token %></td></tr>    
-  <tr><td>Verifier</td><td id="verifier"><%- verifier %></td></tr>    
+  <tr><td><%= gettext('Token') %> </td><td id="token"><%- token %></td></tr>    
+  <tr><td><%= gettext('Verifier') %> </td><td id="verifier"><%- verifier %></td></tr>    
 </table>
 

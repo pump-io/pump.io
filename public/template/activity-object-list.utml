@@ -4,15 +4,15 @@
    <a href="<%- object.url %>">
    <% } %>
    <% if (principal && principal.id == object.id) { %>
-   You
+   <%= gettext('You') %> 
    <% } else if (object.id == "http://activityschema.org/collection/public") { %>
-   Public
+   <%= gettext('Public') %> 
    <% } else if (author && author.followers && object.id == author.followers.url) { %>
-   Followers
+   <%= gettext('Followers') %> 
    <% } else if (object.displayName) { %>
    <%- object.displayName %>
    <% } else if (object.objectType) { %>
-   a(n) <%- object.objectType %> <!-- <%- object.id %> -->
+   <%= gettext('a(n)') %>  <%- object.objectType %> <!-- <%- object.id %> -->
    <% } %>
    <% if (_.has(object, "url")) { %>
    </a>

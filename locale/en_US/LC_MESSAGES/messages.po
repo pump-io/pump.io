@@ -1,0 +1,861 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: pump.io 0.3.0\n"
+"POT-Creation-Date: 2013-12-09 19:20+0100\n"
+"PO-Revision-Date: 2013-12-10 19:34+0100\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language-Team: English\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: public/template/list-content-lists.utml:2
+msgid "Click a list name to show a list."
+msgstr "Click a list name to show a list."
+
+#: public/template/layout.utml:63
+msgid "brought to you by"
+msgstr "brought to you by"
+
+#: public/template/layout.utml:65
+msgid "available under the Apache License 2.0"
+msgstr "available under the Apache License 2.0"
+
+#: public/template/authorization.utml:1
+msgid "Authorize"
+msgstr "Authorize"
+
+#: public/template/authorization.utml:3
+msgid "You are logged in as"
+msgstr "You are logged in as"
+
+#: public/template/authorization.utml:5
+msgid "Do you want to authorize"
+msgstr "Do you want to authorize"
+
+#: public/template/authorization.utml:5
+msgid "to access your account?"
+msgstr "to access your account?"
+
+#: public/template/authorization.utml:7
+msgid "Applications with access to your account can:"
+msgstr "Applications with access to your account can:"
+
+#: public/template/authorization.utml:9
+msgid "Post new activities as you"
+msgstr "Post new activities as you"
+
+#: public/template/authorization.utml:10
+msgid "Read your social graph (followers, following, list)"
+msgstr "Read your social graph (followers, following, list)"
+
+#: public/template/authorization.utml:11
+msgid "Change your profile"
+msgstr "Change your profile"
+
+#: public/template/profile-responses.utml:3
+#: public/template/profile-responses.utml:8
+#: public/javascript/pump/view.js:1877
+msgid "Follow"
+msgstr "Follow"
+
+#: public/template/profile-responses.utml:6
+#: public/javascript/pump/view.js:1855
+msgid "Stop following"
+msgstr "Stop following"
+
+#: public/template/nav-loggedin.utml:7
+msgid "Note"
+msgstr "Note"
+
+#: public/template/nav-loggedin.utml:11
+msgid "Picture"
+msgstr "Picture"
+
+#: public/template/nav-loggedin.utml:27 public/template/profile-nav.utml:2
+msgid "Activity"
+msgstr "Activity"
+
+#: public/template/nav-loggedin.utml:28 public/template/profile-nav.utml:3
+msgid "Favorites"
+msgstr "Favorites"
+
+#: public/template/nav-loggedin.utml:29
+#: public/template/user-content-followers.utml:2
+#: public/template/activity-object-list.utml:11
+#: public/template/profile-nav.utml:9 public/javascript/pump/view.js:3322
+msgid "Followers"
+msgstr "Followers"
+
+#: public/template/nav-loggedin.utml:30
+#: public/template/user-content-following.utml:2
+#: public/template/profile-nav.utml:15
+msgid "Following"
+msgstr "Following"
+
+#: public/template/nav-loggedin.utml:31 public/template/profile-nav.utml:21
+#: public/javascript/pump/view.js:3330 routes/web.js:479 routes/web.js:539
+msgid "Lists"
+msgstr "Lists"
+
+#: public/template/nav-loggedin.utml:33 public/javascript/pump/router.js:113
+msgid "Settings"
+msgstr "Settings"
+
+#: public/template/nav-loggedin.utml:34 public/template/account.utml:7
+#: public/javascript/pump/router.js:123
+msgid "Account"
+msgstr "Account"
+
+#: public/template/nav-loggedin.utml:36 public/template/nav-remote.utml:21
+msgid "Log out"
+msgstr "Log out"
+
+#: public/template/register.utml:3
+msgid "Register for a new account"
+msgstr "Register for a new account"
+
+#: public/template/register.utml:6 public/template/recover.utml:5
+#: public/template/login.utml:5
+msgid "Nickname"
+msgstr "Nickname"
+
+#: public/template/register.utml:8
+msgid "Pick a good one; you can't change it later"
+msgstr "Pick a good one; you can't change it later"
+
+#: public/template/register.utml:9
+msgid "1-64 characters, only letters and numbers and . and - and _"
+msgstr "1-64 characters, only letters and numbers and . and - and _"
+
+#: public/template/register.utml:14
+msgid "Email"
+msgstr "Email"
+
+#: public/template/register.utml:16
+msgid "Your email address"
+msgstr "Your email address"
+
+#: public/template/register.utml:17
+msgid "For updates and password recovery"
+msgstr "For updates and password recovery"
+
+#: public/template/register.utml:22 public/template/account.utml:18
+#: public/template/login.utml:11
+msgid "Password"
+msgstr "Password"
+
+#: public/template/register.utml:24
+msgid "And a password"
+msgstr "And a password"
+
+#: public/template/register.utml:25 public/template/account.utml:21
+msgid "Eight characters, mixed letters and numbers, not stupid"
+msgstr "Eight characters, mixed letters and numbers, not stupid"
+
+#: public/template/register.utml:29 public/template/account.utml:26
+msgid "Repeat"
+msgstr "Repeat"
+
+#: public/template/register.utml:31
+msgid "Make sure you got it right"
+msgstr "Make sure you got it right"
+
+#: public/template/register.utml:36 public/template/nav-anonymous.utml:15
+#: public/javascript/pump/router.js:48 routes/web.js:173
+msgid "Register"
+msgstr "Register"
+
+#: public/template/register.utml:40
+msgid "Already have an account?"
+msgstr "Already have an account?"
+
+#: public/template/register.utml:41 public/template/login.utml:26
+msgid "Account on another server?"
+msgstr "Account on another server?"
+
+#: public/template/extra-menu.utml:7
+msgid "Delete"
+msgstr "Delete"
+
+#: public/template/nav-anonymous.utml:19 public/template/remote.utml:18
+#: public/template/login.utml:21 public/javascript/pump/router.js:66
+#: routes/web.js:178
+msgid "Login"
+msgstr "Login"
+
+#: public/template/list-menu.utml:7
+msgid "New list..."
+msgstr "New list..."
+
+#: public/template/major-activity.utml:21 public/template/major-object.utml:15
+#: public/template/object.utml:16 public/template/reply.utml:11
+msgid "at"
+msgstr "at"
+
+#: public/template/major-activity.utml:25
+msgid "via"
+msgstr "via"
+
+#: public/template/major-activity.utml:33
+msgid "To:"
+msgstr "To:"
+
+#: public/template/major-activity.utml:36
+msgid "CC:"
+msgstr "CC:"
+
+#: public/template/are-you-sure.utml:11
+msgid "Yes"
+msgstr "Yes"
+
+#: public/template/are-you-sure.utml:12 routes/web.js:627
+msgid "No"
+msgstr "No"
+
+#: public/template/welcome.utml:2
+#: public/template/confirmation-email-html.utml:1
+#: public/template/confirmation-email-text.utml:1
+msgid "Welcome to"
+msgstr "Welcome to"
+
+#: public/template/welcome.utml:3
+msgid ""
+"Now that you&apos;re registered, here are a few tips for enjoying yourself "
+"fully."
+msgstr ""
+"Now that you&apos;re registered, here are a few tips for enjoying yourself "
+"fully."
+
+#: public/template/welcome.utml:8
+msgid "You should modify your"
+msgstr "You should modify your"
+
+#: public/template/welcome.utml:8
+msgid "profile"
+msgstr "profile"
+
+#: public/template/welcome.utml:9
+msgid ""
+"to let people know more about you. Don&apos;t forget to upload an avatar!"
+msgstr ""
+"to let people know more about you. Don&apos;t forget to upload an avatar!"
+
+#: public/template/welcome.utml:12
+msgid "Your account id is"
+msgstr "Your account id is"
+
+#: public/template/welcome.utml:13
+msgid "You can use it with pump.io-enabled applications. Try it out on"
+msgstr "You can use it with pump.io-enabled applications. Try it out on"
+
+#: public/template/welcome.utml:13
+msgid "Open Farm Game"
+msgstr "Open Farm Game"
+
+#: public/template/welcome.utml:18
+msgid ""
+"This message will stay in your inbox so you can refer back. Enjoy\n"
+"  yourself and have fun."
+msgstr ""
+"This message will stay in your inbox so you can refer back. Enjoy\n"
+"  yourself and have fun."
+
+#: public/template/remote.utml:5
+msgid "Login to a remote account"
+msgstr "Login to a remote account"
+
+#: public/template/remote.utml:7
+msgid ""
+"Login with your pump.io account to get started. (No pump.io account yet? <a "
+"href=\"http://pump.io/tryit\">Try it</a>!)"
+msgstr ""
+"Login with your pump.io account to get started. (No pump.io account yet? <a "
+"href=\"http://pump.io/tryit\">Try it</a>!)"
+
+#: public/template/remote.utml:10
+msgid "Webfinger ID"
+msgstr "Webfinger ID"
+
+#: public/template/remote.utml:12
+msgid "username@example.com"
+msgstr "username@example.com"
+
+#: public/template/remote.utml:13
+msgid ""
+"Enter your ID on your pump.io site. It looks like an email address, with "
+"your nickname then &quot;@&quot; then your server"
+msgstr ""
+"Enter your ID on your pump.io site. It looks like an email address, with "
+"your nickname then &quot;@&quot; then your server"
+
+#: public/template/remote.utml:22
+msgid "Have an account here?"
+msgstr "Have an account here?"
+
+#: public/template/authorization-finished.utml:1
+msgid "Authorization Complete"
+msgstr "Authorization Complete"
+
+#: public/template/authorization-finished.utml:4
+msgid ""
+"Your authorization is complete, but the program you are using does not\n"
+"take the authorization tokens directly. Check the program or service&apos;s\n"
+"documentation for details on how to input these "
+msgstr ""
+"Your authorization is complete, but the program you are using does not\n"
+"take the authorization tokens directly. Check the program or service&apos;s\n"
+"documentation for details on how to input these "
+
+#: public/template/authorization-finished.utml:10
+msgid "Token"
+msgstr "Token"
+
+#: public/template/authorization-finished.utml:11
+msgid "Verifier"
+msgstr "Verifier"
+
+#: public/template/account.utml:10
+msgid "Username"
+msgstr "Username"
+
+#: public/template/account.utml:13
+msgid "The name you log in with (unchangeable!)"
+msgstr "The name you log in with (unchangeable!)"
+
+#: public/template/account.utml:29
+msgid "Check your typing"
+msgstr "Check your typing"
+
+#: public/template/account.utml:37
+msgid "Save changes"
+msgstr "Save changes"
+
+#: public/template/post-picture.utml:4
+msgid "Post a picture"
+msgstr "Post a picture"
+
+#: public/template/post-picture.utml:10
+msgid "Title"
+msgstr "Title"
+
+#: public/template/post-picture.utml:11
+msgid "(optional)"
+msgstr "(optional)"
+
+#: public/template/post-picture.utml:12 public/template/new-list.utml:11
+msgid "Description"
+msgstr "Description"
+
+#: public/template/post-picture.utml:13
+msgid "Description (optional)"
+msgstr "Description (optional)"
+
+#: public/template/post-picture.utml:16 public/template/post-note.utml:11
+msgid "To"
+msgstr "To"
+
+#: public/template/post-picture.utml:19 public/template/post-note.utml:14
+msgid "CC"
+msgstr "CC"
+
+#: public/template/post-picture.utml:25 public/template/post-note.utml:20
+msgid "Send"
+msgstr "Send"
+
+#: public/template/messages.utml:23
+msgid "All messages"
+msgstr "All messages"
+
+#: public/template/activity-object-list.utml:7
+msgid "You"
+msgstr "You"
+
+#: public/template/activity-object-list.utml:9
+#: public/javascript/pump/view.js:3317
+msgid "Public"
+msgstr "Public"
+
+#: public/template/activity-object-list.utml:15
+msgid "a(n)"
+msgstr "a(n)"
+
+#: public/template/major-object.utml:29 public/template/object.utml:35
+#: public/template/reply.utml:24
+msgid "likes this."
+msgstr "likes this."
+
+#: public/template/major-object.utml:31 public/template/object.utml:37
+#: public/template/reply.utml:26
+msgid "like this."
+msgstr "like this."
+
+#: public/template/major-object.utml:35 public/template/major-object.utml:37
+#: public/template/object.utml:41 public/template/object.utml:43
+msgid "shared this."
+msgstr "shared this."
+
+#: public/template/confirmation-email-html.utml:3
+#: public/template/confirmation-email-text.utml:3
+msgid "You have signed up for"
+msgstr "You have signed up for"
+
+#: public/template/confirmation-email-html.utml:3
+#: public/template/confirmation-email-text.utml:3
+msgid "To confirm this email address, click on the link below:"
+msgstr "To confirm this email address, click on the link below:"
+
+#: public/template/confirmation-email-html.utml:7
+#: public/template/confirmation-email-text.utml:7
+#: public/template/activity-notification-html.utml:11
+#: public/template/recovery-email-html.utml:7
+#: public/template/activity-notification-text.utml:11
+#: public/template/recovery-email-text.utml:7
+msgid ""
+"If you think you received this email in error, you can safely ignore it."
+msgstr ""
+"If you think you received this email in error, you can safely ignore it."
+
+#: public/template/confirm-email-instructions.utml:1
+msgid "Check your email for further instructions"
+msgstr "Check your email for further instructions"
+
+#: public/template/confirm-email-instructions.utml:3
+msgid ""
+"Your registration is complete. Instructions for enabling your\n"
+"account have been sent to your email address. Check your inbox and\n"
+"spam filter."
+msgstr ""
+"Your registration is complete. Instructions for enabling your\n"
+"account have been sent to your email address. Check your inbox and\n"
+"spam filter."
+
+#: public/template/settings.utml:7
+msgid "About you"
+msgstr "About you"
+
+#: public/template/settings.utml:9
+msgid "Real name"
+msgstr "Real name"
+
+#: public/template/settings.utml:11
+msgid "The name you want us to show"
+msgstr "The name you want us to show"
+
+#: public/template/settings.utml:13
+msgid "Hometown"
+msgstr "Hometown"
+
+#: public/template/settings.utml:15
+msgid "Where you usually are"
+msgstr "Where you usually are"
+
+#: public/template/settings.utml:17
+msgid "Bio"
+msgstr "Bio"
+
+#: public/template/settings.utml:19
+msgid "All about you."
+msgstr "All about you."
+
+#: public/template/settings.utml:21
+msgid "Avatar"
+msgstr "Avatar"
+
+#: public/template/settings.utml:32 public/template/new-list.utml:17
+msgid "Save"
+msgstr "Save"
+
+#: public/template/responses.utml:3 public/template/reply.utml:16
+#: public/javascript/pump/view.js:1404 public/javascript/pump/view.js:1688
+#: public/javascript/pump/view.js:1796 public/javascript/pump/view.js:2529
+msgid "Unlike"
+msgstr "Unlike"
+
+#: public/template/responses.utml:5 public/template/reply.utml:18
+#: public/javascript/pump/view.js:1422 public/javascript/pump/view.js:1710
+#: public/javascript/pump/view.js:1819 public/javascript/pump/view.js:2551
+msgid "Like"
+msgstr "Like"
+
+#: public/template/responses.utml:7 public/template/comment-form.utml:19
+msgid "Comment"
+msgstr "Comment"
+
+#: public/template/responses.utml:9 public/javascript/pump/view.js:1444
+#: public/javascript/pump/view.js:1731 public/javascript/pump/view.js:2573
+msgid "Unshare"
+msgstr "Unshare"
+
+#: public/template/responses.utml:11 public/javascript/pump/view.js:1466
+#: public/javascript/pump/view.js:1752 public/javascript/pump/view.js:2595
+msgid "Share"
+msgstr "Share"
+
+#: public/template/inbox.utml:7 public/template/user-content-activities.utml:6
+msgid "Meanwhile..."
+msgstr "Meanwhile..."
+
+#: public/template/choose-contact.utml:9
+msgid "Choose contacts"
+msgstr "Choose contacts"
+
+#: public/template/choose-contact.utml:28
+msgid "Add"
+msgstr "Add"
+
+#: public/template/messages-content.utml:4
+#: public/javascript/pump/router.js:144
+msgid "Messages"
+msgstr "Messages"
+
+#: public/template/messages-content.utml:8
+msgid "Notifications"
+msgstr "Notifications"
+
+#: public/template/recover.utml:3 public/javascript/pump/router.js:85
+#: routes/web.js:889
+msgid "Recover your password"
+msgstr "Recover your password"
+
+#: public/template/recover.utml:12
+msgid "Recover"
+msgstr "Recover"
+
+#: public/template/new-list.utml:4
+msgid "New list"
+msgstr "New list"
+
+#: public/template/new-list.utml:9
+msgid "Name"
+msgstr "Name"
+
+#: public/template/new-list.utml:10
+msgid "Unique name for this list"
+msgstr "Unique name for this list"
+
+#: public/template/recover-sent.utml:2 public/javascript/pump/router.js:94
+#: routes/web.js:893
+msgid "Recovery email sent"
+msgstr "Recovery email sent"
+
+#: public/template/recover-sent.utml:3
+msgid ""
+"Instructions on how to recover your password were sent to the email address "
+"associated with your account."
+msgstr ""
+"Instructions on how to recover your password were sent to the email address "
+"associated with your account."
+
+#: public/template/confirmed.utml:1
+msgid "Email confirmed!"
+msgstr "Email confirmed!"
+
+#: public/template/confirmed.utml:3
+msgid "Your email address has been confirmed."
+msgstr "Your email address has been confirmed."
+
+#: public/template/recover-code.utml:2
+msgid "One moment, please..."
+msgstr "One moment, please..."
+
+#: public/template/login.utml:3
+msgid "Login to your account"
+msgstr "Login to your account"
+
+#: public/template/login.utml:15
+msgid "Forgot your password?"
+msgstr "Forgot your password?"
+
+#: public/template/login.utml:25
+msgid "New user?"
+msgstr "New user?"
+
+#: public/template/activity-notification-html.utml:8
+msgid "more information"
+msgstr "more information"
+
+#: public/template/error.utml:2
+msgid "Error"
+msgstr "Error"
+
+#: public/template/main.utml:10
+msgid ""
+"This site runs <a href=\"http://pump.io/\">pump.io</a>, the high-performance "
+"Open Source social engine. It pumps your life in and out of your friends, "
+"family and colleagues."
+msgstr ""
+"This site runs <a href=\"http://pump.io/\">pump.io</a>, the high-performance "
+"Open Source social engine. It pumps your life in and out of your friends, "
+"family and colleagues."
+
+#: public/template/main.utml:14
+msgid "(No pump.io account yet? <a href=\"http://pump.io/tryit\">Try it</a>!)"
+msgstr "(No pump.io account yet? <a href=\"http://pump.io/tryit\">Try it</a>!)"
+
+#: public/template/main.utml:18
+msgid "Get Started"
+msgstr "Get Started"
+
+#: public/template/post-note.utml:4
+msgid "Post a note"
+msgstr "Post a note"
+
+#: public/template/recovery-email-html.utml:1
+#: public/template/recovery-email-text.utml:1
+msgid "Someone has requested a new password for"
+msgstr "Someone has requested a new password for"
+
+#: public/template/recovery-email-html.utml:1
+#: public/template/recovery-email-text.utml:1
+msgid "on"
+msgstr "on"
+
+#: public/template/recovery-email-html.utml:3
+#: public/template/recovery-email-text.utml:3
+msgid "To complete the password recovery, click on the following URL."
+msgstr "To complete the password recovery, click on the following URL."
+
+#: public/template/activity-notification-text.utml:3
+msgid "You were addressed in an activity."
+msgstr "You were addressed in an activity."
+
+#: public/template/list-content-list.utml:15
+msgid "Add a member"
+msgstr "Add a member"
+
+#: public/template/list-content-list.utml:16
+msgid "Delete list"
+msgstr "Delete list"
+
+#: public/template/reply.utml:11
+msgid "in"
+msgstr "in"
+
+#: public/javascript/pump/auth.js:125 public/javascript/pump/auth.js:145
+msgid "error getting credentials"
+msgstr "error getting credentials"
+
+#: public/javascript/pump/socket.js:73
+msgid "Error getting OAuth credentials."
+msgstr "Error getting OAuth credentials."
+
+#: public/javascript/pump/view.js:835 public/javascript/pump.js:443
+msgid "Couldn't get OAuth credentials. :("
+msgstr "Couldn't get OAuth credentials. :("
+
+#: public/javascript/pump/view.js:848
+msgid "Confirm email"
+msgstr "Confirm email"
+
+#: public/javascript/pump/view.js:895 public/javascript/pump/view.js:2453
+msgid "Passwords don't match."
+msgstr "Passwords don't match."
+
+#: public/javascript/pump/view.js:899
+msgid ""
+"Nicknames have to be a combination of 1-64 letters or numbers and ., - or _."
+msgstr ""
+"Nicknames have to be a combination of 1-64 letters or numbers and ., - or _."
+
+#: public/javascript/pump/view.js:903 public/javascript/pump/view.js:2457
+msgid "Password must be 8 chars or more."
+msgstr "Password must be 8 chars or more."
+
+#: public/javascript/pump/view.js:908 public/javascript/pump/view.js:2462
+msgid "Passwords have to have at least one letter and one number."
+msgstr "Passwords have to have at least one letter and one number."
+
+#: public/javascript/pump/view.js:912
+msgid "Email address required."
+msgstr "Email address required."
+
+#: public/javascript/pump/view.js:2343
+msgid "Avatar file"
+msgstr "Avatar file"
+
+#: public/javascript/pump/view.js:2472
+msgid "Saved."
+msgstr "Saved."
+
+#: public/javascript/pump/view.js:2812
+msgid "Picture file"
+msgstr "Picture file"
+
+#: public/javascript/pump/view.js:3260
+msgid "Search for a user or list"
+msgstr "Search for a user or list"
+
+#: public/javascript/pump/view.js:3326
+msgid "People"
+msgstr "People"
+
+#: public/javascript/pump/view.js:3387
+msgid "Delete this"
+msgstr "Delete this"
+
+#: public/javascript/pump/router.js:76 routes/web.js:200
+msgid "Remote login"
+msgstr "Remote login"
+
+#: public/javascript/pump/router.js:103
+msgid "Recovery code"
+msgstr "Recovery code"
+
+#: public/javascript/pump/router.js:169 routes/web.js:153
+msgid "Home"
+msgstr "Home"
+
+#: public/javascript/pump/router.js:176 routes/web.js:136
+msgid "Welcome"
+msgstr "Welcome"
+
+#: public/javascript/pump/router.js:227 routes/web.js:361
+msgid "favorites"
+msgstr "favorites"
+
+#: public/javascript/pump/router.js:254 routes/web.js:386
+msgid "followers"
+msgstr "followers"
+
+#: public/javascript/pump/router.js:281 routes/web.js:411
+msgid "following"
+msgstr "following"
+
+#: public/javascript/pump/router.js:306
+msgid "lists"
+msgstr "lists"
+
+#: public/javascript/pump/router.js:337
+msgid "list"
+msgstr "list"
+
+#: public/javascript/pump/router.js:372 routes/web.js:627 routes/web.js:662
+msgid "by"
+msgstr "by"
+
+#: public/javascript/pump.js:194
+msgid "Failed to renew"
+msgstr "Failed to renew"
+
+#: public/javascript/pump.js:215
+msgid "An error occurred."
+msgstr "An error occurred."
+
+#: public/javascript/pump.js:613
+msgid "Error saving activity: "
+msgstr "Error saving activity: "
+
+#. XXX: Maybe just log and redirect to / ?
+#: routes/confirm.js:55
+msgid "Already confirmed."
+msgstr "Already confirmed."
+
+#: routes/confirm.js:63
+msgid "This is someone else's confirmation."
+msgstr "This is someone else's confirmation."
+
+#: routes/confirm.js:78
+msgid "Email address confirmed"
+msgstr "Email address confirmed"
+
+#: routes/web.js:171
+msgid "No registration allowed."
+msgstr "No registration allowed."
+
+#: routes/web.js:227
+msgid "Bad format for webfinger"
+msgstr "Bad format for webfinger"
+
+#: routes/web.js:267
+msgid "Too many activities with ID = "
+msgstr "Too many activities with ID = "
+
+#: routes/web.js:291
+msgid "No such activity"
+msgstr "No such activity"
+
+#: routes/web.js:300
+msgid "person"
+msgstr "person"
+
+#: routes/web.js:300
+msgid "is not the actor of"
+msgstr "is not the actor of"
+
+#: routes/web.js:434
+msgid "Incorrect username or password"
+msgstr "Incorrect username or password"
+
+#: routes/web.js:507
+msgid "Not found"
+msgstr "Not found"
+
+#: routes/web.js:508
+msgid "Too many lists"
+msgstr "Too many lists"
+
+#: routes/web.js:511
+msgid "User"
+msgstr "User"
+
+#: routes/web.js:511
+msgid "is not author of"
+msgstr "is not author of"
+
+#: routes/web.js:588
+msgid "Uploading"
+msgstr "Uploading"
+
+#: routes/web.js:588
+msgid "of type"
+msgstr "of type"
+
+#: routes/web.js:627
+msgid "with uuid"
+msgstr "with uuid"
+
+#: routes/web.js:789
+msgid "No principal"
+msgstr "No principal"
+
+#: routes/web.js:791
+msgid "Only for remote users"
+msgstr "Only for remote users"
+
+#: routes/web.js:813
+msgid "No activity outbox endpoint for"
+msgstr "No activity outbox endpoint for"
+
+#: routes/web.js:845
+msgid "Remote OAuth error code"
+msgstr "Remote OAuth error code"
+
+#: routes/web.js:913
+msgid "There is no user with that nickname."
+msgstr "There is no user with that nickname."
+
+#: routes/web.js:949
+msgid "You already requested a password recovery."
+msgstr "You already requested a password recovery."
+
+#: routes/web.js:984
+msgid "Recover password for "
+msgstr "Recover password for "
+
+#: routes/web.js:1006
+msgid "One moment please"
+msgstr "One moment please"
+
+#: routes/web.js:1025
+msgid "This recovery code was already used."
+msgstr "This recovery code was already used."
+
+#: routes/web.js:1029
+msgid "This recovery code is too old."
+msgstr "This recovery code is too old."
+
+#: routes/uploads.js:102 routes/uploads.js:110
+msgid "Not allowed"
+msgstr "Not allowed"

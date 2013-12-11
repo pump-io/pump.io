@@ -4,29 +4,29 @@
 
     <fieldset>
 
-      <legend>Account</legend>
+      <legend><%= gettext('Account') %> </legend>
       
       <div class="clearfix">
-	<label>Username</label>
+	<label><%= gettext('Username') %></label>
 	<div class="input">
           <span class="uneditable-input"><%- principalUser.nickname %></span>
-	  <span class="help-block">The name you log in with (unchangeable!)</span>
+	  <span class="help-block"><%= gettext('The name you log in with (unchangeable!)') %></span>
 	</div>
       </div>
 
       <div class="clearfix">
-	<label>Password</label>
+	<label><%= gettext('Password') %></label>
 	<div class="input">
           <input class="span6" id="password" name="password" size="30" type="password" />
-          <span class="help-block">Eight characters, mixed letters and numbers, not stupid</span>
+          <span class="help-block"><%= gettext('Eight characters, mixed letters and numbers, not stupid') %></span>
 	</div>
       </div>
 
       <div class="clearfix">
-	<label>Repeat</label>
+	<label><%= gettext('Repeat') %></label>
 	<div class="input">
           <input class="span6" id="repeat" name="repeat" size="30" type="password" />
-	  <span class="help-block">Check your typing</span>
+	  <span class="help-block"><%= gettext('Check your typing') %></span>
 	</div>
       </div>
 
@@ -34,7 +34,7 @@
 
     <fieldset>
       <div class="actions">
-	<input type="submit" class="btn btn-primary" value="Save changes">
+	<input type="submit" class="btn btn-primary" value="<%= gettext('Save changes') %>">
       </div>
     </fieldset>  
 

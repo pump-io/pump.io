@@ -18,11 +18,11 @@
     <% } %>
     <p class="muted">
       <small>
-        <% if (!headless || (activity.verb == "share" && author)) { %><a href="<%- author.url %>"><%- author.displayName %></a> at <% } %>
+        <% if (!headless || (activity.verb == "share" && author)) { %><a href="<%- author.url %>"><%- author.displayName %></a> <%= gettext('at') %>  <% } %>
         <a href="<%- object.url || activity.url %>"><abbr title="<%- activity.published %>" class="easydate"><%- activity.published %></abbr></a>
         <% if (activity.location) { %> in <a href="<%- activity.location.url %>"><%- activity.location.displayName %></a><% } %>
         <% if (activity.generator && activity.generator.displayName) { %>
-        via
+        <%= gettext('via') %>
         <% if (activity.generator.url) { %>
         <a href="<%- activity.generator.url %>"><%- activity.generator.displayName %></a>
         <% } else { %>
@@ -30,10 +30,10 @@
         <% } %>
         <% } %>
         <% if (activity.to && activity.to.length > 0) { %>
-        To: <%= partial("activity-object-list", {author: author, activity: activity, objects: activity.to}) %>
+        <%= gettext('To:') %> <%= partial("activity-object-list", {author: author, activity: activity, objects: activity.to}) %>
         <% } %>
         <% if (activity.cc && activity.cc.length > 0) { %>
-        CC: <%= partial("activity-object-list", {author: author, activity: activity, objects: activity.cc}) %>
+        <%= gettext('CC:') %> <%= partial("activity-object-list", {author: author, activity: activity, objects: activity.cc}) %>
         <% } %>
     </small></p>
     <% if (object.image && object.image.url) { %>

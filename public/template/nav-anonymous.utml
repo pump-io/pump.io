@@ -12,11 +12,11 @@
     <ul class="nav pull-right">
       <% if (!config.disableRegistration) { %>
       <li>
-        <a id="register" href="/main/register">Register</a>
+        <a id="register" href="/main/register"><%= gettext('Register') %> </a>
       </li>
       <% } %>
       <li>
-        <a id="login" href="/main/login">Login</a>
+        <a id="login" href="/main/login"><%= gettext('Login') %> </a>
       </li>
     </ul>
   </div>

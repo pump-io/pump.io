@@ -3,7 +3,7 @@
     <%= partial("major-stream", {headless: true}) %>
   </div>
   <div class="span3" id="sidebar">
-    <h3>Meanwhile...</h3>
+    <h3><%= gettext('Meanwhile...') %></h3>
     <%= partial("minor-stream", {headless: true}) %>
   </div>
 </div>

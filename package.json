@@ -38,7 +38,8 @@
                       "dialback-client": "~0.1.5",
 		      "gm": "1.9.x",
                       "set-immediate": "0.1.x",
-                      "crypto-cacerts": "0.1.x"
+                      "crypto-cacerts": "0.1.x",
+                      "i18n-abide": ">= 0.0.14"
 		    },
     "bin": {
         "pump": "./bin/pump",

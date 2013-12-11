@@ -70,7 +70,7 @@
             var pair, secrets;
 
             if (err) {
-                Pump.error("Error getting OAuth credentials.");
+                Pump.error(gettext("Error getting OAuth credentials."));
                 return;
             }
 

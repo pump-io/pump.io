@@ -4,7 +4,7 @@
       <b class="caret"></b>
     </a>
     <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="profile-dropdown">
-      <li class="muted"><a tabindex="-1" class="delete-object" href="#"><small>Delete</small></li>
+      <li class="muted"><a tabindex="-1" class="delete-object" href="#"><small><%= gettext('Delete') %> </small></li>
     </ul>
   </li>
 </ul>

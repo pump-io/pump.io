@@ -1,6 +1,6 @@
 <%= principal.displayName %>,
 
-You were addressed in an activity.
+<%= gettext('You were addressed in an activity.') %> 
 
 <% if (activity.verb == "post") { %>
     <%= activity.object.url %>
@@ -8,4 +8,4 @@ You were addressed in an activity.
     <%= activity.url %>
 <% } %>
 
-<p>If you think you received this email in error, you can safely ignore it.</p>
+<p><%= gettext('If you think you received this email in error, you can safely ignore it.') %> </p>

@@ -191,7 +191,7 @@ if (!window.Pump) {
                 callback(null, data);
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                callback(new Error("Failed to renew"), null);
+                callback(new Error(gettext("Failed to renew")), null);
             }
         };
 
@@ -212,7 +212,7 @@ if (!window.Pump) {
                 console.log(err.stack);
             }
         } else {
-            msg = "An error occurred.";
+            msg = gettext("An error occurred.");
         }
 
         console.log(msg);
@@ -440,7 +440,7 @@ if (!window.Pump) {
             Pump.ensureCred(function(err, cred) {
                 var pair;
                 if (err) {
-                    Pump.error("Couldn't get OAuth credentials. :(");
+                    Pump.error(gettext("Couldn't get OAuth credentials. :("));
                 } else {
                     options.consumerKey = cred.clientID;
                     options.consumerSecret = cred.clientSecret;
@@ -610,7 +610,7 @@ if (!window.Pump) {
                     response = JSON.parse(xhr.responseText);
                     callback(new Error(response.error), null);
                 } else {
-                    callback(new Error("Error saving activity: " + model.id), null);
+                    callback(new Error(gettext("Error saving activity: ") + model.id), null);
                 }
             }
         });

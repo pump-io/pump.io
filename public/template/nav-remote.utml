@@ -18,7 +18,7 @@
         <b class="caret"></b>
       </a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="profile-dropdown">
-        <li><a tabindex="-1" id="logout" href="#">Log out</a></li>
+        <li><a tabindex="-1" id="logout" href="#"><%= gettext('Log out') %> </a></li>
       </ul>
     </li>
   </ul>

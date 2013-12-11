@@ -1,14 +1,14 @@
-<h1>Authorize</h1> 
+<h1><%= gettext('Authorize') %> </h1> 
 
-<p>You are logged in as <strong id="username"><%- principalUser.nickname %></strong>.</p>
+<p><%= gettext('You are logged in as') %>  <strong id="username"><%- principalUser.nickname %></strong>.</p>
 
-<p>Do you want to authorize <em><%- application.title %></em> to access your account?</p>
+<p><%= gettext('Do you want to authorize') %>  <em><%- application.title %></em> <%= gettext('to access your account?') %> </p>
 
-<p>Applications with access to your account can:
+<p><%= gettext('Applications with access to your account can:') %> 
   <ul>
-    <li>Post new activities as you</li>
-    <li>Read your social graph (followers, following, list)</li>
-    <li>Change your profile</li>
+    <li><%= gettext('Post new activities as you') %> </li>
+    <li><%= gettext('Read your social graph (followers, following, list)') %> </li>
+    <li><%= gettext('Change your profile') %> </li>
   </ul>
 </p>
 

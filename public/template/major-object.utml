@@ -12,7 +12,7 @@
     <% } %>
     <p class="muted"><small>
         <% if (obj.author) { %><a href="<%- obj.author.url %>"><%- obj.author.displayName %></a><% } %>
-        at <a href="<%- obj.url %>"><%- obj.published %></a>
+        <%= gettext('at') %> <a href="<%- obj.url %>"><%- obj.published %></a>
         <% if (obj.location) { %> in <a href="<%- obj.location.url %>"><%- obj.location.displayName %></a><% } %>
     </small></p>
     <% if (obj.image && obj.image.url) { %>
@@ -26,15 +26,15 @@
     <% } %>
     <% if (!obj.likes || obj.likes.totalItems === 0) { %>
     <% } else if (obj.likes.totalItems === 1) { %>
-    <p class="muted"><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.likes}) %> likes this.</small></p>
+    <p class="muted"><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.likes}) %> <%= gettext('likes this.') %></small></p>
     <% } else { %>
-    <p class="muted"><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.likes}) %> like this.</small></p>
+    <p class="muted"><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.likes}) %> <%= gettext('like this.') %></small></p>
     <% } %>
     <% if (!obj.shares || obj.shares.totalItems === 0) { %>
     <% } else if (obj.shares.totalItems === 1) { %>
-    <p class="muted"><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.shares}) %> shared this.</small></p>
+    <p class="muted"><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.shares}) %> <%= gettext('shared this.') %></small></p>
     <% } else { %>
-    <p class="muted"><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.shares}) %> shared this.</small></p>
+    <p class="muted"><small><%= partial("activity-object-collection", {author: obj.author, coll: obj.shares}) %> <%= gettext('shared this.') %></small></p>
     <% } %>
     <%= partial("replies", {replies: obj.replies}) %>
   </div>

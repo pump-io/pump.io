@@ -1,20 +1,20 @@
 <p>
-  Welcome to <a href="<%- service.url %>"><%- service.displayName %></a>!
-  Now that you&apos;re registered, here are a few tips for enjoying yourself fully.
+  <%= gettext('Welcome to') %> <a href="<%- service.url %>"><%- service.displayName %></a>!
+  <%= gettext('Now that you&apos;re registered, here are a few tips for enjoying yourself fully.') %>
 </p>
 
 <ul>
   <li>
-    You should modify your <a href="<%- service.url %>main/settings">profile</a>
-    to let people know more about you. Don&apos;t forget to upload an avatar!
+    <%= gettext('You should modify your') %> <a href="<%- service.url %>main/settings"><%= gettext('profile') %></a>
+    <%= gettext('to let people know more about you. Don&apos;t forget to upload an avatar!') %>
   </li>
   <li>
-    Your account id is <strong><%- (profile.id && profile.id.substr(0, 5) == 'acct:') ? profile.id.substr(5) : profile.id %></strong>.
-    You can use it with pump.io-enabled applications. Try it out on <a href="http://openfarmgame.com/">Open Farm Game</a>.
+    <%= gettext('Your account id is') %> <strong><%- (profile.id && profile.id.substr(0, 5) == 'acct:') ? profile.id.substr(5) : profile.id %></strong>.
+    <%= gettext('You can use it with pump.io-enabled applications. Try it out on') %> <a href="http://openfarmgame.com/"><%= gettext('Open Farm Game') %></a>.
   </li>
 </ul>
 
 <p>
-  This message will stay in your inbox so you can refer back. Enjoy
-  yourself and have fun.
+  <%= gettext('This message will stay in your inbox so you can refer back. Enjoy
+  yourself and have fun.') %>
 </p>

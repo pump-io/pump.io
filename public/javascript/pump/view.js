@@ -832,7 +832,7 @@
                     Pump.ensureCred(function(err, cred) {
                         if (err) {
                             view.stopSpin();
-                            view.showError("Couldn't get OAuth credentials. :(");
+                            view.showError(gettext("Couldn't get OAuth credentials. :("));
                         } else {
                             options.consumerKey = cred.clientID;
                             options.consumerSecret = cred.clientSecret;
@@ -845,7 +845,7 @@
                     var objs;
                     if (Pump.config.requireEmail) {
                         Pump.body.setContent({contentView: Pump.ConfirmEmailInstructionsContent,
-                                              title: "Confirm email"});
+                                              title: gettext("Confirm email")});
                         return;
                     }
                     Pump.setNickname(data.nickname);
@@ -892,24 +892,24 @@
 
             if (params.password !== repeat) {
 
-                view.showError("Passwords don't match.");
+                view.showError(gettext("Passwords don't match."));
 
             } else if (!NICKNAME_RE.test(params.nickname)) {
 
-                view.showError("Nicknames have to be a combination of 1-64 letters or numbers and ., - or _.");
+                view.showError(gettext("Nicknames have to be a combination of 1-64 letters or numbers and ., - or _."));
 
             } else if (params.password.length < 8) {
 
-                view.showError("Password must be 8 chars or more.");
+                view.showError(gettext("Password must be 8 chars or more."));
 
             } else if (/^[a-z]+$/.test(params.password.toLowerCase()) ||
                        /^[0-9]+$/.test(params.password)) {
 
-                view.showError("Passwords have to have at least one letter and one number.");
+                view.showError(gettext("Passwords have to have at least one letter and one number."));
 
             } else if (Pump.config.requireEmail && (!email || email.length === 0)) {
 
-                view.showError("Email address required.");
+                view.showError(gettext("Email address required."));
 
             } else {
 
@@ -1401,7 +1401,7 @@
                 view.$(".favorite")
                     .removeClass("favorite")
                     .addClass("unfavorite")
-                    .html("Unlike <i class=\"icon-thumbs-down\"></i>");
+                    .html(gettext("Unlike")+" <i class=\"icon-thumbs-down\"></i>");
                 Pump.addMinorActivity(act);
             });
         },
@@ -1419,7 +1419,7 @@
                     view.$(".unfavorite")
                         .removeClass("unfavorite")
                         .addClass("favorite")
-                        .html("Like <i class=\"icon-thumbs-up\"></i>");
+                        .html(gettext("Like")+" <i class=\"icon-thumbs-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
             });
@@ -1441,7 +1441,7 @@
                     view.$(".share")
                         .removeClass("share")
                         .addClass("unshare")
-                        .html("Unshare <i class=\"icon-remove\"></i>");
+                        .html(gettext("Unshare")+" <i class=\"icon-remove\"></i>");
                     Pump.addMajorActivity(act);
                 }
             });
@@ -1463,7 +1463,7 @@
                     view.$(".unshare")
                         .removeClass("unshare")
                         .addClass("share")
-                        .html("Share <i class=\"icon-share-alt\"></i>");
+                        .html(gettext("Share")+" <i class=\"icon-share-alt\"></i>");
                     Pump.addMinorActivity(act);
                 }
             });
@@ -1685,7 +1685,7 @@
                     view.$(".favorite")
                         .removeClass("favorite")
                         .addClass("unfavorite")
-                        .html("Unlike <i class=\"icon-thumbs-down\"></i>");
+                        .html(gettext("Unlike")+" <i class=\"icon-thumbs-down\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -1707,7 +1707,7 @@
                     view.$(".unfavorite")
                         .removeClass("unfavorite")
                         .addClass("favorite")
-                        .html("Like <i class=\"icon-thumbs-up\"></i>");
+                        .html(gettext("Like")+" <i class=\"icon-thumbs-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -1728,7 +1728,7 @@
                     view.$(".share")
                         .removeClass("share")
                         .addClass("unshare")
-                        .html("Unshare <i class=\"icon-remove\"></i>");
+                        .html(gettext("Unshare")+" <i class=\"icon-remove\"></i>");
                     Pump.addMajorActivity(act);
                 }
                 view.stopSpin();
@@ -1749,7 +1749,7 @@
                     view.$(".unshare")
                         .removeClass("unshare")
                         .addClass("share")
-                        .html("Share <i class=\"icon-share-alt\"></i>");
+                        .html(gettext("Share")+" <i class=\"icon-share-alt\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -1793,7 +1793,7 @@
                     view.$(".favorite")
                         .removeClass("favorite")
                         .addClass("unfavorite")
-                        .html("Unlike <i class=\"icon-thumbs-down\"></i>");
+                        .html(gettext("Unlike")+" <i class=\"icon-thumbs-down\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -1816,7 +1816,7 @@
                     view.$(".unfavorite")
                         .removeClass("unfavorite")
                         .addClass("favorite")
-                        .html("Like <i class=\"icon-thumbs-up\"></i>");
+                        .html(gettext("Like")+" <i class=\"icon-thumbs-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -1852,7 +1852,7 @@
                         .removeClass("follow")
                         .removeClass("btn-primary")
                         .addClass("stop-following")
-                        .html("Stop following");
+                        .html(gettext("Stop following"));
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -1874,7 +1874,7 @@
                         .removeClass("stop-following")
                         .addClass("btn-primary")
                         .addClass("follow")
-                        .html("Follow");
+                        .html(gettext("Follow"));
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -2340,7 +2340,7 @@
                         endpoint: "/main/upload-avatar"
                     },
                     text: {
-                        uploadButton: '<i class="icon-upload icon-white"></i> Avatar file'
+                        uploadButton: '<i class="icon-upload icon-white"></i> '+gettext("Avatar file")
                     },
                     template: '<div class="qq-uploader">' +
                         '<pre class="qq-upload-drop-area"><span>{dragZoneText}</span></pre>' +
@@ -2450,16 +2450,16 @@
 
             if (password !== repeat) {
 
-                view.showError("Passwords don't match.");
+                view.showError(gettext("Passwords don't match."));
 
             } else if (password.length < 8) {
 
-                view.showError("Password must be 8 chars or more.");
+                view.showError(gettext("Password must be 8 chars or more."));
 
             } else if (/^[a-z]+$/.test(password.toLowerCase()) ||
                        /^[0-9]+$/.test(password)) {
 
-                view.showError("Passwords have to have at least one letter and one number.");
+                view.showError(gettext("Passwords have to have at least one letter and one number."));
 
             } else {
 
@@ -2469,7 +2469,7 @@
                           password,
                           {
                               success: function(resp, status, xhr) {
-                                  view.showSuccess("Saved.");
+                                  view.showSuccess(gettext("Saved."));
                                   view.stopSpin();
                               },
                               error: function(model, error, options) {
@@ -2526,7 +2526,7 @@
                     view.$(".favorite")
                         .removeClass("favorite")
                         .addClass("unfavorite")
-                        .html("Unlike <i class=\"icon-thumbs-down\"></i>");
+                        .html(gettext("Unlike")+" <i class=\"icon-thumbs-down\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -2548,7 +2548,7 @@
                     view.$(".unfavorite")
                         .removeClass("unfavorite")
                         .addClass("favorite")
-                        .html("Like <i class=\"icon-thumbs-up\"></i>");
+                        .html(gettext("Like")+" <i class=\"icon-thumbs-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -2570,7 +2570,7 @@
                     view.$(".share")
                         .removeClass("share")
                         .addClass("unshare")
-                        .html("Unshare <i class=\"icon-remove\"></i>");
+                        .html(gettext("Unshare")+" <i class=\"icon-remove\"></i>");
                     Pump.addMajorActivity(act);
                 }
                 view.stopSpin();
@@ -2592,7 +2592,7 @@
                     view.$(".unshare")
                         .removeClass("unshare")
                         .addClass("share")
-                        .html("Share <i class=\"icon-share-alt\"></i>");
+                        .html(gettext("Share")+" <i class=\"icon-share-alt\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -2809,7 +2809,7 @@
                         endpoint: "/main/upload"
                     },
                     text: {
-                        uploadButton: '<i class="icon-upload icon-white"></i> Picture file'
+                        uploadButton: '<i class="icon-upload icon-white"></i> '+gettext("Picture file")
                     },
                     template: '<div class="qq-uploader">' +
                         '<pre class="qq-upload-drop-area"><span>{dragZoneText}</span></pre>' +
@@ -3257,7 +3257,7 @@
         return {
             width: "90%",
             multiple: true,
-            placeholder: "Search for a user or list",
+            placeholder: gettext("Search for a user or list"),
             minimumInputLength: 2,
             initSelection: function(element, callback) {
                 var val = element.val(),
@@ -3384,7 +3384,7 @@
                     verb: "delete",
                     object: view.model.toJSON()
                 }),
-                prompt = "Delete this " + model.get("objectType") + "?";
+                prompt = gettext("Delete this") + " " + model.get("objectType") + "?";
 
             // Hide the dropdown, since we were selected
             view.$el.dropdown('toggle');

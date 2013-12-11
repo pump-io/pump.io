@@ -52,7 +52,7 @@ var confirm = function(req, res, next) {
             confirm = confirms[0];
             if (confirm.confirmed) {
                 // XXX: Maybe just log and redirect to / ?
-                throw new HTTPError("Already confirmed.", 400);
+                throw new HTTPError(req.gettext("Already confirmed."), 400);
             }
             User.get(confirm.nickname, this);
         },
@@ -60,7 +60,7 @@ var confirm = function(req, res, next) {
             if (err) throw err;
             user = results;
             if (principal && principal.id != user.profile.id) {
-                throw new HTTPError("This is someone else's confirmation.", 400);
+                throw new HTTPError(req.gettext("This is someone else's confirmation."), 400);
             }
             user.email = confirm.email;
             user.save(this.parallel());
@@ -75,7 +75,7 @@ var confirm = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("confirmed", {page: {title: "Email address confirmed",
+                res.render("confirmed", {page: {title: req.gettext("Email address confirmed"),
                                                 url: req.originalUrl},
                                          principalUser: user,
                                          principal: user.profile});
