@@ -32,10 +32,12 @@ var _ = require("underscore"),
         .demand(["u","p"])
         .alias("u", "username")
         .alias("p", "password")
+        .alias("e", "email")
         .alias("s", "server")
         .alias("P", "port")
         .describe("u", "Username to register")
         .describe("p", "Password for user")
+        .describe("e", "Email address for user")
         .describe("s", "Server name (default 'localhost')")
         .describe("P", "Port (default 80)")
         .default("P", 80)
@@ -43,7 +45,8 @@ var _ = require("underscore"),
         .argv;
 
 var user = {"nickname": argv.u,
-            "password": argv.p};
+            "password": argv.p,
+            "email": argv.e};
 
 var server = argv.s;
 var port = argv.P;
