@@ -747,6 +747,8 @@ var createUser = function(req, res, next) {
                 return;
             }
         }
+    }else{
+         if(props.email!="undefined") delete props.email
     }
 
     Step(
@@ -928,7 +930,7 @@ var postActivity = function(req, res, next) {
     var props = Scrubber.scrubActivity(req.body),
         activity = new Activity(props),
         finishAndSend = function(profile, activity, callback) {
-            
+
             var dupe = new Activity(_.clone(activity));
 
             Step(
