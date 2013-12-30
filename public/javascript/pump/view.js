@@ -3302,7 +3302,7 @@
                 Pump.ajax({
                     type: "GET",
                     dataType: "json",
-                    url: Pump.fullURL("/api/user/"+user.get("nickname")+"/following?q="+term),
+                    url: Pump.fullURL("/api/user/"+user.get("nickname")+"/following?q="+options.term),
                     success: function(data) {
                         var people = _.map(data.items, function(item) {
                             return {id: item.objectType + ":" + item.id,
