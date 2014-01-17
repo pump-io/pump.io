@@ -2492,11 +2492,38 @@
                 "replies",
                 "activity-object-collection"],
         events: {
+            "mouseenter": "maybeShowExtraMenu",
+            "mouseleave": "maybeHideExtraMenu",
             "click .favorite": "favoriteObject",
             "click .unfavorite": "unfavoriteObject",
             "click .share": "shareObject",
             "click .unshare": "unshareObject",
             "click .comment": "openComment"
+        },
+	 maybeShowExtraMenu: function() {
+            var view = this,
+                activity = view.model,
+                principal = Pump.principal,
+		type = activity.get("objectType");
+           if (principal && activity.author && principal.id == activity.author.id && type == 'comment') {
+                if (!view.extraMenu) {
+                    view.extraMenu = new Pump.ExtraMenuComment({model: activity.object, parent: view});
+                    view.extraMenu.show();
+                }
+            }
+        },
+        maybeHideExtraMenu: function() {
+            var view = this,
+                activity = view.model,
+                principal = Pump.principal,
+                type = activity.get("objectType");
+
+           if (principal && activity.author && principal.id == activity.author.id && type == 'comment') {
+                if (view.extraMenu) {
+                    view.extraMenu.hide();
+                    view.extraMenu = null;
+                }
+            }
         },
         setupSubs: function() {
             var view = this,
@@ -3302,7 +3329,7 @@
                 Pump.ajax({
                     type: "GET",
                     dataType: "json",
-                    url: Pump.fullURL("/api/user/"+user.get("nickname")+"/following?q="+term),
+                    url: Pump.fullURL("/api/user/"+user.get("nickname")+"/following?q="+options.term),
                     success: function(data) {
                         var people = _.map(data.items, function(item) {
                             return {id: item.objectType + ":" + item.id,
@@ -3404,6 +3431,62 @@
                     });
                 }
             });
+        }
+    });
+
+   Pump.ExtraMenuComment = Pump.TemplateView.extend({
+        parent: null,
+        templateName: "extra-menu",
+        events: {
+            "click .delete-object": "deleteObject"
+        },
+        initialize: function(options) {
+            var view = this;
+            if (options.parent) {
+                view.parent = options.parent;
+            }
+        },
+        show: function() {
+            var view = this;
+            view.render();
+        },
+        ready: function() {
+            var view = this;
+            if (view.parent && view.parent.$el) {
+                view.parent.$el.prepend(view.$el);
+            }
+        },
+        hide: function() {
+            var view = this;
+            view.$el.remove();
+        },
+        deleteObject: function() { 
+            //alert("delete:"+ JSON.stringify(this.parent.model.id));
+            var view = this.parent,
+                model = view.model,
+                act = new Pump.Activity({
+                    verb: "delete",
+                    object: view.model.toJSON()
+                }),
+                prompt = "Delete this " + model.get("objectType") + "?";
+            
+            Pump.areYouSure(prompt, function(err, sure) {
+                if (sure) {
+                    Pump.newMinorActivity(act, function(err, act) {
+                        if (err) {
+                            view.showError(err);
+                        } else {
+                            Pump.addMinorActivity(act);
+                            // Remove the parent from the list
+                            view.$el.remove();
+                            location.reload()
+                            //Pump.router.navigate("/", true);
+                        }
+                    });
+                }
+            });
+
+
         }
     });
 
