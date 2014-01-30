@@ -34,15 +34,21 @@ var urlfmt = require("url").format,
         .alias("u", "username")
         .alias("s", "server")
         .alias("P", "port")
+        .alias("I", "client-id")
+        .alias("X", "client-secret")
         .describe("u", "User nickname")
         .describe("s", "Server name (default 'localhost')")
         .describe("P", "Port (default 80)")
+        .describe("I", "Client ID (default to value stored by pump-register-app)")
+        .describe("X", "Client secret (default to value stored by pump-register-app)")
         .default("P", 80)
         .default("s", "localhost")
         .argv,
     username = argv.u,
     server = argv.s,
     port = argv.P,
+    clientId = argv.I,
+    clientSecret = argv.X,
     cl,
     oa,
     rt;
@@ -54,7 +60,11 @@ var rl = readline.createInterface({
 
 Step(
     function() {
-        clientCred(server, this);
+        if (clientId && clientSecret) {
+            this(null, {client_id: clientId, client_secret: clientSecret});
+        } else {
+            clientCred(server, this);
+        }
     },
     function(err, cred) {
         var proto = (port == 443) ? "https:" : "http:",
@@ -99,7 +109,12 @@ Step(
     },
     function(err, token, secret, res) {
         if (err) throw err;
-        setUserCred(username, server, {token: token, token_secret: secret}, this);
+        if (clientId && clientSecret) {
+            console.dir({token: token, token_secret: secret});
+            this(null);
+        } else {
+            setUserCred(username, server, {token: token, token_secret: secret}, this);
+        }
     },
     function(err) {
         if (err) {

@@ -163,6 +163,82 @@ suite.addBatch({
                         }
                     }
                 }
+            },
+            "and we register a different user": {
+                topic: function(cl) {
+                    newPair(cl, "rudie", "chicken-skin-suit", this.callback);
+                },
+                "it works": function(err, pair) {
+                    assert.ifError(err);
+                    assert.isObject(pair);
+                },
+                "and they follow a person": {
+                    topic: function(pair, cl) {
+                        var callback = this.callback,
+                            cred = makeCred(cl, pair),
+                            user;
+
+                        Step(
+                            function() {
+                                register(cl, "thedoctor", "for*a*purpose", this);
+                            },
+                            function(err, results) {
+                                var ucred, url, act;
+                                if (err) throw err;
+                                user = results;
+                                ucred = makeCred(cl, {token: user.token, token_secret: user.secret});
+                                url = "http://localhost:4815/api/user/thedoctor/feed";
+                                act = {
+                                    verb: "update",
+                                    object: {
+                                        id: user.profile.id,
+                                        objectType: "person",
+                                        displayName: "Alimantado"
+                                    }
+                                };
+                                pj(url, ucred, act, this);
+                            },
+                            function(err) {
+                                if (err) throw err;
+                                var act,
+                                    url = "http://localhost:4815/api/user/rudie/feed";
+                                if (err) throw err;
+                                act = {
+                                    verb: "follow",
+                                    object: user.profile
+                                };
+                                pj(url, cred, act, this);
+                            },
+                            function(err) {
+                                callback(err);
+                            }
+                        );
+                    },
+                    "it works": function(err) {
+                        assert.ifError(err);
+                    },
+                    "and we request the following stream with a search parameter": {
+                        topic: function(pair, cl) {
+                            var callback = this.callback,
+                                cred = makeCred(cl, pair),
+                                url = "http://localhost:4815/api/user/rudie/following?q=alim";
+
+                            gj(url, cred, function(err, body, resp) {
+                                callback(err, body);
+                            });
+                        },
+                        "it works": function(err, feed) {
+                            assert.ifError(err);
+                        },
+                        "it includes only the matching objects": function(err, feed) {
+                            var i;
+                            assert.ifError(err);
+                            validFeed(feed);
+                            assert.equal(feed.items.length, 1);
+                            assert.equal(feed.items[0].displayName, "Alimantado");
+                        }
+                    }
+                }
             }
         }
     }
