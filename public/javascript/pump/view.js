@@ -1358,6 +1358,7 @@
             var view = this,
                 model = view.model,
                 $el = view.$(".replies");
+                view.menuParent = view.$(".muted");
 
             if (view.replyStream) {
                 view.replyStream.setElement($el);
@@ -1775,8 +1776,36 @@
         templateName: 'reply',
         modelName: 'reply',
         events: {
+            "mouseenter": "maybeShowExtraMenu",
+            "mouseleave": "maybeHideExtraMenu",
             "click .favorite": "favoriteObject",
             "click .unfavorite": "unfavoriteObject"
+        },
+        maybeShowExtraMenu: function() {
+            var view = this,
+                activity = view.model,
+                principal = Pump.principal;
+
+                view.menuParent = view.$el;
+
+            if (principal && activity.author && principal.id == activity.author.id) {
+                if (!view.extraMenu) {
+                    view.extraMenu = new Pump.ExtraMenu({model: activity, parent: view});
+                    view.extraMenu.show();
+                }
+            }
+        },
+        maybeHideExtraMenu: function() {
+            var view = this,
+                activity = view.model,
+                principal = Pump.principal;
+
+            if (principal && activity.author && principal.id == activity.author.id) {
+                if (view.extraMenu) {
+                    view.extraMenu.hide();
+                    view.extraMenu = null;
+                }
+            }
         },
         favoriteObject: function() {
             var view = this,
@@ -3369,8 +3398,8 @@
         },
         ready: function() {
             var view = this;
-            if (view.parent && view.parent.$el) {
-                view.parent.$el.prepend(view.$el);
+            if (view.parent && view.parent.menuParent) {
+                view.parent.menuParent.prepend(view.$el);
             }
         },
         hide: function() {
