@@ -452,9 +452,10 @@ var getUser = function(req, res, next) {
         },
         function(err) {
             if (err) next(err);
-            // If no user, or different user, hide email
+            // If no user, or different user, hide email and settings
             if (!req.principal || (req.principal.id != req.user.profile.id)) {
                 delete req.user.email;
+                delete req.user.settings;
             }
             req.user.sanitize();
             res.json(req.user);
