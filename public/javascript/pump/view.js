@@ -1358,7 +1358,7 @@
             var view = this,
                 model = view.model,
                 $el = view.$(".replies");
-                view.menuParent = view.$(".muted");
+                view.menuParent = view.$(".muted:first");
 
             if (view.replyStream) {
                 view.replyStream.setElement($el);
