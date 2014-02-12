@@ -1419,27 +1419,63 @@
                 }
             });
         },
-        shareObject: function() {
-            var view = this,
+        shareObject: function () {
+            var view = this;
+            view.showShareModal(view.model, function (err, to) {
                 act = new Pump.Activity({
                     verb: "share",
                     object: view.model.object.toJSON()
                 });
+                strToObj = function (str) {
+                    var colon = str.indexOf(":"),
+                        type = str.substr(0, colon),
+                        id = str.substr(colon + 1);
+                    return new Pump.ActivityObject({
+                        id: id,
+                        objectType: type
+                    });
+                };
+                if (_.isString(to)) {
+                    to = to.split(",");
+                }
+                if (to && to.length > 0) {
+                    act.to = new Pump.ActivityObjectBag(_.map(to, strToObj));
+                }
+                view.startSpin();
+                Pump.newMajorActivity(act, function (err, act) {
+                    if (err) {
+                        view.stopSpin();
+                        view.showError(err);
+                    } else {
+                        view.$(".share")
+                            .removeClass("share")
+                            .addClass("unshare")
+                            .html("Unshare <i class=\"fa fa-times\"></i>");
+                        Pump.addMajorActivity(act);
+                    }
+                });
+            });
+        },
+        showShareModal: function (model, callback) {
+            var view = this,
+                profile = Pump.principal,
+                lists = profile.lists;
 
-            view.startSpin();
-
-            Pump.newMajorActivity(act, function(err, act) {
+            Pump.fetchObjects([lists], function (err, objs) {
                 if (err) {
-                    view.stopSpin();
                     view.showError(err);
                 } else {
-                    view.$(".share")
-                        .removeClass("share")
-                        .addClass("unshare")
-                        .html("Unshare <i class=\"fa fa-times\"></i>");
-                    Pump.addMajorActivity(act);
+                    Pump.showModal(Pump.ShareNoteModal, {
+                        data: {
+                            user: Pump.principalUser,
+                            model: model,
+                            lists: lists
+                        },
+                        callback: callback
+                    });
                 }
             });
+            return false;
         },
         unshareObject: function() {
             var view = this,
@@ -2777,6 +2813,29 @@
                     view.remove();
                 }
             });
+        }
+    });
+
+    Pump.ShareNoteModal = Pump.TemplateView.extend({
+
+        tagName: "div",
+        className: "modal-holder",
+        templateName: 'post-share',
+        parts: ["recipient-selector"],
+        ready: function() {
+            var view = this;
+            view.$("#share-to").select2(Pump.selectOpts());
+        },
+        events: {
+            "click #send-share": "postShare"
+        },
+        postShare: function(ev) {
+            var view = this;
+            callback = view.options.callback;
+            to = view.$('#share-to').val();
+            view.$el.modal('hide');
+            view.remove();
+            callback(null, to);
         }
     });
 
