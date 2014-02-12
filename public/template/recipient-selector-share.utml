@@ -1,0 +1,2 @@
+<label for="<%- id %>"><%- label %></label>
+<input type="hidden" name="<%- name %>" id="<%- id %>" <% if (name == "to") { %>value="collection:http://activityschema.org/collection/public"<% } %>>
