@@ -3428,7 +3428,7 @@
                             // Remove the parent from the list
                             view.parent.$el.remove();
                             // Remove the model from the client-side collection
-                            model.collection.remove(model.id);
+                            if(model.collection)model.collection.remove(model.id);
                         }
                     });
                 }
