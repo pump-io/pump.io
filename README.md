@@ -212,6 +212,8 @@ Here are the main configuration keys.
   Defaults to 1200000, or 20 minutes.
 * *favicon* Local filesystem path to the favicon.ico file to use. This will be served as "/favicon.ico"
   by the server. By default, uses public/images/favicon.ico.
+* *invitationCode* If set to some string, a new user is expected to provide it on registration. If not
+  correct (or not specified), registration does not work. By default this is `null`, thus disabled.
 
 ### Web server proxy
 

@@ -749,6 +749,17 @@ var createUser = function(req, res, next) {
         }
     }
 
+    // Invitation Code validation
+    if (req.app.config.invitationCode) {
+        if (props.invitationCode != req.app.config.invitationCode) {
+            next(new HTTPError("Invalid invitation code", 400));
+            return;
+        }
+    }
+    if (_.has(props, "invitationCode")) {
+        delete props.invitationCode;
+    }
+
     Step(
         function() {
             User.create(props, this);

@@ -825,6 +825,7 @@
                           password: view.$('#registration input[name="password"]').val()},
                 repeat = view.$('#registration input[name="repeat"]').val(),
                 email = (Pump.config.requireEmail) ? view.$('#registration input[name="email"]').val() : null,
+                invitationCode = (Pump.config.invitationCode) ?  view.$('#registration input[name="invitationCode"]').val() : null,
                 options,
                 retries = 0,
                 NICKNAME_RE = /^[a-zA-Z0-9\-_.]{1,64}$/,
@@ -911,10 +912,17 @@
 
                 view.showError("Email address required.");
 
+            } else if (Pump.config.invitationCode && (!invitationCode || invitationCode.length === 0)) {
+
+                view.showError("Invitation code is required.");
+
             } else {
 
                 if (Pump.config.requireEmail) {
                     params.email = email;
+                }
+                if (Pump.config.invitationCode) {
+                    params.invitationCode = invitationCode;
                 }
 
                 view.startSpin();

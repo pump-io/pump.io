@@ -143,6 +143,7 @@
           site: "<%- config.site %>",
           haveEmail: <%- config.haveEmail || false %>,
           requireEmail: <%- config.requireEmail || false %>,
+          invitationCode: <%- config.invitationCode  %>,
           disableRegistration: <%- config.disableRegistration || false %>,
           canUpload: <%- config.canUpload || false %>,
           debugClient: <%- config.debugClient || false %>,
