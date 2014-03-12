@@ -1994,6 +1994,38 @@
                     model: "followers"
                 }
             }
+        },   
+             events: {
+            "click #followall": "FollowAll"
+        },
+        "FollowAll": function () {
+            var view = this,
+            profile = view.options.data.profile.toJSON();
+            url = profile.followers.url;
+            nickname = profile.displayName;
+            Pump.areYouSure("Follow all "+nickname+" followers? This will take a few seconds and you have to reload the page manually!", function(err, sure) {
+                if (err) {
+                    view.showError(err);
+                } else if (sure) {
+                    var user = Pump.User.unique({
+                        nickname: nickname,
+                        url: url
+                    }), 
+                        followers = Pump.PeopleStream.unique({
+                            url: url
+                        });
+                    follower = followers.toJSON();
+                    _.each(follower.items, function (user) {
+                        act = {
+                            verb: "follow",
+                            object: user
+                        };
+                        Pump.newMinorActivity(act, function (err, act) {
+                            Pump.addMinorActivity(act);
+                        });
+                    });
+                }
+            });
         }
     });
 
