@@ -1465,6 +1465,14 @@
                         .addClass("share")
                         .html("Share <i class=\"icon-share-alt\"></i>");
                     Pump.addMinorActivity(act);
+                    Pump.ajax({
+                       type: "DELETE",
+                       dataType: "json",
+                       url: view.model.id,
+                       success: function(data) {
+                         window.location.reload();
+                       }
+                    });
                 }
             });
         },
