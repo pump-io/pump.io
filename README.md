@@ -47,7 +47,11 @@ thing much more enjoyable.
 
 ## Installation
 
-### Prerequisites
+### 1)Using docker image
+
+https://index.docker.io/u/niktrix/docker-pump.io/
+
+### 2) Prerequisites
 
 You'll need four things to get started:
 
