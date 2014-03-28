@@ -1,7 +1,7 @@
 <% var object = activity.object,
        author = (activity.verb == "share") ? object.author : activity.actor;
    if (!headless && !author) return;
-   if (object.deleted) return; %>
+   if (object.deleted || activity.deleted) return; %>
 <li class="media activity major<% if (headless) { %> headless<% } %>" data-activity-id="<%- activity.id %>">
   <% if (!headless) { %>
   <a class="pull-left" href="<%- author.url %>">
@@ -18,6 +18,7 @@
     <% } %>
     <p class="muted">
       <small>
+        <% if (activity.verb == "share") { %><a href="<%- activity.actor.url %>"><%- activity.actor.displayName %></a> shared<% } %>
         <% if (!headless || (activity.verb == "share" && author)) { %><a href="<%- author.url %>"><%- author.displayName %></a> at <% } %>
         <a href="<%- object.url || activity.url %>"><abbr title="<%- activity.published %>" class="easydate"><%- activity.published %></abbr></a>
         <% if (activity.location) { %> in <a href="<%- activity.location.url %>"><%- activity.location.displayName %></a><% } %>
@@ -43,7 +44,7 @@
       <%= object.content %>
     </div>
     <% if (principal) { %>
-    <%= partial("responses", {obj: object}) %>
+    <%= partial("responses", {act: activity, obj: object}) %>
     <% } %>
     <% if (!object.likes || object.likes.totalItems === 0) { %>
     <% } else if (object.likes.totalItems === 1) { %>
