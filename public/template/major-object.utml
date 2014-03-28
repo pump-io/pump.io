@@ -22,7 +22,7 @@
       <%= obj.content %>
     </div>
     <% if (principal) { %>
-    <%= partial("responses", {obj: obj}) %>
+    <%= partial("responses", {act: activity, obj: obj}) %>
     <% } %>
     <% if (!obj.likes || obj.likes.totalItems === 0) { %>
     <% } else if (obj.likes.totalItems === 1) { %>
