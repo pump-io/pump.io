@@ -5,26 +5,22 @@
 
       <div class="span6">
 
-        <h1><%- config.site %></h1>
+        <div style="word-wrap:break-word"><h1><%- config.site %></h1></div>
+	<br>
+        <p>Hier l&auml;uft der <a href="http://pump.io/">pump.io</a>-Server der <a href="http://www.intevation.de">Intevation GmbH</a>.
+           <br>Pump.io ist eine verteilte Freie Software, die eine <i>Social-Engine</i> bereitstellt. 
+            Wir nutzen das System als News- und Blogging-Dienst und soziales Netzwerk unter eigener Kontrolle.
+        </p>
 
-        <p>This site runs <a href="http://pump.io/">pump.io</a>, the
-	  high-performance Open Source social engine. It pumps your life
-	  in and out of your friends, family and colleagues.</p>
-
-        <% if (config.disableRegistration) { %>
-
-        <p>(No pump.io account yet? <a href="http://pump.io/tryit">Try it</a>!)</p>        
-
-        <% } else { %>
-
-        <p><a class="btn primary large" href="/main/register">Get Started &raquo;</a></p>
-
-        <% } %>
+        <p>Unser System wird auch zur internen Kommunikation genutzt. Daher haben wir die Registrierung an unserem Server deaktiviert.
+        <br>Da es sich allerdings um ein verteiltes System handelt, k&ouml;nnen Sie sich einfach <a href="http://pump.io/tryit">an einem der &ouml;ffentlichen Server</a> registrieren und sp&auml;ter mit diesem Account Nutzern auf unserem System folgen.</p>
+        
+        <p><a class="btn primary large" href="/Intevation">Intevation auf io.intevation.de besuchen</a></p>
 
       </div>
 
       <div class="span4">
-        <img src="images/somefriends.jpg" width="340" height="235" class="img-rounded" />
+        <img src="images/intevation.png" class="img-rounded" />
       </div>
 
     </div>

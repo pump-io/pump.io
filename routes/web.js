@@ -68,7 +68,9 @@ var databank = require("databank"),
 var addRoutes = function(app) {
 
     app.get("/", app.session, principal, addMessages, showMain);
-
+  
+    app.get("/main/impressum", app.session, principal, showImpressum);
+  
     app.get("/main/register", app.session, principal, showRegister);
     app.post("/main/register", app.session, principal, clientAuth, reqGenerator, createUser);
 
@@ -129,12 +131,17 @@ var loginRedirect = function(rel) {
 
 var showMain = function(req, res, next) {
     if (req.principalUser) {
-        req.log.info({msg: "Showing inbox for logged-in user", user: req.principalUser});
+        req.log.debug({msg: "Showing inbox for logged-in user", user: req.principalUser});
         showInbox(req, res, next);
     } else {
-        req.log.info({msg: "Showing welcome page"});
+        req.log.debug({msg: "Showing welcome page"});
         res.render("main", {page: {title: "Welcome", url: req.originalUrl}});
     }
+};
+
+var showImpressum = function(req, res, next) {
+        req.log.debug({msg: "Showing impressum page"});
+        res.render("impressum", {page: {title: "Impressum", url: req.originalUrl}});
 };
 
 var showInbox = function(req, res, next) {
@@ -585,7 +592,7 @@ var uploader = function(saver) {
             fileName = req.files.qqfile.path;
         }
 
-        req.log.info("Uploading " + fileName + " of type " + mimeType);
+        req.log.debug("Uploading " + fileName + " of type " + mimeType);
 
         Step(
             function() {
@@ -599,9 +606,9 @@ var uploader = function(saver) {
                             "error": err.message};
                     res.send(JSON.stringify(data), {"Content-Type": "text/plain"}, 500);
                 } else {
-                    req.log.info("Upload successful");
+                    req.log.debug("Upload successful");
                     obj.sanitize();
-                    req.log.info(obj);
+                    req.log.debug(obj);
                     data = {success: true,
                             obj: obj};
                     res.send(JSON.stringify(data), {"Content-Type": "text/plain"}, 200);
@@ -902,13 +909,13 @@ var handleRecover = function(req, res, next) {
 
     Step( 
         function () { 
-            req.log.info({nickname: nickname}, "checking for user to recover");
+            req.log.debug({nickname: nickname}, "checking for user to recover");
             User.get(nickname, this);
         },
         function(err, result) {
             if (err) {
                 if (err.name == "NoSuchThingError") {
-                    req.log.info({nickname: nickname}, "No such user, can't recover");
+                    req.log.debug({nickname: nickname}, "No such user, can't recover");
                     res.status(400);
                     res.json({sent: false, noSuchUser: true, error: "There is no user with that nickname."});
                     return;
@@ -918,17 +925,17 @@ var handleRecover = function(req, res, next) {
             }
             user = result;
             if (!user.email) {
-                req.log.info({nickname: nickname}, "User has no email address; can't recover.");
+                req.log.debug({nickname: nickname}, "User has no email address; can't recover.");
                 // Done
                 res.status(400);
                 res.json({sent: false, noEmail: true, error: "This user account has no email address."});
                 return;
             }
             if (force) {
-                req.log.info({nickname: nickname}, "Forcing recovery regardless of existing recovery records.");
+                req.log.debug({nickname: nickname}, "Forcing recovery regardless of existing recovery records.");
                 this(null, []);
             } else {
-                req.log.info({nickname: nickname}, "Checking for existing recovery records.");
+                req.log.debug({nickname: nickname}, "Checking for existing recovery records.");
                 // Do they have any outstanding recovery requests?
                 Recovery.search({nickname: nickname, recovered: false}, this);
             }
@@ -937,30 +944,30 @@ var handleRecover = function(req, res, next) {
             var stillValid;
             if (err) throw err;
             if (!recoveries || recoveries.length === 0) {
-                req.log.info({nickname: nickname}, "No existing recovery records; continuing.");
+                req.log.debug({nickname: nickname}, "No existing recovery records; continuing.");
                 this(null);
                 return;
             } 
             stillValid = _.filter(recoveries, function(reco) { return Date.now() - Date.parse(reco.timestamp) < Recovery.TIMEOUT; });
             if (stillValid.length > 0) {
-                req.log.info({nickname: nickname, count: stillValid.length}, "Have an existing, valid recovery record.");
+                req.log.debug({nickname: nickname, count: stillValid.length}, "Have an existing, valid recovery record.");
                 // Done
                 res.status(409);
                 res.json({sent: false, existing: true, error: "You already requested a password recovery."});
             } else {
-                req.log.info({nickname: nickname}, "Have old recovery records but they're timed out.");
+                req.log.debug({nickname: nickname}, "Have old recovery records but they're timed out.");
                 this(null);
             }
         },
         function(err) {
             if (err) throw err;
-            req.log.info({nickname: nickname}, "Creating a new recovery record.");
+            req.log.debug({nickname: nickname}, "Creating a new recovery record.");
             Recovery.create({nickname: nickname}, this);
         },
         function(err, recovery) {
             var recoveryURL;
             if (err) throw err;
-            req.log.info({nickname: nickname}, "Generating recovery email output.");
+            req.log.debug({nickname: nickname}, "Generating recovery email output.");
             recoveryURL = URLMaker.makeURL("/main/recover/" + recovery.code);
             res.render("recovery-email-html",
                        {principal: user.profile,
@@ -979,7 +986,7 @@ var handleRecover = function(req, res, next) {
         },
         function(err, html, text) {
             if (err) throw err;
-            req.log.info({nickname: nickname}, "Sending recovery email.");
+            req.log.debug({nickname: nickname}, "Sending recovery email.");
             Mailer.sendEmail({to: user.email,
                               subject: "Recover password for " + req.app.config.site,
                               text: text,
@@ -992,7 +999,7 @@ var handleRecover = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                req.log.info({nickname: nickname}, "Finished with recovery");
+                req.log.debug({nickname: nickname}, "Finished with recovery");
                 res.json({sent: true});
             }
         }

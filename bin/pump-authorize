@@ -35,10 +35,10 @@ var urlfmt = require("url").format,
         .alias("s", "server")
         .alias("P", "port")
         .describe("u", "User nickname")
-        .describe("s", "Server name (default 'localhost')")
-        .describe("P", "Port (default 80)")
-        .default("P", 80)
-        .default("s", "localhost")
+        .describe("s", "Server name")
+        .describe("P", "Port")
+        .default("P", 443)
+        .default("s", "io.intevation.de")
         .argv,
     username = argv.u,
     server = argv.s,

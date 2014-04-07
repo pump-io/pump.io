@@ -1,0 +1,40 @@
+<div id="main">
+ 
+ <div style="min-width:400px;"> 
+  <div class="hero-unit">
+
+    <div class="row">
+          
+
+      <div class="span6">
+
+        <h1>Impressum</h1>
+        <br>
+        Diese Seite wird von der Intevation GmbH bereitgestellt.
+        <br><br><p>
+        E-Mail:&nbsp;&nbsp;&nbsp;<a href="mailto:intevation@intevation.de" class="mail">intevation@intevation.de</a> (<a href="https://www.intevation.de/intevation_gpgkey.txt">GnuPG Key</a>)<br>
+        Telefon: +49-541-33 50 83 - 0<br>
+        Fax:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+49-541-33 50 83 - 99
+        </p>
+        <h4>Addresse</h4>
+        Intevation GmbH<br>
+        Neuer Graben 17 <br>
+        49074 Osnabrück, Deutschland
+        <h4>Registereintrag</h4>
+        HR B 18998<br>
+        Amtsgericht Osnabrück<br>
+        <h4>Umsatzsteuer-Identifikation</h4>
+        de 204 854 484</h4>
+        <h4>Geschäftsführung</h4>
+        Frank Koormann, Bernhard Reiter, Dr. Jan-Oliver Wagner
+        </div>
+        <div class="span4">
+        <img src="../images/intevation.png" class="img-rounded" />
+        </div>
+
+
+      </div>
+    </div>
+    
+  </div>
+</div>

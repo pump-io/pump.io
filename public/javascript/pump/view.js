@@ -585,6 +585,15 @@
                     Pump.showModal(Cls, {data: {user: Pump.principalUser,
                                                 lists: lists},
                                          ready: function() {
+                                                 $('#modal-note').bind('hide', function (e) {
+                                                 if ($('#note-content').val()) {
+                                                    if (window.confirm("Are you sure?")) {
+                                                        $('#modal-note').remove();
+                                                    } else {
+                                                        e.preventDefault();
+                                                    }
+                                                } else $('#modal-note').remove();
+                                               });
                                              stopSpin();
                                          }});
                 }
@@ -733,7 +742,9 @@
             // setup subViews
             view.setupSubs();
             // Initialize state of login button
-            view.onKey();
+            //view.onKey();
+            // Initialize state of login button after a tiny delay for remembered passwords to be filled in
+            setInterval(function(){view.onKey();},100);
         },
         "onKey": function(event) {
             var view = this,
@@ -743,7 +754,7 @@
             if (!nickname || !password || nickname.length === 0 || password.length < 8) {  
                 view.$(':submit').attr('disabled', 'disabled');
             } else {
-                view.$(':submit').removeAttr('disabled');
+               view.$(':submit').removeAttr('disabled');
             }
         },
         "doLogin": function() {
@@ -812,6 +823,10 @@
 
             return false;
         }
+    });
+
+    Pump.ImpressumContent = Pump.ContentView.extend({
+        templateName: 'impressum'
     });
 
     Pump.RegisterContent = Pump.ContentView.extend({
@@ -1358,7 +1373,7 @@
             var view = this,
                 model = view.model,
                 $el = view.$(".replies");
-
+                view.menuParent = view.$(".muted:first");
             if (view.replyStream) {
                 view.replyStream.setElement($el);
                 return;
@@ -1370,8 +1385,7 @@
             var view = this,
                 activity = view.model,
                 principal = Pump.principal;
-
-            if (principal && activity.actor && principal.id == activity.actor.id) {
+            if (principal && activity.actor && principal.id == activity.actor.id ) {
                 if (!view.extraMenu) {
                     view.extraMenu = new Pump.ExtraMenu({model: activity.object, parent: view});
                     view.extraMenu.show();
@@ -1383,7 +1397,7 @@
                 activity = view.model,
                 principal = Pump.principal;
 
-            if (principal && activity.actor && principal.id == activity.actor.id) {
+            if (principal && activity.actor && principal.id == activity.actor.id ) {
                 if (view.extraMenu) {
                     view.extraMenu.hide();
                     view.extraMenu = null;
@@ -1424,27 +1438,59 @@
                 }
             });
         },
-        shareObject: function() {
-            var view = this,
+        shareObject: function () {
+            var view = this;
+            view.showShareModal(view.model, function (err, to) {
                 act = new Pump.Activity({
                     verb: "share",
                     object: view.model.object.toJSON()
                 });
+                strToObj = function (str) {
+                    var colon = str.indexOf(":"),
+                        type = str.substr(0, colon),
+                        id = str.substr(colon + 1);
+                    return new Pump.ActivityObject({
+                        id: id,
+                        objectType: type
+                    });
+                };
+                if (_.isString(to)) {
+                    to = to.split(",");
+                }
+                if (to && to.length > 0) {
+                    act.to = new Pump.ActivityObjectBag(_.map(to, strToObj));
+                }
+                view.startSpin();
+                Pump.newMajorActivity(act, function (err, act) {
+                    if (err) {
+                        view.stopSpin();
+                        view.showError(err);
+                    } else {
+                        Pump.addMajorActivity(act);
+                    }
+                });
+            });
+        },
+        showShareModal: function (model, callback) {
+            var view = this,
+                profile = Pump.principal,
+                lists = profile.lists;
 
-            view.startSpin();
-
-            Pump.newMajorActivity(act, function(err, act) {
+            Pump.fetchObjects([lists], function (err, objs) {
                 if (err) {
-                    view.stopSpin();
                     view.showError(err);
                 } else {
-                    view.$(".share")
-                        .removeClass("share")
-                        .addClass("unshare")
-                        .html("Unshare <i class=\"icon-remove\"></i>");
-                    Pump.addMajorActivity(act);
+                    Pump.showModal(Pump.ShareNoteModal, {
+                        data: {
+                            user: Pump.principalUser,
+                            model: model,
+                            lists: lists
+                        },
+                        callback: callback
+                    });
                 }
             });
+            return false;
         },
         unshareObject: function() {
             var view = this,
@@ -1465,6 +1511,14 @@
                         .addClass("share")
                         .html("Share <i class=\"icon-share-alt\"></i>");
                     Pump.addMinorActivity(act);
+                    Pump.ajax({
+                       type: "DELETE",
+                       dataType: "json",
+                       url: view.model.id,
+                       success: function(data) {
+                         window.location.reload();
+                       }
+                    });
                 }
             });
         },
@@ -1713,26 +1767,59 @@
                 view.stopSpin();
             });
         },
-        shareObject: function() {
-            var view = this,
+        shareObject: function () {
+            var view = this;
+            view.showShareModal(view.model, function (err, to) {
                 act = new Pump.Activity({
                     verb: "share",
-                    object: view.model.toJSON()
+                    object: view.model.object.toJSON()
                 });
+                strToObj = function (str) {
+                    var colon = str.indexOf(":"),
+                        type = str.substr(0, colon),
+                        id = str.substr(colon + 1);
+                    return new Pump.ActivityObject({
+                        id: id,
+                        objectType: type
+                    });
+                };
+                if (_.isString(to)) {
+                    to = to.split(",");
+                }
+                if (to && to.length > 0) {
+                    act.to = new Pump.ActivityObjectBag(_.map(to, strToObj));
+                }
+                view.startSpin();
+                Pump.newMajorActivity(act, function (err, act) {
+                    if (err) {
+                        view.stopSpin();
+                        view.showError(err);
+                    } else {
+                        Pump.addMajorActivity(act);
+                    }
+                });
+            });
+        },
+        showShareModal: function (model, callback) {
+            var view = this,
+                profile = Pump.principal,
+                lists = profile.lists;
 
-            view.startSpin();
-            Pump.newMajorActivity(act, function(err, act) {
+            Pump.fetchObjects([lists], function (err, objs) {
                 if (err) {
                     view.showError(err);
                 } else {
-                    view.$(".share")
-                        .removeClass("share")
-                        .addClass("unshare")
-                        .html("Unshare <i class=\"icon-remove\"></i>");
-                    Pump.addMajorActivity(act);
+                    Pump.showModal(Pump.ShareNoteModal, {
+                        data: {
+                            user: Pump.principalUser,
+                            model: model,
+                            lists: lists
+                        },
+                        callback: callback
+                    });
                 }
-                view.stopSpin();
             });
+            return false;
         },
         unshareObject: function() {
             var view = this,
@@ -1775,8 +1862,33 @@
         templateName: 'reply',
         modelName: 'reply',
         events: {
+            "mouseenter": "maybeShowExtraMenu",
+            "mouseleave": "maybeHideExtraMenu",
             "click .favorite": "favoriteObject",
             "click .unfavorite": "unfavoriteObject"
+        },
+        maybeShowExtraMenu: function() {
+            var view = this,
+                activity = view.model,
+                principal = Pump.principal;
+                view.menuParent = view.$el;
+            if (principal && activity.author && principal.id == activity.author.id) {
+                if (!view.extraMenu) {
+                    view.extraMenu = new Pump.ExtraMenu({model: activity, parent: view});
+                    view.extraMenu.show();
+                }
+            }
+        },
+        maybeHideExtraMenu: function() {
+            var view = this,
+                activity = view.model,
+                principal = Pump.principal;
+            if (principal && activity.author && principal.id == activity.author.id) {
+                if (view.extraMenu) {
+                    view.extraMenu.hide();
+                    view.extraMenu = null;
+                }
+            }
         },
         favoriteObject: function() {
             var view = this,
@@ -1994,7 +2106,39 @@
                     model: "followers"
                 }
             }
-        }
+        },
+             events: {
+            "click #followall": "FollowAll"
+        },
+        "FollowAll": function () {
+            var view = this,
+            profile = view.options.data.profile.toJSON();
+            url = profile.followers.url;
+            nickname = profile.displayName;
+            Pump.areYouSure("Follow all "+nickname+" followers? This will take a few seconds and you have to reload the page manually!", function(err, sure) {
+                if (err) {
+                    view.showError(err);
+                } else if (sure) {
+                    var user = Pump.User.unique({
+                        nickname: nickname,
+                        url: url
+                    }),
+                        followers = Pump.PeopleStream.unique({
+                            url: url
+                        });
+                    follower = followers.toJSON();
+                    _.each(follower.items, function (user) {
+                        act = {
+                            verb: "follow",
+                            object: user
+                        };
+                        Pump.newMinorActivity(act, function (err, act) {
+                            Pump.addMinorActivity(act);
+                        });
+                    });
+                }
+            });
+        }    
     });
 
     Pump.PeopleStreamView = Pump.TemplateView.extend({
@@ -2492,11 +2636,38 @@
                 "replies",
                 "activity-object-collection"],
         events: {
+            "mouseenter": "maybeShowExtraMenu",
+            "mouseleave": "maybeHideExtraMenu",
             "click .favorite": "favoriteObject",
             "click .unfavorite": "unfavoriteObject",
             "click .share": "shareObject",
             "click .unshare": "unshareObject",
             "click .comment": "openComment"
+        },
+	 maybeShowExtraMenu: function() {
+            var view = this,
+                activity = view.model,
+                principal = Pump.principal,
+		type = activity.get("objectType");
+           if (principal && activity.author && principal.id == activity.author.id && type == 'comment') {
+                if (!view.extraMenu) {
+                    view.extraMenu = new Pump.ExtraMenuComment({model: activity.object, parent: view});
+                    view.extraMenu.show();
+                }
+            }
+        },
+        maybeHideExtraMenu: function() {
+            var view = this,
+                activity = view.model,
+                principal = Pump.principal,
+                type = activity.get("objectType");
+
+           if (principal && activity.author && principal.id == activity.author.id && type == 'comment') {
+                if (view.extraMenu) {
+                    view.extraMenu.hide();
+                    view.extraMenu = null;
+                }
+            }
         },
         setupSubs: function() {
             var view = this,
@@ -2554,27 +2725,59 @@
                 view.stopSpin();
             });
         },
-        shareObject: function() {
-            var view = this,
+        shareObject: function () {
+            var view = this;
+            view.showShareModal(view.model, function (err, to) {
                 act = new Pump.Activity({
                     verb: "share",
-                    object: view.model.toJSON()
+                    object: view.model.object.toJSON()
                 });
+                strToObj = function (str) {
+                    var colon = str.indexOf(":"),
+                        type = str.substr(0, colon),
+                        id = str.substr(colon + 1);
+                    return new Pump.ActivityObject({
+                        id: id,
+                        objectType: type
+                    });
+                };
+                if (_.isString(to)) {
+                    to = to.split(",");
+                }
+                if (to && to.length > 0) {
+                    act.to = new Pump.ActivityObjectBag(_.map(to, strToObj));
+                }
+                view.startSpin();
+                Pump.newMajorActivity(act, function (err, act) {
+                    if (err) {
+                        view.stopSpin();
+                        view.showError(err);
+                    } else {
+                        Pump.addMajorActivity(act);
+                    }
+                });
+            });
+        },
+        showShareModal: function (model, callback) {
+            var view = this,
+                profile = Pump.principal,
+                lists = profile.lists;
 
-            view.startSpin();
-
-            Pump.newMajorActivity(act, function(err, act) {
+            Pump.fetchObjects([lists], function (err, objs) {
                 if (err) {
                     view.showError(err);
                 } else {
-                    view.$(".share")
-                        .removeClass("share")
-                        .addClass("unshare")
-                        .html("Unshare <i class=\"icon-remove\"></i>");
-                    Pump.addMajorActivity(act);
+                    Pump.showModal(Pump.ShareNoteModal, {
+                        data: {
+                            user: Pump.principalUser,
+                            model: model,
+                            lists: lists
+                        },
+                        callback: callback
+                    });
                 }
-                view.stopSpin();
             });
+            return false;
         },
         unshareObject: function() {
             var view = this,
@@ -2710,6 +2913,29 @@
         }
     });
 
+ Pump.ShareNoteModal = Pump.TemplateView.extend({
+  
+        tagName: "div",
+        className: "modal-holder",
+        templateName: 'post-share',
+        parts: ["recipient-selector"],
+        ready: function() {
+            var view = this;
+            view.$("#share-to").select2(Pump.selectOpts());
+        },
+        events: {
+            "click #send-share": "postShare"
+        },
+        postShare: function(ev) {
+            var view = this;
+	        callback = view.options.callback;
+                to = view.$('#share-to').val();
+                view.$el.modal('hide');
+                view.remove();
+	        callback(null, to);
+        }
+    });
+
     Pump.PostNoteModal = Pump.TemplateView.extend({
 
         tagName: "div",
@@ -2730,6 +2956,7 @@
             "click #send-note": "postNote"
         },
         postNote: function(ev) {
+            $('#modal-note').unbind();
             var view = this,
                 text = view.$('#post-note #note-content').val(),
                 to = view.$('#post-note #note-to').val(),
@@ -3201,7 +3428,6 @@
     Pump.showModal = function(Cls, options) {
 
         var modalView;
-
         // If we've got it attached already, just show it
 
         modalView = new Cls(options);
@@ -3302,11 +3528,13 @@
                 Pump.ajax({
                     type: "GET",
                     dataType: "json",
-                    url: Pump.fullURL("/api/user/"+user.get("nickname")+"/following?q="+term),
+                    url: Pump.fullURL("/api/user/"+user.get("nickname")+"/following?q="+options.term),
                     success: function(data) {
                         var people = _.map(data.items, function(item) {
+                            var resultName = item.displayName;
+                            if (item.displayName!=item.preferredUsername) resultName = item.displayName + " ("+item.preferredUsername+")"; 
                             return {id: item.objectType + ":" + item.id,
-                                    text: item.displayName};
+                                    text: resultName};
                         }),
                             results = [];
 
@@ -3369,8 +3597,8 @@
         },
         ready: function() {
             var view = this;
-            if (view.parent && view.parent.$el) {
-                view.parent.$el.prepend(view.$el);
+            if (view.parent && view.parent.menuParent) {
+                view.parent.menuParent.prepend(view.$el);
             }
         },
         hide: function() {
@@ -3404,6 +3632,62 @@
                     });
                 }
             });
+        }
+    });
+
+   Pump.ExtraMenuComment = Pump.TemplateView.extend({
+        parent: null,
+        templateName: "extra-menu-comment",
+        events: {
+            "click .delete-object": "deleteObject"
+        },
+        initialize: function(options) {
+            var view = this;
+            if (options.parent) {
+                view.parent = options.parent;
+            }
+        },
+        show: function() {
+            var view = this;
+            view.render();
+        },
+        ready: function() {
+            var view = this;
+            if (view.parent && view.parent.$el) {
+                view.parent.$el.prepend(view.$el);
+            }
+        },
+        hide: function() {
+            var view = this;
+            view.$el.remove();
+        },
+        deleteObject: function() { 
+            //alert("delete:"+ JSON.stringify(this.parent.model.id));
+            var view = this.parent,
+                model = view.model,
+                act = new Pump.Activity({
+                    verb: "delete",
+                    object: view.model.toJSON()
+                }),
+                prompt = "Delete this " + model.get("objectType") + "?";
+            
+            Pump.areYouSure(prompt, function(err, sure) {
+                if (sure) {
+                    Pump.newMinorActivity(act, function(err, act) {
+                        if (err) {
+                            view.showError(err);
+                        } else {
+                            Pump.addMinorActivity(act);
+                            // Remove the parent from the list
+                            view.$el.remove();
+                            var url = "/";
+                            $(location).attr('href',url);
+                        }
+                    });
+                }
+            });
+
+
         }
     });
 

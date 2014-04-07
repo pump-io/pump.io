@@ -8,4 +8,4 @@
 <blockquote><a href="<%- activity.url %>">more information</a></blockquote>
 <% } %>
 
-<p>If you think you received this email in error, you can safely ignore it.</p>
+If you think you received this email in error, you can safely ignore it.

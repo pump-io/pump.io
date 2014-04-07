@@ -1,0 +1,194 @@
+#!/usr/bin/env node
+
+// -*- mode: javascript -*-
+
+// Copyright 2013, Intevation GmbH, Mathias Gebbe
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+var fs = require("fs"),
+    path = require("path"),
+    _ = require("underscore"),
+    Step = require("step"),
+    url = require("url"),
+    common = require("../lib/pumpclient"),
+    userCred = common.userCred,
+    getJSON = common.getJSON,
+    postJSON = common.postJSON,
+    argv = require("optimist")
+        .usage("Usage: $0 -u <username>")
+        .demand(["u"])
+        .alias("u", "username")
+        .alias("s", "server")
+        .alias("n", "news")
+        .alias("f", "file")
+        .alias("v", "verbose")
+        .alias("P", "port")
+        .describe("u", "User nickname")
+        .describe("s", "Server name (default 'io.intevation.de')")
+        .describe("P", "Port (default 443)")
+        .describe("n", "File with already shared news")
+        .describe("f", "File with allowed Users")
+        .describe("v", "Verbose")
+        .default("P", 443)
+        .default("s", "io.intevation.de")
+        .default("n", "./db.shares")
+        .default("f", "./db.users")
+        .argv,
+    username = argv.u,
+    server = argv.s,
+    description = argv.d,
+    port = argv.P,
+    userfile = argv.f,
+    verbose = argv.v,
+    newsfile = argv.n,
+    cred;
+
+if(verbose)  console.log("starting newsbot");
+newsbot_run();
+
+
+function newsbot_run () {
+Step(
+    function() {
+        userCred(username, server, this);
+    },
+    function(err, results) {
+        var endpoint;
+        if (err) throw err;
+        cred = results;
+        endpoint = url.format({
+            protocol: ((port == 443) ? "https" : "http"),
+            host: ((port == 80 || port == 443) ? server : server + ":" + port),
+            pathname: "/api/user/"+username+"/inbox"
+        });
+        getJSON(endpoint, cred, this);
+    },
+    function(err, body, resp) {
+        if (err) {
+            console.error(err);
+        } else {
+            // get the messages from users
+            
+            var posts = _.filter(body.items, function(items){ return items.verb == 'post'; });
+             _.each(posts, function(item) { 
+		  // only posts from user (no follow, no share etc) 
+		  // here can we start to publish news 
+                  printNewsbot(item.actor.id,item.object.content,item.object.id);
+            });
+
+	    var shares = _.filter(body.items, function(items){ return items.verb == 'share'; });
+             _.each(shares, function(item) { 
+		  // only share from user
+		  // here can we start to publish news 
+                  printNewsbot(item.actor.id,item.object.content,item.object.id);
+            });
+
+
+     }
+    }
+);
+
+}
+
+function printNewsbot(id,content,link) {
+
+       var ret,userdb;
+
+       if ( id === undefined || content === undefined || link === undefined) return
+
+       if(!fs.existsSync(userfile)) { console.log("ERROR: File "+userfile+" not found"); return }
+           
+           userdb = fs.readFileSync(userfile,'utf8');
+       	   userdb.trim();
+       
+          if (userdb.indexOf(id+"\n") != -1) ret=true;
+          else return;
+          
+          // here are only valid posts
+                  
+		  //console.log(id);
+                  //console.log(content);
+                  //console.log(link);
+                  //console.log(ret);
+                  //console.log("---------------------------------");
+                  ProofandShare(link);
+
+}
+
+
+function ProofandShare(link) {
+  
+ var newsdb; 
+  
+ if(!fs.existsSync(newsfile)) { console.log("ERROR: File "+newsfile+" not found"); return }
+
+          newsdb = fs.readFileSync(newsfile,'utf8');
+          newsdb.trim();
+
+          if (newsdb.indexOf(link+"\n") != -1) { 
+                   if (verbose) console.log("already shared");
+                  }
+          else { 
+                console.log("i would share: "+link);
+                sharePost(link);
+                markShare(link);
+               }
+}
+
+function sharePost(link) {
+
+   Step(       
+    function() {
+        userCred(username, server, this);
+    },      
+    function(err, cred) {
+        if (err) throw err;
+        var activity = {
+            "verb": "share",
+             cc: [{id: "http://activityschema.org/collection/public",
+             objectType: "collection"}],
+             to: [{id: "https://"+server+"/api/user/"+username+"/followers",
+             objectType: "collection"}],
+            "object": {
+                 "id" : link,
+                 "objectType": "note"
+            }
+        };
+        var endpoint = url.format({
+            protocol: ((port == 443) ? "https" : "http"),
+            host: ((port == 80) ? server : server + ":" + port),
+            pathname: "/api/user/"+username+"/feed"
+        });
+        postJSON(endpoint, cred, activity, this);
+    },
+    function(err, body, resp) {
+        if (err) {
+            console.error(err);
+        } else {
+            console.log("OK");
+        }
+    }
+); 
+
+
+}
+
+function markShare(link) {
+	fs.appendFile(newsfile, link+"\n", 'utf8', function (err) {
+	  if (err) throw err;
+	  if (verbose) console.log('The '+link+' was marked as read');
+});
+
+}
+

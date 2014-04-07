@@ -2,7 +2,7 @@
   <form id="login" class="form-horizontal">
     <legend>Login to your account</legend>
     <div class="control-group" id="nickname-group">
-      <label class="control-label" for="nickname">Nickname</label>
+      <label class="control-label" for="nickname">Benutzername</label>
       <div class="controls">
         <input type="text" id="nickname" name="nickname" size="16">
       </div>
@@ -22,6 +22,8 @@
       </div>
     </div>
   </form>
+ <% if (!config.disableRegistration) { %>
   <p><a class="add-continue" href="/main/register">New user?</a></p>
+ <% } %>
   <p><a class="add-continue" href="/main/remote">Account on another server?</a></p>
 </div>

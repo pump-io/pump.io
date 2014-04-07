@@ -2,11 +2,12 @@
 
 // -*- mode: javascript -*-
 
-// pump-delete.js
+// stopfollowing.js
 //
-// delete an object
+// stop following another user
 //
-// Copyright 2013, E14N https://e14n.com/
+// Copyright 2011-2012, E14N https://e14n.com/
+//           2013, Intevation GmbH http://intevation.org
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,28 +27,44 @@ var _ = require("underscore"),
     common = require("../lib/pumpclient"),
     userCred = common.userCred,
     postJSON = common.postJSON,
-    delJSON = common.delJSON,
     argv = require("optimist")
-        .usage("Usage: $0 -u <username> -i <your note>")
-        .demand(["u", "i"])
+        .usage("Usage: $0 -u <username> -n <note>")
+        .demand(["u", "n"])
         .alias("u", "username")
-        .alias("i", "id")
+        .alias("n", "note")
+        .alias("s", "server")
+        .alias("P", "port")
         .describe("u", "User nickname")
-        .describe("i", "ID of the object (http URL of the API endpoint)")
+        .describe("n", "api-link to unshare note (https://server/api/note/LGuQo1P0TZWheCJg2_mQ5A)")
+        .describe("s", "Server name (default 'io.intevation.de')")
+        .describe("P", "Port (default 443)")
+        .default("P", 443)
+        .default("s", "io.intevation.de")
         .argv,
     username = argv.u,
     server = argv.s,
-    id = argv.i,
-    port = argv.P;
+    port = argv.P,
+    noteurl = argv.n;
 
 Step(
     function() {
-        var parsed = url.parse(id);
-        userCred(username, parsed.hostname, this);
+        userCred(username, server, this);
     },
     function(err, cred) {
         if (err) throw err;
-        delJSON(id, cred, this);
+	var activity = {
+            "verb": "unshare",
+	    "object": {
+		"objectType": "note",
+		id: noteurl
+	    }
+	};
+        var endpoint = url.format({
+            protocol: ((port == 443) ? "https" : "http"),
+            host: ((port == 80) ? server : server + ":" + port),
+            pathname: "/api/user/"+username+"/feed"
+        });
+        postJSON(endpoint, cred, activity, this);
     },
     function(err, body, resp) {
         if (err) {

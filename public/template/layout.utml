@@ -60,9 +60,10 @@
 
       <footer>
         <% if (config.owner) { %>
-        <p><b><%- config.site %></b> brought to you by <% if (config.ownerURL) { %><a href="<%- config.ownerURL %>"><% } %><%- config.owner %><% if (config.ownerURL) { %></a><% } %>.</p>
+        <p><b><%- config.site %></b> wird betrieben von der <% if (config.ownerURL) { %><a href="<%- config.ownerURL %>"><% } %><%- config.owner %><% if (config.ownerURL) { %></a>.<% } %>
+        <span style="display: block; margin: 0px auto; float:right;"><a href="https://io.intevation.de/main/impressum">Impressum</a></span>
         <% } %>
-        <p><a href="http://pump.io/">pump.io</a> available under the Apache License 2.0.</p>
+        <!--<p><a href="http://pump.io/">pump.io</a> available under the Apache License 2.0.</p>-->
       </footer>
 
     </div> <!-- .container -->

@@ -89,6 +89,10 @@ body {
   margin-bottom: 8px;
 }
 
+.major .activity-content, .reply .media-body {
+  margin-right: 20px;
+}
+
 .activity-content p:last-child {
   margin-bottom: 0;
 }

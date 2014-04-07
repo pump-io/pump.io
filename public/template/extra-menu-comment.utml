@@ -1,0 +1,10 @@
+<ul class="nav pull-right">
+  <li id="fat-menu" class="dropdown">
+    <a href="#" id="profile-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown">
+      <b class="caret"></b>
+    </a>
+    <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="profile-dropdown">
+      <li class="muted"><a tabindex="-1" class="delete-object" href="#"><small>Delete comment</small></li>
+    </ul>
+  </li>
+</ul>

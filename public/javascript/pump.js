@@ -367,6 +367,7 @@ if (!window.Pump) {
 
         $.fn.wysihtml5.defaultOptions["font-styles"] = false;
         $.fn.wysihtml5.defaultOptions["image"] = false;
+        $.fn.wysihtml5.defaultOptions["html"] = true;
         $.fn.wysihtml5.defaultOptions["customTemplates"] = Pump.wysihtml5Tmpl;
     };
 

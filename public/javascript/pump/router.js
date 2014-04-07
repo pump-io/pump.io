@@ -34,6 +34,7 @@
             "main/messages":          "messages",
             "main/settings":          "settings",
             "main/account":           "account",
+            "main/impressum":         "impressum",
             "main/register":          "register",
             "main/login":             "login",
             "main/remote":            "remote",
@@ -179,6 +180,17 @@
                                      });
             }
         },
+
+        "impressum": function () {   
+                  
+                  Pump.body.startLoad();
+                  Pump.body.setContent({contentView: Pump.ImpressumContent,
+                                      title: "Impressum"},
+                                     function() {
+                                         Pump.body.endLoad();
+                                     });
+
+	},
 
         profile: function(nickname) {
             var router = this,

@@ -106,7 +106,7 @@ var addRoutes = function(app) {
 
     app.get("/api/user/:nickname/feed", smw, anyReadAuth, reqUser, userStream);
     app.post("/api/user/:nickname/feed", userWriteOAuth, reqUser, sameUser, reqGenerator, postActivity);
-
+    
     app.get("/api/user/:nickname/feed/public", smw, reqUser, userPublicStream);
 
     app.get("/api/user/:nickname/feed/major", smw, anyReadAuth, reqUser, userMajorStream);
@@ -727,9 +727,15 @@ var createUser = function(req, res, next) {
         };
 
     if (req.app.config.disableRegistration) {
-        next(new HTTPError("No registration allowed.", 403));
+        if(req.connection.address().address != req.connection.remoteAddress || props.adminpw != req.app.config.adminpw || req.app.config.adminpw == undefined || props.adminpw == undefined){
+        next(new HTTPError("No remote registration allowed or wrong admin password.", 403));
         return;
+        }
     }
+    if( props.adminpw != undefined){ 
+        var adminpw = props.adminpw;    
+        delete props.adminpw;
+      }
 
     // Email validation
 
@@ -749,6 +755,8 @@ var createUser = function(req, res, next) {
                 return;
             }
         }
+    }else{
+         if(props.email!=undefined && adminpw == undefined) delete props.email;
     }
 
     Step(
@@ -782,7 +790,8 @@ var createUser = function(req, res, next) {
         function(err) {
             if (err) throw err;
             if (req.app.config.requireEmail) {
-                sendConfirmationEmail(user, email, this);
+                if (adminpw == undefined) sendConfirmationEmail(user, email, this);
+                 else this(null);
             } else {
                 // skip if we don't require email
                 this(null);
@@ -820,6 +829,7 @@ var createUser = function(req, res, next) {
                 user.sanitize();
                 user.token = pair.access_token;
                 user.secret = pair.token_secret;
+                if (req.app.config.requireEmail && adminpw!=undefined) activateEmail(props.nickname,email);
                 // If called as /main/register; see ./web.js
                 // XXX: Bad hack
                 if (req.session) {
@@ -1622,7 +1632,7 @@ var proxyRequest = function(req, res, next) {
     var principal = req.principal,
         proxy = req.proxy;
 
-    req.log.info({url: proxy.url, principal: principal.id}, "Getting object through proxy.");
+    req.log.debug({url: proxy.url, principal: principal.id}, "Getting object through proxy.");
 
     // XXX: check local cache first
 
@@ -1682,7 +1692,7 @@ var proxyRequest = function(req, res, next) {
                     res.setHeader("Cache-Control", pres.headers["cache-control"]);
                 }
                 // XXX: save to local cache
-                req.log.info({headers: pres.headers}, "Received object");
+                req.log.debug({headers: pres.headers}, "Received object");
                 res.send(pbody);
             }
         }
@@ -1727,6 +1737,25 @@ var finishObject = function(profile, obj, callback) {
         }
     );
 };
+
+
+function activateEmail(username,email){
+
+  Step(
+        function() {            
+            User.get(username, this);
+        },
+        function(err, results) {
+            if (err) throw err;
+            user = results;
+            user.email = email;
+            user.save(this.parallel());
+	    console.log("mail saved");
+            return;
+        }
+    );
+};
+
 
 exports.addRoutes = addRoutes;
 exports.createUser = createUser;
