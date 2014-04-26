@@ -3427,8 +3427,8 @@
         },
         ready: function() {
             var view = this;
-            if (view.parent && view.parent.menuParent) {
-                view.parent.menuParent.prepend(view.$el);
+            if (view.parent && view.parent.$el) {
+                view.parent.$el.prepend(view.$el);
             }
         },
         hide: function() {
