@@ -3436,19 +3436,36 @@
             view.$el.remove();
         },
         ignoreObject: function() {
-            var view = this,
+            var view = this,  
                 model = view.model,
+                to =  Pump.principalUser.id,
                 act = new Pump.Activity({
                     verb: "ignore",
                     object: view.model.toJSON()
-                }),
-                prompt = "Ignore this " + model.get("objectType") + "?";
+                }), 
+                
+                strToObj = function (str) {
+                    var colon = str.indexOf(":"),
+                        type = str.substr(0, colon),
+                        id = str.substr(colon + 1);
+                    return new Pump.ActivityObject({
+                        id: id,
+                        objectType: type
+                    });
+                };
+                if (_.isString(to)) {
+                    to = to.split(",");
+                }
+                if (to && to.length > 0) {
+                    act.to = new Pump.ActivityObjectBag(_.map(to, strToObj));
+                }
 
+            prompt = "Ignore this " + model.get("objectType") + "?";
             // Hide the dropdown, since we were selected
             view.$el.dropdown('toggle');
-
+                        
             Pump.areYouSure(prompt, function(err, sure) {
-                if (sure) {
+                if (sure) { 
                     Pump.newMinorActivity(act, function(err, act) {
                         if (err) {
                             view.showError(err);
@@ -3461,7 +3478,7 @@
                         }
                     });
                 }
-            });
+            });            
         }
     });
 
