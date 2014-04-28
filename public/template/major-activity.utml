@@ -1,6 +1,7 @@
 <% var object = activity.object,
        author = (activity.verb == "share") ? object.author : activity.actor;
    if (!headless && !author) return;
+   if (object.ignore || activity.ignore) return; 
    if (object.deleted || activity.deleted) return; %>
 <li class="media activity major<% if (headless) { %> headless<% } %>" data-activity-id="<%- activity.id %>">
   <% if (!headless) { %>
