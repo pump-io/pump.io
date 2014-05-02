@@ -1,5 +1,5 @@
 <div id="loginpage">
-  <form id="login" class="form-horizontal">
+  <form id="login" method="post" action="/main/javascript-disabled" class="form-horizontal">
     <legend>Login to your account</legend>
     <div class="control-group" id="nickname-group">
       <label class="control-label" for="nickname">Nickname</label>

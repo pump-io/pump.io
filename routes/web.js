@@ -69,6 +69,8 @@ var addRoutes = function(app) {
 
     app.get("/", app.session, principal, addMessages, showMain);
 
+    app.post("/main/javascript-disabled", app.session, principal, showJavascriptDisabled);
+    
     app.get("/main/register", app.session, principal, showRegister);
     app.post("/main/register", app.session, principal, clientAuth, reqGenerator, createUser);
 
@@ -194,6 +196,10 @@ var handleLogout = function(req, res, next) {
             }
         }
     );
+};
+
+var showJavascriptDisabled = function(req, res, next) {
+    res.render("javascript-disabled", {page: {title: "Javascript disabled"}});
 };
 
 var showRemote = function(req, res, next) {

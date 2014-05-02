@@ -1,5 +1,5 @@
 <div id="registerpage">
-  <form id="registration" class="form-horizontal">
+  <form id="registration"  method="post" action="/main/javascript-disabled" class="form-horizontal">
     <legend>Register for a new account</legend>
     <p class="text-error" id="error"></p>
     <div class="control-group" id="nickname-group">
