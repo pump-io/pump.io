@@ -314,15 +314,17 @@ var showActivity = function(req, res, next) {
 
     var activity = req.activity;
 
-    if (activity.isMajor()) {
-        res.render("major-activity-page", {page: {title: activity.content, url: req.originalUrl},
-                                           principal: principal,
-                                           activity: activity});
-    } else {
-        res.render("minor-activity-page", {page: {title: activity.content, url: req.originalUrl},
-                                           principal: principal,
-                                           activity: activity});
-    }
+    if(typeof activity != "undefined") {
+      if (activity.isMajor()) {
+          res.render("major-activity-page", {page: {title: activity.content, url: req.originalUrl},
+                                             principal: principal,
+                                             activity: activity});
+      } else {
+          res.render("minor-activity-page", {page: {title: activity.content, url: req.originalUrl},
+                                             principal: principal,
+                                             activity: activity});
+      }
+   }
 };
 
 var showStream = function(req, res, next) {

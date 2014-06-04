@@ -80,18 +80,24 @@ Step(
         } else {
             // get the messages from users
             
+            // direct messages to user
             var posts = _.filter(body.items, function(items){ return items.verb == 'post'; });
              _.each(posts, function(item) { 
 		  // only posts from user (no follow, no share etc) 
 		  // here can we start to publish news 
-                  printNewsbot(item.actor.id,item.object.content,item.object.id);
+                  if (item.object.objectType != 'comment') {
+                      printNewsbot(item.actor.id,item.object.content,item.object.id);
+                     }
             });
 
+            // redirected shares to user 
 	    var shares = _.filter(body.items, function(items){ return items.verb == 'share'; });
              _.each(shares, function(item) { 
 		  // only share from user
 		  // here can we start to publish news 
-                  printNewsbot(item.actor.id,item.object.content,item.object.id);
+                  if (item.object.objectType != 'comment') {
+                    printNewsbot(item.actor.id,item.object.content,item.object.id);
+                  }
             });
 
 
