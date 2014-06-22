@@ -6,7 +6,7 @@
     "site":  "Awesome Sauce",
     "owner":  "Awesome Inc.",
     "ownerURL":  "http://example.com/",
-    "port":  8000,
+    "port":  31337,
     "hostname":  "example.org",
     "address":  "pumpio.localhost",
     "nologger":  false,
