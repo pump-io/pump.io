@@ -1345,8 +1345,8 @@
                 "activity-object-collection"],
         modelName: "activity",
         events: {
-            "mouseenter": "maybeShowExtraMenu",
-            "mouseleave": "maybeHideExtraMenu",
+            "mouseenter": "ShowExtraMenu",
+            "mouseleave": "HideExtraMenu",
             "click .favorite": "favoriteObject",
             "click .unfavorite": "unfavoriteObject",
             "click .share": "shareObject",
@@ -1366,7 +1366,7 @@
 
             view.replyStream = new Pump.ReplyStreamView({el: $el, model: model.object.replies});
         },
-        maybeShowExtraMenu: function() {
+        ShowExtraMenu: function() {
             var view = this,
                 activity = view.model,
                 principal = Pump.principal;
@@ -1376,19 +1376,21 @@
                     view.extraMenu = new Pump.ExtraMenu({model: activity.object, parent: view});
                     view.extraMenu.show();
                 }
-            }
+             }
+            else if (principal && !view.extraMenu) {
+                    view.extraMenu = new Pump.ExtraMenuIgnore({model: activity.object, parent: view});
+                    view.extraMenu.show();
+          }
         },
-        maybeHideExtraMenu: function() {
+        HideExtraMenu: function() {
             var view = this,
                 activity = view.model,
                 principal = Pump.principal;
 
-            if (principal && activity.actor && principal.id == activity.actor.id) {
                 if (view.extraMenu) {
                     view.extraMenu.hide();
                     view.extraMenu = null;
                 }
-            }
         },
         favoriteObject: function() {
             var view = this,
@@ -3406,5 +3408,79 @@
             });
         }
     });
+    
+    Pump.ExtraMenuIgnore = Pump.TemplateView.extend({
+        parent: null,
+        templateName: "extra-menu-ignore",
+        events: {
+            "click .ignore-object": "ignoreObject"
+        },
+        initialize: function(options) {
+            var view = this;
+            if (options.parent) {
+                view.parent = options.parent;
+            }
+        },
+        show: function() {
+            var view = this;
+            view.render();
+        },
+        ready: function() {
+            var view = this;
+            if (view.parent && view.parent.$el) {
+                view.parent.$el.prepend(view.$el);
+            }
+        },
+        hide: function() {
+            var view = this;
+            view.$el.remove();
+        },
+        ignoreObject: function() {
+            var view = this,  
+                model = view.model,
+                to =  Pump.principalUser.id,
+                act = new Pump.Activity({
+                    verb: "ignore",
+                    object: view.model.toJSON()
+                }), 
+                
+                strToObj = function (str) {
+                    var colon = str.indexOf(":"),
+                        type = str.substr(0, colon),
+                        id = str.substr(colon + 1);
+                    return new Pump.ActivityObject({
+                        id: id,
+                        objectType: type
+                    });
+                };
+                if (_.isString(to)) {
+                    to = to.split(",");
+                }
+                if (to && to.length > 0) {
+                    act.to = new Pump.ActivityObjectBag(_.map(to, strToObj));
+                }
+
+            prompt = "Ignore this " + model.get("objectType") + "?";
+            // Hide the dropdown, since we were selected
+            view.$el.dropdown('toggle');
+                        
+            Pump.areYouSure(prompt, function(err, sure) {
+                if (sure) { 
+                    Pump.newMinorActivity(act, function(err, act) {
+                        if (err) {
+                            view.showError(err);
+                        } else {
+                            Pump.addMinorActivity(act);
+                            // Remove the parent from the list
+                            view.parent.$el.remove();
+                            // Remove the model from the client-side collection
+                            model.collection.remove(model.id);
+                        }
+                    });
+                }
+            });            
+        }
+    });
+
 
 })(window._, window.$, window.Backbone, window.Pump);

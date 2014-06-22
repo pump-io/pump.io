@@ -58,6 +58,7 @@ var databank = require("databank"),
     addLiked = finishers.addLiked,
     addShared = finishers.addShared,
     addLikers = finishers.addLikers,
+    addIgnore = finishers.addIgnore,
     firstFewReplies = finishers.firstFewReplies,
     firstFewShares = finishers.firstFewShares,
     addFollowed = finishers.addFollowed,
@@ -651,6 +652,7 @@ var showObject = function(req, res, next) {
             addLiked(profile, [obj], this.parallel());
             addShared(profile, [obj], this.parallel());
             addLikers(profile, [obj], this.parallel());
+            addIgnore(profile, [obj], this.parallel());
             firstFewReplies(profile, [obj], this.parallel());
             firstFewShares(profile, [obj], this.parallel());
             if (obj.isFollowable()) {
