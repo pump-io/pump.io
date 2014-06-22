@@ -18,6 +18,10 @@
       <textarea class="span6" id="bio" name="bio" rows="5"><%- (profile.summary || "") %></textarea>
       <span class="help-block">All about you.</span>
 
+      <label for="email">Email</label>
+      <input class="span6" id="email" name="email" size="30" type="text" value="<%- (profile.email || "") %>" />     
+      <span class="help-block">Email address.</span>
+
       <label>Avatar</label>
       <% if (principal.image && principal.image.url) { %>
       <img src="<%- principal.image.url %>" width="96" height="96" class="img-rounded" />
