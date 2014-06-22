@@ -275,6 +275,25 @@ var registerEmail = function(cl, nickname, password, email, hostname, port, call
                       });
 };
 
+var registerInvitation = function (cl, nickname, password, invitationCode, hostname, port, callback) {
+    var proto;
+
+    if (!port) {
+        callback = hostname;
+        hostname = "localhost";
+        port = 4815;
+    }
+
+    proto = (port === 443) ? "https" : "http";
+
+    httputil.postJSON(proto + "://" + hostname + ":" + port + "/api/users",
+        {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
+        {nickname: nickname, password: password, invitationCode: invitationCode},
+        function (err, body, res) {
+            callback(err, body);
+        });
+};
+
 var newCredentials = function(nickname, password, hostname, port, cb) {
 
     var cl, user;
@@ -436,6 +455,7 @@ exports.requestToken = requestToken;
 exports.newClient = newClient;
 exports.register = register;
 exports.registerEmail = registerEmail;
+exports.registerInvitation = registerInvitation;
 exports.newCredentials = newCredentials;
 exports.newPair = newPair;
 exports.accessToken = accessToken;
