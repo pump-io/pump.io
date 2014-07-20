@@ -41,6 +41,13 @@
     <% } %>
     <div class="activity-content">
       <%= object.content %>
+      <% if (object.content.indexOf('www.youtube.com/watch?v=') != -1) {
+         var yt = String(object.content.match(/www\.youtube\.com\/watch\?v=[a-zA-Z0-9_-]*/))
+         %>
+         <% if(yt) { %>
+           <iframe width="420" height="315" frameborder="0" src="//www.youtube.com/embed/<%= yt.substring(yt.indexOf('?v=')+3,yt.length) %>"allowfullscreen></iframe>
+         <% } %>
+       <% } %>
     </div>
     <% if (principal) { %>
     <%= partial("responses", {obj: object}) %>
