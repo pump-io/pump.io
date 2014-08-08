@@ -277,3 +277,8 @@ body {
     display: inline;
   }
 }
+
+.img-polaroid {
+	image-orientation: from-image;
+}
+
