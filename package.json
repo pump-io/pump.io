@@ -12,7 +12,7 @@
         "simplesmtp": "0.1.x",
         "rimraf": "2.0.x"
     },
-    "dependencies": { "connect": "1.x",
+    "dependencies": { "connect": "3.x",
                       "connect-auth": "0.5.3",
                       "express": "2.5.x",
                       "utml": "0.2.x",
