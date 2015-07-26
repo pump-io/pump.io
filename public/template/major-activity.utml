@@ -39,6 +39,9 @@
     <% if (object.image && object.image.url) { %>
     <p><img src="<%- (object.image.pump_io && object.image.pump_io.proxyURL) ? object.image.pump_io.proxyURL : object.image.url %>" class="img-polaroid object-image" /></p>
     <% } %>
+    <% if (object.stream && object.stream.url) { %>
+    <p><video src="<%- object.stream.url %>" width="720" preload="auto" controls></video></p>
+    <% } %>
     <div class="activity-content">
       <%= object.content %>
     </div>
