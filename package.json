@@ -9,7 +9,7 @@
         "node-mocks-http": "0.0.x",
         "zombie": "1.4.x",
         "xml2js": "0.1.x",
-        "simplesmtp": "0.1.x",
+        "simplesmtp": "0.3.x",
         "rimraf": "2.0.x"
     },
     "dependencies": { "connect": "1.x",
