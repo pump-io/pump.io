@@ -42,8 +42,7 @@ The software is useful for at least these scenarios:
 * Activity stream functionality for an existing app
 * Experimenting with social software
 
-Version 0.2.0 will have a Web UI, which will probably make the whole
-thing much more enjoyable.
+It also comes with a web UI.
 
 ## Installation
 
@@ -51,7 +50,7 @@ thing much more enjoyable.
 
 You'll need four things to get started:
 
-* node.js 0.8.0 or higher
+* node.js 0.8.0 or 0.10.0
 * npm 1.1.0 or higher
 * A database server (see below)
 * The `graphicsmagick` package with the `gm` command
