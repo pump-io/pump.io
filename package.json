@@ -58,12 +58,7 @@
         "url": "git://github.com/e14n/pump.io.git"
     },
     "keywords": ["activitystreams", "socialnetwork", "social", "pump", "streams", "api", "app", "server"],
-    "licenses": [
-        {
-            "type": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        }
-    ],
+    "license": "Apache-2.0",
     "engine": {
         "node": ">=0.8"
     }
