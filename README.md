@@ -235,6 +235,15 @@ like this:
 You'll probably get a more reliable experience if you use
 [forever](https://npmjs.org/package/forever) to keep the daemon running.
 
+### Arguments
+
+Execute with the config file on the command line using -c
+
+The default locations are ```/etc/pump.io.json``` and ```~/.pump.io.json```.
+
+    ./bin/pump -c pump.io.json
+
+
 ## Making changes
 
 If you're connecting your pump.io site with other software (such as

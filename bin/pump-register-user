@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+console.log("sart")
 // -*- mode: javascript -*-
 
 // registeruser.js
@@ -38,8 +38,8 @@ var _ = require("underscore"),
         .describe("p", "Password for user")
         .describe("s", "Server name (default 'localhost')")
         .describe("P", "Port (default 80)")
-        .default("P", 80)
-        .default("s", "localhost")
+        .default("P", 31337)
+        .default("s", "127.0.0.1")
         .argv;
 
 var user = {"nickname": argv.u,
@@ -47,7 +47,7 @@ var user = {"nickname": argv.u,
 
 var server = argv.s;
 var port = argv.P;
-
+console.log("hello");
 Step(
     function() {
         clientCred(server, this);
@@ -59,9 +59,13 @@ Step(
             host: ((port == 80) ? server : server + ":" + port),
             pathname: "/api/users"
         });
+        console.log(endpoint);
+        
         postJSON(endpoint, cred, user, this);
     },
     function(err, body, result) {
+        console.log(body);
+        console.log(result);          
         if (err) {
             console.error(err);
         } else {
