@@ -2,9 +2,9 @@
 console.log("sart")
 // -*- mode: javascript -*-
 
-// registeruser.js
+// pump-register-user
 //
-// Register a new user with the activity pump
+// Register a new user with the activity pump.
 //
 // Copyright 2011-2012, E14N https://e14n.com/
 //

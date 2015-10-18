@@ -2,9 +2,9 @@
 
 // -*- mode: javascript -*-
 
-// authorize.js
+// pump-authorize
 //
-// Get OAuth token
+// Get OAuth token for an app
 //
 // Copyright 2011-2012, E14N https://e14n.com/
 //

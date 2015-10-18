@@ -2,9 +2,9 @@
 
 // -*- mode: javascript -*-
 
-// postnote.js
+// pump-post-file
 //
-// Post an image with optional description
+// Post a media file with optional description
 //
 // Copyright 2011-2013, E14N https://e14n.com/
 //
