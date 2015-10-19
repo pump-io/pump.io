@@ -263,6 +263,13 @@ Example :
 
 See http://www.juliengilli.com/2013/05/26/Using-Node.js-NODE_DEBUG-for-fun-and-profit/
 
+### Debugging
+
+Debugging can be done via the Node Inspector https://github.com/node-inspector/node-inspector
+
+    node-debug ./bin/pump
+
+ 
 ### Arguments
 
 Execute with the config file on the command line using -c
