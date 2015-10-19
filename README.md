@@ -45,6 +45,14 @@ The software is useful for at least these scenarios:
 Version 0.2.0 will have a Web UI, which will probably make the whole
 thing much more enjoyable.
 
+## Wiki
+
+For more information please check out the git hub wiki : https://github.com/e14n/pump.io/wiki
+
+or clone it via the following command:
+
+    git clone https://github.com/e14n/pump.io.wiki.git
+
 ## Installation
 
 ### Prerequisites
@@ -114,31 +122,22 @@ Second, you can install in the `databank` directory.
 
 Note that you also need to install and configure your database server.
 
-#### memcached
-
-For using memcached, you want to install and start the server.
-The tools should be installed for ```memcdump```.
-
-On debian:
-
-    apt-get install libmemcached-tools libmemcached
-
-Configure the json file :
-
-    "driver":  "memcached",
-
-Dump the database:
-
-    /usr/bin/memcdump --servers=localhost
  
 
 ### Configuration
 
 pump.io uses a JSON file for configuration. It should be at
-`/etc/pump.io.json`.
+`/etc/pump.io.json` or on ```~/.pump.io.json```.
 
 The `pump.io.json.sample` file should give you an idea of how to use
 it.
+
+The default config values are stored in the source file ```lib/defaults.js``.
+
+You can override the config file location with the ```-c``` option.
+
+    pump -c pump.io.json
+
 
 Here are the main configuration keys.
 
@@ -263,20 +262,6 @@ Example :
 
 See http://www.juliengilli.com/2013/05/26/Using-Node.js-NODE_DEBUG-for-fun-and-profit/
 
-### Debugging
-
-Debugging can be done via the Node Inspector https://github.com/node-inspector/node-inspector
-
-    node-debug ./bin/pump
-
- 
-### Arguments
-
-Execute with the config file on the command line using -c
-
-The default locations are ```/etc/pump.io.json``` and ```~/.pump.io.json```.
-
-    ./bin/pump -c pump.io.json
 
 ## Using the command line tools
 
@@ -284,9 +269,9 @@ The default locations are ```/etc/pump.io.json``` and ```~/.pump.io.json```.
 
 First use this tool to create the credentials file
 
-    ./bin/pump-register-app  -t app-name
+    ./bin/pump-register-app  -t *app name*
 
-This will create the file ```~/.pump.d/*server*.json``` that contains
+This will create the file ```~/.pump.d/*server*.json``` that contains your credentials.
 
     {
     "client_id":"XXXX",
@@ -294,37 +279,25 @@ This will create the file ```~/.pump.d/*server*.json``` that contains
     "expires_at":0
     }
 
-It will also add an entry into the database :
+It will also add an entry into the local database where you will find the
+clientID. Note that if you use the memory database the data will be lost
+between server runs and will need to rerun the configuration.
 
-
-You can dump the database :
-    /usr/bin/memcdump --servers=localhost
-
-    _databank_keys:client
-    _databank_index:client:webfinger:undefined
-    _databank_index:client:host:undefined
-   client:XXXXX
-
-You will find the clientID in there. But if you use the memory database the
-data will be lost between server runs and will need to rerun the configuration.
-
-This is used in the later calls. 
 
 #### pump-register-user
 
-use this command to register a user :
+Use this command to register a user :
 
-    ./bin/pump-register-user  -u test_user -p YourFeypsoz8Password 
+    ./bin/pump-register-user  -u *username* -p *password*
 
 ### pump-authorize
 
 After you register an app, you can authorize your user to use it.
 
-    ./bin/pump-authorize -u test_user
+    ./bin/pump-authorize -u *username*
 
 When you do that it will ask you to open a website, login and verify the
 value. You paste that back in and all is good.
-
 
 
 ## Making changes

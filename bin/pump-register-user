@@ -1,9 +1,12 @@
 #!/usr/bin/env node
+
 // -*- mode: javascript -*-
 
 // pump-register-user
 //
-// Register a new user with the activity pump.
+// register a new user
+//
+// first call register-app, then use this tool
 //
 // Copyright 2011-2012, E14N https://e14n.com/
 //
@@ -37,8 +40,8 @@ var _ = require("underscore"),
         .describe("p", "Password for user")
         .describe("s", "Server name (default 'localhost')")
         .describe("P", "Port (default 80)")
-        .default("P", 31337)
-        .default("s", "127.0.0.1")
+        .default("P", 80)
+        .default("s", "localhost")
         .argv;
 
 var user = {"nickname": argv.u,
@@ -58,17 +61,10 @@ Step(
             host: ((port == 80) ? server : server + ":" + port),
             pathname: "/api/users"
         });
-        console.log(endpoint);
-        
         postJSON(endpoint, cred, user, this);
     },
     function(err, body, result) {
-        console.log("body:");        
-        console.log(body);
-        console.log("result:");
-        console.log(result);          
         if (err) {
-
             console.error(err);
         } else {
             setUserCred(body.nickname, server, {token: body.token, token_secret: body.secret}, this);
