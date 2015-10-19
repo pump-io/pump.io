@@ -2,9 +2,9 @@
 
 // -*- mode: javascript -*-
 
-// postnote.js
+// pump-create-group
 //
-// Post a note with the given text
+// create a group
 //
 // Copyright 2011-2012, E14N https://e14n.com/
 //

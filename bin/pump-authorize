@@ -2,9 +2,12 @@
 
 // -*- mode: javascript -*-
 
-// authorize.js
+// pump-authorize
 //
-// Get OAuth token
+// get OAuth token for an registered app and registered user
+//
+// called after pump-register-app and pump-register-user
+// asks the user to confirm the access via the website
 //
 // Copyright 2011-2012, E14N https://e14n.com/
 //
@@ -75,6 +78,15 @@ Step(
                                  host: (port == 80 || port == 443) ? server : server+":"+port,
                                  pathname: "/oauth/access_token"});
         if (err) throw err;
+        /*
+          rtendpoint is the request token end point, should be http://host/oauth/request_token
+          atendpoint is the access token end point, should be http://127.0.0.1:31337/oauth/access_token
+
+          The next two are from the json file ~/.pump.d/*server*.json :
+          * cred.client_id
+          * cred.client_secret
+
+        */
         oa = new OAuth(rtendpoint,
                        atendpoint,
                        cred.client_id,
