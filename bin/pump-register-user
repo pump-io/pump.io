@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-console.log("sart")
 // -*- mode: javascript -*-
 
 // pump-register-user
@@ -47,7 +46,7 @@ var user = {"nickname": argv.u,
 
 var server = argv.s;
 var port = argv.P;
-console.log("hello");
+
 Step(
     function() {
         clientCred(server, this);
@@ -64,9 +63,12 @@ Step(
         postJSON(endpoint, cred, user, this);
     },
     function(err, body, result) {
+        console.log("body:");        
         console.log(body);
+        console.log("result:");
         console.log(result);          
         if (err) {
+
             console.error(err);
         } else {
             setUserCred(body.nickname, server, {token: body.token, token_secret: body.secret}, this);

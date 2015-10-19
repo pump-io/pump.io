@@ -75,10 +75,10 @@ Step(
                                  host: (port == 80 || port == 443) ? server : server+":"+port,
                                  pathname: "/oauth/access_token"});
         if (err) throw err;
-        oa = new OAuth(rtendpoint,
-                       atendpoint,
-                       cred.client_id,
-                       cred.client_secret,
+        oa = new OAuth(rtendpoint, // http://127.0.0.1:31337/oauth/request_token
+                       atendpoint, // http://127.0.0.1:31337/oauth/access_token
+                       cred.client_id, // from json file ~/.pump.d/*server*.json / client_id
+                       cred.client_secret, // from json file ~/.pump.d/*server*.json / client_secret
                        "1.0",
                        "oob",
                        "HMAC-SHA1",

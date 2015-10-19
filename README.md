@@ -114,6 +114,24 @@ Second, you can install in the `databank` directory.
 
 Note that you also need to install and configure your database server.
 
+#### memcached
+
+For using memcached, you want to install and start the server.
+The tools should be installed for ```memcdump```.
+
+On debian:
+
+    apt-get install libmemcached-tools libmemcached
+
+Configure the json file :
+
+    "driver":  "memcached",
+
+Dump the database:
+
+    /usr/bin/memcdump --servers=localhost
+ 
+
 ### Configuration
 
 pump.io uses a JSON file for configuration. It should be at
@@ -235,6 +253,16 @@ like this:
 You'll probably get a more reliable experience if you use
 [forever](https://npmjs.org/package/forever) to keep the daemon running.
 
+### Environment
+
+Set the env variable ```NODE_DEBUG``` to enable debugging.
+
+Example :
+
+    export NODE_DEBUG=dev,all,net,http,fs,tls,module,timers
+
+See http://www.juliengilli.com/2013/05/26/Using-Node.js-NODE_DEBUG-for-fun-and-profit/
+
 ### Arguments
 
 Execute with the config file on the command line using -c
@@ -242,6 +270,54 @@ Execute with the config file on the command line using -c
 The default locations are ```/etc/pump.io.json``` and ```~/.pump.io.json```.
 
     ./bin/pump -c pump.io.json
+
+## Using the command line tools
+
+### pump-register-app
+
+First use this tool to create the credentials file
+
+    ./bin/pump-register-app  -t app-name
+
+This will create the file ```~/.pump.d/*server*.json``` that contains
+
+    {
+    "client_id":"XXXX",
+    "client_secret":"YYYYY",
+    "expires_at":0
+    }
+
+It will also add an entry into the database :
+
+
+You can dump the database :
+    /usr/bin/memcdump --servers=localhost
+
+    _databank_keys:client
+    _databank_index:client:webfinger:undefined
+    _databank_index:client:host:undefined
+   client:XXXXX
+
+You will find the clientID in there. But if you use the memory database the
+data will be lost between server runs and will need to rerun the configuration.
+
+This is used in the later calls. 
+
+#### pump-register-user
+
+use this command to register a user :
+
+    ./bin/pump-register-user  -u test_user -p YourFeypsoz8Password 
+
+### pump-authorize
+
+After you register an app, you can authorize your user to use it.
+
+    ./bin/pump-authorize -u test_user
+
+When you do that it will ask you to open a website, login and verify the
+value. You paste that back in and all is good.
+
 
 
 ## Making changes
