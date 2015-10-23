@@ -47,7 +47,7 @@ thing much more enjoyable.
 
 ## Wiki
 
-For more information please check out the git hub wiki : https://github.com/e14n/pump.io/wiki
+For more information please check out the [GitHub wiki](https://github.com/e14n/pump.io/wiki)
 
 or clone it via the following command:
 
@@ -127,16 +127,16 @@ Note that you also need to install and configure your database server.
 ### Configuration
 
 pump.io uses a JSON file for configuration. It should be at
-`/etc/pump.io.json` or on ```~/.pump.io.json```.
+`/etc/pump.io.json` or on `~/.pump.io.json`.
 
 The `pump.io.json.sample` file should give you an idea of how to use
 it.
 
-The default config values are stored in the source file ```lib/defaults.js``.
+The default config values are stored in the source file `lib/defaults.js`.
 
-You can override the config file location with the ```-c``` option.
+You can override the config file location with the `-c` option.
 
-    pump -c pump.io.json
+    pump -c <CONFIG_FILE>
 
 
 Here are the main configuration keys.
@@ -252,18 +252,16 @@ like this:
 You'll probably get a more reliable experience if you use
 [forever](https://npmjs.org/package/forever) to keep the daemon running.
 
-### Optional Arguments
-
 
 ### Environment
 
-Set the env variable ```NODE_DEBUG``` to enable debugging.
+Set the env variable `NODE_DEBUG` to enable debugging.
 
-Example :
+Example:
 
     export NODE_DEBUG=dev,all,net,http,fs,tls,module,timers
 
-See http://www.juliengilli.com/2013/05/26/Using-Node.js-NODE_DEBUG-for-fun-and-profit/
+See [How to set NODE_DEBUG](http://www.juliengilli.com/2013/05/26/Using-Node.js-NODE_DEBUG-for-fun-and-profit/)
 
 
 ## Using the command line tools
@@ -272,9 +270,9 @@ See http://www.juliengilli.com/2013/05/26/Using-Node.js-NODE_DEBUG-for-fun-and-p
 
 First use this tool to create the credentials file
 
-    ./bin/pump-register-app  -t *app name*
+    ./bin/pump-register-app  -t <APPNAME>
 
-This will create the file ```~/.pump.d/*server*.json``` that contains your credentials.
+This will create the file `~/.pump.d/*server*.json` that contains your credentials.
 
     {
     "client_id":"XXXX",
@@ -289,15 +287,15 @@ between server runs and will need to rerun the configuration.
 
 #### pump-register-user
 
-Use this command to register a user :
+Use this command to register a user:
 
-    ./bin/pump-register-user  -u *username* -p *password*
+    ./bin/pump-register-user  -u <USERNAME> -p <PASSWORD>
 
 ### pump-authorize
 
 After you register an app, you can authorize your user to use it.
 
-    ./bin/pump-authorize -u *username*
+    ./bin/pump-authorize -u <USERNAME>
 
 When you do that it will ask you to open a website, login and verify the
 value. You paste that back in and all is good.

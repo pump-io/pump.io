@@ -79,10 +79,10 @@ Step(
                                  pathname: "/oauth/access_token"});
         if (err) throw err;
         /*
-          rtendpoint is the request token end point, should be http://host/oauth/request_token
-          atendpoint is the access token end point, should be http://127.0.0.1:31337/oauth/access_token
+          rtendpoint is the request token end point, should be http://<HOST>:<PORT>/oauth/request_token
+          atendpoint is the access token end point, should be http://<HOST>:<PORT>/oauth/access_token
 
-          The next two are from the json file ~/.pump.d/*server*.json :
+          The next two are from the json file ~/.pump.d/<SERVER>.json :
           * cred.client_id
           * cred.client_secret
 
