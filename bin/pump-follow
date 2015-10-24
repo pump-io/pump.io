@@ -2,7 +2,7 @@
 
 // -*- mode: javascript -*-
 
-// follow.js
+// pump-follow
 //
 // follow another user
 //
@@ -56,6 +56,7 @@ if (otherId.substr(0, 5) != "acct:") {
 
 Step(
     function() {
+        console.log("user cred:'" + username + "' server: '" + server + "'");
         userCred(username, server, this);
     },
     function(err, cred) {
@@ -72,6 +73,12 @@ Step(
             host: ((port == 80) ? server : server + ":" + port),
             pathname: "/api/user/"+username+"/feed"
         });
+        console.log("endpoint");
+        console.log(endpoint);
+        console.log("activity"); 
+        console.log(activity);
+        console.log("this"); 
+        console.log(this); 
         postJSON(endpoint, cred, activity, this);
     },
     function(err, body, resp) {

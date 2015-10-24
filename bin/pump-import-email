@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
 // -*- mode: javascript -*-
-
-// import an activitystreams JSON collection
+//
+// pump-import-email
+//
+// set the email of the user from a file
 //
 // Copyright 2013, E14N https://e14n.com/
 //

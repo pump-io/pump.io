@@ -2,9 +2,12 @@
 
 // -*- mode: javascript -*-
 
-// authorize.js
+// pump-authorize
 //
-// Get OAuth token
+// get OAuth token for an registered app and registered user
+//
+// called after pump-register-app and pump-register-user
+// asks the user to confirm the access via the website
 //
 // Copyright 2011-2012, E14N https://e14n.com/
 //

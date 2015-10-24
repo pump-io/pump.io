@@ -15,3 +15,9 @@ node_modules
 npm-debug.log
 
 config.js
+/pump.io.wiki/
+/pump.io.json
+/strace
+/strace.txt
+/trace.txt
+/trace.txt~
