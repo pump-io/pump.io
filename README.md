@@ -272,7 +272,7 @@ First use this tool to create the credentials file
 
     ./bin/pump-register-app  -t <APPNAME>
 
-This will create the file `~/.pump.d/*server*.json` that contains your credentials.
+This will create the file `~/.pump.d/<SERVER>.json` that contains your credentials.
 
     {
     "client_id":"XXXX",
