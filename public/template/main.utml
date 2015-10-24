@@ -13,7 +13,7 @@
 
         <% if (config.disableRegistration) { %>
 
-        <p>(No pump.io account yet? <a href="http://pump.io/tryit">Try it</a>!)</p>        
+        <p>(No pump.io account yet? <a href="http://pump.io/tryit">Try it</a>!)</p>
 
         <% } else { %>
 
@@ -27,7 +27,12 @@
         <img src="images/somefriends.jpg" width="340" height="235" class="img-rounded" />
       </div>
 
+      <div>
+        <p>Check out the <a href="https://pumpio.readthedocs.org/en/latest/User-Guide/"
+        target="_blank">basic user guide</a>.</p>
+      </div>
+
     </div>
-    
+
   </div>
 </div>

@@ -10,11 +10,13 @@
   </li>
   <li>
     Your account id is <strong><%- (profile.id && profile.id.substr(0, 5) == 'acct:') ? profile.id.substr(5) : profile.id %></strong>.
-    You can use it with pump.io-enabled applications. Try it out on <a href="http://openfarmgame.com/">Open Farm Game</a>.
+    You can use it with <a href="https://pumpio.readthedocs.org/en/latest/Clients/">pump.io-enabled applications</a>. Try it out on <a href="http://openfarmgame.com/">Open Farm Game</a>.
   </li>
 </ul>
 
 <p>
-  This message will stay in your inbox so you can refer back. Enjoy
-  yourself and have fun.
+  This message will stay in your inbox so you can refer back.
+  Check out the <a href="https://pumpio.readthedocs.org/en/latest/User-Guide/"
+  target="_blank">basic user guide</a>, too.
+  Enjoy yourself and have fun.
 </p>
