@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
 // -*- mode: javascript -*-
-
+//
+// pump-import-collection
+//
 // import an activitystreams JSON collection
 //
 // Copyright 2013, E14N https://e14n.com/

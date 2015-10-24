@@ -45,6 +45,14 @@ The software is useful for at least these scenarios:
 Version 0.2.0 will have a Web UI, which will probably make the whole
 thing much more enjoyable.
 
+## Wiki
+
+For more information please check out the [GitHub wiki](https://github.com/e14n/pump.io/wiki)
+
+or clone it via the following command:
+
+    git clone https://github.com/e14n/pump.io.wiki.git
+
 ## Installation
 
 ### Prerequisites
@@ -114,13 +122,22 @@ Second, you can install in the `databank` directory.
 
 Note that you also need to install and configure your database server.
 
+ 
+
 ### Configuration
 
 pump.io uses a JSON file for configuration. It should be at
-`/etc/pump.io.json`.
+`/etc/pump.io.json` or on `~/.pump.io.json`.
 
 The `pump.io.json.sample` file should give you an idea of how to use
 it.
+
+The default config values are stored in the source file `lib/defaults.js`.
+
+You can override the config file location with the `-c` option.
+
+    pump -c <CONFIG_FILE>
+
 
 Here are the main configuration keys.
 
@@ -234,6 +251,55 @@ like this:
 
 You'll probably get a more reliable experience if you use
 [forever](https://npmjs.org/package/forever) to keep the daemon running.
+
+
+### Environment
+
+Set the env variable `NODE_DEBUG` to enable debugging.
+
+Example:
+
+    export NODE_DEBUG=dev,all,net,http,fs,tls,module,timers
+
+See [How to set NODE_DEBUG](http://www.juliengilli.com/2013/05/26/Using-Node.js-NODE_DEBUG-for-fun-and-profit/)
+
+
+## Using the command line tools
+
+### pump-register-app
+
+First use this tool to create the credentials file
+
+    ./bin/pump-register-app  -t <APPNAME>
+
+This will create the file `~/.pump.d/<SERVER>.json` that contains your credentials.
+
+    {
+    "client_id":"XXXX",
+    "client_secret":"YYYYY",
+    "expires_at":0
+    }
+
+It will also add an entry into the local database where you will find the
+clientID. Note that if you use the memory database the data will be lost
+between server runs and will need to rerun the configuration.
+
+
+#### pump-register-user
+
+Use this command to register a user:
+
+    ./bin/pump-register-user  -u <USERNAME> -p <PASSWORD>
+
+### pump-authorize
+
+After you register an app, you can authorize your user to use it.
+
+    ./bin/pump-authorize -u <USERNAME>
+
+When you do that it will ask you to open a website, login and verify the
+value. You paste that back in and all is good.
+
 
 ## Making changes
 
