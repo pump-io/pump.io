@@ -9,7 +9,7 @@
         "node-mocks-http": "0.0.x",
         "zombie": "1.4.x",
         "xml2js": "0.1.x",
-        "simplesmtp": "0.1.x",
+        "simplesmtp": "0.3.x",
         "rimraf": "2.0.x"
     },
     "dependencies": { "connect": "1.x",
@@ -58,12 +58,7 @@
         "url": "git://github.com/e14n/pump.io.git"
     },
     "keywords": ["activitystreams", "socialnetwork", "social", "pump", "streams", "api", "app", "server"],
-    "licenses": [
-        {
-            "type": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        }
-    ],
+    "license": "Apache-2.0",
     "engine": {
         "node": ">=0.8"
     }
