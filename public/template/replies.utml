@@ -3,8 +3,10 @@
   <% if (replies.totalItems > 4) { %>
   <a class="show-all-replies" href="#">Show all <%= replies.totalItems %> replies</a>
   <% } %>
+  <% if (replies.items && replies.items.length) { %>
   <% _.each(replies.items.slice(Math.max(0, replies.items.length - 4), replies.items.length).reverse(), function(reply) { %>
   <%= partial("reply", {replies: replies, reply: reply}) %>
   <% }); %>
+  <% } %>
   <% } %>
 </div>
