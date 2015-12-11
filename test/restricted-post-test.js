@@ -290,9 +290,16 @@ suite.addBatch({
                             cb = this.callback,
                             url = doc.object.likes.url;
 
-                        httputil.getJSON(url, cred, function(err, likes, response) {
-                            cb(err, likes);
-                        });
+                        Step(
+                            function(){
+                                setTimeout(this,100);
+                            },
+                            function(){
+                                httputil.getJSON(url, cred, function(err, likes, response) {
+                                    cb(err, likes);
+                                });
+                            }
+                            );
                     },
                     "it works": function(err, likes) {
                         assert.ifError(err);
@@ -686,9 +693,16 @@ suite.addBatch({
                             cb = this.callback,
                             url = doc.object.likes.url;
 
-                        httputil.getJSON(url, cred, function(err, likes, response) {
-                            cb(err, likes);
-                        });
+                        Step(
+                            function(){
+                                setTimeout(this,100);
+                            },
+                            function(){
+                                httputil.getJSON(url, cred, function(err, likes, response) {
+                                    cb(err, likes);
+                                });
+                            }
+                            );
                     },
                     "it works": function(err, likes) {
                         assert.ifError(err);
@@ -890,9 +904,16 @@ suite.addBatch({
                             cb = this.callback,
                             url = doc.object.likes.url;
 
-                        httputil.getJSON(url, cred, function(err, likes, response) {
-                            cb(err, likes);
-                        });
+                        Step(
+                            function(){
+                                    setTimeout(this,100);
+                            },function(){
+                                    console.log("gonna getJSON");
+                                httputil.getJSON(url, cred, function(err, likes, response) {
+                                    cb(err, likes);
+                                });
+                            }
+                            );
                     },
                     "it works": function(err, likes) {
                         assert.ifError(err);
@@ -993,9 +1014,17 @@ suite.addBatch({
                             cb = this.callback,
                             url = doc.object.likes.url;
 
-                        httputil.getJSON(url, cred, function(err, likes, response) {
-                            cb(err, likes);
-                        });
+                        Step(
+                            function(){
+                                setTimeout(this,100);
+                            },
+                            function(){
+                                console.log(" anonymouse reads the likes");
+                                httputil.getJSON(url, cred, function(err, likes, response) {
+                                    cb(err, likes);
+                                });
+                            }
+                            );
                     },
                     "it works": function(err, likes) {
                         assert.ifError(err);
