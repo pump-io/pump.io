@@ -37,6 +37,20 @@ var assert = require("assert"),
     accessToken = oauthutil.accessToken;
 
 var ignore = function(err) {};
+
+var browserClose=function(br){
+	Step(
+		function(){
+			br.on("closed",this);
+			br.window.close();
+		},
+		function(br){
+			//browser is closed;
+		}
+	);
+
+};
+
 var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 
 var suite = vows.describe("OAuth authorization");
@@ -62,6 +76,7 @@ suite.addBatch({
                         port: 4815,
                         path: "/oauth/authorize"
                     };
+
                 http.get(options, function(res) {
                     if (res.statusCode >= 400 && res.statusCode < 500) {
                         cb(null);
@@ -101,6 +116,7 @@ suite.addBatch({
         "and we try to get an access token without any OAuth credentials": {
             topic: function() {
                 var cb = this.callback;
+
                 httputil.post("localhost", 4815, "/oauth/access_token", {}, function(err, res, body) {
                     if (err) {
                         cb(err);
@@ -335,24 +351,38 @@ suite.addBatch({
                         requestToken(cl, this);
                     },
                     function(err, rt) {
+                        var self = this;
+
                         if (err) throw err;
-                        br = new Browser({runScripts: false});
-                        br.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, this);
+                        br = new Browser({runScripts: false}); //faster without scripts...
+                        Step(
+                            function(){
+                        	    br.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, this);
+                            },
+                            function(){
+                                self(!br.success,br);
+                            }
+                        );
                     },
                     function(err, br) {
+                        var self = this;
+
                         if (err) throw err;
-                        if (!br.success) throw new Error("Browser error");
-                        br.fill("username", "dormouse", this);
+                        br.assert.success();
+
+                        br
+                            .fill("username", "dormouse", this)
+                        	.fill("password", "BADPASSWORD", this);
+                        Step(
+                            function(){
+                                br.pressButton("#authenticate", this);
+                            },
+                            function(){
+                                self(!br.success,br);
+			                }
+                        );
                     },
-                    function(err) {
-                        if (err) throw err;
-                        br.fill("password", "BADPASSWORD", this);
-                    },
-                    function(err) {
-                        if (err) throw err;
-                        br.pressButton("#authenticate", this);
-                    },
-                    function(err) {
+                    function(err,br) {
                         if (err && br.statusCode >= 400 && br.statusCode < 500) {
                             callback(null);
                         } else if (err) {
@@ -362,6 +392,9 @@ suite.addBatch({
                         }
                     }
                 );
+            },
+            teardown: function(br){
+                browserClose(br);
             },
             "it fails correctly": function(err) {
                 assert.ifError(err);
@@ -383,24 +416,37 @@ suite.addBatch({
                         requestToken(cl, this);
                     },
                     function(err, rt) {
+                        var self = this;
+
                         if (err) throw err;
-                        br = new Browser({runScripts: false});
-                        br.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, this);
+                            br = new Browser({runScripts: false});
+                            Step(
+                                function(){
+                                    br.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, this);
+                                },
+                                function(){
+                                    self(!br.success,br);
+                                }
+                            );
                     },
                     function(err, br) {
+                        var self = this;
+                        
                         if (err) throw err;
-                        if (!br.success) throw new Error("Browser error");
-                        br.fill("username", "nonexistent", this);
+                        br.assert.success();
+                        br
+                            .fill("username", "nonexistent", this)
+                        	.fill("password", "DOESNTMATTER", this);
+                        Step(
+                            function(){
+                                br.pressButton("#authenticate", this);
+                            },
+                            function(){
+                                self(!br.success,br);
+                            }
+                        );
                     },
-                    function(err) {
-                        if (err) throw err;
-                        br.fill("password", "DOESNTMATTER", this);
-                    },
-                    function(err) {
-                        if (err) throw err;
-                        br.pressButton("#authenticate", this);
-                    },
-                    function(err) {
+                    function(err, br) {
                         if (err && br.statusCode >= 400 && br.statusCode < 500) {
                             callback(null);
                         } else if (err) {
@@ -410,6 +456,9 @@ suite.addBatch({
                         }
                     }
                 );
+            },
+            teardown: function(br){
+                browserClose(br);
             },
             "it fails correctly": function(err) {
                 assert.ifError(err);
@@ -428,6 +477,7 @@ suite.addBatch({
             "and we create a user using the API": {
                 topic: function(cl) {
                     var cb = this.callback;
+
                     Step(
                         function() {
                             newClient(this);
@@ -464,9 +514,21 @@ suite.addBatch({
                     },
                     "and we get the authentication form": {
                         topic: function(rt) {
-                            var cb = this.callback;
-                            Browser.runScripts = false;
-                            Browser.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, cb);
+                            var cb = this.callback,
+                                br;
+
+                            Step(
+                                function(){	
+                                    br = new Browser({runStrips:false});
+                                    br.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, this);
+                                },
+                                function(){
+                                    cb(!br.success, br);
+                                }
+                            );
+                        },
+                        teardown: function(br){
+                            browserClose(br);
                         },
                         "it works": function(err, browser) {
                             assert.ifError(err);
@@ -478,21 +540,18 @@ suite.addBatch({
                         "and we submit the authentication form": {
                             topic: function(browser) {
                                 var cb = this.callback;
-                                browser.fill("username", "alice", function(err) {
-                                    if (err) {
-                                        cb(err);
-                                    } else {
-                                        browser.fill("password", "white*rabbit", function(err) {
-                                            if (err) {
-                                                cb(err);
-                                            } else {
-                                                browser.pressButton("#authenticate", function(err) {
-                                                    cb(err, browser);
-                                                });
-                                            }
-                                        });
+
+                                browser
+                                    .fill("username", "alice")
+                                    .fill("password", "white*rabbit");
+                                Step(
+                                    function(){
+                                        browser.pressButton("#authenticate",this);
+                                    },
+                                    function(){
+                                             cb(!br.success, browser);
                                     }
-                                });
+                                );
                             },
                             "it works": function(err, browser) {
                                 assert.ifError(err);
@@ -507,17 +566,20 @@ suite.addBatch({
                             "and we submit the authorization form": {
                                 topic: function(browser) {
                                     var cb = this.callback;
-                                    browser.pressButton("Authorize", function(err) {
-                                        if (err) {
-                                            cb(err, null);
-                                        } else if (!browser.success) {
-                                            cb(new Error("Browser not successful"), null);
-                                        } else {
-                                            cb(null, {token: browser.text("#token"),
+				    
+                                    Step(
+                                        function(){
+                                    	    browser.pressButton("Authorize", this);
+                                        },
+                                        function(){
+                                            if (!browser.success) {
+                                            	cb(new Error("Browser not successful"), null);
+                                            } else {
+                                            	cb(null, {token: browser.text("#token"),
                                                       verifier: browser.text("#verifier")});
-                                                      
+                                            }
                                         }
-                                    });
+                                    );
                                 },
                                 "it works": function(err, results) {
                                     assert.ifError(err);
@@ -530,8 +592,10 @@ suite.addBatch({
                                     topic: function(pair) {
                                         var cb = this.callback,
                                             oa,
-                                            rt = arguments[5],
-                                            cl = arguments[7];
+                                            //rt = arguments[5],
+                                            rt = arguments[3],
+                                            //cl = arguments[7];
+                                            cl = arguments[5];
 
                                         oa = new OAuth("http://localhost:4815/oauth/request_token",
                                                        "http://localhost:4815/oauth/access_token",
@@ -566,9 +630,11 @@ suite.addBatch({
                                             var cb = this.callback,
                                                 oa,
                                                 pair = arguments[1],
-                                                rt = arguments[6],
-                                                cl = arguments[8];
-
+                                                //rt = arguments[6],
+                                                rt = arguments[4],
+                                                //cl = arguments[8];
+                                                cl = arguments[6];
+					
                                             oa = new OAuth("http://localhost:4815/oauth/request_token",
                                                            "http://localhost:4815/oauth/access_token",
                                                            cl.client_id,
