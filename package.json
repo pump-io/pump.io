@@ -51,6 +51,7 @@
     },
     "scripts": {
         "test": "vows -v test/*-test.js",
+        "postinstall": "./patch/connect_update.sh",
         "start": "./bin/pump"
     },
     "repository": {
