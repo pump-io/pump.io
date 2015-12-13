@@ -5,23 +5,25 @@
     "version": "0.3.0",
     "author": "Evan Prodromou <evan@e14n.com>",
     "devDependencies": {
-        "vows": "0.7.x",
+        "vows": "0.8.x",
         "node-mocks-http": "0.0.x",
-        "zombie": "1.4.x",
+        "zombie": "2.x.x",
         "xml2js": "0.1.x",
-        "simplesmtp": "0.3.x",
+        "simplesmtp": "https://github.com/profOnno/simplesmtp/archive/vows.tar.gz",
         "rimraf": "2.0.x"
     },
-    "dependencies": { "connect": "1.x",
+    "dependencies": { "connect": "1.x.x",
                       "connect-auth": "0.5.3",
                       "express": "2.5.x",
                       "utml": "0.2.x",
                       "underscore": "1.4.x",
                       "underscore-contrib": "0.1.x",
-    		      "node-uuid": "1.3.x",
-		      "bcrypt": "0.8.x",
-		      "dateformat": "1.x",
-		      "databank": "0.19.x",
+                      "node-uuid": "1.3.x",
+                      "bcrypt": "0.8.x",
+                      "dateformat": "1.x",
+                      "express-session": "1.x.x",
+                      "databank": "profOnno/databank#event-emitter",
+                      "connect-databank": "profOnno/connect-databank#upgrade",
                       "step": "0.0.x",
                       "oauth-evanp": "~0.9.10-evanp.2",
                       "optimist": "0.3.x",
@@ -33,11 +35,9 @@
                       "bunyan": "0.16.x",
                       "emailjs": "0.3.x",
                       "mkdirp": "0.3.x",
-		      "connect-databank": "0.13.x",
                       "sockjs": "0.3.x",
                       "dialback-client": "~0.1.5",
-		      "gm": "1.9.x",
-                      "set-immediate": "0.1.x",
+                      "gm": "1.9.x",
                       "crypto-cacerts": "0.1.x"
 		    },
     "bin": {
@@ -50,7 +50,7 @@
         "pump-stop-following": "./bin/pump-stop-following"
     },
     "scripts": {
-        "test": "vows test/*-test.js",
+        "test": "vows -v test/*-test.js",
         "start": "./bin/pump"
     },
     "repository": {
