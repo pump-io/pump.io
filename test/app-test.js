@@ -34,6 +34,7 @@ suite.addBatch({
             assert.isObject(mod);
         },
         "it has the makeApp() export": function(mod) {
+            console.log(mod);
             assert.isFunction(mod.makeApp);
         }
     }

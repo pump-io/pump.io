@@ -1,0 +1,23 @@
+--- ../../2/pump.io/node_modules/connect-databank/lib/connect-databank.js	2013-11-19 02:56:26.000000000 +0000
++++ ../node_modules/connect-databank/lib/connect-databank.js	2015-11-22 20:53:57.656431000 +0000
+@@ -224,6 +224,11 @@
+             });
+         };
+ 
++        store.close = function(){
++            clearInterval(store.interval); //needed to pass vows
++            clearTimeout(store.timeout); //also needed to pass vows
++        }
++
+         // XXX: should this be public?
+ 
+         store.cleanup = function(callback) {
+@@ -285,7 +290,7 @@
+         if (cleanupInterval) {
+             // Since there may be multiple processes trying to clean up,
+             // We stagger our cleanup randomly somewhere over the interval period
+-            setTimeout(function() {
++            store.timeout = setTimeout(function() {
+                 var doCleanup = function() {
+                     store.cleanup(function(err) {
+                         if (err) {
