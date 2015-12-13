@@ -17,7 +17,6 @@
 // limitations under the License.
 
 // Adds to globals
-require("set-immediate");
 
 var databank = require("databank"),
     _ = require("underscore"),
