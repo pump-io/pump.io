@@ -549,7 +549,7 @@ suite.addBatch({
                                         browser.pressButton("#authenticate",this);
                                     },
                                     function(){
-                                             cb(!br.success, browser);
+                                             cb(!browser.success, browser);
                                     }
                                 );
                             },
