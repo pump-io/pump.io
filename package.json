@@ -8,7 +8,7 @@
         "vows": "0.8.x",
         "node-mocks-http": "1.5.x",
         "zombie": "2.x.x",
-        "xml2js": "0.1.x",
+        "xml2js": "0.4.x",
         "simplesmtp": "0.3.x",
         "rimraf": "2.4.x"
     },

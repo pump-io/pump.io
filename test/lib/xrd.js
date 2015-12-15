@@ -44,7 +44,8 @@ var getXRD = function(url) {
                     callback(err, null, null);
                 });
                 res.on("end", function() {
-                    var parser = new xml2js.Parser();
+                    var parser = new xml2js.Parser({attrkey:"@"});
+                    
                     parser.parseString(body, function(err, doc) {
                         if (err) {
                             callback(err, null, null);
@@ -87,6 +88,8 @@ var xrdLinkCheck = function(def) {
                     }
                 }
             };
+        
+        doc=doc.XRD;
         assert.ifError(err);
         assert.isObject(doc);
         assert.include(doc, "Link");
