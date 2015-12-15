@@ -1391,7 +1391,7 @@ suite.addBatch({
 
                     assert.deepEqual(sub.pkey, base.pkey);
                     assert.deepEqual(sub.indices, base.indices);
-                    assert.deepEqual(sub.fields, _.union(base.fields, "members"));
+                    assert.deepEqual(sub.fields, _.union(base.fields, ["members"]));
                 }
             },
             "and we get a sub-schema with remove and add arguments": {
@@ -1405,7 +1405,7 @@ suite.addBatch({
 
                     assert.deepEqual(sub.pkey, base.pkey);
                     assert.deepEqual(sub.indices, base.indices);
-                    assert.deepEqual(sub.fields, _.union(_.without(base.fields, "attachments"), "members"));
+                    assert.deepEqual(sub.fields, _.union(_.without(base.fields, "attachments"), ["members"]));
                 }
             },
             "and we get a sub-schema with index arguments": {
