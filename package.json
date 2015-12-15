@@ -13,7 +13,7 @@
         "rimraf": "2.4.x"
     },
     "dependencies": { "connect": "1.x.x",
-                      "connect-auth": "0.5.3",
+                      "connect-auth": "0.6.x",
                       "express": "2.5.x",
                       "utml": "0.2.x",
                       "underscore": "1.8.x",
