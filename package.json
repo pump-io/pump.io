@@ -9,7 +9,7 @@
         "node-mocks-http": "1.5.x",
         "zombie": "2.x.x",
         "xml2js": "0.1.x",
-        "simplesmtp": "https://github.com/profOnno/simplesmtp/archive/vows.tar.gz",
+        "simplesmtp": "0.3.x",
         "rimraf": "2.4.x"
     },
     "dependencies": { "connect": "1.x.x",
