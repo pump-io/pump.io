@@ -19,7 +19,6 @@
 var _ = require("underscore"),
     Step = require("step"),
     validator = require("validator"),
-    check = validator.check,
     dialback = require("../lib/dialback"),
     maybeDialback = dialback.maybeDialback,
     Client = require("../lib/model/client").Client,
@@ -75,12 +74,7 @@ var clientReg = function(req, res, next) {
         }
         props.contacts = params.contacts.split(" ");
         if (!props.contacts.every(function(contact) {
-                try {
-                    check(contact).isEmail();
-                    return true;
-                } catch (err) {
-                    return false;
-                }
+                return validator.isEmail(contact); 
             })) {
             next(new HTTPError("contacts must be space-separate email addresses.", 400));
             return;
@@ -102,24 +96,17 @@ var clientReg = function(req, res, next) {
     }
 
     if (_(params).has("logo_url")) {
-        try {
-            check(params.logo_url).isUrl();
-            props.logo_url = params.logo_url;
-        } catch (e) {
+        if(!validator.isURL(params.logo_url)){
             next(new HTTPError("Invalid logo_url.", 400));
             return;
         }
+        props.logo_url = params.logo_url;
     }
 
     if (_(params).has("redirect_uris")) {
         props.redirect_uris = params.redirect_uris.split(" ");
         if (!props.redirect_uris.every(function(uri) {
-                try {
-                    check(uri).isUrl();
-                    return true;
-                } catch (err) {
-                    return false;
-                }
+                return validator.isURL(uri);
             })) {
             next(new HTTPError("redirect_uris must be space-separated URLs.", 400));
             return;

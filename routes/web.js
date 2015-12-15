@@ -20,7 +20,6 @@ var databank = require("databank"),
     Step = require("step"),
     _ = require("underscore"),
     validator = require("validator"),
-    check = validator.check,
     Mailer = require("../lib/mailer"),
     URLMaker = require("../lib/urlmaker").URLMaker,
     filters = require("../lib/filters"),
@@ -214,9 +213,7 @@ var handleRemote = function(req, res, next) {
         parts,
         host;
 
-    try {
-        check(webfinger).isEmail();
-    } catch(e) {
+    if(!validator.isEmail(webfinger)){
         next(new HTTPError(e.message, 400));
         return;
     }
