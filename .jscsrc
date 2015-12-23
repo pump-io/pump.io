@@ -1,0 +1,18 @@
+{
+    "preset": "idiomatic",
+    "validateIndentation": 4,
+    "disallowTabs": true,
+    "requireSpacesInsideParentheses": null,
+    "disallowSpacesInsideParentheses": null,
+    "requireSpacesInsideBrackets": null,
+    "disallowSpacesInsideBrackets": true,
+    "requireSpacesInsideObjectBrackets": null,
+    "requireCamelCaseOrUpperCaseIdentifiers": null,
+    "requireCurlyBraces": null,
+    "maximumLineLength": null,
+    "requireSpaceBeforeBinaryOperators": null,
+    "requireSpaceAfterBinaryOperators": null,
+    "validateCommentPosition": null,
+    "requireEarlyReturn": null,
+    "requireDotNotation": null
+}
