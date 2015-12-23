@@ -21,11 +21,11 @@
     Pump.Router = Backbone.Router.extend({
 
         routes: {
-            "":                       "home",    
-            ":nickname":              "profile",   
-            ":nickname/favorites":    "favorites",  
-            ":nickname/following":    "following",  
-            ":nickname/followers":    "followers",  
+            "":                       "home",
+            ":nickname":              "profile",
+            ":nickname/favorites":    "favorites",
+            ":nickname/following":    "following",
+            ":nickname/followers":    "followers",
             ":nickname/activity/:id": "activity",
             ":nickname/lists":        "lists",
             ":nickname/list/:uuid":   "list",

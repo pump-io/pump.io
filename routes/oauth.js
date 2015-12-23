@@ -109,7 +109,7 @@ var authenticate = function(req, res) {
 // Renders the authorization form
 // Will *skip* the authorization form if the user has already authenticated already logged in
 
-var authorize = function(err, req, res, authenticated, rt, application) {  
+var authorize = function(err, req, res, authenticated, rt, application) {
 
     var self = this,
         user;
@@ -192,7 +192,7 @@ var authorize = function(err, req, res, authenticated, rt, application) {
             }
         }
     );
-};  
+};
 
 var authorizationFinished = function(err, req, res, rt) {
 

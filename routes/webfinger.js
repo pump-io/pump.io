@@ -112,7 +112,7 @@ var hostMeta = function(req, res, next) {
     for (i = 0; i < links.length; i++) {
         res.write(Link(links[i]) + "\n");
     }
-    
+
     res.end("</XRD>\n");
 };
 
@@ -264,7 +264,7 @@ var lrdd = function(req, res, next) {
     for (i = 0; i < links.length; i++) {
         res.write(Link(links[i]) + "\n");
     }
-    
+
     res.end("</XRD>\n");
 };
 

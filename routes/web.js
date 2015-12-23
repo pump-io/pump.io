@@ -70,7 +70,7 @@ var addRoutes = function(app) {
     app.get("/", app.session, principal, addMessages, showMain);
 
     app.post("/main/javascript-disabled", app.session, principal, showJavascriptDisabled);
-    
+
     app.get("/main/register", app.session, principal, showRegister);
     app.post("/main/register", app.session, principal, clientAuth, reqGenerator, createUser);
 
@@ -93,7 +93,7 @@ var addRoutes = function(app) {
     }
 
     app.get("/main/authorized/:hostname", app.session, reqHost, reqToken, authorized);
-    
+
     if (app.config.uploaddir) {
         app.post("/main/upload", app.session, principal, principalUserOnly, uploadFile);
         app.post("/main/upload-avatar", app.session, principal, principalUserOnly, uploadAvatar);
@@ -125,7 +125,7 @@ var addRoutes = function(app) {
 
 var loginRedirect = function(rel) {
     return function(req, res, next) {
-        res.redirect('/main/login?continue='+rel);
+        res.redirect("/main/login?continue="+rel);
     };
 };
 
@@ -216,7 +216,7 @@ var handleRemote = function(req, res, next) {
 
     try {
         check(webfinger).isEmail();
-    } catch(e) {
+    } catch (e) {
         next(new HTTPError(e.message, 400));
         return;
     }
@@ -430,8 +430,8 @@ var handleLogin = function(req, res, next) {
 
     var user = null;
 
-    Step( 
-        function () { 
+    Step(
+        function() {
             User.checkCredentials(req.body.nickname, req.body.password, this);
         },
         function(err, result) {
@@ -906,8 +906,8 @@ var handleRecover = function(req, res, next) {
         nickname = req.body.nickname,
         force = req.body.force;
 
-    Step( 
-        function () { 
+    Step(
+        function() {
             req.log.debug({nickname: nickname}, "checking for user to recover");
             User.get(nickname, this);
         },
@@ -946,7 +946,7 @@ var handleRecover = function(req, res, next) {
                 req.log.debug({nickname: nickname}, "No existing recovery records; continuing.");
                 this(null);
                 return;
-            } 
+            }
             stillValid = _.filter(recoveries, function(reco) { return Date.now() - Date.parse(reco.timestamp) < Recovery.TIMEOUT; });
             if (stillValid.length > 0) {
                 req.log.debug({nickname: nickname, count: stillValid.length}, "Have an existing, valid recovery record.");
@@ -1006,7 +1006,7 @@ var handleRecover = function(req, res, next) {
 };
 
 var recoverCode = function(req, res, next) {
-    
+
     var code = req.params.code;
 
     res.render("recover-code", {page: {title: "One moment please"},
