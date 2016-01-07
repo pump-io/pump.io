@@ -1590,13 +1590,18 @@
         tagName: "div",
         className: "row comment-form",
         events: {
-            "submit .post-comment": "saveComment"
+            "submit .post-comment": "saveComment",
+            "click .close-btn": "cancelComment"
         },
         ready: function() {
             var view = this;
             view.$('textarea[name="content"]').wysihtml5({
                 customTemplates: Pump.wysihtml5Tmpl
             });
+        },
+        cancelComment: function() {
+            var view = this;
+            view.remove();
         },
         saveComment: function() {
             var view = this,
