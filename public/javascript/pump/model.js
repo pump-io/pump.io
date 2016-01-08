@@ -35,10 +35,10 @@
         };
 
         var methodMap = {
-            'create': 'POST',
-            'update': 'PUT',
-            'delete': 'DELETE',
-            'read':   'GET'
+            "create": "POST",
+            "update": "PUT",
+            "delete": "DELETE",
+            "read":   "GET"
         };
 
         var type = methodMap[method];
@@ -48,33 +48,33 @@
         options = options || {};
 
         // Default JSON-request options.
-        var params = {type: type, dataType: 'json'};
+        var params = {type: type, dataType: "json"};
 
         // Ensure that we have a URL.
 
         if (!options.url) {
 
-            if (type == 'POST') {
-                params.url = getValue(model.collection, 'url');
+            if (type == "POST") {
+                params.url = getValue(model.collection, "url");
             } else if (model.proxyURL) {
                 params.url = model.proxyURL;
             } else {
-                params.url = getValue(model, 'url');
+                params.url = getValue(model, "url");
             }
 
-            if (!params.url || !_.isString(params.url)) { 
+            if (!params.url || !_.isString(params.url)) {
                 throw new Error("No URL");
             }
         }
 
         // Ensure that we have the appropriate request data.
-        if (!options.data && model && (method == 'create' || method == 'update')) {
-            params.contentType = 'application/json';
+        if (!options.data && model && (method == "create" || method == "update")) {
+            params.contentType = "application/json";
             params.data = JSON.stringify(model.toJSON());
         }
 
         // Don't process data on a non-GET request.
-        if (params.type !== 'GET' && !Backbone.emulateJSON) {
+        if (params.type !== "GET" && !Backbone.emulateJSON) {
             params.processData = false;
         }
 
@@ -214,7 +214,7 @@
             });
         },
         complicated: function() {
-            var attrs = ["activityObjects", 
+            var attrs = ["activityObjects",
                          "activityObjectBags",
                          "activityObjectStreams",
                          "activityStreams",
@@ -312,7 +312,7 @@
     // representation -- some wrap-up data like url and totalItems, plus an array of items.
 
     Pump.Stream = Pump.Model.extend({
-        people: ['author'],
+        people: ["author"],
         itemsClass: Pump.Items,
         idAttribute: "url",
         getObjectType: function() {
@@ -321,7 +321,7 @@
         },
         initialize: function() {
             var str = this,
-                items = str.get('items');
+                items = str.get("items");
 
             Pump.Model.prototype.initialize.apply(str);
 
@@ -343,10 +343,10 @@
         },
         url: function() {
             var str = this;
-            if (str.has('pump_io') && _.has(str.get('pump_io'), 'proxyURL')) {
-                return str.get('pump_io').proxyURL;
+            if (str.has("pump_io") && _.has(str.get("pump_io"), "proxyURL")) {
+                return str.get("pump_io").proxyURL;
             } else {
-                return str.get('url');
+                return str.get("url");
             }
         },
         nextLink: function(count) {
@@ -357,8 +357,8 @@
             if (_.isUndefined(count)) {
                 count = 20;
             }
-            if (str.has('links') && _.has(str.get('links'), 'next')) {
-                url = str.get('links').next.href;
+            if (str.has("links") && _.has(str.get("links"), "next")) {
+                url = str.get("links").next.href;
             } else if (str.items && str.items.length > 0) {
                 item = str.items.at(str.items.length-1);
                 url = str.url() + "?before=" + item.id + "&type=" + item.get("objectType");
@@ -369,7 +369,7 @@
             if (url && count != 20) {
                 url = url + "&count=" + count;
             }
-            
+
             return url;
         },
         prevLink: function(count) {
@@ -380,8 +380,8 @@
             if (_.isUndefined(count)) {
                 count = 20;
             }
-            if (str.has('links') && _.has(str.get('links'), 'prev')) {
-                url = str.get('links').prev.href;
+            if (str.has("links") && _.has(str.get("links"), "prev")) {
+                url = str.get("links").prev.href;
             } else if (str.items && str.items.length > 0) {
                 item = str.items.at(0);
                 url = str.url() + "?since=" + item.id + "&type=" + item.get("objectType");
@@ -392,7 +392,7 @@
             if (url && count != 20) {
                 url = url + "&count=" + count;
             }
-            
+
             return url;
         },
         getPrev: function(count, callback) { // Get stuff later than the current group
@@ -428,10 +428,10 @@
                         }
                     }
                     if (data.links && data.links.prev && data.links.prev.href) {
-                        if (stream.has('links')) {
-                            stream.get('links').prev = data.links.prev;
+                        if (stream.has("links")) {
+                            stream.get("links").prev = data.links.prev;
                         } else {
-                            stream.set('links', {"prev": {"href": data.links.prev.href}});
+                            stream.set("links", {"prev": {"href": data.links.prev.href}});
                         }
                     }
                     if (_.isFunction(callback)) {
@@ -483,14 +483,14 @@
                     }
                     if (data.links) {
                         if (data.links.next && data.links.next.href) {
-                            if (stream.has('links')) {
-                                stream.get('links').next = data.links.next;
+                            if (stream.has("links")) {
+                                stream.get("links").next = data.links.next;
                             } else {
-                                stream.set('links', {"next": {"href": data.links.next.href}});
+                                stream.set("links", {"next": {"href": data.links.next.href}});
                             }
                         } else {
-                            if (stream.has('links')) {
-                                delete stream.get('links').next;
+                            if (stream.has("links")) {
+                                delete stream.get("links").next;
                             }
                         }
                     }
@@ -588,7 +588,7 @@
                 });
 
             } else {
-                
+
                 count = stream.maxCount();
 
                 options = {
@@ -604,10 +604,10 @@
                             }
                         }
                         if (data.links && data.links.next && data.links.next.href) {
-                            if (stream.has('links')) {
-                                stream.get('links').next = data.links.next;
+                            if (stream.has("links")) {
+                                stream.get("links").next = data.links.next;
                             } else {
-                                stream.set('links', data.links);
+                                stream.set("links", data.links);
                             }
                         } else {
                             // XXX: end-of-collection indicator?
@@ -630,7 +630,7 @@
         maxCount: function() {
             var stream = this,
                 count,
-                total = stream.get('totalItems');
+                total = stream.get("totalItems");
 
             if (_.isNumber(total)) {
                 count = Math.min(total, 200);
@@ -675,7 +675,7 @@
         complicated: function() {
             var str = this,
                 names = Pump.Model.prototype.complicated.apply(str);
-            
+
             names.push("items");
 
             return names;
@@ -688,8 +688,8 @@
     // A social activity.
 
     Pump.Activity = Pump.Model.extend({
-        activityObjects: ['actor', 'object', 'target', 'generator', 'provider', 'location'],
-        activityObjectBags: ['to', 'cc', 'bto', 'bcc'],
+        activityObjects: ["actor", "object", "target", "generator", "provider", "location"],
+        activityObjectBags: ["to", "cc", "bto", "bcc"],
         url: function() {
             var links = this.get("links"),
                 pump_io = this.get("pump_io"),
@@ -731,7 +731,7 @@
             if (!options) {
                 options = {};
             }
-            if (!_.has(options, 'at')) {
+            if (!_.has(options, "at")) {
                 options.at = 0;
             }
             Backbone.Collection.prototype.add.apply(this, [models, options]);
@@ -760,7 +760,7 @@
                 }
                 switch (act.get("verb")) {
                 case "post":
-                case "create":                    
+                case "create":
                     if (act.object.inReplyTo) {
                         if (!act.object.author) {
                             act.object.author = act.actor;
@@ -815,9 +815,9 @@
     });
 
     Pump.ActivityObject = Pump.Model.extend({
-        activityObjects: ['author', 'location', 'inReplyTo'],
-        activityObjectBags: ['attachments', 'tags'],
-        activityObjectStreams: ['likes', 'replies', 'shares'],
+        activityObjects: ["author", "location", "inReplyTo"],
+        activityObjectBags: ["attachments", "tags"],
+        activityObjectStreams: ["likes", "replies", "shares"],
         url: function() {
             var links = this.get("links"),
                 pump_io = this.get("pump_io"),
@@ -826,7 +826,7 @@
             if (pump_io && pump_io.proxyURL) {
                 return pump_io.proxyURL;
             } else if (links &&
-                       _.isObject(links) && 
+                       _.isObject(links) &&
                        _.has(links, "self") &&
                        _.isObject(links.self) &&
                        _.has(links.self, "href") &&
@@ -844,7 +844,7 @@
 
     Pump.List = Pump.ActivityObject.extend({
         objectType: "collection",
-        peopleStreams: ['members'],
+        peopleStreams: ["members"],
         initialize: function() {
             Pump.Model.prototype.initialize.apply(this, arguments);
         }
@@ -852,9 +852,9 @@
 
     Pump.Person = Pump.ActivityObject.extend({
         objectType: "person",
-        activityObjectStreams: ['favorites'],
-        listStreams: ['lists'],
-        peopleStreams: ['followers', 'following'],
+        activityObjectStreams: ["favorites"],
+        listStreams: ["lists"],
+        peopleStreams: ["followers", "following"],
         initialize: function() {
             Pump.Model.prototype.initialize.apply(this, arguments);
         }
@@ -919,7 +919,7 @@
 
     Pump.User = Pump.Model.extend({
         idAttribute: "nickname",
-        people: ['profile'],
+        people: ["profile"],
         initialize: function() {
             var user = this,
                 streamUrl = function(rel) {

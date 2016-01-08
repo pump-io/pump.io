@@ -43,7 +43,7 @@ var clientReg = function(req, res, next) {
     }
 
     type = params.type;
-    
+
     if (_(params).has("client_id")) {
         if (type !== "client_update") {
             // XXX: log this

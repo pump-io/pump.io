@@ -39,7 +39,7 @@
 
     Pump.refreshStreams = function() {
         var streams = Pump.getStreams();
-        
+
         _.each(streams, function(stream, name) {
             stream.getPrev();
         });
@@ -143,7 +143,7 @@
         }
 
         var streams = Pump.getStreams();
-        
+
         _.each(streams, function(stream, name) {
             Pump.socket.send(JSON.stringify({cmd: "follow", url: stream.url()}));
         });
@@ -160,7 +160,7 @@
         }
 
         var streams = Pump.getStreams();
-        
+
         _.each(streams, function(stream, name) {
             Pump.socket.send(JSON.stringify({cmd: "unfollow", url: stream.url()}));
         });

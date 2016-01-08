@@ -113,7 +113,7 @@ if (!window.Pump) {
                 pair = Pump.getUserCred();
 
                 if (pair) {
-                    
+
                     // We need to renew the session, for images and objects and so on.
 
                     Pump.renewSession(function(err, data) {
@@ -216,7 +216,7 @@ if (!window.Pump) {
         }
 
         console.log(msg);
-        
+
         if (Pump.body && Pump.body.nav) {
             var $nav = Pump.body.nav.$el,
                 $alert = $("#error-popup");
@@ -224,10 +224,10 @@ if (!window.Pump) {
             if ($alert.length === 0) {
                 $alert = $('<div id="error-popup" class="alert-error" style="display: none; margin-top: 0px; text-align: center">'+
                            '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                           '<span class="error-message">'+msg+'</span>'+
-                           '</div>');
+                           '<span class="error-message">'+msg+"</span>"+
+                           "</div>");
                 $nav.after($alert);
-                $alert.slideDown('fast');
+                $alert.slideDown("fast");
             } else {
                 $(".error-message", $alert).text(msg);
             }
@@ -249,11 +249,11 @@ if (!window.Pump) {
 
         var here = window.location;
 
-        if (url.indexOf(':') == -1) {
-            if (url.substr(0, 1) == '/') {
-                url = here.protocol + '//' + here.host + url;
+        if (url.indexOf(":") == -1) {
+            if (url.substr(0, 1) == "/") {
+                url = here.protocol + "//" + here.host + url;
             } else {
-                url = here.href.substr(0, here.href.lastIndexOf('/') + 1) + url;
+                url = here.href.substr(0, here.href.lastIndexOf("/") + 1) + url;
             }
         }
 
@@ -375,20 +375,20 @@ if (!window.Pump) {
     Pump.searchParams = function(str) {
         var params = {},
             pl     = /\+/g,
-            decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+            decode = function(s) { return decodeURIComponent(s.replace(pl, " ")); },
             pairs;
 
         if (!str) {
             str = window.location.search;
         }
-        
+
         pairs = str.substr(1).split("&");
 
         _.each(pairs, function(pairStr) {
             var pair = pairStr.split("=", 2),
                 key = decode(pair[0]),
                 value = (pair.length > 1) ? decode(pair[1]) : null;
-            
+
             params[key] = value;
         });
 
@@ -495,7 +495,7 @@ if (!window.Pump) {
 
     Pump.rel = function(url) {
 
-        var a = document.createElement('a'),
+        var a = document.createElement("a"),
             pathname;
 
         a.href = url;
@@ -505,11 +505,11 @@ if (!window.Pump) {
     };
 
     Pump.htmlEncode = function(value) {
-        return $('<div/>').text(value).html();
+        return $("<div/>").text(value).html();
     };
 
     Pump.htmlDecode = function(value) {
-        return $('<div/>').html(value).text();
+        return $("<div/>").html(value).text();
     };
 
     // Sets up the initial view and sub-views

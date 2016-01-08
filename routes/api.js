@@ -736,7 +736,7 @@ var createUser = function(req, res, next) {
             next(new HTTPError("No email address", 400));
             return;
         } else {
-            if(validator.isEmail(props.email)){
+            if (validator.isEmail(props.email)) {
                 email = props.email;
                 delete props.email;
             } else {
@@ -925,7 +925,7 @@ var postActivity = function(req, res, next) {
     var props = Scrubber.scrubActivity(req.body),
         activity = new Activity(props),
         finishAndSend = function(profile, activity, callback) {
-            
+
             var dupe = new Activity(_.clone(activity));
 
             Step(
@@ -1534,10 +1534,10 @@ var streamArgs = function(req, defaultCount, maxCount) {
         }
 
         if (_(req.query).has("count")) {
-            if(!validator.isInt(req.query.count, {min: 0 , max: maxCount})){
+            if (!validator.isInt(req.query.count, {min: 0, max: maxCount})) {
                 throw new Error("Count must be between 0 and " + maxCount);
-            }else{
-                args.count = validator.toInt(req.query.count)
+            }else {
+                args.count = validator.toInt(req.query.count);
             }
         } else {
             args.count = defaultCount;
@@ -1547,7 +1547,7 @@ var streamArgs = function(req, defaultCount, maxCount) {
         // XXX: Check "before" and "since" for URI...?
 
         if (_(req.query).has("before")) {
-            if(validator.isNull(req.query.before)){
+            if (validator.isNull(req.query.before)) {
                 throw new Error(req.query.before + " is null");
             } else {
                 args.before = validator.trim(req.query.before);
@@ -1558,9 +1558,9 @@ var streamArgs = function(req, defaultCount, maxCount) {
             if (_(args).has("before")) {
                 throw new Error("Can't have both 'before' and 'since' parameters");
             }
-            if(validator.isNull(req.query.since)){
+            if (validator.isNull(req.query.since)) {
                 throw new Error(req.query.since + " is null");
-            }else{
+            }else {
                 args.since = validator.trim(req.query.since);
             }
         }
@@ -1572,9 +1572,9 @@ var streamArgs = function(req, defaultCount, maxCount) {
             if (_(args).has("since")) {
                 throw new Error("Can't have both 'since' and 'offset' parameters");
             }
-            if(!validator.isInt(req.query.offset,{min:0})){
+            if (!validator.isInt(req.query.offset, {min:0})) {
                 throw new Error("Offset must be an integer greater than or equal to zero");
-            }else{
+            }else {
                 args.start = validator.toInt(req.query.offset);
             }
         }
