@@ -23,7 +23,7 @@
                       "dateformat": "1.x",
                       "express-session": "1.x.x",
                       "databank": "0.19.x",
-                      "connect-databank": "profOnno/connect-databank",
+                      "connect-databank": "profOnno/connect-databank#v0.13.0b",
                       "step": "0.0.x",
                       "oauth-evanp": "~0.9.10-evanp.2",
                       "optimist": "0.6.x",
