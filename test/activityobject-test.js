@@ -34,7 +34,7 @@ var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 
 suite.addBatch({
     "When we require the activityobject module": {
-        topic: function() { 
+        topic: function() {
             var cb = this.callback;
             // Need this to make IDs
 
@@ -50,7 +50,7 @@ suite.addBatch({
                 var mod;
 
                 DatabankObject.bank = db;
-                
+
                 mod = require("../lib/model/activityobject") || null;
 
                 cb(null, mod);
@@ -249,7 +249,7 @@ suite.addBatch({
                     assert.equal(cinnamon.objectType, "http://condiment.example/type/spice");
                 }
             },
-           "and we create an activityobject object": {
+            "and we create an activityobject object": {
                 topic: function(ActivityObject) {
                     var props = {
                         objectType: ActivityObject.ARTICLE,
@@ -961,7 +961,7 @@ suite.addBatch({
                         Person = require("../lib/model/person").Person,
                         place = null,
                         person = null;
-                    
+
                     Step(
                         function() {
                             Place.create({displayName: "North Pole",
@@ -997,7 +997,7 @@ suite.addBatch({
                     },
                     "it worked": function(err, favers, person) {
                         assert.ifError(err);
-                    } ,
+                    },
                     "it is the right size": function(err, favers, person) {
                         assert.ifError(err);
                         assert.isArray(favers);
@@ -1028,7 +1028,7 @@ suite.addBatch({
                         Person = require("../lib/model/person").Person,
                         place = null,
                         person = null;
-                    
+
                     Step(
                         function() {
                             Place.create({displayName: "Montreal",
@@ -1065,7 +1065,7 @@ suite.addBatch({
                     },
                     "it worked": function(err, favers, person) {
                         assert.ifError(err);
-                    } ,
+                    },
                     "it is the right size": function(err, favers, person) {
                         assert.ifError(err);
                         assert.isArray(favers);
@@ -1090,7 +1090,7 @@ suite.addBatch({
                     var cb = this.callback,
                         Place = require("../lib/model/place").Place,
                         place = null;
-                    
+
                     Step(
                         function() {
                             Place.create({displayName: "San Francisco",
@@ -1129,7 +1129,7 @@ suite.addBatch({
                     var cb = this.callback,
                         Comment = require("../lib/model/comment").Comment,
                         comment;
-                    
+
                     Step(
                         function() {
                             var props = {
@@ -1306,7 +1306,7 @@ suite.addBatch({
                     var cb = this.callback,
                         Place = require("../lib/model/place").Place,
                         place = null;
-                    
+
                     Step(
                         function() {
                             Place.create({displayName: "Empire State Building",

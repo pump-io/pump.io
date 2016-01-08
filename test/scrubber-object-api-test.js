@@ -37,7 +37,7 @@ var DANGEROUS = "This is a <script>alert('Boo!')</script> dangerous string.";
 var HARMLESS = "This is a harmless string.";
 
 var deepProperty = function(object, property) {
-    var i = property.indexOf('.');
+    var i = property.indexOf(".");
     if (!object) {
         return null;
     } else if (i == -1) { // no dots
@@ -66,7 +66,7 @@ var updateObject = function(orig, update) {
                     if (err) throw err;
                     copied = _.extend(post.object, update);
                     url = post.object.links.self.href;
-                    httputil.putJSON(url, cred, update, this); 
+                    httputil.putJSON(url, cred, update, this);
                 },
                 function(err, updated) {
                     if (err) {
@@ -144,27 +144,27 @@ suite.addBatch({
                 assert.ifError(err);
                 assert.isObject(cred);
             },
-            "and we update an object with harmless content": 
+            "and we update an object with harmless content":
             goodUpdate({objectType: "note",
                         content: "Hello, World!"},
                        {content: HARMLESS},
                        "content"),
-            "and we update an object with dangerous content": 
+            "and we update an object with dangerous content":
             badUpdate({objectType: "note",
                         content: "Hello, World!"},
                        {content: DANGEROUS},
                        "content"),
-            "and we update an object with harmless summary": 
+            "and we update an object with harmless summary":
             goodUpdate({objectType: "note",
                         summary: "Hello, World!"},
                        {summary: HARMLESS},
                        "summary"),
-            "and we update an object with dangerous summary": 
+            "and we update an object with dangerous summary":
             badUpdate({objectType: "note",
                        summary: "Hello, World!"},
                       {summary: DANGEROUS},
                       "summary"),
-            "and we update an object with private member": 
+            "and we update an object with private member":
             privateUpdate({objectType: "note",
                            summary: "Hello, World!"},
                           {_uuid: "0xDEADBEEF"},

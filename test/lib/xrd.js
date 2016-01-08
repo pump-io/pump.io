@@ -25,7 +25,7 @@ var assert = require("assert"),
 
 var getXRD = function(url) {
     var parts = urlparse(url),
-        mod = (parts.protocol == "https:") ? https : http;            
+        mod = (parts.protocol == "https:") ? https : http;
 
     return function() {
         var callback = this.callback,
@@ -45,7 +45,7 @@ var getXRD = function(url) {
                 });
                 res.on("end", function() {
                     var parser = new xml2js.Parser({attrkey:"@"});
-                    
+
                     parser.parseString(body, function(err, doc) {
                         if (err) {
                             callback(err, null, null);
@@ -88,8 +88,8 @@ var xrdLinkCheck = function(def) {
                     }
                 }
             };
-        
-        doc=doc.XRD;
+
+        doc = doc.XRD;
         assert.ifError(err);
         assert.isObject(doc);
         assert.include(doc, "Link");
@@ -126,7 +126,7 @@ var xrdContext = function(url, def) {
 
 var getJRD = function(url) {
     var parts = urlparse(url),
-        mod = (parts.protocol == "https:") ? https : http;            
+        mod = (parts.protocol == "https:") ? https : http;
     return function() {
         var callback = this.callback,
             req;

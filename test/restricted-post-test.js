@@ -89,7 +89,7 @@ suite.addBatch({
                             townclown: {
                                 password: "balloons?"
                             }
-                               
+
                         };
                     Step(
                         function() {
@@ -291,15 +291,15 @@ suite.addBatch({
                             url = doc.object.likes.url;
 
                         Step(
-                            function(){
-                                setTimeout(this,100);
+                            function() {
+                                setTimeout(this, 100);
                             },
-                            function(){
+                            function() {
                                 httputil.getJSON(url, cred, function(err, likes, response) {
                                     cb(err, likes);
                                 });
                             }
-                            );
+                        );
                     },
                     "it works": function(err, likes) {
                         assert.ifError(err);
@@ -596,7 +596,7 @@ suite.addBatch({
                             dancingbear: {
                                 password: "hey*doll"
                             }
-                               
+
                         };
                     Step(
                         function() {
@@ -694,10 +694,10 @@ suite.addBatch({
                             url = doc.object.likes.url;
 
                         Step(
-                            function(){
-                                setTimeout(this,100);
+                            function() {
+                                setTimeout(this, 100);
                             },
-                            function(){
+                            function() {
                                 httputil.getJSON(url, cred, function(err, likes, response) {
                                     cb(err, likes);
                                 });
@@ -905,9 +905,9 @@ suite.addBatch({
                             url = doc.object.likes.url;
 
                         Step(
-                            function(){
-                                    setTimeout(this,100);
-                            },function(){
+                            function() {
+                                setTimeout(this, 100);
+                            }, function() {
                                 httputil.getJSON(url, cred, function(err, likes, response) {
                                     cb(err, likes);
                                 });
@@ -1014,10 +1014,10 @@ suite.addBatch({
                             url = doc.object.likes.url;
 
                         Step(
-                            function(){
-                                setTimeout(this,100);
+                            function() {
+                                setTimeout(this, 100);
                             },
-                            function(){
+                            function() {
                                 httputil.getJSON(url, cred, function(err, likes, response) {
                                     cb(err, likes);
                                 });

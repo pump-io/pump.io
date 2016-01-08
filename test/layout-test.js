@@ -45,11 +45,11 @@ suite.addBatch({
                 var cb = this.callback,
                     browser = new Browser();
 
-                browser.visit("http://localhost:4815/", function(){
-                    cb(!browser.success, browser)
+                browser.visit("http://localhost:4815/", function() {
+                    cb(!browser.success, browser);
                 });
             },
-            teardown: function(br){
+            teardown: function(br) {
                 br.window.close();
             },
             "it works": function(err, br) {

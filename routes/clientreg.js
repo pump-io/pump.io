@@ -74,7 +74,7 @@ var clientReg = function(req, res, next) {
         }
         props.contacts = params.contacts.split(" ");
         if (!props.contacts.every(function(contact) {
-                return validator.isEmail(contact); 
+                return validator.isEmail(contact);
             })) {
             next(new HTTPError("contacts must be space-separate email addresses.", 400));
             return;
@@ -96,7 +96,7 @@ var clientReg = function(req, res, next) {
     }
 
     if (_(params).has("logo_url")) {
-        if(!validator.isURL(params.logo_url)){
+        if (!validator.isURL(params.logo_url)) {
             next(new HTTPError("Invalid logo_url.", 400));
             return;
         }

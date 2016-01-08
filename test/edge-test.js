@@ -26,7 +26,7 @@ var assert = require("assert"),
 var suite = vows.describe("edge module interface");
 
 var testSchema = {
-    pkey: "id", 
+    pkey: "id",
     fields: ["from",
              "to",
              "published",

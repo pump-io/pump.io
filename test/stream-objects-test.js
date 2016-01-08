@@ -59,7 +59,7 @@ suite.addBatch({
                 }
 
                 DatabankObject.bank = db;
-                
+
                 mod = require("../lib/model/stream");
 
                 if (!mod) {
@@ -82,7 +82,7 @@ suite.addBatch({
             assert.isFunction(Stream);
         },
         "and we create a stream object": {
-            topic: function(Stream) { 
+            topic: function(Stream) {
                 Stream.create({name: "object-test-1"}, this.callback);
             },
             "it has a getObjects() method": function(err, stream) {
@@ -120,7 +120,7 @@ suite.addBatch({
             "and we get objects with indexes greater than some object": {
                 topic: function(stream) {
                     var cb = this.callback,
-                        NotInStreamError = require('../lib/model/stream').NotInStreamError;
+                        NotInStreamError = require("../lib/model/stream").NotInStreamError;
 
                     stream.getObjectsGreaterThan({a: "b"}, 10, function(err, objects) {
                         if (err && err instanceof NotInStreamError) {
@@ -139,7 +139,7 @@ suite.addBatch({
             "and we get objects with indexes less than some object": {
                 topic: function(stream) {
                     var cb = this.callback,
-                        NotInStreamError = require('../lib/model/stream').NotInStreamError;
+                        NotInStreamError = require("../lib/model/stream").NotInStreamError;
 
                     stream.getObjectsLessThan({a: "b"}, 10, function(err, objects) {
                         if (err && err instanceof NotInStreamError) {
@@ -158,7 +158,7 @@ suite.addBatch({
             "and we remove an object that doesn't exist": {
                 topic: function(stream) {
                     var cb = this.callback,
-                        NotInStreamError = require('../lib/model/stream').NotInStreamError;
+                        NotInStreamError = require("../lib/model/stream").NotInStreamError;
 
                     stream.removeObject({a: "b"}, function(err) {
                         if (err && err instanceof NotInStreamError) {
@@ -176,7 +176,7 @@ suite.addBatch({
             }
         },
         "and we create another stream": {
-            topic: function(Stream) { 
+            topic: function(Stream) {
                 Stream.create({name: "object-test-2"}, this.callback);
             },
             "it works": function(err, stream) {

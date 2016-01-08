@@ -56,7 +56,7 @@ suite.addBatch({
         "it works": function(err, app) {
             assert.ifError(err);
         },
-        "and we check the whoami endpoint": 
+        "and we check the whoami endpoint":
         httputil.endpoint("/api/whoami", ["GET"]),
         "and we get a new client": {
             topic: function() {

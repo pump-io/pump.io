@@ -40,30 +40,30 @@ suite.addBatch({
         },
         "and we visit the root URL": {
             topic: function() {
-                var cb=this.callback,
+                var cb = this.callback,
                     browser = new Browser();
 
-                browser.visit("http://localhost:4815/", function(){
-                        cb(!browser.success, browser);
+                browser.visit("http://localhost:4815/", function() {
+                    cb(!browser.success, browser);
                 });
             },
-            teardown: function(br){
-                if(br && br.window.close){
+            teardown: function(br) {
+                if (br && br.window.close) {
                     br.window.close();
                 }
             },
             "it works": function(err, br) {
                 assert.ifError(err);
-		        br.assert.success();
+                br.assert.success();
             },
             "it has the right title": function(err, br) {
                 assert.ifError(err);
-		        br.assert.success();
+                br.assert.success();
                 br.assert.text("title", "API - pump.io");
             },
             "it has the right H1": function(err, br) {
                 assert.ifError(err);
-		        br.assert.success();
+                br.assert.success();
                 br.assert.text("H1", "pump.io API");
             }
         }

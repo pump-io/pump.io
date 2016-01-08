@@ -21,7 +21,7 @@ var assert = require("assert"),
 
 vows.describe("httperror module interface").addBatch({
     "When we require the http error module": {
-        topic: function() { 
+        topic: function() {
             return require("../lib/httperror");
         },
         "we get an object": function(httperror) {
@@ -50,7 +50,7 @@ vows.describe("httperror module interface").addBatch({
                     assert.equal(err.code, 404);
                 }
             }
-            
+
         }
     }
 })["export"](module);

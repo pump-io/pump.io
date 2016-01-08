@@ -53,7 +53,7 @@ mb["When we require the nonce module"]
   ["and we create a nonce instance"]
   ["auto-generated fields are there"] = function(err, created) {
       assert.isString(created.token_nonce);
-};
+  };
 
 mb["When we require the nonce module"]
 ["and we get its Nonce class export"]

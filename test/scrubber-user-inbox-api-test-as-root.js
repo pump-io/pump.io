@@ -58,11 +58,11 @@ var assoc = function(id, token, ts, callback) {
 
     if (!ts) ts = Date.now();
 
-    httputil.dialbackPost(URL, 
-                          id, 
-                          token, 
-                          ts, 
-                          requestBody, 
+    httputil.dialbackPost(URL,
+                          id,
+                          token,
+                          ts,
+                          requestBody,
                           "application/x-www-form-urlencoded",
                           parseJSON);
 };

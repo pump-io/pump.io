@@ -106,7 +106,7 @@ var sameUser = function(url, objects) {
             });
         };
     }
-    
+
     return ctx;
 };
 
@@ -177,7 +177,7 @@ var justClient = function(url, objects) {
             });
         };
     }
-    
+
     return ctx;
 };
 
@@ -245,7 +245,7 @@ var otherUser = function(url, objects) {
             });
         };
     }
-    
+
     return ctx;
 };
 
@@ -291,7 +291,7 @@ suite.addBatch({
                                 var group = this.group();
                                 _.times(20, function(i) {
                                     var act = {
-                                        to: [pair.user.profile], 
+                                        to: [pair.user.profile],
                                         cc: [{objectType: "collection",
                                               id: "http://activityschema.org/collection/public"}],
                                         verb: "post",
@@ -329,17 +329,17 @@ suite.addBatch({
                     "it works": function(err) {
                         assert.ifError(err);
                     },
-                    "and we check their major inbox with same user credentials": 
+                    "and we check their major inbox with same user credentials":
                     sameUser("http://localhost:4815/api/user/humbaba/inbox/major"),
-                    "and we check their major feed with same user credentials": 
+                    "and we check their major feed with same user credentials":
                     sameUser("http://localhost:4815/api/user/humbaba/feed/major"),
                     "and we check their major direct inbox with same user credentials":
                     sameUser("http://localhost:4815/api/user/humbaba/inbox/direct/major"),
-                    "and we check their favorites with same user credentials": 
+                    "and we check their favorites with same user credentials":
                     sameUser("http://localhost:4815/api/user/humbaba/favorites", true),
                     "and we check their major feed with client credentials":
                     justClient("http://localhost:4815/api/user/humbaba/feed/major"),
-                    "and we check their favorites with client credentials": 
+                    "and we check their favorites with client credentials":
                     justClient("http://localhost:4815/api/user/humbaba/favorites", true),
                     "and we register another user": {
                         topic: function(pair, cl) {

@@ -47,7 +47,7 @@ var tinyApp = function(port, hostname, callback) {
     var app = express.createServer(),
         authcb = null;
 
-    app.configure(function(){
+    app.configure(function() {
         app.set("port", port);
         app.use(express.bodyParser());
         app.use(express.query());

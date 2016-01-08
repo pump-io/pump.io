@@ -77,7 +77,7 @@ suite.addBatch({
                         var url = "http://localhost:4815/api/user/philippe/feed",
                             cred = makeCred(cl, pair),
                             callback = this.callback;
-                        
+
                         Step(
                             function() {
                                 var act = {

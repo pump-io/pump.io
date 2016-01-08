@@ -38,16 +38,16 @@ var assert = require("assert"),
 
 var ignore = function(err) {};
 
-var browserClose=function(br){
-	Step(
-		function(){
-			br.on("closed",this);
-			br.window.close();
-		},
-		function(br){
-			//browser is closed;
-		}
-	);
+var browserClose = function(br) {
+    Step(
+        function() {
+            br.on("closed", this);
+            br.window.close();
+        },
+        function(br) {
+            // browser is closed;
+        }
+    );
 
 };
 
@@ -145,7 +145,7 @@ suite.addBatch({
                                "HMAC-SHA1",
                                null, // nonce size; use default
                                {"User-Agent": "pump.io/"+version});
-                                        
+
                 oa.getOAuthAccessToken("NOTATOKEN", "NOTATOKENSECRET", "NOTAVERIFIER", function(err, token, secret) {
                     if (err) {
                         cb(null);
@@ -176,7 +176,7 @@ suite.addBatch({
                                            "HMAC-SHA1",
                                            null, // nonce size; use default
                                            {"User-Agent": "pump.io/"+version});
-                        
+
                         oa.getOAuthAccessToken("NOTATOKEN", "NOTATOKENSECRET", "NOTAVERIFIER", function(err, token, secret) {
                             if (err) {
                                 cb(null, cl);
@@ -214,7 +214,7 @@ suite.addBatch({
                                            "HMAC-SHA1",
                                            null, // nonce size; use default
                                            {"User-Agent": "pump.io/"+version});
-                        
+
                         oa.getOAuthAccessToken("NOTATOKEN", "NOTATOKENSECRET", "NOTAVERIFIER", function(err, token, secret) {
                             if (err) {
                                 cb(null, cl);
@@ -258,7 +258,7 @@ suite.addBatch({
                                            "HMAC-SHA1",
                                            null, // nonce size; use default
                                            {"User-Agent": "pump.io/"+version});
-                        
+
                         oa.getOAuthAccessToken(rt.token, "NOTATOKENSECRET", "NOTAVERIFIER", function(err, token, secret) {
                             if (err) {
                                 cb(null, {cl: cl, rt: rt});
@@ -305,7 +305,7 @@ suite.addBatch({
                                            "HMAC-SHA1",
                                            null, // nonce size; use default
                                            {"User-Agent": "pump.io/"+version});
-                        
+
                         oa.getOAuthAccessToken(rt.token, rt.token_secret, "NOTAVERIFIER", function(err, token, secret) {
                             if (err) {
                                 cb(null, {cl: cl, rt: rt});
@@ -341,8 +341,8 @@ suite.addBatch({
                     function(err, results) {
                         if (err) throw err;
                         cl = results;
-                        httputil.postJSON("http://localhost:4815/api/users", 
-                                          {consumer_key: cl.client_id, consumer_secret: cl.client_secret}, 
+                        httputil.postJSON("http://localhost:4815/api/users",
+                                          {consumer_key: cl.client_id, consumer_secret: cl.client_secret},
                                           {nickname: "dormouse", password: "feed*ur*head"},
                                           this);
                     },
@@ -354,13 +354,13 @@ suite.addBatch({
                         var self = this;
 
                         if (err) throw err;
-                        br = new Browser({runScripts: false}); //faster without scripts...
+                        br = new Browser({runScripts: false}); // faster without scripts...
                         Step(
-                            function(){
-                        	    br.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, this);
+                            function() {
+                                br.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, this);
                             },
-                            function(){
-                                self(!br.success,br);
+                            function() {
+                                self(!br.success, br);
                             }
                         );
                     },
@@ -369,20 +369,20 @@ suite.addBatch({
 
                         if (err) throw err;
                         br.assert.success();
-
                         br
                             .fill("username", "dormouse", this)
-                        	.fill("password", "BADPASSWORD", this);
+                            .fill("password", "BADPASSWORD", this);
+
                         Step(
-                            function(){
+                            function() {
                                 br.pressButton("#authenticate", this);
                             },
-                            function(){
-                                self(!br.success,br);
-			                }
-                        );
+                            function() {
+                                self(!br.success, br);
+                            }
+                                                    );
                     },
-                    function(err,br) {
+                    function(err, br) {
                         if (err && br.statusCode >= 400 && br.statusCode < 500) {
                             callback(null);
                         } else if (err) {
@@ -393,7 +393,7 @@ suite.addBatch({
                     }
                 );
             },
-            teardown: function(br){
+            teardown: function(br) {
                 browserClose(br);
             },
             "it fails correctly": function(err) {
@@ -419,30 +419,31 @@ suite.addBatch({
                         var self = this;
 
                         if (err) throw err;
-                            br = new Browser({runScripts: false});
-                            Step(
-                                function(){
+                        br = new Browser({runScripts: false});
+                        Step(
+                                function() {
                                     br.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, this);
                                 },
-                                function(){
-                                    self(!br.success,br);
+                                function() {
+                                    self(!br.success, br);
                                 }
                             );
                     },
                     function(err, br) {
                         var self = this;
-                        
+
                         if (err) throw err;
                         br.assert.success();
                         br
                             .fill("username", "nonexistent", this)
-                        	.fill("password", "DOESNTMATTER", this);
+                            .fill("password", "DOESNTMATTER", this);
+
                         Step(
-                            function(){
+                            function() {
                                 br.pressButton("#authenticate", this);
                             },
-                            function(){
-                                self(!br.success,br);
+                            function() {
+                                self(!br.success, br);
                             }
                         );
                     },
@@ -457,7 +458,7 @@ suite.addBatch({
                     }
                 );
             },
-            teardown: function(br){
+            teardown: function(br) {
                 browserClose(br);
             },
             "it fails correctly": function(err) {
@@ -484,8 +485,8 @@ suite.addBatch({
                         },
                         function(err, other) {
                             if (err) throw err;
-                            httputil.postJSON("http://localhost:4815/api/users", 
-                                              {consumer_key: other.client_id, consumer_secret: other.client_secret}, 
+                            httputil.postJSON("http://localhost:4815/api/users",
+                                              {consumer_key: other.client_id, consumer_secret: other.client_secret},
                                               {nickname: "alice", password: "white*rabbit"},
                                               this);
                         },
@@ -518,16 +519,16 @@ suite.addBatch({
                                 br;
 
                             Step(
-                                function(){	
+                                function() {
                                     br = new Browser({runStrips:false});
                                     br.visit("http://localhost:4815/oauth/authorize?oauth_token=" + rt.token, this);
                                 },
-                                function(){
+                                function() {
                                     cb(!br.success, br);
                                 }
                             );
                         },
-                        teardown: function(br){
+                        teardown: function(br) {
                             browserClose(br);
                         },
                         "it works": function(err, browser) {
@@ -544,12 +545,13 @@ suite.addBatch({
                                 browser
                                     .fill("username", "alice")
                                     .fill("password", "white*rabbit");
+
                                 Step(
-                                    function(){
-                                        browser.pressButton("#authenticate",this);
+                                    function() {
+                                        browser.pressButton("#authenticate", this);
                                     },
-                                    function(){
-                                             cb(!browser.success, browser);
+                                    function() {
+                                        cb(!browser.success, browser);
                                     }
                                 );
                             },
@@ -566,17 +568,17 @@ suite.addBatch({
                             "and we submit the authorization form": {
                                 topic: function(browser) {
                                     var cb = this.callback;
-				    
+
                                     Step(
-                                        function(){
-                                    	    browser.pressButton("Authorize", this);
+                                        function() {
+                                            browser.pressButton("Authorize", this);
                                         },
-                                        function(){
+                                        function() {
                                             if (!browser.success) {
-                                            	cb(new Error("Browser not successful"), null);
+                                                cb(new Error("Browser not successful"), null);
                                             } else {
-                                            	cb(null, {token: browser.text("#token"),
-                                                      verifier: browser.text("#verifier")});
+                                                cb(null, {token: browser.text("#token"),
+                                                          verifier: browser.text("#verifier")});
                                             }
                                         }
                                     );
@@ -592,9 +594,7 @@ suite.addBatch({
                                     topic: function(pair) {
                                         var cb = this.callback,
                                             oa,
-                                            //rt = arguments[5],
                                             rt = arguments[3],
-                                            //cl = arguments[7];
                                             cl = arguments[5];
 
                                         oa = new OAuth("http://localhost:4815/oauth/request_token",
@@ -606,7 +606,7 @@ suite.addBatch({
                                                        "HMAC-SHA1",
                                                        null, // nonce size; use default
                                                        {"User-Agent": "pump.io/"+version});
-                                        
+
                                         oa.getOAuthAccessToken(pair.token, rt.token_secret, pair.verifier, function(err, token, secret) {
                                             if (err) {
                                                 cb(new Error(err.data), null);
@@ -630,11 +630,9 @@ suite.addBatch({
                                             var cb = this.callback,
                                                 oa,
                                                 pair = arguments[1],
-                                                //rt = arguments[6],
                                                 rt = arguments[4],
-                                                //cl = arguments[8];
                                                 cl = arguments[6];
-					
+
                                             oa = new OAuth("http://localhost:4815/oauth/request_token",
                                                            "http://localhost:4815/oauth/access_token",
                                                            cl.client_id,

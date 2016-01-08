@@ -119,7 +119,7 @@ var getDoc = function(url) {
 };
 
 var failDoc = function(url) {
-    return function(cred) { 
+    return function(cred) {
         var cb = this.callback;
         httputil.getJSON(url, cred, function(err, doc, resp) {
             if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {

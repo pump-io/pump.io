@@ -59,7 +59,7 @@ suite.addBatch({
                 }
 
                 DatabankObject.bank = db;
-                
+
                 var Stream = require("../lib/model/stream").Stream;
                 cb(null, Stream);
             });

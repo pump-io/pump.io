@@ -95,39 +95,39 @@ suite.addBatch({
         "and we check for a membership that doesn't exist": {
             topic: function(Membership) {
                 var Person = require("../lib/model/person").Person,
-		    Group = require("../lib/model/group").Group,
-		    person = new Person({id: "http://example.com/user/2"}),
-		    group = new Group({id: "http://example.net/group/42"});
+                    Group = require("../lib/model/group").Group,
+                    person = new Person({id: "http://example.com/user/2"}),
+                    group = new Group({id: "http://example.net/group/42"});
 
-		Membership.isMember(person, group, this.callback);
+                Membership.isMember(person, group, this.callback);
             },
             "it is false": function(err, isMember) {
                 assert.ifError(err);
-		assert.isFalse(isMember);
+                assert.isFalse(isMember);
             }
         },
         "and we check for a membership that exists": {
             topic: function(Membership) {
                 var Person = require("../lib/model/person").Person,
-		    Group = require("../lib/model/group").Group,
-		    person = new Person({id: "http://example.com/user/3", objectType: "person"}),
-		    group = new Group({id: "http://example.net/group/23", objectType: "group"}),
-		    callback = this.callback;
+                    Group = require("../lib/model/group").Group,
+                    person = new Person({id: "http://example.com/user/3", objectType: "person"}),
+                    group = new Group({id: "http://example.net/group/23", objectType: "group"}),
+                    callback = this.callback;
 
-		Step(
-		    function() {
-			Membership.create({member: person, group: group}, this);
-		    },
-		    function(err, ship) {
-			if (err) throw err;
-			Membership.isMember(person, group, this);
-		    },
-		    callback
-		);
+                Step(
+                    function() {
+                        Membership.create({member: person, group: group}, this);
+                    },
+                    function(err, ship) {
+                        if (err) throw err;
+                        Membership.isMember(person, group, this);
+                    },
+                    callback
+                );
             },
             "it is true": function(err, isMember) {
                 assert.ifError(err);
-		assert.isTrue(isMember);
+                assert.isTrue(isMember);
             }
         }
     }

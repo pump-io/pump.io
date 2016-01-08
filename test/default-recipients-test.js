@@ -218,7 +218,7 @@ suite.addBatch({
                             newPair(cl, "elaine", "bo0merang", this);
                         },
                         function(err, pair) {
-                            var act; 
+                            var act;
                             if (err) throw err;
                             cred = makeCred(cl, pair);
                             act = {
@@ -282,7 +282,7 @@ suite.addBatch({
                             newPair(cl, "tuesday", "i*have*feelings", this);
                         },
                         function(err, pair) {
-                            var act; 
+                            var act;
                             if (err) throw err;
                             cred = makeCred(cl, pair);
                             act = {

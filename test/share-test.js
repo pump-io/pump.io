@@ -26,7 +26,7 @@ var assert = require("assert"),
 var suite = vows.describe("share module interface");
 
 var testSchema = {
-    pkey: "id", 
+    pkey: "id",
     fields: ["sharer",
              "shared",
              "published",

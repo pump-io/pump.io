@@ -238,7 +238,7 @@ suite.addBatch({
                                 q = new Queue(10);
 
                             for (var i = 0; i < 100; i++) {
-                                q.enqueue(httputil.postJSON, 
+                                q.enqueue(httputil.postJSON,
                                           [url,
                                            cred,
                                            {

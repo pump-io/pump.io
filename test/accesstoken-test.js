@@ -63,7 +63,7 @@ mb["When we require the accesstoken module"]
       assert.isString(created.token_secret);
       assert.isString(created.created);
       assert.isString(created.updated);
-};
+  };
 
 suite.addBatch(mb);
 

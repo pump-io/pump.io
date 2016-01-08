@@ -135,24 +135,24 @@ suite.addBatch({
         "it works": function(err, app) {
             assert.ifError(err);
         },
-        "and we check the client registration endpoint": 
+        "and we check the client registration endpoint":
         httputil.endpoint("/api/client/register", ["POST"]),
         "and we register with no type": assocFail({application_name: "Typeless"}),
-        "and we register with an unknown type": 
+        "and we register with an unknown type":
         assocFail({application_name: "Frobnicator",
                    type: "client_frobnicate"
                   }),
-        "and we register to associate with a client ID already set": 
+        "and we register to associate with a client ID already set":
         assocFail({application_name: "Jump The Gun",
                    type: "client_associate",
                    client_id: "I MADE IT MYSELF"
                   }),
-        "and we register to associate with a client secret set": 
+        "and we register to associate with a client secret set":
         assocFail({application_name: "Psst",
                    type: "client_associate",
                    client_secret: "I hate corn."
                   }),
-        "and we register to associate with an unknown application type": 
+        "and we register to associate with an unknown application type":
         assocFail({application_name: "Scoodly",
                    type: "client_associate",
                    application_type: "unknown"
@@ -308,7 +308,7 @@ suite.addBatch({
                        application_name: "Original title"},
                       {type: "client_update",
                        application_name: "Updated title"}),
-        "and we update with an unknown application type": 
+        "and we update with an unknown application type":
         updateFail({type: "client_associate",
                     application_name: "Unknown app type"},
                    {application_name: "Unknown app type",

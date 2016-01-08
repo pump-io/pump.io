@@ -59,7 +59,7 @@ suite.addBatch({
                 }
 
                 DatabankObject.bank = db;
-                
+
                 mod = require("../lib/model/stream");
 
                 if (!mod) {

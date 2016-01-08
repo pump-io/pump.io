@@ -50,7 +50,7 @@ suite.addBatch({
                     cb(err, browser);
                 });
             },
-            teardown: function(br){
+            teardown: function(br) {
                 br.window.close();
             },
             "it works": function(err, br) {
@@ -80,9 +80,9 @@ suite.addBatch({
                 "the registration form has a submit button": function(err, br) {
                     br.assert.element("div#registerpage form button[type=\"submit\"]");
                 },
-            "and we submit the form": {
-                topic: function(br) {
-                    var callback = this.callback;
+                "and we submit the form": {
+                    topic: function(br) {
+                        var callback = this.callback;
 
                         Step(
                             function() {
@@ -90,10 +90,11 @@ suite.addBatch({
                                 br
                                     .fill("nickname", "sparks", this)
                                     .fill("password", "redplainsrider1", this)
-                                    .fill("repeat", "redplainsrider1", this);
-                                br.pressButton("button[type=\"submit\"]", function(){
-                                    self(null,br);
-                                });
+                                    .fill("repeat", "redplainsrider1", this)
+                                    .pressButton("button[type=\"submit\"]", function() {
+                                        self(null, br);
+                                    });
+
                             },
                             function(err, br) {
                                 if (err) {

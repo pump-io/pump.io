@@ -1,7 +1,7 @@
 // lrdd.js
 //
 // Tests the LRDD XRD endpoint
-// 
+//
 // Copyright 2012 E14N https://e14n.com/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -92,7 +92,7 @@ suite.addBatch({
         "it works": function(err, app) {
             assert.ifError(err);
         },
-        "and we check the lrdd endpoint": 
+        "and we check the lrdd endpoint":
         httputil.endpoint("/api/lrdd", ["GET"]),
         "and we get the lrdd endpoint with no uri":
         httputil.getfail("/api/lrdd", 400),

@@ -400,12 +400,12 @@ suite.addBatch({
                             if (err) throw err;
                             var activity = {
                                 "verb": "post",
-				object: {
-				    id: "http://photo.example/heisenberg/me-making-meth.jpg",
-				    objectType: "image",
-				    displayName: "Ha ha ha",
-				    url: "http://photo.example/heisenberg/me-making-meth.jpg"
-				},
+                                object: {
+                                    id: "http://photo.example/heisenberg/me-making-meth.jpg",
+                                    objectType: "image",
+                                    displayName: "Ha ha ha",
+                                    url: "http://photo.example/heisenberg/me-making-meth.jpg"
+                                },
                                 "target": {
                                     "objectType": "group",
                                     "id": "tag:pump.io,2012:test:group:4"

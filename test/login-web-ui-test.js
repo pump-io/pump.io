@@ -25,6 +25,18 @@ var assert = require("assert"),
     setupAppConfig = oauthutil.setupAppConfig,
     newCredentials = oauthutil.newCredentials;
 
+var browserClose = function(br) {
+    Step(
+        function() {
+            br.on("closed", this);
+            br.window.close();
+        },
+        function() {
+            // browser is closed
+        }
+    );
+};
+
 var suite = vows.describe("login web UI test");
 
 // A batch to test some of the layout basics
@@ -44,7 +56,7 @@ suite.addBatch({
         },
         "and we register a user with the API": {
             topic: function() {
-                 newCredentials("croach", "ihave1onus", "localhost", 4815, this.callback);
+                newCredentials("croach", "ihave1onus", "localhost", 4815, this.callback);
             },
             "it works": function(err, cred) {
                 assert.ifError(err);
@@ -52,33 +64,34 @@ suite.addBatch({
             },
             "and we visit the login URL": {
                 topic: function() {
-                    var cb = this.callback;
-                    browser = new Browser({runScripts: true});
-                    browser.visit("http://localhost:4815/main/login", function(){
+                    var cb = this.callback,
+                        browser = new Browser({runScripts: true});
+
+                    browser.visit("http://localhost:4815/main/login", function() {
                         cb(!browser.success, browser);
                     });
                 },
-                teardown: function(br){
-                    br.window.close();
+                teardown: function(br) {
+                    browserClose(br);
                 },
                 "it works": function(err, br) {
                     assert.ifError(err);
-                    browser.assert.success("ok");
+                    br.assert.success("ok");
                 },
                 "it includes a login div": function(br) {
-                    browser.assert.element("div#loginpage");
+                    br.assert.element("div#loginpage");
                 },
                 "it includes a login form": function(br) {
-                    browser.assert.element("div#loginpage form");
+                    br.assert.element("div#loginpage form");
                 },
                 "the login form has a nickname field": function(br) {
-                    browser.assert.element("div#loginpage form input[name=\"nickname\"]");
+                    br.assert.element("div#loginpage form input[name=\"nickname\"]");
                 },
                 "the login form has a password field": function(br) {
-                    browser.assert.element("div#loginpage form input[name=\"password\"]");
+                    br.assert.element("div#loginpage form input[name=\"password\"]");
                 },
                 "the login form has a submit button": function(br) {
-                    browser.assert.element("div#loginpage form button[type=\"submit\"]");
+                    br.assert.element("div#loginpage form button[type=\"submit\"]");
                 }
             }
         }

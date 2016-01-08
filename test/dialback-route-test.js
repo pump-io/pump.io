@@ -39,7 +39,7 @@ suite.addBatch({
         "it works": function(err, app) {
             assert.ifError(err);
         },
-        "and we check the dialback endpoint": 
+        "and we check the dialback endpoint":
         httputil.endpoint("/api/dialback", ["POST"])
     }
 });

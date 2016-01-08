@@ -23,8 +23,8 @@ var assert = require("assert"),
     Step = require("step"),
     fs = require("fs"),
     path = require("path"),
-    URLMaker = require('../lib/urlmaker').URLMaker,
-    schema = require('../lib/schema').schema,
+    URLMaker = require("../lib/urlmaker").URLMaker,
+    schema = require("../lib/schema").schema,
     Stream = require("../lib/model/stream").Stream,
     NotInStreamError = require("../lib/model/stream").NotInStreamError,
     Databank = databank.Databank,
@@ -36,7 +36,7 @@ var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 
 suite.addBatch({
     "When we get the User class": {
-        topic: function() { 
+        topic: function() {
 
             var cb = this.callback;
             // Need this to make IDs
@@ -53,7 +53,7 @@ suite.addBatch({
                 var User;
 
                 DatabankObject.bank = db;
-                
+
                 User = require("../lib/model/user").User || null;
 
                 cb(null, User);

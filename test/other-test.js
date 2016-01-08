@@ -71,7 +71,7 @@ mb["When we require the other module"]
       assert.isString(created.id);
       assert.isString(created.published);
       assert.isString(created.updated);
-};
+  };
 
 suite.addBatch(mb);
 

@@ -27,7 +27,7 @@ var suite = vows.describe("app module interface");
 
 suite.addBatch({
     "When we get the app module": {
-        topic: function() { 
+        topic: function() {
             return require("../lib/app");
         },
         "there is one": function(mod) {

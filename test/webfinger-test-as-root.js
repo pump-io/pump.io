@@ -1,7 +1,7 @@
 // webfinger.js
 //
 // Tests the Webfinger XRD and JRD endpoints
-// 
+//
 // Copyright 2012 E14N https://e14n.com/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
