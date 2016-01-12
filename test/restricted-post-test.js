@@ -1022,7 +1022,7 @@ suite.addBatch({
                                     cb(err, likes);
                                 });
                             }
-                            );
+                        );
                     },
                     "it works": function(err, likes) {
                         assert.ifError(err);

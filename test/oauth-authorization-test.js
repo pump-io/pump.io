@@ -369,9 +369,8 @@ suite.addBatch({
 
                         if (err) throw err;
                         br.assert.success();
-                        br
-                            .fill("username", "dormouse", this)
-                            .fill("password", "BADPASSWORD", this);
+                        br.fill("username", "dormouse", this)
+                          .fill("password", "BADPASSWORD", this);
 
                         Step(
                             function() {
@@ -380,7 +379,7 @@ suite.addBatch({
                             function() {
                                 self(!br.success, br);
                             }
-                                                    );
+                        );
                     },
                     function(err, br) {
                         if (err && br.statusCode >= 400 && br.statusCode < 500) {
@@ -434,9 +433,8 @@ suite.addBatch({
 
                         if (err) throw err;
                         br.assert.success();
-                        br
-                            .fill("username", "nonexistent", this)
-                            .fill("password", "DOESNTMATTER", this);
+                        br.fill("username", "nonexistent", this)
+                          .fill("password", "DOESNTMATTER", this);
 
                         Step(
                             function() {
@@ -542,9 +540,8 @@ suite.addBatch({
                             topic: function(browser) {
                                 var cb = this.callback;
 
-                                browser
-                                    .fill("username", "alice")
-                                    .fill("password", "white*rabbit");
+                                browser.fill("username", "alice")
+                                       .fill("password", "white*rabbit");
 
                                 Step(
                                     function() {

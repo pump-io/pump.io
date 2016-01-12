@@ -152,36 +152,33 @@ var authorize = function(cl, rt, user, hostname, port, cb) {
                   pathname: "/oauth/authorize",
                   query: {oauth_token: rt.token}});
 
-    browser
-        .visit(url)
-        .then(function() {
+    browser.visit(url)
+           .then(function() {
+               browser.fill("#username", user.nickname)
+                      .fill("#password", user.password)
+                      .pressButton("#authenticate", function() {
+                          // is there an authorize button?
+                          if (browser.button("#authorize")) {
+                              // if so, press it
+                              browser.pressButton("#authorize", function() {
+                                  var res;
 
-            browser
-                .fill("#username", user.nickname)
-                .fill("#password", user.password)
-                .pressButton("#authenticate", function() {
-                    // is there an authorize button?
-                    if (browser.button("#authorize")) {
-                        // if so, press it
-                        browser.pressButton("#authorize", function() {
-                            var res;
+                                  res = browser.text("#verifier");
+                                  browserClose(browser);
+                                  cb(null, res);
+                              }).fail(function(err) {
+                                  browserClose(browser);
+                                  cb(err, null);
+                              });
+                          } else {
+                              var res;
 
-                            res = browser.text("#verifier");
-                            browserClose(browser);
-                            cb(null, res);
-                        }).fail(function(err) {
-                            browserClose(browser);
-                            cb(err, null);
-                        });
-                    } else {
-                        var res;
-
-                        res = browser.text("#verifier");
-                        browserClose(browser);
-                        cb(null, res);
-                    }
-                });
-        });
+                              res = browser.text("#verifier");
+                              browserClose(browser);
+                              cb(null, res);
+                          }
+                      });
+           });
 };
 
 var redeemToken = function(cl, rt, verifier, hostname, port, cb) {

@@ -87,13 +87,12 @@ suite.addBatch({
                         Step(
                             function() {
                                 var self = this;
-                                br
-                                    .fill("nickname", "sparks", this)
-                                    .fill("password", "redplainsrider1", this)
-                                    .fill("repeat", "redplainsrider1", this)
-                                    .pressButton("button[type=\"submit\"]", function() {
-                                        self(null, br);
-                                    });
+                                br.fill("nickname", "sparks", this)
+                                  .fill("password", "redplainsrider1", this)
+                                  .fill("repeat", "redplainsrider1", this)
+                                  .pressButton("button[type=\"submit\"]", function() {
+                                      self(null, br);
+                                  });
 
                             },
                             function(err, br) {
