@@ -66,7 +66,7 @@ mb["When we require the client module"]
       assert.isString(created.secret);
       assert.isString(created.created);
       assert.isString(created.updated);
-};
+  };
 
 suite.addBatch(mb);
 

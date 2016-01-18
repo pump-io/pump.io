@@ -25,7 +25,7 @@ var fs = require("fs"),
 
 var suite = vows.describe("web module interface");
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 suite.addBatch({
     "When we require the web module": {

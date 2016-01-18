@@ -67,7 +67,7 @@ suite.addBatch({
             "and we create a new user": {
                 topic: function(cl) {
                     var callback = this.callback;
-                    
+
                     Step(
                         function() {
                             var group = this.group();
@@ -130,7 +130,7 @@ suite.addBatch({
                                                               target: list
                                                           },
                                                           group());
-                                        
+
                                     });
                                 },
                                 function(err, acts) {
@@ -149,7 +149,7 @@ suite.addBatch({
                             topic: function(list, pairs, cl) {
                                 var callback = this.callback,
                                     cred = makeCred(cl, pairs[0]);
-                                
+
                                 httputil.postJSON("http://localhost:4815/api/user/fry/feed",
                                                   cred,
                                                   {
@@ -179,7 +179,7 @@ suite.addBatch({
                                             _.each(pairs.slice(1), function(pair) {
                                                 var user = pair.user,
                                                     cred = makeCred(cl, pair);
-                                                
+
                                                 httputil.getJSON("http://localhost:4815/api/user/"+user.nickname+"/inbox",
                                                                  cred,
                                                                  group());
@@ -219,7 +219,7 @@ suite.addBatch({
                         list,
                         act,
                         q = new Queue(25);
-                    
+
                     Step(
                         function() {
                             var i, group = this.group();
@@ -261,7 +261,7 @@ suite.addBatch({
                                            }
                                           ],
                                           group());
-                                
+
                             });
                         },
                         function(err, responses) {

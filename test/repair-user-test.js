@@ -97,7 +97,7 @@ suite.addBatch({
                         profile.shares = {
                             url: "http://example.com/api/person/AAAAAAAA/shares"
                         };
-                        // Note: we're routing around the Person 
+                        // Note: we're routing around the Person
                         db.update("person", profile.id, profile, this);
                     },
                     function(err, results) {
@@ -132,7 +132,7 @@ suite.addBatch({
                         profile = user.profile;
                         delete profile.links["activity-inbox"];
                         delete profile.links["activity-outbox"];
-                        // Note: we're routing around the Person 
+                        // Note: we're routing around the Person
                         db.update("person", profile.id, profile, this);
                     },
                     function(err, results) {

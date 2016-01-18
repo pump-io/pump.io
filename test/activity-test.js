@@ -34,7 +34,7 @@ var suite = vows.describe("activity module interface");
 var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 
 var testSchema = {
-    pkey: "id", 
+    pkey: "id",
     fields: ["actor",
              "content",
              "generator",
@@ -231,7 +231,7 @@ suite.addBatch({
                 }
 
                 DatabankObject.bank = db;
-                
+
                 mod = require("../lib/model/activity");
 
                 if (!mod) {
@@ -305,7 +305,7 @@ suite.addBatch({
                             content: "Feeling groovy."
                         }
                     });
-                
+
                 act.apply(null, function(err) {
                     if (err) {
                         cb(err, null);
@@ -924,7 +924,7 @@ suite.addBatch({
                     user1,
                     user2,
                     list;
-                
+
 
                 Step(
                     function() {
@@ -997,7 +997,7 @@ suite.addBatch({
                     user1,
                     user2,
                     list;
-                
+
 
                 Step(
                     function() {
@@ -1058,7 +1058,7 @@ suite.addBatch({
                     cb = this.callback,
                     user1,
                     user2;
-                
+
 
                 Step(
                     function() {
@@ -1123,7 +1123,7 @@ suite.addBatch({
                     cb = this.callback,
                     user1,
                     user2;
-                
+
 
                 Step(
                     function() {
@@ -1186,7 +1186,7 @@ suite.addBatch({
                     user1,
                     user2,
                     list;
-                
+
 
                 Step(
                     function() {
@@ -1477,7 +1477,7 @@ suite.addBatch({
                 }
 
                 DatabankObject.bank = db;
-                
+
                 mod = require("../lib/model/activity");
 
                 if (!mod) {

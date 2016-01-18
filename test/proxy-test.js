@@ -52,7 +52,7 @@ mb["When we require the proxy module"]
       assert.ifError(err);
       assert.isString(created.id);
       assert.isString(created.created);
-};
+  };
 
 mb["When we require the proxy module"]
 ["and we get its Proxy class export"]

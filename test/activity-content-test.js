@@ -46,7 +46,7 @@ var contentCheck = function(actor, verb, object, expected) {
                                     to: [thePublic],
                                     verb: verb,
                                     object: object});
-            
+
             Step(
                 function() {
                     // First, ensure recipients
@@ -107,7 +107,7 @@ suite.addBatch({
                 }
 
                 DatabankObject.bank = db;
-                
+
                 mod = require("../lib/model/activity");
 
                 if (!mod) {
@@ -189,7 +189,7 @@ suite.addBatch({
             "it works": function(err) {
                 assert.ifError(err);
             },
-            "and we post an activity without the full actor data": 
+            "and we post an activity without the full actor data":
             contentCheck({objectType: "person",
                                id: "urn:uuid:3e2273f4-fec7-11e2-9db1-32b36b1a1850"},
                          "like",
@@ -211,7 +211,7 @@ suite.addBatch({
             "it works": function(err) {
                 assert.ifError(err);
             },
-            "and we post an activity without the full object data": 
+            "and we post an activity without the full object data":
             contentCheck({objectType: "person",
                           id: "urn:uuid:6a8eab28-fec8-11e2-a39d-32b36b1a1850",
                           displayName: "Catherine Hawk"},
@@ -233,7 +233,7 @@ suite.addBatch({
             "it works": function(err) {
                 assert.ifError(err);
             },
-            "and we post an activity without the full inReplyTo data": 
+            "and we post an activity without the full inReplyTo data":
             contentCheck({objectType: "person",
                           id: "urn:uuid:1f91eea4-fec9-11e2-8d0c-32b36b1a1850",
                           displayName: "Zee Modem"},

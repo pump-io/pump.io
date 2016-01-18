@@ -96,7 +96,7 @@ suite.addBatch({
                             }
                         },
                         callback = this.callback;
-                    
+
                     pj(url, cred1, act, function(err, body, resp) {
                         if (err) {
                             callback(err, null);
@@ -136,7 +136,7 @@ suite.addBatch({
                                         }
                                     },
                                     callback = this.callback;
-                                
+
                                 pj(url, cred1, act, function(err, body, resp) {
                                     if (err) {
                                         callback(err, null);
@@ -161,7 +161,7 @@ suite.addBatch({
                                     topic: function(second, first, cred1, cred2, social, photo) {
                                         var url = "http://photo.localhost/api/user/bob/inbox",
                                             callback = this.callback;
-                                        
+
                                         gj(url, cred2, function(err, feed, resp) {
                                             if (err) {
                                                 callback(err, null, null);

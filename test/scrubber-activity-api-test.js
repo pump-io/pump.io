@@ -38,7 +38,7 @@ var DANGEROUS = "This is a <script>alert('Boo!')</script> dangerous string.";
 var HARMLESS = "This is a harmless string.";
 
 var deepProperty = function(object, property) {
-    var i = property.indexOf('.');
+    var i = property.indexOf(".");
     if (!object) {
         return null;
     } else if (i == -1) { // no dots
@@ -230,7 +230,7 @@ suite.addBatch({
                               content: "Hello, world."
                           },
                           target: {
-			      id: "urn:uuid:1a749377-5b7d-41d9-a4f7-2a3a4ca3e630",
+                              id: "urn:uuid:1a749377-5b7d-41d9-a4f7-2a3a4ca3e630",
                               objectType: "collection",
                               summary: HARMLESS
                           }
@@ -243,7 +243,7 @@ suite.addBatch({
                               content: "Hello, world."
                           },
                           target: {
-			      id: "urn:uuid:5ead821a-f418-4429-b4fa-e6ab0290f8da",
+                              id: "urn:uuid:5ead821a-f418-4429-b4fa-e6ab0290f8da",
                               objectType: "collection",
                               summary: DANGEROUS
                           }
@@ -338,7 +338,7 @@ suite.addBatch({
                               content: "Hello, world."
                           },
                           source: {
-                             id: "urn:uuid:5b9f1672-ddba-11e2-aa23-2c8158efb9e9",
+                              id: "urn:uuid:5b9f1672-ddba-11e2-aa23-2c8158efb9e9",
                               objectType: "collection",
                               summary: HARMLESS
                           }

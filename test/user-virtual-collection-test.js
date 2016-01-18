@@ -25,7 +25,7 @@ var assert = require("assert"),
     Step = require("step"),
     Collection = require("../lib/model/collection").Collection,
     URLMaker = require("../lib/urlmaker").URLMaker,
-    schema = require('../lib/schema').schema,
+    schema = require("../lib/schema").schema,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
@@ -35,7 +35,7 @@ var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 
 suite.addBatch({
     "When we get the User class": {
-        topic: function() { 
+        topic: function() {
 
             var cb = this.callback;
             // Need this to make IDs
@@ -53,7 +53,7 @@ suite.addBatch({
                 var User;
 
                 DatabankObject.bank = db;
-                
+
                 User = require("../lib/model/user").User || null;
 
                 cb(null, User);

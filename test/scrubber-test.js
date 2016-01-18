@@ -462,7 +462,7 @@ vows.describe("scrubber module interface").addBatch({
                             content: "Hello, world!"
                         },
                         target: {
-			    id: "urn:uuid:b9b0a2b4-96b8-463a-8941-708210ef202b",
+                            id: "urn:uuid:b9b0a2b4-96b8-463a-8941-708210ef202b",
                             objectType: "collection",
                             summary: HARMLESS
                         }
@@ -490,7 +490,7 @@ vows.describe("scrubber module interface").addBatch({
                             content: "Hello, world!"
                         },
                         target: {
-			    id: "urn:uuid:90528c00-ec91-4d27-880b-46ae3c374619",
+                            id: "urn:uuid:90528c00-ec91-4d27-880b-46ae3c374619",
                             objectType: "collection",
                             summary: DANGEROUS
                         }
@@ -794,8 +794,8 @@ vows.describe("scrubber module interface").addBatch({
                     assert.isObject(result.to[1]);
                     assert.isString(result.to[0].summary);
                     assert.isString(result.to[1].summary);
-                    assert.equal(result.to[0].summary.indexOf('<script>'), -1);
-                    assert.equal(result.to[1].summary.indexOf('<script>'), -1);
+                    assert.equal(result.to[0].summary.indexOf("<script>"), -1);
+                    assert.equal(result.to[1].summary.indexOf("<script>"), -1);
                 }
             },
             "and we scrub an activity with innocuous 'cc' recipients": {
@@ -872,8 +872,8 @@ vows.describe("scrubber module interface").addBatch({
                     assert.isObject(result.cc[1]);
                     assert.isString(result.cc[0].summary);
                     assert.isString(result.cc[1].summary);
-                    assert.equal(result.cc[0].summary.indexOf('<script>'), -1);
-                    assert.equal(result.cc[1].summary.indexOf('<script>'), -1);
+                    assert.equal(result.cc[0].summary.indexOf("<script>"), -1);
+                    assert.equal(result.cc[1].summary.indexOf("<script>"), -1);
                 }
             },
             "and we scrub an activity with innocuous 'bto' recipients": {
@@ -950,8 +950,8 @@ vows.describe("scrubber module interface").addBatch({
                     assert.isObject(result.bto[1]);
                     assert.isString(result.bto[0].summary);
                     assert.isString(result.bto[1].summary);
-                    assert.equal(result.bto[0].summary.indexOf('<script>'), -1);
-                    assert.equal(result.bto[1].summary.indexOf('<script>'), -1);
+                    assert.equal(result.bto[0].summary.indexOf("<script>"), -1);
+                    assert.equal(result.bto[1].summary.indexOf("<script>"), -1);
                 }
             },
             "and we scrub an activity with innocuous 'bcc' recipients": {
@@ -1028,8 +1028,8 @@ vows.describe("scrubber module interface").addBatch({
                     assert.isObject(result.bcc[1]);
                     assert.isString(result.bcc[0].summary);
                     assert.isString(result.bcc[1].summary);
-                    assert.equal(result.bcc[0].summary.indexOf('<script>'), -1);
-                    assert.equal(result.bcc[1].summary.indexOf('<script>'), -1);
+                    assert.equal(result.bcc[0].summary.indexOf("<script>"), -1);
+                    assert.equal(result.bcc[1].summary.indexOf("<script>"), -1);
                 }
             },
             "and we scrub an activity with private members": {

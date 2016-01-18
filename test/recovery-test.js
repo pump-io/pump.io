@@ -53,7 +53,7 @@ mb["When we require the recovery module"]
       assert.isString(created.code);
       assert.isString(created.timestamp);
       assert.isFalse(created.recovered);
-};
+  };
 
 mb["When we require the recovery module"]
 ["and we get its Recovery class export"]

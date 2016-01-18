@@ -1,7 +1,7 @@
 // webfinger.js
 //
 // Tests the Webfinger JRD endpoints
-// 
+//
 // Copyright 2012 E14N https://e14n.com/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -91,10 +91,10 @@ suite.addBatch({
         "it works": function(err, app) {
             assert.ifError(err);
         },
-        "and we check the webfinger endpoint": 
+        "and we check the webfinger endpoint":
         httputil.endpoint("/.well-known/webfinger", ["GET"]),
-         "and we get the webfinger endpoint with no uri":
-        httputil.getfail("/.well-known/webfinger", 400),
+        "and we get the webfinger endpoint with no uri":
+       httputil.getfail("/.well-known/webfinger", 400),
         "and we get the webfinger endpoint with an empty uri":
         httputil.getfail("/.well-known/webfinger?resource=", 404),
         "and we get the webfinger endpoint with an HTTP URI at some other domain":

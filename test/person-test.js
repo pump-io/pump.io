@@ -100,7 +100,7 @@ suite.addBatch({
                 }
 
                 DatabankObject.bank = db;
-                
+
                 mod = require("../lib/model/person");
 
                 if (!mod) {

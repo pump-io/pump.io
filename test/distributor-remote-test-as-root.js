@@ -95,7 +95,7 @@ suite.addBatch({
                             }
                         },
                         callback = this.callback;
-                    
+
                     pj(url, cred1, act, function(err, body, resp) {
                         if (err) {
                             callback(err, null);
@@ -120,7 +120,7 @@ suite.addBatch({
                         topic: function(act, cred1, cred2) {
                             var url = "http://social.localhost/api/user/maven/following",
                                 callback = this.callback;
-                            
+
                             gj(url, cred1, function(err, body, resp) {
                                 if (err) {
                                     callback(err, null);
@@ -139,7 +139,7 @@ suite.addBatch({
                             assert.include(feed, "items");
                             assert.isArray(feed.items);
                             assert.greater(feed.items.length, 0);
-			    assert.isObject(_.find(feed.items, function(item) { return item.id == "acct:photog@photo.localhost" }));
+                            assert.isObject(_.find(feed.items, function(item) { return item.id == "acct:photog@photo.localhost"; }));
                         }
                     },
                     "and we check the second user's followers list": {
@@ -210,7 +210,7 @@ suite.addBatch({
                         topic: function(act, cred1, cred2) {
                             var url = "http://photo.localhost/api/user/photog/inbox",
                                 callback = this.callback;
-                            
+
                             gj(url, cred2, function(err, feed, resp) {
                                 if (err) {
                                     callback(err, null, null);
@@ -245,7 +245,7 @@ suite.addBatch({
                                         displayName: "My Photo"
                                     }
                                 };
-                            
+
                             pj(url, cred2, post, function(err, act, resp) {
                                 if (err) {
                                     callback(err, null);
@@ -290,26 +290,26 @@ suite.addBatch({
                                     assert.include(feed, "items");
                                     assert.isArray(feed.items);
                                     assert.greater(feed.items.length, 0);
-				    assert.isObject(_.find(feed.items, function(item) { return item.id == act.id; }));
+                                    assert.isObject(_.find(feed.items, function(item) { return item.id == act.id; }));
                                 },
                                 "activity is sanitized": function(err, feed, act) {
-				    var item;
+                                    var item;
                                     assert.ifError(err);
                                     assert.isObject(feed);
                                     assert.isArray(feed.items);
                                     assert.greater(feed.items.length, 0);
-				    item = _.find(feed.items, function(item) { return item.id == act.id; });
-				    assert.isObject(item);
-				    assert.isObject(item.actor);
+                                    item = _.find(feed.items, function(item) { return item.id == act.id; });
+                                    assert.isObject(item);
+                                    assert.isObject(item.actor);
                                     assert.isFalse(_(item.actor).has("_user"));
                                 },
                                 "activity likes and replies feeds have right host": function(err, feed, act) {
-				    var item;
+                                    var item;
                                     assert.ifError(err);
                                     assert.isObject(feed);
                                     assert.isArray(feed.items);
                                     assert.greater(feed.items.length, 0);
-				    item = _.find(feed.items, function(item) { return item.id == act.id; });
+                                    item = _.find(feed.items, function(item) { return item.id == act.id; });
                                     assert.isObject(item);
                                     assert.isObject(item.object);
                                     assert.isObject(item.object.likes);
@@ -357,7 +357,7 @@ suite.addBatch({
                                         topic: function(pc, pi, fu, cred1, cred2) {
                                             var url = "http://photo.localhost/api/user/photog/inbox",
                                                 callback = this.callback;
-                                            
+
                                             gj(url, cred2, function(err, feed, resp) {
                                                 if (err) {
                                                     callback(err, null, null);
@@ -372,14 +372,14 @@ suite.addBatch({
                                             assert.isObject(act);
                                         },
                                         "it includes the activity": function(err, feed, act) {
-					    var item;
+                                            var item;
                                             assert.ifError(err);
                                             assert.isObject(feed);
                                             assert.isObject(act);
                                             assert.include(feed, "items");
                                             assert.isArray(feed.items);
                                             assert.greater(feed.items.length, 0);
-					    item = _.find(feed.items, function(item) { return item.id == act.id; });
+                                            item = _.find(feed.items, function(item) { return item.id == act.id; });
                                             assert.isObject(item);
                                         }
                                     },
@@ -387,7 +387,7 @@ suite.addBatch({
                                         topic: function(pc, pi, fu, cred1, cred2) {
                                             var url = pi.object.replies.url,
                                                 callback = this.callback;
-                                            
+
                                             gj(url, cred2, function(err, feed, resp) {
                                                 if (err) {
                                                     callback(err, null, null);
@@ -401,15 +401,15 @@ suite.addBatch({
                                             assert.isObject(feed);
                                         },
                                         "feed includes the comment": function(err, feed, pc) {
-					    var item;
+                                            var item;
                                             assert.ifError(err);
                                             assert.isObject(feed);
                                             assert.isObject(pc);
                                             assert.include(feed, "items");
                                             assert.isArray(feed.items);
                                             assert.greater(feed.items.length, 0);
-					    item = _.find(feed.items, function(item) { return item.id == pc.object.id; });
-					    assert.isObject(item);
+                                            item = _.find(feed.items, function(item) { return item.id == pc.object.id; });
+                                            assert.isObject(item);
                                         }
                                     },
                                     "and the second user likes the comment": {
@@ -420,7 +420,7 @@ suite.addBatch({
                                                     verb: "favorite",
                                                     object: pc.object
                                                 };
-                                            
+
                                             pj(url, cred2, post, function(err, act, resp) {
                                                 if (err) {
                                                     callback(err, null);
@@ -465,15 +465,15 @@ suite.addBatch({
                                                     assert.include(feed, "items");
                                                     assert.isArray(feed.items);
                                                     assert.greater(feed.items.length, 0);
-						    item = _.find(feed.items, function(item) { return item.id == act.id; });
-						    assert.isObject(item);
+                                                    item = _.find(feed.items, function(item) { return item.id == act.id; });
+                                                    assert.isObject(item);
                                                 }
                                             },
                                             "and we check the comment's likes feed": {
                                                 topic: function(fc, pc, pi, fu, cred1, cred2) {
                                                     var url = pc.object.likes.url,
                                                         callback = this.callback;
-                                                    
+
                                                     gj(url, cred1, function(err, feed, resp) {
                                                         if (err) {
                                                             callback(err, null, null);
@@ -487,15 +487,15 @@ suite.addBatch({
                                                     assert.isObject(feed);
                                                 },
                                                 "feed includes the second user": function(err, feed, fc) {
-						    var item;
+                                                    var item;
                                                     assert.ifError(err);
                                                     assert.isObject(feed);
                                                     assert.isObject(fc);
                                                     assert.include(feed, "items");
                                                     assert.isArray(feed.items);
                                                     assert.greater(feed.items.length, 0);
-						    item = _.find(feed.items, function(item) { return item.id == fc.actor.id; });
-						    assert.isObject(item);
+                                                    item = _.find(feed.items, function(item) { return item.id == fc.actor.id; });
+                                                    assert.isObject(item);
                                                 }
                                             }
                                         }

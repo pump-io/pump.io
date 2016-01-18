@@ -3,7 +3,7 @@
 // Copyright 2012 E14N https://e14n.com/
 //
 // "I never met a host I didn't like"
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -74,11 +74,11 @@ suite.addBatch({
         "it works": function(err, app) {
             assert.ifError(err);
         },
-        "and we check the host-meta endpoint": 
+        "and we check the host-meta endpoint":
         httputil.endpoint("/.well-known/host-meta", ["GET"]),
-        "and we check the host-meta.json endpoint": 
+        "and we check the host-meta.json endpoint":
         httputil.endpoint("/.well-known/host-meta.json", ["GET"]),
-        "and we GET the host-meta file": 
+        "and we GET the host-meta file":
         xrdutil.xrdContext("http://localhost:4815/.well-known/host-meta",
                    hostmeta),
         "and we GET the host-meta.json file":

@@ -184,7 +184,7 @@ suite.addBatch({
                     assert.include(reply, "object");
                     assert.include(reply.object, "inReplyTo");
                     assert.include(reply.object.inReplyTo, "id");
-                    assert.equal(reply.object.inReplyTo.id, photo.object.id); 
+                    assert.equal(reply.object.inReplyTo.id, photo.object.id);
                 },
                 "and we check the replies feed": {
                     topic: function(photo, reply, cred1, cred2) {
@@ -213,7 +213,7 @@ suite.addBatch({
                     "and we delete the reply and re-check the feed": {
                         topic: function(coll, reply, photo, replyAgain, cred1, cred2) {
                             var cb = this.callback;
-                            
+
                             Step(
                                 function() {
                                     httputil.delJSON(reply.object.id, cred2, this);

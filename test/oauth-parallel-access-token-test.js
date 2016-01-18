@@ -1,4 +1,4 @@
-// oauth-test.js
+// oauth-parallel-access-token-test.js
 //
 // Test the client registration API
 //
@@ -23,7 +23,6 @@ var assert = require("assert"),
     querystring = require("querystring"),
     http = require("http"),
     OAuth = require("oauth-evanp").OAuth,
-    Browser = require("zombie"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     setupApp = oauthutil.setupApp,

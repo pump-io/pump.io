@@ -76,7 +76,7 @@ suite.addBatch({
                 smtp = simplesmtp.createServer({disableDNSValidation: true});
             Step(
                 function() {
-                    smtp.listen(1623, this); 
+                    smtp.listen(1623, this);
                 },
                 function(err) {
                     if (err) throw err;

@@ -71,7 +71,7 @@ suite.addBatch({
                             }
                         },
                         url = "http://localhost:4815/api/user/snail/feed/major";
-                    
+
                     httputil.postJSON(url, cred, act, function(err, doc, response) {
                         cb(err, doc);
                     });
@@ -84,7 +84,7 @@ suite.addBatch({
                     topic: function(act, cred) {
                         var cb = this.callback,
                             url = "http://localhost:4815/api/user/snail/feed/major";
-                        
+
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc, act);
                         });
@@ -102,7 +102,7 @@ suite.addBatch({
                     topic: function(act, cred) {
                         var cb = this.callback,
                             url = "http://localhost:4815/api/user/snail/feed";
-                        
+
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc, act);
                         });
@@ -120,7 +120,7 @@ suite.addBatch({
                     topic: function(act, cred) {
                         var cb = this.callback,
                             url = "http://localhost:4815/api/user/snail/feed/minor";
-                        
+
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc, act);
                         });
@@ -147,7 +147,7 @@ suite.addBatch({
                             }
                         },
                         url = "http://localhost:4815/api/user/snail/feed/major";
-                    
+
                     httputil.postJSON(url, cred, act, function(err, doc, response) {
                         if (err && err.statusCode >= 400 && err.statusCode < 500) {
                             cb(null);
@@ -175,7 +175,7 @@ suite.addBatch({
                             }
                         },
                         url = "http://localhost:4815/api/user/snail/feed/minor";
-                    
+
                     httputil.postJSON(url, cred, act, function(err, doc, response) {
                         cb(err, doc);
                     });
@@ -188,7 +188,7 @@ suite.addBatch({
                     topic: function(act, cred) {
                         var cb = this.callback,
                             url = "http://localhost:4815/api/user/snail/feed/minor";
-                        
+
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc, act);
                         });
@@ -206,7 +206,7 @@ suite.addBatch({
                     topic: function(act, cred) {
                         var cb = this.callback,
                             url = "http://localhost:4815/api/user/snail/feed";
-                        
+
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc, act);
                         });
@@ -224,7 +224,7 @@ suite.addBatch({
                     topic: function(act, cred) {
                         var cb = this.callback,
                             url = "http://localhost:4815/api/user/snail/feed/major";
-                        
+
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             cb(err, doc, act);
                         });
@@ -251,7 +251,7 @@ suite.addBatch({
                             }
                         },
                         url = "http://localhost:4815/api/user/snail/feed/minor";
-                    
+
                     httputil.postJSON(url, cred, act, function(err, doc, response) {
                         if (err && err.statusCode >= 400 && err.statusCode < 500) {
                             cb(null);

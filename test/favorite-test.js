@@ -26,7 +26,7 @@ var assert = require("assert"),
 var suite = vows.describe("favorite module interface");
 
 var testSchema = {
-    pkey: "id", 
+    pkey: "id",
     fields: ["from",
              "to",
              "published",

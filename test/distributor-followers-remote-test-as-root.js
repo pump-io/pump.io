@@ -95,7 +95,7 @@ suite.addBatch({
                             }
                         },
                         callback = this.callback;
-                    
+
                     pj(url, cred1, act, function(err, body, resp) {
                         if (err) {
                             callback(err, null);
@@ -128,7 +128,7 @@ suite.addBatch({
                                         displayName: "My Photo"
                                     }
                                 };
-                            
+
                             pj(url, cred2, post, function(err, act, resp) {
                                 if (err) {
                                     callback(err, null);
@@ -173,7 +173,7 @@ suite.addBatch({
                                     assert.include(feed, "items");
                                     assert.isArray(feed.items);
                                     assert.greater(feed.items.length, 0);
-				    assert.isObject(_.find(feed.items, function(item) { return item.id == act.id; }));
+                                    assert.isObject(_.find(feed.items, function(item) { return item.id == act.id; }));
                                 }
                             }
                         }

@@ -131,7 +131,7 @@ suite.addBatch({
                         var callback = this.callback,
                             url = "http://localhost:4815/api/user/moe/profile",
                             cred = makeCred(cl, users.larry.pair);
-                        
+
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             callback(err, doc);
                         });
@@ -154,7 +154,7 @@ suite.addBatch({
                         var callback = this.callback,
                             url = "http://localhost:4815/api/user/moe/profile",
                             cred = makeCred(cl, users.curly.pair);
-                        
+
                         httputil.getJSON(url, cred, function(err, doc, response) {
                             callback(err, doc);
                         });
@@ -410,8 +410,8 @@ suite.addBatch({
                         var cb = this.callback,
                             url = "http://localhost:4815/api/user/abbott/following",
                             cred = makeCred(cl, users.abbott.pair);
-                        
-                            httputil.getJSON(url, cred, function(err, doc, resp) {
+
+                        httputil.getJSON(url, cred, function(err, doc, resp) {
                                 cb(err, doc);
                             });
                     },
@@ -433,8 +433,8 @@ suite.addBatch({
                         var cb = this.callback,
                             url = "http://localhost:4815/api/user/abbott/feed",
                             cred = makeCred(cl, users.abbott.pair);
-                        
-                            httputil.getJSON(url, cred, function(err, doc, resp) {
+
+                        httputil.getJSON(url, cred, function(err, doc, resp) {
                                 cb(err, doc);
                             });
                     },

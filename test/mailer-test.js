@@ -121,7 +121,7 @@ var suite = vows.describe("mailer module interface").addBatch({
                                     var i,
                                         rgroup = this.group(),
                                         sgroup = this.group(),
-                                        to, 
+                                        to,
                                         message;
                                     for (i = 1; i < 51; i++) {
                                         to = (123+i) + "@fakestreet.example";

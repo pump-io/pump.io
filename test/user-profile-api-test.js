@@ -98,7 +98,7 @@ suite.addBatch({
                 assert.equal(user.profile.id, "http://localhost:4815/api/user/jamesbond/profile");
             },
 
-            "and we get the options on the user profile api endpoint": 
+            "and we get the options on the user profile api endpoint":
             httputil.endpoint("/api/user/jamesbond/profile", ["GET", "PUT"]),
 
             "and we GET the user profile data": {

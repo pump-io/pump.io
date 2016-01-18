@@ -31,11 +31,11 @@ var http = require("http"),
 
 var OAuthJSONError = function(obj) {
     Error.captureStackTrace(this, OAuthJSONError);
-    this.name = "OAuthJSONError";  
+    this.name = "OAuthJSONError";
     _.extend(this, obj);
 };
 
-OAuthJSONError.prototype = new Error();  
+OAuthJSONError.prototype = new Error();
 OAuthJSONError.prototype.constructor = OAuthJSONError;
 
 OAuthJSONError.prototype.toString = function() {
@@ -86,6 +86,7 @@ var endpoint = function(url, hostname, port, methods) {
             assert.include(allow, method);
         };
     };
+
     var i;
 
     for (i = 0; i < methods.length; i++) {
@@ -181,7 +182,7 @@ var head = function(url, callback) {
 
     options.method = "HEAD";
     options.headers = {
-            "User-Agent": "pump.io/"+version
+        "User-Agent": "pump.io/"+version
     };
 
     var mod = (options.protocol == "https:") ? https : http;
@@ -228,9 +229,7 @@ var postJSON = function(serverUrl, cred, payload, callback) {
     var oa, toSend;
 
     oa = newOAuth(serverUrl, cred);
-    
     toSend = JSON.stringify(payload);
-
     oa.post(serverUrl, cred.token, cred.token_secret, toSend, "application/json", jsonHandler(callback));
 };
 
@@ -263,9 +262,7 @@ var putJSON = function(serverUrl, cred, payload, callback) {
     var oa, toSend;
 
     oa = newOAuth(serverUrl, cred);
-    
     toSend = JSON.stringify(payload);
-
     oa.put(serverUrl, cred.token, cred.token_secret, toSend, "application/json", jsonHandler(callback));
 };
 
@@ -274,7 +271,6 @@ var getJSON = function(serverUrl, cred, callback) {
     var oa, toSend;
 
     oa = newOAuth(serverUrl, cred);
-    
     oa.get(serverUrl, cred.token, cred.token_secret, jsonHandler(callback));
 };
 
@@ -283,7 +279,6 @@ var delJSON = function(serverUrl, cred, callback) {
     var oa, toSend;
 
     oa = newOAuth(serverUrl, cred);
-    
     oa["delete"](serverUrl, cred.token, cred.token_secret, jsonHandler(callback));
 };
 
@@ -365,41 +360,45 @@ var dialbackPost = function(endpoint, id, token, ts, requestBody, contentType, c
 var proxy = function(options, callback) {
 
     var server = express.createServer(),
-        front = _.defaults(options.front || {}, {hostname: "localhost",
-						 port: 2342,
-						 path: "/pumpio"}),
-        back = _.defaults(options.back || {}, {hostname: "localhost",
-					       port: 4815,
-					       path: ""});
+        front = _.defaults(options.front || {}, {
+            hostname: "localhost",
+            port: 2342,
+            path: "/pumpio"
+        }),
+        back = _.defaults(options.back || {}, {
+            hostname: "localhost",
+            port: 4815,
+            path: ""
+        });
 
     server.all(front.path + "/*", function(req, res, next) {
-	var full = req.originalUrl,
-	    rel = full.substr(front.path.length + 1),
-	    options = {
-		hostname: back.hostname,
-		port: back.port,
-		method: req.route.method.toUpperCase(),
-		path: back.path + "/" + rel,
-		headers: _.extend(req.headers, {"Via": "pump.io-test-proxy/0.1.0"})
-	    };
+        var full = req.originalUrl,
+            rel = full.substr(front.path.length + 1),
+            options = {
+                hostname: back.hostname,
+                port: back.port,
+                method: req.route.method.toUpperCase(),
+                path: back.path + "/" + rel,
+                headers: _.extend(req.headers, {"Via": "pump.io-test-proxy/0.1.0"})
+            };
 
-	breq = http.request(options, function(bres) {
-	    res.status(bres.statusCode);
-	    _.each(bres.headers, function(value, name) {
-		res.header(name, value);
-	    });
-	    util.pump(bres, res);
-	});
-	breq.on("error", function(err) {
-	    next(err);
-	});
-	util.pump(req, breq);
+        breq = http.request(options, function(bres) {
+            res.status(bres.statusCode);
+            _.each(bres.headers, function(value, name) {
+                res.header(name, value);
+            });
+            util.pump(bres, res);
+        });
+        breq.on("error", function(err) {
+            next(err);
+        });
+        util.pump(req, breq);
     });
 
     // XXX: need to call callback on an error
 
     server.listen(front.port, front.hostname, function() {
-	callback(null, server);
+        callback(null, server);
     });
 };
 

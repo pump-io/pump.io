@@ -32,62 +32,63 @@ vows.describe("uuidv5 module interface").addBatch({
         },
         "and we make two UUIDs with the same data": {
             topic: function(uuidv5) {
-		var secret = "My dog has fleas";
+                var secret = "My dog has fleas";
+
                 return [uuidv5(secret), uuidv5(secret)];
             },
             "it works": function(ids) {
                 assert.isArray(ids);
-		assert.isString(ids[0]);
-		assert.isString(ids[1]);
-		assert.equal(ids[0], ids[1]);
+                assert.isString(ids[0]);
+                assert.isString(ids[1]);
+                assert.equal(ids[0], ids[1]);
             }
         },
         "and we make two UUIDs with different data": {
             topic: function(uuidv5) {
                 return [uuidv5("your dog does too"),
-			uuidv5("no he does not")];
+                uuidv5("no he does not")];
             },
             "it works": function(ids) {
                 assert.isArray(ids);
-		assert.isString(ids[0]);
-		assert.isString(ids[1]);
-		assert.notEqual(ids[0], ids[1]);
+                assert.isString(ids[0]);
+                assert.isString(ids[1]);
+                assert.notEqual(ids[0], ids[1]);
             }
         },
         "and we make two UUIDs with the same data and ns": {
             topic: function(uuidv5) {
                 return [uuidv5("pump.io", uuidv5.ns.DNS),
-			uuidv5("pump.io", uuidv5.ns.DNS)];
+                uuidv5("pump.io", uuidv5.ns.DNS)];
             },
             "it works": function(ids) {
                 assert.isArray(ids);
-		assert.isString(ids[0]);
-		assert.isString(ids[1]);
-		assert.equal(ids[0], ids[1]);
+                assert.isString(ids[0]);
+                assert.isString(ids[1]);
+                assert.equal(ids[0], ids[1]);
             }
         },
         "and we make two UUIDs with different data and same ns": {
             topic: function(uuidv5) {
                 return [uuidv5("pump.io", uuidv5.ns.DNS),
-			uuidv5("idno.co", uuidv5.ns.DNS)];
+                uuidv5("idno.co", uuidv5.ns.DNS)];
             },
             "it works": function(ids) {
                 assert.isArray(ids);
-		assert.isString(ids[0]);
-		assert.isString(ids[1]);
-		assert.notEqual(ids[0], ids[1]);
+                assert.isString(ids[0]);
+                assert.isString(ids[1]);
+                assert.notEqual(ids[0], ids[1]);
             }
         },
         "and we make two UUIDs with same data and different ns": {
             topic: function(uuidv5) {
                 return [uuidv5("pump.io", uuidv5.ns.DNS),
-			uuidv5("pump.io", null)];
+                uuidv5("pump.io", null)];
             },
             "it works": function(ids) {
                 assert.isArray(ids);
-		assert.isString(ids[0]);
-		assert.isString(ids[1]);
-		assert.notEqual(ids[0], ids[1]);
+                assert.isString(ids[0]);
+                assert.isString(ids[1]);
+                assert.notEqual(ids[0], ids[1]);
             }
         }
     }

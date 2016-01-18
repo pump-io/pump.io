@@ -37,7 +37,7 @@ var DANGEROUS = "This is a <script>alert('Boo!')</script> dangerous string.";
 var HARMLESS = "This is a harmless string.";
 
 var deepProperty = function(object, property) {
-    var i = property.indexOf('.');
+    var i = property.indexOf(".");
     if (!object) {
         return null;
     } else if (i == -1) { // no dots
@@ -124,31 +124,31 @@ suite.addBatch({
                 assert.ifError(err);
                 assert.isObject(cred);
             },
-            "and we follow an object with good content": 
+            "and we follow an object with good content":
             goodFollow({objectType: "person",
                         id: "urn:uuid:31981bb2-3293-11e2-98b1-0024beb67924",
                         content: HARMLESS
                        },
                        "content"),
-            "and we follow an object with bad content": 
+            "and we follow an object with bad content":
             badFollow({objectType: "person",
                        id: "urn:uuid:3198b87e-3293-11e2-99c3-0024beb67924",
                        content: DANGEROUS
                       },
                       "content"),
-            "and we follow an object with good summary": 
+            "and we follow an object with good summary":
             goodFollow({objectType: "person",
                         id: "urn:uuid:31995450-3293-11e2-a166-0024beb67924",
                         summary: HARMLESS
                        },
                        "summary"),
-            "and we follow an object with bad summary": 
+            "and we follow an object with bad summary":
             badFollow({objectType: "person",
                        id: "urn:uuid:3199f00e-3293-11e2-a5ac-0024beb67924",
                        summary: DANGEROUS
                       },
                       "summary"),
-            "and we follow an object with a private member": 
+            "and we follow an object with a private member":
             privateFollow({objectType: "person",
                            id: "urn:uuid:75f81018-36ae-11e2-ad19-70f1a154e1aa",
                            _user: true,

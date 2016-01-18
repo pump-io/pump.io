@@ -61,7 +61,7 @@ mb["When we require the credentials module"]
       assert.isString(created.host_and_id);
       assert.isString(created.created);
       assert.isString(created.updated);
-};
+  };
 
 suite.addBatch(mb);
 

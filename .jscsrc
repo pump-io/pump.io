@@ -10,8 +10,24 @@
     "requireCamelCaseOrUpperCaseIdentifiers": null,
     "requireCurlyBraces": null,
     "maximumLineLength": null,
-    "requireSpaceBeforeBinaryOperators": null,
-    "requireSpaceAfterBinaryOperators": null,
+    "requireSpaceBeforeBinaryOperators": [
+        "=",
+        "==",
+        "===",
+        "!=",
+        "!==",
+        "&&",
+        "||"
+    ],
+    "requireSpaceAfterBinaryOperators": [
+        "=",
+        "==",
+        "===",
+        "!=",
+        "!==",
+        "&&",
+        "||"
+    ],
     "validateCommentPosition": null,
     "requireEarlyReturn": null,
     "requireDotNotation": null

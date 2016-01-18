@@ -41,7 +41,7 @@ var oneEmail = function(smtp, addr, callback) {
             if (isOurs(envelope)) {
                 data = "";
                 smtp.on("data", accumulator);
-                smtp.once("dataReady", ender);    
+                smtp.once("dataReady", ender);
             }
         },
         accumulator = function(envelope, chunk) {
@@ -92,7 +92,7 @@ var confirmEmail = function(message, callback) {
                 callback(null);
             }
         });
-    }).on('error', function(err) {
+    }).on("error", function(err) {
         callback(err);
     });
 };

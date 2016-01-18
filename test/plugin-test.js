@@ -108,13 +108,13 @@ suite.addBatch({
                             url = "http://localhost:4815/api/user/aang/feed";
                             activity = {
                                 verb: "post",
-				to: [
-				    cred2.user.profile
-				],
-				cc: [{
-				    objectType: "collection",
-				    id: cred.user.profile.followers.url
-				}],
+                                to: [
+                                cred2.user.profile
+                                ],
+                                cc: [{
+                                    objectType: "collection",
+                                    id: cred.user.profile.followers.url
+                                }],
                                 object: {
                                     objectType: "note",
                                     content: "Hello, world."

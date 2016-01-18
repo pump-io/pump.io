@@ -43,7 +43,7 @@ vows.describe("provider module interface").addBatch({
 
     "When we get the provider module": {
 
-        topic: function() { 
+        topic: function() {
             var cb = this.callback;
             // Need this to make IDs
 
@@ -248,7 +248,7 @@ vows.describe("provider module interface").addBatch({
                                 cb(err, null);
                                 return;
                             }
-                            var props = {consumer_key: client.consumer_key, 
+                            var props = {consumer_key: client.consumer_key,
                                          callback: "http://example.com/madeup/endpoint"};
                             RequestToken.create(props, function(err, rt) {
                                 if (err) {
@@ -1291,7 +1291,7 @@ vows.describe("provider module interface").addBatch({
                     topic: function(provider) {
                         var cb = this.callback,
                             user;
-                        
+
                         Step(
                             function() {
                                 User.create({nickname: "nancy", password: "change-me"}, this);
@@ -1325,7 +1325,7 @@ vows.describe("provider module interface").addBatch({
                     topic: function(provider) {
                         var cb = this.callback,
                             user;
-                        
+
                         Step(
                             function() {
                                 User.create({nickname: "oliver", password: "followThe$"}, this);
@@ -1361,7 +1361,7 @@ vows.describe("provider module interface").addBatch({
                             props = {consumer_key: testClient.consumer_key,
                                      callback: "http://example.com/callback/abc123/"},
                             user1, user2, rt;
-                        
+
                         Step(
                             function() {
                                 User.create({nickname: "paul", password: "austrian,"}, this.parallel());
@@ -1410,8 +1410,8 @@ vows.describe("provider module interface").addBatch({
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
                                      callback: "http://example.com/callback/abc123/"},
-                            user,rt;
-                        
+                            user, rt;
+
                         Step(
                             function() {
                                 User.create({nickname: "quincy", password: "john*adams"}, this.parallel());
@@ -1465,11 +1465,11 @@ vows.describe("provider module interface").addBatch({
                 "and we call associateTokenToUser with a valid username and an invalid token": {
                     topic: function(provider) {
                         var cb = this.callback;
-                        
+
                         User.create({nickname: "ronald", password: "mcdonald1"}, function(err, user) {
                             if (err) {
                                 cb(err, null);
-                            } else { 
+                            } else {
                                 provider.associateTokenToUser(user.nickname, "badtoken", function(err, newt) {
                                     if (err) { // should fail
                                         cb(null, user);
@@ -1494,7 +1494,7 @@ vows.describe("provider module interface").addBatch({
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
                                      callback: "http://example.com/callback/abc123/"};
-                        
+
                         RequestToken.create(props, function(err, rt) {
                             if (err) {
                                 cb(err, null);
@@ -1524,7 +1524,7 @@ vows.describe("provider module interface").addBatch({
                             props = {consumer_key: testClient.consumer_key,
                                      callback: "http://example.com/callback/abc123/"},
                             user1, user2, rt;
-                        
+
                         Step(
                             function() {
                                 User.create({nickname: "samuel", password: "dinos4ur"}, this.parallel());
@@ -1573,8 +1573,8 @@ vows.describe("provider module interface").addBatch({
                         var cb = this.callback,
                             props = {consumer_key: testClient.consumer_key,
                                      callback: "http://example.com/callback/abc123/"},
-                            user,rt;
-                        
+                            user, rt;
+
                         Step(
                             function() {
                                 User.create({nickname: "thomas", password: "aquinas1"}, this.parallel());
@@ -2028,7 +2028,7 @@ vows.describe("provider module interface").addBatch({
                     topic: function(provider) {
                         var cb = this.callback,
                             client;
-                        
+
                         Step(
                             function() {
                                 Client.create({title: "No requests app"}, this);
@@ -2063,7 +2063,7 @@ vows.describe("provider module interface").addBatch({
                             client,
                             before,
                             after;
-                        
+
                         Step(
                             function() {
                                 Client.create({title: "No out of date requests app"}, this);
@@ -2136,7 +2136,7 @@ vows.describe("provider module interface").addBatch({
                             before,
                             outdated,
                             after;
-                        
+
                         Step(
                             function() {
                                 Client.create({title: "Some out-of-date requests app"}, this);
@@ -2152,7 +2152,7 @@ vows.describe("provider module interface").addBatch({
                                 }
                             },
                             function(err, rts) {
-                                var i, 
+                                var i,
                                     touched = Date(Date.now() - 10 * 24 * 3600),
                                     bank = RequestToken.bank(),
                                     group = this.group();
@@ -2227,7 +2227,7 @@ vows.describe("provider module interface").addBatch({
                             client,
                             before,
                             after;
-                        
+
                         Step(
                             function() {
                                 Client.create({title: "Only out-of-date requests app"}, this);
@@ -2243,7 +2243,7 @@ vows.describe("provider module interface").addBatch({
                                 }
                             },
                             function(err, rts) {
-                                var i, 
+                                var i,
                                     touched = Date(Date.now() - 10 * 24 * 3600),
                                     bank = RequestToken.bank(),
                                     group = this.group();

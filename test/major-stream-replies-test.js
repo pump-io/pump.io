@@ -108,7 +108,7 @@ var sameUser = function(url, objects) {
     } else {
         ctx["all objects have 'replies' feed with 'items' property"] = goodActivities;
     }
-    
+
     return ctx;
 };
 
@@ -146,7 +146,7 @@ var justClient = function(url, objects) {
     } else {
         ctx["all objects have 'replies' feed with 'items' property"] = goodActivities;
     }
-    
+
     return ctx;
 };
 
@@ -181,7 +181,7 @@ var otherUser = function(url, objects) {
     } else {
         ctx["all objects have 'replies' feed with 'items' property"] = goodActivities;
     }
-    
+
     return ctx;
 };
 
@@ -239,7 +239,7 @@ suite.addBatch({
                                 var group = this.group();
                                 _.times(20, function(i) {
                                     var act = {
-                                        to: [pair1.user.profile], 
+                                        to: [pair1.user.profile],
                                         cc: [{objectType: "collection",
                                               id: "http://activityschema.org/collection/public"}],
                                         verb: "post",
@@ -293,17 +293,17 @@ suite.addBatch({
                     "it works": function(err) {
                         assert.ifError(err);
                     },
-                    "and we check their major inbox with same user credentials": 
+                    "and we check their major inbox with same user credentials":
                     sameUser("http://localhost:4815/api/user/gummy/inbox/major"),
-                    "and we check their major feed with same user credentials": 
+                    "and we check their major feed with same user credentials":
                     sameUser("http://localhost:4815/api/user/gummy/feed/major"),
                     "and we check their major direct inbox with same user credentials":
                     sameUser("http://localhost:4815/api/user/gummy/inbox/direct/major"),
-                    "and we check their favorites with same user credentials": 
+                    "and we check their favorites with same user credentials":
                     sameUser("http://localhost:4815/api/user/gummy/favorites", true),
                     "and we check their major feed with client credentials":
                     justClient("http://localhost:4815/api/user/gummy/feed/major"),
-                    "and we check their favorites with client credentials": 
+                    "and we check their favorites with client credentials":
                     justClient("http://localhost:4815/api/user/gummy/favorites", true),
                     "and we check the first user's major feed with different user credentials":
                     otherUser("http://localhost:4815/api/user/gummy/feed/major"),

@@ -53,7 +53,7 @@ suite.addBatch({
                 dirname = path.join(os.tmpDir(),
                                     "upload-file-test",
                                     ""+Date.now());
-            mkdirp(dirname, function (err) {
+            mkdirp(dirname, function(err) {
                 if (err) {
                     callback(err, null);
                 } else {
@@ -66,7 +66,7 @@ suite.addBatch({
             assert.isString(dir);
         },
         teardown: function(dir) {
-            rimraf(dir, function(err) { 
+            rimraf(dir, function(err) {
             });
         },
         "and we set up the app": {
@@ -170,7 +170,7 @@ suite.addBatch({
                                         oa;
 
                                     oa = httputil.newOAuth(url, cred);
-                                    
+
                                     Step(
                                         function() {
                                             oa.get(url, cred.token, cred.token_secret, this);
@@ -272,7 +272,7 @@ suite.addBatch({
                                         .replace(/\+/g, "-")
                                         .replace(/\//g, "_")
                                         .replace(/=/g, "");
-                                    
+
                                     httputil.postJSON(url, cred, bin, this);
                                 },
                                 function(err, doc, result) {

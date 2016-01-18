@@ -92,21 +92,21 @@ var newClient = function(hostname, port, path, cb) {
 
     // newClient(hostname, port, cb)
     if (!cb) {
-	cb = path;
-	path = "";
+        cb = path;
+        path = "";
     }
 
     // newClient(cb)
     if (!cb) {
-	cb = hostname;
+        cb = hostname;
         hostname = "localhost";
         port = 4815;
     }
 
     if (path) {
-	full = path + rel;
+        full = path + rel;
     } else {
-	full = rel;
+        full = rel;
     }
 
     httputil.post(hostname, port, full, {type: "client_associate"}, function(err, res, body) {
@@ -117,16 +117,28 @@ var newClient = function(hostname, port, path, cb) {
             try {
                 cl = JSON.parse(body);
                 cb(null, cl);
-            } catch (err) {
-                cb(err, null);
+            } catch (e) {
+                cb(e, null);
             }
         }
     });
 };
 
-var authorize = function(cl, rt, user, hostname, port, cb) {
+var browserClose = function(br) {
+    Step(
+        function() {
+            br.on("closed", this);
+            br.window.close();
+        },
+        function() {
+            // browser is closed
+        }
+    );
+};
 
-    var browser = new Browser(),
+var authorize = function(cl, rt, user, hostname, port, cb) {
+    // waitDuration is needed cause zombie sometimes need more time (it sometimes is a zombie).
+    var browser = new Browser({waitDuration:"30s"}),
         url;
 
     if (!port) {
@@ -140,29 +152,33 @@ var authorize = function(cl, rt, user, hostname, port, cb) {
                   pathname: "/oauth/authorize",
                   query: {oauth_token: rt.token}});
 
-    browser.on("error", function(err) {
-        cb(err, null);
-    });
-
     browser.visit(url)
-        .then(function() {
-            browser
-                .fill("#username", user.nickname)
-                .fill("#password", user.password)
-                .pressButton("#authenticate", function() {
-                    // is there an authorize button?
-                    if (browser.button("#authorize")) {
-                        // if so, press it
-                        browser.pressButton("#authorize", function() {
-                            cb(null, browser.text("#verifier"));
-                        }).fail(function(err) {
-                            cb(err, null);
-                        });
-                    } else {
-                        cb(null, browser.text("#verifier"));
-                    }
-                });
-        });
+           .then(function() {
+               browser.fill("#username", user.nickname)
+                      .fill("#password", user.password)
+                      .pressButton("#authenticate", function() {
+                          // is there an authorize button?
+                          if (browser.button("#authorize")) {
+                              // if so, press it
+                              browser.pressButton("#authorize", function() {
+                                  var res;
+
+                                  res = browser.text("#verifier");
+                                  browserClose(browser);
+                                  cb(null, res);
+                              }).fail(function(err) {
+                                  browserClose(browser);
+                                  cb(err, null);
+                              });
+                          } else {
+                              var res;
+
+                              res = browser.text("#verifier");
+                              browserClose(browser);
+                              cb(null, res);
+                          }
+                      });
+           });
 };
 
 var redeemToken = function(cl, rt, verifier, hostname, port, cb) {
@@ -227,10 +243,9 @@ var register = function(cl, nickname, password, hostname, port, path, callback) 
     var proto, full, rel = "/api/users";
 
     // register(cl, nickname, hostname, port, callback)
-
     if (!callback) {
-	callback = path;
-	path = null;
+        callback = path;
+        path = null;
     }
 
     // register(cl, nickname, callback)
@@ -243,9 +258,9 @@ var register = function(cl, nickname, password, hostname, port, path, callback) 
     proto = (port === 443) ? "https" : "http";
 
     if (path) {
-	full = path + rel;
+        full = path + rel;
     } else {
-	full = rel;
+        full = rel;
     }
 
     httputil.postJSON(proto+"://"+hostname+":"+port+full,
@@ -382,7 +397,8 @@ var setupAppConfig = function(config, callback) {
 
     var dummy = {
         close: function() {
-            child.kill();
+            child.kill("SIGKILL"); // SIGKILL really needed??
+            child.disconnect();
         },
         killCred: function(webfinger, callback) {
             var timeout = setTimeout(function() {

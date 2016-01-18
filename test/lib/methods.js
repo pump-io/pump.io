@@ -26,7 +26,7 @@ var methodContext = function(methods) {
                 return obj;
             }
         };
-    
+
     for (i in methods) {
         m = methods[i];
         if ("aeiouAEIOU".indexOf(m.charAt(0)) !== -1) {

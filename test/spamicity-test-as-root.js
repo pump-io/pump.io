@@ -121,8 +121,8 @@ suite.addBatch({
         },
         "and we start a pump app with the spam server configured": {
             topic: function(spam) {
-                setupAppConfig({port: 80, 
-                                hostname: "social.localhost", 
+                setupAppConfig({port: 80,
+                                hostname: "social.localhost",
                                 driver: tc.driver,
                                 spamhost: "http://activityspam.localhost",
                                 spamclientid: "AAAAAAAAA",
@@ -212,8 +212,8 @@ suite.addBatch({
         },
         "and we start a pump app with no spam server configured": {
             topic: function(spam) {
-                setupAppConfig({port: 80, 
-                                hostname: "photo.localhost", 
+                setupAppConfig({port: 80,
+                                hostname: "photo.localhost",
                                 driver: tc.driver,
                                 params: tc.params},
                                this.callback);

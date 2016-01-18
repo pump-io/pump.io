@@ -63,7 +63,7 @@ mb["When we require the requesttoken module"]
       assert.isString(created.verifier);
       assert.isString(created.created);
       assert.isString(created.updated);
-};
+  };
 
 suite.addBatch(mb);
 

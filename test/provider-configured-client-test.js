@@ -73,10 +73,10 @@ vows.describe("provider module interface").addBatch({
             },
             "and we create a new Provider with predefined keys": {
                 topic: function(Provider) {
-		    var clients = [{
-			client_id: "AAAAAAAAAA",
-			client_secret: "BBBBBBBBBB"
-		    }];
+                    var clients = [{
+                        client_id: "AAAAAAAAAA",
+                        client_secret: "BBBBBBBBBB"
+                    }];
                     return new Provider(null, clients);
                 },
                 "it exists": function(provider) {
@@ -99,18 +99,19 @@ vows.describe("provider module interface").addBatch({
                 },
                 "and we use applicationByConsumerKey() on a valid key": {
                     topic: function(provider) {
-			var callback = this.callback;
-			Step(
-			    function() {
-				Client.create({title: "Test App", description: "App for testing"}, this);
-			    },
-			    function(err, client) {
-				if (err) throw err;
-				provider.applicationByConsumerKey(client.consumer_key, this);
-			    },
-			    callback
-			);
-		    },
+                        var callback = this.callback;
+
+                        Step(
+                            function() {
+                                Client.create({title: "Test App", description: "App for testing"}, this);
+                            },
+                            function(err, client) {
+                                if (err) throw err;
+                                provider.applicationByConsumerKey(client.consumer_key, this);
+                            },
+                            callback
+                        );
+                    },
                     "it works": function(err, client) {
                         assert.ifError(err);
                         assert.isObject(client);
@@ -123,9 +124,10 @@ vows.describe("provider module interface").addBatch({
                 },
                 "and we use applicationByConsumerKey() on a configured key": {
                     topic: function(provider) {
-			var callback = this.callback;
-			provider.applicationByConsumerKey("AAAAAAAAAA", callback);
-		    },
+                        var callback = this.callback;
+
+                        provider.applicationByConsumerKey("AAAAAAAAAA", callback);
+                    },
                     "it works": function(err, client) {
                         assert.ifError(err);
                         assert.isObject(client);
@@ -136,7 +138,7 @@ vows.describe("provider module interface").addBatch({
                         assert.isString(client.secret);
                     }
                 }
-	    }
+            }
         }
     }
 })["export"](module);
