@@ -63,6 +63,7 @@
         <p><b><%- config.site %></b> brought to you by <% if (config.ownerURL) { %><a href="<%- config.ownerURL %>"><% } %><%- config.owner %><% if (config.ownerURL) { %></a><% } %>.</p>
         <% } %>
         <p><a href="http://pump.io/">pump.io</a> available under the Apache License 2.0.</p>
+        <p><a href="/javascript/about.html" data-jslicense="1">JavaScript license information</a></p>
       </footer>
 
     </div> <!-- .container -->
@@ -133,6 +134,7 @@
     <% }); %>
 
     <script>
+      /* @license magnet:?xt=urn:btih:8e4f440f4c65981c5bf93c76d35135ba5064d8b7&dn=apache-2.0.txt Apache-2.0 */
       if (!Pump) {
           Pump = {};
       }
@@ -167,6 +169,7 @@
       Pump.principalUser = null;
       <% } %>
 
+      /* @license-end */
     </script>
   </body>
 
