@@ -12,7 +12,7 @@
         "simplesmtp": "0.3.x",
         "rimraf": "2.4.x"
     },
-    "dependencies": { "connect": "profOnno/connect#v1.9.3",
+    "dependencies": { "connect": "1.x.x",
                       "connect-auth": "0.6.x",
                       "express": "2.5.x",
                       "utml": "0.2.x",
