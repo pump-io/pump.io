@@ -37,6 +37,18 @@ var assert = require("assert"),
 var DANGEROUS = "This is a <script>alert('Boo!')</script> dangerous string.";
 var HARMLESS = "This is a harmless string.";
 
+var browserClose = function(br) {
+    Step(
+        function() {
+            br.on("closed", this);
+            br.window.close();
+        },
+        function() {
+            // browser is closed
+        }
+    );
+};
+
 var deepProperty = function(object, property) {
     var i = property.indexOf(".");
     if (!object) {
@@ -179,6 +191,42 @@ suite.addBatch({
             "it works": function(err, cred) {
                 assert.ifError(err);
                 assert.isObject(cred);
+            },
+            "and we post content": {
+                topic: function(cred) {
+                    var url = "http://localhost:4815/api/user/mickey/feed",
+                        act = {
+                            verb: "post",
+                            content: "Hello World",
+                            object: {
+                                objectType: "note",
+                                content: "Hello, World"
+                            }
+                        };
+                    httputil.postJSON(url, cred, act, this.callback);
+                },
+                "it works": function(err, result, response) {
+                    assert.ifError(err);
+                },
+                "and we visit it with a browser": {
+                    topic: function() {
+                        var browser = new Browser({silent: true});
+                        cb = this.callback;
+
+                        // triggers defang function in 'public/layout.utml'
+                        // name: displayName
+                        // value: Major activities by mickey
+                        browser.visit("http://localhost:4815/mickey", function() {
+                            cb(!browser.success, browser);
+                        });
+                    },
+                    teardown: function(br) {
+                        browserClose(br);
+                    },
+                    "it works": function(err, br) {
+                        br.assert.success();
+                    }
+                }
             },
             "and we post an activity with good content":
             goodActivity({verb: "post",
