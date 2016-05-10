@@ -43,8 +43,8 @@ suite.addBatch({
                 var cb = this.callback,
                     browser = new Browser();
 
-                browser.visit("http://localhost:4815/", function() {
-                    cb(!browser.success, browser);
+                browser.visit("http://localhost:4815/", function(err) {
+                    cb(err, browser);
                 });
             },
             teardown: function(br) {
