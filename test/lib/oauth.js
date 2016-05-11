@@ -137,7 +137,7 @@ var browserClose = function(br) {
 };
 
 var authorize = function(cl, rt, user, hostname, port, cb) {
-    // waitDuration is needed cause zombie sometimes need more time (it sometimes is a zombie).
+    // waitDuration is needed cause Zombie sometimes needs more time (it sometimes is a zombie).
     var browser = new Browser({waitDuration:"30s"}),
         url;
 
@@ -397,8 +397,7 @@ var setupAppConfig = function(config, callback) {
 
     var dummy = {
         close: function() {
-            child.kill("SIGKILL"); // SIGKILL really needed??
-            child.disconnect();
+            child.kill();
         },
         killCred: function(webfinger, callback) {
             var timeout = setTimeout(function() {
