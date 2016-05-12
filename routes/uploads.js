@@ -17,7 +17,7 @@
 // limitations under the License.
 
 var connect = require("connect"),
-    send = connect.middleware.static.send,
+    send = require("send"),
     cutils = connect.utils,
     fs = require("fs"),
     path = require("path"),
@@ -91,7 +91,7 @@ var uploadedFile = function(req, res, next) {
             if (profile &&
                 obj.author &&
                 profile.id == obj.author.id) {
-                send(req, res, next, {path: slug, root: req.app.config.uploaddir});
+                send(req, req.app.config.uploaddir + '/' +  slug).pipe(res);
                 return;
             }
             Activity.postOf(obj, this);
