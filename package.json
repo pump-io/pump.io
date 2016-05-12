@@ -1,66 +1,76 @@
 {
-    "name": "pump.io",
-    "preferGlobal": "true",
-    "homepage": "http://pump.io/",
-    "version": "0.3.0",
-    "author": "Evan Prodromou <evan@e14n.com>",
-    "devDependencies": {
-        "vows": "0.8.x",
-        "node-mocks-http": "1.5.x",
-        "zombie": "2.x.x",
-        "xml2js": "0.4.x",
-        "simplesmtp": "0.3.x",
-        "rimraf": "2.4.x"
-    },
-    "dependencies": { "connect": "1.x.x",
-                      "connect-auth": "0.6.x",
-                      "express": "2.5.x",
-                      "utml": "0.2.x",
-                      "underscore": "1.8.x",
-                      "underscore-contrib": "0.3.x",
-                      "node-uuid": "1.4.x",
-                      "bcrypt": "0.8.x",
-                      "dateformat": "1.x",
-                      "express-session": "1.x.x",
-                      "databank": "0.19.x",
-                      "connect-databank": "^1.0.3",
-                      "step": "0.0.x",
-                      "oauth-evanp": "~0.9.10-evanp.2",
-                      "optimist": "0.6.x",
-                      "validator": "4.4.x",
-                      "sanitize-html": "1.11.x",
-                      "webfinger": "~0.4.2",
-                      "showdown": "1.3.x",
-                      "jankyqueue": "0.1.x",
-                      "schlock": "~0.2.1",
-                      "bunyan": "1.5.x",
-                      "emailjs": "1.0.x",
-                      "mkdirp": "0.5.x",
-                      "sockjs": "0.3.x",
-                      "dialback-client": "0.2.x",
-                      "gm": "1.21.x",
-                      "crypto-cacerts": "0.1.x"
-		    },
-    "bin": {
-        "pump": "./bin/pump",
-        "pump-authorize": "./bin/pump-authorize",
-        "pump-follow": "./bin/pump-follow",
-        "pump-post-note": "./bin/pump-post-note",
-        "pump-register-app": "./bin/pump-register-app",
-        "pump-register-user": "./bin/pump-register-user",
-        "pump-stop-following": "./bin/pump-stop-following"
-    },
-    "scripts": {
-        "test": "vows -v test/*-test.js",
-        "start": "./bin/pump"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/e14n/pump.io.git"
-    },
-    "keywords": ["activitystreams", "socialnetwork", "social", "pump", "streams", "api", "app", "server"],
-    "license": "Apache-2.0",
-    "engine": {
-        "node": ">=0.8"
-    }
+  "name": "pump.io",
+  "preferGlobal": "true",
+  "homepage": "http://pump.io/",
+  "version": "0.3.0",
+  "author": "Evan Prodromou <evan@e14n.com>",
+  "devDependencies": {
+    "vows": "0.8.x",
+    "node-mocks-http": "1.5.x",
+    "zombie": "2.x.x",
+    "xml2js": "0.4.x",
+    "simplesmtp": "0.3.x",
+    "rimraf": "2.4.x"
+  },
+  "dependencies": {
+    "bcrypt": "0.8.x",
+    "bunyan": "1.5.x",
+    "connect": "1.x.x",
+    "connect-auth": "0.6.x",
+    "connect-databank": "^1.0.3",
+    "crypto-cacerts": "0.1.x",
+    "databank": "0.19.x",
+    "dateformat": "1.x",
+    "dialback-client": "0.2.x",
+    "emailjs": "1.0.x",
+    "express": "2.5.x",
+    "express-session": "1.x.x",
+    "gm": "1.21.x",
+    "jankyqueue": "0.1.x",
+    "mkdirp": "0.5.x",
+    "node-uuid": "1.4.x",
+    "oauth-evanp": "~0.9.10-evanp.2",
+    "optimist": "0.6.x",
+    "sanitize-html": "1.11.x",
+    "schlock": "~0.2.1",
+    "showdown": "1.3.x",
+    "sockjs": "0.3.x",
+    "step": "0.0.x",
+    "underscore": "1.8.x",
+    "underscore-contrib": "0.3.x",
+    "utml": "0.2.x",
+    "validator": "4.4.x",
+    "webfinger": "~0.4.2"
+  },
+  "bin": {
+    "pump": "./bin/pump",
+    "pump-authorize": "./bin/pump-authorize",
+    "pump-follow": "./bin/pump-follow",
+    "pump-post-note": "./bin/pump-post-note",
+    "pump-register-app": "./bin/pump-register-app",
+    "pump-register-user": "./bin/pump-register-user",
+    "pump-stop-following": "./bin/pump-stop-following"
+  },
+  "scripts": {
+    "test": "vows -v test/*-test.js",
+    "start": "./bin/pump"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/e14n/pump.io.git"
+  },
+  "keywords": [
+    "activitystreams",
+    "socialnetwork",
+    "social",
+    "pump",
+    "streams",
+    "api",
+    "app",
+    "server"
+  ],
+  "license": "Apache-2.0",
+  "engine": {
+    "node": ">=0.8"
+  }
 }
