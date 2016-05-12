@@ -17,7 +17,7 @@
 // limitations under the License.
 
 var connect = require("connect"),
-    send = connect.middleware.static.send,
+    send = require("send"),
     cutils = connect.utils,
     fs = require("fs"),
     path = require("path"),
@@ -42,7 +42,7 @@ var sharedFile = function(fname) {
     var root = path.join(__dirname, "..", "node_modules");
 
     return function(req, res, next) {
-        send(req, res, next, {path: fname, root: root});
+        send(req, root + '/' + fname).pipe(res);
     };
 };
 
