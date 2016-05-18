@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "bcrypt": "0.8.x",
-    "bunyan": "1.5.x",
+    "bunyan": "^1.8.1",
     "connect": "2.x.x",
     "connect-auth": "0.6.x",
     "connect-databank": "^1.0.3",
