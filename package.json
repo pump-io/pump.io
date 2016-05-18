@@ -25,7 +25,7 @@
     "emailjs": "1.0.x",
     "express": "2.5.x",
     "express-session": "1.x.x",
-    "gm": "1.21.x",
+    "gm": "^1.22.0",
     "jankyqueue": "0.1.x",
     "mkdirp": "0.5.x",
     "node-uuid": "1.4.x",
