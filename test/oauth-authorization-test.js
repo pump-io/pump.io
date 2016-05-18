@@ -39,16 +39,8 @@ var assert = require("assert"),
 var ignore = function(err) {};
 
 var browserClose = function(br) {
-    Step(
-        function() {
-            br.on("closed", this);
-            br.window.close();
-        },
-        function(br) {
-            // browser is closed;
-        }
-    );
-
+        br.on("closed", this);
+        br.window.close();
 };
 
 var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
