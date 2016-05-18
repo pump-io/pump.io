@@ -290,16 +290,9 @@ suite.addBatch({
                             cb = this.callback,
                             url = doc.object.likes.url;
 
-                        Step(
-                            function() {
-                                setTimeout(this, 100);
-                            },
-                            function() {
-                                httputil.getJSON(url, cred, function(err, likes, response) {
-                                    cb(err, likes);
-                                });
-                            }
-                        );
+                            httputil.getJSON(url, cred, function(err, likes, response) {
+                                cb(err, likes);
+                            });
                     },
                     "it works": function(err, likes) {
                         assert.ifError(err);
