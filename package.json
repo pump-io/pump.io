@@ -23,7 +23,7 @@
     "dateformat": "1.x",
     "dialback-client": "0.2.x",
     "emailjs": "1.0.x",
-    "express": "2.5.x",
+    "express": "^3.21.2",
     "express-session": "1.x.x",
     "gm": "^1.22.0",
     "jankyqueue": "0.1.x",
