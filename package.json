@@ -26,6 +26,7 @@
     "express": "2.5.x",
     "express-session": "1.x.x",
     "gm": "^1.22.0",
+    "jade": "^1.11.0",
     "jankyqueue": "0.1.x",
     "mkdirp": "0.5.x",
     "node-uuid": "1.4.x",
@@ -40,7 +41,6 @@
     "step": "0.0.x",
     "underscore": "1.8.x",
     "underscore-contrib": "0.3.x",
-    "utml": "0.2.x",
     "validator": "4.4.x",
     "webfinger": "~0.4.2"
   },
