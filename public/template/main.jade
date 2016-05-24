@@ -1,38 +1,25 @@
-<div id="main">
-  <div class="hero-unit">
+div#main
 
-    <div class="row">
+  div.hero-unit
 
-      <div class="span6">
+    div.row
 
-        <h1><%- config.site %></h1>
+      div.span6
 
-        <p>This site runs <a href="http://pump.io/">pump.io</a>, the
-	  high-performance Open Source social engine. It pumps your life
-	  in and out of your friends, family and colleagues.</p>
+        h1= config.site
 
-        <% if (config.disableRegistration) { %>
+        p This site runs <a href="http://pump.io/">pump.io</a>, the high-performance Open Source social engine. It pumps your life in and out of your friends, family and colleagues.
 
-        <p>(No pump.io account yet? <a href="http://pump.io/tryit">Try it</a>!)</p>
+        if config.disableRegistration
 
-        <% } else { %>
+          p (No pump.io account yet? <a href="http://pump.io/tryit">Try it</a>!)
 
-        <p><a class="btn primary large" href="/main/register">Get Started &raquo;</a></p>
+        else
 
-        <% } %>
+          p <a class="btn primary large" href="/main/register">Get Started &raquo;</a>
 
-      </div>
+      div.span4
+        img(src="images/somefriends.jpg", width="340", height="235", class="img-rounded")
 
-      <div class="span4">
-        <img src="images/somefriends.jpg" width="340" height="235" class="img-rounded" />
-      </div>
-
-      <div>
-        <p>Check out the <a href="https://pumpio.readthedocs.org/en/latest/userguide.html"
-        target="_blank">basic user guide</a>.</p>
-      </div>
-
-    </div>
-
-  </div>
-</div>
+      div
+        p Check out the <a href="https://pumpio.readthedocs.org/en/latest/userguide.html" target="_blank">basic user guide</a>.
