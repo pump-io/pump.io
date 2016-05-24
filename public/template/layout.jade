@@ -1,139 +1,127 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta charset="utf-8">
-    <title><%- page.title %> - <%- config.site %></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+doctype html
+html(lang='en')
+  head
+    meta(http-equiv="Content-Type", content="text/html; charset=UTF-8")
+    meta(charset="utf-8")
+    title= page.title + ' - ' + config.site
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
 
-    <% if (config.noCDN) { %>
+    if config.noCDN
 
-    <link href="/stylesheet/bootstrap.min.css" rel="stylesheet">
-    <link href="/stylesheet/bootstrap-responsive.min.css" rel="stylesheet">
-    <link href="/stylesheet/fineuploader.css" rel="stylesheet">
-    <link href="/stylesheet/select2.css" rel="stylesheet">
+      link(href="/stylesheet/bootstrap.min.css", rel="stylesheet")
+      link(href="/stylesheet/bootstrap-responsive.min.css", rel="stylesheet")
+      link(href="/stylesheet/fineuploader.css", rel="stylesheet")
+      link(href="/stylesheet/select2.css", rel="stylesheet")
 
-    <% } else { %>
+    else
 
-    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.min.css" rel="stylesheet">
-    <link href="//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.1.1/fineuploader.css" rel="stylesheet">
-    <link href="//cdnjs.cloudflare.com/ajax/libs/select2/3.4.1/select2.min.css" rel="stylesheet">
+      link(href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.min.css", rel="stylesheet")
+      link(href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.min.css", rel="stylesheet")
+      link(href="//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.1.1/fineuploader.css", rel="stylesheet")
+      link(href="//cdnjs.cloudflare.com/ajax/libs/select2/3.4.1/select2.min.css", rel="stylesheet")
 
-    <% } %>
+    link(href="/stylesheet/bootstrap-wysihtml5.css", rel="stylesheet")
+    link(href="/stylesheet/bootstrap-lightbox.min.css", rel="stylesheet")
 
-    <link href="/stylesheet/bootstrap-wysihtml5.css" rel="stylesheet">
-    <link href="/stylesheet/bootstrap-lightbox.min.css" rel="stylesheet">
+    // Finally, our own override sheet
 
-    <!-- Finally, our own override sheet -->
+    link(href="/stylesheet/pumpio.css", rel="stylesheet")
 
-    <link href="/stylesheet/pumpio.css" rel="stylesheet">
+    <!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 
-    <!--[if lt IE 9]>
-        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
+  body
 
-  <body>
+    div.navbar.navbar-inverse.navbar-fixed-top
+      div.navbar-inner
+          if page.nologin
+            include ./nav-nologin.jade
+          else if principalUser
+            include nav-loggedin.jade
+          else if principal
+            include nav-remote.jade
+          else
+            include nav-anonymous.jade
 
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-          <% if (page.nologin) { %>
-          <%= partial('nav-nologin') %>
-          <% } else if (principalUser) { %>
-          <%= partial('nav-loggedin') %>
-          <% } else if (principal) { %>
-          <%= partial('nav-remote') %>
-          <% } else { %>
-          <%= partial('nav-anonymous') %>
-          <% } %>
-      </div> <!-- /navbar-inner -->
-    </div> <!-- /navbar -->
+    div.container
 
-    <div class="container">
-
-      <div id="content">
+      div#content
+      // TODO
         <%= body %>
-      </div> <!-- content -->
 
-      <hr>
+      hr
 
-      <footer>
-        <% if (config.owner) { %>
-        <p><b><%- config.site %></b> brought to you by <% if (config.ownerURL) { %><a href="<%- config.ownerURL %>"><% } %><%- config.owner %><% if (config.ownerURL) { %></a><% } %>.</p>
-        <% } %>
-        <p><a href="http://pump.io/">pump.io</a> available under the Apache License 2.0.</p>
-        <p><a href="/javascript/about.html" data-jslicense="1">JavaScript license information</a></p>
-      </footer>
+      footer
+        if config.owner
+          p
+            b #{config.site} 
+            | brought to you by 
+            if config.ownerURL
+              a(href="#{config.ownerURL}") #{config.owner}
+            else
+              | #{config.owner}
+        p <a href="http://pump.io/">pump.io</a> available under the Apache License 2.0.
+        p <a href="/javascript/about.html" data-jslicense="1">JavaScript license information</a>
 
-    </div> <!-- .container -->
+    if config.debugClient
+      script(src="/javascript/libs/jquery-1.10.2.js")
+      script(src="/javascript/libs/jquery.easydate-0.2.4.js")
+      script(src="/javascript/libs/json2.js")
+      script(src="/javascript/libs/bootstrap.js")
+      script(src="/shared/underscore.js")
+      script(src="/javascript/libs/backbone.js")
+      script(src="/javascript/libs/oauth.js")
+      script(src="/javascript/libs/sha1.js")
+      script(src="/javascript/libs/spin.js")
+      script(src="/javascript/libs/jquery-spin.js")
+      script(src="/javascript/libs/jquery.fineuploader.js")
+      script(src="/javascript/libs/wysihtml5-0.3.0.js")
+      script(src="/javascript/libs/bootstrap-wysihtml5.js")
+      script(src="/javascript/libs/select2.js")
+      script(src="/javascript/libs/bootstrap-lightbox.js")
+      if config.sockjs
+        script(src="/javascript/libs/sockjs.js")
+    else
+      if config.noCDN
+        script(src="/javascript/libs/jquery-1.10.2.min.js")
+        script(src="/javascript/libs/json2.min.js")
+        script(src="/javascript/libs/bootstrap.min.js")
+        script(src="/shared/underscore-min.js")
+        script(src="/javascript/libs/backbone-min.js")
+        script(src="/javascript/libs/spin.min.js")
+        script(src="/javascript/libs/jquery.fineuploader.min.js")
+        script(src="/javascript/libs/wysihtml5-0.3.0.min.js")
+        script(src="/javascript/libs/select2.min.js")
+        if config.sockjs
+          script(src="/javascript/libs/sockjs.min.js")
+      else
+        script(src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js")
+        script(src="//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2.min.js")
+        script(src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js")
+        script(src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js")
+        script(src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js")
+        script(src="//cdnjs.cloudflare.com/ajax/libs/spin.js/1.2.7/spin.min.js")
+        script(src="//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.1.1/jquery.fineuploader.min.js")
+        script(src="//cdnjs.cloudflare.com/ajax/libs/wysihtml5/0.3.0/wysihtml5.min.js")
+        script(src="//cdnjs.cloudflare.com/ajax/libs/select2/3.4.1/select2.min.js")
+        if config.sockjs
+          script(src="//cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.2/sockjs-min.js")
+      script(src="/javascript/libs/jquery.easydate-0.2.4.min.js")
+      script(src="/javascript/libs/oauth.min.js")
+      script(src="/javascript/libs/sha1.min.js")
+      script(src="/javascript/libs/jquery-spin.js")
+      script(src="/javascript/libs/bootstrap-wysihtml5.js")
+      script(src="/javascript/libs/bootstrap-lightbox.min.js")
+    script(src="/javascript/pump.js")
+    script(src="/javascript/pump/auth.js")
+    script(src="/javascript/pump/model.js")
+    script(src="/javascript/pump/router.js")
+    script(src="/javascript/pump/socket.js")
+    script(src="/javascript/pump/view.js")
 
-    <% if (config.debugClient) { %>
-    <script src="/javascript/libs/jquery-1.10.2.js"></script>
-    <script src="/javascript/libs/jquery.easydate-0.2.4.js"></script>
-    <script src="/javascript/libs/json2.js"></script>
-    <script src="/javascript/libs/bootstrap.js"></script>
-    <script src="/shared/underscore.js"></script>
-    <script src="/javascript/libs/backbone.js"></script>
-    <script src="/javascript/libs/oauth.js"></script>
-    <script src="/javascript/libs/sha1.js"></script>
-    <script src="/javascript/libs/spin.js"></script>
-    <script src="/javascript/libs/jquery-spin.js"></script>
-    <script src="/javascript/libs/jquery.fineuploader.js"></script>
-    <script src="/javascript/libs/wysihtml5-0.3.0.js"></script>
-    <script src="/javascript/libs/bootstrap-wysihtml5.js"></script>
-    <script src="/javascript/libs/select2.js"></script>
-    <script src="/javascript/libs/bootstrap-lightbox.js"></script>
-    <% if (config.sockjs) { %>
-    <script src="/javascript/libs/sockjs.js"></script>
-    <% } %>
-    <% } else { %>
-    <% if (config.noCDN) { %>
-    <script src="/javascript/libs/jquery-1.10.2.min.js"></script>
-    <script src="/javascript/libs/json2.min.js"></script>
-    <script src="/javascript/libs/bootstrap.min.js"></script>
-    <script src="/shared/underscore-min.js"></script>
-    <script src="/javascript/libs/backbone-min.js"></script>
-    <script src="/javascript/libs/spin.min.js"></script>
-    <script src="/javascript/libs/jquery.fineuploader.min.js"></script>
-    <script src="/javascript/libs/wysihtml5-0.3.0.min.js"></script>
-    <script src="/javascript/libs/select2.min.js"></script>
-    <% if (config.sockjs) { %>
-    <script src="/javascript/libs/sockjs.min.js"></script>
-    <% } %>
-    <% } else { %>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/spin.js/1.2.7/spin.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.1.1/jquery.fineuploader.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/wysihtml5/0.3.0/wysihtml5.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.4.1/select2.min.js"></script>
-    <% if (config.sockjs) { %>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.2/sockjs-min.js"></script>
-    <% } %>
-    <% } %>
-    <script src="/javascript/libs/jquery.easydate-0.2.4.min.js"></script>
-    <script src="/javascript/libs/oauth.min.js"></script>
-    <script src="/javascript/libs/sha1.min.js"></script>
-    <script src="/javascript/libs/jquery-spin.js"></script>
-    <script src="/javascript/libs/bootstrap-wysihtml5.js"></script>
-    <script src="/javascript/libs/bootstrap-lightbox.min.js"></script>
-    <% } %>
-    <script src="/javascript/pump.js"></script>
-    <script src="/javascript/pump/auth.js"></script>
-    <script src="/javascript/pump/model.js"></script>
-    <script src="/javascript/pump/router.js"></script>
-    <script src="/javascript/pump/socket.js"></script>
-    <script src="/javascript/pump/view.js"></script>
+    each script in config.scripts
+      script(src="#{script}")
 
-    <% _.each(config.scripts, function(script) { %>
-    <script src="<%= script %>"></script>
-    <% }); %>
-
-    <script>
+    script.
       /* @license magnet:?xt=urn:btih:8e4f440f4c65981c5bf93c76d35135ba5064d8b7&dn=apache-2.0.txt Apache-2.0 */
       if (!Pump) {
           Pump = {};
@@ -142,35 +130,19 @@
           Pump.config = {};
       }
       _.extend(Pump.config, {
-          site: "<%- config.site %>",
-          haveEmail: <%- config.haveEmail || false %>,
-          requireEmail: <%- config.requireEmail || false %>,
-          disableRegistration: <%- config.disableRegistration || false %>,
-          canUpload: <%- config.canUpload || false %>,
-          debugClient: <%- config.debugClient || false %>,
-          sockjs: <%- config.sockjs || false %>
+          site: "#{config.site}",
+          haveEmail: #{config.haveEmail || false},
+          requireEmail: #{config.requireEmail || false},
+          disableRegistration: #{config.disableRegistration || false},
+          canUpload: #{config.canUpload || false},
+          debugClient: #{config.debugClient || false},
+          sockjs: #{config.sockjs || false}
       });
 
-      <% if (data) { %>
-      Pump.initialData = <%= JSON.stringify(defang(data)) %>;
-      <% } else { %>
-      Pump.initialData = null;
-      <% } %>
+      Pump.initialData = #{data ? JSON.stringify(defang(data)) : 'null'};
 
-      <% if (principal) { %>
-      Pump.principal = <%= JSON.stringify(defang(principal)) %>;
-      <% } else { %>
-      Pump.principal = null;
-      <% } %>
+      Pump.principal = #{principal ? JSON.stringify(defang(principal)) : 'null'};
 
-      <% if (principalUser) { %>
-      Pump.principalUser = <%= JSON.stringify(defang(principalUser)) %>;
-      <% } else { %>
-      Pump.principalUser = null;
-      <% } %>
+      Pump.principalUser = #{principalUser ? JSON.stringify(defang(principalUser)) : 'null'};
 
       /* @license-end */
-    </script>
-  </body>
-
-</html>
