@@ -47,7 +47,7 @@ li.media.activity.major(class=headless ? 'headless' : undefined, data-activity-i
       p
         img.img-polaroid.object-image(src=(object.image.pump_io && object.image.pump_io.proxyURL) ? object.image.pump_io.proxyURL : object.image.url)
     
-    .activity-content= object.content
+    .activity-content!= object.content
 
     if principal
       - var obj = object;
