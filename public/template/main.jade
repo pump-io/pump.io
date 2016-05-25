@@ -8,18 +8,25 @@ div#main
 
         h1= config.site
 
-        p This site runs <a href="http://pump.io/">pump.io</a>, the high-performance Open Source social engine. It pumps your life in and out of your friends, family and colleagues.
+        p This site runs #[a(href="http://pump.io/") pump.io], the high-performance Open Source social engine. It pumps your life in and out of your friends, family and colleagues.
 
         if config.disableRegistration
 
-          p (No pump.io account yet? <a href="http://pump.io/tryit">Try it</a>!)
+          p
+            | (No pump.io account yet? 
+            a(href="http://pump.io/tryit") Try it
+            | !)
 
         else
 
-          p <a class="btn primary large" href="/main/register">Get Started &raquo;</a>
+          p
+            a.btn.primary.large(href="/main/register") Get Started &raquo;
 
       div.span4
         img(src="images/somefriends.jpg", width="340", height="235", class="img-rounded")
 
       div
-        p Check out the <a href="https://pumpio.readthedocs.org/en/latest/userguide.html" target="_blank">basic user guide</a>.
+        p
+          | Check out the 
+          a(href="https://pumpio.readthedocs.org/en/latest/userguide.html" target="_blank") basic user guide
+          | .

@@ -2,7 +2,7 @@ each object, index in objects
   if index !== 0
     | , 
   if _.has(object, "url")
-    a(href=object.url)
+    | <a href=#{object.url}>
 
   if principal && principal.id == object.id
     | You

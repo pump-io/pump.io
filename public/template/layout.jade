@@ -57,8 +57,11 @@ html(lang='en')
               a(href="#{config.ownerURL}") #{config.owner}
             else
               | #{config.owner}
-        p <a href="http://pump.io/">pump.io</a> available under the Apache License 2.0.
-        p <a href="/javascript/about.html" data-jslicense="1">JavaScript license information</a>
+        p
+          a(href="http://pump.io/") pump.io
+          | available under the Apache License 2.0.
+        p
+          a(href="/javascript/about.html", data-jslicense="1") JavaScript license information
 
     if config.debugClient
       script(src="/javascript/libs/jquery-1.10.2.js")
