@@ -4,10 +4,12 @@ div.container
 
   div.btn-group
     button.btn.btn-small.primary#post-note-button(type="button", title="Post a note")
-      #[span.hidden-phone Note] #[i.icon-pencil]
+      span.hidden-phone Note 
+      i.icon-pencil
     if config.canUpload
-      buttonbtn.btn-small.primary#post-picture-button(type="button", title="Post a picture")
-        #[span.hidden-phone Picture] #[i.icon-picture]
+      button.btn.btn-small.primary#post-picture-button(type="button", title="Post a picture")
+        span.hidden-phone Picture 
+        i.icon-picture
 
   ul.nav.pull-right
     li.dropdown#fat-menu

@@ -1,6 +1,6 @@
 div.btn-group.dropdown#messages
   button.btn.dropdown-toggle.btn-small.btn-success(disabled=messages.totalItems <= 0, data-toggle="dropdown", href="#")
-    i class="icon-envelope icon-white"></i>
+    i.icon-envelope.icon-white
     if messages.items.length > 0
       span.badge.badge-important= messages.items.length
 
