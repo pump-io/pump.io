@@ -1,5 +1,3 @@
-<ul class="media-list" id="people-stream">
-  <% _.each(people.items, function(person) { %>
-  <%= partial("major-person", {person: person}) %>
-  <% }); %>
-</ul>
+ul.media-list#people-stream
+  each person in people.items
+    include ./major-person.jade

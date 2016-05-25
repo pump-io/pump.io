@@ -1,6 +1,5 @@
-<div class="user-content" id="user-content-following">
-  <h2>Following</h2>
-  <div class="span9">
-    <%= partial("people-stream", {people: following}) %>
-  </div>
-</div>
+.user-content#user-content-following
+  h2 Following
+  .span9
+    - var people = following;
+    include ./people-stream.jade

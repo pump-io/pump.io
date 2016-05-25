@@ -1,29 +1,24 @@
-<li class="media person major" data-person-id="<%- person.id %>">
-  <a class="pull-left" href="<%- person.url %>">
-    <% if (person.image && person.image.url) { %>
-    <img src="<%- (person.image.pump_io && person.image.pump_io.proxyURL) ? person.image.pump_io.proxyURL : person.image.url %>" width="64" height="64" class="img-rounded media-object" />
-    <% } else { %>
-    <img src="/images/default.png" width="64" height="64" class="img-rounded media-object" />
-    <% } %>
-  </a>
-  <div class="media-body">
-    <h4 class="media-heading"><a href="<%- person.url %>"><%- person.displayName %></a>
-      <small>
-        <% if (person.id && person.id.substr(0, 5) == 'acct:') { %>
-        <%- person.id.substr(5) %>
-        <% } else { %>
-        <%- person.preferredUsername %>
-        <% } %>
-      </small>
-    </h4>
-    <div class="pull-right">
-      <%= partial("profile-responses", {person: person}) %>
-    </div>
-    <% if (person.location) { %>
-    <p class="location"><%- person.location.displayName %></p>
-    <% } %>
-    <% if (person.summary) { %>
-    <p class="summary"><%- person.summary %></p>
-    <% } %>
-  </div>
-</li>
+li.media.person.major(data-person-id=person.id)
+  a.pull-left(href=person.url)
+    if person.image && person.image.url
+      img.img-rounded.media-object(src=(person.image.pump_io && person.image.pump_io.proxyURL) ? person.image.pump_io.proxyURL : person.image.url, width="64", height="64")
+    else
+      img.img-rounded.media-object(src="/images/default.png", width="64", height="64")
+
+  .media-body
+    h4.media-heading
+      a(href=person.url)= person.displayName
+      //- TODO does this syntax actually work?
+      small=
+        if person.id && person.id.substr(0, 5) === 'acct:'
+          person.id.substr(5)
+        else
+          person.preferredUsername
+
+    .pull-right
+      include ./profile-responses.jade
+
+    if person.location
+      p.location= person.location.displayName
+    if person.summary
+      p.summary= person.summary
