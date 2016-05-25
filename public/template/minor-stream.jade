@@ -1,5 +1,3 @@
-<ul class="media-list" id="minor-stream">
-  <% _.each(minor.items, function(activity) { %>
-  <%= partial("minor-activity", {activity: activity, headless: headless}) %>
-  <% }); %>
-</ul>
+ul.media-list#minor-stream
+  each activity in minor.items
+    include ./minor-activity.jade

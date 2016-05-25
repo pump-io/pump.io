@@ -1,9 +1,7 @@
-<div class="row activities user-content" id="user-content-activities">
-  <div class="span9">
-    <%= partial("major-stream", {headless: true}) %>
-  </div>
-  <div class="span3" id="sidebar">
-    <h3>Meanwhile...</h3>
-    <%= partial("minor-stream", {headless: true}) %>
-  </div>
-</div>
+.row.activities.user-content#user-content-activities
+  - var headless = true;
+  .span9
+    include ./major-stream.jade
+  .span3#sidebar
+    h3 Meanwhile...
+    include ./minor-stream.jade

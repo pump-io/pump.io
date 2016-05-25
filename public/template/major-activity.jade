@@ -1,62 +1,90 @@
-<% var object = activity.object,
-       author = (activity.verb == "share") ? object.author : activity.actor;
-   if (!headless && !author) return;
-   if (object.deleted) return; %>
-<li class="media activity major<% if (headless) { %> headless<% } %>" data-activity-id="<%- activity.id %>">
-  <% if (!headless) { %>
-  <a class="pull-left" href="<%- author.url %>">
-    <% if (author.image && author.image.url) { %>
-    <img src="<%- (author.image.pump_io && author.image.pump_io.proxyURL) ? author.image.pump_io.proxyURL : author.image.url %>" width="64" height="64" class="img-rounded media-object" />
-    <% } else { %>
-    <img src="/images/default.png" width="64" height="64" class="img-rounded media-object" />
-    <% } %>
-  </a>
-  <% } %>
-  <div class="media-body">
-    <% if (object.displayName) { %>
-    <h4 class="media-heading"><%- object.displayName %></h4>
-    <% } %>
-    <p class="muted">
-      <small>
-        <% if (!headless || (activity.verb == "share" && author)) { %><a href="<%- author.url %>"><%- author.displayName %></a> at <% } %>
-        <a href="<%- object.url || activity.url %>"><abbr title="<%- activity.published %>" class="easydate"><%- activity.published %></abbr></a>
-        <% if (activity.location) { %> in <a href="<%- activity.location.url %>"><%- activity.location.displayName %></a><% } %>
-        <% if (activity.generator && activity.generator.displayName) { %>
-        via
-        <% if (activity.generator.url) { %>
-        <a href="<%- activity.generator.url %>"><%- activity.generator.displayName %></a>
-        <% } else { %>
-        <span><%- activity.generator.displayName %></span>
-        <% } %>
-        <% } %>
-        <% if (activity.to && activity.to.length > 0) { %>
-        To: <%= partial("activity-object-list", {author: author, activity: activity, objects: activity.to}) %>
-        <% } %>
-        <% if (activity.cc && activity.cc.length > 0) { %>
-        CC: <%= partial("activity-object-list", {author: author, activity: activity, objects: activity.cc}) %>
-        <% } %>
-    </small></p>
-    <% if (object.image && object.image.url) { %>
-    <p><img src="<%- (object.image.pump_io && object.image.pump_io.proxyURL) ? object.image.pump_io.proxyURL : object.image.url %>" class="img-polaroid object-image" /></p>
-    <% } %>
-    <div class="activity-content">
-      <%= object.content %>
-    </div>
-    <% if (principal) { %>
-    <%= partial("responses", {obj: object}) %>
-    <% } %>
-    <% if (!object.likes || object.likes.totalItems === 0) { %>
-    <% } else if (object.likes.totalItems === 1) { %>
-    <p class="muted"><small><%= partial("activity-object-collection", {author: author, coll: object.likes}) %> likes this.</small></p>
-    <% } else { %>
-    <p class="muted"><small><%= partial("activity-object-collection", {author: author, coll: object.likes}) %> like this.</small></p>
-    <% } %>
-    <% if (!object.shares || object.shares.totalItems === 0) { %>
-    <% } else if (object.shares.totalItems === 1) { %>
-    <p class="muted"><small><%= partial("activity-object-collection", {author: author, coll: object.shares}) %> shared this.</small></p>
-    <% } else { %>
-    <p class="muted"><small><%= partial("activity-object-collection", {author: author, coll: object.shares}) %> shared this.</small></p>
-    <% } %>
-    <%= partial("replies", {replies: object.replies}) %>
-  </div>
-</li>
+-
+  var object = activity.object,
+      author = (activity.verb == "share") ? object.author : activity.actor;
+  // TODO does this work?
+  if (!headless && !author) return;
+  if (object.deleted) return;
+
+li.media.activity.major(class=headless ? 'headless' : undefined, data-activity-id="#{activity.id}")
+  unless headless
+    a.pull-left(href="#{author.url}")
+      if author.image && author.image.url
+        img.img-rounded.media-object(src=(author.image.pump_io && author.image.pump_io.proxyURL) ? author.image.pump_io.proxyURL : author.image.url, width="64", height="64")
+      else
+        img.img-rounded.media-object(src="/images/default.png", width="64", height="64")
+  .media-body
+    if object.displayName
+      h4.media-heading= object.displayName
+
+    p.muted
+      small
+        if !headless || (activity.verb == "share" && author)
+          a(href="#{author.url}")= author.displayName 
+          | at 
+        a(href=object.url || activity.url)
+          abbr.easydate(title=activity.published)= activity.published
+        if activity.location
+          | in 
+          a(href=activity.location.url)= activity.location.displayName
+        if activity.generator && activity.generator.displayName
+          | via 
+          if activity.generator.url
+            a(href=activity.generator.url)= activity.generator.displayName
+          else
+            span= activity.generator.displayName
+        
+        if activity.to && activity.to.length > 0
+          | To: 
+          - var objects = activity.to;
+          include ./activity-object-list.jade
+        
+        if activity.cc && activity.cc.length > 0
+          | CC: 
+          - var objects = activity.cc;
+          include ./activity-object-list.jade
+
+    if object.image && object.image.url
+      p
+        img.img-polaroid.object-image(src=(object.image.pump_io && object.image.pump_io.proxyURL) ? object.image.pump_io.proxyURL : object.image.url)
+    
+    .activity-content= object.content
+
+    if principal
+      - var obj = object;
+      include ./responses.jade
+
+    //- List out who liked the post
+    if !object.likes || object.likes.totalItems === 0
+      // Object has no likes so we don't show anything
+    else
+      - var coll = object.likes
+      if object.likes.totalItems === 1
+        p.muted
+          small
+            include ./activity-object-collection.jade
+            | likes this.
+      else
+        p.muted
+          small
+            include ./activity-object-collection.jade
+            | like this.
+
+    //- List out who shared the post
+    if !object.shares || object.shares.totalItems === 0
+      // Object has no shares so we don't show anything
+    else
+      - var coll = object.shares
+      if object.shares.totalItems === 1
+        p.muted
+          small
+            include ./activity-object-collection.jade
+            | shared this.
+      else
+        p.muted
+          small
+            include ./activity-object-collection.jade
+            | shared this.
+
+    - var replies = object.replies;
+    include ./replies.jade
+
