@@ -1,8 +1,6 @@
-<div class="user-content row" id="user-content-list">
-  <div class="span2" id="list-menu">
-    <%= partial("list-menu") %>
-  </div>
-  <div class="span10" id="list-content">
-    <%= partial("list-content-list") %>
-  </div>
-</div>
+.user-content.row#user-content-list
+  .span2#list-menu
+    include ./list-menu.jade
+
+  .span10#list-content
+    include ./list-content-list.jade
