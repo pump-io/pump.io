@@ -1,25 +1,17 @@
-<div class="media comment-form">
-  <span class="pull-left">
-    <% if (principal.image && principal.image.url) { %>
-    <img src="<%- principal.image.url %>" width="32" height="32" class="img-rounded" />
-    <% } else { %>
-    <img src="/images/default.png" width="32" height="32" class="img-rounded" />
-    <% } %>
-  </span>
-  <div class="media-body">
-    <form class="post-comment">
-      <fieldset>
-        <div class="control-group">
-          <div class="controls">
-            <textarea class="span5" name="content" rows="6"></textarea>
-          </div>
-        </div>
-        <div class="control-group">
-          <div class="controls">
-            <button type="submit" class="btn btn-primary">Comment</button>
-          </div>
-        </div>
-      </fieldset>
-    </form>
-  </div>
-</div>
+.media.comment-form
+  span.pull-left
+    if principal.image && principal.image.url
+      img.img-rounded(src=principal.image.url, width="32", height="32")
+    else
+      img.img-rounded(src="/images/default.png", width="32", height="32")
+
+  .media-body
+    form.post-comment
+      fieldset
+        .control-group
+          .controls
+            textarea.span5(name="content", rows="6")
+
+        .control-group
+          .controls
+            button.btn.btn-primary(type="submit") Comment
