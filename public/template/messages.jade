@@ -8,7 +8,7 @@ div.btn-group.dropdown#messages
     each activity in messages.items
       if _.isObject(activity)
         li
-          small= activity.content
+          small!= activity.content
 
     if messages.items.length > 0
       li.divider

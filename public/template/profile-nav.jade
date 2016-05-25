@@ -7,8 +7,8 @@ ul.nav.nav-tabs
         span.label= profile.favorites.totalItems
   li
     a(href="/#{profile.preferredUsername}/followers") Followers
-      if profile.followers && _.has(profile.followers, "totalItems"))
-        span.label= {profile.followers.totalItems
+      if profile.followers && _.has(profile.followers, "totalItems")
+        span.label= profile.followers.totalItems
   li
     a(href="/#{profile.preferredUsername}/following") Following
       if profile.following && _.has(profile.following, "totalItems")
