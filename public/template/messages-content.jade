@@ -1,12 +1,10 @@
-<div class="direct">
-  <div class="row">
-    <div class="span9">
-      <h1>Messages</h1>
-      <%= partial("major-stream", {headless: false}) %>
-    </div>
-    <div class="span3" id="sidebar">
-      <h3>Notifications</h3>
-      <%= partial("minor-stream", {headless: false}) %>
-    </div>
-  </div>
-</div>
+.direct
+  .row
+    - var headless = false;
+    .span9
+      h1 Messages
+      include ./major-stream.jade
+
+    .span3#sidebar
+      h3 Notifications
+      include ./minor-stream.jade

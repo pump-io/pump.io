@@ -1,19 +1,16 @@
-<h1>Authorize</h1> 
+h1 Authorize
 
-<p>You are logged in as <strong id="username"><%- principalUser.nickname %></strong>.</p>
+p You are logged in as #[strong#username= principalUser.nickname].
 
-<p>Do you want to authorize <em><%- application.title %></em> to access your account?</p>
+p Do you want to authorize #[em= application.title] to access your account?
 
-<p>Applications with access to your account can:
-  <ul>
-    <li>Post new activities as you</li>
-    <li>Read your social graph (followers, following, list)</li>
-    <li>Change your profile</li>
-  </ul>
-</p>
+p Applications with access to your account can:
+  ul
+    li Post new activities as you
+    li Read your social graph (followers, following, list)
+    li Change your profile
 
-<form id="authorize" method="post"> 
-  <input type="hidden" id="oauth_token" name="oauth_token" value="<%- token %>"/> 
-  <input type="hidden" id="verifier" name="verifier" value="<%- verifier %>"/> 
-  <input type="submit" class="btn btn-primary" id="authorize" value="Authorize"/>
-</form>                
+form#authorize(method="post")
+  input#oauth_token(type="hidden", name="oauth_token", value=token)
+  input#verifier(type="hidden", name="verifier", value=verifier)
+  input.btn.btn-primary#authorize(type="submit" value="Authorize")

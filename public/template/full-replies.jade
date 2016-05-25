@@ -1,5 +1,3 @@
-<div class="replies full-replies">
-   <% _.each(replies.items.reverse(), function(reply) { %>
-   <%= partial("reply", {reply: reply}) %>
-   <% }); %>
-</div>
+.replies.full-replies
+   each reply in replies.items.reverse()
+     include ./reply.jade

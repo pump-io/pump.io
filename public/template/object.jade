@@ -1,48 +1,63 @@
-<div class="object-page">
-  <div class="media">
-    <a class="pull-left" href="<%- object.author.url %>">
-      <% if (object.author && object.author.image && object.author.image.url) { %>
-      <img src="<%- object.author.image.url %>" width="96" height="96" class="img-rounded media-object" />
-      <% } else { %>
-      <img src="/images/default.png" width="96" height="96" class="img-rounded media-object" />
-      <% } %>
-    </a>
-    <div class="media-body">
-      <% if (object.displayName) { %>
-      <h2 class="media-heading"><%- object.displayName %></h2>
-      <% } %>
-      <p class="muted">
-        <small> 
-        <% if (object.author) { %><a href="<%- object.author.url %>"><%- object.author.displayName %></a> at <% } %>
-        <a href="<%- object.url %>"><%- object.published %></a>
-        <% if (object.location) { %> in <a href="<%- object.location.url %>"><%- object.location.displayName %></a><% } %></small>
-      </p>
+.object-page
+  .media
+    a.pull-left(href=object.author.url)
+      if object.author && object.author.image && object.author.image.url
+        img.img-rounded.media-object(src=object.author.image.url, width="96", height="96")
+      else
+        img.img-rounded.media-object(src="/images/default.png", width="96", height="96")
 
-      <% if (object.image && object.image.url) { %>
-      <p><img src="<%- object.image.url %>" class="img-polaroid" /></p>
-      <% } %>
+    .media-body
+      if object.displayName
+        h2.media-heading= object.displayName
 
-      <div class="object-content">
-        <%= object.content %>
-      </div>
+      p.muted
+        small 
+          if object.author
+            a(href=object.author.url= object.author.displayName
+            | at 
+          a(href=object.url)= object.published
+          if object.location
+            | in 
+            a(href=object.location.url)= object.location.displayName
 
-      <% if (principal) { %>
-      <%= partial("responses") %>
-      <% } %>
+      if object.image && object.image.url
+        p
+          img.img-polaroid(src=object.image.url)
 
-      <% if (!object.likes || object.likes.totalItems === 0) { %>
-      <% } else if (object.likes.totalItems === 1) { %>
-      <p class="muted"><small><%= partial("activity-object-collection", {author: object.author, coll: object.likes}) %> likes this.</small></p>
-      <% } else { %>
-      <p class="muted"><small><%= partial("activity-object-collection", {author: object.author, coll: object.likes}) %> like this.</small></p>
-      <% } %>
-      <% if (!object.shares || object.shares.totalItems === 0) { %>
-      <% } else if (object.shares.totalItems === 1) { %>
-      <p class="muted"><small><%= partial("activity-object-collection", {author: object.author, coll: object.shares}) %> shared this.</small></p>
-      <% } else { %>
-      <p class="muted"><small><%= partial("activity-object-collection", {author: object.author, coll: object.shares}) %> shared this.</small></p>
-      <% } %>
-      <%= partial("replies", {replies: object.replies}) %>
-    </div>
-  </div>
-</div>
+      .object-content= object.content
+
+      if principal
+        include ./responses.jade
+
+      - var author = object.author;
+      - var coll = object.likes;
+      if !object.likes || object.likes.totalItems === 0
+        // No likes, so we don't show anything
+      else if object.likes.totalItems === 1
+        p.muted
+          small
+            include .activity-object-collection.jade
+            | likes this.
+      else
+        p.muted
+          small
+            include ./activity-object-collection.jade
+            | like this.
+
+      - var author = object.author;
+      - var coll = object.shares;
+      if !object.shares || object.shares.totalItems === 0
+        // No shares, so we don't show anything
+      else if object.shares.totalItems === 1
+        p.muted
+          small
+            include ./activity-object-collection.jade
+            | shared this.
+      else
+        p.muted
+          small
+            include ./activity-object-collection.jade
+            | shared this.
+
+      - var replies = object.replies;
+      include ./replies.jade

@@ -1,8 +1,7 @@
-<div id="fullImageLightbox" class="lightbox hide fade" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="lightbox-content">
-    <img src="<%- (object.fullImage.pump_io && object.fullImage.pump_io.proxyURL) ? object.fullImage.pump_io.proxyURL : object.fullImage.url %>" class="img-polaroid" />
-    <% if (object.content) { %>
-    <div class="lightbox-caption"><p><%- object.content %></p></div>
-    <% } %>
-  </div>
-</div>
+
+.lightbox.hide.fade#fullImageLightbox(tabindex="-1", role="dialog", aria-hidden="true")
+  .lightbox-content
+    img.img-polaroid(src=(object.fullImage.pump_io && object.fullImage.pump_io.proxyURL) ? object.fullImage.pump_io.proxyURL : object.fullImage.url)
+    if object.content
+      .lightbox-caption
+      p= object.content

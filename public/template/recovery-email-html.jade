@@ -1,7 +1,8 @@
-<h1>Someone has requested a new password for <%- principalUser.nickname %> on <%- config.site %>.</h1>
+h1 Someone has requested a new password for #{principalUser.nickname} on #{config.site}.
 
-<p>To complete the password recovery, click on the following URL.</p>
+p To complete the password recovery, click on the following URL.
 
-<blockquote><a href="<%- recoveryURL %>"><%- recoveryURL %></a></blockquote>
+blockquote
+  a(href=recoveryURL)= recoveryURL
 
-<p>If you think you received this email in error, you can safely ignore it.</p>
+p If you think you received this email in error, you can safely ignore it.
