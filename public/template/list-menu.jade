@@ -1,10 +1,8 @@
-<ul class="nav nav-tabs nav-stacked" id="list-menu-inner" profile-id="<%- profile.id %>">
-  <% _.each(lists.items, function(list) { %>
-  <%= partial("list-menu-item", {listItem: list}) %>
-  <% }); %>
-  <% if (principal && principal.id == profile.id) { %>
-  <li class="add-a-list">
-    <a href="#" class="new-list">New list...</a>
-  </li>
-  <% } %>
-</ul>
+ul.nav.nav-tabs.nav-stacked#list-menu-inner(profile-id=profile.id)
+  each list in lists.items
+    - var listItem = list;
+    include ./list-menu-item.jade
+
+  if principal && principal.id == profile.id
+    li.add-a-list
+      a.new-list(href="#) New list...
