@@ -1,19 +1,9 @@
-<div class="btn-group" id="notifications">
-  <button class="btn dropdown-toggle btn-small btn-success
-                 <% if (notifications.totalItems <= 0) { %>
-                 disabled
-                 <% } %>"
-                 data-toggle="dropdown" href="#">
-    <i class="icon-exclamation-sign icon-white"></i>
-    <% if (notifications.items.length > 0) { %>
-    <span class="badge badge-important"><%- notifications.items.length %></span>
-    <% } %>
-  </button>
-  <ul class="dropdown-menu">
-    <% _.each(notifications.items, function(activity) { %>
-    <li>
-      <small><%= activity.content %></small>
-    </li>
-    <% }); %>
-  </ul>
-</div>
+div.btn-group#notifications
+  button.btn.dropdown-toggle.btn-small.btn-success(disabled=notifications.totalItems <= 0, data-toggle="dropdown", href="#")
+    i.icon-exclamation-sign.icon-white
+    if notifications.items.length > 0
+      span.badge.badge-important= notifications.items.length
+  ul.dropdown-menu
+    each activity in notifications.items
+      li
+        small= activity.content
