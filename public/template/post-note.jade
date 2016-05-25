@@ -1,22 +1,17 @@
-<div id="modal-note" class="modal pump-modal hide fade" tabindex="-1" role="dialog" aria-labelledby="post-label" aria-hidden="true">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 id="post-label">Post a note</h3>
-  </div>
-  <div class="modal-body">
-    <form id="post-note" class="form-horizontal">
-      <fieldset>
-        <textarea id="note-content" class="span5" name="note" rows="6"></textarea>
-        <div>
-          <%= partial("recipient-selector", {name: "to", id: "note-to", label: "To"}) %>
-        </div>
-        <div>
-          <%= partial("recipient-selector", {name: "cc", id: "note-cc", label: "CC"}) %>
-        </div>
-      </fieldset>
-    </form>
-  </div>
-  <div class="modal-footer">
-    <button type="submit" class="btn btn-primary" id="send-note">Send</button>
-  </div>
-</div>
+include ./recipient-selector.jade
+
+.modal.pump-modal.hide.fade#modal-note(tabindex="-1", role="dialog", aria-labelledby="post-label", aria-hidden="true")
+  .modal-header
+    button.close(type="button", data-dismiss="modal", aria-hidden="true") &times;
+    h3#post-label Post a note
+
+  .modal-body
+    form.form-horizontal#post-note
+      fieldset
+        textarea.span5#note-content(name="note" rows="6")
+        div
+          +recipient-selector({name: "to", id: "note-to", label: "To"})
+        div
+          +recipient-selector({name: "cc", id: "note-cc", label: "CC"})
+  .modal-footer
+    button.btn.btn-primary#send-note(type="submit") Send
