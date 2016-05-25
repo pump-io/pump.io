@@ -1,4 +1,3 @@
-<div id="user-content-favorites">
-  <%= partial("object-stream", {objects: favorites}) %>
-</div>
-
+#user-content-favorites
+  - var objects = favorites;
+  include ./object-stream.jade

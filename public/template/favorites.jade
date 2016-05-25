@@ -1,17 +1,12 @@
-<div class="user user-favorites">
-  <div class="row">
-    <div class="span12">
-      <%= partial("profile-block") %>
-    </div>
-  </div>
-  <div class="row">
-    <div class="span12">
-      <%= partial("profile-nav") %>
-    </div>
-  </div>
-  <div class="row">
-    <div class="span12" id="user-content">
-      <%= partial("user-content-favorites") %>
-    </div>
-  </div>
-</div>
+.user.user-favorites
+  .row
+    .span12
+      include ./profile-block
+
+  .row
+    .span12
+      include ./profile-nav.jade
+
+  .row
+    .span12#user-content
+      include ./user-content-favorites.jade
