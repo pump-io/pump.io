@@ -1,38 +1,29 @@
-<div class="span12" id="settings">
+.span12#settings
 
-  <form id="settings">
+  form#settings
 
-    <fieldset>
+    fieldset
 
-      <legend>About you</legend>
+      legend About you
 
-      <label for="realname">Real name</label>
-      <input class="span6" id="realname" name="realname" size="30" type="text" value="<%- (profile.displayName || "") %>" />
-      <span class="help-block">The name you want us to show</span>
+      label(for="realname") Real name
+      input.span6#realname(name="realname", size="30", type="text", value=profile.displayName || "")
+      span.help-block The name you want us to show
 
-      <label for="location">Hometown</label>
-      <input class="span6" id="location" name="location" size="30" type="text" value="<%- ((profile.location) ? (profile.location.displayName || "") : "") %>" />
-      <span class="help-block">Where you usually are</span>
+      label(for="location") Hometown
+      input.span6#location(name="location", size="30", type="text", value=profile.location ? (profile.location.displayName || "") : "")
+      span.help-block Where you usually are
 
-      <label for="bio">Bio</label>
-      <textarea class="span6" id="bio" name="bio" rows="5"><%- (profile.summary || "") %></textarea>
-      <span class="help-block">All about you.</span>
+      label(for="bio") Bio
+      textarea.span6#bio(name="bio", rows="5")= profile.summary || ""
+      span.help-block All about you.
 
-      <label>Avatar</label>
-      <% if (principal.image && principal.image.url) { %>
-      <img src="<%- principal.image.url %>" width="96" height="96" class="img-rounded" />
-      <% } %>
+      label Avatar
+      if principal.image && principal.image.url
+        img.img-rounded(src=principal.image.url, width="96", height="96")
 
-      <div id="avatar-fineupload"></div>
+      #avatar-fineupload
 
-    </fieldset>
-
-    <fieldset>
-      <div class="actions">
-	<input type="submit" class="btn btn-primary" value="Save">
-      </div>
-    </fieldset>  
-
-  </form>
-
-</div>
+    fieldset
+      .actions
+	input.btn.btn-primary(type="submit", value="Save")
