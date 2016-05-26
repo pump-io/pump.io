@@ -1,8 +1,8 @@
-div.container
+.container
 
   a.brand(href="/")= config.site
 
-  div.btn-group
+  .btn-group
     button.btn.btn-small.primary#post-note-button(type="button", title="Post a note")
       span.hidden-phone Note 
       i.icon-pencil
@@ -42,6 +42,6 @@ div.container
         li
           a#logout(tabindex="-1", href="#") Log out
 
-  div.pull-right
+  .pull-right
     include ./messages.jade
     include ./notifications.jade

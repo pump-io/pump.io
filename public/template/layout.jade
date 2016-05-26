@@ -31,8 +31,8 @@ html(lang='en')
 
   body
 
-    div.navbar.navbar-inverse.navbar-fixed-top
-      div.navbar-inner
+    .navbar.navbar-inverse.navbar-fixed-top
+      .navbar-inner
           if page.nologin
             include ./nav-nologin.jade
           else if principalUser
@@ -42,9 +42,9 @@ html(lang='en')
           else
             include nav-anonymous.jade
 
-    div.container
+    .container
 
-      div#content!= body
+      #content!= body
 
       hr
 
