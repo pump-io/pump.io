@@ -2,6 +2,5 @@ ul.media-list#object-stream
   each object in objects.items
       - var obj = object;
       include ./major-object.jade
-      //- TODO
       if err
         // Error showing object #{obj.id}: #{err.message}
