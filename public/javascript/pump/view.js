@@ -189,10 +189,11 @@
                     if (_.has(Pump.templates, name)) {
                         cb(null, Pump.templates[name]);
                     } else {
-                        $.get("/template/"+name+".utml", function(data) {
+                        $.get("/template/"+name+".jade.js", function(data) {
                             var f;
                             try {
-                                f = _.template(data);
+                                eval(data);
+                                f = template;
                                 f.templateName = name;
                                 Pump.templates[name] = f;
                             } catch (err) {
@@ -213,7 +214,8 @@
                         if (res.readyState === 4 &&
                             ((res.status >= 200 && res.status < 300) || res.status === 304)) {
                             data = res.responseText;
-                            f = _.template(data);
+                            eval(data);
+                            f = template;
                             f.templateName = name;
                             Pump.templates[name] = f;
                         }
