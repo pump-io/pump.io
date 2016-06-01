@@ -55,7 +55,8 @@
   },
   "scripts": {
     "test": "vows -v test/*-test.js",
-    "start": "./bin/pump"
+    "start": "./bin/pump",
+    "prepublish": "jade --client --extension jade.js --no-debug public/template"
   },
   "repository": {
     "type": "git",

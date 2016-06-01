@@ -14,6 +14,14 @@ Some quick documentation for hackery of pump.io.
 * Use [databank](https://github.com/evanp/databank). Don't write to some storage engine's API.
 * Use [vows](http://vowsjs.org/).
 
+## TEMPLATES
+
+* Templates are written in [Jade](http://jade-lang.com)
+* Templates are precompiled to JS for client-side rendering. You need to recompile with `npm run-script prepublish` every time you change templates.
+* 2-character indent, spaces only.
+* Use `.classname` instead of `div.classname` - ditto for `div#id` and `#id`
+* Use `#[]` interpolation
+
 ## LOGGING
 
 * Use [bunyan](https://github.com/trentm/node-bunyan) for logging.
