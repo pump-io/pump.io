@@ -192,6 +192,7 @@
                         $.get("/template/"+name+".jade.js", function(data) {
                             var f;
                             try {
+                                /* jslint evil: true */
                                 eval(data);
                                 f = template;
                                 f.templateName = name;
@@ -214,6 +215,7 @@
                         if (res.readyState === 4 &&
                             ((res.status >= 200 && res.status < 300) || res.status === 304)) {
                             data = res.responseText;
+                            /* jslint evil: true */
                             eval(data);
                             f = template;
                             f.templateName = name;
