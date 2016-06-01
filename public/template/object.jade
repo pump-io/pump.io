@@ -13,7 +13,7 @@
       p.muted
         small 
           if object.author
-            a(href=object.author.url= object.author.displayName
+            a(href=object.author.url)= object.author.displayName
             | at 
           a(href=object.url)= object.published
           if object.location
@@ -36,7 +36,7 @@
       else if object.likes.totalItems === 1
         p.muted
           small
-            include .activity-object-collection.jade
+            include ./activity-object-collection.jade
             | likes this.
       else
         p.muted

@@ -8,12 +8,11 @@ li.media.person.major(data-person-id=person.id)
   .media-body
     h4.media-heading
       a(href=person.url)= person.displayName
-      //- TODO does this syntax actually work?
-      small=
+      small
         if person.id && person.id.substr(0, 5) === 'acct:'
-          person.id.substr(5)
+          = person.id.substr(5)
         else
-          person.preferredUsername
+          = person.preferredUsername
 
     .pull-right
       include ./profile-responses.jade
