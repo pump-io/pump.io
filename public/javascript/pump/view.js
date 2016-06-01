@@ -276,36 +276,6 @@
             main.principalUser = (Pump.principalUser) ? Pump.principalUser.toJSON() : null;
             main.principal = (Pump.principal) ? Pump.principal.toJSON() : null;
 
-            main.partial = function(name, locals) {
-                var template, scoped, html;
-                if (locals) {
-                    scoped = _.clone(locals);
-                    _.extend(scoped, main);
-                } else {
-                    scoped = main;
-                }
-                if (!_.has(partials, name)) {
-                    Pump.debug("Didn't preload template " + name + " for " + view.templateName + " so fetching sync");
-                    // XXX: Put partials in the parts array of the
-                    // view to avoid this shameful sync call
-                    partials[name] = getTemplateSync(name);
-                }
-                template = partials[name];
-                if (!template) {
-                    throw new Error("No template for " + name);
-                }
-                try {
-                    html = template(scoped);
-                    return html;
-                } catch (e) {
-                    if (e instanceof Pump.TemplateError) {
-                        throw e;
-                    } else {
-                        throw new Pump.TemplateError(template, scoped, e);
-                    }
-                }
-            };
-
             // XXX: set main.page.title
 
             // If there are sub-parts, we do them in parallel then
