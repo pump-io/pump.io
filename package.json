@@ -32,7 +32,6 @@
     "oauth-evanp": "~0.9.10-evanp.2",
     "optimist": "0.6.x",
     "rimraf": "^2.5.2",
-    "sanitize-html": "1.11.x",
     "schlock": "~0.2.1",
     "send": "^0.13.2",
     "showdown": "^1.4.1",
@@ -42,7 +41,8 @@
     "underscore-contrib": "0.3.x",
     "utml": "0.2.x",
     "validator": "4.4.x",
-    "webfinger": "~0.4.2"
+    "webfinger": "~0.4.2",
+    "xss-filters": "^1.2.6"
   },
   "bin": {
     "pump": "./bin/pump",
