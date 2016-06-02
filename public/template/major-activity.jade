@@ -19,14 +19,14 @@ unless object.deleted
           small
             if !headless || (activity.verb == "share" && author)
               a(href="#{author.url}")= author.displayName 
-              | at 
+              |  at 
             a(href=object.url || activity.url)
               abbr.easydate(title=activity.published)= activity.published
             if activity.location
-              | in 
+              |  in 
               a(href=activity.location.url)= activity.location.displayName
             if activity.generator && activity.generator.displayName
-              | via 
+              |  via 
               if activity.generator.url
                 a(href=activity.generator.url)= activity.generator.displayName
               else
