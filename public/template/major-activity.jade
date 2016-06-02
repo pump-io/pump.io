@@ -3,7 +3,7 @@
       author = (activity.verb == "share") ? object.author : activity.actor;
 
 unless object.deleted
-  if headless && author
+  unless !headless && !author
     li.media.activity.major(class=headless ? 'headless' : undefined, data-activity-id="#{activity.id}")
       unless headless
         a.pull-left(href="#{author.url}")
