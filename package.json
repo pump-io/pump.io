@@ -6,6 +6,7 @@
   "author": "Evan Prodromou <evan@e14n.com>",
   "devDependencies": {
     "jscs": "^3.0.3",
+    "jshint": "^2.9.2",
     "node-mocks-http": "1.5.x",
     "rimraf": "2.4.x",
     "simplesmtp": "0.3.x",
