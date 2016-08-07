@@ -17,7 +17,7 @@ Some quick documentation for hackery of pump.io.
 ## TEMPLATES
 
 * Templates are written in [Jade](http://jade-lang.com)
-* Templates are precompiled to JS for client-side rendering. You need to recompile with `npm run-script prepublish` every time you change templates.
+* Templates are precompiled to JS for client-side rendering. You need to recompile with `npm run build` every time you change templates.
 * 2-character indent, spaces only.
 * Use `.classname` instead of `div.classname` - ditto for `div#id` and `#id`
 * Use `#[]` interpolation
