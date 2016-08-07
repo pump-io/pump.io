@@ -33,12 +33,12 @@ unless object.deleted
                 span= activity.generator.displayName
 
             if activity.to && activity.to.length > 0
-              | To: 
+              |  To: 
               - var objects = activity.to;
               include ./activity-object-list.jade
 
             if activity.cc && activity.cc.length > 0
-              | CC: 
+              |  CC: 
               - var objects = activity.cc;
               include ./activity-object-list.jade
 
@@ -61,12 +61,12 @@ unless object.deleted
             p.muted
               small
                 include ./activity-object-collection.jade
-                | likes this.
+                |  likes this.
           else
             p.muted
               small
                 include ./activity-object-collection.jade
-                | like this.
+                |  like this.
 
         //- List out who shared the post
         if !object.shares || object.shares.totalItems === 0
@@ -77,12 +77,12 @@ unless object.deleted
             p.muted
               small
                 include ./activity-object-collection.jade
-                | shared this.
+                |  shared this.
           else
             p.muted
               small
                 include ./activity-object-collection.jade
-                | shared this.
+                |  shared this.
 
         - var replies = object.replies;
         include ./replies.jade
