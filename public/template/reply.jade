@@ -6,7 +6,7 @@
       img.img-rounded.media-object(src="/images/default.png", width="32", height="32")
 
 
-  .media-body= reply.content
+  .media-body!= reply.content
     p
       small
         a(href=reply.author.url)= reply.author.displayName
