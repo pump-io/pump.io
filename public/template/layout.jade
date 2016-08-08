@@ -132,19 +132,19 @@ html(lang='en')
           Pump.config = {};
       }
       _.extend(Pump.config, {
-          site: "#{config.site}",
-          haveEmail: #{config.haveEmail || false},
-          requireEmail: #{config.requireEmail || false},
-          disableRegistration: #{config.disableRegistration || false},
-          canUpload: #{config.canUpload || false},
-          debugClient: #{config.debugClient || false},
-          sockjs: #{config.sockjs || false}
+          site: "!{config.site}",
+          haveEmail: !{config.haveEmail || false},
+          requireEmail: !{config.requireEmail || false},
+          disableRegistration: !{config.disableRegistration || false},
+          canUpload: !{config.canUpload || false},
+          debugClient: !{config.debugClient || false},
+          sockjs: !{config.sockjs || false}
       });
 
-      Pump.initialData = #{data ? JSON.stringify(defang(data)) : 'null'};
+      Pump.initialData = !{data ? JSON.stringify(defang(data)) : 'null'};
 
-      Pump.principal = #{principal ? JSON.stringify(defang(principal)) : 'null'};
+      Pump.principal = !{principal ? JSON.stringify(defang(principal)) : 'null'};
 
-      Pump.principalUser = #{principalUser ? JSON.stringify(defang(principalUser)) : 'null'};
+      Pump.principalUser = !{principalUser ? JSON.stringify(defang(principalUser)) : 'null'};
 
       /* @license-end */
