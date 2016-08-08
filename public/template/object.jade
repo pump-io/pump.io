@@ -27,6 +27,7 @@
       .object-content= object.content
 
       if principal
+        - var obj = object
         include ./responses.jade
 
       - var author = object.author;
