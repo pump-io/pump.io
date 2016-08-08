@@ -23,8 +23,7 @@ li.media.object.major(data-object-id=obj.id)
       p
         img.img-polaroid.object-image(src=(obj.image.pump_io && obj.image.pump_io.proxyURL) ? obj.image.pump_io.proxyURL : obj.image.url)
 
-    .object-content
-      = obj.content
+    .object-content!= obj.content
 
     if principal
       include ./responses.jade

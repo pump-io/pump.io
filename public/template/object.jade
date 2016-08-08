@@ -24,7 +24,7 @@
         p
           img.img-polaroid(src=object.image.url)
 
-      .object-content= object.content
+      .object-content!= object.content
 
       if principal
         - var obj = object
