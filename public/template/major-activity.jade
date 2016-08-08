@@ -54,10 +54,10 @@ unless object.deleted
 
         //- List out who liked the post
         if !object.likes || object.likes.totalItems === 0
-          // Object has no likes so we don't show anything
+          //- Object has no likes so we don't show anything
         else
           - var coll = object.likes
-          if object.likes.totalItems === 1
+          if object.likes.totalItems === 1 && object.likes.items[0].url !== principal.url
             p.muted
               small
                 include ./activity-object-collection.jade
@@ -70,7 +70,7 @@ unless object.deleted
 
         //- List out who shared the post
         if !object.shares || object.shares.totalItems === 0
-          // Object has no shares so we don't show anything
+          //- Object has no shares so we don't show anything
         else
           - var coll = object.shares
           if object.shares.totalItems === 1

@@ -10,9 +10,9 @@
     p
       small
         a(href=reply.author.url)= reply.author.displayName
-          |  at 
-          a(href=reply.url)
-            abbr.easydate(title=reply.published)= reply.published
+        |  at 
+        a(href=reply.url)
+          abbr.easydate(title=reply.published)= reply.published
         if reply.location
           |  in 
           a(href=reply.location.url)= reply.location.displayName
@@ -31,14 +31,14 @@
     - var author = reply.author;
     - var coll = reply.likes;
     if !reply.likes || reply.likes.totalItems === 0
-      // No likes, so we don't display anything
-    else if reply.likes.totalItems === 1
+      //- No likes, so we don't display anything
+    else if reply.likes.totalItems === 1 && reply.likes.items[0].url !== principal.url
       p.muted
         small
           include ./activity-object-collection.jade
-          | likes this.
+          |  likes this.
     else
       p.muted
         small
           include ./activity-object-collection.jade
-          | like this.
+          |  like this.
