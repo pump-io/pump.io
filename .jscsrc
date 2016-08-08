@@ -1,6 +1,5 @@
 {
     "preset": "idiomatic",
-    "validateIndentation": 4,
     "disallowTabs": true,
     "requireSpacesInsideParentheses": null,
     "disallowSpacesInsideParentheses": null,

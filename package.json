@@ -5,12 +5,14 @@
   "version": "0.3.0",
   "author": "Evan Prodromou <evan@e14n.com>",
   "devDependencies": {
-    "vows": "0.8.x",
+    "jscs": "^3.0.3",
+    "jshint": "^2.9.2",
     "node-mocks-http": "1.5.x",
-    "zombie": "2.x.x",
-    "xml2js": "0.4.x",
+    "rimraf": "2.4.x",
     "simplesmtp": "0.3.x",
-    "rimraf": "2.4.x"
+    "vows": "0.8.x",
+    "xml2js": "0.4.x",
+    "zombie": "2.x.x"
   },
   "dependencies": {
     "bcrypt": "0.8.x",
@@ -54,10 +56,10 @@
     "pump-stop-following": "./bin/pump-stop-following"
   },
   "scripts": {
-    "test": "vows -v test/*-test.js",
-    "start": "./bin/pump",
     "build": "jade --client --extension jade.js --no-debug public/template",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "test": "jshint --exclude 'public/javascript/libs' bin routes && jscs bin lib public/javascript/pump* routes test && vows -v test/*-test.js",
+    "start": "./bin/pump"
   },
   "repository": {
     "type": "git",

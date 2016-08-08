@@ -213,7 +213,9 @@ var handleRemote = function(req, res, next) {
         parts,
         host;
 
-    if (!validator.isEmail(webfinger)) {
+    try {
+        validator.isEmail(webfinger);
+    } catch (e) {
         next(new HTTPError(e.message, 400));
         return;
     }
