@@ -88,7 +88,99 @@
         },
         templateName: null,
         parts: null,
+        subs: {},
         ready: function() {
+            // setup subViews
+            this.setupSubs();
+        },
+        setupSubs: function() {
+
+            var view = this,
+                data = view.options.data,
+                subs = view.subs;
+
+            if (!subs) {
+                return;
+            }
+
+            _.each(subs, function(def, selector) {
+
+                var $el = view.$(selector),
+                    options,
+                    sub,
+                    id;
+
+                if (def.attr && view[def.attr]) {
+                    view[def.attr].setElement($el);
+                    return;
+                }
+
+                if (def.idAttr && view.model && view.model.items) {
+
+                    if (def.map) {
+                        if (!view[def.map]) {
+                            view[def.map] = {};
+                        }
+                    }
+
+                    $el.each(function(i, el) {
+
+                        var id = $(el).attr(def.idAttr),
+                            options = {el: el};
+
+                        if (!id) {
+                            return;
+                        }
+
+                        options.model = view.model.items.get(id);
+
+                        if (!options.model) {
+                            return;
+                        }
+
+                        if (def.subOptions) {
+                            if (def.subOptions.data) {
+                                options.data = {};
+                                _.each(def.subOptions.data, function(item) {
+                                    if (item == view.modelName) {
+                                        options.data[item] = view.model.items || view.model;
+                                    } else {
+                                        options.data[item] = data[item];
+                                    }
+                                });
+                            }
+                        }
+
+                        sub = new Pump[def.subView](options);
+
+                        if (def.map) {
+                            view[def.map][id] = sub;
+                        }
+                    });
+
+                    return;
+                }
+
+                options = {el: $el};
+
+                if (def.subOptions) {
+                    if (def.subOptions.model) {
+                        options.model = data[def.subOptions.model];
+                    }
+                    if (def.subOptions.data) {
+                        options.data = {};
+                        _.each(def.subOptions.data, function(item) {
+                            options.data[item] = data[item];
+                        });
+                    }
+                }
+
+                sub = new Pump[def.subView](options);
+
+                if (def.attr) {
+                    view[def.attr] = sub;
+                }
+            });
         },
         render: function() {
             var view = this,
@@ -241,6 +333,7 @@
 
             var view = this,
                 id = model.get("id"),
+                subs = view.subs,
                 data = view.options.data,
                 options,
                 aview,
@@ -249,11 +342,22 @@
 
             // Strange!
 
+            if (!subs) {
+                return;
+            }
+
             if (!view.model || !view.model.items) {
                 return;
             }
 
             // Find the first def and selector with a map
+
+            _.each(subs, function(subDef, subSelector) {
+                if (subDef.map) {
+                    def = subDef;
+                    selector = subSelector;
+                }
+            });
 
             if (!def) {
                 return;
@@ -271,6 +375,15 @@
 
             options = {model: model};
 
+            if (def.subOptions) {
+                if (def.subOptions.data) {
+                    options.data = {};
+                    _.each(def.subOptions.data, function(item) {
+                        options.data[item] = data[item];
+                    });
+                }
+            }
+
             // Show the new item
 
             aview = new Pump[def.subView](options);
@@ -287,25 +400,52 @@
 
                 aview.$el.hide();
 
+                view.placeSub(aview, $el);
+
                 aview.$el.fadeIn("slow");
             });
 
             aview.render();
+        },
+        placeSub: function(aview, $el) {
+            var view = this,
+                model = aview.model,
+                idx = view.model.items.indexOf(model);
+
+            if (idx <= 0) {
+                view.$el.prepend(aview.$el);
+            } else if (idx >= $el.length) {
+                view.$el.append(aview.$el);
+            } else {
+                aview.$el.insertBefore($el[idx]);
+            }
         },
         showRemoved: function(model) {
             var view = this,
                 id = model.get("id"),
                 aview,
                 def,
-                selector;
+                selector,
+                subs = view.subs;
 
             // Possible but not likely
+
+            if (!subs) {
+                return;
+            }
 
             if (!view.model || !view.model.items) {
                 return;
             }
 
             // Find the first def and selector with a map
+
+            _.each(subs, function(subDef, subSelector) {
+                if (subDef.map) {
+                    def = subDef;
+                    selector = subSelector;
+                }
+            });
 
             if (!def) {
                 return;
@@ -348,6 +488,22 @@
         templateName: "nav-loggedin",
         parts: ["messages",
                 "notifications"],
+        subs: {
+            "#messages": {
+                attr: "majorStreamView",
+                subView: "MessagesView",
+                subOptions: {
+                    model: "messages"
+                }
+            },
+            "#notifications": {
+                attr: "minorStreamView",
+                subView: "NotificationsView",
+                subOptions: {
+                    model: "notifications"
+                }
+            }
+        },
         events: {
             "click #logout": "logout",
             "click #post-note-button": "postNoteModal",
@@ -527,6 +683,8 @@
         },
         ready: function() {
             var view = this;
+            // setup subViews
+            view.setupSubs();
             // Initialize state of login button
             view.onKey();
         },
@@ -735,6 +893,8 @@
         templateName: "remote",
         ready: function() {
             var view = this;
+            // setup subViews
+            view.setupSubs();
             // Initialize continueTo
             view.addContinueTo();
         },
@@ -756,6 +916,8 @@
         },
         ready: function() {
             var view = this;
+            // setup subViews
+            view.setupSubs();
             // Initialize state of recover button
             view.onKey();
         },
@@ -819,6 +981,8 @@
         templateName: "recover-code",
         ready: function() {
             var view = this;
+            // setup subViews
+            view.setupSubs();
             // Initialize state of recover button
             view.redeemCode();
         },
@@ -942,6 +1106,23 @@
                 }
             }
             return streams;
+        },
+        subs: {
+            "#profile-block": {
+
+                attr: "profileBlock",
+                subView: "ProfileBlock",
+                subOptions: {
+                    model: "profile"
+                }
+            },
+            "#user-content-activities": {
+                attr: "userContent",
+                subView: "ActivitiesUserContent",
+                subOptions: {
+                    data: ["major", "minor", "headless"]
+                }
+            }
         }
     });
 
@@ -956,7 +1137,25 @@
                 "replies",
                 "profile-responses",
                 "activity-object-list",
-                "activity-object-collection"]
+                "activity-object-collection"],
+        subs: {
+            "#major-stream": {
+                attr: "majorStreamView",
+                subView: "MajorStreamView",
+                subOptions: {
+                    model: "major",
+                    data: ["headless"]
+                }
+            },
+            "#minor-stream": {
+                attr: "minorStreamView",
+                subView: "MinorStreamView",
+                subOptions: {
+                    model: "minor",
+                    data: ["headless"]
+                }
+            }
+        }
     });
 
     Pump.MajorStreamView = Pump.TemplateView.extend({
@@ -967,13 +1166,33 @@
                 "reply",
                 "replies",
                 "activity-object-list",
-                "activity-object-collection"]
+                "activity-object-collection"],
+        subs: {
+            ".activity.major": {
+                map: "activities",
+                subView: "MajorActivityView",
+                idAttr: "data-activity-id",
+                subOptions: {
+                    data: ["headless"]
+                }
+            }
+        }
     });
 
     Pump.MinorStreamView = Pump.TemplateView.extend({
         templateName: "minor-stream",
         modelName: "activities",
-        parts: ["minor-activity"]
+        parts: ["minor-activity"],
+        subs: {
+            ".activity.minor": {
+                map: "activities",
+                subView: "MinorActivityView",
+                idAttr: "data-activity-id",
+                subOptions: {
+                    data: ["headless"]
+                }
+            }
+        }
     });
 
     Pump.InboxContent = Pump.ContentView.extend({
@@ -1006,6 +1225,24 @@
                 streams.minor = view.minorStreamView.model;
             }
             return streams;
+        },
+        subs: {
+            "#major-stream": {
+                attr: "majorStreamView",
+                subView: "MajorStreamView",
+                subOptions: {
+                    model: "major",
+                    data: ["headless"]
+                }
+            },
+            "#minor-stream": {
+                attr: "minorStreamView",
+                subView: "MinorStreamView",
+                subOptions: {
+                    model: "minor",
+                    data: ["headless"]
+                }
+            }
         }
     });
 
@@ -1031,6 +1268,24 @@
             var view = this,
                 aview;
             view.minorStreamView.showAdded(act);
+        },
+        subs: {
+            "#major-stream": {
+                attr: "majorStreamView",
+                subView: "MajorStreamView",
+                subOptions: {
+                    model: "major",
+                    data: ["headless"]
+                }
+            },
+            "#minor-stream": {
+                attr: "minorStreamView",
+                subView: "MinorStreamView",
+                subOptions: {
+                    model: "minor",
+                    data: ["headless"]
+                }
+            }
         }
     });
 
@@ -1051,6 +1306,18 @@
             "click .unshare": "unshareObject",
             "click .comment": "openComment",
             "click .object-image": "openImage"
+        },
+        setupSubs: function() {
+            var view = this,
+                model = view.model,
+                $el = view.$(".replies");
+
+            if (view.replyStream) {
+                view.replyStream.setElement($el);
+                return;
+            }
+
+            view.replyStream = new Pump.ReplyStreamView({el: $el, model: model.object.replies});
         },
         maybeShowExtraMenu: function() {
             var view = this,
@@ -1199,6 +1466,13 @@
         templateName: "replies",
         parts: ["reply"],
         modelName: "replies",
+        subs: {
+            ".reply": {
+                map: "activities",
+                subView: "ReplyView",
+                idAttr: "data-activity-id"
+            }
+        },
         events: {
             "click .show-all-replies": "showAllReplies"
         },
@@ -1244,6 +1518,13 @@
         templateName: "full-replies",
         parts: ["reply"],
         modelName: "replies",
+        subs: {
+            ".reply": {
+                map: "activities",
+                subView: "ReplyView",
+                idAttr: "data-activity-id"
+            }
+        },
         placeSub: function(aview, $el) {
             var view = this,
                 model = aview.model,
@@ -1328,6 +1609,18 @@
             "click .share": "shareObject",
             "click .unshare": "unshareObject",
             "click .comment": "openComment"
+        },
+        setupSubs: function() {
+            var view = this,
+                model = view.model,
+                $el = view.$(".replies");
+
+            if (view.replyStream) {
+                view.replyStream.setElement($el);
+                return;
+            }
+
+            view.replyStream = new Pump.ReplyStreamView({el: $el, model: model.replies});
         },
         favoriteObject: function() {
             var view = this,
@@ -1568,7 +1861,24 @@
                 "reply",
                 "profile-responses",
                 "activity-object-list",
-                "activity-object-collection"]
+                "activity-object-collection"],
+        subs: {
+            "#profile-block": {
+                attr: "profileBlock",
+                subView: "ProfileBlock",
+                subOptions: {
+                    model: "profile"
+                }
+            },
+            "#user-content-favorites": {
+                attr: "userContent",
+                subView: "FavoritesUserContent",
+                subOptions: {
+                    model: "favorites",
+                    data: ["profile"]
+                }
+            }
+        }
     });
 
     Pump.FavoritesUserContent = Pump.TemplateView.extend({
@@ -1579,7 +1889,14 @@
                 "responses",
                 "reply",
                 "profile-responses",
-                "activity-object-collection"]
+                "activity-object-collection"],
+        subs: {
+            ".object.major": {
+                map: "favorites",
+                subView: "MajorObjectView",
+                idAttr: "data-object-id"
+            }
+        }
     });
 
     Pump.FollowersContent = Pump.ContentView.extend({
@@ -1590,6 +1907,22 @@
                 "people-stream",
                 "major-person",
                 "profile-responses"],
+        subs: {
+            "#profile-block": {
+                attr: "profileBlock",
+                subView: "ProfileBlock",
+                subOptions: {
+                    model: "profile"
+                }
+            },
+            "#user-content-followers": {
+                attr: "userContent",
+                subView: "FollowersUserContent",
+                subOptions: {
+                    data: ["profile", "followers"]
+                }
+            }
+        },
         getStreams: function() {
             var view = this,
                 streams = {};
@@ -1605,12 +1938,28 @@
         modelName: "followers",
         parts: ["people-stream",
                 "major-person",
-                "profile-responses"]
+                "profile-responses"],
+        subs: {
+            "#people-stream": {
+                attr: "peopleStreamView",
+                subView: "PeopleStreamView",
+                subOptions: {
+                    model: "followers"
+                }
+            }
+        }
     });
 
     Pump.PeopleStreamView = Pump.TemplateView.extend({
         templateName: "people-stream",
-        modelName: "people"
+        modelName: "people",
+        subs: {
+            ".person.major": {
+                map: "people",
+                subView: "MajorPersonView",
+                idAttr: "data-person-id"
+            }
+        }
     });
 
     Pump.FollowingContent = Pump.ContentView.extend({
@@ -1621,6 +1970,22 @@
                 "people-stream",
                 "major-person",
                 "profile-responses"],
+        subs: {
+            "#profile-block": {
+                attr: "profileBlock",
+                subView: "ProfileBlock",
+                subOptions: {
+                    model: "profile"
+                }
+            },
+            "#user-content-following": {
+                attr: "userContent",
+                subView: "FollowingUserContent",
+                subOptions: {
+                    data: ["profile", "following"]
+                }
+            }
+        },
         getStreams: function() {
             var view = this,
                 streams = {};
@@ -1636,7 +2001,16 @@
         modelName: "following",
         parts: ["people-stream",
                 "major-person",
-                "profile-responses"]
+                "profile-responses"],
+        subs: {
+            "#people-stream": {
+                attr: "peopleStreamView",
+                subView: "PeopleStreamView",
+                subOptions: {
+                    model: "following"
+                }
+            }
+        }
     });
 
     Pump.ListsContent = Pump.ContentView.extend({
@@ -1647,14 +2021,40 @@
                 "list-content-lists",
                 "list-menu",
                 "list-menu-item",
-                "profile-responses"]
+                "profile-responses"],
+        subs: {
+            "#profile-block": {
+                attr: "profileBlock",
+                subView: "ProfileBlock",
+                subOptions: {
+                    model: "profile"
+                }
+            },
+            "#user-content-lists": {
+                attr: "userContent",
+                subView: "ListsUserContent",
+                subOptions: {
+                    data: ["profile", "lists"]
+                }
+            }
+        }
     });
 
     Pump.ListsUserContent = Pump.TemplateView.extend({
         templateName: "user-content-lists",
         parts: ["list-menu",
                 "list-menu-item",
-                "list-content-lists"]
+                "list-content-lists"],
+        subs: {
+            "#list-menu-inner": {
+                attr: "listMenu",
+                subView: "ListMenu",
+                subOptions: {
+                    model: "lists",
+                    data: ["profile", "list"]
+                }
+            }
+        }
     });
 
     Pump.ListMenu = Pump.TemplateView.extend({
@@ -1667,6 +2067,13 @@
         },
         newList: function() {
             Pump.showModal(Pump.NewListModal, {data: {user: Pump.principalUser}});
+        },
+        subs: {
+            ".list": {
+                map: "lists",
+                subView: "ListMenuItem",
+                idAttr: "data-list-id"
+            }
         }
     });
 
@@ -1693,6 +2100,22 @@
                 "list-menu",
                 "list-menu-item"
                ],
+        subs: {
+            "#profile-block": {
+                attr: "profileBlock",
+                subView: "ProfileBlock",
+                subOptions: {
+                    model: "profile"
+                }
+            },
+            "#user-content-list": {
+                attr: "userContent",
+                subView: "ListUserContent",
+                subOptions: {
+                    data: ["profile", "lists", "list", "members"]
+                }
+            }
+        },
         getStreams: function() {
             var view = this,
                 streams = {};
@@ -1714,7 +2137,25 @@
                 "major-person",
                 "list-menu-item",
                 "list-menu"
-               ]
+               ],
+        subs: {
+            "#list-menu-inner": {
+                attr: "listMenu",
+                subView: "ListMenu",
+                subOptions: {
+                    model: "lists",
+                    data: ["profile"]
+                }
+            },
+            "#list-content-list": {
+                attr: "listContent",
+                subView: "ListListContent",
+                subOptions: {
+                    model: "list",
+                    data: ["profile", "members", "lists", "list"]
+                }
+            }
+        }
     });
 
     Pump.ListListContent = Pump.TemplateView.extend({
@@ -1722,6 +2163,16 @@
         modelName: "list",
         parts: ["member-stream",
                 "member"],
+        subs: {
+            "#member-stream": {
+                attr: "memberStreamView",
+                subView: "MemberStreamView",
+                subOptions: {
+                    model: "members",
+                    data: ["profile", "lists", "list"]
+                }
+            }
+        },
         events: {
             "click #add-list-member": "addListMember",
             "click #delete-list": "deleteList"
@@ -1767,7 +2218,17 @@
 
     Pump.MemberStreamView = Pump.TemplateView.extend({
         templateName: "member-stream",
-        modelName: "people"
+        modelName: "people",
+        subs: {
+            ".person.major": {
+                map: "people",
+                subView: "MemberView",
+                idAttr: "data-person-id",
+                subOptions: {
+                    data: ["list"]
+                }
+            }
+        }
     });
 
     Pump.MemberView = Pump.TemplateView.extend({
@@ -1824,6 +2285,7 @@
         fileCount: 0,
         ready: function() {
             var view = this;
+            view.setupSubs();
 
             if (view.$("#avatar-fineupload").length > 0) {
                 view.$("#avatar-fineupload").fineUploader({
@@ -1988,6 +2450,18 @@
             "click .share": "shareObject",
             "click .unshare": "unshareObject",
             "click .comment": "openComment"
+        },
+        setupSubs: function() {
+            var view = this,
+                model = view.model,
+                $el = view.$(".replies");
+
+            if (view.replyStream) {
+                view.replyStream.setElement($el);
+                return;
+            }
+
+            view.replyStream = new Pump.ReplyStreamView({el: $el, model: model.replies});
         },
         favoriteObject: function() {
             var view = this,
