@@ -186,40 +186,13 @@
 
             // XXX: set main.page.title
 
-            // If there are sub-parts, we do them in parallel then
-            // do the main one. Note: only one level.
-
-            if (false) {
-                pc = 0;
-                cnt = _.keys(view.parts).length;
-                _.each(view.parts, function(templateName) {
-                    getTemplate(templateName, function(err, template) {
-                        if (err) {
-                            Pump.error(err);
-                        } else {
-                            pc++;
-                            partials[templateName] = template;
-                            if (pc >= cnt) {
-                                getTemplate(view.templateName, function(err, template) {
-                                    if (err) {
-                                        Pump.error(err);
-                                        return;
-                                    }
-                                    runTemplate(template, main, setOutput);
-                                });
-                            }
-                        }
-                    });
-                });
-            } else {
-                getTemplate(view.templateName, function(err, template) {
-                    if (err) {
-                        Pump.error(err);
-                        return;
-                    }
-                    runTemplate(template, main, setOutput);
-                });
-            }
+            getTemplate(view.templateName, function(err, template) {
+                if (err) {
+                    Pump.error(err);
+                    return;
+                }
+                runTemplate(template, main, setOutput);
+            });
             return this;
         },
         stopSpin: function() {
