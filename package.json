@@ -58,7 +58,7 @@
   "scripts": {
     "build": "jade --client --extension jade.js --no-debug public/template",
     "prepublish": "npm run build",
-    "postinstall": "cd dirname $(dirname $(npm run env | grep PATH | cut -d= -f2 | sed 's/:/\n/g' | grep pump.io/node_modules/.bin)) && test $(ls public/template/*.jade.js | wc -l) = $(ls public/template/*.jade | wc -l) || npm run build",
+    "postinstall": "cd $(dirname $(dirname $(npm run env | grep PATH | cut -d= -f2 | sed 's/:/\\n/g' | grep pump.io/node_modules/.bin))) && test $(ls public/template/*.jade.js | wc -l) = $(ls public/template/*.jade | wc -l) || npm run build",
     "test": "jshint --exclude 'public/javascript/libs' bin routes && jscs bin lib public/javascript/pump* routes test && vows -v test/*-test.js",
     "start": "./bin/pump"
   },
