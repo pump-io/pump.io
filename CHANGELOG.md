@@ -17,15 +17,11 @@ pump.io follows [Semantic Versioning][semver].
 * FIXME Changed XSS scrubber
 * [WEB] Add links to the user guide on the homepage and welcome message (#1125)
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 * [WEB] Fix a crash upon access of an activity without any replies (#1135)
-
-### Security
+* [WEB] Disable registration link if registration is disabled (#853)
+* `package.json` now uses a valid SPDX license identifier (#1112)
 
 ## 0.3.0 - 2014-06-21
 
