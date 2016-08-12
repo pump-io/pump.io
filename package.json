@@ -30,6 +30,7 @@
     "gm": "^1.22.0",
     "jade": "^1.11.0",
     "jankyqueue": "0.1.x",
+    "method-override": "^2.3.6",
     "mkdirp": "0.5.x",
     "node-uuid": "1.4.x",
     "oauth-evanp": "~0.9.10-evanp.2",
