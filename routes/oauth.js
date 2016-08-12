@@ -151,8 +151,8 @@ var authorize = function(err, req, res, authenticated, rt, application) {
             if (err) throw err;
             req.principal = user.profile;
             req.principalUser = user;
-            res.local("principal", user.profile);
-            res.local("principalUser", user);
+            res.locals.principal = user.profile;
+            res.locals.principalUser = user;
             authc.setPrincipal(req.session, user.profile, this);
         },
         function(err) {
