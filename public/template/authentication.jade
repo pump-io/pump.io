@@ -1,20 +1,24 @@
-h1 Login
+extends ./layout.jade
 
-if error
-  p.alert.alert-error= error
+block body
 
-form.form-horizontal#oauth-authentication(action="/oauth/authorize", method="post")
-  fieldset
-    input(type="hidden", name="oauth_token", value=token)
-    .control-group
-      label.control-label(for="username") Username
-      .controls
-        input.input-medium#username(type="text", name="username")
-
-    .control-group
-      label.control-label(for="password") Password
-      .controls
-        input.input-medium#password(type="password", name="password")
-
-    .form-actions
-      input.btn.btn-primary#authenticate(type="submit", name="submit", value="Login")
+  h1 Login
+  
+  if error
+    p.alert.alert-error= error
+  
+  form.form-horizontal#oauth-authentication(action="/oauth/authorize", method="post")
+    fieldset
+      input(type="hidden", name="oauth_token", value=token)
+      .control-group
+        label.control-label(for="username") Username
+        .controls
+          input.input-medium#username(type="text", name="username")
+  
+      .control-group
+        label.control-label(for="password") Password
+        .controls
+          input.input-medium#password(type="password", name="password")
+  
+      .form-actions
+        input.btn.btn-primary#authenticate(type="submit", name="submit", value="Login")

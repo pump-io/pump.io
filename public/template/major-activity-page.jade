@@ -1,3 +1,7 @@
-div.span9.major-activity-page
-  - var headless = false;
-  include ./major-activity.jade
+extends ./layout.jade
+
+block body
+
+  div.span9.major-activity-page
+    - var headless = false;
+    include ./major-activity.jade

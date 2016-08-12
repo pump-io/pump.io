@@ -1,12 +1,16 @@
-.user.user-list
-  .row
-    .span12
-      include ./profile-block.jade
+extends ./layout.jade
 
-  .row
-    span12
-      include ./profile-nav.jade
+block body
 
-  .row
-    .span12#user-content
-      include ./user-content-list.jade
+  .user.user-list
+    .row
+      .span12
+        include ./profile-block.jade
+  
+    .row
+      span12
+        include ./profile-nav.jade
+  
+    .row
+      .span12#user-content
+        include ./user-content-list.jade

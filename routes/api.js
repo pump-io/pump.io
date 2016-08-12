@@ -628,8 +628,7 @@ var createUser = function(req, res, next) {
                     res.render("welcome",
                                {page: {title: "Welcome"},
                                 profile: user.profile,
-                                service: svc,
-                                layout: false},
+                                service: svc},
                                this);
                 },
                 function(err, text) {
@@ -670,15 +669,13 @@ var createUser = function(req, res, next) {
                                {principal: user.profile,
                                 principalUser: user,
                                 confirmation: confirmation,
-                                confirmationURL: confirmationURL,
-                                layout: false},
+                                confirmationURL: confirmationURL},
                                this.parallel());
                     res.render("confirmation-email-text",
                                {principal: user.profile,
                                 principalUser: user,
                                 confirmation: confirmation,
-                                confirmationURL: confirmationURL,
-                                layout: false},
+                                confirmationURL: confirmationURL},
                                this.parallel());
                 },
                 function(err, html, text) {

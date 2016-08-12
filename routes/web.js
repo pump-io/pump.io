@@ -971,15 +971,13 @@ var handleRecover = function(req, res, next) {
                        {principal: user.profile,
                         principalUser: user,
                         recovery: recovery,
-                        recoveryURL: recoveryURL,
-                        layout: false},
+                        recoveryURL: recoveryURL},
                        this.parallel());
             res.render("recovery-email-text",
                        {principal: user.profile,
                         principalUser: user,
                         recovery: recovery,
-                        recoveryURL: recoveryURL,
-                        layout: false},
+                        recoveryURL: recoveryURL},
                        this.parallel());
         },
         function(err, html, text) {
