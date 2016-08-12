@@ -882,8 +882,8 @@ var addMessages = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.local("messages", messages);
-                res.local("notifications", notifications);
+                res.locals.messages = messages;
+                res.locals.notifications = notifications;
                 next();
             }
         }
