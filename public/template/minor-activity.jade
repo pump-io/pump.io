@@ -1,0 +1,10 @@
+li.media.activity.minor(headless=headless, data-activity-id=activity.id)
+  unless headless
+    a.pull-left(href=activity.actor.url)
+      if activity.actor.image && activity.actor.image.url
+        img.img-rounded.media-object(src=(activity.actor.image.pump_io && activity.actor.image.pump_io.proxyURL) ? activity.actor.image.pump_io.proxyURL : activity.actor.image.url, width="32", height="32")
+      else
+        img.img-rounded.media-object(src="/images/default.png", width="32", height="32")
+
+  .media-body.muted
+    small!= activity.content

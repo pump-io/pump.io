@@ -5,12 +5,14 @@
   "version": "0.3.0",
   "author": "Evan Prodromou <evan@e14n.com>",
   "devDependencies": {
-    "vows": "0.8.x",
+    "jscs": "^3.0.3",
+    "jshint": "^2.9.2",
     "node-mocks-http": "1.5.x",
-    "zombie": "2.x.x",
-    "xml2js": "0.4.x",
+    "rimraf": "2.4.x",
     "simplesmtp": "0.3.x",
-    "rimraf": "2.4.x"
+    "vows": "0.8.x",
+    "xml2js": "0.4.x",
+    "zombie": "2.x.x"
   },
   "dependencies": {
     "bcrypt": "0.8.x",
@@ -26,6 +28,7 @@
     "express": "^3.21.2",
     "express-session": "1.x.x",
     "gm": "^1.22.0",
+    "jade": "^1.11.0",
     "jankyqueue": "0.1.x",
     "mkdirp": "0.5.x",
     "node-uuid": "1.4.x",
@@ -40,7 +43,6 @@
     "step": "0.0.x",
     "underscore": "1.8.x",
     "underscore-contrib": "0.3.x",
-    "utml": "0.2.x",
     "validator": "4.4.x",
     "webfinger": "~0.4.2"
   },
@@ -54,7 +56,10 @@
     "pump-stop-following": "./bin/pump-stop-following"
   },
   "scripts": {
-    "test": "vows -v test/*-test.js",
+    "build": "jade --client --extension jade.js --no-debug public/template",
+    "prepublish": "npm run build",
+    "postinstall": "cd $(dirname $(dirname $(echo $PATH | cut -d= -f2 | sed 's/:/\\n/g' | grep pump.io/node_modules/.bin))) && test $(ls public/template/*.jade.js | wc -l) = $(ls public/template/*.jade | wc -l) || npm run build",
+    "test": "jshint --exclude 'public/javascript/libs' bin routes && jscs bin lib public/javascript/pump* routes test && vows -v test/*-test.js",
     "start": "./bin/pump"
   },
   "repository": {

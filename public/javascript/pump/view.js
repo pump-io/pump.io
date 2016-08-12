@@ -189,10 +189,12 @@
                     if (_.has(Pump.templates, name)) {
                         cb(null, Pump.templates[name]);
                     } else {
-                        $.get("/template/"+name+".utml", function(data) {
+                        $.get("/template/"+name+".jade.js", function(data) {
                             var f;
                             try {
-                                f = _.template(data);
+                                /* jslint evil: true */
+                                eval(data);
+                                f = template;
                                 f.templateName = name;
                                 Pump.templates[name] = f;
                             } catch (err) {
@@ -213,7 +215,9 @@
                         if (res.readyState === 4 &&
                             ((res.status >= 200 && res.status < 300) || res.status === 304)) {
                             data = res.responseText;
-                            f = _.template(data);
+                            /* jslint evil: true */
+                            eval(data);
+                            f = template;
                             f.templateName = name;
                             Pump.templates[name] = f;
                         }
@@ -272,72 +276,15 @@
             main.principalUser = (Pump.principalUser) ? Pump.principalUser.toJSON() : null;
             main.principal = (Pump.principal) ? Pump.principal.toJSON() : null;
 
-            main.partial = function(name, locals) {
-                var template, scoped, html;
-                if (locals) {
-                    scoped = _.clone(locals);
-                    _.extend(scoped, main);
-                } else {
-                    scoped = main;
-                }
-                if (!_.has(partials, name)) {
-                    Pump.debug("Didn't preload template " + name + " for " + view.templateName + " so fetching sync");
-                    // XXX: Put partials in the parts array of the
-                    // view to avoid this shameful sync call
-                    partials[name] = getTemplateSync(name);
-                }
-                template = partials[name];
-                if (!template) {
-                    throw new Error("No template for " + name);
-                }
-                try {
-                    html = template(scoped);
-                    return html;
-                } catch (e) {
-                    if (e instanceof Pump.TemplateError) {
-                        throw e;
-                    } else {
-                        throw new Pump.TemplateError(template, scoped, e);
-                    }
-                }
-            };
-
             // XXX: set main.page.title
 
-            // If there are sub-parts, we do them in parallel then
-            // do the main one. Note: only one level.
-
-            if (view.parts) {
-                pc = 0;
-                cnt = _.keys(view.parts).length;
-                _.each(view.parts, function(templateName) {
-                    getTemplate(templateName, function(err, template) {
-                        if (err) {
-                            Pump.error(err);
-                        } else {
-                            pc++;
-                            partials[templateName] = template;
-                            if (pc >= cnt) {
-                                getTemplate(view.templateName, function(err, template) {
-                                    if (err) {
-                                        Pump.error(err);
-                                        return;
-                                    }
-                                    runTemplate(template, main, setOutput);
-                                });
-                            }
-                        }
-                    });
-                });
-            } else {
-                getTemplate(view.templateName, function(err, template) {
-                    if (err) {
-                        Pump.error(err);
-                        return;
-                    }
-                    runTemplate(template, main, setOutput);
-                });
-            }
+            getTemplate(view.templateName, function(err, template) {
+                if (err) {
+                    Pump.error(err);
+                    return;
+                }
+                runTemplate(template, main, setOutput);
+            });
             return this;
         },
         stopSpin: function() {

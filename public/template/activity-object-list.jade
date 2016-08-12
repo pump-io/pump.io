@@ -1,0 +1,20 @@
+each object, index in objects
+  if index !== 0
+    | , 
+  if _.has(object, "url")
+    | <a href=#{object.url}>
+
+  if principal && principal.id == object.id
+    | You
+  else if object.id === "http://activityschema.org/collection/public"
+    | Public
+  else if author && author.followers && object.id == author.followers.url
+    | Followers
+  else if object.displayName
+    | #{object.displayName}
+  else if object.objectType
+    // #{object.id}
+    | a(n) #{object.objectType}
+
+  if _.has(object, "url")
+    | </a>

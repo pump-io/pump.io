@@ -30,7 +30,7 @@ if (!window.Pump) {
 
 (function(_, $, Backbone, Pump) {
 
-    // This is overwritten by inline script in layout.utml
+    // This is overwritten by inline script in layout.jade
 
     Pump.config = {};
 

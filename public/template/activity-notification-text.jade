@@ -1,0 +1,10 @@
+| #{principal.displayName},
+| 
+| You were addressed in an activity.
+| 
+if activity.verb === "post"
+  |     #{activity.object.url}
+else
+  |     #{activity.url}
+| 
+| If you think you received this email in error, you can safely ignore it.

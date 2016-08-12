@@ -91,7 +91,7 @@ var uploadedFile = function(req, res, next) {
             if (profile &&
                 obj.author &&
                 profile.id == obj.author.id) {
-                send(req, req.app.config.uploaddir + '/' +  slug).pipe(res);
+                send(req, req.app.config.uploaddir + "/" +  slug).pipe(res);
                 return;
             }
             Activity.postOf(obj, this);
@@ -109,7 +109,7 @@ var uploadedFile = function(req, res, next) {
             } else if (!flag) {
                 next(new HTTPError("Not allowed", 403));
             } else {
-                send(req, res, next, {path: slug, root: req.app.config.uploaddir});
+                send(req, req.app.config.uploaddir + "/" +  slug).pipe(res);
             }
         }
     );

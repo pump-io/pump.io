@@ -1,3 +1,0 @@
-<div id="recover-code" data-code="<%- code %>">
-  <p>One moment, please...</p>
-</div>
