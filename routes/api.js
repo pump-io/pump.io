@@ -1595,7 +1595,7 @@ var streamArgs = function(req, defaultCount, maxCount) {
 };
 
 var whoami = function(req, res, next) {
-    res.redirect("/api/user/"+req.principalUser.nickname+"/profile", 302);
+    res.redirect(302, "/api/user/"+req.principalUser.nickname+"/profile");
 };
 
 var reqProxy = function(req, res, next) {
