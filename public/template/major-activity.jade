@@ -59,12 +59,12 @@ unless object.deleted
           - var coll = object.likes
           p.muted
             small
-              if object.likes.totalItems === 1 && object.likes.items[0].url !== principal.url
-                include ./activity-object-collection.jade
-                |  likes this.
-              else
+              if object.likes.totalItems === 1 && principal && object.likes.items[0].url === principal.url
                 include ./activity-object-collection.jade
                 |  like this.
+              else
+                include ./activity-object-collection.jade
+                |  likes this.
 
         //- List out who shared the post
         if !object.shares || object.shares.totalItems === 0

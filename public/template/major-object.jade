@@ -36,12 +36,12 @@ li.media.object.major(data-object-id=obj.id)
     else
       p.muted
         small
-          if obj.likes.totalItems === 1 && obj.likes.items[0].url !== principal.url
-            include ./activity-object-collection.jade
-            |  likes this.
-          else
+          if obj.likes.totalItems === 1 && principal && obj.likes.items[0].url === principal.url
             include ./activity-object-collection.jade
             |  like this.
+          else
+            include ./activity-object-collection.jade
+            |  likes this.
 
     //- List out who shared the object
     - var author = obj.author;
