@@ -57,14 +57,12 @@ unless object.deleted
           //- Object has no likes so we don't show anything
         else
           - var coll = object.likes
-          if object.likes.totalItems === 1 && object.likes.items[0].url !== principal.url
-            p.muted
-              small
+          p.muted
+            small
+              if object.likes.totalItems === 1 && object.likes.items[0].url !== principal.url
                 include ./activity-object-collection.jade
                 |  likes this.
-          else
-            p.muted
-              small
+              else
                 include ./activity-object-collection.jade
                 |  like this.
 

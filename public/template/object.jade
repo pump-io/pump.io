@@ -34,16 +34,15 @@
       - var coll = object.likes;
       if !object.likes || object.likes.totalItems === 0
         //- No likes, so we don't show anything
-      else if object.likes.totalItems === 1 && object.likes.items[0].url !== principal.url
-        p.muted
-          small
-            include ./activity-object-collection.jade
-            |  likes this.
       else
         p.muted
           small
-            include ./activity-object-collection.jade
-            |  like this.
+            if object.likes.totalItems === 1 && object.likes.items[0].url !== principal.url
+              include ./activity-object-collection.jade
+              |  likes this.
+            else
+              include ./activity-object-collection.jade
+              |  like this.
 
       - var author = object.author;
       - var coll = object.shares;

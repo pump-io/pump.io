@@ -32,13 +32,12 @@
     - var coll = reply.likes;
     if !reply.likes || reply.likes.totalItems === 0
       //- No likes, so we don't display anything
-    else if reply.likes.totalItems === 1 && reply.likes.items[0].url !== principal.url
-      p.muted
-        small
-          include ./activity-object-collection.jade
-          |  likes this.
     else
       p.muted
         small
-          include ./activity-object-collection.jade
-          |  like this.
+          if reply.likes.totalItems === 1 && reply.likes.items[0].url !== principal.url
+            include ./activity-object-collection.jade
+            |  likes this.
+          else
+            include ./activity-object-collection.jade
+            |  like this.
