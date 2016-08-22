@@ -33,16 +33,15 @@ li.media.object.major(data-object-id=obj.id)
     - var coll = obj.likes;
     if !obj.likes || obj.likes.totalItems === 0
       //- Object has no likes
-    else if obj.likes.totalItems === 1 && obj.likes.items[0].url !== principal.url
-      p.muted
-        small
-          include ./activity-object-collection.jade
-          |  likes this.
     else
       p.muted
         small
-          include ./activity-object-collection.jade
-          |  like this.
+          if obj.likes.totalItems === 1 && principal && obj.likes.items[0].url === principal.url
+            include ./activity-object-collection.jade
+            |  like this.
+          else
+            include ./activity-object-collection.jade
+            |  likes this.
 
     //- List out who shared the object
     - var author = obj.author;
