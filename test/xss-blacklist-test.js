@@ -62,7 +62,7 @@ vows.describe("XSS blacklist middleware").addBatch({
                 var callback = this.callback;
                 br = new Browser({runScripts: false});
 
-	        br.userAgent = "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko";
+                br.userAgent = "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko";
                 br.visit("http://localhost:4815/", callback);
             },
             "it works": function(err) {
@@ -93,8 +93,10 @@ vows.describe("XSS blacklist middleware").addBatch({
                 var callback = this.callback;
 
                 br.userAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)";
+                // TODO: this shows errors even though it technically succeeds
                 br.visit("http://localhost:4815/");
                 br.wait();
+                // TODO: this is hacky
                 setTimeout(callback, 100);
             },
             "it works": function(err) {
