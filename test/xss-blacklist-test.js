@@ -62,7 +62,8 @@ vows.describe("XSS blacklist middleware").addBatch({
                 var callback = this.callback;
                 br = new Browser({runScripts: false});
 
-                br.visit("http://localhost:4815/", {userAgent: "User-Agent: Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko"}, callback);
+	        br.userAgent = "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko";
+                br.visit("http://localhost:4815/", callback);
             },
             "it works": function(err) {
                 assert.ifError(err);
@@ -90,13 +91,14 @@ vows.describe("XSS blacklist middleware").addBatch({
         "and we visit the home page with an IE10 User-Agent header": {
             topic: function(app) {
                 var callback = this.callback;
-                br = new Browser({runScripts: false});
 
-                br.visit("http://localhost:4815/", {userAgent: "User-Agent: Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)"}, callback);
+                br.userAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)";
+                br.visit("http://localhost:4815/");
+                br.wait();
+                setTimeout(callback, 100);
             },
             "it works": function(err) {
                 assert.ifError(err);
-	        assert.isTrue(true);
             },
             "it has a status code of 400": function() {
                 br.assert.status(400);
