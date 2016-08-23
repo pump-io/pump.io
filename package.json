@@ -44,7 +44,8 @@
     "underscore-contrib": "0.3.x",
     "utml": "0.2.x",
     "validator": "4.4.x",
-    "webfinger": "~0.4.2"
+    "webfinger": "~0.4.2",
+    "zombie": "^3.1.1"
   },
   "bin": {
     "pump": "./bin/pump",
