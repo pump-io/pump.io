@@ -29,6 +29,7 @@
     "express": "2.5.x",
     "express-session": "1.x.x",
     "gm": "^1.22.0",
+    "helmet": "^2.1.2",
     "jankyqueue": "0.1.x",
     "jsdom": "^7.2.2",
     "mkdirp": "0.5.x",
