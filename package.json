@@ -60,7 +60,8 @@
     "pump-stop-following": "./bin/pump-stop-following"
   },
   "scripts": {
-    "test": "jshint --exclude 'public/javascript/libs' bin routes && jscs bin lib public/javascript/pump* routes test && vows -v test/*-test.js",
+    "test": "npm run lint && vows -v test/*-test.js",
+    "lint": "jshint --exclude 'public/javascript/libs' bin routes && jscs bin lib public/javascript/pump* routes test",
     "start": "./bin/pump"
   },
   "repository": {
