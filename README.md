@@ -58,7 +58,7 @@ or clone it via the following command:
 
 You'll need four things to get started:
 
-* node.js 0.8.0 or 0.10.0
+* node.js 0.10 or 0.12
 * npm 1.1.0 or higher
 * A database server (see below)
 * The `graphicsmagick` package with the `gm` command
