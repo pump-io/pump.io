@@ -164,7 +164,7 @@ Here are the main configuration keys.
 * *nologger* If you're debugging or whatever, turn off
   logging. Defaults to false (leave logging on).
 * *logfile* Full path to the logfile. Logs are JSON in
-  [https://github.com/trentm/node-bunyan](bunyan) format.
+  [bunyan](https://github.com/trentm/node-bunyan) format.
 * *serverUser* If you're listening on a port lower than 1024, you need
   to be root. Set this to the name of a user to change to after the
   server is listening. `daemon` or `nobody` are good choices, or you
@@ -241,10 +241,10 @@ you want http://pump.yourdomain.example/ to proxy to the pump.io
 daemon listening on port 8000 on 127.0.0.1, use configuration options
 like this:
 
-   "hostname": "pump.yourdomain.example",
-   "urlPort": 80,
-   "address": "127.0.0.1",
-   "port": 8000
+    "hostname": "pump.yourdomain.example",
+    "urlPort": 80,
+    "address": "127.0.0.1",
+    "port": 8000
 
 ## Running the daemon
 
