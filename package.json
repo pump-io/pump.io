@@ -8,6 +8,7 @@
     "jscs": "^3.0.3",
     "jshint": "^2.9.2",
     "node-mocks-http": "1.5.x",
+    "pug-lint": "^2.3.0",
     "rimraf": "2.4.x",
     "simplesmtp": "0.3.x",
     "vows": "0.8.x",
@@ -64,7 +65,7 @@
     "prepublish": "npm run build",
     "postinstall": "cd $(dirname $(dirname $(echo $PATH | cut -d= -f2 | tr : '\n' | grep pump.io/node_modules/.bin))) && test $(ls public/template/*.jade.js | wc -l) = $(ls public/template/*.jade | wc -l) || npm run build",
     "test": "npm run lint && vows -v test/*-test.js",
-    "lint": "jshint --exclude 'public/javascript/libs' bin routes && jscs bin lib public/javascript/pump* routes test",
+    "lint": "jshint --exclude 'public/javascript/libs' bin routes && jscs bin lib public/javascript/pump* routes test && pug-lint public/template/*.jade",
     "start": "./bin/pump"
   },
   "repository": {
