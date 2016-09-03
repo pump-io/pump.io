@@ -61,7 +61,9 @@
   },
   "scripts": {
     "test": "npm run lint && vows -v test/*-test.js",
-    "lint": "jshint --exclude 'public/javascript/libs' bin routes && jscs bin lib public/javascript/pump* routes test",
+    "lint": "npm run lint:jshint && npm run lint:jscs",
+    "lint:jshint": "jshint --exclude 'public/javascript/libs' bin routes",
+    "lint:jscs": "jscs bin lib public/javascript/pump* routes test",
     "start": "./bin/pump"
   },
   "repository": {
