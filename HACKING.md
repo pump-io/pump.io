@@ -14,6 +14,8 @@ Some quick documentation for hackery of pump.io.
 * Use [databank](https://github.com/evanp/databank). Don't write to some storage engine's API.
 * Use [vows](http://vowsjs.org/).
 
+You can check for (most) style violations with `npm run lint:jscs`, and you can check for JSHint errors with `npm run lint:jshint`.
+
 ## LOGGING
 
 * Use [bunyan](https://github.com/trentm/node-bunyan) for logging.
