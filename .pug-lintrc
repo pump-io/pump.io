@@ -15,5 +15,6 @@
     "validateTemplateString": ["variable", "string"],
     "requireStrictEqualityOperators": true,
     "validateDivTags": true,
-    "requireSpaceAfterCodeOperator": true
+    "requireSpaceAfterCodeOperator": true,
+    "validateIndentation": 2
 }
