@@ -14,5 +14,6 @@
     "validAttributeSeparator": ", ",
     "validateTemplateString": ["variable", "string"],
     "requireStrictEqualityOperators": true,
-    "validateDivTags": true
+    "validateDivTags": true,
+    "requireSpaceAfterCodeOperator": true
 }
