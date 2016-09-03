@@ -2,6 +2,7 @@
   button.btn.dropdown-toggle.btn-small.btn-success(disabled=messages.totalItems <= 0, data-toggle="dropdown", href="#")
     i.icon-envelope.icon-white
     if messages.items.length > 0
+      | &nbsp;
       span.badge.badge-important= messages.items.length
 
   ul.dropdown-menu(role="menu")
