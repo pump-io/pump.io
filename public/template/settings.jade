@@ -15,7 +15,7 @@
       span.help-block Where you usually are
 
       label(for="bio") Bio
-      textarea.span6#bio(name="bio", rows="5")= profile.summary || ""
+      textarea.span6#bio(name="bio", rows="5")!= profile.summary || ""
       span.help-block All about you.
 
       label Avatar
