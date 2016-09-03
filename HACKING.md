@@ -22,6 +22,8 @@ Some quick documentation for hackery of pump.io.
 * Use `.classname` instead of `div.classname` - ditto for `div#id` and `#id`
 * Use `#[]` interpolation
 
+You can check for style violations with `npm run lint:jade`.
+
 ## LOGGING
 
 * Use [bunyan](https://github.com/trentm/node-bunyan) for logging.
