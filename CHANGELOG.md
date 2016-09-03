@@ -2,7 +2,7 @@
 
 pump.io follows [Semantic Versioning][semver].
 
-## 1.0.0 - 2016-08-26 [unreleased]
+## 1.0.0 - 2016-08-26
 
 This release adds many security features. It's recommended that admins upgrade as soon as possible.
 
