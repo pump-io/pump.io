@@ -3,7 +3,7 @@
     p
       a.btn.btn-primary.save-continue-to(href="/main/login") Follow
   else
-    if principal && principal.id != person.id
+    if principal && principal.id !== person.id
       if person.pump_io && person.pump_io.followed
         p
           a.btn.stop-following(href="#") Stop following

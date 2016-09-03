@@ -1,6 +1,6 @@
 -
   var object = activity.object,
-      author = (activity.verb == "share") ? object.author : activity.actor;
+      author = (activity.verb === "share") ? object.author : activity.actor;
 
 unless object.deleted
   unless !headless && !author
@@ -17,7 +17,7 @@ unless object.deleted
 
         p.muted
           small
-            if !headless || (activity.verb == "share" && author)
+            if !headless || (activity.verb === "share" && author)
               a(href="#{author.url}")= author.displayName 
               |  at 
             a(href=object.url || activity.url)

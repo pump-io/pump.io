@@ -12,5 +12,6 @@
     "requireLowerCaseTags": true,
     "validateAttributeQuoteMarks": "\"",
     "validAttributeSeparator": ", ",
-    "validateTemplateString": ["variable", "string"]
+    "validateTemplateString": ["variable", "string"],
+    "requireStrictEqualityOperators": true
 }

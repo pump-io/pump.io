@@ -3,6 +3,6 @@ ul.nav.nav-tabs.nav-stacked#list-menu-inner(profile-id=profile.id)
     - var listItem = list;
     include ./list-menu-item.jade
 
-  if principal && principal.id == profile.id
+  if principal && principal.id === profile.id
     li.add-a-list
       a.new-list(href="#") New list...

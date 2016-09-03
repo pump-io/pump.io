@@ -10,7 +10,7 @@
     include ./profile-responses.jade
   h1.media-header= profile.displayName
     small
-        if profile.id && profile.id.substr(0, 5) == 'acct:'
+        if profile.id && profile.id.substr(0, 5) === 'acct:'
           #{profile.id.substr(5)}
         else
           #{profile.preferredUsername}

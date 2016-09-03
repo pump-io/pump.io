@@ -4,11 +4,11 @@ each object, index in coll.items
   //- TODO this is hacky
   if _.has(object, "url")
     | <a href="#{object.url}">
-  if principal && principal.id == object.id
+  if principal && principal.id === object.id
     | You
-  else if object.id == "http://activityschema.org/collection/public"
+  else if object.id === "http://activityschema.org/collection/public"
     | Public
-  else if author && author.followers && object.id == author.followers.url
+  else if author && author.followers && object.id === author.followers.url
     | Followers
   else if object.displayName
     | #{object.displayName}
