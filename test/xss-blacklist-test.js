@@ -97,7 +97,7 @@ vows.describe("XSS blacklist middleware").addBatch({
                 br.visit("http://localhost:4815/");
                 br.wait();
                 // TODO: this is hacky
-                setTimeout(callback, 100);
+                setTimeout(callback, 3000);
             },
             "it works": function(err) {
                 assert.ifError(err);
