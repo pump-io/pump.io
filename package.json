@@ -18,7 +18,7 @@
     "bcrypt": "0.8.x",
     "bunyan": "^1.8.1",
     "connect": "2.x.x",
-    "connect-auth": "0.6.x",
+    "connect-auth": "github:e14n/connect-auth",
     "connect-databank": "^1.0.3",
     "crypto-cacerts": "0.1.x",
     "databank": "0.19.x",
