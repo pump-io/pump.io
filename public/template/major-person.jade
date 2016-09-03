@@ -7,7 +7,7 @@ li.media.person.major(data-person-id=person.id)
 
   .media-body
     h4.media-heading
-      a(href=person.url)= person.displayName
+      a(href=person.url)!= person.displayName
       small
         if person.id && person.id.substr(0, 5) === 'acct:'
           = person.id.substr(5)
@@ -18,6 +18,6 @@ li.media.person.major(data-person-id=person.id)
       include ./profile-responses.jade
 
     if person.location
-      p.location= person.location.displayName
+      p.location!= person.location.displayName
     if person.summary
-      p.summary= person.summary
+      p.summary!= person.summary
