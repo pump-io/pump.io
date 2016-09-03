@@ -13,5 +13,6 @@
     "validateAttributeQuoteMarks": "\"",
     "validAttributeSeparator": ", ",
     "validateTemplateString": ["variable", "string"],
-    "requireStrictEqualityOperators": true
+    "requireStrictEqualityOperators": true,
+    "validateDivTags": true
 }
