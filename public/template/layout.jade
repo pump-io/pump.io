@@ -1,5 +1,5 @@
 doctype html
-html(lang='en')
+html(lang="en")
   head
     meta(http-equiv="Content-Type", content="text/html; charset=UTF-8")
     meta(charset="utf-8")
@@ -33,14 +33,14 @@ html(lang='en')
 
     .navbar.navbar-inverse.navbar-fixed-top
       .navbar-inner
-          if page.nologin
-            include ./nav-nologin.jade
-          else if principalUser
-            include nav-loggedin.jade
-          else if principal
-            include nav-remote.jade
-          else
-            include nav-anonymous.jade
+        if page.nologin
+          include ./nav-nologin.jade
+        else if principalUser
+          include nav-loggedin.jade
+        else if principal
+          include nav-remote.jade
+        else
+          include nav-anonymous.jade
 
     .container
 

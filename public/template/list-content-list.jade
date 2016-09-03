@@ -10,7 +10,7 @@
         include ./member-stream.jade
 
     .span3
-      if principal && principal.id == profile.id
+      if principal && principal.id === profile.id
         p
           button.btn#add-list-member Add a member
         p

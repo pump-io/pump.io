@@ -678,8 +678,8 @@
         templateName: "login",
         events: {
             "submit #login": "doLogin",
-            "keyup #password": "onKey",
-            "keyup #nickname": "onKey"
+            "input #password": "onKey",
+            "input #nickname": "onKey"
         },
         ready: function() {
             var view = this;

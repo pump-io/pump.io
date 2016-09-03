@@ -8,15 +8,15 @@
   .pull-right
     - var person = profile
     include ./profile-responses.jade
-  h1.media-header= profile.displayName
+  h1.media-header!= profile.displayName
     small
-        if profile.id && profile.id.substr(0, 5) == 'acct:'
-          #{profile.id.substr(5)}
-        else
-          #{profile.preferredUsername}
+      if profile.id && profile.id.substr(0, 5) === 'acct:'
+        = profile.id.substr(5)
+      else
+        = profile.preferredUsername
 
 if profile.location
-  p.location= profile.location.displayName
+  p.location!= profile.location.displayName
 if profile.summary
-  p.summary= profile.summary
+  p.summary!= profile.summary
 // TODO: HOME PAGE HERE

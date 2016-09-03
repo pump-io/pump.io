@@ -14,7 +14,7 @@ include ./recipient-selector.jade
         label(for="description") Description
         textarea.span5#picture-description(name="description", placeholder="Description (optional)", rows="3")
 
-        dif
+        div
           +recipient-selector({name: "to", id: "picture-to", label: "To"})
 
         div
