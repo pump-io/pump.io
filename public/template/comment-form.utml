@@ -16,7 +16,7 @@
         </div>
         <div class="control-group">
           <div class="controls">
-            <button type="submit" class="btn btn-primary">Comment</button>
+            <button type="submit" class="btn btn-primary">Comment</button> <button class="btn btn-default close-btn">Cancel</button>
           </div>
         </div>
       </fieldset>
