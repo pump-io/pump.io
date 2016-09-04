@@ -359,7 +359,8 @@ var dialbackPost = function(endpoint, id, token, ts, requestBody, contentType, c
 
 var proxy = function(options, callback) {
 
-    var server = express.createServer(),
+    var app = express(),
+        server = http.createServer(app),
         front = _.defaults(options.front || {}, {
             hostname: "localhost",
             port: 2342,
@@ -371,7 +372,7 @@ var proxy = function(options, callback) {
             path: ""
         });
 
-    server.all(front.path + "/*", function(req, res, next) {
+    app.all(front.path + "/*", function(req, res, next) {
         var full = req.originalUrl,
             rel = full.substr(front.path.length + 1),
             options = {

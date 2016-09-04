@@ -18,6 +18,7 @@
 
 var fs = require("fs"),
     path = require("path"),
+    http = require("http"),
     assert = require("assert"),
     express = require("express"),
     vows = require("vows"),
@@ -50,24 +51,26 @@ suite.addBatch({
             },
             "and we set up an http server": {
                 topic: function(web) {
-                    var app = express.createServer(),
+                    var app = express(),
+                        appServer = http.createServer(app),
                         callback = this.callback;
 
                     app.get("/foo", function(req, res, next) {
                         res.send("Hello, world.");
                     });
 
-                    app.on("error", function(err) {
-                        callback(err, null);
+                    appServer.on("error", function(err) {
+                        callback(err, null, null);
                     });
 
-                    app.listen(1623, "localhost", function() {
-                        callback(null, app);
+                    appServer.listen(1623, "localhost", function() {
+                        callback(null, app, appServer);
                     });
                 },
-                "it works": function(err, app) {
+                "it works": function(err, app, appServer) {
                     assert.ifError(err);
-                    assert.isObject(app);
+                    assert.isFunction(app);
+                    assert.isObject(appServer);
                 },
                 "teardown": function(app) {
                     if (app && app.close) {
@@ -114,27 +117,27 @@ suite.addBatch({
                 topic: function(web) {
                     var key = path.join(__dirname, "data", "secure.localhost.key"),
                         cert = path.join(__dirname, "data", "secure.localhost.crt"),
-                        app,
+                        app = express(),
+                        appServer = http.createServer(app, {key: fs.readFileSync(key),
+                                                      cert: fs.readFileSync(cert)}),
                         callback = this.callback;
-
-                    app = express.createServer({key: fs.readFileSync(key),
-                                                cert: fs.readFileSync(cert)});
 
                     app.get("/foo", function(req, res, next) {
                         res.send("Hello, world.");
                     });
 
-                    app.on("error", function(err) {
-                        callback(err, null);
+                    appServer.on("error", function(err) {
+                        callback(err, null, null);
                     });
 
-                    app.listen(2315, "secure.localhost", function() {
-                        callback(null, app);
+                    appServer.listen(2315, "secure.localhost", function() {
+                        callback(null, app, appServer);
                     });
                 },
-                "it works": function(err, app) {
+                "it works": function(err, app, appServer) {
                     assert.ifError(err);
-                    assert.isObject(app);
+                    assert.isFunction(app);
+                    assert.isObject(appServer);
                 },
                 "teardown": function(app) {
                     if (app && app.close) {
