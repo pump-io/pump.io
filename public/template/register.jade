@@ -1,0 +1,33 @@
+#registerpage
+  form#registration.form-horizontal(method="post", action="/main/javascript-disabled")
+    legend Register for a new account
+    p.text-error#error
+    .control-group#nickname-group
+      label.control-label(for="nickname") Nickname
+      .controls
+        input#nickname(type="text", name="nickname", size="16", placeholder="Pick a good one; you can't change it later")
+        span.help-inline 1-64 characters, only letters and numbers and . and - and _
+    if config.requireEmail
+      .control-group#nickname-group
+        label.control-label(for="nickname") Email
+        .controls
+          input#email(type="text", name="email", size="16", placeholder="Your email address")
+          span.help-inline For updates and password recovery
+
+    .control-group#password-group
+      label.control-label(for="password") Password
+      .controls
+        input#password(type="password", name="password", size="16", placeholder="And a password")
+        span.help-inline Eight characters, mixed letters and numbers, not stupid
+    .control-group#repeat-group
+      label.control-label(for="repeat") Repeat
+      .controls
+        input#repeat(type="password", name="repeat", size="16", placeholder="Make sure you got it right")
+    .control-group
+      .controls
+        button.btn.btn-primary(type="submit") Register
+
+  p
+    a(href="/main/login") Already have an account?
+  p
+    a(href="/main/remote") Account on another server?

@@ -1,0 +1,29 @@
+.span12#settings
+
+  form#settings
+
+    fieldset
+
+      legend About you
+
+      label(for="realname") Real name
+      input.span6#realname(name="realname", size="30", type="text", value=profile.displayName || "")
+      span.help-block The name you want us to show
+
+      label(for="location") Hometown
+      input.span6#location(name="location", size="30", type="text", value=profile.location ? (profile.location.displayName || "") : "")
+      span.help-block Where you usually are
+
+      label(for="bio") Bio
+      textarea.span6#bio(name="bio", rows="5")!= profile.summary || ""
+      span.help-block All about you.
+
+      label Avatar
+      if principal.image && principal.image.url
+        img.img-rounded(src=principal.image.url, width="96", height="96")
+
+      #avatar-fineupload
+
+    fieldset
+      .actions
+        input.btn.btn-primary(type="submit", value="Save")

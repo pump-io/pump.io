@@ -8,6 +8,7 @@
     "jscs": "^3.0.3",
     "jshint": "^2.9.2",
     "node-mocks-http": "1.5.x",
+    "pug-lint": "^2.3.0",
     "rimraf": "2.4.x",
     "simplesmtp": "0.3.x",
     "vows": "0.8.x",
@@ -30,6 +31,7 @@
     "express-session": "1.x.x",
     "gm": "^1.22.0",
     "helmet": "^2.1.2",
+    "jade": "^1.11.0",
     "jankyqueue": "0.1.x",
     "jsdom": "^7.2.2",
     "mkdirp": "0.5.x",
@@ -46,7 +48,6 @@
     "ua-parser-js": "^0.7.10",
     "underscore": "1.8.x",
     "underscore-contrib": "0.3.x",
-    "utml": "0.2.x",
     "validator": "4.4.x",
     "webfinger": "~0.4.2"
   },
@@ -60,10 +61,14 @@
     "pump-stop-following": "./bin/pump-stop-following"
   },
   "scripts": {
+    "build": "jade --client --extension jade.js --no-debug public/template",
+    "prepublish": "npm run build",
+    "postinstall": "cd $(dirname $(dirname $(echo $PATH | cut -d= -f2 | tr : '\n' | grep pump.io/node_modules/.bin))) && test $(ls public/template/*.jade.js | wc -l) = $(ls public/template/*.jade | wc -l) || npm run build",
     "test": "npm run lint && vows -v test/*-test.js",
-    "lint": "npm run lint:jshint && npm run lint:jscs",
+    "lint": "npm run lint:jshint && npm run lint:jscs && npm run lint:jade",
     "lint:jshint": "jshint --exclude 'public/javascript/libs' bin routes",
     "lint:jscs": "jscs bin lib public/javascript/pump* routes test",
+    "lint:jade": "pug-lint public/template/*.jade",
     "start": "./bin/pump"
   },
   "repository": {

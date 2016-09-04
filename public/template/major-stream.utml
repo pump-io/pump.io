@@ -1,5 +1,0 @@
-<ul class="media-list" id="major-stream">
-  <% _.each(major.items, function(activity) { %>
-  <%= partial("major-activity", {activity: activity, headless: headless}) %>
-  <% }); %>
-</ul>

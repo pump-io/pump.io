@@ -1,0 +1,15 @@
+.modal.pump-modal.hide.fade#modal-list(tabindex="-1", role="dialog", aria-labelledby="post-label", aria-hidden="true")
+  .modal-header
+    button.close(type="button", data-dismiss="modal", aria-hidden="true") &times;
+    h3#post-label New list
+
+  .modal-body
+    form.form-horizontal#new-list
+      fieldset
+        label(for="name") Name
+        input#list-name(type="text", placeholder="Unique name for this list", name="list-name")
+        label(for="description") Description
+        textarea.span5#list-description(name="list-description", rows="6")
+
+  .modal-footer
+    button.btn.btn-primary#save-new-list(type="button") Save

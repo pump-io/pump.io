@@ -1,0 +1,19 @@
+.modal.pump-modal.hide.fade#modal-contact(tabindex="-1", role="dialog", aria-labelledby="post-label" aria-hidden="true")
+  .modal-header
+    button.close(type="button", data-dismiss="modal", aria-hidden="true") &times;
+    h3#post-label Choose contacts
+
+  .modal-body
+    form.form-horizontal#choose-contact
+      ul.thumbnails
+        each person in people.items
+          -
+            var abbrev = (person.id && person.id.substr(0, 5) === 'acct:') ?
+            person.id.substr(5) : person.preferredUsername,
+            imgUrl = (person.image && person.image.url) ? person.image.url : "/images/default.png";
+          li.thumbnail.span1(data-person-id=person.id, data-title=abbrev)
+          img.img-rounded(src=imgUrl, width="64", height="64", alt=abbrev)
+          span= person.displayName
+
+  .modal-footer
+    button.btn.btn-primary#add-contact(type="button") Add

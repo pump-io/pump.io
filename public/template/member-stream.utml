@@ -1,5 +1,0 @@
-<ul class="media-list" id="member-stream">
-  <% _.each(people.items, function(person) { %>
-  <%= partial("member", {person: person}) %>
-  <% }); %>
-</ul>

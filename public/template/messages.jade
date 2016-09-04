@@ -1,0 +1,18 @@
+.btn-group.dropdown#messages
+  button.btn.dropdown-toggle.btn-small.btn-success(disabled=messages.totalItems <= 0, data-toggle="dropdown", href="#")
+    i.icon-envelope.icon-white
+    if messages.items.length > 0
+      | &nbsp;
+      span.badge.badge-important= messages.items.length
+
+  ul.dropdown-menu(role="menu")
+    each activity in messages.items
+      if _.isObject(activity)
+        li
+          small!= activity.content
+
+    if messages.items.length > 0
+      li.divider
+
+    li
+      a(tabindex="-1", href="/main/messages") All messages

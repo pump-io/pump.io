@@ -1,0 +1,16 @@
+.container
+
+  a.btn.btn-navbar(data-toggle="collapse", data-target=".nav-collapse", href="#")
+    span.icon-bar
+    span.icon-bar
+    span.icon-bar
+  
+  a.brand(href="/")= config.site
+  
+  .nav-collapse.collapse
+    ul.nav.pull-right
+      unless config.disableRegistration
+        li
+          a#register(href="/main/register") Register
+      li
+        a#login(href="/main/login") Login

@@ -16,6 +16,16 @@ Some quick documentation for hackery of pump.io.
 
 You can check for (most) style violations with `npm run lint:jscs`, and you can check for JSHint errors with `npm run lint:jshint`.
 
+## TEMPLATES
+
+* Templates are written in [Jade](http://jade-lang.com)
+* Templates are precompiled to JS for client-side rendering. You need to recompile with `npm run build` every time you change templates.
+* 2-character indent, spaces only.
+* Use `.classname` instead of `div.classname` - ditto for `div#id` and `#id`
+* Use `#[]` interpolation
+
+You can check for style violations with `npm run lint:jade`.
+
 ## LOGGING
 
 * Use [bunyan](https://github.com/trentm/node-bunyan) for logging.
