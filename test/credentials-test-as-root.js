@@ -42,7 +42,9 @@ var tinyApp = function(port, hostname, callback) {
     var app = express.createServer();
 
     app.set("port", port);
-    app.use(express.bodyParser());
+    app.use(express.json());
+    app.use(express.urlencoded());
+    app.use(express.multipart());
     app.use(app.router);
 
     app.get("/.well-known/host-meta.json", function(req, res) {
