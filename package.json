@@ -21,6 +21,7 @@
     "connect": "2.x.x",
     "connect-auth": "github:e14n/connect-auth",
     "connect-databank": "^1.0.3",
+    "connect-multiparty": "^2.0.0",
     "crypto-cacerts": "0.1.x",
     "databank": "0.19.x",
     "dateformat": "1.x",
