@@ -26,7 +26,7 @@
     "dateformat": "1.x",
     "dialback-client": "0.2.x",
     "dompurify": "^0.8.3",
-    "emailjs": "1.0.x",
+    "emailjs": "1.0.5",
     "express": "2.5.x",
     "express-session": "1.x.x",
     "gm": "^1.22.0",
