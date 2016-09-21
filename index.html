@@ -307,9 +307,12 @@ an array of objects, each of which has a 'client_id' and 'client_secret' propert
 an optional 'title' and 'description' object. Most people don't need this. Default is an empty list.</li>
 <li>
 <em>sockjs</em> Use <a href="https://github.com/sockjs/sockjs-node">SockJS-node</a> to provide a realtime connection. Defaults to `true`.</li>
+<li>
 <em>cleanupSession</em> Time interval to clean up sessions (in ms). These are staggered a bit if you have more than one child process running, to spread them out a bit. Defaults to 1200000, or 20 minutes.</li>
+<li>
 <em>cleanupNonce</em> Time interval to clean up OAuth nonces (in ms). Staggered.
   Defaults to 1200000, or 20 minutes.</li>
+<li>
 <em>favicon</em> Local filesystem path to the favicon.ico file to use. This will be served as "/favicon.ico"
   by the server. By default, uses public/images/favicon.ico.</li>
 </ul><h3>
