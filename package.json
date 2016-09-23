@@ -74,7 +74,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/e14n/pump.io.git"
+    "url": "git://github.com/pump-io/pump.io.git"
   },
   "keywords": [
     "activitystreams",
