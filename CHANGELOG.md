@@ -2,6 +2,12 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 2.0.0 - Future
+
+### Changed
+
+Templates are now based on Jade instead of utml (#1167)
+
 ## 1.0.0 - 2016-08-26
 
 This release adds many security features. It's recommended that admins upgrade as soon as possible.
