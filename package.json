@@ -62,9 +62,10 @@
     "pump-stop-following": "./bin/pump-stop-following"
   },
   "scripts": {
-    "build": "jade --client --extension jade.js --no-debug public/template",
+    "build": "cd $(dirname $(dirname $(echo $PATH | cut -d= -f2 | tr : '\n' | grep pump.io/node_modules/.bin))) && for i in public/template/*.jade; do test \\( ! -e $i.js \\) -o $i -nt $i.js && jade --client --extension jade.js --no-debug $i; done || true",
+    "fullbuild": "jade --client --extension jade.js --no-debug public/template",
     "prepublish": "npm run build",
-    "postinstall": "cd $(dirname $(dirname $(echo $PATH | cut -d= -f2 | tr : '\n' | grep pump.io/node_modules/.bin))) && test $(ls public/template/*.jade.js | wc -l) = $(ls public/template/*.jade | wc -l) || npm run build",
+    "postinstall": "npm run build",
     "test": "npm run lint && vows -v test/*-test.js",
     "lint": "npm run lint:jshint && npm run lint:jscs && npm run lint:jade",
     "lint:jshint": "jshint --exclude 'public/javascript/libs' bin routes",
