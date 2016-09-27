@@ -89,4 +89,4 @@ TODO
 
  [semver]: http://semver.org/
  [librejs]: https://www.gnu.org/software/librejs/
- [security-headers]: https://github.com/e14n/pump.io/issues/1184#issuecomment-242264403
+ [security-headers]: https://github.com/pump-io/pump.io/issues/1184#issuecomment-242264403
