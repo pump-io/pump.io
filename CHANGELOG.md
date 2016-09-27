@@ -4,9 +4,13 @@ pump.io follows [Semantic Versioning][semver].
 
 ## 2.0.0 - Future
 
+### Added
+
+* Any internal web UI link with a `data-bypass` attribute is now ignored by the routing logic (useful for e.g. custom pages added by the admin)
+
 ### Changed
 
-Templates are now based on Jade instead of utml (#1167)
+* Templates are now based on Jade instead of utml (#1167)
 
 ## 1.0.0 - 2016-08-26
 
