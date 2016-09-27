@@ -3018,7 +3018,7 @@
 
             // For local <a>, use the router
 
-            if (!el.host || el.host == here.host) {
+            if (!el.host || el.host == here.host && el["data-bypass"]) {
                 try {
                     Pump.debug("Navigating to " + el.pathname);
                     Pump.router.navigate(el.pathname, true);
