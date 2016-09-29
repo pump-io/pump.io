@@ -19,6 +19,7 @@
 var fs = require("fs"),
     path = require("path"),
     http = require("http"),
+    https = require("https"),
     assert = require("assert"),
     express = require("express"),
     vows = require("vows"),
@@ -117,8 +118,8 @@ suite.addBatch({
                     var key = path.join(__dirname, "data", "secure.localhost.key"),
                         cert = path.join(__dirname, "data", "secure.localhost.crt"),
                         app = express(),
-                        appServer = http.createServer(app, {key: fs.readFileSync(key),
-                                                      cert: fs.readFileSync(cert)}),
+                        appServer = https.createServer({key: fs.readFileSync(key),
+                                                        cert: fs.readFileSync(cert)}, app),
                         callback = this.callback;
 
                     app.get("/foo", function(req, res, next) {
