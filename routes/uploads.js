@@ -40,9 +40,9 @@ var connect = require("connect"),
 
 var EXPIRES = 365 * 24 * 60 * 60 * 1000;
 
-var addRoutes = function(app) {
+var addRoutes = function(app, session) {
     if (app.session) {
-        app.get("/uploads/*", app.session, everyAuth, uploadedFile);
+        app.get("/uploads/*", session, everyAuth, uploadedFile);
     } else {
         app.get("/uploads/*", everyAuth, uploadedFile);
     }

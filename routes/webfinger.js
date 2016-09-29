@@ -29,7 +29,7 @@ var urlparse = require("url").parse,
 
 // Initialize the app controller
 
-var addRoutes = function(app) {
+var addRoutes = function(app, session) {
     app.get("/.well-known/host-meta", hostMeta);
     app.get("/.well-known/host-meta.json", hostMetaJSON);
     app.get("/api/lrdd", lrddUser, lrdd);
