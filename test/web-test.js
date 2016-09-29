@@ -72,9 +72,9 @@ suite.addBatch({
                     assert.isFunction(app);
                     assert.isObject(appServer);
                 },
-                "teardown": function(app) {
-                    if (app && app.close) {
-                        app.close(function(err) {});
+                "teardown": function(app, appServer) {
+                    if (appServer && appServer.close) {
+                        appServer.close(function(err) {});
                     }
                 },
                 "and we make an http request": {
@@ -138,9 +138,9 @@ suite.addBatch({
                     assert.isFunction(app);
                     assert.isObject(appServer);
                 },
-                "teardown": function(app) {
-                    if (app && app.close) {
-                        app.close(function(err) {});
+                "teardown": function(app, appServer) {
+                    if (app && appServer.close) {
+                        appServer.close(function(err) {});
                     }
                 },
                 "and we make an https request": {
