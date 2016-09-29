@@ -29,7 +29,7 @@
     "dialback-client": "0.2.x",
     "dompurify": "^0.8.3",
     "emailjs": "^1.0.8",
-    "express": "^3.21.2",
+    "express": "^4.14.0",
     "express-session": "1.x.x",
     "gm": "^1.22.0",
     "helmet": "^3.3.0",
