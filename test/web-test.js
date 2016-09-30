@@ -18,6 +18,8 @@
 
 var fs = require("fs"),
     path = require("path"),
+    http = require("http"),
+    https = require("https"),
     assert = require("assert"),
     express = require("express"),
     vows = require("vows"),
@@ -50,39 +52,40 @@ suite.addBatch({
             },
             "and we set up an http server": {
                 topic: function(web) {
-                    var app = express.createServer(),
+                    var app = express(),
+                        appServer = http.createServer(app),
                         callback = this.callback;
 
                     app.get("/foo", function(req, res, next) {
                         res.send("Hello, world.");
                     });
 
-                    app.on("error", function(err) {
-                        callback(err, null);
+                    appServer.on("error", function(err) {
+                        callback(err, null, null);
                     });
 
-                    app.listen(1623, "localhost", function() {
-                        callback(null, app);
+                    appServer.listen(1623, "localhost", function() {
+                        callback(null, app, appServer);
                     });
                 },
-                "it works": function(err, app) {
+                "it works": function(err, app, appServer) {
                     assert.ifError(err);
-                    assert.isObject(app);
+                    assert.isFunction(app);
+                    assert.isObject(appServer);
                 },
-                "teardown": function(app) {
-                    if (app && app.close) {
-                        app.close(function(err) {});
+                "teardown": function(app, appServer) {
+                    if (appServer && appServer.close) {
+                        appServer.close(function(err) {});
                     }
                 },
                 "and we make an http request": {
-                    topic: function(app, web) {
+                    topic: function(app, appServer, web) {
                         var callback = this.callback,
                             options = {
                                 host: "localhost",
                                 port: 1623,
                                 path: "/foo"
                             };
-
                         web.http(options, function(err, res) {
                             if (err) {
                                 callback(err, null);
@@ -114,35 +117,35 @@ suite.addBatch({
                 topic: function(web) {
                     var key = path.join(__dirname, "data", "secure.localhost.key"),
                         cert = path.join(__dirname, "data", "secure.localhost.crt"),
-                        app,
+                        app = express(),
+                        appServer = https.createServer({key: fs.readFileSync(key),
+                                                        cert: fs.readFileSync(cert)}, app),
                         callback = this.callback;
-
-                    app = express.createServer({key: fs.readFileSync(key),
-                                                cert: fs.readFileSync(cert)});
 
                     app.get("/foo", function(req, res, next) {
                         res.send("Hello, world.");
                     });
 
-                    app.on("error", function(err) {
-                        callback(err, null);
+                    appServer.on("error", function(err) {
+                        callback(err, null, null);
                     });
 
-                    app.listen(2315, "secure.localhost", function() {
-                        callback(null, app);
+                    appServer.listen(2315, "secure.localhost", function() {
+                        callback(null, app, appServer);
                     });
                 },
-                "it works": function(err, app) {
+                "it works": function(err, app, appServer) {
                     assert.ifError(err);
-                    assert.isObject(app);
+                    assert.isFunction(app);
+                    assert.isObject(appServer);
                 },
-                "teardown": function(app) {
-                    if (app && app.close) {
-                        app.close(function(err) {});
+                "teardown": function(app, appServer) {
+                    if (app && appServer.close) {
+                        appServer.close(function(err) {});
                     }
                 },
                 "and we make an https request": {
-                    topic: function(app, web) {
+                    topic: function(app, appServer, web) {
                         var callback = this.callback,
                             options = {
                                 host: "secure.localhost",

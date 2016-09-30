@@ -114,12 +114,12 @@ var launchApps = function(config) {
         });
 
     } else {
-        makeApp(config, function(err, app) {
+        makeApp(config, function(err, appServer) {
             if (err) {
                 console.error(err);
                 process.exit(1);
             } else {
-                app.run(function(err) {
+                appServer.run(function(err) {
                     if (err) {
                         console.error(err);
                         process.exit(1);

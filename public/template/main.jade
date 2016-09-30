@@ -1,32 +1,36 @@
-#main
+extends ./layout.jade
 
-  .hero-unit
+block body
 
-    .row
-
-      .span6
-
-        h1= config.site
-
-        p This site runs #[a(href="http://pump.io/") pump.io], the high-performance Open Source social engine. It pumps your life in and out of your friends, family and colleagues.
-
-        if config.disableRegistration
-
+  #main
+  
+    .hero-unit
+  
+      .row
+  
+        .span6
+  
+          h1= config.site
+  
+          p This site runs #[a(href="http://pump.io/") pump.io], the high-performance Open Source social engine. It pumps your life in and out of your friends, family and colleagues.
+  
+          if config.disableRegistration
+  
+            p
+              | (No pump.io account yet? 
+              a(href="http://pump.io/tryit") Try it
+              | !)
+  
+          else
+  
+            p
+              a.btn.primary.large(href="/main/register") Get Started &raquo;
+  
+        .span4
+          img.img-rounded(src="images/somefriends.jpg", width="340", height="235")
+  
+        div
           p
-            | (No pump.io account yet? 
-            a(href="http://pump.io/tryit") Try it
-            | !)
-
-        else
-
-          p
-            a.btn.primary.large(href="/main/register") Get Started &raquo;
-
-      .span4
-        img.img-rounded(src="images/somefriends.jpg", width="340", height="235")
-
-      div
-        p
-          | Check out the 
-          a(href="https://pumpio.readthedocs.org/en/latest/userguide.html" target="_blank") basic user guide
-          | .
+            | Check out the 
+            a(href="https://pumpio.readthedocs.org/en/latest/userguide.html" target="_blank") basic user guide
+            | .

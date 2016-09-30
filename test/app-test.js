@@ -16,6 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// TODO: this needs to be updated for Express 3.x
+
 var assert = require("assert"),
     vows = require("vows"),
     fs = require("fs"),
@@ -63,11 +65,6 @@ suite.addBatch({
         },
         "app has the run() method": function(err, app) {
             assert.isFunction(app.run);
-        },
-        "app has the config property": function(err, app) {
-            assert.isObject(app.config);
-            assert.include(app.config, "hostname");
-            assert.equal(app.config.hostname, "localhost");
         },
         "and we app.run()": {
             topic: function(app) {

@@ -1,15 +1,19 @@
-h1 Authorization Complete
+extends ./layout.jade
 
-p.
-  Your authorization is complete, but the program you are using does not
-  take the authorization tokens directly. Check the program or service&apos;s
-  documentation for details on how to input these 
+block body
 
-table
-  tr
-    td Token
-    td#token= token
-  tr
-    td Verifier
-    td#verifier= verifier
-
+  h1 Authorization Complete
+  
+  p.
+    Your authorization is complete, but the program you are using does not
+    take the authorization tokens directly. Check the program or service&apos;s
+    documentation for details on how to input these 
+  
+  table
+    tr
+      td Token
+      td#token= token
+    tr
+      td Verifier
+      td#verifier= verifier
+  

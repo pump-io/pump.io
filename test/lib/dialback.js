@@ -16,17 +16,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var express = require("express");
+var http = require("http"),
+    express = require("express");
 
 var dialbackApp = function(port, hostname, callback) {
 
-    var app = express.createServer();
+    var app = express(),
+        server = http.createServer(app);
 
-    app.configure(function() {
-        app.set("port", port);
-        app.use(express.bodyParser());
-        app.use(app.router);
-    });
+    app.set("port", port);
+    app.use(express.json());
+    app.use(express.urlencoded());
+    app.use(express.multipart());
+    app.use(app.router);
 
     app.get("/.well-known/host-meta.json", function(req, res) {
         res.json({
@@ -124,11 +126,11 @@ var dialbackApp = function(port, hostname, callback) {
         res.status(200).send("OK");
     });
 
-    app.on("error", function(err) {
+    server.on("error", function(err) {
         callback(err, null);
     });
 
-    app.listen(port, hostname, function() {
+    server.listen(port, hostname, function() {
         callback(null, app);
     });
 };

@@ -1,29 +1,33 @@
-.span12.account
+extends ./layout.jade
 
-  form#account
+block body
 
-    fieldset
-
-      legend Account
-      
-      .clearfix
-        label Username
-        .input
-          span.uneditable-input= principalUser.nickname
-          span.help-block The name you log in with (unchangeable!)
-
-      .clearfix
-        label Password
-        .input
-          input.span6#password(name="password", size="30", type="password")
-          span.help-block Eight characters, mixed letters and numbers, not stupid
-
-      .clearfix
-        label Repeat
-        .input
-          input.span6#repeat(name="repeat", size="30", type="password")
-          span.help-block Check your typing
-
-    fieldset
-      .actions
-        input.btn.btn-primary(type="submit", value="Save changes")
+  .span12.account
+  
+    form#account
+  
+      fieldset
+  
+        legend Account
+        
+        .clearfix
+          label Username
+          .input
+            span.uneditable-input= principalUser.nickname
+            span.help-block The name you log in with (unchangeable!)
+  
+        .clearfix
+          label Password
+          .input
+            input.span6#password(name="password", size="30", type="password")
+            span.help-block Eight characters, mixed letters and numbers, not stupid
+  
+        .clearfix
+          label Repeat
+          .input
+            input.span6#repeat(name="repeat", size="30", type="password")
+            span.help-block Check your typing
+  
+      fieldset
+        .actions
+          input.btn.btn-primary(type="submit", value="Save changes")

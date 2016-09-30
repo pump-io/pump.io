@@ -1,4 +1,8 @@
-.content.error
-  h1 Error #{error.code}
+extends ./layout.jade
 
-  p#error= error.message
+block body
+
+  .content.error
+    h1 Error #{error.code}
+  
+    p#error= error.message

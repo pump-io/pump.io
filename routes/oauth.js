@@ -38,10 +38,9 @@ var authenticate = function(req, res) {
         application;
 
     if (!token) {
-        res.render("error", {page: {title: "Error",
+        res.status(400).render("error", {page: {title: "Error",
                                     nologin: true,
                                     url: req.originalUrl},
-                             status: 400,
                              error: new HTTPError("Must provide an oauth_token", 400)});
     } else {
         Step(
@@ -84,10 +83,9 @@ var authenticate = function(req, res) {
             },
             function(err, result) {
                 if (err) {
-                    res.render("error", {page: {title: "Error",
+                    res.status(400).render("error", {page: {title: "Error",
                                                 nologin: true,
                                                 url: req.originalUrl},
-                                         status: 400,
                                          error: err});
                     return;
                 }
@@ -115,8 +113,7 @@ var authorize = function(err, req, res, authenticated, rt, application) {
         user;
 
     if (err) {
-        res.render("authentication", {status: 400,
-                                      page: {title: "Authentication",
+        res.status(400).render("authentication", {page: {title: "Authentication",
                                              nologin: true,
                                              url: req.originalUrl},
                                       token: rt.token,
@@ -151,8 +148,8 @@ var authorize = function(err, req, res, authenticated, rt, application) {
             if (err) throw err;
             req.principal = user.profile;
             req.principalUser = user;
-            res.local("principal", user.profile);
-            res.local("principalUser", user);
+            res.locals.principal = user.profile;
+            res.locals.principalUser = user;
             authc.setPrincipal(req.session, user.profile, this);
         },
         function(err) {
@@ -164,8 +161,7 @@ var authorize = function(err, req, res, authenticated, rt, application) {
         function(err, ats) {
             var url, sep;
             if (err) {
-                res.render("error", {status: 400,
-                                     page: {title: "Error",
+                res.status(400).render("error", {page: {title: "Error",
                                             nologin: true,
                                             url: req.originalUrl},
                                      error: err});
