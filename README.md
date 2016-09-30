@@ -5,7 +5,7 @@ Version 1.0.0
 This is pump.io. It's a stream server that does most of what people
 really want from a social network.
 
-[![Build Status](https://secure.travis-ci.org/e14n/pump.io.png)](http://travis-ci.org/e14n/pump.io)
+[![Build Status](https://secure.travis-ci.org/pump-io/pump.io.png)](http://travis-ci.org/pump-io/pump.io)
 
 ## License
 
@@ -46,11 +46,11 @@ It also comes with a web UI.
 
 ## Wiki
 
-For more information please check out the [GitHub wiki](https://github.com/e14n/pump.io/wiki)
+For more information please check out the [GitHub wiki](https://github.com/pump-io/pump.io/wiki)
 
 or clone it via the following command:
 
-    git clone https://github.com/e14n/pump.io.wiki.git
+    git clone https://github.com/pump-io/pump.io.wiki.git
 
 ## Installation
 
@@ -80,7 +80,7 @@ That should set up all the files and dependencies for you.
 If you want to set up the software in its own directory, you can clone
 the git repository, so:
 
-    git clone https://github.com/e14n/pump.io.git
+    git clone https://github.com/pump-io/pump.io.git
 
 You can then install the dependencies using `npm`:
 
@@ -322,7 +322,7 @@ name first before making connections to other sites.
 
 If you find bugs, you can report them here:
 
-https://github.com/e14n/pump.io/issues
+https://github.com/pump-io/pump.io/issues
 
 You can also email me at evan@e14n.com.
 
