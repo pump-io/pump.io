@@ -182,6 +182,4 @@ suite.addBatch({
     }
 });
 
-module.exports = {}; // TODO reenable this test when it's passing
-
-// suite["export"](module);
+suite["export"](module);
