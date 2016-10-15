@@ -63,6 +63,9 @@
     "pump-register-user": "./bin/pump-register-user",
     "pump-stop-following": "./bin/pump-stop-following"
   },
+  "man": [
+    "./doc/pump.1"
+  ],
   "scripts": {
     "build": "cd $(dirname $(dirname $(echo $PATH | cut -d= -f2 | tr : '\n' | grep pump.io/node_modules/.bin))) && for i in public/template/*.jade; do test \\( ! -e $i.js \\) -o $i -nt $i.js && jade --client --extension jade.js --no-debug $i; done || true",
     "fullbuild": "jade --client --extension jade.js --no-debug public/template",
