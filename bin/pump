@@ -54,11 +54,11 @@ var getConfig = function(filename) {
     if (filename) {
         files = [filename];
     } else {
-        files = ['/etc/pump.io.json'];
+        files = ["/etc/pump.io.json"];
         if (process.env.HOME) {
-            files.push(path.join(process.env.HOME, ".pump.io.json"))
+            files.push(path.join(process.env.HOME, ".pump.io.json"));
         }
-    }   
+    }
 
     // This is all sync
     for (i = 0; i < files.length; i++) {
@@ -107,9 +107,9 @@ var launchApps = function(config) {
 
         // Restart child processes when they die
 
-        cluster.on('exit', function(worker, code, signal) {
+        cluster.on("exit", function(worker, code, signal) {
             var exitCode = worker.process.exitCode;
-            clusterLog.warn('worker ' + worker.process.pid + ' died ('+exitCode+'). restarting...');
+            clusterLog.warn("worker " + worker.process.pid + " died ("+exitCode+"). restarting...");
             cluster.fork();
         });
 
