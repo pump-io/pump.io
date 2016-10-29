@@ -27,7 +27,7 @@ var cluster = require("cluster"),
     Logger = require("bunyan"),
     _ = require("underscore"),
     colors = require("colors/safe"),
-    warningColors = colors.red,
+    warningColors = colors.yellow,
     argv = require("optimist")
         .usage("Usage: $0 -c <configfile>")
         .alias("c", "config")
@@ -41,7 +41,7 @@ var cluster = require("cluster"),
 
 if (majorRelease < 5 && cluster.isMaster) {
     // Console warning
-    console.warn(warningColors.bold.underline("WARNING:") + warningColors.bold(" support for running pump.io Node.js " + process.versions.node + " is deprecated!"));
+    console.warn(colors.red.bold.underline("WARNING:") + colors.red.bold(" support for running pump.io Node.js " + process.versions.node + " is deprecated!"));
     console.warn(warningColors("Please upgrade to Node.js 4 or higher to silence this warning."));
     console.warn(warningColors("See https://github.com/pump-io/pump.io/issues/1212 for details."));
 }
