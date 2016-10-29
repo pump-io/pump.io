@@ -39,7 +39,7 @@ var cluster = require("cluster"),
 
 // First we warn if the user is on a deprecated Node.js version
 
-if (majorRelease < 5 && cluster.isMaster) {
+if (majorRelease < 4 && cluster.isMaster) {
     // Console warning
     console.warn(colors.red.bold.underline("WARNING:") + colors.red.bold(" support for running pump.io Node.js " + process.versions.node + " is deprecated!"));
     console.warn(warningColors("Please upgrade to Node.js 4 or higher to silence this warning."));
