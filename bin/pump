@@ -41,7 +41,7 @@ var cluster = require("cluster"),
 
 if (majorRelease < 4 && cluster.isMaster) {
     // Console warning
-    console.warn(colors.red.bold.underline("WARNING:") + colors.red.bold(" support for running pump.io Node.js " + process.versions.node + " is deprecated!"));
+    console.warn(colors.red.bold.underline("WARNING:") + colors.red.bold(" running pump.io on Node.js " + process.versions.node + " has security implications and is deprecated!"));
     console.warn(warningColors("Please upgrade to Node.js 4 or higher to silence this warning."));
     console.warn(warningColors("See https://github.com/pump-io/pump.io/issues/1212 for details."));
 }
