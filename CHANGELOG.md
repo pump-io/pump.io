@@ -2,15 +2,24 @@
 
 pump.io follows [Semantic Versioning][semver].
 
-## 2.0.0 - Future
+## 2.0.0 beta 0 - 2016-11-02
 
 ### Added
 
+* A pump(1) manpage is now included
 * Any internal web UI link with a `data-bypass` attribute is now ignored by the routing logic (useful for e.g. custom pages added by the admin)
+* YouTube links in posts are now shown as  embeds by the web UI (#1158)
 
 ### Changed
 
-* Templates are now based on Jade instead of utml (#1167)
+* Node.js 0.10 and 0.12 support is now deprecated (#1212)
+* TLS connections now use Mozilla's "intermediate" cipher suite and forces server cipher suite preferences (#1061)
+* Adjusted the XSS error page wording based on user feedback
+
+### Breaking
+
+* Upgrade to Express 3.x (affects plugins)
+* Templates are now based on Jade instead of utml (affects people who change the templates) (#1167)
 
 ## 1.0.0 - 2016-08-26
 
