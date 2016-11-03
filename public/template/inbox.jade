@@ -2,12 +2,4 @@ extends ./layout.jade
 
 block body
 
-  #inbox
-    .row
-      - var headless = false;
-      .span9
-        include ./major-stream.jade
-  
-      .span3#sidebar
-        h3 Meanwhile...
-          include ./minor-stream.jade
+  include inbox-client.jade

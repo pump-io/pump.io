@@ -189,7 +189,7 @@
                     if (_.has(Pump.templates, name)) {
                         cb(null, Pump.templates[name]);
                     } else {
-                        $.get("/template/"+name+".jade.js", function(data) {
+                        $.get("/template/"+name+"-client.jade.js", function(data) {
                             var f;
                             try {
                                 /* jslint evil: true */
@@ -210,7 +210,7 @@
                     if (_.has(Pump.templates, name)) {
                         return Pump.templates[name];
                     } else {
-                        res = $.ajax({url: "/template/"+name+".utml",
+                        res = $.ajax({url: "/template/"+name+"-client.jade.js",
                                       async: false});
                         if (res.readyState === 4 &&
                             ((res.status >= 200 && res.status < 300) || res.status === 304)) {

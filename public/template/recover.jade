@@ -2,14 +2,4 @@ extends ./layout.jade
 
 block body
 
-  #recoverpage
-    form#recover.form-horizontal
-      legend Recover your password
-      .control-group#nickname-group
-        label.control-label(for="nickname") Nickname
-        .controls
-          input#nickname(type="text", name="nickname", size="16")
-  
-      .control-group
-        .controls
-          button.btn.btn-primary(type="submit", disabled="disabled") Recover
+  include recover-client.jade

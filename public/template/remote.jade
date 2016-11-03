@@ -2,23 +2,4 @@ extends ./layout.jade
 
 block body
 
-  .remote
-  
-    form.form-horizontal#remote(action="/main/remote", method="post")
-  
-      legend Login to a remote account
-  
-      p Login with your pump.io account to get started. (No pump.io account yet? #[a(href="http://pump.io/tryit") Try it]!)
-  
-      .control-group#nickname-group
-        label.control-label(for="webfinger") Webfinger ID
-        .controls
-          input#webfinger(type="email", name="webfinger", size="30", placeholder="username@example.com")
-          span.help-block Enter your ID on your pump.io site. It looks like an email address, with your nickname then &quot;@&quot; then your server
-  
-      .control-group
-        .controls
-          button.btn.btn-primary(type="submit") Login
-  
-    p
-      a.add-continue(href="/main/login") Have an account here?
+  include remote-client.jade

@@ -2,15 +2,4 @@ extends ./layout.jade
 
 block body
 
-  .user.user-lists
-    .row
-      .span12
-        include ./profile-block.jade
-  
-    .row
-      .span12
-        include ./profile-nav.jade
-  
-    .row
-      .span12#user-content
-        include ./user-content-lists.jade
+  include lists-client.jade
