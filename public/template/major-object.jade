@@ -7,17 +7,17 @@ li.media.object.major(data-object-id=obj.id)
 
   .media-body
     if obj.displayName
-      h4.media-heading= obj.displayName
+      h4.media-heading!= obj.displayName
 
     p.muted
       small
         if obj.author
-          a(href=obj.author.url)= obj.author.displayName
+          a(href=obj.author.url)!= obj.author.displayName
           |  at 
         a(href=obj.url)= obj.published
         if obj.location
           |  in 
-          a(href=obj.location.url)= obj.location.displayName
+          a(href=obj.location.url)!= obj.location.displayName
 
     if obj.image && obj.image.url
       p

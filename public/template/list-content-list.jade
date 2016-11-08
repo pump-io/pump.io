@@ -1,9 +1,9 @@
 #list-content-list
   .row-fluid
     .span9
-      h3= list.displayName
+      h3!= list.displayName
       if list.content
-        p= list.content
+        p!= list.content
 
       #list-members
         - var people = members;

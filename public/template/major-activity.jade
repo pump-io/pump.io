@@ -13,24 +13,24 @@ unless object.deleted
             img.img-rounded.media-object(src="/images/default.png", width="64", height="64")
       .media-body
         if object.displayName
-          h4.media-heading= object.displayName
+          h4.media-heading!= object.displayName
 
         p.muted
           small
             if !headless || (activity.verb === "share" && author)
-              a(href="#{author.url}")= author.displayName 
+              a(href="#{author.url}")!= author.displayName
               |  at 
             a(href=object.url || activity.url)
               abbr.easydate(title=activity.published)= activity.published
             if activity.location
               |  in 
-              a(href=activity.location.url)= activity.location.displayName
+              a(href=activity.location.url)!= activity.location.displayName
             if activity.generator && activity.generator.displayName
               |  via 
               if activity.generator.url
-                a(href=activity.generator.url)= activity.generator.displayName
+                a(href=activity.generator.url)!= activity.generator.displayName
               else
-                span= activity.generator.displayName
+                span!= activity.generator.displayName
 
             if activity.to && activity.to.length > 0
               |  To: 

@@ -9,13 +9,13 @@
   .media-body!= reply.content
     p
       small
-        a(href=reply.author.url)= reply.author.displayName
+        a(href=reply.author.url)!= reply.author.displayName
         |  at 
         a(href=reply.url)
           abbr.easydate(title=reply.published)= reply.published
         if reply.location
           |  in 
-          a(href=reply.location.url)= reply.location.displayName
+          a(href=reply.location.url)!= reply.location.displayName
 
     if principal
       .responses

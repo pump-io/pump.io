@@ -8,17 +8,17 @@
 
     .media-body
       if object.displayName
-        h2.media-heading= object.displayName
+        h2.media-heading!= object.displayName
 
       p.muted
         small 
           if object.author
-            a(href=object.author.url)= object.author.displayName
+            a(href=object.author.url)!= object.author.displayName
             |  at 
           a(href=object.url)= object.published
           if object.location
             |  in  
-            a(href=object.location.url)= object.location.displayName
+            a(href=object.location.url)!= object.location.displayName
 
       if object.image && object.image.url
         p
