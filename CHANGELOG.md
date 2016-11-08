@@ -2,6 +2,12 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 2.0.0 beta 2 - 2016-11-07
+
+### Changed
+
+* Fixed the web UI mangling some special characters when showing displayName properties
+
 ## 2.0.0 beta 1 - 2016-11-02
 
 ### Added
