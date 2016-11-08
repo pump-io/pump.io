@@ -93,7 +93,7 @@ var sameUser = function(url, objects) {
                 assert.include(activity, "object");
                 assert.isObject(activity.object);
                 assert.include(activity.object, "liked");
-                if (activity.object.secretNumber % 2 == 0) {
+                if (activity.object.secretNumber % 2 === 0) {
                     assert.isTrue(activity.object.liked);
                 } else {
                     assert.isFalse(activity.object.liked);
@@ -283,7 +283,7 @@ suite.addBatch({
                                 var group = this.group();
                                 if (err) throw err;
                                 _.each(posts, function(post, i) {
-                                    if (post.object.secretNumber % 2 == 0) {
+                                    if (post.object.secretNumber % 2 === 0) {
                                         var act = {
                                             verb: "favorite",
                                             object: post.object

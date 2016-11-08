@@ -108,7 +108,7 @@ suite.addBatch({
                             function() {
                                 var group = this.group(), i;
                                 for (i = 0; i < 100; i++) {
-                                    registerAndFollow((i % 10 == 0) ? ("billy"+i) : ("trying"+i), "i_rolled_8", group());
+                                    registerAndFollow((i % 10 === 0) ? ("billy"+i) : ("trying"+i), "i_rolled_8", group());
                                 }
                             },
                             function(err) {

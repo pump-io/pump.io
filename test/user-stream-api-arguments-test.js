@@ -507,7 +507,7 @@ suite.addBatch({
 
                             for (i = 0; i < 100; i++) {
                                 newAct = JSON.parse(JSON.stringify(act));
-                                newAct.object.content = "I love it! " + i,
+                                newAct.object.content = "I love it! " + i;
                                 httputil.postJSON(url, cred, newAct, group());
                             }
                         },
@@ -568,7 +568,7 @@ suite.addBatch({
 
                             for (i = 0; i < 100; i++) {
                                 newAct = JSON.parse(JSON.stringify(act));
-                                newAct.object.content = "Hi there! " + i,
+                                newAct.object.content = "Hi there! " + i;
                                 httputil.postJSON(url, cred2, newAct, group());
                             }
                         },
@@ -627,7 +627,7 @@ suite.addBatch({
 
                             for (i = 0; i < 100; i++) {
                                 newAct = JSON.parse(JSON.stringify(act));
-                                newAct.object.content = "This is great! " + i,
+                                newAct.object.content = "This is great! " + i;
                                 httputil.postJSON(url, cred2, newAct, group());
                             }
                         },
