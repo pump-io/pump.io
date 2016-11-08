@@ -13,7 +13,7 @@
             imgUrl = (person.image && person.image.url) ? person.image.url : "/images/default.png";
           li.thumbnail.span1(data-person-id=person.id, data-title=abbrev)
           img.img-rounded(src=imgUrl, width="64", height="64", alt=abbrev)
-          span= person.displayName
+          span!= person.displayName
 
   .modal-footer
     button.btn.btn-primary#add-contact(type="button") Add

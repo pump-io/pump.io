@@ -19,7 +19,7 @@
         else
           img.pull-left.img-rounded(src="/images/default.png", width="24", height="24")
         | &nbsp;
-        span.hidden-phone= principal.displayName
+        span.hidden-phone!= principal.displayName
         b.caret
 
       ul.dropdown-menu(role="menu", aria-labelledby="profile-dropdown")
