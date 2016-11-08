@@ -16,6 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+"use strict";
+
 var databank = require("databank"),
     Step = require("step"),
     _ = require("underscore"),

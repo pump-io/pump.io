@@ -16,6 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+"use strict";
+
 var http = require("http"),
     https = require("https"),
     assert = require("assert"),

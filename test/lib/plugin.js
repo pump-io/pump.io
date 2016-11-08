@@ -16,6 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+"use strict";
+
 module.exports = {
     called: {log: false, schema: false, app: false, distribute: false, touser: false},
     initializeLog: function(schema) {

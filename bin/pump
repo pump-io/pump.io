@@ -20,6 +20,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+"use strict";
+
 var cluster = require("cluster"),
     os = require("os"),
     fs = require("fs"),
