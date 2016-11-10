@@ -212,8 +212,8 @@ suite.addBatch({
                 },
                 "and we visit it with a browser": {
                     topic: function() {
-                        var browser = new Browser({silent: true});
-                        cb = this.callback;
+                        var browser = new Browser({silent: true}),
+                            cb = this.callback;
 
                         // triggers defang function in 'public/layout.utml'
                         // name: displayName

@@ -107,31 +107,6 @@ suite.addBatch({
             topic: function(ActivityObject) {
                 var callback = this.callback,
                     props = {
-                        id: "urn:uuid:015a8bd6-b706-11e2-b87b-c8f73398600c",
-                        objectType: {
-                            left: 1,
-                            right: 2
-                        }
-                    };
-
-                ActivityObject.ensureObject(props, function(err, obj) {
-                    if (err && err instanceof TypeError) {
-                        callback(null);
-                    } else if (err) {
-                        callback(err);
-                    } else {
-                        callback(new Error("Unexpected success"));
-                    }
-                });
-            },
-            "it fails correctly": function(err) {
-                assert.ifError(err);
-            }
-        },
-        "and we try to ensureObject with a non-string objectType": {
-            topic: function(ActivityObject) {
-                var callback = this.callback,
-                    props = {
                         id: "urn:uuid:c6df5d5c-b713-11e2-9369-2c8158efb9e9",
                         objectType: {
                             left: 1,

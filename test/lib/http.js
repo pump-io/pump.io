@@ -383,7 +383,8 @@ var proxy = function(options, callback) {
                 method: req.route.method.toUpperCase(),
                 path: back.path + "/" + rel,
                 headers: _.extend(req.headers, {"Via": "pump.io-test-proxy/0.1.0"})
-            };
+            },
+            breq;
 
         breq = http.request(options, function(bres) {
             res.status(bres.statusCode);

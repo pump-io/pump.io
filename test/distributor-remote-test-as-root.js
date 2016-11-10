@@ -461,6 +461,7 @@ suite.addBatch({
                                                     assert.isObject(act);
                                                 },
                                                 "it includes the activity": function(err, feed, act) {
+                                                    var item;
                                                     assert.ifError(err);
                                                     assert.isObject(feed);
                                                     assert.isObject(act);

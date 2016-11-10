@@ -1102,7 +1102,7 @@ suite.addBatch({
         emptyStreamContext(function(user, callback) {
             user.getMajorInboxStream(callback);
         }),
-        "and we check their major inbox":
+        "and we check their major outbox":
         emptyStreamContext(function(user, callback) {
             user.getMajorOutboxStream(callback);
         })
