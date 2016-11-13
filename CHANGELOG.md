@@ -2,6 +2,12 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 2.0.3 - 2016-11-13
+
+### Fixed
+
+* Certain template resource 404s in the web UI are now fixed
+
 ## 2.0.2 - 2016-11-13
 
 ### Fixed
