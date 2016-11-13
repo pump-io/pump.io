@@ -2,11 +2,18 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 2.0.2 - 2016-11-13
+
+### Fixed
+
+* Jade client-side files are now included in registry packages
+* The Server: header now reports the correct pump.io version
+
 ## 2.0.1 - 2016-11-10
 
 ### Fixed
 
-Updated some documentation version numbers.
+* Updated some documentation version numbers
 
 ## 2.0.0 - 2016-11-10
 
