@@ -185,11 +185,42 @@
         render: function() {
             var view = this,
                 getTemplate = function(name, cb) {
-                    var url;
                     if (_.has(Pump.templates, name)) {
                         cb(null, Pump.templates[name]);
                     } else {
-                        $.get("/template/"+name+"-client.jade.js", function(data) {
+	                var url = "/template/"+ name;
+                        var clientUrls = ["account",
+                                          "authentication",
+                                          "authorization",
+                                          "authorization-finished",
+                                          "confirmed",
+                                          "doc",
+                                          "error",
+                                          "favorites",
+                                          "followers",
+                                          "inbox",
+                                          "javascript-disabled",
+                                          "list",
+                                          "lists",
+                                          "login",
+                                          "main",
+                                          "major-activity-page",
+                                          "minor-activity-page",
+                                          "object",
+                                          "recover",
+                                          "recover-code",
+                                          "recover-sent",
+                                          "register",
+                                          "remote",
+                                          "user",
+                                          "xss-error"];
+	                        debugger;
+                        if (clientUrls.indexOf(name) !== -1) {
+                            url += "-client";
+                        }
+	                url += ".jade.js";
+
+                        $.get(url, function(data) {
                             var f;
                             try {
                                 /* jslint evil: true */
