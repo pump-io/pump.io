@@ -60,13 +60,13 @@ Step(
     },
     function(err, cred) {
         if (err) throw err;
-	var activity = {
+        var activity = {
             "verb": "stop-following",
-	    "object": {
-		"objectType": "person",
-		id: otherId
-	    }
-	};
+            "object": {
+                "objectType": "person",
+                id: otherId
+            }
+        };
         var endpoint = url.format({
             protocol: ((port == 443) ? "https" : "http"),
             host: ((port == 80) ? server : server + ":" + port),

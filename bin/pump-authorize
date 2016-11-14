@@ -30,7 +30,7 @@ var urlfmt = require("url").format,
     clientCred = common.clientCred,
     setUserCred = common.setUserCred,
     OAuth = require("oauth-evanp").OAuth,
-    readline = require('readline'),
+    readline = require("readline"),
     argv = require("optimist")
         .usage("Usage: $0 -u <username>")
         .demand(["u"])

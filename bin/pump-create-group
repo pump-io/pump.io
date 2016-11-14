@@ -54,8 +54,8 @@ Step(
         var activity = {
             "verb": "create",
             "object": {
-	        "objectType": "group",
-	        "displayName": note
+                "objectType": "group",
+                "displayName": note
             }
         };
         var endpoint = url.format({

@@ -30,7 +30,7 @@ var _ = require("underscore"),
     postJSON = common.postJSON,
     argv = require("optimist")
         .usage("Usage: $0 -u <nickname> -p <password>")
-        .demand(["u","p"])
+        .demand(["u", "p"])
         .alias("u", "username")
         .alias("p", "password")
         .alias("s", "server")

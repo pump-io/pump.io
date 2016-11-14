@@ -54,8 +54,8 @@ Step(
         var activity = {
             "verb": "post",
             "object": {
-	        "objectType": "note",
-	        "content": note
+                "objectType": "note",
+                "content": note
             }
         };
         var endpoint = url.format({

@@ -226,7 +226,7 @@ var getConfig = function(filename) {
     if (filename) {
         files = [filename];
     } else {
-        files = ['/etc/pump.io.json',
+        files = ["/etc/pump.io.json",
                  path.join(process.env.HOME, ".pump.io.json")];
     }
 
@@ -374,7 +374,7 @@ var importActivity = function(props, log, callback) {
             if (activity.provider && !activity.provider.id && activity.provider.url) {
                 activity.provider.id = activity.provider.url;
             }
-            
+
             delete activity.content;
             // Specific fixups for different verbs
             switch (activity.verb) {
@@ -418,7 +418,7 @@ var importActivity = function(props, log, callback) {
                         activity.object.author = shared.actor;
                     }
                 }
-		this(null);
+                this(null);
                 break;
             default:
                 this(null);
@@ -662,7 +662,7 @@ var maybeLocalize = function(object, callback) {
 };
 
 var maybeLocalizeArray = function(arr, callback) {
-    
+
     // skip if it's null or empty
 
     if (!arr) {
@@ -766,7 +766,7 @@ var maybeLocalizeObject = function(object, callback) {
                     object.shares = {
                         url: URLMaker.makeURL("api/" + type + "/" + object._uuid + "/shares")
                     };
-                    
+
                     Step(
                         function() {
                             maybeLocalize(object.inReplyTo, this.parallel());
@@ -937,7 +937,7 @@ var badGraphActivity = function(activity) {
 var isUser = function(object) {
     var id = object.id,
         p;
-    
+
     if (!id) {
         return false;
     }
