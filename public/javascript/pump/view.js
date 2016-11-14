@@ -188,7 +188,7 @@
                     if (_.has(Pump.templates, name)) {
                         cb(null, Pump.templates[name]);
                     } else {
-	                var url = "/template/"+ name;
+                        var url = "/template/"+ name;
                         var clientUrls = ["account",
                                           "authentication",
                                           "authorization",
@@ -217,7 +217,7 @@
                         if (clientUrls.indexOf(name) !== -1) {
                             url += "-client";
                         }
-	                url += ".jade.js";
+                        url += ".jade.js";
 
                         $.get(url, function(data) {
                             var f;
