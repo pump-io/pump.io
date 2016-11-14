@@ -2,6 +2,13 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 2.0.4 - 2016-11-13
+
+### Fixed
+
+* Fix To: and CC: fields not showing in the web UI
+* Remove a stray debugger statement in the web UI JS
+
 ## 2.0.3 - 2016-11-13
 
 ### Fixed
