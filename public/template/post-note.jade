@@ -10,8 +10,8 @@ include ./recipient-selector.jade
       fieldset
         textarea.span5#note-content(name="note" rows="6")
         div
-          +recipient-selector({name: "to", id: "note-to", label: "To"})
+          +recipient-selector("to", "note-to", "To")
         div
-          +recipient-selector({name: "cc", id: "note-cc", label: "CC"})
+          +recipient-selector("cc", "note-cc", "CC")
   .modal-footer
     button.btn.btn-primary#send-note(type="submit") Send
