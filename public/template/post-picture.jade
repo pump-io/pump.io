@@ -15,10 +15,10 @@ include ./recipient-selector.jade
         textarea.span5#picture-description(name="description", placeholder="Description (optional)", rows="3")
 
         div
-          +recipient-selector({name: "to", id: "picture-to", label: "To"})
+          +recipient-selector("to", "picture-to", "To")
 
         div
-          +recipient-selector({name: "cc", id: "picture-cc", label: "CC"})
+          +recipient-selector("cc", "picture-cc", "CC")
 
   .modal-footer
     button.btn.btn-primary#send-picture(type="submit") Send
