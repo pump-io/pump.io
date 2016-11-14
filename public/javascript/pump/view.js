@@ -214,7 +214,6 @@
                                           "remote",
                                           "user",
                                           "xss-error"];
-	                        debugger;
                         if (clientUrls.indexOf(name) !== -1) {
                             url += "-client";
                         }
