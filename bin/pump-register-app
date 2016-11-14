@@ -62,7 +62,7 @@ if (argv.web) {
 
 if (argv.email) {
     args.contacts = argv.email;
-};
+}
 
 Step(
     function() {
