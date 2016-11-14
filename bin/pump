@@ -80,7 +80,8 @@ var getConfig = function(filename) {
                 parsed = JSON.parse(raw);
                 _.extend(config, parsed);
             } catch (err) {
-                console.log(err);
+                console.error("Error parsing JSON configuration:", err.toString());
+                console.error("Try using a JSON validator.");
                 process.exit(1);
             }
         }
