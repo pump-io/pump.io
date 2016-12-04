@@ -2,6 +2,12 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 2.1.0 - Future
+
+### Improved
+
+* Enable strict mode for server-side JS (#1221)
+
 ## 2.0.4 - 2016-11-13
 
 ### Fixed
