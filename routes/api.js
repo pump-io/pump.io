@@ -1559,7 +1559,7 @@ var streamArgs = function(req, defaultCount, maxCount) {
             }
             if (validator.isEmpty(req.query.since)) {
                 throw new Error(req.query.since + " is null");
-            }else {
+            } else {
                 args.since = validator.trim(req.query.since);
             }
         }
@@ -1573,7 +1573,7 @@ var streamArgs = function(req, defaultCount, maxCount) {
             }
             if (!validator.isInt(req.query.offset, {min:0})) {
                 throw new Error("Offset must be an integer greater than or equal to zero");
-            }else {
+            } else {
                 args.start = validator.toInt(req.query.offset);
             }
         }
