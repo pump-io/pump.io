@@ -2,6 +2,12 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 2.0.5 - 2016-12-11
+
+### Fixed
+
+* Fix web UI YouTube embeds appearing in all subsequent posts (#1249)
+
 ## 2.0.4 - 2016-11-13
 
 ### Fixed
