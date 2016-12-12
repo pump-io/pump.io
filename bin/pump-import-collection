@@ -20,6 +20,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+"use strict";
+
 var fs = require("fs"),
     path = require("path"),
     urlparse = require("url").parse,
@@ -226,7 +228,7 @@ var getConfig = function(filename) {
     if (filename) {
         files = [filename];
     } else {
-        files = ['/etc/pump.io.json',
+        files = ["/etc/pump.io.json",
                  path.join(process.env.HOME, ".pump.io.json")];
     }
 
@@ -319,7 +321,7 @@ var importActivity = function(props, log, callback) {
             Activity.get(activity.id, this);
         },
         function(err) {
-            if (err && err.name == "NoSuchThingError") {
+            if (err && err.name === "NoSuchThingError") {
                 log.info({activity: activity.id}, "Unseen activity.");
                 this(null);
             } else if (err) {
@@ -346,7 +348,7 @@ var importActivity = function(props, log, callback) {
             _.each(["to", "cc", "bto", "bcc"], function(name) {
                 if (origF && newF && origF != newF) {
                     _.each(activity[name], function(addr) {
-                        if (addr.id == origF) {
+                        if (addr.id === origF) {
                             log.info({original: origF, new: newF}, "Replacing followers URL in addresses");
                             addr.id = newF;
                         }
@@ -374,7 +376,7 @@ var importActivity = function(props, log, callback) {
             if (activity.provider && !activity.provider.id && activity.provider.url) {
                 activity.provider.id = activity.provider.url;
             }
-            
+
             delete activity.content;
             // Specific fixups for different verbs
             switch (activity.verb) {
@@ -390,17 +392,17 @@ var importActivity = function(props, log, callback) {
                 break;
             case Activity.POST:
                 // Auto-create activity content
-                if (activity.id == activity.object.id) {
+                if (activity.id === activity.object.id) {
                     activity.id = betterID(activity);
                 }
-                if (activity.url == activity.object.url) {
+                if (activity.url === activity.object.url) {
                     delete activity.url;
                 }
-                if (activity.object.objectType == "note" && _.isObject(activity.object.inReplyTo)) {
+                if (activity.object.objectType === "note" && _.isObject(activity.object.inReplyTo)) {
                     activity.object.objectType = "comment";
                 }
                 // Add a date to the object if it's not there
-                if (activity.verb == "post" && !activity.object.published) {
+                if (activity.verb === "post" && !activity.object.published) {
                     activity.object.published = activity.published;
                 }
                 this(null);
@@ -413,12 +415,12 @@ var importActivity = function(props, log, callback) {
                 var shared = activity.object;
                 if (shared.verb) {
                     log.info({activity: activity.id, sharedActivity: shared.id}, "Changing shared activity to shared object");
-                    if (shared.verb == Activity.POST) {
+                    if (shared.verb === Activity.POST) {
                         activity.object = shared.object;
                         activity.object.author = shared.actor;
                     }
                 }
-		this(null);
+                this(null);
                 break;
             default:
                 this(null);
@@ -472,13 +474,13 @@ var importActivity = function(props, log, callback) {
 
 var isRegistration = function(activity) {
     return (activity.actor &&
-            activity.actor.objectType == ActivityObject.PERSON &&
+            activity.actor.objectType === ActivityObject.PERSON &&
             activity.verb &&
-            activity.verb == Activity.JOIN &&
+            activity.verb === Activity.JOIN &&
             activity.object &&
-            activity.object.objectType == ActivityObject.SERVICE &&
+            activity.object.objectType === ActivityObject.SERVICE &&
             activity.object.url &&
-            urlparse(activity.object.url).hostname == URLMaker.hostname);
+            urlparse(activity.object.url).hostname === URLMaker.hostname);
 };
 
 var registerUser = function(activity, log, callback) {
@@ -530,7 +532,7 @@ var registerUser = function(activity, log, callback) {
             User.get(props.nickname, this);
         },
         function(err, user) {
-            if (err && err.name == "NoSuchThingError") {
+            if (err && err.name === "NoSuchThingError") {
                 log.info({nickname: props.nickname}, "Unseen user.");
                 this(null);
             } else if (err) {
@@ -617,7 +619,7 @@ var usersStream = function(callback) {
         },
         function(err, str) {
             if (err) {
-                if (err.name == "NoSuchThingError") {
+                if (err.name === "NoSuchThingError") {
                     Stream.create({name: "user:all"}, this);
                 } else {
                     throw err;
@@ -628,7 +630,7 @@ var usersStream = function(callback) {
         },
         function(err, str) {
             if (err) {
-                if (err.name == "AlreadyExistsError") {
+                if (err.name === "AlreadyExistsError") {
                     Stream.get("user:all", callback);
                 } else {
                     callback(err);
@@ -662,7 +664,7 @@ var maybeLocalize = function(object, callback) {
 };
 
 var maybeLocalizeArray = function(arr, callback) {
-    
+
     // skip if it's null or empty
 
     if (!arr) {
@@ -695,8 +697,8 @@ var maybeLocalizePerson = function(person, callback) {
         domain,
         id;
 
-    if ((person.url && urlparse(person.url).hostname == URLMaker.hostname) ||
-        (person.id && urlparse(person.id).hostname == URLMaker.hostname)) {
+    if ((person.url && urlparse(person.url).hostname === URLMaker.hostname) ||
+        (person.id && urlparse(person.id).hostname === URLMaker.hostname)) {
         domain = URLMaker.hostname;
     } else {
         personByOldID(person, callback);
@@ -744,7 +746,7 @@ var maybeLocalizeObject = function(object, callback) {
                 ActivityObject.getObject(object.objectType, object.id, this);
             },
             function(err, results) {
-                if (err && err.name == "NoSuchThingError") {
+                if (err && err.name === "NoSuchThingError") {
                     object._uuid = IDMaker.makeID();
 
                     if (!_.has(object, "links")) {
@@ -766,7 +768,7 @@ var maybeLocalizeObject = function(object, callback) {
                     object.shares = {
                         url: URLMaker.makeURL("api/" + type + "/" + object._uuid + "/shares")
                     };
-                    
+
                     Step(
                         function() {
                             maybeLocalize(object.inReplyTo, this.parallel());
@@ -811,7 +813,7 @@ var maybeLocalizeGroup = function(group, callback) {
             function(err, results) {
                 if (err) {
                     throw err;
-                } else if (!results || results.length == 0) {
+                } else if (!results || results.length === 0) {
 
                     group.upstreamDuplicates = [
                         group.id
@@ -855,7 +857,7 @@ var maybeLocalizeCollection = function(coll, callback) {
                 Collection.get(coll.id, this);
             },
             function(err, results) {
-                if (err && err.name == "NoSuchThingError") {
+                if (err && err.name === "NoSuchThingError") {
                     coll._uuid = IDMaker.makeID();
 
                     if (!_.has(coll, "links")) {
@@ -897,7 +899,7 @@ var personByOldID = function(person, callback) {
             Person.get(person.id, this);
         },
         function(err, found) {
-            if (err && err.name == "NoSuchThingError") {
+            if (err && err.name === "NoSuchThingError") {
                 this(null, person);
             } else if (err) {
                 this(err, null);
@@ -919,7 +921,7 @@ var personByLocalID = function(person, callback) {
         },
         function(err, people) {
             if (err) throw err;
-            if (people && people.length == 1) {
+            if (people && people.length === 1) {
                 this(null, people[0]);
             } else {
                 this(null, person);
@@ -930,14 +932,14 @@ var personByLocalID = function(person, callback) {
 };
 
 var badGraphActivity = function(activity) {
-    return ((activity.verb == Activity.FOLLOW || activity.verb == Activity.STOP_FOLLOWING) &&
+    return ((activity.verb === Activity.FOLLOW || activity.verb === Activity.STOP_FOLLOWING) &&
         (!isUser(activity.actor) || !isUser(activity.object)));
 };
 
 var isUser = function(object) {
     var id = object.id,
         p;
-    
+
     if (!id) {
         return false;
     }
@@ -948,7 +950,7 @@ var isUser = function(object) {
         return false;
     }
 
-    return (p[2] == URLMaker.hostname);
+    return (p[2] === URLMaker.hostname);
 };
 
 var betterID = function(activity) {
@@ -988,7 +990,7 @@ var checkJoin = function(activity, log, callback) {
         function(err, group) {
             if (err && err.name != "NoSuchThingError") {
                 throw err;
-            } else if (err && err.name == "NoSuchThingError") {
+            } else if (err && err.name === "NoSuchThingError") {
                 importActivity({actor: activity.actor,
                                 verb: "create",
                                 to: [{objectType: ActivityObject.COLLECTION,
@@ -1012,7 +1014,7 @@ var checkJoin = function(activity, log, callback) {
 };
 
 var isLocalObjectID = function(id) {
-    return (id && urlparse(id).hostname == URLMaker.hostname);
+    return (id && urlparse(id).hostname === URLMaker.hostname);
 };
 
 // Run the main function

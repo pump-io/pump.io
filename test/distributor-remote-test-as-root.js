@@ -16,6 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+"use strict";
+
 var assert = require("assert"),
     vows = require("vows"),
     Step = require("step"),
@@ -459,6 +461,7 @@ suite.addBatch({
                                                     assert.isObject(act);
                                                 },
                                                 "it includes the activity": function(err, feed, act) {
+                                                    var item;
                                                     assert.ifError(err);
                                                     assert.isObject(feed);
                                                     assert.isObject(act);

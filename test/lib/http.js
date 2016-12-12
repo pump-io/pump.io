@@ -16,6 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+"use strict";
+
 var http = require("http"),
     https = require("https"),
     assert = require("assert"),
@@ -381,7 +383,8 @@ var proxy = function(options, callback) {
                 method: req.route.method.toUpperCase(),
                 path: back.path + "/" + rel,
                 headers: _.extend(req.headers, {"Via": "pump.io-test-proxy/0.1.0"})
-            };
+            },
+            breq;
 
         breq = http.request(options, function(bres) {
             res.status(bres.statusCode);

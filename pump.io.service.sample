@@ -1,0 +1,12 @@
+[Unit]
+Description=Pump.io - stream server that does most of what people really want from a social network
+After=syslog.target network.target mongodb.service
+Requires=mongodb.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/pump
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target

@@ -16,6 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+"use strict";
+
 var connect = require("connect"),
     send = require("send"),
     cutils = connect.utils,

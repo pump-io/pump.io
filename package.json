@@ -2,7 +2,7 @@
   "name": "pump.io",
   "preferGlobal": "true",
   "homepage": "http://pump.io/",
-  "version": "2.0.4",
+  "version": "2.1.0-beta.0",
   "author": "Evan Prodromou <evan@e14n.com>",
   "devDependencies": {
     "jscs": "^3.0.3",
@@ -38,8 +38,8 @@
     "jsdom": "^7.2.2",
     "method-override": "^2.3.6",
     "mkdirp": "0.5.x",
-    "node-uuid": "1.4.x",
     "oauth-evanp": "~0.9.10-evanp.2",
+    "octal": "^1.0.0",
     "optimist": "0.6.x",
     "rimraf": "^2.5.2",
     "sanitize-html": "^1.13.0",
@@ -52,6 +52,7 @@
     "ua-parser-js": "^0.7.10",
     "underscore": "1.8.x",
     "underscore-contrib": "0.3.x",
+    "uuid": "^3.0.0",
     "validator": "4.4.x",
     "webfinger": "~0.4.2"
   },
@@ -74,8 +75,8 @@
     "postinstall": "npm run build",
     "test": "npm run lint && vows -v test/*-test.js",
     "lint": "npm run lint:jshint && npm run lint:jscs && npm run lint:jade",
-    "lint:jshint": "jshint --exclude 'public/javascript/libs' bin routes",
-    "lint:jscs": "jscs bin lib public/javascript/pump* routes test",
+    "lint:jshint": "jshint --exclude 'public/javascript/libs' bin/* routes",
+    "lint:jscs": "jscs bin/* lib public/javascript/pump* routes test",
     "lint:jade": "pug-lint public/template/*.jade",
     "start": "./bin/pump"
   },

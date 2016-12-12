@@ -16,6 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+"use strict";
+
 var assert = require("assert"),
     util = require("util"),
     urlparse = require("url").parse,
@@ -289,8 +291,6 @@ suite.addBatch({
                                     id: "http://social.localhost/activity/3",
                                     to: [group],
                                     verb: "post",
-                                    to: [{objectType: "person",
-                                          id: "http://localhost:4815/api/user/louisck"}],
                                     object: {
                                         id: "http://social.localhost/note/2",
                                         objectType: "note",

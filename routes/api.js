@@ -16,6 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+"use strict";
+
 // Adds to globals
 
 var databank = require("databank"),
@@ -737,7 +739,7 @@ var createUser = function(req, res, next) {
                 email = props.email;
                 delete props.email;
             } else {
-                next(new HTTPError(e.message, 400));
+                next(new HTTPError("Invalid email address provided", 400));
                 return;
             }
         }

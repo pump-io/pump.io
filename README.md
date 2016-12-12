@@ -1,6 +1,6 @@
 # pump.io
 
-Version 2.0.4
+Version 2.1.0 beta 0
 
 This is pump.io. It's a stream server that does most of what people
 really want from a social network.
@@ -58,7 +58,7 @@ or clone it via the following command:
 
 You'll need four things to get started:
 
-* node.js 0.10 or 0.12
+* node.js 4.x or 6.x
 * npm 1.1.0 or higher
 * A database server (see below)
 * The `graphicsmagick` package with the `gm` command

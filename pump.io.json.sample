@@ -15,5 +15,5 @@
     "cert":  "/etc/my/server.crt",
     "uploaddir": "/var/local/pump.io/uploads",
     "debugClient": false,
-    "firehose": "ofirehose.example"
+    "firehose": "ofirehose.com"
 }

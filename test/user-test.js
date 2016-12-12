@@ -16,6 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+"use strict";
+
 var assert = require("assert"),
     vows = require("vows"),
     databank = require("databank"),
@@ -1100,7 +1102,7 @@ suite.addBatch({
         emptyStreamContext(function(user, callback) {
             user.getMajorInboxStream(callback);
         }),
-        "and we check their major inbox":
+        "and we check their major outbox":
         emptyStreamContext(function(user, callback) {
             user.getMajorOutboxStream(callback);
         })

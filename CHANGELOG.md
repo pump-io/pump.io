@@ -2,6 +2,24 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 2.1.0 beta 0 - 2016-12-11
+
+### Fixed
+
+* Files in bin/ are now properly validated by JSHint and JSCS
+
+### Improved
+
+* Enable strict mode for server-side JS (#1221)
+* Provide a more useful error message for invalid config JSON
+* A sample systemd service is now included
+
+## 2.0.5 - 2016-12-11
+
+### Fixed
+
+* Fix web UI YouTube embeds appearing in all subsequent posts (#1249)
+
 ## 2.0.4 - 2016-11-13
 
 ### Fixed

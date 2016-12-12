@@ -16,6 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+"use strict";
+
 var assert = require("assert"),
     vows = require("vows"),
     Step = require("step"),
@@ -96,7 +98,7 @@ var sameUser = function(url, objects) {
                 assert.include(activity, "object");
                 assert.isObject(activity.object);
                 assert.include(activity.object, "likes");
-                if (activity.object.secretNumber % 2 == 0) {
+                if (activity.object.secretNumber % 2 === 0) {
                     assert.include(activity.object.likes, "items");
                     assert.isArray(activity.object.likes.items);
                     assert.lengthOf(activity.object.likes.items, 1);
@@ -167,7 +169,7 @@ var justClient = function(url, objects) {
                 assert.include(activity, "object");
                 assert.isObject(activity.object);
                 assert.include(activity.object, "likes");
-                if (activity.object.secretNumber % 2 == 0) {
+                if (activity.object.secretNumber % 2 === 0) {
                     assert.include(activity.object.likes, "items");
                     assert.isArray(activity.object.likes.items);
                     assert.lengthOf(activity.object.likes.items, 1);
@@ -235,7 +237,7 @@ var otherUser = function(url, objects) {
                 assert.include(activity, "object");
                 assert.isObject(activity.object);
                 assert.include(activity.object, "likes");
-                if (activity.object.secretNumber % 2 == 0) {
+                if (activity.object.secretNumber % 2 === 0) {
                     assert.include(activity.object.likes, "items");
                     assert.isArray(activity.object.likes.items);
                     assert.lengthOf(activity.object.likes.items, 1);
@@ -308,7 +310,7 @@ suite.addBatch({
                                 var group = this.group();
                                 if (err) throw err;
                                 _.each(posts, function(post, i) {
-                                    if (post.object.secretNumber % 2 == 0) {
+                                    if (post.object.secretNumber % 2 === 0) {
                                         var act = {
                                             verb: "favorite",
                                             object: post.object

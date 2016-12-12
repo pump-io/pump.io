@@ -16,6 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+"use strict";
+
 // TODO: this needs to be updated for Express 3.x
 
 var assert = require("assert"),

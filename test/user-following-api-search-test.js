@@ -16,6 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+"use strict";
+
 var assert = require("assert"),
     vows = require("vows"),
     Step = require("step"),
@@ -108,7 +110,7 @@ suite.addBatch({
                             function() {
                                 var group = this.group(), i;
                                 for (i = 0; i < 100; i++) {
-                                    registerAndFollow((i % 10 == 0) ? ("billy"+i) : ("trying"+i), "i_rolled_8", group());
+                                    registerAndFollow((i % 10 === 0) ? ("billy"+i) : ("trying"+i), "i_rolled_8", group());
                                 }
                             },
                             function(err) {

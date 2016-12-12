@@ -20,6 +20,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+"use strict";
+
 var cluster = require("cluster"),
     os = require("os"),
     fs = require("fs"),
@@ -80,7 +82,8 @@ var getConfig = function(filename) {
                 parsed = JSON.parse(raw);
                 _.extend(config, parsed);
             } catch (err) {
-                console.log(err);
+                console.error("Error parsing JSON configuration:", err.toString());
+                console.error("Try using a JSON validator.");
                 process.exit(1);
             }
         }
