@@ -54,6 +54,7 @@ var databank = require("databank"),
     mm = require("../lib/mimemap"),
     saveUpload = require("../lib/saveupload").saveUpload,
     streams = require("../lib/streams"),
+    apiUtil = require("../lib/api"),
     reqUser = mw.reqUser,
     reqGenerator = mw.reqGenerator,
     sameUser = mw.sameUser,
@@ -80,8 +81,8 @@ var databank = require("databank"),
     addShared = finishers.addShared,
     firstFewReplies = finishers.firstFewReplies,
     firstFewShares = finishers.firstFewShares,
-    DEFAULT_ITEMS = 20,
-    MAX_ITEMS = DEFAULT_ITEMS * 10;
+    DEFAULT_ITEMS = apiUtil.DEFAULT_ITEMS,
+    MAX_ITEMS = apiUtil.MAX_ITEMS;
 
 // Initialize the app controller
 

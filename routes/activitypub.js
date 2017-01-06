@@ -16,15 +16,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+var Step = require("step"),
+    mw = require("../lib/middleware"),
+    streams = require("../lib/streams"),
+    apiUtil = require("../lib/api"),
+    reqUser = mw.reqUser;
+
 var addRoutes = function(app) {
+
+    // TODO: auth
+
+    var smw = (app.session) ? [app.session] : [];
 
     // Users
 
-    app.get("/activitypub/user/:nickname");
+    app.get("/activitypub/user/:nickname", smw, reqUser);
 
     // Inboxes
 
-    app.get("/activitypub/user/:nickname/inbox");
+    app.get("/activitypub/user/:nickname/inbox", smw, reqUser, userInbox);
     app.post("/activitypub/user/:nickname/inbox");
 
     // Outboxes
@@ -53,6 +63,22 @@ var addRoutes = function(app) {
     app.post("/activitypub/publicInbox");
 
     // TODO: do we need to do something special here for regular Object `id`s?
+};
+
+var userInbox = function(req, res, next) {
+    // TODO: we fudge the query arguments for now but eventually this should use paging
+    var args = {
+        count: apiUtil.DEFAULT_ITEMS
+    };
+
+    // TODO: upgrade this to AS2
+    streams.userInbox({user: req.user}, req.principal, args, function(err, collection) {
+            if (err) {
+                next(err);
+            } else {
+                res.json(collection);
+            }
+    });
 };
 
 exports.addRoutes = addRoutes;
