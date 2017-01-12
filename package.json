@@ -32,7 +32,7 @@
     "express": "^3.21.2",
     "express-session": "1.x.x",
     "gm": "^1.22.0",
-    "helmet": "^2.1.2",
+    "helmet": "^3.3.0",
     "jade": "^1.11.0",
     "jankyqueue": "0.1.x",
     "jsdom": "^7.2.2",
