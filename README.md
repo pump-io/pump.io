@@ -173,6 +173,7 @@ Here are the main configuration keys.
    "/etc/ssl/private/myserver.key".
 * *cert* If you're using SSL, the path to the server cert, like
    "/etc/ssl/private/myserver.crt".
+* *hsts* Controls the HTTP `Strict-Transport-Security` header. It's passed directly to the [hsts](https://www.npmjs.com/package/hsts) module, so you can set `true` to use the defaults (180 days, `includeSubdomains` is on) or set an object to use a longer time, enable preloading, etc.
 * *uploaddir* If you want to enable file uploads, set this to the
   full path of a local directory. It should be writeable and readable by the
   'serverUser'.
