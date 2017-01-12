@@ -2,6 +2,12 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 2.2.0 - Future
+
+### Improved
+
+* HTTP Strict Transport Security can now be configured (#1197)
+
 ## 2.1.0 - 2017-01-04
 
 No changes from 2.1.0 beta 0.
