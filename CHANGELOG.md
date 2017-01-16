@@ -8,6 +8,10 @@ pump.io follows [Semantic Versioning][semver].
 
 * HTTP Strict Transport Security can now be configured (#1197)
 
+### Changed
+
+* The web UI no longer loads a JSON polyfill
+
 ## 2.1.0 - 2017-01-04
 
 No changes from 2.1.0 beta 0.
