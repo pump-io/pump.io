@@ -57,7 +57,7 @@ suite.addBatch({
             "the Content-Security-Policy header is correct": function(err, res, body) {
                 assert.isObject(res.headers);
                 assert.include(res.headers, "content-security-policy");
-                assert.equal(res.headers["content-security-policy"], "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src *; object-src 'none'; media-src *; child-src 'self' www.youtube.com; frame-ancestors 'none'; plugin-types 'none'");
+                assert.equal(res.headers["content-security-policy"], "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src *; object-src 'none'; media-src *; child-src 'self' www.youtube.com; frame-ancestors 'none'");
             },
             "the X-Content-Type-Options header is correct": function(err, res, body) {
                 assert.isObject(res.headers);
