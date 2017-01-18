@@ -16,6 +16,13 @@ pump.io follows [Semantic Versioning][semver].
 
 * Incorrect and unnecessary 'plugin-types' Content Security Policy directives are no longer sent
 
+## 2.1.1 - 2017-01-18
+
+### Fixed
+
+* Realtime functionality is working again
+* Incorrect and unnecessary 'plugin-types' Content Security Policy directives are no longer sent
+
 ## 2.1.0 - 2017-01-04
 
 No changes from 2.1.0 beta 0.
