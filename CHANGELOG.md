@@ -2,7 +2,7 @@
 
 pump.io follows [Semantic Versioning][semver].
 
-## 2.2.0 - Future
+## 3.0.0 - Future
 
 ### Improved
 
@@ -15,6 +15,10 @@ pump.io follows [Semantic Versioning][semver].
 ### Fixed
 
 * Incorrect and unnecessary 'plugin-types' Content Security Policy directives are no longer sent
+
+### Breaking
+
+* The `uploaddir` option is obsolete and should be migrated to the new `datadir` option (#1272)
 
 ## 2.1.1 - 2017-01-18
 

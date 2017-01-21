@@ -55,7 +55,7 @@ suite.addBatch({
                 dirname = path.join(os.tmpDir(),
                                     "upload-file-test",
                                     ""+Date.now());
-            mkdirp(dirname, function(err) {
+            mkdirp(path.join(dirname, "uploads"), function(err) {
                 if (err) {
                     callback(err, null);
                 } else {
@@ -73,7 +73,7 @@ suite.addBatch({
         },
         "and we set up the app": {
             topic: function(dir) {
-                setupAppConfig({uploaddir: dir},
+                setupAppConfig({datadir: dir, uploadsEnabled: true},
                                this.callback);
             },
             teardown: function(app) {
