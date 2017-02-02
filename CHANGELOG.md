@@ -2,6 +2,31 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 3.0.0 beta 0 - 2017-02-01
+
+### Improved
+
+* HTTP Strict Transport Security can now be configured (#1197)
+
+### Changed
+
+* The web UI no longer loads a JSON polyfill
+
+### Fixed
+
+* Incorrect and unnecessary 'plugin-types' Content Security Policy directives are no longer sent
+
+### Breaking
+
+* The `uploaddir` option is obsolete and should be migrated to the new `datadir` option (#1272)
+
+## 2.1.1 - 2017-01-18
+
+### Fixed
+
+* Realtime functionality is working again
+* Incorrect and unnecessary 'plugin-types' Content Security Policy directives are no longer sent
+
 ## 2.1.0 - 2017-01-04
 
 No changes from 2.1.0 beta 0.

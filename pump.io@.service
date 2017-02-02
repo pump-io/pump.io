@@ -1,7 +1,7 @@
 [Unit]
 Description=Pump.io - stream server that does most of what people really want from a social network
-After=syslog.target network.target mongodb.service
-Requires=mongodb.service
+After=syslog.target network.target %i.service
+Requires=%i.service
 
 [Service]
 Type=simple
