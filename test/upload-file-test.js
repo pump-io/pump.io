@@ -73,7 +73,7 @@ suite.addBatch({
         },
         "and we set up the app": {
             topic: function(dir) {
-                setupAppConfig({datadir: dir, uploadsEnabled: true},
+                setupAppConfig({datadir: dir, enableUploads: true},
                                this.callback);
             },
             teardown: function(app) {
