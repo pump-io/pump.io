@@ -173,10 +173,17 @@ Here are the main configuration keys.
    "/etc/ssl/private/myserver.key".
 * *cert* If you're using SSL, the path to the server cert, like
    "/etc/ssl/private/myserver.crt".
-* *hsts* Controls the HTTP `Strict-Transport-Security` header. It's passed directly to the [hsts](https://www.npmjs.com/package/hsts) module, so you can set `true` to use the defaults (180 days, `includeSubdomains` is on) or set an object to use a longer time, enable preloading, etc.
-* *uploaddir* If you want to enable file uploads, set this to the
-  full path of a local directory. It should be writeable and readable by the
-  'serverUser'.
+* *hsts* Controls the HTTP `Strict-Transport-Security` header. It's passed
+  directly to the [hsts](https://www.npmjs.com/package/hsts) module, so you can
+  set `true` to use the defaults (180 days, `includeSubdomains` is on) or set
+  an object to use a longer time, enable preloading, etc.
+* *uploaddir* Obsolete; see issue #1261
+* *datadir* Directory for the server to store data in (mostly uploads). Should
+  be the full path of a local directory that's readable and writeable by the
+  `serverUser`. Optional unless you have uploads turned on.
+* *uploadsEnabled* If you want to enable file uploads, set this to `true`. Make
+  sure that `datadir` is set and that the directory it's set to contains a
+  subdirectory named `uploads`.
 * *debugClient* For developers, if you're debugging the Web interface
   and you want to use the non-minified version of the JavaScript libraries,
   set this to `true`. Defaults to `false`, which is what people should
