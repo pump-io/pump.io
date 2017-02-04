@@ -75,6 +75,7 @@
     "postinstall": "npm run build",
     "test": "npm run lint && vows -v test/*-test.js",
     "test-root": "vows -v test/*-test-as-root.js",
+    "test:install": "sudo $(which npm) install -g .",
     "lint": "npm run lint:jshint && npm run lint:jscs && npm run lint:jade",
     "lint:jshint": "jshint --exclude 'public/javascript/libs' bin/* routes",
     "lint:jscs": "jscs bin/* lib public/javascript/pump* routes test",
