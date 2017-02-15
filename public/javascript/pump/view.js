@@ -198,6 +198,7 @@
                                           "error",
                                           "favorites",
                                           "followers",
+                                          "following",
                                           "inbox",
                                           "javascript-disabled",
                                           "list",
