@@ -2,6 +2,17 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 3.0.0 beta 1 - 2017-02-15
+
+### Improved
+
+* Improve performance of front-page image
+
+### Fixed
+
+* Fix the web UI repeating YouTube videos (again)
+* Fix direct visits to /following URLs not rendering layout (#1279)
+
 ## 3.0.0 beta 0 - 2017-02-01
 
 ### Improved
