@@ -130,4 +130,4 @@ answer any questions you have.
  [commits]: http://chris.beams.io/posts/git-commit/
  [open a Pull Request]: https://help.github.com/articles/creating-a-pull-request/
  [community]: https://github.com/pump-io/pump.io/wiki/Community
- [Alex Jordan]: https://strugee.net/contact/
+ [Alex Jordan]: https://strugee.net/contact
