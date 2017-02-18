@@ -85,6 +85,9 @@ should check your code for style and correctness violations by running
 test`, but you don't have to since that will take a while and will be
 run automatically when you submit your change back to the project.
 
+You can find more notes about hacking on the codebase
+in [HACKING.md][].
+
 ## Sending a Pull Request
 
 Almost done! The next step is to upload your branch and send a Pull
@@ -128,6 +131,7 @@ answer any questions you have.
  [clone your fork]: https://help.github.com/articles/cloning-a-repository/
  [Node.js]: https://nodejs.org
  [commits]: http://chris.beams.io/posts/git-commit/
+ [HACKING.md]: https://github.com/pump-io/pump.io/blob/master/HACKING.md
  [open a Pull Request]: https://help.github.com/articles/creating-a-pull-request/
  [community]: https://github.com/pump-io/pump.io/wiki/Community
  [Alex Jordan]: https://strugee.net/contact
