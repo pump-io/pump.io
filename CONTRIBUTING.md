@@ -7,6 +7,8 @@ pump.io has a [Code of Conduct][] based on
 the [Contributor Covenant][] - participants are expected to adhere to
 the rules at all times. (They're not that difficult.)
 
+Gotten stuck? No problem. Look at the bottom for tips on getting help.
+
 ## Finding an issue
 
 The first step is to find an issue you want to work on. If you came
@@ -97,6 +99,28 @@ comments.
 Congratulations! Your code's made it into pump.io! Thanks for
 contributing - we hope to see you again soon <3
 
+## Getting help
+
+Everyone gets stuck sometimes. If this is you, the community will be
+happy to help you.
+
+[Here's a couple ways][community] that you can get in touch. The
+easiest way is probably IRC - you can download a client, but for your
+first time it'll be easier to use https://webchat.freenode.net/. You
+need to join the `#pump.io` channel; make up a nickname and don't
+check the "auth to services" checkbox. Be aware that it's normal to
+not receive an immediate reply on IRC - people often leave their IRC
+clients open while they do other things and come back and read the
+history later. This is also why it's important to not say things like
+"can I ask a question?" - just ask! Someone'll probably give you an
+answer later.
+
+Alternately, you can ask for help in a comment on the issue you're
+fixing.
+
+Finally, you can contact [Alex Jordan][] directly. He'll be happy to
+answer any questions you have.
+
  [Code of Conduct]: https://github.com/pump-io/pump.io/blob/master/CODE_OF_CONDUCT.md
  [Contributor Covenant]: http://contributor-covenant.org/
  [good first pr]: https://github.com/pump-io/pump.io/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+pr%22
@@ -105,3 +129,5 @@ contributing - we hope to see you again soon <3
  [Node.js]: https://nodejs.org
  [commits]: http://chris.beams.io/posts/git-commit/
  [open a Pull Request]: https://help.github.com/articles/creating-a-pull-request/
+ [community]: https://github.com/pump-io/pump.io/wiki/Community
+ [Alex Jordan]: https://strugee.net/contact/
