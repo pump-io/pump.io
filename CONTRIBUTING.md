@@ -31,3 +31,6 @@ If you've found a bug, include as much information as possible about the server:
 If it's a bug in the web UI, please provide exact step-by-step instructions for reproducing it.
 
 If it's a bug in the API, include details about what you're submitting or the exact URL that you're querying.
+
+ [commits]: https://chris.beams.io/posts/git-commit/
+ [CONTRIBUTING_CODE.md]: https://github.com/pump-io/pump.io/blob/master/doc/CONTRIBUTING_CODE.md
