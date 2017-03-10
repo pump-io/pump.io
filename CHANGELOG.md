@@ -2,6 +2,12 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 3.0.1 - 2017-03-10
+
+### Fixed
+
+* Removed build logic from public npm package because it was completely breaking installs (#1291)
+
 ## 3.0.0 - 2017-03-05
 
 No changes from 3.0.0 beta 1.
