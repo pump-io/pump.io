@@ -1,11 +1,11 @@
 # pump.io
 
-Version 2.1.0
 
 This is pump.io. It's a stream server that does most of what people
 really want from a social network.
 
-[![Build Status](https://secure.travis-ci.org/pump-io/pump.io.png)](http://travis-ci.org/pump-io/pump.io)
+[![Build Status](https://secure.travis-ci.org/pump-io/pump.io.png)](http://travis-ci.org/pump-io/pump.io) [![npm](https://img.shields.io/npm/v/pump.io.svg)](https://npmjs.com/package/pump.io)
+
 
 ## License
 
