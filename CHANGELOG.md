@@ -2,6 +2,13 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 3.0.2 - 2017-03-10
+
+### Fixed
+
+* Fix README.md documenting the old name of a config parameter
+* Fix the sample `pump.io.json` including an obsolete parameter
+
 ## 3.0.1 - 2017-03-10
 
 ### Fixed
