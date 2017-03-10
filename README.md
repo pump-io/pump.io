@@ -181,7 +181,7 @@ Here are the main configuration keys.
 * *datadir* Directory for the server to store data in (mostly uploads). Should
   be the full path of a local directory that's readable and writeable by the
   `serverUser`. Optional unless you have uploads turned on.
-* *uploadsEnabled* If you want to enable file uploads, set this to `true`. Make
+* *enableUploads* If you want to enable file uploads, set this to `true`. Make
   sure that `datadir` is set and that the directory it's set to contains a
   subdirectory named `uploads`.
 * *debugClient* For developers, if you're debugging the Web interface
