@@ -1,6 +1,6 @@
 # pump.io
 
-Version 3.0.0
+Version 3.0.1
 
 This is pump.io. It's a stream server that does most of what people
 really want from a social network.
