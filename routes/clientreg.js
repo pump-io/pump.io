@@ -26,7 +26,7 @@ var _ = require("underscore"),
     Client = require("../lib/model/client").Client,
     HTTPError = require("../lib/httperror").HTTPError;
 
-var addRoutes = function(app) {
+var addRoutes = function(app, session) {
 
     // Client registration
 

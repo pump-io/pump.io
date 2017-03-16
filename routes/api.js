@@ -85,9 +85,9 @@ var databank = require("databank"),
 
 // Initialize the app controller
 
-var addRoutes = function(app) {
+var addRoutes = function(app, session) {
 
-    var smw = (app.session) ? [app.session] : [];
+    var smw = (session) ? [session] : [];
 
     // Proxy to a remote server
 

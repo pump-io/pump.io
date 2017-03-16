@@ -66,47 +66,47 @@ var databank = require("databank"),
     principalActorOrRecipient = omw.principalActorOrRecipient,
     principalAuthorOrRecipient = omw.principalAuthorOrRecipient;
 
-var addRoutes = function(app) {
+var addRoutes = function(app, session) {
 
-    app.get("/", app.session, principal, addMessages, showMain);
+    app.get("/", session, principal, addMessages, showMain);
 
-    app.post("/main/javascript-disabled", app.session, principal, showJavascriptDisabled);
+    app.post("/main/javascript-disabled", session, principal, showJavascriptDisabled);
 
-    app.get("/main/register", app.session, principal, showRegister);
-    app.post("/main/register", app.session, principal, clientAuth, reqGenerator, createUser);
+    app.get("/main/register", session, principal, showRegister);
+    app.post("/main/register", session, principal, clientAuth, reqGenerator, createUser);
 
-    app.get("/main/login", app.session, principal, addMessages, showLogin);
-    app.post("/main/login", app.session, clientAuth, handleLogin);
+    app.get("/main/login", session, principal, addMessages, showLogin);
+    app.post("/main/login", session, clientAuth, handleLogin);
 
-    app.post("/main/logout", app.session, someReadAuth, handleLogout);
+    app.post("/main/logout", session, someReadAuth, handleLogout);
 
-    app.post("/main/renew", app.session, userAuth, renewSession);
+    app.post("/main/renew", session, userAuth, renewSession);
 
-    app.get("/main/remote", app.session, principal, showRemote);
-    app.post("/main/remote", app.session, handleRemote);
+    app.get("/main/remote", session, principal, showRemote);
+    app.post("/main/remote", session, handleRemote);
 
     if (app.config.haveEmail) {
-        app.get("/main/recover", app.session, showRecover);
-        app.get("/main/recover-sent", app.session, showRecoverSent);
-        app.post("/main/recover", app.session, handleRecover);
-        app.get("/main/recover/:code", app.session, recoverCode);
-        app.post("/main/redeem-code", app.session, clientAuth, redeemCode);
+        app.get("/main/recover", session, showRecover);
+        app.get("/main/recover-sent", session, showRecoverSent);
+        app.post("/main/recover", session, handleRecover);
+        app.get("/main/recover/:code", session, recoverCode);
+        app.post("/main/redeem-code", session, clientAuth, redeemCode);
     }
 
-    app.get("/main/authorized/:hostname", app.session, reqHost, reqToken, authorized);
+    app.get("/main/authorized/:hostname", session, reqHost, reqToken, authorized);
 
     if (app.config.uploaddir) {
-        app.post("/main/upload", app.session, principal, principalUserOnly, uploadFile);
-        app.post("/main/upload-avatar", app.session, principal, principalUserOnly, uploadAvatar);
+        app.post("/main/upload", session, principal, principalUserOnly, uploadFile);
+        app.post("/main/upload-avatar", session, principal, principalUserOnly, uploadAvatar);
     }
 
-    app.get("/:nickname", app.session, principal, addMessages, reqUser, showStream);
-    app.get("/:nickname/favorites", app.session, principal, addMessages, reqUser, showFavorites);
-    app.get("/:nickname/followers", app.session, principal, addMessages, reqUser, showFollowers);
-    app.get("/:nickname/following", app.session, principal, addMessages, reqUser, showFollowing);
+    app.get("/:nickname", session, principal, addMessages, reqUser, showStream);
+    app.get("/:nickname/favorites", session, principal, addMessages, reqUser, showFavorites);
+    app.get("/:nickname/followers", session, principal, addMessages, reqUser, showFollowers);
+    app.get("/:nickname/following", session, principal, addMessages, reqUser, showFollowing);
 
-    app.get("/:nickname/lists", app.session, principal, addMessages, reqUser, showLists);
-    app.get("/:nickname/list/:uuid", app.session, principal, addMessages, reqUser, showList);
+    app.get("/:nickname/lists", session, principal, addMessages, reqUser, showLists);
+    app.get("/:nickname/list/:uuid", session, principal, addMessages, reqUser, showList);
 
     // For things that you can only see if you're logged in,
     // we redirect to the login page, then let you go there
@@ -115,13 +115,13 @@ var addRoutes = function(app) {
     app.get("/main/account", loginRedirect("/main/account"));
     app.get("/main/messages", loginRedirect("/main/messages"));
 
-    app.post("/main/proxy", app.session, principal, principalNotUser, proxyActivity);
+    app.post("/main/proxy", session, principal, principalNotUser, proxyActivity);
 
     // These are catchalls and should go at the end to prevent conflicts
 
-    app.get("/:nickname/activity/:uuid", app.session, principal, addMessages, requestActivity, reqUser, userIsActor, principalActorOrRecipient, showActivity);
+    app.get("/:nickname/activity/:uuid", session, principal, addMessages, requestActivity, reqUser, userIsActor, principalActorOrRecipient, showActivity);
 
-    app.get("/:nickname/:type/:uuid", app.session, principal, addMessages, requestObject, reqUser, userIsAuthor, principalAuthorOrRecipient, showObject);
+    app.get("/:nickname/:type/:uuid", session, principal, addMessages, requestObject, reqUser, userIsAuthor, principalAuthorOrRecipient, showObject);
 };
 
 var loginRedirect = function(rel) {

@@ -30,7 +30,7 @@ var connect = require("connect"),
 
 var EXPIRES = 365 * 24 * 60 * 60 * 1000;
 
-var addRoutes = function(app) {
+var addRoutes = function(app, session) {
 
     // expose this one file over the web
 

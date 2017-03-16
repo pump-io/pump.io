@@ -28,9 +28,9 @@ var _ = require("underscore"),
     setPrincipal = authc.setPrincipal,
     principal = authc.principal;
 
-var addRoutes = function(app) {
+var addRoutes = function(app, session) {
 
-    app.get("/main/confirm/:code", app.session, principal, confirm);
+    app.get("/main/confirm/:code", session, principal, confirm);
 
 };
 
