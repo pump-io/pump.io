@@ -26,7 +26,6 @@ var http = require("http"),
     Step = require("step"),
     fs = require("fs"),
     express = require("express"),
-    util = require("util"),
     version = require("../../lib/version").version,
     OAuth = require("oauth-evanp").OAuth,
     urlparse = require("url").parse;
@@ -391,12 +390,12 @@ var proxy = function(options, callback) {
             _.each(bres.headers, function(value, name) {
                 res.header(name, value);
             });
-            util.pump(bres, res);
+            bres.pipe(res);
         });
         breq.on("error", function(err) {
             next(err);
         });
-        util.pump(req, breq);
+        req.pipe(breq);
     });
 
     // XXX: need to call callback on an error
