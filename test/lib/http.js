@@ -379,7 +379,7 @@ var proxy = function(options, callback) {
             options = {
                 hostname: back.hostname,
                 port: back.port,
-                method: req.route.method.toUpperCase(),
+                method: req.method.toUpperCase(),
                 path: back.path + "/" + rel,
                 headers: _.extend(req.headers, {"Via": "pump.io-test-proxy/0.1.0"})
             },
