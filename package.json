@@ -21,7 +21,6 @@
     "bunyan": "^1.8.1",
     "colors": "^1.1.2",
     "compression": "^1.6.2",
-    "connect": "2.x.x",
     "connect-auth": "github:e14n/connect-auth",
     "connect-databank": "^1.0.3",
     "connect-multiparty": "^2.0.0",

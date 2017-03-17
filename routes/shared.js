@@ -18,9 +18,7 @@
 
 "use strict";
 
-var connect = require("connect"),
-    send = require("send"),
-    cutils = connect.utils,
+var send = require("send"),
     fs = require("fs"),
     path = require("path"),
     Step = require("step"),
