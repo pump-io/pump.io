@@ -30,6 +30,8 @@ if (!window.Pump) {
 
 (function(_, $, Backbone, Pump) {
 
+    "use strict";
+
     // This is overwritten by inline script in layout.jade
 
     Pump.config = {};

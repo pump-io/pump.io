@@ -24,6 +24,8 @@
 
 (function(_, $, Backbone, Pump) {
 
+    "use strict";
+
     Pump.Router = Backbone.Router.extend({
 
         routes: {
