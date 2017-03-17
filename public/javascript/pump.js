@@ -560,13 +560,13 @@ if (!window.Pump) {
         // When I say "view" the crowd say "selector"
 
         function processInitialData(value, name) {
-	    if (name == View.prototype.modelName) {
-		options.model = def.models[name].unique(value);
-	    } else if (def.models[name]) {
-		    options.data[name] = def.models[name].unique(value);
-	    } else {
-		    options.data[name] = value;
-	    }
+            if (name == View.prototype.modelName) {
+                options.model = def.models[name].unique(value);
+            } else if (def.models[name]) {
+                    options.data[name] = def.models[name].unique(value);
+            } else {
+                    options.data[name] = value;
+            }
         }
 
         for (selector in selectorToView) {
