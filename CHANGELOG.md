@@ -2,6 +2,19 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 4.0.0 beta 0 - Future
+
+### Improved
+
+* Frontend JavaScript runs in strict mode (#1221)
+* Frontend Javascript passes JSHint (#1176)
+* Removed direct Connect dependency (#1274)
+* Upgrade to bcrypt@1
+
+### Breaking
+
+* Upgrade to Express 4.x (affects plugins)
+
 ## 3.0.2 - 2017-03-10
 
 ### Fixed
