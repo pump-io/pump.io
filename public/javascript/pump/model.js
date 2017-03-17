@@ -24,6 +24,8 @@
 
 (function(_, $, Backbone, Pump) {
 
+    "use strict";
+
     // Override backbone sync to use OAuth
 
     Backbone.sync = function(method, model, options) {

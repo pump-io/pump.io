@@ -24,6 +24,8 @@
 
 (function(_, $, Backbone, Pump) {
 
+    "use strict";
+
     Pump.getStreams = function() {
 
         var streams = {};

@@ -26,6 +26,8 @@
 
 (function(_, $, Backbone, Pump) {
 
+    "use strict";
+
     Pump.templates = {};
 
     Pump.TemplateError = function(template, data, err) {
