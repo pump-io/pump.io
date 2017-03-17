@@ -372,8 +372,8 @@ if (!window.Pump) {
         // Set wysiwyg defaults
 
         $.fn.wysihtml5.defaultOptions["font-styles"] = false;
-        $.fn.wysihtml5.defaultOptions["image"] = false;
-        $.fn.wysihtml5.defaultOptions["customTemplates"] = Pump.wysihtml5Tmpl;
+        $.fn.wysihtml5.defaultOptions.image = false;
+        $.fn.wysihtml5.defaultOptions.customTemplates = Pump.wysihtml5Tmpl;
     };
 
     // Turn the querystring into an object
@@ -559,6 +559,16 @@ if (!window.Pump) {
 
         // When I say "view" the crowd say "selector"
 
+        function processInitialData(value, name) {
+	    if (name == View.prototype.modelName) {
+		options.model = def.models[name].unique(value);
+	    } else if (def.models[name]) {
+		    options.data[name] = def.models[name].unique(value);
+	    } else {
+		    options.data[name] = value;
+	    }
+        }
+
         for (selector in selectorToView) {
             if (_.has(selectorToView, selector)) {
                 $el = $content.find(selector);
@@ -567,15 +577,7 @@ if (!window.Pump) {
                     View = def.View;
                     options = {el: $el, data: {}};
                     data = Pump.initialData;
-                    _.each(data, function(value, name) {
-                        if (name == View.prototype.modelName) {
-                            options.model = def.models[name].unique(value);
-                        } else if (def.models[name]) {
-                            options.data[name] = def.models[name].unique(value);
-                        } else {
-                            options.data[name] = value;
-                        }
-                    });
+                    _.each(data, processInitialData);
                     Pump.body.content = new View(options);
                     Pump.initialData = null;
                     break;
