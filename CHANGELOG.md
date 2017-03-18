@@ -35,6 +35,7 @@ No changes from 3.0.0 beta 1.
 ### Improved
 
 * HTTP Strict Transport Security can now be configured (#1197)
+* The sample systemd service can now be directly be used by specifying a Databank driver as an @-service parameter
 
 ### Changed
 
