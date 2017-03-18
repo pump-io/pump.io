@@ -44,7 +44,6 @@
     "oauth-evanp": "~0.9.10-evanp.2",
     "octal": "^1.0.0",
     "optimist": "0.6.x",
-    "rimraf": "^2.5.2",
     "sanitize-html": "^1.13.0",
     "schlock": "~0.2.1",
     "send": "^0.15.1",
