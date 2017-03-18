@@ -1546,7 +1546,7 @@ var streamArgs = function(req, defaultCount, maxCount) {
         // XXX: Check "before" and "since" for URI...?
 
         if (_(req.query).has("before")) {
-            if (validator.isNull(req.query.before)) {
+            if (validator.isEmpty(req.query.before)) {
                 throw new Error(req.query.before + " is null");
             } else {
                 args.before = validator.trim(req.query.before);
@@ -1557,7 +1557,7 @@ var streamArgs = function(req, defaultCount, maxCount) {
             if (_(args).has("before")) {
                 throw new Error("Can't have both 'before' and 'since' parameters");
             }
-            if (validator.isNull(req.query.since)) {
+            if (validator.isEmpty(req.query.since)) {
                 throw new Error(req.query.since + " is null");
             }else {
                 args.since = validator.trim(req.query.since);

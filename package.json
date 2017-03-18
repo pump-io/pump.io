@@ -56,7 +56,7 @@
     "underscore": "1.8.x",
     "underscore-contrib": "0.3.x",
     "uuid": "^3.0.0",
-    "validator": "4.4.x",
+    "validator": "^7.0.0",
     "webfinger": "~0.4.2"
   },
   "bin": {
