@@ -6,6 +6,7 @@ really want from a social network.
 
 [![Build Status](https://travis-ci.org/pump-io/pump.io.svg?branch=master)](http://travis-ci.org/pump-io/pump.io)
 [![npm](https://img.shields.io/npm/v/pump.io.svg)](https://npmjs.com/package/pump.io)
+[![NSP Status](https://nodesecurity.io/orgs/pumpio/projects/32213bb8-f9a6-4dd0-8fc6-5caa8ea5f8fc/badge)](https://nodesecurity.io/orgs/pumpio/projects/32213bb8-f9a6-4dd0-8fc6-5caa8ea5f8fc)
 
 ## License
 
