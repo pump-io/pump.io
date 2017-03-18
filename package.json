@@ -8,12 +8,12 @@
   "devDependencies": {
     "jscs": "^3.0.3",
     "jshint": "^2.9.2",
-    "node-mocks-http": "1.5.x",
+    "node-mocks-http": "^1.6.1",
     "pug-lint": "^2.3.0",
-    "rimraf": "2.4.x",
-    "simplesmtp": "0.3.x",
-    "vows": "0.8.x",
-    "xml2js": "0.4.x",
+    "rimraf": "^2.6.1",
+    "simplesmtp": "^0.3.35",
+    "vows": "^0.8.1",
+    "xml2js": "^0.4.17",
     "zombie": "^3.1.1"
   },
   "dependencies": {
