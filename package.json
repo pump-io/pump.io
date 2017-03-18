@@ -28,7 +28,7 @@
     "cookie-parser": "^1.4.3",
     "crypto-cacerts": "0.1.x",
     "databank": "0.19.x",
-    "dateformat": "1.x",
+    "dateformat": "^2.0.0",
     "dialback-client": "0.2.x",
     "dompurify": "^0.8.3",
     "emailjs": "^1.0.8",
