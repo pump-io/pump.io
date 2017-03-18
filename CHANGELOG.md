@@ -9,7 +9,7 @@ pump.io follows [Semantic Versioning][semver].
 * Frontend JavaScript runs in strict mode (#1221)
 * Frontend Javascript passes JSHint (#1176)
 * Removed direct Connect dependency (#1274)
-* Upgrade to bcrypt@1
+* Upgrade many minor dependencies
 
 ### Breaking
 
