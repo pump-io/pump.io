@@ -1,5 +1,7 @@
 # pump.io
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/pump-io/pump.io.svg)](https://greenkeeper.io/)
+
 
 This is pump.io. It's a stream server that does most of what people
 really want from a social network.
