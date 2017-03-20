@@ -106,5 +106,12 @@
   "license": "Apache-2.0",
   "engine": {
     "node": ">=0.10"
+  },
+  "greenkeeper": {
+    "ignore": [
+      "connect-auth",
+      "databank",
+      "zombie"
+    ]
   }
 }
