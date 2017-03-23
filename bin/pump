@@ -109,6 +109,20 @@ var launchApps = function(config) {
         cnt = Math.max(os.cpus().length - 1, 1);
     }
 
+    if (_(config).has("autoHTTPS")) {
+        // Sanity checks
+        if (config.key || config.cert) throw new Error("Auto HTTPS is enabled but a manual HTTPS key or cert was configured");
+
+        // If the config value is "true", use the defaults
+        if (config.autoHTTPS === true) config.autoHTTPS = {};
+
+         _(config.autoHTTPS).defaults({
+             // 10 days
+             renewWithin: 10 * (24 * 60 * 60 * 1000)
+         });
+
+    }
+
     // Useful for some processes in each worker
     config.workers = cnt;
 
