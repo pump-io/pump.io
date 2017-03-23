@@ -32,5 +32,13 @@ If it's a bug in the web UI, please provide exact step-by-step instructions for 
 
 If it's a bug in the API, include details about what you're submitting or the exact URL that you're querying.
 
+## Hosting
+
+Running a public pump.io node (or even a private one for yourself) is a great way to contribute to the project.
+
+If this sounds interesting you, check out our [sysadmin documentation][], and feel free to get in touch with the [community][] if you run into any problems.
+
  [commits]: https://chris.beams.io/posts/git-commit/
  [CONTRIBUTING_CODE.md]: https://github.com/pump-io/pump.io/blob/master/doc/CONTRIBUTING_CODE.md
+ [sysadmin documentation]: 
+ [community]: https://github.com/pump-io/pump.io/wiki/Community
