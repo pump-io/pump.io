@@ -45,10 +45,10 @@ function run() {
 		fi
 	fi		
 	
-	# Check for `datadir` and `uploadsEnabled` already being there
+	# Check for `datadir` and `enableUploads` already being there
 	
 	# Bug: this will presumably fail if either of these are explicitly set to null, but that's such an edge case, who cares
-	for i in datadir uploadsEnabled; do
+	for i in datadir enableUploads; do
 		if ! [ $(jq '.'$i $JSONFILE) = null ]; then
 			echo $0: $JSONFILE: \`$i\` key already present 1>&2
 			exit 1
@@ -89,12 +89,12 @@ function run() {
 		rmdir $TMPDIR
 	
 		# Adjust the config to match the move we just did
-		jq '.datadir = .uploaddir' $JSONFILE | jq 'del(.uploaddir)' | jq '.uploadsEnabled = true' > $TMPFILE
+		jq '.datadir = .uploaddir' $JSONFILE | jq 'del(.uploaddir)' | jq '.enableUploads = true' > $TMPFILE
 	else
 		# `uploaddir` ends in /uploads
 		DATADIR=$(echo $UPLOADDIR | sed "s;/uploads/\?;;")
 		echo $DATADIR
-		jq '.datadir = '\"$DATADIR\" $JSONFILE | jq 'del(.uploaddir)' | jq '.uploadsEnabled = true' > $TMPFILE
+		jq '.datadir = '\"$DATADIR\" $JSONFILE | jq 'del(.uploaddir)' | jq '.enableUploads = true' > $TMPFILE
 	fi
 	
 	mv $TMPFILE $JSONFILE
