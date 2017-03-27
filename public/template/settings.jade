@@ -18,11 +18,12 @@
       textarea.span6#bio(name="bio", rows="5")!= profile.summary || ""
       span.help-block All about you.
 
-      label Avatar
-      if principal.image && principal.image.url
-        img.img-rounded(src=principal.image.url, width="96", height="96")
+      if config.canUpload
+        label Avatar
+        if principal.image && principal.image.url
+          img.img-rounded(src=principal.image.url, width="96", height="96")
 
-      #avatar-fineupload
+        #avatar-fineupload
 
     fieldset
       .actions
