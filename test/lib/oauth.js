@@ -395,7 +395,7 @@ var setupAppConfig = function(config, callback) {
         args.push(prop + "=" + JSON.stringify(config[prop]));
     }
 
-    var child = cp.fork(path.join(__dirname, "app.js"), args);
+    var child = cp.fork(path.join(__dirname, "app-standalone.js"), args);
 
     var dummy = {
         close: function() {
