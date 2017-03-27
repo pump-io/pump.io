@@ -27,9 +27,10 @@ var assert = require("assert"),
     http = require("http"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
     xrdutil = require("./lib/xrd"),
-    setupApp = oauthutil.setupApp;
+    setupApp = apputil.setupApp;
 
 var suite = vows.describe("host meta test");
 

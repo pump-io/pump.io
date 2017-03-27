@@ -27,10 +27,11 @@ var assert = require("assert"),
     OAuth = require("oauth-evanp").OAuth,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     accessToken = oauthutil.accessToken,
     requestToken = oauthutil.requestToken,
     register = oauthutil.register,
-    setupApp = oauthutil.setupApp,
+    setupApp = apputil.setupApp,
     newClient = oauthutil.newClient,
     newCredentials = oauthutil.newCredentials;
 

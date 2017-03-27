@@ -22,8 +22,9 @@ var assert = require("assert"),
     vows = require("vows"),
     http = require("http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     httputil = require("./lib/http"),
-    setupApp = oauthutil.setupApp;
+    setupApp = apputil.setupApp;
 
 var suite = vows.describe("shared library test");
 

@@ -26,9 +26,10 @@ var assert = require("assert"),
     gj = httputil.getJSON,
     pj = httputil.postJSON,
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
     validActivity = actutil.validActivity,
-    setupAppConfig = oauthutil.setupAppConfig,
+    setupAppConfig = apputil.setupAppConfig,
     newPair = oauthutil.newPair;
 
 var CLIENT_ID_1 = "AAAAAAAAAAAAAAAAAAAA",

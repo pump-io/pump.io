@@ -29,7 +29,8 @@ var assert = require("assert"),
     OAuth = require("oauth-evanp").OAuth,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
-    setupApp = oauthutil.setupApp;
+    apputil = require("./lib/app"),
+    setupApp = apputil.setupApp;
 
 var suite = vows.describe("user list API");
 

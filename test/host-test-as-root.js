@@ -36,7 +36,8 @@ var assert = require("assert"),
     Credentials = require("../lib/model/credentials").Credentials,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
-    setupAppConfig = oauthutil.setupAppConfig,
+    apputil = require("./lib/app"),
+    setupAppConfig = apputil.setupAppConfig,
     register = oauthutil.register,
     authorize = oauthutil.authorize;
 

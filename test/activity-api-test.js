@@ -27,8 +27,9 @@ var assert = require("assert"),
     urlparse = require("url").parse,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
-    setupApp = oauthutil.setupApp,
+    setupApp = apputil.setupApp,
     newCredentials = oauthutil.newCredentials;
 
 var suite = vows.describe("Activity API test");

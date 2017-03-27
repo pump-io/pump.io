@@ -24,8 +24,9 @@ var assert = require("assert"),
     URLMaker = require("../lib/urlmaker").URLMaker,
     modelBatch = require("./lib/model").modelBatch,
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     httputil = require("./lib/http"),
-    setupApp = oauthutil.setupApp,
+    setupApp = apputil.setupApp,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 

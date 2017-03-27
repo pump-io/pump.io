@@ -24,9 +24,11 @@ var assert = require("assert"),
     path = require("path"),
     version = require("../lib/version").version,
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
+    apputil = require("./lib/app"),
     httputil = require("./lib/http"),
-    setupApp = oauthutil.setupApp,
-    setupAppConfig = oauthutil.setupAppConfig;
+    setupApp = apputil.setupApp,
+    setupAppConfig = apputil.setupAppConfig;
 
 var ignore = function(err) {};
 

@@ -21,13 +21,15 @@
 var assert = require("assert"),
     vows = require("vows"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
+    apputil = require("./lib/app"),
     Browser = require("zombie"),
     Step = require("step"),
     http = require("http"),
     fs = require("fs"),
     path = require("path"),
-    setupApp = oauthutil.setupApp,
-    setupAppConfig = oauthutil.setupAppConfig,
+    setupApp = apputil.setupApp,
+    setupAppConfig = apputil.setupAppConfig,
     newCredentials = oauthutil.newCredentials;
 
 var suite = vows.describe("favicon.ico test");

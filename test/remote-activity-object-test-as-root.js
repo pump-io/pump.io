@@ -27,13 +27,14 @@ var assert = require("assert"),
     urlparse = require("url").parse,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
     newCredentials = oauthutil.newCredentials,
     newClient = oauthutil.newClient,
     validActivity = actutil.validActivity,
     pj = httputil.postJSON,
     gj = httputil.getJSON,
-    setupApp = oauthutil.setupApp;
+    setupApp = apputil.setupApp;
 
 var suite = vows.describe("remote activity object test");
 

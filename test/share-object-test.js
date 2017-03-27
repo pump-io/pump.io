@@ -25,8 +25,9 @@ var assert = require("assert"),
     OAuth = require("oauth-evanp").OAuth,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
-    setupApp = oauthutil.setupApp,
+    setupApp = apputil.setupApp,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair;
 

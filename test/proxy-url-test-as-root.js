@@ -33,13 +33,15 @@ var util = require("util"),
     urlparse = require("url").parse,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
+    apputil = require("./lib/app"),
     newCredentials = oauthutil.newCredentials,
     newClient = oauthutil.newClient,
     pj = httputil.postJSON,
     gj = httputil.getJSON,
     dialbackApp = require("./lib/dialback").dialbackApp,
-    setupAppConfig = oauthutil.setupAppConfig,
-    setupApp = oauthutil.setupApp;
+    setupAppConfig = apputil.setupAppConfig,
+    setupApp = apputil.setupApp;
 
 var suite = vows.describe("proxy url test");
 

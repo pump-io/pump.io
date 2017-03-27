@@ -21,8 +21,9 @@
 var assert = require("assert"),
     vows = require("vows"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     Browser = require("zombie"),
-    setupAppConfig = oauthutil.setupAppConfig;
+    setupAppConfig = apputil.setupAppConfig;
 
 var suite = vows.describe("homepage with noweb test");
 

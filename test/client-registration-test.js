@@ -24,7 +24,8 @@ var assert = require("assert"),
     _ = require("underscore"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
-    setupApp = oauthutil.setupApp;
+    apputil = require("./lib/app"),
+    setupApp = apputil.setupApp;
 
 var ignore = function(err) {};
 

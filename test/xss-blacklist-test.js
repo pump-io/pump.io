@@ -24,8 +24,9 @@ var assert = require("assert"),
     Step = require("step"),
     Browser = require("zombie"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     http = require("http"),
-    setupApp = oauthutil.setupApp,
+    setupApp = apputil.setupApp,
     br;
 
 vows.describe("XSS blacklist middleware").addBatch({

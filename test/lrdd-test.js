@@ -27,12 +27,13 @@ var assert = require("assert"),
     http = require("http"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     xrdutil = require("./lib/xrd"),
     actutil = require("./lib/activity"),
     pj = httputil.postJSON,
     gj = httputil.getJSON,
     validActivity = actutil.validActivity,
-    setupApp = oauthutil.setupApp,
+    setupApp = apputil.setupApp,
     newCredentials = oauthutil.newCredentials;
 
 var suite = vows.describe("LRDD test");
