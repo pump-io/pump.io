@@ -82,7 +82,7 @@
     "test:install": "npm install -g .",
     "lint": "npm run lint:jshint && npm run lint:jscs && npm run lint:jade && npm run lint:json && npm run lint:deps",
     "lint:deps": "dependency-check package.json > /dev/null && dependency-check --unused --no-dev package.json > /dev/null",
-    "lint:jshint": "jshint --exclude 'public/javascript/libs' bin/* lib routes public/javascript",
+    "lint:jshint": "jshint --exclude 'public/javascript/libs' bin/* lib routes public/javascript test",
     "lint:jscs": "jscs bin/* lib public/javascript/pump* routes test",
     "lint:jade": "pug-lint public/template/*.jade",
     "lint:json": "jsonlint -q package.json pump.io.json.sample",
