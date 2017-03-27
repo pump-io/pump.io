@@ -8,8 +8,10 @@ pump.io follows [Semantic Versioning][semver].
 
 * Frontend JavaScript runs in strict mode (#1221)
 * Frontend Javascript passes JSHint (#1176)
-* Removed direct Connect dependency (#1274)
+* Remove direct Connect dependency (#1274)
 * Upgrade many minor dependencies
+* Add a robots.txt file (#1286)
+* Don't suggest or offer avatar uploads if uploads aren't available
 
 ### Breaking
 
