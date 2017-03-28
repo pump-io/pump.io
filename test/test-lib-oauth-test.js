@@ -22,7 +22,8 @@ var assert = require("assert"),
     http = require("http"),
     vows = require("vows"),
     Step = require("step"),
-    _ = require("underscore");
+    _ = require("underscore"),
+    apputil = require("./lib/app");
 
 var suite = vows.describe("user REST API");
 
@@ -33,10 +34,6 @@ suite.addBatch({
         },
         "it works": function(oauth) {
             assert.isObject(oauth);
-        },
-        "it has a setupApp() export": function(oauth) {
-            assert.isTrue(_(oauth).has("setupApp"));
-            assert.isFunction(oauth.setupApp);
         },
         "it has a newClient() export": function(oauth) {
             assert.isTrue(_(oauth).has("newClient"));
@@ -60,7 +57,7 @@ suite.addBatch({
         },
         "and we setup the app": {
             topic: function(oauth) {
-                oauth.setupApp(this.callback);
+                apputil.setupApp(this.callback);
             },
             "it works": function(err, app) {
                 assert.ifError(err);
