@@ -1,0 +1,23 @@
+{
+    "driver":  "mongodb",
+    "params":  {"dbname": "pumpio", "host":"127.0.0.1", "port":27017},
+    "secret":  "put a secret string here",
+    "noweb":  false,
+    "site":  "My pump.io site using Docker",
+    "owner":  "My name is Docker",
+    "ownerURL":  "http://dockerio.cloudapp.net",
+    "hostname":  "pumpio.example.com",
+    "port":  443,
+    "urlPort": 443,
+    "key": "/etc/ssl/private/privkey.pem",
+    "cert": "/etc/ssl/private/fullchain.pem",
+    "address":  "0.0.0.0",
+    "nologger":  false,
+    "serverUser":  "pumpio",
+    "datadir": "/data/uploads",
+    "enableUploads" : true,
+    "disableRegistration": false,
+    "debugClient": false,
+    "sockjs": true,
+    "firehose": "ofirehose.com"
+}
