@@ -25,7 +25,8 @@ var assert = require("assert"),
     querystring = require("querystring"),
     OAuth = require("oauth-evanp").OAuth,
     httputil = require("./lib/http"),
-    oauthutil = require("./lib/oauth");
+    oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app");
 
 var suite = vows.describe("Test Webfinger for user profile IDs");
 
