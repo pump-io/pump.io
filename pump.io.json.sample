@@ -14,7 +14,7 @@
     "key":  "/etc/my/keyfile.key",
     "cert":  "/etc/my/server.crt",
     "datadir": "/var/local/pump.io",
-    "uploadsEnabled": true,
+    "enableUploads": true,
     "debugClient": false,
     "firehose": "ofirehose.com"
 }
