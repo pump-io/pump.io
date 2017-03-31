@@ -50,4 +50,4 @@ jspm_packages
 
 config.js
 
-public/template/*.jade.js
+public/template/*.js
