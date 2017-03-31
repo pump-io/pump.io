@@ -29,6 +29,7 @@
     "use strict";
 
     Pump.templates = {};
+    Pump._templates = window._pumpTemplates; // All available templates
 
     Pump.TemplateError = function(template, data, err) {
         if (Error.captureStackTrace) {
@@ -223,7 +224,7 @@
 
                         var f;
                         try {
-                            f = window.pumpTemplates[templateName];
+                            f = Pump._templates()[templateName];
                             f.templateName = name;
                             Pump.templates[name] = f;
                         } catch (err) {
@@ -238,10 +239,13 @@
                     if (_.has(Pump.templates, name)) {
                         return Pump.templates[name];
                     } else {
-                        f = window.pumpTemplates[name + "-client"];
-                        f.templateName = name;
-                        Pump.templates[name] = f;
-
+                        try {
+                            f = Pump._templates()[name + "-client"];
+                            f.templateName = name;
+                            Pump.templates[name] = f;
+                        } catch (err) {
+                            Pump.debug(err);
+                        }
                         return f;
                     }
                 },
