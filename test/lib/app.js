@@ -19,7 +19,8 @@
 "use strict";
 
 var cp = require("child_process"),
-    path = require("path");
+    path = require("path"),
+    assert = require("assert");
 
 // Call as setupApp(port, hostname, callback)
 // setupApp(hostname, callback)
@@ -114,5 +115,24 @@ var setupAppConfig = function(config, callback) {
     });
 };
 
+var withAppSetup = function(batchConfig) {
+    batchConfig.topic = function() {
+        setupApp(this.callback);
+    };
+    batchConfig.teardown = function(app) {
+        if (app && app.close) {
+            app.close();
+        }
+    };
+    batchConfig["it works"] = function(err, app) {
+        assert.ifError(err);
+    };
+
+    return {
+        "When we set up the app": batchConfig
+    };
+};
+
 exports.setupApp = setupApp;
 exports.setupAppConfig = setupAppConfig;
+exports.withAppSetup = withAppSetup;
