@@ -71,6 +71,7 @@ var cluster = require("cluster"),
 
                return config;
            })
+           .env("PUMPIO")
            .alias("help", "h")
            .help()
            .argv,
