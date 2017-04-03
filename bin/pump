@@ -34,8 +34,8 @@ var cluster = require("cluster"),
            .usage("Usage: $0 -c <configfile>")
            .alias("c", "config")
            // Hack to make sure that .config()'s callback gets run even if -c isn't specified
-           .default("config", "/dev/null")
-           .config("c", "Configuration file (default: /etc/pump.io.json and ~/.pump.io.json)", function findConfig(filename) {
+           .default("c", "/dev/null", "/etc/pump.io.json and ~/.pump.io.json")
+           .config("c", "Configuration file", function findConfig(filename) {
                var files,
                    config = {},
                    i,
@@ -71,6 +71,8 @@ var cluster = require("cluster"),
 
                return config;
            })
+           .alias("help", "h")
+           .help()
            .argv,
     Dispatch = require("../lib/dispatch"),
     makeApp = require("../lib/app").makeApp,
