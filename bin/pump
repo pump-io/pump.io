@@ -72,6 +72,8 @@ var cluster = require("cluster"),
                return config;
            })
            .env("PUMPIO")
+           // TODO more validation of booleans, etc. here
+           .number(["port", "urlPort", "smtpport", "smtptimeout", "cleanupSession", "cleanupNonce"])
            .alias("help", "h")
            .help()
            .alias("version", "v")
