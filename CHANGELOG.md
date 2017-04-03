@@ -12,10 +12,14 @@ pump.io follows [Semantic Versioning][semver].
 * Upgrade many minor dependencies
 * Add a robots.txt file (#1286)
 * Don't suggest or offer avatar uploads if uploads aren't available
+* Added the ability to specify configuration via environment variables
+* Added the ability to specify configuration via CLI flags
+* Added `--help` and `--version` CLI flags
 
 ### Breaking
 
 * Upgrade to Express 4.x (affects plugins)
+* Switch to Yargs for config and CLI option parsing (should be identical but please double-check that your config is respected in case of subtle edge cases)
 
 ## 3.0.2 - 2017-03-10
 
