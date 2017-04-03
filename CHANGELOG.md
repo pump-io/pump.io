@@ -2,6 +2,39 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 4.0.0 beta 0 - Future
+
+### Improved
+
+* Frontend JavaScript runs in strict mode (#1221)
+* Frontend Javascript passes JSHint (#1176)
+* Remove direct Connect dependency (#1274)
+* Upgrade many minor dependencies
+* Add a robots.txt file (#1286)
+* Don't suggest or offer avatar uploads if uploads aren't available
+* Added the ability to specify configuration via environment variables
+* Added the ability to specify configuration via CLI flags
+* Added `--help` and `--version` CLI flags
+* Embed IndieWeb metadata in the web UI
+
+### Breaking
+
+* Upgrade to Express 4.x (affects plugins)
+* Switch to Yargs for config and CLI option parsing (should be identical but please double-check that your config is respected in case of subtle edge cases)
+
+## 3.0.2 - 2017-03-10
+
+### Fixed
+
+* Fix README.md documenting the old name of a config parameter
+* Fix the sample `pump.io.json` including an obsolete parameter
+
+## 3.0.1 - 2017-03-10
+
+### Fixed
+
+* Removed build logic from public npm package because it was completely breaking installs (#1291)
+
 ## 3.0.0 - 2017-03-05
 
 No changes from 3.0.0 beta 1.
@@ -22,6 +55,7 @@ No changes from 3.0.0 beta 1.
 ### Improved
 
 * HTTP Strict Transport Security can now be configured (#1197)
+* The sample systemd service can now be directly be used by specifying a Databank driver as an @-service parameter
 
 ### Changed
 

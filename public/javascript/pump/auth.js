@@ -24,6 +24,8 @@
 
 (function(_, $, Backbone, Pump) {
 
+    "use strict";
+
     Pump.principalUser = null; // XXX: load from server...?
 
     Pump.clientID = null;

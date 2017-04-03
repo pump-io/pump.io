@@ -1,30 +1,32 @@
-.object-page
+.object-page.h-entry
   .media
-    a.pull-left(href=object.author.url)
+    a.pull-left.h-card.p-author(href=object.author.url)
       if object.author && object.author.image && object.author.image.url
-        img.img-rounded.media-object(src=object.author.image.url, width="96", height="96")
+        img.img-rounded.media-object(src=object.author.image.url, width="96", height="96", alt=object.author.displayName)
       else
-        img.img-rounded.media-object(src="/images/default.png", width="96", height="96")
+        img.img-rounded.media-object(src="/images/default.png", width="96", height="96", alt=object.author.displayName)
 
     .media-body
       if object.displayName
-        h2.media-heading!= object.displayName
+        h2.media-heading.p-name!= object.displayName
 
       p.muted
         small 
           if object.author
             a(href=object.author.url)!= object.author.displayName
             |  at 
-          a(href=object.url)= object.published
+          a(href=object.url)
+            time.dt-published(datetime=object.published)= object.published
           if object.location
             |  in  
             a(href=object.location.url)!= object.location.displayName
 
-      if object.image && object.image.url
-        p
-          img.img-polaroid(src=object.image.url)
+      .e-content
+        if object.image && object.image.url
+          p
+            img.img-polaroid(src=object.image.url)
 
-      .object-content!= object.content
+        .object-content.p-summary!= object.content
 
       if principal
         - var obj = object

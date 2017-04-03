@@ -26,7 +26,6 @@ var http = require("http"),
     Step = require("step"),
     fs = require("fs"),
     express = require("express"),
-    util = require("util"),
     version = require("../../lib/version").version,
     OAuth = require("oauth-evanp").OAuth,
     urlparse = require("url").parse;
@@ -380,7 +379,7 @@ var proxy = function(options, callback) {
             options = {
                 hostname: back.hostname,
                 port: back.port,
-                method: req.route.method.toUpperCase(),
+                method: req.method.toUpperCase(),
                 path: back.path + "/" + rel,
                 headers: _.extend(req.headers, {"Via": "pump.io-test-proxy/0.1.0"})
             },
@@ -391,12 +390,12 @@ var proxy = function(options, callback) {
             _.each(bres.headers, function(value, name) {
                 res.header(name, value);
             });
-            util.pump(bres, res);
+            bres.pipe(res);
         });
         breq.on("error", function(err) {
             next(err);
         });
-        util.pump(req, breq);
+        req.pipe(breq);
     });
 
     // XXX: need to call callback on an error

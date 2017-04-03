@@ -1,11 +1,12 @@
 # pump.io
 
-Version 3.0.0-beta.1
-
 This is pump.io. It's a stream server that does most of what people
 really want from a social network.
 
-[![Build Status](https://secure.travis-ci.org/pump-io/pump.io.png)](http://travis-ci.org/pump-io/pump.io)
+[![Build Status](https://travis-ci.org/pump-io/pump.io.svg?branch=master)](http://travis-ci.org/pump-io/pump.io)
+[![npm](https://img.shields.io/npm/v/pump.io.svg)](https://npmjs.com/package/pump.io)
+[![NSP Status](https://nodesecurity.io/orgs/pumpio/projects/32213bb8-f9a6-4dd0-8fc6-5caa8ea5f8fc/badge)](https://nodesecurity.io/orgs/pumpio/projects/32213bb8-f9a6-4dd0-8fc6-5caa8ea5f8fc)
+[![Greenkeeper badge](https://badges.greenkeeper.io/pump-io/pump.io.svg)](https://greenkeeper.io/)
 
 ## License
 
@@ -181,7 +182,7 @@ Here are the main configuration keys.
 * *datadir* Directory for the server to store data in (mostly uploads). Should
   be the full path of a local directory that's readable and writeable by the
   `serverUser`. Optional unless you have uploads turned on.
-* *uploadsEnabled* If you want to enable file uploads, set this to `true`. Make
+* *enableUploads* If you want to enable file uploads, set this to `true`. Make
   sure that `datadir` is set and that the directory it's set to contains a
   subdirectory named `uploads`.
 * *debugClient* For developers, if you're debugging the Web interface

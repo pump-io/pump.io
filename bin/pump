@@ -30,11 +30,55 @@ var cluster = require("cluster"),
     _ = require("underscore"),
     colors = require("colors/safe"),
     warningColors = colors.yellow,
-    argv = require("optimist")
-        .usage("Usage: $0 -c <configfile>")
-        .alias("c", "config")
-        .describe("c", "Configuration file (default: /etc/pump.io.json and ~/.pump.io.json)")
-        .argv,
+    argv = require("yargs")
+           .usage("Usage: $0 -c <configfile>")
+           .alias("c", "config")
+           // Hack to make sure that .config()'s callback gets run even if -c isn't specified
+           .default("c", "/dev/null", "/etc/pump.io.json and ~/.pump.io.json")
+           .config("c", "Configuration file", function findConfig(filename) {
+               var files,
+                   config = {},
+                   i,
+                   raw,
+                   parsed;
+
+               if (filename !== "/dev/null") {
+                   files = [filename];
+               } else {
+                   files = ["/etc/pump.io.json"];
+                   if (process.env.HOME) {
+                       files.push(path.join(process.env.HOME, ".pump.io.json"));
+                   }
+               }
+
+               // This is all sync
+               for (i = 0; i < files.length; i++) {
+                   try {
+                       raw = fs.readFileSync(files[i]);
+                   } catch (err) {
+                       continue;
+                   }
+
+                   try {
+                       parsed = JSON.parse(raw);
+                       _.extend(config, parsed);
+                   } catch (err) {
+                       console.error("Error parsing JSON configuration:", err.toString());
+                       console.error("Try using a JSON validator.");
+                       process.exit(1);
+                   }
+               }
+
+               return config;
+           })
+           .env("PUMPIO")
+           // TODO more validation of booleans, etc. here
+           .number(["port", "urlPort", "smtpport", "smtptimeout", "cleanupSession", "cleanupNonce"])
+           .alias("help", "h")
+           .help()
+           .alias("version", "v")
+           .version()
+           .argv,
     Dispatch = require("../lib/dispatch"),
     makeApp = require("../lib/app").makeApp,
     majorRelease = Number(process.versions.node.split(".")[0]);
@@ -51,45 +95,8 @@ if (majorRelease < 4 && cluster.isMaster) {
 // Then we get config files and launch some cluster apps
 
 var main = function() {
-    var config = getConfig(argv.c);
+    var config = argv;
     launchApps(config);
-};
-
-// Gets the configuration vars for this server from config files
-
-var getConfig = function(filename) {
-
-    var files,
-        config = {},
-        i,
-        raw,
-        parsed;
-
-    if (filename) {
-        files = [filename];
-    } else {
-        files = ["/etc/pump.io.json"];
-        if (process.env.HOME) {
-            files.push(path.join(process.env.HOME, ".pump.io.json"));
-        }
-    }
-
-    // This is all sync
-    for (i = 0; i < files.length; i++) {
-        if (fs.existsSync(files[i])) {
-            raw = fs.readFileSync(files[i]);
-            try {
-                parsed = JSON.parse(raw);
-                _.extend(config, parsed);
-            } catch (err) {
-                console.error("Error parsing JSON configuration:", err.toString());
-                console.error("Try using a JSON validator.");
-                process.exit(1);
-            }
-        }
-    }
-
-    return config;
 };
 
 // Launch apps

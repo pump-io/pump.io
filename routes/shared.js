@@ -18,9 +18,7 @@
 
 "use strict";
 
-var connect = require("connect"),
-    send = require("send"),
-    cutils = connect.utils,
+var send = require("send"),
     fs = require("fs"),
     path = require("path"),
     Step = require("step"),
@@ -30,7 +28,7 @@ var connect = require("connect"),
 
 var EXPIRES = 365 * 24 * 60 * 60 * 1000;
 
-var addRoutes = function(app) {
+var addRoutes = function(app, session) {
 
     // expose this one file over the web
 

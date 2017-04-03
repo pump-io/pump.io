@@ -18,6 +18,7 @@ before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -qq graphicsmagick
 notifications:
+ email: false
  irc:
    channels:
      - "chat.freenode.net#pump.io"
