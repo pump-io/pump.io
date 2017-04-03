@@ -74,6 +74,8 @@ var cluster = require("cluster"),
            .env("PUMPIO")
            .alias("help", "h")
            .help()
+           .alias("version", "v")
+           .version()
            .argv,
     Dispatch = require("../lib/dispatch"),
     makeApp = require("../lib/app").makeApp,
