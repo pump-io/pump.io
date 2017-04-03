@@ -15,6 +15,7 @@ pump.io follows [Semantic Versioning][semver].
 * Added the ability to specify configuration via environment variables
 * Added the ability to specify configuration via CLI flags
 * Added `--help` and `--version` CLI flags
+* Embed IndieWeb metadata in the web UI
 
 ### Breaking
 
