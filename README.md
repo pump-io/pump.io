@@ -87,6 +87,7 @@ You can then install the dependencies using `npm`:
 
     cd pump.io
     npm install
+    npm run build
 
 To test the install, run:
 
