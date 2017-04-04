@@ -2,9 +2,15 @@
 
 pump.io follows [Semantic Versioning][semver].
 
-## 4.0.0 beta 3 - 2017-04-03
+## 4.0.0 beta 4 - 2017-04-03
 
 ### Fixed
+
+* Fix a whitespace issue with `appendFooter`
+
+## 4.0.0 beta 3 - 2017-04-03
+
+### Changed
 
 * Permanently remove the build-on-git-install hacks (#1291)
 
