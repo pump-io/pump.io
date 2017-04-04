@@ -2,6 +2,12 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 4.0.0 beta 3 - 2017-04-03
+
+### Fixed
+
+* Permanently remove the build-on-git-install hacks (#1291)
+
 ## 4.0.0 beta 2 - 2017-04-03
 
 ### Fixed
