@@ -58,6 +58,8 @@ html(lang="en")
               a(href="#{config.ownerURL}") #{config.owner}
             else
               | #{config.owner}
+            if config.appendFooter
+              |  !{config.appendFooter}
         p
           a(href="http://pump.io/") pump.io
           |  available under the Apache License 2.0.

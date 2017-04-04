@@ -162,6 +162,7 @@ Here are the main configuration keys.
 * *site* Name of the server, like "My great social service".
 * *owner* Name of owning entity, if you want to link to it.
 * *ownerURL* URL of owning entity, if you want to link to it.
+* *appendFooter* a bit of custom HTML you want appended to the footer text.
 * *nologger* If you're debugging or whatever, turn off
   logging. Defaults to false (leave logging on).
 * *logfile* Full path to the logfile. Logs are JSON in
