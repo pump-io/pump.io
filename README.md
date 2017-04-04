@@ -258,9 +258,11 @@ like this:
 
 ## Running the daemon
 
+To run the pump.io daemon, you need to run either `./bin/pump` (if you
+installed from git) or `pump` (if you installed from npm).
+
 You'll probably get a more reliable experience if you use
 [forever](https://npmjs.org/package/forever) to keep the daemon running.
-
 
 ### Environment
 
