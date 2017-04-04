@@ -277,11 +277,18 @@ See [How to set NODE_DEBUG](http://www.juliengilli.com/2013/05/26/Using-Node.js-
 
 ## Using the command line tools
 
+You can use any pump.io client application you want to interact with
+pump.io servers. However, this repository comes with some samples to
+get you started, if you want.
+
 ### pump-register-app
 
 First use this tool to create the credentials file
 
     ./bin/pump-register-app  -t <APPNAME>
+
+`<APPNAME>` will be the name of the client app that
+`pump-register-app` registers with the server.
 
 This will create the file `~/.pump.d/<SERVER>.json` that contains your credentials.
 
@@ -291,10 +298,10 @@ This will create the file `~/.pump.d/<SERVER>.json` that contains your credentia
     "expires_at":0
     }
 
-It will also add an entry into the local database where you will find the
-clientID. Note that if you use the memory database the data will be lost
-between server runs and will need to rerun the configuration.
-
+It will also add an entry into the server database where you will find
+the clientID. Note that if you use the memory Databank driver the data
+will be lost between server runs and you will need to rerun the
+configuration.
 
 #### pump-register-user
 
@@ -310,7 +317,6 @@ After you register an app, you can authorize your user to use it.
 
 When you do that it will ask you to open a website, login and verify the
 value. You paste that back in and all is good.
-
 
 ## Making changes
 
