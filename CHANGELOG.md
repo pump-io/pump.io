@@ -2,7 +2,13 @@
 
 pump.io follows [Semantic Versioning][semver].
 
-## 4.0.0 beta 0 - Future
+## 4.0.0 beta 1 - 2017-04-03
+
+### Improved
+
+* Added the `appendFooter` config option
+
+## 4.0.0 beta 0 - 2017-04-03
 
 ### Improved
 
