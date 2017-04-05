@@ -47,11 +47,14 @@ It also comes with a web UI.
 
 ## Wiki
 
-For more information please check out the [GitHub wiki](https://github.com/pump-io/pump.io/wiki)
+For more information please check out the [GitHub
+wiki](https://github.com/pump-io/pump.io/wiki) and our
+[ReadTheDocs](https://pumpio.readthedocs.io/en/latest/) documentation.
 
-or clone it via the following command:
+or clone them with the following commands:
 
     git clone https://github.com/pump-io/pump.io.wiki.git
+    git clone clone https://gitlab.com/pump.io/pump-docs.git
 
 ## Installation
 
