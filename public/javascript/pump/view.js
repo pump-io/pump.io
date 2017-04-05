@@ -190,7 +190,8 @@
                     if (_.has(Pump.templates, name)) {
                         cb(null, Pump.templates[name]);
                     } else {
-                        var url = "/template/"+ name;
+                        var url = "/template/";
+                        var templateName = name;
                         var clientUrls = ["account",
                                           "authentication",
                                           "authorization",
@@ -218,9 +219,13 @@
                                           "user",
                                           "xss-error"];
                         if (clientUrls.indexOf(name) !== -1) {
-                            url += "-client";
+                            templateName += "-client";
                         }
-                        url += ".jade.js";
+                        var _template = Pump._templates[templateName];
+                        if (_template && !Pump.config.debugClient) {
+                            templateName += "." + _template.hash;
+                        }
+                        url += templateName + ".jade.js";
 
                         $.get(url, function(data) {
                             var f;
@@ -243,7 +248,15 @@
                     if (_.has(Pump.templates, name)) {
                         return Pump.templates[name];
                     } else {
-                        res = $.ajax({url: "/template/"+name+"-client.jade.js",
+                        var templateName = name + "-client";
+                        var _template = Pump._templates[templateName];
+
+                        if (_template && !Pump.config.debugClient) {
+                            templateName += "." + _template.hash;
+                        }
+                        templateName += ".jade.js";
+
+                        res = $.ajax({url: "/template/" + templateName,
                                       async: false});
                         if (res.readyState === 4 &&
                             ((res.status >= 200 && res.status < 300) || res.status === 304)) {
