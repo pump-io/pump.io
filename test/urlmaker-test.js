@@ -149,6 +149,14 @@ suite.addBatch({
             "its parts are correct": function(url) {
                 // parse query params too
                 var parts = parseURL(url, true);
+
+                // XXX this is an EXTREMELY dirty hack to work around a
+                // problem with Vows under Node 6
+                // See vowsjs/vows#375
+                if (typeof parts.query.hasOwnProperty === "undefined") {
+                    Object.setPrototypeOf(parts.query, {});
+                }
+
                 assert.equal(parts.hostname, "example.com");
                 assert.equal(parts.port, 2342);
                 assert.equal(parts.host, "example.com:2342");
