@@ -25,26 +25,17 @@ var assert = require("assert"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
-    setupApp = apputil.setupApp;
+    withAppSetup = apputil.withAppSetup;
 
 var ignore = function(err) {};
 
 var suite = vows.describe("dialback endpoint API");
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            app.close();
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we check the dialback endpoint":
         httputil.endpoint("/api/dialback", ["POST"])
-    }
-});
+    })
+);
 
 suite["export"](module);

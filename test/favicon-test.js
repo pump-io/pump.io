@@ -28,7 +28,7 @@ var assert = require("assert"),
     http = require("http"),
     fs = require("fs"),
     path = require("path"),
-    setupApp = apputil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     setupAppConfig = apputil.setupAppConfig,
     newCredentials = oauthutil.newCredentials;
 

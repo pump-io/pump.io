@@ -33,7 +33,7 @@ var assert = require("assert"),
     validActivity = actutil.validActivity,
     validActivityObject = actutil.validActivityObject,
     validFeed = actutil.validFeed,
-    setupApp = apputil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     newCredentials = oauthutil.newCredentials,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair;
@@ -52,19 +52,8 @@ var makeCred = function(cl, pair) {
 
 // A batch for manipulating groups API
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we make a new user": {
             topic: function() {
                 newCredentials("fafhrd", "lankhmar+1", this.callback);
@@ -966,7 +955,7 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

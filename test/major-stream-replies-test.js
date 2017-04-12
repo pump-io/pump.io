@@ -28,7 +28,7 @@ var assert = require("assert"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
-    setupApp = apputil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     newClient = oauthutil.newClient,
     register = oauthutil.register,
     newCredentials = oauthutil.newCredentials,
@@ -190,19 +190,8 @@ var otherUser = function(url, objects) {
 
 // A batch to test favoriting/unfavoriting objects
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we register a client": {
             topic: function() {
                 newClient(this.callback);
@@ -315,7 +304,7 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

@@ -29,7 +29,7 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
-    setupApp = apputil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     register = oauthutil.register,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair,
@@ -49,19 +49,8 @@ var makeCred = function(cl, pair) {
 
 // A batch for testing that updated information is updated
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we get more information about an object": {
             topic: function() {
                 var callback = this.callback,
@@ -223,7 +212,7 @@ suite.addBatch({
                 assert.equal(note.content, "Hello, world.");
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

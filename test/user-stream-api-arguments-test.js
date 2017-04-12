@@ -29,7 +29,7 @@ var assert = require("assert"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
-    setupApp = apputil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     register = oauthutil.register,
     newCredentials = oauthutil.newCredentials;
 

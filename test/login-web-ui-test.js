@@ -25,7 +25,7 @@ var assert = require("assert"),
     apputil = require("./lib/app"),
     Browser = require("zombie"),
     Step = require("step"),
-    setupApp = apputil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     setupAppConfig = apputil.setupAppConfig,
     newCredentials = oauthutil.newCredentials;
 

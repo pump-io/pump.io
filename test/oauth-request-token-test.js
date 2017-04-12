@@ -31,25 +31,14 @@ var assert = require("assert"),
     accessToken = oauthutil.accessToken,
     requestToken = oauthutil.requestToken,
     register = oauthutil.register,
-    setupApp = apputil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     newClient = oauthutil.newClient,
     newCredentials = oauthutil.newCredentials;
 
 var suite = vows.describe("user API");
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we request a token with no Authorization": {
             topic: function() {
                 var cb = this.callback;
@@ -129,24 +118,13 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 // A batch to test parallel requests
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we create a client using the api": {
             topic: function() {
                 newClient(this.callback);
@@ -175,24 +153,13 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 // A batch to test parallel requests
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we create a client using the api": {
             topic: function() {
                 newClient(this.callback);
@@ -220,24 +187,13 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 // A batch to test request token after access token
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we get a request token after getting an access token": {
             topic: function() {
                 var cb = this.callback,
@@ -273,7 +229,7 @@ suite.addBatch({
                 assert.isObject(rt);
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

@@ -30,7 +30,7 @@ var assert = require("assert"),
     apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
     xrdutil = require("./lib/xrd"),
-    setupApp = apputil.setupApp;
+    withAppSetup = apputil.withAppSetup;
 
 var suite = vows.describe("host meta test");
 
@@ -64,19 +64,8 @@ var hostmeta = {
 
 // A batch to test hostmeta functions
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we check the host-meta endpoint":
         httputil.endpoint("/.well-known/host-meta", ["GET"]),
         "and we check the host-meta.json endpoint":
@@ -129,7 +118,7 @@ suite.addBatch({
             "it has a JSON content type": xrdutil.typeCheck("application/json; charset=utf-8"),
             "it has lrdd template links": xrdutil.jrdLinkCheck(hostmeta)
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

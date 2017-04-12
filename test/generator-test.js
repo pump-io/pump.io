@@ -29,7 +29,7 @@ var assert = require("assert"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
-    setupApp = apputil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     register = oauthutil.register,
     newCredentials = oauthutil.newCredentials,
     newPair = oauthutil.newPair,
@@ -57,19 +57,8 @@ var clientCred = function(cl) {
 
 // A batch for testing the read access to the API
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we register a new client": {
             topic: function() {
                 var cb = this.callback,
@@ -467,7 +456,7 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

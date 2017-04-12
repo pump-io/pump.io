@@ -39,24 +39,8 @@ var assert = require("assert"),
 
 var suite = vows.describe("firehose module interface");
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupAppConfig({port: 80,
-                            hostname: "social.localhost",
-                            firehose: "firehose.localhost"
-                           },
-                           this.callback);
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-            assert.isObject(app);
-        },
-        "teardown": function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
+suite.addBatch(
+    withAppSetup({
         "and we set up a firehose dummy server": {
             topic: function(Firehose) {
                 var app = express.createServer(express.bodyParser()),
@@ -121,8 +105,8 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 module.exports = {}; // TODO reenable this test when it's passing
 

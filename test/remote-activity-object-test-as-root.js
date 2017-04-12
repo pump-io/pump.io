@@ -34,7 +34,7 @@ var assert = require("assert"),
     validActivity = actutil.validActivity,
     pj = httputil.postJSON,
     gj = httputil.getJSON,
-    setupApp = apputil.setupApp;
+    withAppSetup = apputil.withAppSetup;
 
 var suite = vows.describe("remote activity object test");
 

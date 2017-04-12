@@ -40,7 +40,7 @@ var util = require("util"),
     gj = httputil.getJSON,
     dialbackApp = require("./lib/dialback").dialbackApp,
     setupAppConfig = apputil.setupAppConfig,
-    setupApp = apputil.setupApp;
+    withAppSetup = apputil.withAppSetup;
 
 var suite = vows.describe("proxy url test");
 

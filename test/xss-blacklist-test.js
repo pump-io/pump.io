@@ -26,7 +26,7 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
     http = require("http"),
-    setupApp = apputil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     br;
 
 vows.describe("XSS blacklist middleware").addBatch({
@@ -46,20 +46,8 @@ vows.describe("XSS blacklist middleware").addBatch({
             }
         }
     }
-}).addBatch({
-    "When we setup the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-            assert.isObject(app);
-        },
-        "teardown": function(app) {
-            if (app && app.close) {
-                app.close(function(err) {});
-            }
-        },
+}).addBatch(
+    withAppSetup({
         "and we visit the home page with an IE11 User-Agent header": {
             topic: function(app) {
                 var callback = this.callback;
@@ -76,21 +64,9 @@ vows.describe("XSS blacklist middleware").addBatch({
                 br.assert.status(200);
             }
         }
-    }
-}).addBatch({
-    "When we setup the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-            assert.isObject(app);
-        },
-        "teardown": function(app) {
-            if (app && app.close) {
-                app.close(function(err) {});
-            }
-        },
+    })
+).addBatch(
+    withAppSetup({
         "and we visit the home page with an IE10 User-Agent header": {
             topic: function(app) {
                 var callback = this.callback;
@@ -109,5 +85,5 @@ vows.describe("XSS blacklist middleware").addBatch({
                 br.assert.status(400);
             }
         }
-    }
-})["export"](module);
+    })
+)["export"](module);

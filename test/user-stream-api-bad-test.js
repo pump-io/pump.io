@@ -29,7 +29,7 @@ var assert = require("assert"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
-    setupApp = apputil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     register = oauthutil.register,
     newPair = oauthutil.newPair,
     newCredentials = oauthutil.newCredentials;
@@ -97,19 +97,8 @@ var emptyFeed = function(endpoint) {
 
 // Test some "bad" kinds of activity
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we get new credentials": {
             topic: function(app) {
                 newCredentials("diego", "to*the*rescue", this.callback);
@@ -237,7 +226,7 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

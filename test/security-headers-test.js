@@ -26,7 +26,7 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
     httputil = require("./lib/http"),
-    setupApp = apputil.setupApp;
+    withAppSetup = apputil.withAppSetup;
 
 var ignore = function(err) {};
 
@@ -34,20 +34,8 @@ var suite = vows.describe("Security headers");
 
 var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 
-suite.addBatch({
-    "When we setup the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-            assert.isObject(app);
-        },
-        "teardown": function(app) {
-            if (app && app.close) {
-                app.close(function(err) {});
-            }
-        },
+suite.addBatch(
+    withAppSetup({
         "and we HEAD the home page": {
             topic: function(app) {
                 httputil.head("http://localhost:4815/", this.callback);
@@ -81,7 +69,7 @@ suite.addBatch({
                 assert.equal(res.headers["x-xss-protection"], "1; mode=block");
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

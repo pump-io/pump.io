@@ -27,7 +27,7 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
-    setupApp = apputil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair,
     newCredentials = oauthutil.newCredentials,
@@ -39,19 +39,8 @@ var suite = vows.describe("activityobject foreign id test");
 
 // A batch to test activity objects with foreign IDs
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we register a user": {
             topic: function() {
                 newCredentials("jesse", "chili*p!", this.callback);
@@ -438,7 +427,7 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

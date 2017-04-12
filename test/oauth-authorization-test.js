@@ -33,7 +33,7 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
     apputil = require("./lib/app"),
-    setupApp = apputil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     setupAppConfig = apputil.setupAppConfig,
     requestToken = oauthutil.requestToken,
     newClient = oauthutil.newClient,
@@ -59,19 +59,8 @@ var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 
 var suite = vows.describe("OAuth authorization");
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we try to get the authorization form without a request token": {
             topic: function() {
                 var cb = this.callback,
@@ -662,7 +651,7 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

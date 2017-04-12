@@ -24,7 +24,7 @@ var assert = require("assert"),
     apputil = require("./lib/app"),
     apputil = require("./lib/app"),
     Browser = require("zombie"),
-    setupApp = apputil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     setupAppConfig = apputil.setupAppConfig;
 
 var suite = vows.describe("layout test");

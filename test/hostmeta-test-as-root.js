@@ -31,7 +31,7 @@ var assert = require("assert"),
     apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
     xrdutil = require("./lib/xrd"),
-    setupApp = apputil.setupApp;
+    withAppSetup = apputil.withAppSetup;
 
 var suite = vows.describe("host meta test");
 

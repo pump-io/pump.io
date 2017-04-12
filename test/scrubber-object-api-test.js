@@ -30,7 +30,7 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
-    setupApp = apputil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     newCredentials = oauthutil.newCredentials,
     newPair = oauthutil.newPair,
     newClient = oauthutil.newClient,
@@ -126,19 +126,8 @@ var suite = vows.describe("Scrubber Object API test");
 
 // A batch to test posting to the regular feed endpoint
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we get a new set of credentials": {
             topic: function() {
                 oauthutil.newCredentials("dangermouse", "gad|gets", this.callback);
@@ -173,7 +162,7 @@ suite.addBatch({
                           {_uuid: "0xDEADBEEF"},
                           "_uuid")
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

@@ -30,7 +30,7 @@ var assert = require("assert"),
     apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
     Queue = require("jankyqueue"),
-    setupApp = apputil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair,
     register = oauthutil.register;
@@ -83,19 +83,8 @@ var suite = vows.describe("list members api test");
 
 // A batch to test following/unfollowing users
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we register a client": {
             topic: function() {
                 newClient(this.callback);
@@ -269,7 +258,7 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);
