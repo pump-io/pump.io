@@ -30,7 +30,7 @@ var assert = require("assert"),
     newCredentials = oauthutil.newCredentials,
     newClient = oauthutil.newClient,
     dialbackApp = require("./lib/dialback").dialbackApp,
-    withAppSetup = apputil.withAppSetup;
+    setupApp = apputil.setupApp;
 
 var DANGEROUS = "This is a <script>alert('Boo!')</script> dangerous string.";
 

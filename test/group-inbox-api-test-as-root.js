@@ -38,7 +38,7 @@ var assert = require("assert"),
     newCredentials = oauthutil.newCredentials,
     newClient = oauthutil.newClient,
     dialbackApp = require("./lib/dialback").dialbackApp,
-    withAppSetup = apputil.withAppSetup;
+    setupApp = apputil.setupApp;
 
 var clientCred = function(cl) {
     return {

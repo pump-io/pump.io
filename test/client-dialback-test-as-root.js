@@ -27,7 +27,7 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
     dialbackApp = require("./lib/dialback").dialbackApp,
-    withAppSetup = apputil.withAppSetup;
+    setupApp = apputil.setupApp;
 
 var suite = vows.describe("client registration with dialback");
 

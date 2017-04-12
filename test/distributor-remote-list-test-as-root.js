@@ -37,7 +37,7 @@ var assert = require("assert"),
     pj = httputil.postJSON,
     gj = httputil.getJSON,
     dialbackApp = require("./lib/dialback").dialbackApp,
-    withAppSetup = apputil.withAppSetup;
+    setupApp = apputil.setupApp;
 
 var suite = vows.describe("distributor remote list test");
 

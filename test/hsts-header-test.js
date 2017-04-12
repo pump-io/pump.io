@@ -27,7 +27,7 @@ var assert = require("assert"),
     apputil = require("./lib/app"),
     apputil = require("./lib/app"),
     httputil = require("./lib/http"),
-    withAppSetup = apputil.withAppSetup,
+    setupApp = apputil.setupApp,
     setupAppConfig = apputil.setupAppConfig;
 
 var ignore = function(err) {};
