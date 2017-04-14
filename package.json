@@ -82,7 +82,8 @@
     "lint:jscs": "jscs bin/* lib public/javascript/pump* routes test",
     "lint:jade": "pug-lint public/template/*.jade",
     "start": "./bin/pump",
-    "update-docs": "for doc in manpage readme; do npm run update-docs:$doc; done",
+    "update-docs": "for doc in copyright manpage readme; do npm run update-docs:$doc; done",
+    "update-docs:copyright": "for i in README.md doc/pump.1; do sed -E \"s/2011-20[[:digit:]]{2}/2011-$(date +%Y)/g\" $i | sponge $i; done",
     "update-docs:manpage": "sed \"s/^\\.TH PUMP 1.*$/.TH PUMP 1 \\\"$(date +'%d %B %Y')\\\" \\\"$npm_package_version\\\"/\" doc/pump.1 | sponge doc/pump.1",
     "update-docs:readme": "sed \"s/^Version .*\\..*\\..*$/Version $npm_package_version/\" README.md | sponge README.md",
     "version": "npm run update-docs && git add README.md doc/"
