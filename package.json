@@ -6,6 +6,7 @@
   "author": "Evan Prodromou <evan@e14n.com>",
   "description": "Social server with an ActivityStreams API",
   "devDependencies": {
+    "dependency-check": "^2.8.0",
     "jscs": "^3.0.3",
     "jshint": "^2.9.2",
     "node-mocks-http": "^1.6.1",
@@ -78,7 +79,8 @@
     "test:vows": "vows -v test/*-test.js",
     "test:root": "vows -v test/*-test-as-root.js",
     "test:install": "npm install -g .",
-    "lint": "npm run lint:jshint && npm run lint:jscs && npm run lint:jade && npm run lint:json",
+    "lint": "npm run lint:jshint && npm run lint:jscs && npm run lint:jade && npm run lint:json && npm run lint:deps",
+    "lint:deps": "dependency-check package.json && dependency-check --unused --no-dev package.json",
     "lint:jshint": "jshint --exclude 'public/javascript/libs' bin/* routes public/javascript",
     "lint:jscs": "jscs bin/* lib public/javascript/pump* routes test",
     "lint:jade": "pug-lint public/template/*.jade",
