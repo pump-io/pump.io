@@ -9,6 +9,7 @@
     "dependency-check": "^2.8.0",
     "jscs": "^3.0.3",
     "jshint": "^2.9.2",
+    "jsonlint": "^1.6.2",
     "node-mocks-http": "^1.6.1",
     "pug-lint": "^2.3.0",
     "rimraf": "^2.6.1",
