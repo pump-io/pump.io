@@ -275,6 +275,22 @@ in. This should be set to `production` in production environments or
 performance will be significantly degraded. In development
 environments it should be set to `development`, which is the default.
 
+The `pump` daemon also accepts configuration values via environment
+variables. You can find available configuration values above - the
+basic idea is to start with `PUMPIO_` and append the capitalized
+configuration key you want to set. For example, the `port` key in
+`pump.io.json` would translate to the environment variable
+`PUMPIO_PORT`. To configure camelcased config values like `urlPort`,
+replace the camelcasing with an underscore (`_`). For example,
+`urlPort` would become `PUMPIO_URL_PORT`. Keys whose value is an
+object can be specified using `__` (two underscores) to separate
+subkeys. For example, a `pump.io.json` with the following contents:
+
+    { "params": { "host": "localhost" } }
+
+can be represented by exporting `PUMPIO_PARAMS__HOST` to the
+environment with a value of `localhost`.
+
 You can also set the env variable `NODE_DEBUG` to enable debugging of
 internal libraries.
 
