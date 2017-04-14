@@ -8,6 +8,7 @@ pump.io follows [Semantic Versioning][semver].
 
 * Revert bcrypt upgrade to fix install issues (#1333)
 * Don't use newer `github:` syntax in `connect-auth` dep as it breaks npm@1 (#1253)
+* The commandline tools no longer crash due to missing `optimist`
 
 ### Improved
 
