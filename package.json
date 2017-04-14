@@ -74,7 +74,8 @@
   "scripts": {
     "build": "for i in public/template/*.jade; do test \\( ! -e $i.js \\) -o $i -nt $i.js && jade --client --extension jade.js --no-debug $i; done || true",
     "fullbuild": "jade --client --extension jade.js --no-debug public/template",
-    "test": "npm run lint && vows -v test/*-test.js",
+    "test": "npm run lint && npm run test:vows",
+    "test:vows": "vows -v test/*-test.js",
     "test:root": "vows -v test/*-test-as-root.js",
     "test:install": "npm install -g .",
     "lint": "npm run lint:jshint && npm run lint:jscs && npm run lint:jade",
