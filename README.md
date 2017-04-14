@@ -142,7 +142,6 @@ You can override the config file location with the `-c` option.
 
     pump -c <CONFIG_FILE>
 
-
 Here are the main configuration keys.
 
 * *driver* The databank driver you're using. Defaults to "disk", which
@@ -242,6 +241,17 @@ Here are the main configuration keys.
   Defaults to 1200000, or 20 minutes.
 * *favicon* Local filesystem path to the favicon.ico file to use. This will be served as "/favicon.ico"
   by the server. By default, uses public/images/favicon.ico.
+
+You can also set these by passing commandline flags starting with
+`--` - for example, `pump.io.json`'s `port` value can be set by
+passing `--port`. Camelcasing like `urlPort` should be replaced with
+`-` (i.e.  `urlPort` becomes `--url-port`). Keys whose value is an
+object can be specified using `.` to separate nested keys. For
+example, a `pump.io.json` with the following contents:
+
+    { "params": { "host": "localhost" } }
+
+can be set by passing `--params.host localhost`.
 
 ### Web server proxy
 
