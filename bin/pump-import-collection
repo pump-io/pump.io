@@ -346,7 +346,7 @@ var importActivity = function(props, log, callback) {
                 newF = _.getPath(activity, ["actor", "followers", "url"]);
 
             _.each(["to", "cc", "bto", "bcc"], function(name) {
-                if (origF && newF && origF != newF) {
+                if (origF && newF && origF !== newF) {
                     _.each(activity[name], function(addr) {
                         if (addr.id === origF) {
                             log.info({original: origF, new: newF}, "Replacing followers URL in addresses");
@@ -978,7 +978,7 @@ var personLocalID = function(person) {
 var checkJoin = function(activity, log, callback) {
 
     if (!isLocalObjectID(activity.object.id) ||
-        activity.object.objectType != ActivityObject.GROUP) {
+        activity.object.objectType !== ActivityObject.GROUP) {
         callback(null);
         return;
     }
@@ -988,7 +988,7 @@ var checkJoin = function(activity, log, callback) {
             ActivityObject.getObject(ActivityObject.GROUP, activity.object.id, this);
         },
         function(err, group) {
-            if (err && err.name != "NoSuchThingError") {
+            if (err && err.name !== "NoSuchThingError") {
                 throw err;
             } else if (err && err.name === "NoSuchThingError") {
                 importActivity({actor: activity.actor,

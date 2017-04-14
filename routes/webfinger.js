@@ -148,7 +148,7 @@ var lrddUser = function(req, res, next) {
         return;
     }
 
-    if (parts.hostname != URLMaker.hostname) {
+    if (parts.hostname !== URLMaker.hostname) {
         next(new HTTPError("Unrecognized host", 404));
         return;
     }

@@ -52,7 +52,7 @@ if (otherId.indexOf("@") === -1) {
     otherId = otherId + "@" + server;
 }
 
-if (otherId.substr(0, 5) != "acct:") {
+if (otherId.substr(0, 5) !== "acct:") {
     otherId = "acct:" + otherId;
 }
 

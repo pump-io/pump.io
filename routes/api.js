@@ -452,7 +452,7 @@ var getUser = function(req, res, next) {
         function(err) {
             if (err) next(err);
             // If no user, or different user, hide email and settings
-            if (!req.principal || (req.principal.id != req.user.profile.id)) {
+            if (!req.principal || (req.principal.id !== req.user.profile.id)) {
                 delete req.user.email;
                 delete req.user.settings;
             }
@@ -894,7 +894,7 @@ var listUsers = function(req, res, next) {
 
             _.each(users, function(user) {
                 user.sanitize();
-                if (!req.principal || req.principal.id != user.profile.id) {
+                if (!req.principal || req.principal.id !== user.profile.id) {
                     delete user.email;
                 }
             });
@@ -1098,12 +1098,12 @@ var newRemoteActivity = function(principal, props, callback) {
 var validateActor = function(client, principal, actor) {
 
     if (client.webfinger) {
-        if (ActivityObject.canonicalID(actor.id) != ActivityObject.canonicalID(principal.id)) {
+        if (ActivityObject.canonicalID(actor.id) !== ActivityObject.canonicalID(principal.id)) {
             throw new HTTPError("Actor is invalid since " + actor.id + " is not " + principal.id, 400);
         }
     } else if (client.hostname) {
-        if (ActivityObject.canonicalID(actor.id) != "https://" + client.hostname + "/" &&
-            ActivityObject.canonicalID(actor.id) != "http://" + client.hostname + "/") {
+        if (ActivityObject.canonicalID(actor.id) !== "https://" + client.hostname + "/" &&
+            ActivityObject.canonicalID(actor.id) !== "http://" + client.hostname + "/") {
             throw new HTTPError("Actor is invalid since " + actor.id + " is not " + principal.id, 400);
         }
     }

@@ -48,7 +48,7 @@ var confirm = function(req, res, next) {
         function(err, confirms) {
             if (err) throw err;
             if (!_.isArray(confirms) ||
-                confirms.length != 1) {
+                confirms.length !== 1) {
                 throw new HTTPError("Invalid state for confirmation.", 500);
             }
             confirm = confirms[0];
@@ -61,7 +61,7 @@ var confirm = function(req, res, next) {
         function(err, results) {
             if (err) throw err;
             user = results;
-            if (principal && principal.id != user.profile.id) {
+            if (principal && principal.id !== user.profile.id) {
                 throw new HTTPError("This is someone else's confirmation.", 400);
             }
             user.email = confirm.email;
