@@ -1,4 +1,16 @@
 {
   "node": true,
-  "sub": true
+  "sub": true,
+  "bitwise": true,
+  "eqeqeq": true,
+  "forin": true,
+  "freeze": true,
+  "futurehostile": true,
+  "noarg": true,
+  "nocomma": true,
+  "nonbsp": true,
+  "nonew": true,
+  "singleGroups": true,
+  "strict": true,
+  "undef": true
 }
