@@ -50,7 +50,7 @@ var fs = require("fs"),
         .alias("d", "directory")
         .describe("f", "File in Activity Streams JSON collection format")
         .describe("d", "Recursive directory of files, one activity per, like divider makes")
-        .check(function(argv) { if (!argv.f & !argv.d) { throw new Error("Must have one of -f or -d");  } })
+        .check(function(argv) { if (!argv.f && !argv.d) { throw new Error("Must have one of -f or -d");  } })
         .argv;
 
 var QUEUE_MAX = 1;
