@@ -2,6 +2,19 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 4.0.0 beta 5 - Future
+
+### Fixed
+
+* Revert bcrypt upgrade to fix install issues (#1333)
+* Don't use newer `github:` syntax in `connect-auth` dep as it breaks npm@1 (#1253)
+
+### Improved
+
+* Update documentation to match new config options
+* Lock `connect-auth` dep to a particular version
+* Turn on tests for Node 6
+
 ## 4.0.0 beta 4 - 2017-04-03
 
 ### Fixed
