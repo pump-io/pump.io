@@ -301,7 +301,7 @@ var userIsActor = function(req, res, next) {
 
     actor = activity.actor;
 
-    if (person && actor && person.id == actor.id) {
+    if (person && actor && person.id === actor.id) {
         next();
     } else {
         next(new HTTPError("person " + person.id + " is not the actor of " + activity.id, 404));
@@ -628,7 +628,7 @@ var userIsAuthor = function(req, res, next) {
         obj = req[type],
         author = obj.author;
 
-    if (person && author && person.id == author.id) {
+    if (person && author && person.id === author.id) {
         next();
     } else {
         next(new HTTPError("No " + type + " by " + user.nickname + " with uuid " + obj._uuid, 404));
@@ -914,7 +914,7 @@ var handleRecover = function(req, res, next) {
         },
         function(err, result) {
             if (err) {
-                if (err.name == "NoSuchThingError") {
+                if (err.name === "NoSuchThingError") {
                     req.log.debug({nickname: nickname}, "No such user, can't recover");
                     res.status(400);
                     res.json({sent: false, noSuchUser: true, error: "There is no user with that nickname."});

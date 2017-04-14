@@ -61,8 +61,8 @@ Step(
             }
         };
         var endpoint = url.format({
-            protocol: ((port == 443) ? "https" : "http"),
-            host: ((port == 80) ? server : server + ":" + port),
+            protocol: ((port === 443) ? "https" : "http"),
+            host: ((port === 80) ? server : server + ":" + port),
             pathname: "/api/user/"+username+"/feed"
         });
         postJSON(endpoint, cred, activity, this);

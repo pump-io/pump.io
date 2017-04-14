@@ -58,8 +58,8 @@ Step(
     function(err, cred) {
         if (err) throw err;
         var endpoint = url.format({
-            protocol: ((port == 443) ? "https" : "http"),
-            host: ((port == 80) ? server : server + ":" + port),
+            protocol: ((port === 443) ? "https" : "http"),
+            host: ((port === 80) ? server : server + ":" + port),
             pathname: "/api/users"
         });
         postJSON(endpoint, cred, user, this);

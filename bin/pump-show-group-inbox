@@ -61,8 +61,8 @@ Step(
         if (err) throw err;
         cred = results;
         endpoint = url.format({
-            protocol: ((port == 443) ? "https" : "http"),
-            host: ((port == 80 || port == 443) ? server : server + ":" + port),
+            protocol: ((port === 443) ? "https" : "http"),
+            host: ((port === 80 || port === 443) ? server : server + ":" + port),
             pathname: url.parse(groupID).pathname + "/inbox"
         });
         getJSON(endpoint, cred, this);
