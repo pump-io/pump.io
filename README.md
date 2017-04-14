@@ -277,7 +277,7 @@ Example:
 
     export NODE_DEBUG=dev,all,net,http,fs,tls,module,timers
 
-See [How to set NODE_DEBUG](http://www.juliengilli.com/2013/05/26/Using-Node.js-NODE_DEBUG-for-fun-and-profit/)
+See [How to set NODE_DEBUG](http://www.juliengilli.com/2013/05/26/Using-Node.js-NODE_DEBUG-for-fun-and-profit/).
 
 ## Using the command line tools
 
