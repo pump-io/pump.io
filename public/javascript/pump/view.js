@@ -540,8 +540,7 @@
         events: {
             "click #logout": "logout",
             "click #post-note-button": "postNoteModal",
-            "click #post-picture-button": "postPictureModal",
-            "click #fat-menu .dropdown-menu li": "closeDropdown"
+            "click #post-picture-button": "postPictureModal"
         },
         postNoteModal: function() {
             var view = this;
@@ -631,10 +630,6 @@
                 streams.notifications = view.minorStreamView.model;
             }
             return streams;
-        },
-        closeDropdown: function(e) {
-            e.preventDefault();
-            $("#profile-dropdown").dropdown("toggle");
         }
     });
 
