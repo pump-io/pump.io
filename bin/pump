@@ -117,9 +117,9 @@ var launchApps = function(config) {
     }
 
     // Useful for some processes in each worker
-    config.workers = cnt;
+    config.workers = cnt > 0 ? 1 : cnt;
 
-    if (cluster.isMaster) {
+    if (cluster.isMaster && config.children !== 0) {
 
         Dispatch.start(log);
 
