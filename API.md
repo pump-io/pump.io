@@ -298,7 +298,7 @@ There are four types of address supported:
 * *Followers*. A user's own followers can be addressed with an object
    with `objectType` equal to "collection" and `id` equal to the follower stream URL of the user --
    usually
-   `http://<hostname>/api/user/<nickname>/followers`. Activities
+   `https://<hostname>/api/user/<nickname>/followers`. Activities
    addressed to followers will be delivered to all followers, and will
    only be visible to followers.
 * *Users*. Users can be addressed by their profile object --
@@ -358,7 +358,7 @@ The feeds are at `/api/user/<nickname>/inbox/direct`,
 
 When objects like a "note" or an "image" are created, they're assigned
 a REST endpoint, usually something like
-`http://<hostname>/api/<objectType>/<id>`, where the `<id>` is a
+`https://<hostname>/api/<objectType>/<id>`, where the `<id>` is a
 screwy-looking random value. (It's a UUID in URL-safe base-64 format.)
 
 You can get the object endpoint from the object's `links` property;
@@ -442,7 +442,7 @@ too long.
 If you use objects with foreign IDs, you can get the data for that
 object from an endpoint like:
 
-    `http://<hostname>/api/<objectType>?id=<the-object-id>`
+    `https://<hostname>/api/<objectType>?id=<the-object-id>`
 
 The main object feeds be accessed this way as well:
 
@@ -452,9 +452,9 @@ The main object feeds be accessed this way as well:
 
 Group objects have feed endpoints that can be accessed this way as well:
 
-    `http://<hostname>/api/group/members?id=<the-object-id>`
-    `http://<hostname>/api/group/inbox?id=<the-object-id>`
-    `http://<hostname>/api/group/documents?id=<the-object-id>`
+    `https://<hostname>/api/group/members?id=<the-object-id>`
+    `https://<hostname>/api/group/inbox?id=<the-object-id>`
+    `https://<hostname>/api/group/documents?id=<the-object-id>`
 
 ## Activity endpoints
 
