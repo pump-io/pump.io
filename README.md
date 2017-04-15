@@ -47,11 +47,14 @@ It also comes with a web UI.
 
 ## Wiki
 
-For more information please check out the [GitHub wiki](https://github.com/pump-io/pump.io/wiki)
+For more information please check out the [GitHub
+wiki](https://github.com/pump-io/pump.io/wiki) and our
+[ReadTheDocs](https://pumpio.readthedocs.io/en/latest/) documentation.
 
-or clone it via the following command:
+or clone them with the following commands:
 
     git clone https://github.com/pump-io/pump.io.wiki.git
+    git clone clone https://gitlab.com/pump.io/pump-docs.git
 
 ## Installation
 
@@ -87,6 +90,7 @@ You can then install the dependencies using `npm`:
 
     cd pump.io
     npm install
+    npm run build
 
 To test the install, run:
 
@@ -137,7 +141,6 @@ The default config values are stored in the source file `lib/defaults.js`.
 You can override the config file location with the `-c` option.
 
     pump -c <CONFIG_FILE>
-
 
 Here are the main configuration keys.
 
@@ -239,6 +242,17 @@ Here are the main configuration keys.
 * *favicon* Local filesystem path to the favicon.ico file to use. This will be served as "/favicon.ico"
   by the server. By default, uses public/images/favicon.ico.
 
+You can also set these by passing commandline flags starting with
+`--` - for example, `pump.io.json`'s `port` value can be set by
+passing `--port`. Camelcasing like `urlPort` should be replaced with
+`-` (i.e.  `urlPort` becomes `--url-port`). Keys whose value is an
+object can be specified using `.` to separate nested keys. For
+example, a `pump.io.json` with the following contents:
+
+    { "params": { "host": "localhost" } }
+
+can be set by passing `--params.host localhost`.
+
 ### Web server proxy
 
 pump.io is designed to be a standalone server. You do not need
@@ -258,28 +272,58 @@ like this:
 
 ## Running the daemon
 
+To run the pump.io daemon, you need to run either `./bin/pump` (if you
+installed from git) or `pump` (if you installed from npm).
+
 You'll probably get a more reliable experience if you use
 [forever](https://npmjs.org/package/forever) to keep the daemon running.
 
-
 ### Environment
 
-Set the env variable `NODE_DEBUG` to enable debugging.
+`NODE_ENVIRONMENT` determines the environment pump.io is running
+in. This should be set to `production` in production environments or
+performance will be significantly degraded. In development
+environments it should be set to `development`, which is the default.
+
+The `pump` daemon also accepts configuration values via environment
+variables. You can find available configuration values above - the
+basic idea is to start with `PUMPIO_` and append the capitalized
+configuration key you want to set. For example, the `port` key in
+`pump.io.json` would translate to the environment variable
+`PUMPIO_PORT`. To configure camelcased config values like `urlPort`,
+replace the camelcasing with an underscore (`_`). For example,
+`urlPort` would become `PUMPIO_URL_PORT`. Keys whose value is an
+object can be specified using `__` (two underscores) to separate
+subkeys. For example, a `pump.io.json` with the following contents:
+
+    { "params": { "host": "localhost" } }
+
+can be represented by exporting `PUMPIO_PARAMS__HOST` to the
+environment with a value of `localhost`.
+
+You can also set the env variable `NODE_DEBUG` to enable debugging of
+internal libraries.
 
 Example:
 
     export NODE_DEBUG=dev,all,net,http,fs,tls,module,timers
 
-See [How to set NODE_DEBUG](http://www.juliengilli.com/2013/05/26/Using-Node.js-NODE_DEBUG-for-fun-and-profit/)
-
+See [How to set NODE_DEBUG](http://www.juliengilli.com/2013/05/26/Using-Node.js-NODE_DEBUG-for-fun-and-profit/).
 
 ## Using the command line tools
+
+You can use any pump.io client application you want to interact with
+pump.io servers. However, this repository comes with some samples to
+get you started, if you want.
 
 ### pump-register-app
 
 First use this tool to create the credentials file
 
     ./bin/pump-register-app  -t <APPNAME>
+
+`<APPNAME>` will be the name of the client app that
+`pump-register-app` registers with the server.
 
 This will create the file `~/.pump.d/<SERVER>.json` that contains your credentials.
 
@@ -289,10 +333,10 @@ This will create the file `~/.pump.d/<SERVER>.json` that contains your credentia
     "expires_at":0
     }
 
-It will also add an entry into the local database where you will find the
-clientID. Note that if you use the memory database the data will be lost
-between server runs and will need to rerun the configuration.
-
+It will also add an entry into the server database where you will find
+the clientID. Note that if you use the memory Databank driver the data
+will be lost between server runs and you will need to rerun the
+configuration.
 
 #### pump-register-user
 
@@ -308,7 +352,6 @@ After you register an app, you can authorize your user to use it.
 
 When you do that it will ask you to open a website, login and verify the
 value. You paste that back in and all is good.
-
 
 ## Making changes
 

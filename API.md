@@ -21,9 +21,9 @@ requirements, of [The Atom Publishing Protocol](http://tools.ietf.org/html/rfc50
 Here's the quick start version of the API:
 
 * Register a new OAuth client by posting to the client registration endpoint.
-  See : bin/pump-register-app for an example implementation.
+  See: bin/pump-register-app for an example implementation.
 * Use OAuth 1.0 to get an OAuth token for the user.
-  See : bin/pump-authorize for an example implementation.
+  See: bin/pump-authorize for an example implementation.
 * Post to the user's activity outbox feed to create new
   activities. These can create new content, respond to existing
   content, or modify the social graph.
