@@ -140,6 +140,7 @@ suite.addBatch({
                             validFeed(feed);
                             assert.equal(feed.items.length, 10);
                             for (i = 0; i < 100; i += 10) {
+                                /* jshint loopfunc: true */
                                 assert.ok(_.some(feed.items, function(item) { return item.preferredUsername === ("billy"+i); }));
                             }
                         }

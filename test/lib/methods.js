@@ -36,6 +36,7 @@ var methodContext = function(methods) {
         } else {
             k = "it has a "+m+" method";
         }
+        /* jshint loopfunc: true */
         context[k] = function(obj) {
             assert.isFunction(obj[methods[i]]);
         };
