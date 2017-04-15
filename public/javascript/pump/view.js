@@ -1469,6 +1469,7 @@
                 form = new Pump.CommentForm({original: view.model.object});
                 form.on("ready", function() {
                     view.$(".replies").append(form.$el);
+                    view.$("form.post-comment textarea").focus();
                 });
                 form.render();
             }
@@ -1756,6 +1757,7 @@
                 form = new Pump.CommentForm({original: view.model});
                 form.on("ready", function() {
                     view.$(".replies").append(form.$el);
+                    view.$("form.post-comment textarea").focus();
                 });
                 form.render();
             }
@@ -2599,6 +2601,7 @@
                 form = new Pump.CommentForm({original: view.model});
                 form.on("ready", function() {
                     view.$(".replies").append(form.$el);
+                    view.$("form.post-comment textarea").focus();
                 });
                 form.render();
             }
