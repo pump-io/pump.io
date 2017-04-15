@@ -179,12 +179,12 @@ suite.addBatch({
                                     assert.include(inbox2, "items");
                                     assert.isArray(inbox2.items);
                                     assert.greater(inbox2.items.length, 0);
-                                    assert.isObject(_.find(inbox2.items, function(item) { return item.id == act.id; }),
+                                    assert.isObject(_.find(inbox2.items, function(item) { return item.id === act.id; }),
                                     "Activity is not in first inbox");
                                     assert.include(inbox3, "items");
                                     assert.isArray(inbox3.items);
                                     assert.greater(inbox3.items.length, 0);
-                                    assert.isObject(_.find(inbox3.items, function(item) { return item.id == act.id; }),
+                                    assert.isObject(_.find(inbox3.items, function(item) { return item.id === act.id; }),
                                     "Activity is not in second inbox");
                                 }
                             }

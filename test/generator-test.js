@@ -124,7 +124,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.isObject(doc);
                         assert.isArray(doc.items);
-                        reg = _.find(doc.items, function(activity) { return activity.verb == "join"; });
+                        reg = _.find(doc.items, function(activity) { return activity.verb === "join"; });
                         assert.ok(reg);
                         assert.isObject(reg.generator);
                         assert.equal(reg.generator.displayName, "Generator Test");
@@ -238,8 +238,8 @@ suite.addBatch({
                             assert.isObject(doc);
                             assert.isArray(doc.items);
                             follow = _.find(doc.items, function(activity) {
-                                return activity.verb == "follow" &&
-                                    activity.object.id == "urn:uuid:b7144562-486f-11e2-b1c7-2c8158efb9e9";
+                                return activity.verb === "follow" &&
+                                    activity.object.id === "urn:uuid:b7144562-486f-11e2-b1c7-2c8158efb9e9";
                             });
                             assert.ok(follow);
                             assert.isObject(follow.generator);
@@ -281,8 +281,8 @@ suite.addBatch({
                             assert.isObject(doc);
                             assert.isArray(doc.items);
                             favorite = _.find(doc.items, function(activity) {
-                                return activity.verb == "favorite" &&
-                                    activity.object.id == "urn:uuid:298cd086-4871-11e2-adf2-2c8158efb9e9";
+                                return activity.verb === "favorite" &&
+                                    activity.object.id === "urn:uuid:298cd086-4871-11e2-adf2-2c8158efb9e9";
                             });
                             assert.ok(favorite);
                             assert.isObject(favorite.generator);
@@ -340,8 +340,8 @@ suite.addBatch({
                             assert.isObject(doc);
                             assert.isArray(doc.items);
                             update = _.find(doc.items, function(activity) {
-                                return activity.verb == "update" &&
-                                    activity.object.content == "Stop this crazy thing!!!!!!!!!";
+                                return activity.verb === "update" &&
+                                    activity.object.content === "Stop this crazy thing!!!!!!!!!";
                             });
                             assert.ok(update);
                             assert.isObject(update.generator);
@@ -398,7 +398,7 @@ suite.addBatch({
                             assert.isObject(doc);
                             assert.isArray(doc.items);
                             del = _.find(doc.items, function(activity) {
-                                return activity.verb == "delete";
+                                return activity.verb === "delete";
                             });
                             assert.ok(del);
                             assert.isObject(del.generator);
@@ -420,7 +420,7 @@ suite.addBatch({
                                 var list, person;
                                 if (err) throw err;
                                 list = _.find(doc.items, function(item) {
-                                    return item.displayName == "Family";
+                                    return item.displayName === "Family";
                                 });
                                 if (!list) {
                                     throw new Error("No 'Family' list found");
@@ -456,7 +456,7 @@ suite.addBatch({
                             assert.isObject(doc);
                             assert.isArray(doc.items);
                             add = _.find(doc.items, function(activity) {
-                                return activity.verb == "add";
+                                return activity.verb === "add";
                             });
                             assert.ok(add);
                             assert.isObject(add.generator);

@@ -186,8 +186,8 @@ suite.addBatch({
                                 assert.include(feed, "items");
                                 assert.isArray(feed.items);
                                 assert.greater(feed.items.length, 0);
-                                assert.isObject(_.find(feed.items, function(item) { return item.id == "acct:harpo@photo.localhost"; }));
-                                assert.isObject(_.find(feed.items, function(item) { return item.id == "acct:chico@social.localhost"; }));
+                                assert.isObject(_.find(feed.items, function(item) { return item.id === "acct:harpo@photo.localhost"; }));
+                                assert.isObject(_.find(feed.items, function(item) { return item.id === "acct:chico@social.localhost"; }));
                             }
                         },
                         "and one user posts a message to the group": {
@@ -238,7 +238,7 @@ suite.addBatch({
                                         assert.include(feed, "items");
                                         assert.isArray(feed.items);
                                         assert.greater(feed.items.length, 0);
-                                        assert.isObject(_.find(feed.items, function(item) { return item.id == act.id; }));
+                                        assert.isObject(_.find(feed.items, function(item) { return item.id === act.id; }));
                                     }
                                 }
                             }

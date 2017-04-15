@@ -124,7 +124,7 @@ suite.addBatch({
                                this.parallel());
                         },
                         function(err, received, sent) {
-                            if (err && err.message == "Timeout reached") {
+                            if (err && err.message === "Timeout reached") {
                                 callback(null);
                             } else if (err) {
                                 callback(err);

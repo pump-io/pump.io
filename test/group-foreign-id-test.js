@@ -68,7 +68,7 @@ suite.addBatch({
                             httputil.getJSON(url, cred, this);
                         },
                         function(err, doc, response) {
-                            if (err && err.statusCode == 400) {
+                            if (err && err.statusCode === 400) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -91,7 +91,7 @@ suite.addBatch({
                             httputil.getJSON(url, cred, this);
                         },
                         function(err, doc, response) {
-                            if (err && err.statusCode == 404) {
+                            if (err && err.statusCode === 404) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);

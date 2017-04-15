@@ -195,7 +195,7 @@ suite.addBatch({
                                                       this.parallel());
                                 },
                                 function(err, body, resp) {
-                                    if (err && err.statusCode == 400) {
+                                    if (err && err.statusCode === 400) {
                                         callback(null);
                                     } else if (err) {
                                         callback(err);

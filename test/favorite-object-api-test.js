@@ -661,7 +661,7 @@ suite.addBatch({
                             httputil.postJSON(url, cred, obj, this);
                         },
                         function(err, doc, response) {
-                            if (err && err.statusCode == 401) {
+                            if (err && err.statusCode === 401) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);

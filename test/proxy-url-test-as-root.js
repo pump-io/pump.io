@@ -222,7 +222,7 @@ suite.addBatch({
                                         assert.isArray(feed.items);
                                         assert.greater(feed.items.length, 0);
 
-                                        fi0 = _.find(feed.items, function(item) { return item.id == act.id; });
+                                        fi0 = _.find(feed.items, function(item) { return item.id === act.id; });
 
                                         assert.isObject(fi0);
 
@@ -236,7 +236,7 @@ suite.addBatch({
                                     "and we get the image proxyURL": {
                                         topic: function(feed, posted, postedBefore, followed, cred1, cred2) {
                                             var callback = this.callback,
-                                                fi0 = _.find(feed.items, function(item) { return item.id == posted.id; }),
+                                                fi0 = _.find(feed.items, function(item) { return item.id === posted.id; }),
                                                 url = fi0.object.image.pump_io.proxyURL,
                                                 oa;
 
@@ -254,7 +254,7 @@ suite.addBatch({
                                     "and we get the replies proxyURL": {
                                         topic: function(feed, posted, postedBefore, followed, cred1, cred2) {
                                             var callback = this.callback,
-                                                fi0 = _.find(feed.items, function(item) { return item.id == posted.id; }),
+                                                fi0 = _.find(feed.items, function(item) { return item.id === posted.id; }),
                                                 url = fi0.object.replies.pump_io.proxyURL,
                                                 oa;
 

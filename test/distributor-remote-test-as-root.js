@@ -141,7 +141,7 @@ suite.addBatch({
                             assert.include(feed, "items");
                             assert.isArray(feed.items);
                             assert.greater(feed.items.length, 0);
-                            assert.isObject(_.find(feed.items, function(item) { return item.id == "acct:photog@photo.localhost"; }));
+                            assert.isObject(_.find(feed.items, function(item) { return item.id === "acct:photog@photo.localhost"; }));
                         }
                     },
                     "and we check the second user's followers list": {
@@ -233,7 +233,7 @@ suite.addBatch({
                             assert.include(feed, "items");
                             assert.isArray(feed.items);
                             assert.greater(feed.items.length, 0);
-                            assert.isObject(_.find(feed.items, function(item) { return item.id == act.id; }));
+                            assert.isObject(_.find(feed.items, function(item) { return item.id === act.id; }));
                         }
                     },
                     "and the second user posts an image": {
@@ -292,7 +292,7 @@ suite.addBatch({
                                     assert.include(feed, "items");
                                     assert.isArray(feed.items);
                                     assert.greater(feed.items.length, 0);
-                                    assert.isObject(_.find(feed.items, function(item) { return item.id == act.id; }));
+                                    assert.isObject(_.find(feed.items, function(item) { return item.id === act.id; }));
                                 },
                                 "activity is sanitized": function(err, feed, act) {
                                     var item;
@@ -300,7 +300,7 @@ suite.addBatch({
                                     assert.isObject(feed);
                                     assert.isArray(feed.items);
                                     assert.greater(feed.items.length, 0);
-                                    item = _.find(feed.items, function(item) { return item.id == act.id; });
+                                    item = _.find(feed.items, function(item) { return item.id === act.id; });
                                     assert.isObject(item);
                                     assert.isObject(item.actor);
                                     assert.isFalse(_(item.actor).has("_user"));
@@ -311,7 +311,7 @@ suite.addBatch({
                                     assert.isObject(feed);
                                     assert.isArray(feed.items);
                                     assert.greater(feed.items.length, 0);
-                                    item = _.find(feed.items, function(item) { return item.id == act.id; });
+                                    item = _.find(feed.items, function(item) { return item.id === act.id; });
                                     assert.isObject(item);
                                     assert.isObject(item.object);
                                     assert.isObject(item.object.likes);
@@ -381,7 +381,7 @@ suite.addBatch({
                                             assert.include(feed, "items");
                                             assert.isArray(feed.items);
                                             assert.greater(feed.items.length, 0);
-                                            item = _.find(feed.items, function(item) { return item.id == act.id; });
+                                            item = _.find(feed.items, function(item) { return item.id === act.id; });
                                             assert.isObject(item);
                                         }
                                     },
@@ -410,7 +410,7 @@ suite.addBatch({
                                             assert.include(feed, "items");
                                             assert.isArray(feed.items);
                                             assert.greater(feed.items.length, 0);
-                                            item = _.find(feed.items, function(item) { return item.id == pc.object.id; });
+                                            item = _.find(feed.items, function(item) { return item.id === pc.object.id; });
                                             assert.isObject(item);
                                         }
                                     },
@@ -468,7 +468,7 @@ suite.addBatch({
                                                     assert.include(feed, "items");
                                                     assert.isArray(feed.items);
                                                     assert.greater(feed.items.length, 0);
-                                                    item = _.find(feed.items, function(item) { return item.id == act.id; });
+                                                    item = _.find(feed.items, function(item) { return item.id === act.id; });
                                                     assert.isObject(item);
                                                 }
                                             },
@@ -497,7 +497,7 @@ suite.addBatch({
                                                     assert.include(feed, "items");
                                                     assert.isArray(feed.items);
                                                     assert.greater(feed.items.length, 0);
-                                                    item = _.find(feed.items, function(item) { return item.id == fc.actor.id; });
+                                                    item = _.find(feed.items, function(item) { return item.id === fc.actor.id; });
                                                     assert.isObject(item);
                                                 }
                                             }

@@ -46,10 +46,10 @@ var getOAuth = function(hostname, port, client_id, client_secret) {
 
     var proto = (port === 443) ? "https" : "http",
             rtendpoint = urlfmt({protocol: proto,
-                                 host: (port == 80 || port == 443) ? hostname : hostname+":"+port,
+                                 host: (port === 80 || port === 443) ? hostname : hostname+":"+port,
                                  pathname: "/oauth/request_token"}),
             atendpoint = urlfmt({protocol: proto,
-                                 host: (port == 80 || port == 443) ? hostname : hostname+":"+port,
+                                 host: (port === 80 || port === 443) ? hostname : hostname+":"+port,
                                  pathname: "/oauth/access_token"}),
         oa = new OAuth(rtendpoint,
                        atendpoint,
@@ -150,7 +150,7 @@ var authorize = function(cl, rt, user, hostname, port, cb) {
     }
 
     url = urlfmt({protocol: (port === 443) ? "https" : "http",
-                  host: (port == 80 || port == 443) ? hostname : hostname+":"+port,
+                  host: (port === 80 || port === 443) ? hostname : hostname+":"+port,
                   pathname: "/oauth/authorize",
                   query: {oauth_token: rt.token}});
 

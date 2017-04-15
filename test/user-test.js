@@ -72,7 +72,7 @@ mb["When we require the user module"]
 ["and we create an user instance"]
 ["passed-in fields are there"] = function(err, created) {
     _.each(testData.create, function(value, key) {
-        if (key == "profile") {
+        if (key === "profile") {
             _.each(testData.create.profile, function(value, key) {
                 assert.deepEqual(created.profile[key], value);
             });
@@ -1059,7 +1059,7 @@ var streamCountContext = function(streamgetter, targetCount) {
         assert.isObject(act);
         assert.isArray(activities);
         matches = activities.filter(function(item) {
-            return (item == act.id);
+            return (item === act.id);
         });
         assert.lengthOf(matches, targetCount);
     };

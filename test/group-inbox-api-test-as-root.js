@@ -423,7 +423,7 @@ suite.addBatch({
                             assert.isArray(feed.items);
                             assert.greater(feed.items.length, 0);
                             assert.isTrue(_.some(feed.items, function(item) {
-                                return (_.isObject(item) && item.id == act.id);
+                                return (_.isObject(item) && item.id === act.id);
                             }));
                         }
                     }

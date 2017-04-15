@@ -136,7 +136,7 @@ suite.addBatch({
                             newact.mood = {
                                 displayName: "Friendly"
                             };
-                            // wait 2000 ms to make sure updated != published
+                            // wait 2000 ms to make sure updated !== published
                             setTimeout(function() {
                                 httputil.putJSON(act.id, cred, newact, function(err, contents, result) {
                                     cb(err, {newact: contents, act: act});
@@ -773,7 +773,7 @@ suite.addBatch({
                             httputil.getJSON(id, cred, this);
                         },
                         function(err, got, resp) {
-                            if (err && err.statusCode && err.statusCode == 410) {
+                            if (err && err.statusCode && err.statusCode === 410) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -801,7 +801,7 @@ suite.addBatch({
                         };
 
                     httputil.putJSON(url, cred, act, function(err, got, resp) {
-                            if (err && err.statusCode && err.statusCode == 404) {
+                            if (err && err.statusCode && err.statusCode === 404) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -821,7 +821,7 @@ suite.addBatch({
                         url = "http://localhost:4815/api/activity/NONEXISTENT";
 
                     httputil.getJSON(url, cred, function(err, got, resp) {
-                            if (err && err.statusCode && err.statusCode == 404) {
+                            if (err && err.statusCode && err.statusCode === 404) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -841,7 +841,7 @@ suite.addBatch({
                         url = "http://localhost:4815/api/activity/NONEXISTENT";
 
                     httputil.delJSON(url, cred, function(err, got, resp) {
-                            if (err && err.statusCode && err.statusCode == 404) {
+                            if (err && err.statusCode && err.statusCode === 404) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);

@@ -97,7 +97,7 @@ suite.addBatch({
                         assert.include(doc, "items");
                         assert.isArray(doc.items);
                         assert.greater(doc.items.length, 0);
-                        assert.isTrue(_.any(doc.items, function(item) { return item.id == act.id; }));
+                        assert.isTrue(_.any(doc.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and we check the feed": {
@@ -115,7 +115,7 @@ suite.addBatch({
                         assert.include(doc, "items");
                         assert.isArray(doc.items);
                         assert.greater(doc.items.length, 0);
-                        assert.isTrue(_.any(doc.items, function(item) { return item.id == act.id; }));
+                        assert.isTrue(_.any(doc.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and we check the minor feed": {
@@ -132,7 +132,7 @@ suite.addBatch({
                         assert.isObject(doc);
                         assert.include(doc, "items");
                         assert.isArray(doc.items);
-                        assert.isTrue(_.every(doc.items, function(item) { return item.id != act.id; }));
+                        assert.isTrue(_.every(doc.items, function(item) { return item.id !== act.id; }));
                     }
                 }
             },
@@ -201,7 +201,7 @@ suite.addBatch({
                         assert.include(doc, "items");
                         assert.isArray(doc.items);
                         assert.greater(doc.items.length, 0);
-                        assert.isTrue(_.any(doc.items, function(item) { return item.id == act.id; }));
+                        assert.isTrue(_.any(doc.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and we check the feed": {
@@ -219,7 +219,7 @@ suite.addBatch({
                         assert.include(doc, "items");
                         assert.isArray(doc.items);
                         assert.greater(doc.items.length, 0);
-                        assert.isTrue(_.any(doc.items, function(item) { return item.id == act.id; }));
+                        assert.isTrue(_.any(doc.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and we check the major feed": {
@@ -236,7 +236,7 @@ suite.addBatch({
                         assert.isObject(doc);
                         assert.include(doc, "items");
                         assert.isArray(doc.items);
-                        assert.isTrue(_.every(doc.items, function(item) { return item.id != act.id; }));
+                        assert.isTrue(_.every(doc.items, function(item) { return item.id !== act.id; }));
                     }
                 }
             },

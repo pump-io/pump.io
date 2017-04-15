@@ -176,7 +176,7 @@ suite.addBatch({
                                         function(err, act) {
                                             if (err) {
                                                 callback(err, null);
-                                            } else if (act.mood.displayName == mood) {
+                                            } else if (act.mood.displayName === mood) {
                                                 callback(null, true);
                                             } else {
                                                 callback(null, false);
@@ -238,7 +238,7 @@ suite.addBatch({
                                 for (i = 0; i < chunks.length; i++) {
                                     assert.isArray(chunks[i]);
                                     if (i === 16) {
-                                        // total == 330, last is only 10
+                                        // total === 330, last is only 10
                                         assert.lengthOf(chunks[i], 10);
                                     } else {
                                         assert.lengthOf(chunks[i], 20);
@@ -494,7 +494,7 @@ suite.addBatch({
                                             if (err) {
                                                 callback(err, null);
                                             } else {
-                                                callback(null, person.gender == "f");
+                                                callback(null, person.gender === "f");
                                             }
                                         }
                                     );

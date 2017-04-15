@@ -55,7 +55,7 @@ var deepProperty = function(object, property) {
     var i = property.indexOf(".");
     if (!object) {
         return null;
-    } else if (i == -1) { // no dots
+    } else if (i === -1) { // no dots
         return object[property];
     } else {
         return deepProperty(object[property.substr(0, i)], property.substr(i + 1));

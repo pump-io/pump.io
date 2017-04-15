@@ -231,7 +231,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(feed.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and the author reads their own inbox": {
@@ -251,7 +251,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(inbox, "items");
                         assert.isArray(inbox.items);
-                        assert.ok(_.find(inbox.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(inbox.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and the recipient reads the activity": {
@@ -340,7 +340,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(feed.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and the recipient reads their own inbox": {
@@ -360,7 +360,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(inbox, "items");
                         assert.isArray(inbox.items);
-                        assert.ok(_.find(inbox.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(inbox.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and a follower reads the activity": {
@@ -370,7 +370,7 @@ suite.addBatch({
                             url = doc.links.self.href;
 
                         httputil.getJSON(url, cred, function(err, act, response) {
-                            if (err && err.statusCode && err.statusCode == 403) {
+                            if (err && err.statusCode && err.statusCode === 403) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -390,7 +390,7 @@ suite.addBatch({
                             url = doc.object.id;
 
                         httputil.getJSON(url, cred, function(err, note, response) {
-                            if (err && err.statusCode && err.statusCode == 403) {
+                            if (err && err.statusCode && err.statusCode === 403) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -410,7 +410,7 @@ suite.addBatch({
                             url = doc.object.likes.url;
 
                         httputil.getJSON(url, cred, function(err, likes, response) {
-                            if (err && err.statusCode && err.statusCode == 403) {
+                            if (err && err.statusCode && err.statusCode === 403) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -430,7 +430,7 @@ suite.addBatch({
                             url = doc.object.replies.url;
 
                         httputil.getJSON(url, cred, function(err, replies, response) {
-                            if (err && err.statusCode && err.statusCode == 403) {
+                            if (err && err.statusCode && err.statusCode === 403) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -491,7 +491,7 @@ suite.addBatch({
                             url = doc.links.self.href;
 
                         httputil.getJSON(url, cred, function(err, act, response) {
-                            if (err && err.statusCode && err.statusCode == 403) {
+                            if (err && err.statusCode && err.statusCode === 403) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -511,7 +511,7 @@ suite.addBatch({
                             url = doc.object.id;
 
                         httputil.getJSON(url, cred, function(err, note, response) {
-                            if (err && err.statusCode && err.statusCode == 403) {
+                            if (err && err.statusCode && err.statusCode === 403) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -531,7 +531,7 @@ suite.addBatch({
                             url = doc.object.likes.url;
 
                         httputil.getJSON(url, cred, function(err, likes, response) {
-                            if (err && err.statusCode && err.statusCode == 403) {
+                            if (err && err.statusCode && err.statusCode === 403) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -551,7 +551,7 @@ suite.addBatch({
                             url = doc.object.replies.url;
 
                         httputil.getJSON(url, cred, function(err, replies, response) {
-                            if (err && err.statusCode && err.statusCode == 403) {
+                            if (err && err.statusCode && err.statusCode === 403) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -743,7 +743,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(feed.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and the author reads their own inbox": {
@@ -763,7 +763,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(inbox, "items");
                         assert.isArray(inbox.items);
-                        assert.ok(_.find(inbox.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(inbox.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and an unrelated user reads the activity": {
@@ -845,7 +845,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(feed.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and an unrelated user reads their own inbox": {
@@ -953,7 +953,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(feed.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and a follower reads their own inbox": {
@@ -973,7 +973,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(feed.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and an anonymous user reads the activity": {
@@ -1063,7 +1063,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(feed.items, function(item) { return item.id === act.id; }));
                     }
                 }
             }

@@ -245,7 +245,7 @@ suite.addBatch({
                     },
                     function(err, res, body) {
                         if (err) throw err;
-                        if (res.statusCode != 200) throw new Error("Bad assoc");
+                        if (res.statusCode !== 200) throw new Error("Bad assoc");
                         var reg = JSON.parse(body);
                         rp({application_name: "No Secret",
                             logo_url: "http://example.com/my-logo-url.jpg",
@@ -276,7 +276,7 @@ suite.addBatch({
                     },
                     function(err, res, body) {
                         if (err) throw err;
-                        if (res.statusCode != 200) throw new Error("Bad assoc");
+                        if (res.statusCode !== 200) throw new Error("Bad assoc");
                         var reg = JSON.parse(body);
                         rp({application_name: "Wrong Secret",
                             logo_url: "http://example.com/my-logo-url.jpg",

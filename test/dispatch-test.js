@@ -48,7 +48,7 @@ suite.addBatch({
                 },
                 "it works": function(err, name) {
                     assert.ifError(err);
-                    assert.isTrue(name == "parent" || name == "child");
+                    assert.isTrue(name === "parent" || name === "child");
                 }
             }
         }

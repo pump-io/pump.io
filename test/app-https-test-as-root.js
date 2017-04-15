@@ -55,7 +55,7 @@ var makeCred = function(cl, pair) {
 
 var httpsURL = function(url) {
     var parts = urlparse(url);
-    return parts.protocol == "https:";
+    return parts.protocol === "https:";
 };
 
 // hostmeta links

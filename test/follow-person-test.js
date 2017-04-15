@@ -489,7 +489,7 @@ suite.addBatch({
                             httputil.postJSON(url, cred, users.cop.profile, this);
                         },
                         function(err, posted, result) {
-                            if (err && err.statusCode == 401) {
+                            if (err && err.statusCode === 401) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
