@@ -33,7 +33,7 @@ var assert = require("assert"),
 
 var ignore = function(err) {};
 
-var suite = vows.describe("Post note API test");
+var suite = vows.describe("Restricted post test");
 
 var makeCred = function(cl, pair) {
     return {
