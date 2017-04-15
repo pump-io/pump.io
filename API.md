@@ -199,7 +199,7 @@ Verbs that have side-effects include:
 * "add": If the target is a collection that belongs to the actor, will
   add the object to the collection. Good for adding users to user lists.
 * "remove": If the target is a collection that belongs to the actor, will
-  add the object to the collection. Good for removing users from user lists.
+  remove the object from the collection. Good for removing users from user lists.
 
 Other verbs may have side-effects in the future -- especially the ones
 around friendships, groups, events, and playing media.
