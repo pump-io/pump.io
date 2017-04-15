@@ -15,10 +15,10 @@ html(lang="en")
 
     else
 
-      link(href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.min.css", rel="stylesheet")
-      link(href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.min.css", rel="stylesheet")
-      link(href="//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.1.1/fineuploader.css", rel="stylesheet")
-      link(href="//cdnjs.cloudflare.com/ajax/libs/select2/3.4.1/select2.min.css", rel="stylesheet")
+      link(href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.min.css", rel="stylesheet", integrity="sha384-MY3lqAyZWEjvYefTFTBYUN85pnmwAxdSjsX+8IqCP1N5VBzOIX6GNo1rUt9gz74C", crossorigin="anonymous")
+      link(href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.min.css", rel="stylesheet", integrity="sha384-F6SkVapMeW8omBv9cyqV+15oQ6VSZ+g9B3dXePPOKKVGEdFOfLo50I4anpVkG3kQ", crossorigin="anonymous")
+      link(href="//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.1.1/fineuploader.css", rel="stylesheet", integrity="sha384-C1uGbpJ1NVxkJw+K28nyR5P7oWY/VD8Lx0DAsjBFkbMg5dyTRHOL9GExCfvV7b7q", crossorigin="anonymous")
+      link(href="//cdnjs.cloudflare.com/ajax/libs/select2/3.4.1/select2.min.css", rel="stylesheet", integrity="sha384-t087KIbF6xNxaqAXujy7+OhZdVNxg+hOPvSnopWEydtBFKWmlbnxx5GT/BFlu1hv", crossorigin="anonymous")
 
     link(href="/stylesheet/bootstrap-wysihtml5.css", rel="stylesheet")
     link(href="/stylesheet/bootstrap-lightbox.min.css", rel="stylesheet")
@@ -96,16 +96,17 @@ html(lang="en")
         if config.sockjs
           script(src="/javascript/libs/sockjs.min.js")
       else
-        script(src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js")
-        script(src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js")
-        script(src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js")
-        script(src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js")
-        script(src="//cdnjs.cloudflare.com/ajax/libs/spin.js/1.2.7/spin.min.js")
-        script(src="//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.1.1/jquery.fineuploader.min.js")
-        script(src="//cdnjs.cloudflare.com/ajax/libs/wysihtml5/0.3.0/wysihtml5.min.js")
-        script(src="//cdnjs.cloudflare.com/ajax/libs/select2/3.4.1/select2.min.js")
+        script(src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js", integrity="sha384-aBL3Lzi6c9LNDGvpHkZrrm3ZVsIwohDD7CDozL0pk8FwCrfmV7H9w8j3L7ikEv6h", crossorigin="anonymous")
+        script(src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js", integrity="sha384-7sVK908dLMjOwvGD47EHg9cxk32sTpllx4Qqg0vzxEIlyBSsK9UauzrqZl8SPP0+", crossorigin="anonymous")
+        script(src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js", integrity="sha384-dUBywiUuX4dPOAQyWEyB4SZGdQt4X73zYyUywoVqBN1NlZvdbJBq7Oed5/0ETLa0", crossorigin="anonymous")
+        script(src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js", integrity="sha384-pnGWvh1+0enznvYWohFuSUv0tb3JastgrbJUehic37q6s4gKBh0xWz2JwkngJqmr", crossorigin="anonymous")
+        script(src="//cdnjs.cloudflare.com/ajax/libs/spin.js/1.2.7/spin.min.js", integrity="sha384-42TRsE23GzHQqobaGq/ztrEcPEKDkg6hIb2Q5aNK1TJH9kCBPgCxjcD+V8JHyp8T", crossorigin="anonymous")
+        script(src="//cdnjs.cloudflare.com/ajax/libs/file-uploader/3.1.1/jquery.fineuploader.min.js", integrity="sha384-4I5M7IeYacs/DxdNapH3ZJWHpGDurSEJauRkgBLTK6CsKl1vodNWjNeYWqScb6kv", crossorigin="anonymous")
+        script(src="//cdnjs.cloudflare.com/ajax/libs/wysihtml5/0.3.0/wysihtml5.min.js", integrity="sha384-PnQt2OMXYkEzb0JokcAmMcT5g2xbk1w3l8isPt7kTZ2OHnVnC2xcxy8iUsiIet/C", crossorigin="anonymous")
+        script(src="//cdnjs.cloudflare.com/ajax/libs/select2/3.4.1/select2.min.js", integrity="sha384-Bjg2cC/PBtxwe9XCP8SmjTXhPAU/u3pPvfvdQUp9cmQLY8fV2i+RAB4grzjuXOqJ", crossorigin="anonymous")        if config.sockjs
+  
         if config.sockjs
-          script(src="//cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.2/sockjs-min.js")
+          script(src="//cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.2/sockjs-min.js", integrity="sha384-TfTpmLAfOnzYnGyQoXfZGuCTAAZspKwo6IsvPh6oedkmD3TmDvDukGLT7pZiDwlB", crossorigin="anonymous")
       script(src="/javascript/libs/jquery.easydate-0.2.4.min.js")
       script(src="/javascript/libs/oauth.min.js")
       script(src="/javascript/libs/sha1.min.js")
