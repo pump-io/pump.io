@@ -1,3 +1,5 @@
+"use strict";
+
 var _ = require("underscore"),
     Step = require("step"),
     cluster = require("cluster"),
