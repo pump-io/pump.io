@@ -3,7 +3,6 @@
   "sub": true,
   "bitwise": true,
   "eqeqeq": true,
-  "forin": true,
   "freeze": true,
   "futurehostile": true,
   "noarg": true,
