@@ -16,6 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+"use strict";
+
 var Step = require("step"),
     mw = require("../lib/middleware"),
     streams = require("../lib/streams"),
