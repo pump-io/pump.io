@@ -139,7 +139,8 @@ html(lang="en")
           disableRegistration: !{config.disableRegistration || false},
           canUpload: !{config.canUpload || false},
           debugClient: !{config.debugClient || false},
-          sockjs: !{config.sockjs || false}
+          sockjs: !{config.sockjs || false},
+          nicknameBlacklist: !{JSON.stringify(config.nicknameBlacklist)}
       });
 
       Pump.initialData = !{data ? JSON.stringify(defang(data)) : 'null'};

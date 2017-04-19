@@ -881,7 +881,11 @@
                     }
                 };
 
-            if (params.password !== repeat) {
+            if (_.contains(Pump.config.nicknameBlacklist, params.nickname)) {
+
+                view.showError("That nickname is not allowed");
+
+            } else if (params.password !== repeat) {
 
                 view.showError("Passwords don't match.");
 
