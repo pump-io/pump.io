@@ -15,6 +15,7 @@ RUN apk add --no-cache imagemagick openssl nodejs python make g++ git \
      && cd "${PUMP_LOCATION}" \
      && sed -i 's/"bcrypt": "0.8.x"/"bcrypt": "^1.0.2"/g' package.json\
      && npm install \
+     && npm run build \
      && addgroup -S -g "${PUMP_GUID}" "pump" \
      && adduser -S -D -H -G "pump" -h "/usr/local/pump" -u "${PUMP_UID}" "pump" \
      && chown -R "pump:pump" /usr/local/pump \
