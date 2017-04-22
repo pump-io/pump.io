@@ -221,9 +221,9 @@
                         if (clientUrls.indexOf(name) !== -1) {
                             templateName += "-client";
                         }
-                        var _template = Pump._templates[templateName];
-                        if (_template && !Pump.config.debugClient) {
-                            templateName += "." + _template.hash;
+                        var hash = Pump._templates[templateName];
+                        if (hash && !Pump.config.debugClient) {
+                            templateName += "." + hash;
                         }
                         url += templateName + ".jade.js";
 
@@ -249,10 +249,10 @@
                         return Pump.templates[name];
                     } else {
                         var templateName = name + "-client";
-                        var _template = Pump._templates[templateName];
+                        var hash = Pump._templates[templateName];
 
-                        if (_template && !Pump.config.debugClient) {
-                            templateName += "." + _template.hash;
+                        if (hash && !Pump.config.debugClient) {
+                            templateName += "." + hash;
                         }
                         templateName += ".jade.js";
 
