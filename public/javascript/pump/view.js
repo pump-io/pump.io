@@ -341,9 +341,21 @@
 
             view.$(".alert").alert();
         },
-        showError: function(msg) {
-            var view = this;
-            if (view.$(".alert").length > 0) {
+        showError: function(err) {
+            var view = this,
+                msg;
+
+            if (_.isString(err)) {
+                msg = err;
+            } else if (_.isObject(err)) {
+                msg = err.message ||
+                    (err.responseJSON &&
+                     err.responseJSON.error) ||
+                    (err.status && err.status +
+                     ": " + err.statusText);
+            }
+
+            if (view.$(".alert").length > 0 && msg) {
                 view.showAlert(msg, "error");
             } else {
                 Pump.error(msg);
@@ -2312,7 +2324,7 @@
                                  view.stopSpin();
                              },
                              error: function(model, error, options) {
-                                 view.showError(error.message);
+                                 view.showError(error);
                                  view.stopSpin();
                              }
                          });
@@ -2377,7 +2389,7 @@
                                   view.stopSpin();
                               },
                               error: function(model, error, options) {
-                                  view.showError(error.message);
+                                  view.showError(error);
                                   view.stopSpin();
                               }
                           }
