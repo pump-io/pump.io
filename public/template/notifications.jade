@@ -1,5 +1,5 @@
 .btn-group#notifications
-  button.btn.dropdown-toggle.btn-small.btn-success(disabled=notifications.totalItems <= 0, data-toggle="dropdown", href="#")
+  button.btn.dropdown-toggle.btn-small.btn-success(data-toggle="dropdown", href="#")
     i.icon-exclamation-sign.icon-white
     if notifications.items.length > 0
       | &nbsp;
@@ -8,3 +8,6 @@
     each activity in notifications.items
       li
         small!= activity.content
+    if !notifications.items.length
+      li
+        small="No notifications... yet!"
