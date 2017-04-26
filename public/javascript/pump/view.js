@@ -2435,9 +2435,10 @@
         templateName: "account",
         modelName: "user",
         events: {
-            "submit #account": "saveAccount"
+            "submit #account-password": "changePassword",
+            "submit #account-email": "changeEmail"
         },
-        saveAccount: function() {
+        changePassword: function() {
             var view = this,
                 user = Pump.principalUser,
                 password = view.$("#password").val(),
@@ -2464,11 +2465,41 @@
                           password,
                           {
                               success: function(resp, status, xhr) {
-                                  view.showSuccess("Saved.");
+                                  view.showSuccess("Changed password successful.");
                                   view.stopSpin();
                               },
                               error: function(model, error, options) {
-                                  view.showError(error.message);
+                                  view.showError(error);
+                                  view.stopSpin();
+                              }
+                          }
+                         );
+            }
+
+            return false;
+        },
+        changeEmail: function() {
+            var view = this,
+                user = Pump.principalUser,
+                email = view.$("#email").val();
+
+            if (!email || email.length === 0) {
+                view.showError("Email input look empty.");
+            }
+            email = email.toLowerCase();
+
+            if (email === user.get("email")) {
+                view.showAlert("The email looks like the same.");
+            } else {
+                user.save("email",
+                          email,
+                          {
+                              success: function(resp, status, xhr) {
+                                  view.showSuccess("Change email successful.");
+                                  view.stopSpin();
+                              },
+                              error: function(model, error, options) {
+                                  view.showError(error);
                                   view.stopSpin();
                               }
                           }

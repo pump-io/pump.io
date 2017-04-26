@@ -1,29 +1,43 @@
 .span12.account
 
-  form#account
+  legend Account
+
+  form#account-email
 
     fieldset
 
-      legend Account
-      
       .clearfix
         label Username
         .input
           span.uneditable-input= principalUser.nickname
           span.help-block The name you log in with (unchangeable!)
 
+      if config.requireEmail
+        .clearfix
+          label Email
+          .input
+            input.span6#email(value=principalUser.email, type="email",
+            name="email", size="16", placeholder="Your email address")
+            span.help-block For updates and password recovery
+
+        .actions
+          input.btn.btn-primary(type="submit", value="Change email")
+
+  form#account-password
+
+    fieldset
+
       .clearfix
-        label Password
+        label New password
         .input
           input.span6#password(name="password", size="30", type="password")
           span.help-block Eight characters, mixed letters and numbers, not stupid
 
       .clearfix
-        label Repeat
+        label Confirm new password
         .input
           input.span6#repeat(name="repeat", size="30", type="password")
           span.help-block Check your typing
 
-    fieldset
       .actions
-        input.btn.btn-primary(type="submit", value="Save changes")
+        input.btn.btn-primary(type="submit", value="Change password")
