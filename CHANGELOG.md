@@ -2,6 +2,10 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 4.0.0 - 2017-05-02
+
+No changes from 4.0.0 beta 5.
+
 ## 4.0.0 beta 5 - 2017-04-14
 
 ### Fixed
