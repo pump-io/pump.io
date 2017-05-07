@@ -8,6 +8,6 @@
     each activity in notifications.items
       li
         small!= activity.content
-    if notifications.items.length <= 0
+    if notifications.items.length === 0
       li
         small No notifications... yet!

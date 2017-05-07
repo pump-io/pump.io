@@ -10,7 +10,7 @@
       if _.isObject(activity)
         li
           small!= activity.content
-    if !messages.items.length
+    if messages.items.length === 0
       li
         small You do not have any messages yet
     li.divider
