@@ -723,8 +723,8 @@
             var view = this;
             // setup subViews
             view.setupSubs();
-            // Initialize state of login button
-            view.onKey();
+            // Initialize state of login button after a tiny delay for remembered passwords to be filled in
+            setInterval(function(){view.onKey();},100);
         },
         "onKey": function(event) {
             var view = this,
