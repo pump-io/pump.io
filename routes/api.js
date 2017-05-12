@@ -743,6 +743,8 @@ var createUser = function(req, res, next) {
                 return;
             }
         }
+    }else{
+         if(props.email!="undefined") delete props.email
     }
 
     Step(
