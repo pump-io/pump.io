@@ -1,0 +1,3 @@
+[submodule ".openshift"]
+	path = .openshift
+	url = git://github.com/grdryn/nodejs-custom-version-openshift.git
