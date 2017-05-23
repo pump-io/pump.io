@@ -21,6 +21,24 @@ pump.io follows [Semantic Versioning][semver].
 
 * Return the correct Content-Type for OAuth endpoints (#822)
 
+## 4.0.1 - 2017-05-23
+
+### Security
+
+* Increase minimum DOMPurify version to 0.9.0
+
+## 3.0.3 - 2017-05-23
+
+### Security
+
+* Increase minimum DOMPurify version to 0.9.0
+
+## 2.1.2 - 2017-05-23
+
+### Security
+
+* Increase minimum DOMPurify version to 0.9.0
+
 ## 4.0.0 - 2017-05-02
 
 No changes from 4.0.0 beta 5.
