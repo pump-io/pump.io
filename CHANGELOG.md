@@ -2,6 +2,133 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 4.0.1 - 2017-05-23
+
+### Security
+
+* Increase minimum DOMPurify version to 0.9.0
+
+## 3.0.3 - 2017-05-23
+
+### Security
+
+* Increase minimum DOMPurify version to 0.9.0
+
+## 2.1.2 - 2017-05-23
+
+### Security
+
+* Increase minimum DOMPurify version to 0.9.0
+
+## 4.0.0 - 2017-05-02
+
+No changes from 4.0.0 beta 5.
+
+## 4.0.0 beta 5 - 2017-04-14
+
+### Fixed
+
+* Revert bcrypt upgrade to fix install issues (#1333)
+* Don't use newer `github:` syntax in `connect-auth` dep as it breaks npm@1 (#1253)
+* The commandline tools no longer crash due to missing `optimist`
+
+### Improved
+
+* Update documentation to match new config options
+* Lock `connect-auth` dep to a particular version
+* Turn on tests for Node 6
+
+## 4.0.0 beta 4 - 2017-04-03
+
+### Fixed
+
+* Fix a whitespace issue with `appendFooter`
+
+## 4.0.0 beta 3 - 2017-04-03
+
+### Changed
+
+* Permanently remove the build-on-git-install hacks (#1291)
+
+## 4.0.0 beta 2 - 2017-04-03
+
+### Fixed
+
+* Correct a potentially bad npm publish
+
+## 4.0.0 beta 1 - 2017-04-03
+
+### Improved
+
+* Added the `appendFooter` config option
+
+## 4.0.0 beta 0 - 2017-04-03
+
+### Improved
+
+* Frontend JavaScript runs in strict mode (#1221)
+* Frontend Javascript passes JSHint (#1176)
+* Remove direct Connect dependency (#1274)
+* Upgrade many minor dependencies
+* Add a robots.txt file (#1286)
+* Don't suggest or offer avatar uploads if uploads aren't available
+* Added the ability to specify configuration via environment variables
+* Added the ability to specify configuration via CLI flags
+* Added `--help` and `--version` CLI flags
+* Embed IndieWeb metadata in the web UI
+
+### Breaking
+
+* Upgrade to Express 4.x (affects plugins)
+* Switch to Yargs for config and CLI option parsing (should be identical but please double-check that your config is respected in case of subtle edge cases)
+
+## 3.0.2 - 2017-03-10
+
+### Fixed
+
+* Fix README.md documenting the old name of a config parameter
+* Fix the sample `pump.io.json` including an obsolete parameter
+
+## 3.0.1 - 2017-03-10
+
+### Fixed
+
+* Removed build logic from public npm package because it was completely breaking installs (#1291)
+
+## 3.0.0 - 2017-03-05
+
+No changes from 3.0.0 beta 1.
+
+## 3.0.0 beta 1 - 2017-02-15
+
+### Improved
+
+* Improve performance of front-page image
+
+### Fixed
+
+* Fix the web UI repeating YouTube videos (again)
+* Fix direct visits to /following URLs not rendering layout (#1279)
+
+## 3.0.0 beta 0 - 2017-02-01
+
+### Improved
+
+* HTTP Strict Transport Security can now be configured (#1197)
+* The sample systemd service can now be directly be used by specifying a Databank driver as an @-service parameter
+
+### Changed
+
+* The web UI no longer loads a JSON polyfill
+
+### Fixed
+
+* Incorrect and unnecessary 'plugin-types' Content Security Policy directives are no longer sent
+
+### Breaking
+
+* The `uploaddir` option is obsolete and should be migrated to the new `datadir` option (#1272)
+
 ## 2.1.1 - 2017-01-18
 
 ### Fixed
