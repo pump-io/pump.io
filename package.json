@@ -2,7 +2,7 @@
   "name": "pump.io",
   "preferGlobal": "true",
   "homepage": "http://pump.io/",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "author": "Evan Prodromou <evan@e14n.com>",
   "devDependencies": {
     "jscs": "^3.0.3",
