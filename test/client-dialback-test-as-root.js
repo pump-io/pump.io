@@ -25,8 +25,9 @@ var assert = require("assert"),
     _ = require("underscore"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     dialbackApp = require("./lib/dialback").dialbackApp,
-    setupApp = oauthutil.setupApp;
+    setupApp = apputil.setupApp;
 
 var suite = vows.describe("client registration with dialback");
 

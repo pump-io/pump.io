@@ -25,14 +25,15 @@ var assert = require("assert"),
     querystring = require("querystring"),
     OAuth = require("oauth-evanp").OAuth,
     httputil = require("./lib/http"),
-    oauthutil = require("./lib/oauth");
+    oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app");
 
 var suite = vows.describe("Test Webfinger for user profile IDs");
 
 suite.addBatch({
     "When we set up the app": {
         topic: function() {
-            oauthutil.setupApp(80, "social.localhost", this.callback);
+            apputil.setupApp(80, "social.localhost", this.callback);
         },
         teardown: function(app) {
             app.close();

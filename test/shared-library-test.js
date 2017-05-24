@@ -22,8 +22,9 @@ var assert = require("assert"),
     vows = require("vows"),
     http = require("http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     httputil = require("./lib/http"),
-    setupApp = oauthutil.setupApp;
+    withAppSetup = apputil.withAppSetup;
 
 var suite = vows.describe("shared library test");
 
@@ -47,26 +48,14 @@ var testGet = function(rel) {
 
 // A batch to test that the API docs are served at root
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we check the showdown endpoint URL": httputil.endpoint("/shared/showdown.js", ["GET"]),
         "and we check the underscore endpoint URL": httputil.endpoint("/shared/underscore.js", ["GET"]),
         "and we check the underscore-min endpoint URL": httputil.endpoint("/shared/underscore-min.js", ["GET"]),
         "and we get the showdown file": testGet("/shared/showdown.js"),
         "and we get the underscore file": testGet("/shared/underscore.js"),
         "and we get the underscore-min file": testGet("/shared/underscore-min.js")
-    }
-});
+}));
 
 suite["export"](module);

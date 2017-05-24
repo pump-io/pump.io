@@ -27,27 +27,17 @@ var assert = require("assert"),
     urlparse = require("url").parse,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
-    setupApp = oauthutil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     newCredentials = oauthutil.newCredentials;
 
 var suite = vows.describe("Activity API test");
 
 // A batch for testing the read-write access to the API
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we get new credentials": {
             topic: function() {
                 newCredentials("gerold", "just*a*guy", this.callback);
@@ -856,7 +846,7 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

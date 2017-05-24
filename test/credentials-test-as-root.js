@@ -33,7 +33,8 @@ var assert = require("assert"),
     Credentials = require("../lib/model/credentials").Credentials,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
-    setupAppConfig = oauthutil.setupAppConfig;
+    apputil = require("./lib/app"),
+    setupAppConfig = apputil.setupAppConfig;
 
 var suite = vows.describe("credentials module interface");
 

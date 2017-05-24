@@ -24,29 +24,19 @@ var assert = require("assert"),
     URLMaker = require("../lib/urlmaker").URLMaker,
     modelBatch = require("./lib/model").modelBatch,
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     httputil = require("./lib/http"),
-    setupApp = oauthutil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
 var suite = vows.describe("proxy route");
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we check the dialback endpoint":
         httputil.endpoint("/api/proxy/AAAAAAAA", ["GET"])
-    }
-});
+    })
+);
 
 suite["export"](module);

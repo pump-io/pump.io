@@ -26,10 +26,11 @@ var assert = require("assert"),
     http = require("http"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
     pj = httputil.postJSON,
     gj = httputil.getJSON,
-    setupApp = oauthutil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair,
     register = oauthutil.register,
@@ -51,19 +52,8 @@ var suite = vows.describe("User stream search test");
 
 // A batch for testing the read access to the API
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we make a new client": {
             topic: function() {
                 newClient(this.callback);
@@ -244,7 +234,7 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

@@ -27,12 +27,13 @@ var assert = require("assert"),
     http = require("http"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     xrdutil = require("./lib/xrd"),
     actutil = require("./lib/activity"),
     pj = httputil.postJSON,
     gj = httputil.getJSON,
     validActivity = actutil.validActivity,
-    setupApp = oauthutil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     newCredentials = oauthutil.newCredentials;
 
 var suite = vows.describe("LRDD test");
@@ -81,19 +82,8 @@ var webfinger = {
 
 // A batch to test endpoints
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we check the lrdd endpoint":
         httputil.endpoint("/api/lrdd", ["GET"]),
         "and we get the lrdd endpoint with no uri":
@@ -106,22 +96,11 @@ suite.addBatch({
         httputil.getfail("/api/lrdd?resource=evan@photo.example", 404),
         "and we get the lrdd endpoint with a Webfinger of a non-existent user":
         httputil.getfail("/api/lrdd?resource=evan@localhost", 404)
-    }
-});
+    })
+);
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we register a client and user": {
             topic: function() {
                 newCredentials("alice", "test+pass", this.callback);
@@ -195,7 +174,7 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);
