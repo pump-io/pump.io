@@ -29,6 +29,7 @@
     "use strict";
 
     Pump.templates = {};
+    Pump._templates = window._pumpTemplates; // All available templates
 
     Pump.TemplateError = function(template, data, err) {
         if (Error.captureStackTrace) {
@@ -190,7 +191,7 @@
                     if (_.has(Pump.templates, name)) {
                         cb(null, Pump.templates[name]);
                     } else {
-                        var url = "/template/"+ name;
+                        var templateName = name;
                         var clientUrls = ["account",
                                           "authentication",
                                           "authorization",
@@ -218,24 +219,19 @@
                                           "user",
                                           "xss-error"];
                         if (clientUrls.indexOf(name) !== -1) {
-                            url += "-client";
+                            templateName += "-client";
                         }
-                        url += ".jade.js";
 
-                        $.get(url, function(data) {
-                            var f;
-                            try {
-                                /* jslint evil: true */
-                                eval(data);
-                                f = template;
-                                f.templateName = name;
-                                Pump.templates[name] = f;
-                            } catch (err) {
-                                cb(err, null);
-                                return;
-                            }
-                            cb(null, f);
-                        });
+                        var f;
+                        try {
+                            f = Pump._templates()[templateName];
+                            f.templateName = name;
+                            Pump.templates[name] = f;
+                        } catch (err) {
+                            cb(err, null);
+                            return;
+                        }
+                        cb(null, f);
                     }
                 },
                 getTemplateSync = function(name) {
@@ -243,16 +239,12 @@
                     if (_.has(Pump.templates, name)) {
                         return Pump.templates[name];
                     } else {
-                        res = $.ajax({url: "/template/"+name+"-client.jade.js",
-                                      async: false});
-                        if (res.readyState === 4 &&
-                            ((res.status >= 200 && res.status < 300) || res.status === 304)) {
-                            data = res.responseText;
-                            /* jslint evil: true */
-                            eval(data);
-                            f = template;
+                        try {
+                            f = Pump._templates()[name + "-client"];
                             f.templateName = name;
                             Pump.templates[name] = f;
+                        } catch (err) {
+                            Pump.debug(err);
                         }
                         return f;
                     }
