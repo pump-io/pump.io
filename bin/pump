@@ -123,6 +123,16 @@ var launchApps = function(config) {
 
         Dispatch.start(log);
 
+        if (_(config).has("debug")) {
+            debug = config.debug;
+            // for debugging
+            var fixedExecArgv=[];
+            fixedExecArgv.push(debug);
+            cluster.setupMaster({ 
+                execArgv: fixedExecArgv 
+            });
+        }
+        
         for (i = 0; i < cnt; i++) {
             cluster.fork();
         }
