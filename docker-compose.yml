@@ -18,7 +18,7 @@ services:
     environment:
       - NODE_ENVIRONMENT=production
       - PUMPIO_ADDRESS=0.0.0.0
-      - PUMPIO_DATADIR=/var/local/pumpio
+      - PUMPIO_DATADIR=/var/local/pump.io
       - PUMPIO_ENABLE_UPLOADS=true
       - PUMPIO_DRIVER=mongodb
       - PUMPIO_PARAMS__HOST=mongodb
