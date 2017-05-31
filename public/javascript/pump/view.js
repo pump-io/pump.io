@@ -1396,7 +1396,7 @@
                 view.$(".favorite")
                     .removeClass("favorite")
                     .addClass("unfavorite")
-                    .html("Unlike <i class=\"fa fa-thumbs-down pumpicon pumpicon-thumbs-down\"></i>");
+                    .html("Unlike <i class=\"fa fa-thumbs-down\"></i>");
                 Pump.addMinorActivity(act);
             });
         },
@@ -1414,7 +1414,7 @@
                     view.$(".unfavorite")
                         .removeClass("unfavorite")
                         .addClass("favorite")
-                        .html("Like <i class=\"fa fa-thumbs-up pumpicon pumpicon-thumbs-up\"></i>");
+                        .html("Like <i class=\"fa fa-thumbs-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
             });
@@ -1436,7 +1436,7 @@
                     view.$(".share")
                         .removeClass("share")
                         .addClass("unshare")
-                        .html("Unshare <i class=\"fa fa-times pumpicon pumpicon-unshare\"></i>");
+                        .html("Unshare <i class=\"fa fa-times\"></i>");
                     Pump.addMajorActivity(act);
                 }
             });
@@ -1458,7 +1458,7 @@
                     view.$(".unshare")
                         .removeClass("unshare")
                         .addClass("share")
-                        .html("Share <i class=\"fa fa-share pumpicon pumpicon-share\"></i>");
+                        .html("Share <i class=\"fa fa-share\"></i>");
                     Pump.addMinorActivity(act);
                 }
             });
@@ -1680,7 +1680,7 @@
                     view.$(".favorite")
                         .removeClass("favorite")
                         .addClass("unfavorite")
-                        .html("Unlike <i class=\"fa fa-thumbs-down pumpicon pumpicon-thumbs-down\"></i>");
+                        .html("Unlike <i class=\"fa fa-thumbs-down\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -1702,7 +1702,7 @@
                     view.$(".unfavorite")
                         .removeClass("unfavorite")
                         .addClass("favorite")
-                        .html("Like <i class=\"fa fa-thumbs-up pumpicon pumpicon-thumbs-up\"></i>");
+                        .html("Like <i class=\"fa fa-thumbs-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -1723,7 +1723,7 @@
                     view.$(".share")
                         .removeClass("share")
                         .addClass("unshare")
-                        .html("Unshare <i class=\"fa fa-times pumpicon pumpicon-unshare\"></i>");
+                        .html("Unshare <i class=\"fa fa-times\"></i>");
                     Pump.addMajorActivity(act);
                 }
                 view.stopSpin();
@@ -1744,7 +1744,7 @@
                     view.$(".unshare")
                         .removeClass("unshare")
                         .addClass("share")
-                        .html("Share <i class=\"fa fa-share pumpicon pumpicon-share\"></i>");
+                        .html("Share <i class=\"fa fa-share\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -1788,7 +1788,7 @@
                     view.$(".favorite")
                         .removeClass("favorite")
                         .addClass("unfavorite")
-                        .html("Unlike <i class=\"fa fa-thumbs-down pumpicon pumpicon-thumbs-down\"></i>");
+                        .html("Unlike <i class=\"fa fa-thumbs-down\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -1811,7 +1811,7 @@
                     view.$(".unfavorite")
                         .removeClass("unfavorite")
                         .addClass("favorite")
-                        .html("Like <i class=\"fa fa-thumbs-up pumpicon pumpicon-thumbs-up\"></i>");
+                        .html("Like <i class=\"fa fa-thumbs-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -2335,7 +2335,7 @@
                         endpoint: "/main/upload-avatar"
                     },
                     text: {
-                        uploadButton: '<i class="fa fa-upload pumpicon pumpicon-upload"></i> Avatar file'
+                        uploadButton: '<i class="fa fa-upload"></i> Avatar file'
                     },
                     template: '<div class="qq-uploader">' +
                         '<pre class="qq-upload-drop-area"><span>{dragZoneText}</span></pre>' +
@@ -2521,7 +2521,7 @@
                     view.$(".favorite")
                         .removeClass("favorite")
                         .addClass("unfavorite")
-                        .html("Unlike <i class=\"fa fa-thumbs-down pumpicon pumpicon-thumbs-down\"></i>");
+                        .html("Unlike <i class=\"fa fa-thumbs-down\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -2543,7 +2543,7 @@
                     view.$(".unfavorite")
                         .removeClass("unfavorite")
                         .addClass("favorite")
-                        .html("Like <i class=\"fa fa-thumbs-up pumpicon pumpicon-thumbs-up\"></i>");
+                        .html("Like <i class=\"fa fa-thumbs-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -2565,7 +2565,7 @@
                     view.$(".share")
                         .removeClass("share")
                         .addClass("unshare")
-                        .html("Unshare <i class=\"fa fa-times pumpicon pumpicon-unshare\"></i>");
+                        .html("Unshare <i class=\"fa fa-times\"></i>");
                     Pump.addMajorActivity(act);
                 }
                 view.stopSpin();
@@ -2587,7 +2587,7 @@
                     view.$(".unshare")
                         .removeClass("unshare")
                         .addClass("share")
-                        .html("Share <i class=\"fa fa-share pumpicon pumpicon-share\"></i>");
+                        .html("Share <i class=\"fa fa-share\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -2804,7 +2804,7 @@
                         endpoint: "/main/upload"
                     },
                     text: {
-                        uploadButton: '<i class="fa fa-upload pumpicon pumpicon-upload"></i> Picture file'
+                        uploadButton: '<i class="fa fa-upload"></i> Picture file'
                     },
                     template: '<div class="qq-uploader">' +
                         '<pre class="qq-upload-drop-area"><span>{dragZoneText}</span></pre>' +
