@@ -75,7 +75,7 @@
   ],
   "scripts": {
     "build": "jade --client --extension jade.js --no-debug public/template",
-    "fullbuild": "jade --client --extension jade.js --no-debug public/template",
+    "fullbuild": "npm run build && echo 'use `npm run build` instead next time' 1>&2",
     "test": "npm run lint && npm run test:vows",
     "test:vows": "vows -v test/*-test.js",
     "test:root": "vows -v test/*-test-as-root.js",
