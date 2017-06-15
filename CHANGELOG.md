@@ -9,8 +9,8 @@ pump.io follows [Semantic Versioning][semver].
 * Added some basic styles to the LibreJS info page (#1353)
 * Minor UX improvements to the web UI (#1355, #1354)
 * Expanded the list of disallowed nicknames and warn about them in the web UI (#1345, #1347)
-* Pull our fork of connect-auth from npm instead of GitHub
-* Use [Subresource Integrity][] for web UI resources pulled from CDNs
+* Pull our fork of connect-auth from npm instead of GitHub (#1360)
+* Use [Subresource Integrity][] for web UI resources pulled from CDNs (#1340)
 * Internal test refactoring
 
 ### Changed
