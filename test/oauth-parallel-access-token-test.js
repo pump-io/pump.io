@@ -27,7 +27,8 @@ var assert = require("assert"),
     OAuth = require("oauth-evanp").OAuth,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
-    setupApp = oauthutil.setupApp,
+    apputil = require("./lib/app"),
+    withAppSetup = apputil.withAppSetup,
     requestToken = oauthutil.requestToken,
     newClient = oauthutil.newClient,
     register = oauthutil.register,
@@ -39,19 +40,8 @@ var suite = vows.describe("OAuth parallel access tokens");
 
 // A batch to test lots of parallel access token requests
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we get a lot of access tokens in parallel for a single client": {
             topic: function() {
                 var cb = this.callback,
@@ -97,7 +87,7 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

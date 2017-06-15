@@ -1,123 +1,138 @@
-var _ = require("underscore"),
-    Step = require("step"),
-    cluster = require("cluster"),
-    mod = require("../../lib/app"),
-    fs = require("fs"),
+// app.js
+//
+// Utilities to set up app instances
+//
+// Copyright 2012-2013 E14N https://e14n.com/
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+"use strict";
+
+var cp = require("child_process"),
     path = require("path"),
-    Dispatch = require("../../lib/dispatch"),
-    makeApp = mod.makeApp;
+    assert = require("assert");
 
-var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "config.json")));
+// Call as setupApp(port, hostname, callback)
+// setupApp(hostname, callback)
+// setupApp(callback)
 
-var config = {driver: tc.driver,
-              params: tc.params,
-              firehose: false,
-              sockjs: false,
-              noCDN: true,
-              debugClient: true,
-              nologger: true},
-    app = null,
-    i,
-    parts,
-    worker;
+var setupApp = function(port, hostname, callback) {
 
-process.env.NODE_ENV = "test";
+    if (!hostname) {
+        callback = port;
+        hostname = "localhost";
+        port = 4815;
+    }
 
-for (i = 2; i < process.argv.length; i++) {
-    parts = process.argv[i].split("=");
-    config[parts[0]] = JSON.parse(parts[1]);
-}
+    if (!callback) {
+        callback = hostname;
+        hostname = "localhost";
+    }
 
-config.port = parseInt(config.port, 10);
+    port = port || 4815;
+    hostname = hostname || "localhost";
 
-if (cluster.isMaster) {
-    worker = cluster.fork();
-    worker.on("message", function(msg) {
+    var config = {
+        port: port,
+        hostname: hostname
+    };
+
+    setupAppConfig(config, callback);
+};
+
+var setupAppConfig = function(config, callback) {
+
+    var prop, args = [], credwait = {}, objwait = {};
+
+    config.port = config.port || 4815;
+    config.hostname = config.hostname || "localhost";
+
+    for (prop in config) {
+        args.push(prop + "=" + JSON.stringify(config[prop]));
+    }
+
+    var child = cp.fork(path.join(__dirname, "app-standalone.js"), args);
+
+    var dummy = {
+        close: function() {
+            child.kill();
+        },
+        killCred: function(webfinger, callback) {
+            var timeout = setTimeout(function() {
+                callback(new Error("Timed out waiting for cred to die."));
+            }, 30000);
+            credwait[webfinger] = {callback: callback, timeout: timeout};
+            child.send({cmd: "killcred", webfinger: webfinger});
+        },
+        changeObject: function(obj, callback) {
+            var timeout = setTimeout(function() {
+                callback(new Error("Timed out waiting for object change."));
+            }, 30000);
+            objwait[obj.id] = {callback: callback, timeout: timeout};
+            child.send({cmd: "changeobject", object: obj});
+        }
+    };
+
+    child.on("error", function(err) {
+        callback(err, null);
+    });
+
+    child.on("message", function(msg) {
         switch (msg.cmd) {
-        case "error":
         case "listening":
+            callback(null, dummy);
+            break;
+        case "error":
+            callback(msg.value, null);
+            break;
         case "credkilled":
-        case "objectchanged":
-            process.send(msg);
-            break;
-        default:
-            break;
-        }
-    });
-    Dispatch.start();
-    process.on("message", function(msg) {
-        switch (msg.cmd) {
-        case "killcred":
-        case "changeobject":
-            worker.send(msg);
-            break;
-        }
-    });
-} else {
-    Step(
-        function() {
-            makeApp(config, this);
-        },
-        function(err, res) {
-            if (err) throw err;
-            app = res;
-            app.run(this);
-        },
-        function(err) {
-            if (err) {
-                process.send({cmd: "error", value: err});
+            clearTimeout(credwait[msg.webfinger].timeout);
+            if (msg.error) {
+                credwait[msg.webfinger].callback(new Error(msg.error));
             } else {
-                process.send({cmd: "listening"});
+                credwait[msg.webfinger].callback(null);
             }
-        }
-    );
-
-    process.on("message", function(msg) {
-        switch (msg.cmd) {
-        case "killcred":
-            // This is to simulate losing the credentials of a remote client
-            // It's hard to do without destroying the database values directly,
-            // so we essentially do that.
-            Step(
-                function() {
-                    var client = require("../../lib/model/client"),
-                        Client = client.Client;
-                    Client.search({webfinger: msg.webfinger}, this);
-                },
-                function(err, results) {
-                    if (err) throw err;
-                    if (!results || results.length !== 1) {
-                        throw new Error("Bad results");
-                    }
-                    results[0].del(this);
-                },
-                function(err) {
-                    if (err) {
-                        process.send({cmd: "credkilled", error: err.message, webfinger: msg.webfinger});
-                    } else {
-                        process.send({cmd: "credkilled", webfinger: msg.webfinger});
-                    }
-                }
-            );
             break;
-        case "changeobject":
-            // we break an object
-            var DatabankObject = require("databank").DatabankObject,
-                db = DatabankObject.bank,
-                object = msg.object;
-            Step(
-                function() {
-                    db.update(object.objectType, object.id, object, this);
-                },
-                function(err) {
-                    if (err) {
-                        process.send({cmd: "objectchanged", error: err.message, id: object.id});
-                    } else {
-                        process.send({cmd: "objectchanged", id: object.id});
-                    }
-                }
-            );
+        case "objectchanged":
+            clearTimeout(objwait[msg.id].timeout);
+            if (msg.error) {
+                objwait[msg.id].callback(new Error(msg.error));
+            } else {
+                objwait[msg.id].callback(null);
+            }
             break;
         }
     });
-}
+};
+
+var withAppSetup = function(batchConfig) {
+    batchConfig.topic = function() {
+        setupApp(this.callback);
+    };
+    batchConfig.teardown = function(app) {
+        if (app && app.close) {
+            app.close();
+        }
+    };
+    batchConfig["it works"] = function(err, app) {
+        assert.ifError(err);
+    };
+
+    return {
+        "When we set up the app": batchConfig
+    };
+};
+
+exports.setupApp = setupApp;
+exports.setupAppConfig = setupAppConfig;
+exports.withAppSetup = withAppSetup;

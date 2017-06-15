@@ -29,12 +29,13 @@ var assert = require("assert"),
     urlparse = require("url").parse,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     newCredentials = oauthutil.newCredentials,
     newClient = oauthutil.newClient,
     pj = httputil.postJSON,
     gj = httputil.getJSON,
     dialbackApp = require("./lib/dialback").dialbackApp,
-    setupAppConfig = oauthutil.setupAppConfig;
+    setupAppConfig = apputil.setupAppConfig;
 
 var timed = function(callback, time) {
     var id;
@@ -124,7 +125,7 @@ suite.addBatch({
                                this.parallel());
                         },
                         function(err, received, sent) {
-                            if (err && err.message == "Timeout reached") {
+                            if (err && err.message === "Timeout reached") {
                                 callback(null);
                             } else if (err) {
                                 callback(err);

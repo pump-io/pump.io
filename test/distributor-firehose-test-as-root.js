@@ -29,33 +29,18 @@ var assert = require("assert"),
     urlparse = require("url").parse,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     newCredentials = oauthutil.newCredentials,
     newClient = oauthutil.newClient,
     pj = httputil.postJSON,
     gj = httputil.getJSON,
     dialbackApp = require("./lib/dialback").dialbackApp,
-    setupAppConfig = oauthutil.setupAppConfig;
+    withAppSetup = apputil.withAppSetup;
 
 var suite = vows.describe("firehose module interface");
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupAppConfig({port: 80,
-                            hostname: "social.localhost",
-                            firehose: "firehose.localhost"
-                           },
-                           this.callback);
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-            assert.isObject(app);
-        },
-        "teardown": function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
+suite.addBatch(
+    withAppSetup({
         "and we set up a firehose dummy server": {
             topic: function(Firehose) {
                 var app = express.createServer(express.bodyParser()),
@@ -120,8 +105,8 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 module.exports = {}; // TODO reenable this test when it's passing
 

@@ -25,8 +25,9 @@ var assert = require("assert"),
     OAuth = require("oauth-evanp").OAuth,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
-    setupApp = oauthutil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair;
 
@@ -59,19 +60,8 @@ var suite = vows.describe("favorite object activity api test");
 
 // A batch to test favoriting/unfavoriting objects
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we register a client": {
             topic: function() {
                 newClient(this.callback);
@@ -661,7 +651,7 @@ suite.addBatch({
                             httputil.postJSON(url, cred, obj, this);
                         },
                         function(err, doc, response) {
-                            if (err && err.statusCode == 401) {
+                            if (err && err.statusCode === 401) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -759,7 +749,7 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

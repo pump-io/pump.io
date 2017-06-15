@@ -27,7 +27,8 @@ var assert = require("assert"),
     OAuth = require("oauth-evanp").OAuth,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
-    setupApp = oauthutil.setupApp,
+    apputil = require("./lib/app"),
+    withAppSetup = apputil.withAppSetup,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair,
     register = oauthutil.register;
@@ -81,26 +82,8 @@ var assertValidList = function(doc, total, count) {
     }
 };
 
-suite.addBatch({
-
-    "When we set up the app": {
-
-        topic: function() {
-            var cb = this.callback;
-            setupApp(cb);
-        },
-
-        "it works": function(err, app) {
-            assert.ifError(err);
-            assert.isObject(app);
-        },
-
-        teardown: function(app) {
-            if (app) {
-                app.close();
-            }
-        },
-
+suite.addBatch(
+    withAppSetup({
         "and we create a new client": {
             topic: function() {
                 newClient(this.callback);
@@ -979,7 +962,7 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

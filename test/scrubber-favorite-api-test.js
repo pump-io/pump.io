@@ -28,8 +28,9 @@ var assert = require("assert"),
     Browser = require("zombie"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
-    setupApp = oauthutil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     newCredentials = oauthutil.newCredentials,
     newPair = oauthutil.newPair,
     newClient = oauthutil.newClient,
@@ -42,7 +43,7 @@ var deepProperty = function(object, property) {
     var i = property.indexOf(".");
     if (!object) {
         return null;
-    } else if (i == -1) { // no dots
+    } else if (i === -1) { // no dots
         return object[property];
     } else {
         return deepProperty(object[property.substr(0, i)], property.substr(i + 1));
@@ -105,19 +106,8 @@ var suite = vows.describe("Scrubber favorite API test");
 
 // A batch to test posting to the regular feed endpoint
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we get a new set of credentials": {
             topic: function() {
                 oauthutil.newCredentials("shatner", "deep*fried*turkey", this.callback);
@@ -158,7 +148,7 @@ suite.addBatch({
                             },
                             "_user")
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

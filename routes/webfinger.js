@@ -148,7 +148,7 @@ var lrddUser = function(req, res, next) {
         return;
     }
 
-    if (parts.hostname != URLMaker.hostname) {
+    if (parts.hostname !== URLMaker.hostname) {
         next(new HTTPError("Unrecognized host", 404));
         return;
     }
@@ -165,7 +165,7 @@ var lrddUser = function(req, res, next) {
                 user.expand(this);
             },
             function(err) {
-                if (err && err.name == "NoSuchThingError") {
+                if (err && err.name === "NoSuchThingError") {
                     next(new HTTPError(err.message, 404));
                 } else if (err) {
                     next(err);
@@ -186,7 +186,7 @@ var lrddUser = function(req, res, next) {
         }
         var type = match[1];
         ActivityObject.getObject(type, resource, function(err, obj) {
-            if (err && err.name == "NoSuchThingError") {
+            if (err && err.name === "NoSuchThingError") {
                 next(new HTTPError(err.message, 404));
             } else if (err) {
                 next(err);

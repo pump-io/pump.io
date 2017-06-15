@@ -26,9 +26,10 @@ var fs = require("fs"),
     Step = require("step"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     newClient = oauthutil.newClient,
     newCredentials = oauthutil.newCredentials,
-    setupAppConfig = oauthutil.setupAppConfig;
+    setupAppConfig = apputil.setupAppConfig;
 
 var suite = vows.describe("spamicity module interface");
 
@@ -195,7 +196,7 @@ suite.addBatch({
                                                       this.parallel());
                                 },
                                 function(err, body, resp) {
-                                    if (err && err.statusCode == 400) {
+                                    if (err && err.statusCode === 400) {
                                         callback(null);
                                     } else if (err) {
                                         callback(err);

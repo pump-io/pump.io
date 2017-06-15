@@ -33,13 +33,14 @@ var util = require("util"),
     urlparse = require("url").parse,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     newCredentials = oauthutil.newCredentials,
     newClient = oauthutil.newClient,
     pj = httputil.postJSON,
     gj = httputil.getJSON,
     dialbackApp = require("./lib/dialback").dialbackApp,
-    setupAppConfig = oauthutil.setupAppConfig,
-    setupApp = oauthutil.setupApp;
+    setupAppConfig = apputil.setupAppConfig,
+    withAppSetup = apputil.withAppSetup;
 
 var suite = vows.describe("proxy url test");
 
@@ -222,7 +223,7 @@ suite.addBatch({
                                         assert.isArray(feed.items);
                                         assert.greater(feed.items.length, 0);
 
-                                        fi0 = _.find(feed.items, function(item) { return item.id == act.id; });
+                                        fi0 = _.find(feed.items, function(item) { return item.id === act.id; });
 
                                         assert.isObject(fi0);
 
@@ -236,7 +237,7 @@ suite.addBatch({
                                     "and we get the image proxyURL": {
                                         topic: function(feed, posted, postedBefore, followed, cred1, cred2) {
                                             var callback = this.callback,
-                                                fi0 = _.find(feed.items, function(item) { return item.id == posted.id; }),
+                                                fi0 = _.find(feed.items, function(item) { return item.id === posted.id; }),
                                                 url = fi0.object.image.pump_io.proxyURL,
                                                 oa;
 
@@ -254,7 +255,7 @@ suite.addBatch({
                                     "and we get the replies proxyURL": {
                                         topic: function(feed, posted, postedBefore, followed, cred1, cred2) {
                                             var callback = this.callback,
-                                                fi0 = _.find(feed.items, function(item) { return item.id == posted.id; }),
+                                                fi0 = _.find(feed.items, function(item) { return item.id === posted.id; }),
                                                 url = fi0.object.replies.pump_io.proxyURL,
                                                 oa;
 

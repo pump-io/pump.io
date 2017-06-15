@@ -28,7 +28,8 @@ var assert = require("assert"),
     Browser = require("zombie"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
-    setupApp = oauthutil.setupApp,
+    apputil = require("./lib/app"),
+    withAppSetup = apputil.withAppSetup,
     register = oauthutil.register,
     newCredentials = oauthutil.newCredentials;
 
@@ -395,19 +396,8 @@ var workout = function(endpoint, total) {
     };
 };
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         // TODO: disabled because this test portion is failing
         /*  "and we get new credentials": {
             topic: function(app) {
@@ -650,7 +640,7 @@ suite.addBatch({
                 sizeFeed("/api/user/backpack/inbox/direct/major", 1)
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

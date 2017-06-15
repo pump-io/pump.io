@@ -58,8 +58,8 @@ Step(
         if (err) throw err;
         cred = results;
         endpoint = url.format({
-            protocol: ((port == 443) ? "https" : "http"),
-            host: ((port == 80 || port == 443) ? server : server + ":" + port),
+            protocol: ((port === 443) ? "https" : "http"),
+            host: ((port === 80 || port === 443) ? server : server + ":" + port),
             pathname: "/api/user/"+username+"/feed"
         });
         getJSON(endpoint, cred, this);

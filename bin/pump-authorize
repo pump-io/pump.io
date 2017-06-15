@@ -72,12 +72,12 @@ Step(
         }
     },
     function(err, cred) {
-        var proto = (port == 443) ? "https:" : "http:",
+        var proto = (port === 443) ? "https:" : "http:",
             rtendpoint = urlfmt({protocol: proto,
-                                 host: (port == 80 || port == 443) ? server : server+":"+port,
+                                 host: (port === 80 || port === 443) ? server : server+":"+port,
                                  pathname: "/oauth/request_token"}),
             atendpoint = urlfmt({protocol: proto,
-                                 host: (port == 80 || port == 443) ? server : server+":"+port,
+                                 host: (port === 80 || port === 443) ? server : server+":"+port,
                                  pathname: "/oauth/access_token"});
         if (err) throw err;
         /*
@@ -104,11 +104,11 @@ Step(
         var url;
         var callback = this;
         var verifier = "";
-        var proto = (port == 443) ? "https:" : "http:";
+        var proto = (port === 443) ? "https:" : "http:";
         if (err) throw err;
         rt = {token: token, secret: secret};
         url = urlfmt({protocol: proto,
-                      host: (port == 80 || port == 443) ? server : server+":"+port,
+                      host: (port === 80 || port === 443) ? server : server+":"+port,
                       pathname: "/oauth/authorize",
                       query: {oauth_token: rt.token}});
         console.log("Login here: " + url);

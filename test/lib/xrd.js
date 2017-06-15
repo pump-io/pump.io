@@ -27,7 +27,7 @@ var assert = require("assert"),
 
 var getXRD = function(url) {
     var parts = urlparse(url),
-        mod = (parts.protocol == "https:") ? https : http;
+        mod = (parts.protocol === "https:") ? https : http;
 
     return function() {
         var callback = this.callback,
@@ -128,7 +128,7 @@ var xrdContext = function(url, def) {
 
 var getJRD = function(url) {
     var parts = urlparse(url),
-        mod = (parts.protocol == "https:") ? https : http;
+        mod = (parts.protocol === "https:") ? https : http;
     return function() {
         var callback = this.callback,
             req;

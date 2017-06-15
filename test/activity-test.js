@@ -1473,7 +1473,7 @@ suite.addBatch({
                     "the _received property contains the value we added": function(activity) {
                         assert.isArray(activity._received);
                         assert.isObject(_.find(activity._received, function(item) {
-                            return (item.id == "acct:gerald@photo.example" && item.objectType == "person");
+                            return (item.id === "acct:gerald@photo.example" && item.objectType === "person");
                         }));
                     }
                 },
@@ -1499,7 +1499,7 @@ suite.addBatch({
                     },
                     "our added object is a recipient": function(recipients) {
                         assert.isObject(_.find(recipients, function(item) {
-                            return (item.id == "acct:gerald@photo.example" && item.objectType == "person");
+                            return (item.id === "acct:gerald@photo.example" && item.objectType === "person");
                         }));
                     }
                 }

@@ -31,6 +31,7 @@ var assert = require("assert"),
     urlparse = require("url").parse,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     activity = require("./lib/activity"),
     validUser = activity.validUser,
     validFeed = activity.validFeed;
@@ -66,7 +67,7 @@ suite.addBatch({
 
             Step(
                 function() {
-                    oauthutil.setupAppConfig(config, this.parallel());
+                    apputil.setupAppConfig(config, this.parallel());
                     httputil.proxy({
                         front: {
                             hostname: "localhost",

@@ -90,7 +90,7 @@ var uploadedFile = function(req, res, next) {
             obj = objs[0];
             if (profile &&
                 obj.author &&
-                profile.id == obj.author.id) {
+                profile.id === obj.author.id) {
                 send(req, req.app.config.uploaddir + "/" +  slug).pipe(res);
                 return;
             }

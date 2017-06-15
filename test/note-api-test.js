@@ -28,7 +28,8 @@ var assert = require("assert"),
     Browser = require("zombie"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
-    setupApp = oauthutil.setupApp,
+    apputil = require("./lib/app"),
+    withAppSetup = apputil.withAppSetup,
     register = oauthutil.register,
     newCredentials = oauthutil.newCredentials,
     newPair = oauthutil.newPair,
@@ -53,19 +54,8 @@ var pairOf = function(user) {
 
 // A batch for testing the read access to the API
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we get a new client": {
             topic: function() {
                 var cb = this.callback;
@@ -145,7 +135,7 @@ suite.addBatch({
                             var cb = this.callback,
                                 pair = pairOf(user),
                                 cred = makeCred(cl, pair);
-                            // ID == JSON representation URL
+                            // ID === JSON representation URL
                             httputil.getJSON(act.object.id, cred, function(err, note) {
                                 cb(err, note, act);
                             });
@@ -237,7 +227,7 @@ suite.addBatch({
                         var callback = this.callback,
                             url = del.object.id;
                         httputil.getJSON(url, cred, function(err, obj, res) {
-                            if (err && err.statusCode == 410) {
+                            if (err && err.statusCode === 410) {
                                 callback(null);
                             } else if (err) {
                                 callback(err);
@@ -450,7 +440,7 @@ suite.addBatch({
                     topic: function(url, cred) {
                         var callback = this.callback;
                         httputil.getJSON(url, cred, function(err, obj, res) {
-                            if (err && err.statusCode == 410) {
+                            if (err && err.statusCode === 410) {
                                 callback(null);
                             } else if (err) {
                                 callback(err);
@@ -490,7 +480,7 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

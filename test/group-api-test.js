@@ -26,13 +26,14 @@ var assert = require("assert"),
     urlparse = require("url").parse,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
     pj = httputil.postJSON,
     gj = httputil.getJSON,
     validActivity = actutil.validActivity,
     validActivityObject = actutil.validActivityObject,
     validFeed = actutil.validFeed,
-    setupApp = oauthutil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     newCredentials = oauthutil.newCredentials,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair;
@@ -51,19 +52,8 @@ var makeCred = function(cl, pair) {
 
 // A batch for manipulating groups API
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we make a new user": {
             topic: function() {
                 newCredentials("fafhrd", "lankhmar+1", this.callback);
@@ -460,7 +450,7 @@ suite.addBatch({
                             assert.greater(feed.totalItems, 0);
                             assert.isArray(feed.items);
                             assert.greater(feed.items.length, 0);
-                            item = _.find(feed.items, function(item) { return item.id == act.id; });
+                            item = _.find(feed.items, function(item) { return item.id === act.id; });
                             assert.isObject(item);
                         }
                     },
@@ -484,7 +474,7 @@ suite.addBatch({
                             assert.greater(feed.totalItems, 0);
                             assert.isArray(feed.items);
                             assert.greater(feed.items.length, 0);
-                            item = _.find(feed.items, function(item) { return item.id == act.id; });
+                            item = _.find(feed.items, function(item) { return item.id === act.id; });
                             assert.isObject(item);
                         }
                     }
@@ -701,7 +691,7 @@ suite.addBatch({
                             assert.isArray(feed.items);
                             assert.isTrue(feed.items.length > 0);
                             assert.isObject(_.find(feed.items, function(item) {
-                                return item.url == "http://photo.example/priest0/photos/the-whole-gang.jpg";
+                                return item.url === "http://photo.example/priest0/photos/the-whole-gang.jpg";
                             }));
                         }
                     },
@@ -724,7 +714,7 @@ suite.addBatch({
                             assert.isArray(feed.items);
                             assert.isTrue(feed.items.length > 0);
                             assert.isObject(_.find(feed.items, function(item) {
-                                return item.url == "http://photo.example/priest0/photos/the-whole-gang.jpg";
+                                return item.url === "http://photo.example/priest0/photos/the-whole-gang.jpg";
                             }));
                         }
                     }
@@ -775,7 +765,7 @@ suite.addBatch({
                             assert.isArray(feed.items);
                             assert.isTrue(feed.items.length > 0);
                             assert.isObject(_.find(feed.items, function(item) {
-                                return item.url == "http://docs.example/priest1/files/action-plan.docx";
+                                return item.url === "http://docs.example/priest1/files/action-plan.docx";
                             }));
                         }
                     },
@@ -798,7 +788,7 @@ suite.addBatch({
                             assert.isArray(feed.items);
                             assert.isTrue(feed.items.length > 0);
                             assert.isObject(_.find(feed.items, function(item) {
-                                return item.url == "http://docs.example/priest1/files/action-plan.docx";
+                                return item.url === "http://docs.example/priest1/files/action-plan.docx";
                             }));
                         }
                     }
@@ -817,7 +807,7 @@ suite.addBatch({
                                 gj(url, cred, this);
                             },
                             function(err, body, response) {
-                                if (err && err.statusCode == 403) {
+                                if (err && err.statusCode === 403) {
                                     callback(null);
                                 } else if (err) {
                                     callback(err);
@@ -858,7 +848,7 @@ suite.addBatch({
                                 pj(url, cred, act, this);
                             },
                             function(err, body, response) {
-                                if (err && err.statusCode == 400) {
+                                if (err && err.statusCode === 400) {
                                     callback(null);
                                 } else if (err) {
                                     callback(err);
@@ -886,7 +876,7 @@ suite.addBatch({
                                 gj(url, cred, this);
                             },
                             function(err, body, response) {
-                                if (err && err.statusCode == 403) {
+                                if (err && err.statusCode === 403) {
                                     callback(null);
                                 } else if (err) {
                                     callback(err);
@@ -958,14 +948,14 @@ suite.addBatch({
                             assert.ifError(err);
                             assert.isArray(feed.items);
                             assert.isUndefined(_.find(feed.items, function(item) {
-                                return item.id == "http://photo.example/priest2/photos/my-vacation-2006";
+                                return item.id === "http://photo.example/priest2/photos/my-vacation-2006";
                             }));
                         }
                     }
                 }
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

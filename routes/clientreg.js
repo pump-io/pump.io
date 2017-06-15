@@ -114,7 +114,7 @@ var clientReg = function(req, res, next) {
             return;
         }
 
-        if (props.redirect_uris.length == 1) {
+        if (props.redirect_uris.length === 1) {
 
             // Does it look like glopped-together URLs?
 

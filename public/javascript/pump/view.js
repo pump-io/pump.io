@@ -540,7 +540,8 @@
         events: {
             "click #logout": "logout",
             "click #post-note-button": "postNoteModal",
-            "click #post-picture-button": "postPictureModal"
+            "click #post-picture-button": "postPictureModal",
+            "click #fat-menu .dropdown-menu li": "closeDropdown"
         },
         postNoteModal: function() {
             var view = this;
@@ -630,6 +631,10 @@
                 streams.notifications = view.minorStreamView.model;
             }
             return streams;
+        },
+        closeDropdown: function(e) {
+            e.preventDefault();
+            $("#profile-dropdown").dropdown("toggle");
         }
     });
 
@@ -876,7 +881,11 @@
                     }
                 };
 
-            if (params.password !== repeat) {
+            if (_.contains(Pump.config.nicknameBlacklist, params.nickname)) {
+
+                view.showError("That nickname is not allowed");
+
+            } else if (params.password !== repeat) {
 
                 view.showError("Passwords don't match.");
 

@@ -86,7 +86,7 @@ var dialbackApp = function(port, hostname, callback) {
             return;
         }
 
-        if (host && host != hostname) {
+        if (host && host !== hostname) {
             res.status(400).send("Incorrect host");
             return;
         }
@@ -95,7 +95,7 @@ var dialbackApp = function(port, hostname, callback) {
             parts = webfinger.split("@", 2);
             user = parts[0];
             host = parts[1];
-            if (user == "invalid" || host != hostname) {
+            if (user === "invalid" || host !== hostname) {
                 res.status(400).send("Invalid webfinger");
                 return;
             }
@@ -118,7 +118,7 @@ var dialbackApp = function(port, hostname, callback) {
             return;
         }
 
-        if (token == "INVALID") {
+        if (token === "INVALID") {
             res.status(400).send("Invalid token");
             return;
         }

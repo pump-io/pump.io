@@ -261,7 +261,7 @@ var userOnly = function(req, res, next) {
 var actorOnly = function(req, res, next) {
     var act = req.activity;
 
-    if (act && act.actor && act.actor.id == req.principal.id) {
+    if (act && act.actor && act.actor.id === req.principal.id) {
         next();
     } else {
         next(new HTTPError("Only the actor can modify this object.", 403));
@@ -273,7 +273,7 @@ var actorOrRecipient = function(req, res, next) {
     var act = req.activity,
         person = req.principal;
 
-    if (act && act.actor && person && act.actor.id == person.id) {
+    if (act && act.actor && person && act.actor.id === person.id) {
         next();
     } else {
         act.checkRecipient(person, function(err, isRecipient) {
@@ -438,7 +438,7 @@ var getUser = function(req, res, next) {
             if (!req.principal) {
                 // skip
                 this(null);
-            } else if (req.principal.id == req.user.profile.id) {
+            } else if (req.principal.id === req.user.profile.id) {
                 // same user
                 req.user.profile.pump_io = {
                     followed: false
@@ -452,7 +452,7 @@ var getUser = function(req, res, next) {
         function(err) {
             if (err) next(err);
             // If no user, or different user, hide email and settings
-            if (!req.principal || (req.principal.id != req.user.profile.id)) {
+            if (!req.principal || (req.principal.id !== req.user.profile.id)) {
                 delete req.user.email;
                 delete req.user.settings;
             }
@@ -578,7 +578,7 @@ var usersStream = function(callback) {
         },
         function(err, str) {
             if (err) {
-                if (err.name == "NoSuchThingError") {
+                if (err.name === "NoSuchThingError") {
                     Stream.create({name: "user:all"}, this);
                 } else {
                     throw err;
@@ -589,7 +589,7 @@ var usersStream = function(callback) {
         },
         function(err, str) {
             if (err) {
-                if (err.name == "AlreadyExistsError") {
+                if (err.name === "AlreadyExistsError") {
                     Stream.get("user:all", callback);
                 } else {
                     callback(err);
@@ -756,7 +756,7 @@ var createUser = function(req, res, next) {
                     throw new HTTPError(err.message, 400);
                 } else if (err instanceof User.BadNicknameError) {
                     throw new HTTPError(err.message, 400);
-                } else if (err.name == "AlreadyExistsError") {
+                } else if (err.name === "AlreadyExistsError") {
                     throw new HTTPError(err.message, 409); // conflict
                 } else {
                     throw err;
@@ -894,7 +894,7 @@ var listUsers = function(req, res, next) {
 
             _.each(users, function(user) {
                 user.sanitize();
-                if (!req.principal || req.principal.id != user.profile.id) {
+                if (!req.principal || req.principal.id !== user.profile.id) {
                     delete user.email;
                 }
             });
@@ -1020,7 +1020,7 @@ var ensureRemoteActivity = function(principal, props, retries, callback) {
             Activity.get(props.id, this);
         },
         function(err, activity) {
-            if (err && err.name == "NoSuchThingError") {
+            if (err && err.name === "NoSuchThingError") {
                 newRemoteActivity(principal, props, this);
             } else if (!err) {
                 this(null, activity);
@@ -1074,15 +1074,15 @@ var newRemoteActivity = function(principal, props, callback) {
         },
         function(err) {
             if (err) {
-                if (err.name == "AppError") {
+                if (err.name === "AppError") {
                     throw new HTTPError(err.message, 400);
-                } else if (err.name == "NoSuchThingError") {
+                } else if (err.name === "NoSuchThingError") {
                     throw new HTTPError(err.message, 400);
-                } else if (err.name == "AlreadyExistsError") {
+                } else if (err.name === "AlreadyExistsError") {
                     throw new HTTPError(err.message, 400);
-                } else if (err.name == "NoSuchItemError") {
+                } else if (err.name === "NoSuchItemError") {
                     throw new HTTPError(err.message, 400);
-                } else if (err.name == "NotInStreamError") {
+                } else if (err.name === "NotInStreamError") {
                     throw new HTTPError(err.message, 400);
                 } else {
                     throw err;
@@ -1098,12 +1098,12 @@ var newRemoteActivity = function(principal, props, callback) {
 var validateActor = function(client, principal, actor) {
 
     if (client.webfinger) {
-        if (ActivityObject.canonicalID(actor.id) != ActivityObject.canonicalID(principal.id)) {
+        if (ActivityObject.canonicalID(actor.id) !== ActivityObject.canonicalID(principal.id)) {
             throw new HTTPError("Actor is invalid since " + actor.id + " is not " + principal.id, 400);
         }
     } else if (client.hostname) {
-        if (ActivityObject.canonicalID(actor.id) != "https://" + client.hostname + "/" &&
-            ActivityObject.canonicalID(actor.id) != "http://" + client.hostname + "/") {
+        if (ActivityObject.canonicalID(actor.id) !== "https://" + client.hostname + "/" &&
+            ActivityObject.canonicalID(actor.id) !== "http://" + client.hostname + "/") {
             throw new HTTPError("Actor is invalid since " + actor.id + " is not " + principal.id, 400);
         }
     }
@@ -1177,7 +1177,7 @@ var validateGroupRecipient = function(group, act) {
         }
     });
 
-    if (!_.some(recipients, function(item) { return item.id == group.id && item.objectType == group.objectType; })) {
+    if (!_.some(recipients, function(item) { return item.id === group.id && item.objectType === group.objectType; })) {
         throw new HTTPError("Group " + group.id + " is not a recipient of activity " + act.id, 400);
     }
 
@@ -1254,15 +1254,15 @@ var initActivity = function(activity, callback) {
         },
         function(err) {
             if (err) {
-                if (err.name == "AppError") {
+                if (err.name === "AppError") {
                     throw new HTTPError(err.message, 400);
-                } else if (err.name == "NoSuchThingError") {
+                } else if (err.name === "NoSuchThingError") {
                     throw new HTTPError(err.message, 400);
-                } else if (err.name == "AlreadyExistsError") {
+                } else if (err.name === "AlreadyExistsError") {
                     throw new HTTPError(err.message, 400);
-                } else if (err.name == "NoSuchItemError") {
+                } else if (err.name === "NoSuchItemError") {
                     throw new HTTPError(err.message, 400);
-                } else if (err.name == "NotInStreamError") {
+                } else if (err.name === "NotInStreamError") {
                     throw new HTTPError(err.message, 400);
                 } else {
                     throw err;
@@ -1664,7 +1664,7 @@ var proxyRequest = function(req, res, next) {
         function(err, pbody, pres) {
             var toCopy;
             if (err) {
-                if (err.statusCode == 304) {
+                if (err.statusCode === 304) {
                     res.statusCode = 304;
                     res.end();
                 } else {

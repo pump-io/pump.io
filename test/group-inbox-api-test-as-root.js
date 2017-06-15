@@ -29,6 +29,7 @@ var assert = require("assert"),
     version = require("../lib/version").version,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
     validActivityObject = actutil.validActivityObject,
     validFeed = actutil.validFeed,
@@ -37,7 +38,7 @@ var assert = require("assert"),
     newCredentials = oauthutil.newCredentials,
     newClient = oauthutil.newClient,
     dialbackApp = require("./lib/dialback").dialbackApp,
-    setupApp = oauthutil.setupApp;
+    setupApp = apputil.setupApp;
 
 var clientCred = function(cl) {
     return {
@@ -423,7 +424,7 @@ suite.addBatch({
                             assert.isArray(feed.items);
                             assert.greater(feed.items.length, 0);
                             assert.isTrue(_.some(feed.items, function(item) {
-                                return (_.isObject(item) && item.id == act.id);
+                                return (_.isObject(item) && item.id === act.id);
                             }));
                         }
                     }

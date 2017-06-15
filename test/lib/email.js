@@ -23,6 +23,7 @@ var assert = require("assert"),
     _ = require("underscore"),
     simplesmtp = require("simplesmtp"),
     oauthutil = require("./oauth"),
+    apputil = require("./app"),
     httputil = require("./http"),
     Step = require("step"),
     http = require("http"),
@@ -30,8 +31,8 @@ var assert = require("assert"),
     accessToken = oauthutil.accessToken,
     register = oauthutil.register,
     registerEmail = oauthutil.registerEmail,
-    setupApp = oauthutil.setupApp,
-    setupAppConfig = oauthutil.setupAppConfig;
+    setupApp = apputil.setupApp,
+    setupAppConfig = apputil.setupAppConfig;
 
 var oneEmail = function(smtp, addr, callback) {
     var data,

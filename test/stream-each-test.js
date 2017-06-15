@@ -193,7 +193,7 @@ suite.addBatch({
                                 throw theError;
                             },
                             function(err) {
-                                if (err == theError) {
+                                if (err === theError) {
                                     callback(null);
                                 } else if (err) {
                                     callback(err);

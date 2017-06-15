@@ -23,6 +23,8 @@ var assert = require("assert"),
     _ = require("underscore"),
     simplesmtp = require("simplesmtp"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
+    apputil = require("./lib/app"),
     httputil = require("./lib/http"),
     emailutil = require("./lib/email"),
     Browser = require("zombie"),
@@ -31,8 +33,8 @@ var assert = require("assert"),
     newClient = oauthutil.newClient,
     register = oauthutil.register,
     registerEmail = oauthutil.registerEmail,
-    setupApp = oauthutil.setupApp,
-    setupAppConfig = oauthutil.setupAppConfig,
+    withAppSetup = apputil.withAppSetup,
+    setupAppConfig = apputil.setupAppConfig,
     oneEmail = emailutil.oneEmail,
     confirmEmail = emailutil.confirmEmail;
 
@@ -100,7 +102,7 @@ suite.addBatch({
                 topic: function(cl, app, smtp) {
                     var callback = this.callback;
                     register(cl, "florida", "good*times", function(err, result, response) {
-                        if (err && err.statusCode == 400) {
+                        if (err && err.statusCode === 400) {
                             callback(null);
                         } else {
                             callback(new Error("Unexpected success"));
@@ -240,7 +242,7 @@ suite.addBatch({
                             assert.ifError(err);
                             assert.isObject(feed);
                             target = _.filter(feed.items, function(user) {
-                                return (user.nickname == "jj");
+                                return (user.nickname === "jj");
                             });
                             assert.lengthOf(target, 1);
                             assert.isObject(target[0]);
@@ -290,7 +292,7 @@ suite.addBatch({
                             assert.ifError(err);
                             assert.isObject(feed);
                             target = _.filter(feed.items, function(user) {
-                                return (user.nickname == "jj");
+                                return (user.nickname === "jj");
                             });
                             assert.lengthOf(target, 1);
                             assert.isObject(target[0]);
@@ -317,7 +319,7 @@ suite.addBatch({
                             assert.ifError(err);
                             assert.isObject(feed);
                             target = _.filter(feed.items, function(user) {
-                                return (user.nickname == "jj");
+                                return (user.nickname === "jj");
                             });
                             assert.lengthOf(target, 1);
                             assert.isObject(target[0]);
@@ -363,7 +365,7 @@ suite.addBatch({
                                 httputil.getJSON("http://localhost:4815/api/user/bookman", cred, this);
                             },
                             function(err, body, resp) {
-                                if (err && err.statusCode && err.statusCode == 403) {
+                                if (err && err.statusCode && err.statusCode === 403) {
                                     callback(null);
                                 } else if (err) {
                                     callback(err);

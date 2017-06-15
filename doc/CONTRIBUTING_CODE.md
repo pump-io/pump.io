@@ -99,6 +99,8 @@ Then, to to your fork on GitHub and [open a Pull Request][] to
 pump.io. The last step is to wait for a review and address the review
 comments.
 
+Note that by sending a Pull Request, you're implicitly agreeing to the [Developer Certificate of Origin][DCO]. This sounds scarier than it is - it's basically just you promising that you actually have the rights to submit your code.
+
 Congratulations! Your code's made it into pump.io! Thanks for
 contributing - we hope to see you again soon <3
 
@@ -135,3 +137,4 @@ answer any questions you have.
  [open a Pull Request]: https://help.github.com/articles/creating-a-pull-request/
  [community]: https://github.com/pump-io/pump.io/wiki/Community
  [Alex Jordan]: https://strugee.net/contact
+ [DCO]: https://github.com/pump-io/pump.io/blob/master/CONTRIBUTING.md#developer-certificate-of-origin

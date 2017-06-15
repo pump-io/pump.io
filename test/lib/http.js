@@ -109,7 +109,7 @@ var options = function(host, port, path, callback) {
         }
     };
 
-    var mod = (port == 443) ? https : http;
+    var mod = (port === 443) ? https : http;
 
     var req = mod.request(reqOpts, function(res) {
         var body = "";
@@ -152,7 +152,7 @@ var post = function(host, port, path, params, callback) {
         }
     };
 
-    var mod = (port == 443) ? https : http;
+    var mod = (port === 443) ? https : http;
 
     var req = mod.request(reqOpts, function(res) {
         var body = "";
@@ -186,7 +186,7 @@ var head = function(url, callback) {
         "User-Agent": "pump.io/"+version
     };
 
-    var mod = (options.protocol == "https:") ? https : http;
+    var mod = (options.protocol === "https:") ? https : http;
 
     var req = mod.request(options, function(res) {
         var body = "";
@@ -330,7 +330,7 @@ var dialbackPost = function(endpoint, id, token, ts, requestBody, contentType, c
         auth = "Dialback webfinger=\"" + id + "\", token=\""+token+"\"";
     }
 
-    var mod = (reqOpts.protocol == "https:") ? https : http;
+    var mod = (reqOpts.protocol === "https:") ? https : http;
 
     reqOpts.headers["Authorization"] = auth;
     reqOpts.headers["Date"] = (new Date(ts)).toUTCString();

@@ -26,10 +26,11 @@ var assert = require("assert"),
     _ = require("underscore"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     newCredentials = oauthutil.newCredentials,
     newClient = oauthutil.newClient,
     dialbackApp = require("./lib/dialback").dialbackApp,
-    setupApp = oauthutil.setupApp;
+    setupApp = apputil.setupApp;
 
 var DANGEROUS = "This is a <script>alert('Boo!')</script> dangerous string.";
 

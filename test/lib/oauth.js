@@ -18,8 +18,7 @@
 
 "use strict";
 
-var cp = require("child_process"),
-    urlfmt = require("url").format,
+var urlfmt = require("url").format,
     path = require("path"),
     Step = require("step"),
     _ = require("underscore"),
@@ -46,10 +45,10 @@ var getOAuth = function(hostname, port, client_id, client_secret) {
 
     var proto = (port === 443) ? "https" : "http",
             rtendpoint = urlfmt({protocol: proto,
-                                 host: (port == 80 || port == 443) ? hostname : hostname+":"+port,
+                                 host: (port === 80 || port === 443) ? hostname : hostname+":"+port,
                                  pathname: "/oauth/request_token"}),
             atendpoint = urlfmt({protocol: proto,
-                                 host: (port == 80 || port == 443) ? hostname : hostname+":"+port,
+                                 host: (port === 80 || port === 443) ? hostname : hostname+":"+port,
                                  pathname: "/oauth/access_token"}),
         oa = new OAuth(rtendpoint,
                        atendpoint,
@@ -150,7 +149,7 @@ var authorize = function(cl, rt, user, hostname, port, cb) {
     }
 
     url = urlfmt({protocol: (port === 443) ? "https" : "http",
-                  host: (port == 80 || port == 443) ? hostname : hostname+":"+port,
+                  host: (port === 80 || port === 443) ? hostname : hostname+":"+port,
                   pathname: "/oauth/authorize",
                   query: {oauth_token: rt.token}});
 
@@ -356,99 +355,6 @@ var newPair = function(cl, nickname, password, hostname, port, cb) {
     );
 };
 
-// Call as setupApp(port, hostname, callback)
-// setupApp(hostname, callback)
-// setupApp(callback)
-
-var setupApp = function(port, hostname, callback) {
-
-    if (!hostname) {
-        callback = port;
-        hostname = "localhost";
-        port = 4815;
-    }
-
-    if (!callback) {
-        callback = hostname;
-        hostname = "localhost";
-    }
-
-    port = port || 4815;
-    hostname = hostname || "localhost";
-
-    var config = {
-        port: port,
-        hostname: hostname
-    };
-
-    setupAppConfig(config, callback);
-};
-
-var setupAppConfig = function(config, callback) {
-
-    var prop, args = [], credwait = {}, objwait = {};
-
-    config.port = config.port || 4815;
-    config.hostname = config.hostname || "localhost";
-
-    for (prop in config) {
-        args.push(prop + "=" + JSON.stringify(config[prop]));
-    }
-
-    var child = cp.fork(path.join(__dirname, "app.js"), args);
-
-    var dummy = {
-        close: function() {
-            child.kill();
-        },
-        killCred: function(webfinger, callback) {
-            var timeout = setTimeout(function() {
-                callback(new Error("Timed out waiting for cred to die."));
-            }, 30000);
-            credwait[webfinger] = {callback: callback, timeout: timeout};
-            child.send({cmd: "killcred", webfinger: webfinger});
-        },
-        changeObject: function(obj, callback) {
-            var timeout = setTimeout(function() {
-                callback(new Error("Timed out waiting for object change."));
-            }, 30000);
-            objwait[obj.id] = {callback: callback, timeout: timeout};
-            child.send({cmd: "changeobject", object: obj});
-        }
-    };
-
-    child.on("error", function(err) {
-        callback(err, null);
-    });
-
-    child.on("message", function(msg) {
-        switch (msg.cmd) {
-        case "listening":
-            callback(null, dummy);
-            break;
-        case "error":
-            callback(msg.value, null);
-            break;
-        case "credkilled":
-            clearTimeout(credwait[msg.webfinger].timeout);
-            if (msg.error) {
-                credwait[msg.webfinger].callback(new Error(msg.error));
-            } else {
-                credwait[msg.webfinger].callback(null);
-            }
-            break;
-        case "objectchanged":
-            clearTimeout(objwait[msg.id].timeout);
-            if (msg.error) {
-                objwait[msg.id].callback(new Error(msg.error));
-            } else {
-                objwait[msg.id].callback(null);
-            }
-            break;
-        }
-    });
-};
-
 exports.requestToken = requestToken;
 exports.newClient = newClient;
 exports.register = register;
@@ -458,5 +364,3 @@ exports.newPair = newPair;
 exports.accessToken = accessToken;
 exports.authorize = authorize;
 exports.redeemToken = redeemToken;
-exports.setupApp = setupApp;
-exports.setupAppConfig = setupAppConfig;

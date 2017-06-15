@@ -25,7 +25,8 @@ var assert = require("assert"),
     OAuth = require("oauth-evanp").OAuth,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
-    setupApp = oauthutil.setupApp,
+    apputil = require("./lib/app"),
+    withAppSetup = apputil.withAppSetup,
     register = oauthutil.register,
     newCredentials = oauthutil.newCredentials,
     newPair = oauthutil.newPair,
@@ -33,7 +34,7 @@ var assert = require("assert"),
 
 var ignore = function(err) {};
 
-var suite = vows.describe("Post note API test");
+var suite = vows.describe("Restricted post test");
 
 var makeCred = function(cl, pair) {
     return {
@@ -57,19 +58,8 @@ var pairOf = function(user) {
 
 // A batch for testing the visibility of bcc and bto addressing
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we register a client": {
             topic: function() {
                 newClient(this.callback);
@@ -231,7 +221,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(feed.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and the author reads their own inbox": {
@@ -251,7 +241,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(inbox, "items");
                         assert.isArray(inbox.items);
-                        assert.ok(_.find(inbox.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(inbox.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and the recipient reads the activity": {
@@ -340,7 +330,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(feed.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and the recipient reads their own inbox": {
@@ -360,7 +350,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(inbox, "items");
                         assert.isArray(inbox.items);
-                        assert.ok(_.find(inbox.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(inbox.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and a follower reads the activity": {
@@ -370,7 +360,7 @@ suite.addBatch({
                             url = doc.links.self.href;
 
                         httputil.getJSON(url, cred, function(err, act, response) {
-                            if (err && err.statusCode && err.statusCode == 403) {
+                            if (err && err.statusCode && err.statusCode === 403) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -390,7 +380,7 @@ suite.addBatch({
                             url = doc.object.id;
 
                         httputil.getJSON(url, cred, function(err, note, response) {
-                            if (err && err.statusCode && err.statusCode == 403) {
+                            if (err && err.statusCode && err.statusCode === 403) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -410,7 +400,7 @@ suite.addBatch({
                             url = doc.object.likes.url;
 
                         httputil.getJSON(url, cred, function(err, likes, response) {
-                            if (err && err.statusCode && err.statusCode == 403) {
+                            if (err && err.statusCode && err.statusCode === 403) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -430,7 +420,7 @@ suite.addBatch({
                             url = doc.object.replies.url;
 
                         httputil.getJSON(url, cred, function(err, replies, response) {
-                            if (err && err.statusCode && err.statusCode == 403) {
+                            if (err && err.statusCode && err.statusCode === 403) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -491,7 +481,7 @@ suite.addBatch({
                             url = doc.links.self.href;
 
                         httputil.getJSON(url, cred, function(err, act, response) {
-                            if (err && err.statusCode && err.statusCode == 403) {
+                            if (err && err.statusCode && err.statusCode === 403) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -511,7 +501,7 @@ suite.addBatch({
                             url = doc.object.id;
 
                         httputil.getJSON(url, cred, function(err, note, response) {
-                            if (err && err.statusCode && err.statusCode == 403) {
+                            if (err && err.statusCode && err.statusCode === 403) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -531,7 +521,7 @@ suite.addBatch({
                             url = doc.object.likes.url;
 
                         httputil.getJSON(url, cred, function(err, likes, response) {
-                            if (err && err.statusCode && err.statusCode == 403) {
+                            if (err && err.statusCode && err.statusCode === 403) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -551,7 +541,7 @@ suite.addBatch({
                             url = doc.object.replies.url;
 
                         httputil.getJSON(url, cred, function(err, replies, response) {
-                            if (err && err.statusCode && err.statusCode == 403) {
+                            if (err && err.statusCode && err.statusCode === 403) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -743,7 +733,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(feed.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and the author reads their own inbox": {
@@ -763,7 +753,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(inbox, "items");
                         assert.isArray(inbox.items);
-                        assert.ok(_.find(inbox.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(inbox.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and an unrelated user reads the activity": {
@@ -845,7 +835,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(feed.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and an unrelated user reads their own inbox": {
@@ -953,7 +943,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(feed.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and a follower reads their own inbox": {
@@ -973,7 +963,7 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(feed.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and an anonymous user reads the activity": {
@@ -1063,12 +1053,12 @@ suite.addBatch({
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.ok(_.find(feed.items, function(item) { return item.id == act.id; }));
+                        assert.ok(_.find(feed.items, function(item) { return item.id === act.id; }));
                     }
                 }
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

@@ -21,9 +21,11 @@
 var assert = require("assert"),
     vows = require("vows"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
+    apputil = require("./lib/app"),
     Browser = require("zombie"),
-    setupApp = oauthutil.setupApp,
-    setupAppConfig = oauthutil.setupAppConfig;
+    withAppSetup = apputil.withAppSetup,
+    setupAppConfig = apputil.setupAppConfig;
 
 var suite = vows.describe("layout test");
 

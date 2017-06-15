@@ -29,7 +29,8 @@ var assert = require("assert"),
     OAuth = require("oauth-evanp").OAuth,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
-    setupApp = oauthutil.setupApp;
+    apputil = require("./lib/app"),
+    withAppSetup = apputil.withAppSetup;
 
 var suite = vows.describe("user list API");
 
@@ -162,20 +163,8 @@ var doubleRegisterFail = function(first, second) {
     };
 };
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            var cb = this.callback;
-            setupApp(cb);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we check the user list endpoint": {
             topic: function() {
                 httputil.options("localhost", 4815, "/api/users", this.callback);
@@ -282,21 +271,11 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            var cb = this.callback;
-            setupApp(cb);
-        },
-        teardown: function(app) {
-            app.close();
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we create a client using the api": {
             topic: function() {
                 var cb = this.callback;
@@ -609,7 +588,7 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

@@ -27,12 +27,13 @@ var assert = require("assert"),
     urlparse = require("url").parse,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     newCredentials = oauthutil.newCredentials,
     newClient = oauthutil.newClient,
     pj = httputil.postJSON,
     gj = httputil.getJSON,
     dialbackApp = require("./lib/dialback").dialbackApp,
-    setupApp = oauthutil.setupApp;
+    setupApp = apputil.setupApp;
 
 var suite = vows.describe("distributor multiple remote test");
 
@@ -179,12 +180,12 @@ suite.addBatch({
                                     assert.include(inbox2, "items");
                                     assert.isArray(inbox2.items);
                                     assert.greater(inbox2.items.length, 0);
-                                    assert.isObject(_.find(inbox2.items, function(item) { return item.id == act.id; }),
+                                    assert.isObject(_.find(inbox2.items, function(item) { return item.id === act.id; }),
                                     "Activity is not in first inbox");
                                     assert.include(inbox3, "items");
                                     assert.isArray(inbox3.items);
                                     assert.greater(inbox3.items.length, 0);
-                                    assert.isObject(_.find(inbox3.items, function(item) { return item.id == act.id; }),
+                                    assert.isObject(_.find(inbox3.items, function(item) { return item.id === act.id; }),
                                     "Activity is not in second inbox");
                                 }
                             }

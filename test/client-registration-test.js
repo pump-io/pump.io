@@ -24,7 +24,8 @@ var assert = require("assert"),
     _ = require("underscore"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
-    setupApp = oauthutil.setupApp;
+    apputil = require("./lib/app"),
+    withAppSetup = apputil.withAppSetup;
 
 var ignore = function(err) {};
 
@@ -126,17 +127,8 @@ var assocSucceed = function(params) {
     };
 };
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            app.close();
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we check the client registration endpoint":
         httputil.endpoint("/api/client/register", ["POST"]),
         "and we register with no type": assocFail({application_name: "Typeless"}),
@@ -245,7 +237,7 @@ suite.addBatch({
                     },
                     function(err, res, body) {
                         if (err) throw err;
-                        if (res.statusCode != 200) throw new Error("Bad assoc");
+                        if (res.statusCode !== 200) throw new Error("Bad assoc");
                         var reg = JSON.parse(body);
                         rp({application_name: "No Secret",
                             logo_url: "http://example.com/my-logo-url.jpg",
@@ -276,7 +268,7 @@ suite.addBatch({
                     },
                     function(err, res, body) {
                         if (err) throw err;
-                        if (res.statusCode != 200) throw new Error("Bad assoc");
+                        if (res.statusCode !== 200) throw new Error("Bad assoc");
                         var reg = JSON.parse(body);
                         rp({application_name: "Wrong Secret",
                             logo_url: "http://example.com/my-logo-url.jpg",
@@ -383,7 +375,7 @@ suite.addBatch({
         updateSucceed({type: "client_associate"},
                       {type: "client_update",
                        redirect_uris: "http://example.org/redirect http://example.org/redirect2 http://example.org/redirect3"})
-    }
-});
+    })
+);
 
 suite["export"](module);

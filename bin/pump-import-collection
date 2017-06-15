@@ -50,7 +50,7 @@ var fs = require("fs"),
         .alias("d", "directory")
         .describe("f", "File in Activity Streams JSON collection format")
         .describe("d", "Recursive directory of files, one activity per, like divider makes")
-        .check(function(argv) { if (!argv.f & !argv.d) { throw new Error("Must have one of -f or -d");  } })
+        .check(function(argv) { if (!argv.f && !argv.d) { throw new Error("Must have one of -f or -d");  } })
         .argv;
 
 var QUEUE_MAX = 1;
@@ -346,7 +346,7 @@ var importActivity = function(props, log, callback) {
                 newF = _.getPath(activity, ["actor", "followers", "url"]);
 
             _.each(["to", "cc", "bto", "bcc"], function(name) {
-                if (origF && newF && origF != newF) {
+                if (origF && newF && origF !== newF) {
                     _.each(activity[name], function(addr) {
                         if (addr.id === origF) {
                             log.info({original: origF, new: newF}, "Replacing followers URL in addresses");
@@ -978,7 +978,7 @@ var personLocalID = function(person) {
 var checkJoin = function(activity, log, callback) {
 
     if (!isLocalObjectID(activity.object.id) ||
-        activity.object.objectType != ActivityObject.GROUP) {
+        activity.object.objectType !== ActivityObject.GROUP) {
         callback(null);
         return;
     }
@@ -988,7 +988,7 @@ var checkJoin = function(activity, log, callback) {
             ActivityObject.getObject(ActivityObject.GROUP, activity.object.id, this);
         },
         function(err, group) {
-            if (err && err.name != "NoSuchThingError") {
+            if (err && err.name !== "NoSuchThingError") {
                 throw err;
             } else if (err && err.name === "NoSuchThingError") {
                 importActivity({actor: activity.actor,

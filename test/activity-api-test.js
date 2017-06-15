@@ -27,27 +27,17 @@ var assert = require("assert"),
     urlparse = require("url").parse,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
+    apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
-    setupApp = oauthutil.setupApp,
+    withAppSetup = apputil.withAppSetup,
     newCredentials = oauthutil.newCredentials;
 
 var suite = vows.describe("Activity API test");
 
 // A batch for testing the read-write access to the API
 
-suite.addBatch({
-    "When we set up the app": {
-        topic: function() {
-            setupApp(this.callback);
-        },
-        teardown: function(app) {
-            if (app && app.close) {
-                app.close();
-            }
-        },
-        "it works": function(err, app) {
-            assert.ifError(err);
-        },
+suite.addBatch(
+    withAppSetup({
         "and we get new credentials": {
             topic: function() {
                 newCredentials("gerold", "just*a*guy", this.callback);
@@ -136,7 +126,7 @@ suite.addBatch({
                             newact.mood = {
                                 displayName: "Friendly"
                             };
-                            // wait 2000 ms to make sure updated != published
+                            // wait 2000 ms to make sure updated !== published
                             setTimeout(function() {
                                 httputil.putJSON(act.id, cred, newact, function(err, contents, result) {
                                     cb(err, {newact: contents, act: act});
@@ -773,7 +763,7 @@ suite.addBatch({
                             httputil.getJSON(id, cred, this);
                         },
                         function(err, got, resp) {
-                            if (err && err.statusCode && err.statusCode == 410) {
+                            if (err && err.statusCode && err.statusCode === 410) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -801,7 +791,7 @@ suite.addBatch({
                         };
 
                     httputil.putJSON(url, cred, act, function(err, got, resp) {
-                            if (err && err.statusCode && err.statusCode == 404) {
+                            if (err && err.statusCode && err.statusCode === 404) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -821,7 +811,7 @@ suite.addBatch({
                         url = "http://localhost:4815/api/activity/NONEXISTENT";
 
                     httputil.getJSON(url, cred, function(err, got, resp) {
-                            if (err && err.statusCode && err.statusCode == 404) {
+                            if (err && err.statusCode && err.statusCode === 404) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -841,7 +831,7 @@ suite.addBatch({
                         url = "http://localhost:4815/api/activity/NONEXISTENT";
 
                     httputil.delJSON(url, cred, function(err, got, resp) {
-                            if (err && err.statusCode && err.statusCode == 404) {
+                            if (err && err.statusCode && err.statusCode === 404) {
                                 cb(null);
                             } else if (err) {
                                 cb(err);
@@ -856,7 +846,7 @@ suite.addBatch({
                 }
             }
         }
-    }
-});
+    })
+);
 
 suite["export"](module);

@@ -76,7 +76,7 @@ var authenticate = function(req, res) {
                     return;
                 }
 
-                if (rt.username && rt.username != req.principalUser.nickname) {
+                if (rt.username && rt.username !== req.principalUser.nickname) {
                     throw new Error("Token already associated with a different user");
                 }
 
@@ -179,7 +179,7 @@ var authorize = function(err, req, res, authenticated, rt, application) {
                                              application: application});
             } else {
                 // Already authorized; either redirect back or show the verifier
-                if (rt.callback && rt.callback != "oob") {
+                if (rt.callback && rt.callback !== "oob") {
                     sep = (rt.callback.indexOf("?") === -1) ? "?" : "&";
                     url = rt.callback + sep + qs.stringify({oauth_token: rt.token,
                                                             oauth_verifier: rt.verifier});
