@@ -2,6 +2,25 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 4.1.0 beta 0 - Future
+
+### Improved
+
+* Added some basic styles to the LibreJS info page (#1353)
+* Minor UX improvements to the web UI (#1355, #1354)
+* Expanded the list of disallowed nicknames and warn about them in the web UI (#1345, #1347)
+* Pull our fork of connect-auth from npm instead of GitHub
+* Use [Subresource Integrity][] for web UI resources pulled from CDNs
+* Internal test refactoring
+
+### Changed
+
+* Switched bcrypt implementation from `bcrypt` to `bcryptjs` (#1233)
+
+### Fixed
+
+* Return the correct Content-Type for OAuth endpoints (#822)
+
 ## 4.0.0 - 2017-05-02
 
 No changes from 4.0.0 beta 5.
@@ -277,3 +296,4 @@ TODO
  [semver]: http://semver.org/
  [librejs]: https://www.gnu.org/software/librejs/
  [security-headers]: https://github.com/pump-io/pump.io/issues/1184#issuecomment-242264403
+ [Subresource Integrity]: https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity
