@@ -6,7 +6,7 @@
   "author": "Evan Prodromou <evan@e14n.com>",
   "description": "Social server with an ActivityStreams API",
   "devDependencies": {
-    "dependency-check": "2.8.0",
+    "dependency-check": "2.9.1",
     "jscs": "^3.0.3",
     "jshint": "^2.9.2",
     "jsonlint": "^1.6.2",
