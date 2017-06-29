@@ -28,8 +28,6 @@ var cluster = require("cluster"),
     path = require("path"),
     Logger = require("bunyan"),
     _ = require("underscore"),
-    colors = require("colors/safe"),
-    warningColors = colors.yellow,
     argv = require("yargs")
            .usage("Usage: $0 -c <configfile>")
            .alias("c", "config")
@@ -80,19 +78,9 @@ var cluster = require("cluster"),
            .version()
            .argv,
     Dispatch = require("../lib/dispatch"),
-    makeApp = require("../lib/app").makeApp,
-    majorRelease = Number(process.versions.node.split(".")[0]);
+    makeApp = require("../lib/app").makeApp;
 
-// First we warn if the user is on a deprecated Node.js version
-
-if (majorRelease < 4 && cluster.isMaster) {
-    // Console warning
-    console.warn(colors.red.bold.underline("WARNING:") + colors.red.bold(" running pump.io on Node.js " + process.versions.node + " has security implications and is deprecated!"));
-    console.warn(warningColors("Please upgrade to Node.js 4 or higher to silence this warning."));
-    console.warn(warningColors("See https://github.com/pump-io/pump.io/issues/1212 for details."));
-}
-
-// Then we get config files and launch some cluster apps
+// We first get config files and launch some cluster apps
 
 var main = function() {
     var config = argv;
