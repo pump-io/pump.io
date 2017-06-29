@@ -12,6 +12,7 @@ pump.io follows [Semantic Versioning][semver].
 ## Breaking
 
 * Dropped support for Node.js 0.10 and 0.12
+* Added a period and space after the footer text; if you use `appendFooter` please adjust accordingly
 
 ## 4.1.0 - Future
 
