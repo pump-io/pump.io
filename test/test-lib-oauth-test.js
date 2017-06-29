@@ -25,7 +25,7 @@ var assert = require("assert"),
     _ = require("underscore"),
     apputil = require("./lib/app");
 
-var suite = vows.describe("user REST API");
+var suite = vows.describe("OAuth test library");
 
 suite.addBatch({
     "When we load the module": {

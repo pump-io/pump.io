@@ -25,7 +25,7 @@ var assert = require("assert"),
     Step = require("step"),
     _ = require("underscore");
 
-var suite = vows.describe("user REST API");
+var suite = vows.describe("app setup test library");
 
 suite.addBatch({
     "When we load the module": {
