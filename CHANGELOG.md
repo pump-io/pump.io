@@ -2,6 +2,17 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 5.0.0 - Future
+
+## Changed
+
+* Removed 0.10/0.12-specific hacks
+* Internal refactoring to use newer ES6 features
+
+## Breaking
+
+* Dropped support for Node.js 0.10 and 0.12
+
 ## 4.1.0 - Future
 
 No changes from 4.1.0 beta 0. This will be the last release to support Node.js 0.10 and 0.12.
