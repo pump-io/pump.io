@@ -43,7 +43,6 @@
     "mkdirp": "0.5.x",
     "oauth-evanp": "~0.9.10-evanp.2",
     "optimist": "^0.6.1",
-    "sanitize-html": "^1.13.0",
     "schlock": "~0.2.1",
     "send": "^0.15.1",
     "serve-favicon": "^2.3.0",
