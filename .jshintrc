@@ -1,5 +1,6 @@
 {
   "node": true,
+  "esversion": 6,
   "sub": true,
   "bitwise": true,
   "eqeqeq": true,
