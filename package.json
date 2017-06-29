@@ -113,9 +113,7 @@
   },
   "greenkeeper": {
     "ignore": [
-      "connect-auth",
-      "databank",
-      "zombie"
+      "databank"
     ]
   }
 }
