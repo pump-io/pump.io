@@ -2,6 +2,10 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 4.1.0 - 2017-07-01
+
+No changes from 4.1.0 beta 0. This will be the last release to support Node.js 0.10 and 0.12.
+
 ## 4.1.0 beta 0 - 2017-06-15
 
 ### Improved
