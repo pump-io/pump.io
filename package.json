@@ -90,7 +90,7 @@
     "update-docs:readme": "sed \"s/^Version .*\\..*\\..*$/Version $npm_package_version/\" README.md | sponge README.md",
     "prepublish": "npm run build",
     "version": "npm run update-docs && git add README.md doc/",
-    "postversion": "git push origin v$npm_package_version && git push"
+    "postversion": "git push origin v$npm_package_version && echo $npm_package_version | grep beta > /dev/null || git push --set-upstream origin $(git symbolic-ref --short HEAD)"
   },
   "repository": {
     "type": "git",
