@@ -89,7 +89,7 @@
     "update-docs:manpage": "sed \"s/^\\.TH PUMP 1.*$/.TH PUMP 1 \\\"$(date +'%d %B %Y')\\\" \\\"$npm_package_version\\\"/\" doc/pump.1 | sponge doc/pump.1",
     "update-docs:readme": "sed \"s/^Version .*\\..*\\..*$/Version $npm_package_version/\" README.md | sponge README.md",
     "prepare": "npm run build",
-    "prepublish": "npm run prepublish:versioncheck && for task in workdircheck; do npm run prepublish:$task || (err=true; break); done; if $err; then exit 1; fi",
+    "prepublish": "npm run prepublish:versioncheck && err=false; for task in workdircheck; do npm run prepublish:$task || (err=true; break); done; if $err; then exit 1; fi",
     "prepublish:versioncheck": "semver -r '>=5.0.0' $(npm -v) > /dev/null || (echo 'npm version too old; you need npm 5 or better' 1>&2 && exit 1)",
     "prepublish:workdircheck": "test -z \"$(git status --porcelain)\" || (echo 'git working directory not clean' 1>&2 && exit 1)",
     "version": "npm run update-docs && git add README.md doc/",
