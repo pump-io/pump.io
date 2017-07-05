@@ -24,7 +24,7 @@
 
 var fs = require("fs"),
     path = require("path"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     Step = require("step"),
     url = require("url"),
     common = require("../lib/pumpclient"),

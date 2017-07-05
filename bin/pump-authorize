@@ -26,7 +26,7 @@
 "use strict";
 
 var urlfmt = require("url").format,
-    _ = require("underscore"),
+    _ = require("lodash"),
     Step = require("step"),
     common = require("../lib/pumpclient"),
     clientCred = common.clientCred,

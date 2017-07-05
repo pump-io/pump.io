@@ -27,7 +27,7 @@ var cluster = require("cluster"),
     fs = require("fs"),
     path = require("path"),
     Logger = require("bunyan"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     argv = require("yargs")
            .usage("Usage: $0 -c <configfile>")
            .alias("c", "config")

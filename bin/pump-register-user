@@ -23,7 +23,7 @@
 
 "use strict";
 
-var _ = require("underscore"),
+var _ = require("lodash"),
     url = require("url"),
     Step = require("step"),
     common = require("../lib/pumpclient"),
