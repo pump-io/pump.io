@@ -16,6 +16,7 @@ addons:
 script: "npm test && sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root && npm run test:install'"
 before_script:
   - "./test/hosts.sh"
+  - "npm install -g npm@5"
 before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -qq graphicsmagick
