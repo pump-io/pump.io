@@ -12,6 +12,8 @@ There's always work to be done on the pump.io codebase. Here are the general rul
 * Send patches via Pull Request (or, less preferably, emailed to <alex@strugee.net>)
 * See [HACKING.md][] for more guidelines
 
+Please be aware that you need npm 5 to work on pump.io.
+
 Need a more detailed explanation, or aren't sure how to start? See [CONTRIBUTING_CODE.md][].
 
 ## Issues

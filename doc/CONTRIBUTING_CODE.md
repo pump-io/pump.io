@@ -34,7 +34,9 @@ clone their personal fork, @octocat might do:
 ## Setting up your environment
 
 At this point, if you don't already have it, you'll need to
-install [Node.js][].
+install [Node.js][]. You'll need npm 5 or better to work on pump.io -
+you can check with `npm -v`, and if your npm isn't new enough, you can
+upgrade it with `npm install -g npm`.
 
 Once you have Node, you need to install the dependencies that pump.io
 needs to run. To do this, run `npm install` and go get a nice cup of
