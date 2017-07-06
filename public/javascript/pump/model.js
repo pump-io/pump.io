@@ -171,7 +171,7 @@
                 },
                 seenNow;
 
-            if (seen && id && _.contains(seen, id)) {
+            if (seen && id && _.includes(seen, id)) {
 
                 json = obj.toJSONRef();
 
@@ -214,7 +214,7 @@
             _.each(props, function(value, key) {
                 if (!model.has(key)) {
                     model.set(key, value);
-                } else if (_.contains(complicated, key) && model[key] && _.isFunction(model[key].merge)) {
+                } else if (_.includes(complicated, key) && model[key] && _.isFunction(model[key].merge)) {
                     model[key].merge(value);
                 } else {
                     // XXX: resolve non-complicated stuff
@@ -663,7 +663,7 @@
 
             json = Pump.Model.prototype.toJSON.apply(str, [seen]);
 
-            if (!seen || (url && !_.contains(seen, url))) {
+            if (!seen || (url && !_.includes(seen, url))) {
 
                 if (seen) {
                     seenNow = seen.slice(0);

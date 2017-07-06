@@ -48,7 +48,7 @@ if (!window.Pump) {
         });
     })(Backbone.View);
 
-	// Main entry point
+    // Main entry point
 
     $(document).ready(function() {
 

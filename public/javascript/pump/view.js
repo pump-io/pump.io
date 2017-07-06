@@ -881,7 +881,7 @@
                     }
                 };
 
-            if (_.contains(Pump.config.nicknameBlacklist, params.nickname)) {
+            if (_.includes(Pump.config.nicknameBlacklist, params.nickname)) {
 
                 view.showError("That nickname is not allowed");
 
