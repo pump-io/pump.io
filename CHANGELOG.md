@@ -17,6 +17,7 @@ pump.io follows [Semantic Versioning][semver].
 
 * Dropped support for Node.js 0.10 and 0.12 (#1234)
 * Added a period and space after the footer text; if you use `appendFooter` please adjust accordingly (#1349)
+* Switched from Glyphicons to Font Awesome; if you modify web UI templates, please adjust accordingly (#1351)
 
 ## 4.1.0 - 2017-07-01
 
