@@ -359,8 +359,8 @@ if (!window.Pump) {
         "emphasis": function(locale) {
             return "<li>" +
                 "<div class='btn-group'>" +
-                "<a class='btn' data-wysihtml5-command='bold' title='"+locale.emphasis.bold+"'><i class='icon-bold'></i></a>" +
-                "<a class='btn' data-wysihtml5-command='italic' title='"+locale.emphasis.italic+"'><i class='icon-italic'></i></a>" +
+                "<a class='btn' data-wysihtml5-command='bold' title='"+locale.emphasis.bold+"'><i class='fa fa-bold'></i></a>" +
+                "<a class='btn' data-wysihtml5-command='italic' title='"+locale.emphasis.italic+"'><i class='fa fa-italic'></i></a>" +
                 "<a class='btn' data-wysihtml5-command='underline' title='"+locale.emphasis.underline+"'>_</a>" +
                 "</div>" +
                 "</li>";

@@ -22,11 +22,11 @@
         if reply.liked
           a.unfavorite(href="#")
             | Unlike 
-            i.icon-thumbs-down
+            i.fa.fa-thumbs-down
         else
           a.favorite(href="#")
             | Like 
-            i.icon-thumbs-up
+            i.fa.fa-thumbs-up
     
     - var author = reply.author;
     - var coll = reply.likes;
