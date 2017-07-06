@@ -133,7 +133,7 @@ suite.addBatch({
                 "the email is not included": function(err, message, user) {
                     assert.ifError(err);
                     assert.isObject(user);
-                    assert.isFalse(_.include(user, "email"));
+                    assert.isFalse(_.includes(user, "email"));
                 },
                 "and we confirm the email address": {
                     topic: function(message, user, cl) {
@@ -348,7 +348,7 @@ suite.addBatch({
                 "the email is not included": function(err, message, user) {
                     assert.ifError(err);
                     assert.isObject(user);
-                    assert.isFalse(_.include(user, "email"));
+                    assert.isFalse(_.includes(user, "email"));
                 },
                 "and we fetch the user with user credentials without confirmation": {
                     topic: function(message, user, cl) {

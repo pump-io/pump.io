@@ -113,7 +113,7 @@ suite.addBatch(
                             Step(
                                 function() {
                                     var group = this.group();
-                                    _.each(_.pluck(pairs.slice(1), "user"), function(user) {
+                                    _.each(_.map(pairs.slice(1), "user"), function(user) {
                                         httputil.postJSON("http://localhost:4815/api/user/fry/feed",
                                                           cred,
                                                           {
@@ -242,7 +242,7 @@ suite.addBatch(
                             if (err) throw err;
                             list = act.object;
                             cred = makeCred(cl, pairs[0]);
-                            _.each(_.pluck(pairs.slice(1), "user"), function(user) {
+                            _.each(_.map(pairs.slice(1), "user"), function(user) {
                                 q.enqueue(httputil.postJSON,
                                           ["http://localhost:4815/api/user/robot0/feed",
                                            cred,

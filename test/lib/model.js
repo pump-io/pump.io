@@ -172,7 +172,7 @@ var modelBatch = function(typeName, className, testSchema, testData) {
             assert.ifError(err);
             for (prop in testData.create) {
                 // Author may have auto-created properties
-                if (_.contains(["author", "inReplyTo"], prop)) {
+                if (_.includes(["author", "inReplyTo"], prop)) {
                     /* jshint loopfunc: true */
                     _.each(testData.create[prop], function(value, key) {
                         assert.deepEqual(created[prop][key], value);

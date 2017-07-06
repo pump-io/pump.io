@@ -517,7 +517,7 @@ suite.addBatch({
                                     function(err, refs) {
                                         var ids;
                                         if (err) throw err;
-                                        Person.readArray(_.pluck(refs, "id"), this);
+                                        Person.readArray(_.map(refs, "id"), this);
                                     },
                                     callback
                                 );
