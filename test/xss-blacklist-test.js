@@ -20,7 +20,7 @@
 
 var assert = require("assert"),
     vows = require("vows"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     Step = require("step"),
     Browser = require("zombie"),
     oauthutil = require("./lib/oauth"),

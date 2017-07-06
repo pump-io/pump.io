@@ -21,7 +21,7 @@
 var assert = require("assert"),
     vows = require("vows"),
     Step = require("step"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     http = require("http"),
     version = require("../lib/version").version,
     urlparse = require("url").parse,

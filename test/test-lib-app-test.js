@@ -23,7 +23,7 @@ var assert = require("assert"),
     http = require("http"),
     vows = require("vows"),
     Step = require("step"),
-    _ = require("underscore");
+    _ = require("lodash");
 
 var suite = vows.describe("app setup test library");
 

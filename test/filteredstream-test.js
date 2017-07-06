@@ -20,7 +20,7 @@
 
 var assert = require("assert"),
     vows = require("vows"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     databank = require("databank"),
     Step = require("step"),
     fs = require("fs"),

@@ -21,7 +21,7 @@
 // Adds to globals
 
 var databank = require("databank"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     Step = require("step"),
     validator = require("validator"),
     OAuth = require("oauth-evanp").OAuth,

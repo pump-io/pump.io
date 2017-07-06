@@ -22,7 +22,7 @@ var assert = require("assert"),
     http = require("http"),
     vows = require("vows"),
     Step = require("step"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     apputil = require("./lib/app");
 
 var suite = vows.describe("OAuth test library");
