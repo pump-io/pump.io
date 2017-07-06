@@ -4,6 +4,10 @@ pump.io follows [Semantic Versioning][semver].
 
 ## 5.0.0 beta 0 - Future
 
+## Improved
+
+* Node 7 and 8 are now supported
+
 ## Changed
 
 * Removed 0.10/0.12-specific hacks
