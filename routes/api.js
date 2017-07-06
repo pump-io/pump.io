@@ -318,7 +318,7 @@ var putObject = function(req, res, next) {
             actor: req.principal,
             generator: req.generator,
             verb: "update",
-            object: _(obj).extend(updates)
+            object: _(obj).extend(updates).value()
         });
 
     Step(
