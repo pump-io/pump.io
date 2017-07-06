@@ -13,7 +13,6 @@
     "node-mocks-http": "^1.6.1",
     "pug-lint": "^2.3.0",
     "rimraf": "^2.6.1",
-    "semver": "^5.3.0",
     "simplesmtp": "^0.3.35",
     "vows": "^0.8.1",
     "xml2js": "^0.4.17",
