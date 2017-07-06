@@ -48,8 +48,6 @@
         initialize: function(options) {
             var view = this;
 
-            view.options = options || {};
-
             if (_.has(view, "model") && _.isObject(view.model)) {
                 view.listenTo(view.model, "change", function(model, options) {
                     Pump.debug("Re-rendering " + view.templateName + " #" + view.cid + " based on change to " + view.model.id);
@@ -1889,8 +1887,6 @@
         modelName: "profile",
         parts: ["profile-responses"],
         initialize: function(options) {
-            this.options = options || {};
-
             Pump.debug("Initializing profile-block #" + this.cid);
             Pump.PersonView.prototype.initialize.apply(this);
         }
@@ -3020,8 +3016,6 @@
 
     Pump.BodyView = Backbone.View.extend({
         initialize: function(options) {
-            this.options = options || {};
-
             _.bindAll(this, "navigateToHref");
         },
         el: "body",
@@ -3360,9 +3354,6 @@
         },
         initialize: function(options) {
             var view = this;
-
-            view.options = options || {};
-
             if (options.parent) {
                 view.parent = options.parent;
             }
