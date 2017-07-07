@@ -21,7 +21,6 @@
 var url = require("url"),
     qs = require("querystring"),
     Step = require("step"),
-    _ = require("lodash"),
     authc = require("../lib/authc"),
     RequestToken = require("../lib/model/requesttoken").RequestToken,
     AccessToken = require("../lib/model/accesstoken").AccessToken,
