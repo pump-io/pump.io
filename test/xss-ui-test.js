@@ -20,27 +20,24 @@
 
 var assert = require("assert"),
     vows = require("vows"),
-    Browser = require("zombie"),
     apputil = require("./lib/app"),
     withAppSetup = apputil.withAppSetup,
-    br;
+    httputil = require("./lib/http");
 
 vows.describe("XSS blacklist middleware").addBatch(
     withAppSetup({
         "and we visit the home page with an IE11 User-Agent header": {
             topic: function(app) {
-                var callback = this.callback;
-                br = new Browser({runScripts: false});
-
-                br.userAgent = "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko";
-                br.visit("http://localhost:4815/", callback);
+                httputil.head("http://localhost:4815/", {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko"
+                }, this.callback);
             },
-            "it works": function(err) {
+            "it works": function(err, res) {
                 assert.ifError(err);
-                br.assert.success();
             },
-            "it has a status code of 200": function() {
-                br.assert.status(200);
+            "it has a status code of 200": function(err, res) {
+                assert.isNumber(res.statusCode);
+                assert.equal(res.statusCode, 200);
             }
         }
     })
@@ -48,20 +45,16 @@ vows.describe("XSS blacklist middleware").addBatch(
     withAppSetup({
         "and we visit the home page with an IE10 User-Agent header": {
             topic: function(app) {
-                var callback = this.callback;
-
-                br.userAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)";
-                // TODO: this shows errors even though it technically succeeds
-                br.visit("http://localhost:4815/");
-                br.wait();
-                // TODO: this is hacky
-                setTimeout(callback, 3000);
+                httputil.head("http://localhost:4815/", {
+                    "User-Agent":"Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)"
+                }, this.callback);
             },
-            "it works": function(err) {
+            "it works": function(err, res) {
                 assert.ifError(err);
             },
-            "it has a status code of 400": function() {
-                br.assert.status(400);
+            "it has a status code of 400": function(err, res) {
+                assert.isNumber(res.statusCode);
+                assert.equal(res.statusCode, 400);
             }
         }
     })
