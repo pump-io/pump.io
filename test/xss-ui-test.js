@@ -20,12 +20,8 @@
 
 var assert = require("assert"),
     vows = require("vows"),
-    _ = require("lodash"),
-    Step = require("step"),
     Browser = require("zombie"),
-    oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
-    http = require("http"),
     withAppSetup = apputil.withAppSetup,
     br;
 
