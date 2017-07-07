@@ -125,7 +125,7 @@ answer later.
 Alternately, you can ask for help in a comment on the issue you're
 fixing.
 
-Finally, you can contact [Alex Jordan][] directly. He'll be happy to
+Finally, you can contact [AJ Jordan][] directly. He'll be happy to
 answer any questions you have.
 
  [Code of Conduct]: https://github.com/pump-io/pump.io/blob/master/CODE_OF_CONDUCT.md
@@ -138,5 +138,5 @@ answer any questions you have.
  [HACKING.md]: https://github.com/pump-io/pump.io/blob/master/HACKING.md
  [open a Pull Request]: https://help.github.com/articles/creating-a-pull-request/
  [community]: https://github.com/pump-io/pump.io/wiki/Community
- [Alex Jordan]: https://strugee.net/contact
+ [AJ Jordan]: https://strugee.net/contact
  [DCO]: https://github.com/pump-io/pump.io/blob/master/CONTRIBUTING.md#developer-certificate-of-origin

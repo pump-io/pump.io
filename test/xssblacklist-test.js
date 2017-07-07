@@ -2,7 +2,7 @@
 //
 // Test the XSS blacklist middleware
 //
-// Copyright 2016 Alex Jordan <alex@strugee.net>
+// Copyright 2016 AJ Jordan <alex@strugee.net>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
