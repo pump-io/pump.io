@@ -39,10 +39,7 @@ vows.describe("XSS blacklist middleware").addBatch(
                 assert.isNumber(res.statusCode);
                 assert.equal(res.statusCode, 200);
             }
-        }
-    })
-).addBatch(
-    withAppSetup({
+        },
         "and we visit the home page with an IE10 User-Agent header": {
             topic: function(app) {
                 httputil.head("http://localhost:4815/", {
