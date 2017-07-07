@@ -18,7 +18,7 @@
 
 "use strict";
 
-var _ = require("underscore"),
+var _ = require("lodash"),
     Step = require("step"),
     authc = require("../lib/authc"),
     HTTPError = require("../lib/httperror").HTTPError,

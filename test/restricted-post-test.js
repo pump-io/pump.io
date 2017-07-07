@@ -21,7 +21,7 @@
 var assert = require("assert"),
     vows = require("vows"),
     Step = require("step"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     OAuth = require("oauth-evanp").OAuth,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
@@ -450,7 +450,7 @@ suite.addBatch(
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.isEmpty(_.where(feed.items, {id: act.id}));
+                        assert.isEmpty(_.filter(feed.items, {id: act.id}));
                     }
                 },
                 "and a follower reads their own inbox": {
@@ -471,7 +471,7 @@ suite.addBatch(
                         assert.include(inbox, "items");
                         assert.isArray(inbox.items);
                         // should be the follow activity, welcome note, reg activity
-                        assert.isEmpty(_.where(inbox.items, {id: act.id}));
+                        assert.isEmpty(_.filter(inbox.items, {id: act.id}));
                     }
                 },
                 "and an anonymous user reads the activity": {
@@ -571,7 +571,7 @@ suite.addBatch(
                         assert.ifError(err);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
-                        assert.isEmpty(_.where(feed.items, {id: act.id}));
+                        assert.isEmpty(_.filter(feed.items, {id: act.id}));
                     }
                 }
             },
@@ -855,7 +855,7 @@ suite.addBatch(
                         assert.ifError(err);
                         assert.include(inbox, "totalItems");
                         assert.isNumber(inbox.totalItems);
-                        assert.isEmpty(_.where(inbox.items, {id: act.id}));
+                        assert.isEmpty(_.filter(inbox.items, {id: act.id}));
                     }
                 },
                 "and a follower reads the activity": {

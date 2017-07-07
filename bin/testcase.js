@@ -4,7 +4,7 @@
 
 var fs = require("fs"),
     path = require("path"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     argv = require("yargs")
            // Hack to make sure that .config()'s callback gets run even if -c isn't specified
            .default("config", "/dev/null", "/etc/pump.io.json\" and \"~/.pump.io.json")

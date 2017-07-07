@@ -21,7 +21,7 @@
 var assert = require("assert"),
     vows = require("vows"),
     Step = require("step"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     querystring = require("querystring"),
     http = require("http"),
     OAuth = require("oauth-evanp").OAuth,
@@ -87,7 +87,7 @@ suite.addBatch(
                         assert.include(doc, "items");
                         assert.isArray(doc.items);
                         assert.greater(doc.items.length, 0);
-                        assert.isTrue(_.any(doc.items, function(item) { return item.id === act.id; }));
+                        assert.isTrue(_.some(doc.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and we check the feed": {
@@ -105,7 +105,7 @@ suite.addBatch(
                         assert.include(doc, "items");
                         assert.isArray(doc.items);
                         assert.greater(doc.items.length, 0);
-                        assert.isTrue(_.any(doc.items, function(item) { return item.id === act.id; }));
+                        assert.isTrue(_.some(doc.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and we check the minor feed": {
@@ -191,7 +191,7 @@ suite.addBatch(
                         assert.include(doc, "items");
                         assert.isArray(doc.items);
                         assert.greater(doc.items.length, 0);
-                        assert.isTrue(_.any(doc.items, function(item) { return item.id === act.id; }));
+                        assert.isTrue(_.some(doc.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and we check the feed": {
@@ -209,7 +209,7 @@ suite.addBatch(
                         assert.include(doc, "items");
                         assert.isArray(doc.items);
                         assert.greater(doc.items.length, 0);
-                        assert.isTrue(_.any(doc.items, function(item) { return item.id === act.id; }));
+                        assert.isTrue(_.some(doc.items, function(item) { return item.id === act.id; }));
                     }
                 },
                 "and we check the major feed": {

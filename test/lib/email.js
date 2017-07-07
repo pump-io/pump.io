@@ -20,7 +20,7 @@
 
 var assert = require("assert"),
     vows = require("vows"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     simplesmtp = require("simplesmtp"),
     oauthutil = require("./oauth"),
     apputil = require("./app"),
@@ -38,7 +38,7 @@ var oneEmail = function(smtp, addr, callback) {
     var data,
         timeoutID,
         isOurs = function(envelope) {
-            return _.contains(envelope.to, addr);
+            return _.includes(envelope.to, addr);
         },
         starter = function(envelope) {
             if (isOurs(envelope)) {

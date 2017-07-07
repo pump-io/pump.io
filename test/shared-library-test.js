@@ -51,11 +51,11 @@ var testGet = function(rel) {
 suite.addBatch(
     withAppSetup({
         "and we check the showdown endpoint URL": httputil.endpoint("/shared/showdown.js", ["GET"]),
-        "and we check the underscore endpoint URL": httputil.endpoint("/shared/underscore.js", ["GET"]),
-        "and we check the underscore-min endpoint URL": httputil.endpoint("/shared/underscore-min.js", ["GET"]),
+        "and we check the lodash endpoint URL": httputil.endpoint("/shared/lodash.js", ["GET"]),
+        "and we check the lodash-min endpoint URL": httputil.endpoint("/shared/lodash-min.js", ["GET"]),
         "and we get the showdown file": testGet("/shared/showdown.js"),
-        "and we get the underscore file": testGet("/shared/underscore.js"),
-        "and we get the underscore-min file": testGet("/shared/underscore-min.js")
+        "and we get the lodash file": testGet("/shared/lodash.js"),
+        "and we get the lodash-min file": testGet("/shared/lodash-min.js")
 }));
 
 suite["export"](module);

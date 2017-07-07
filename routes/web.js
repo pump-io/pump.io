@@ -20,7 +20,7 @@
 
 var databank = require("databank"),
     Step = require("step"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     validator = require("validator"),
     Mailer = require("../lib/mailer"),
     URLMaker = require("../lib/urlmaker").URLMaker,

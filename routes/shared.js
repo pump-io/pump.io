@@ -33,8 +33,8 @@ var addRoutes = function(app, session) {
     // expose this one file over the web
 
     app.get("/shared/showdown.js", sharedFile("showdown/src/showdown.js"));
-    app.get("/shared/underscore.js", sharedFile("underscore/underscore.js"));
-    app.get("/shared/underscore-min.js", sharedFile("underscore/underscore-min.js"));
+    app.get("/shared/lodash.js", sharedFile("lodash/lodash.js"));
+    app.get("/shared/lodash-min.js", sharedFile("lodash/lodash.min.js"));
     // TODO serve a minified version of this
     app.get("/shared/jade-runtime.js", sharedFile("jade/runtime.js"));
 };

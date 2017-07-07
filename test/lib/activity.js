@@ -18,7 +18,7 @@
 
 "use strict";
 
-var _ = require("underscore"),
+var _ = require("lodash"),
     assert = require("assert"),
     vows = require("vows");
 

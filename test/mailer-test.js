@@ -20,7 +20,7 @@
 
 var assert = require("assert"),
     vows = require("vows"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     Logger = require("bunyan"),
     simplesmtp = require("simplesmtp"),
     emailutil = require("./lib/email"),

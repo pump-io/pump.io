@@ -18,7 +18,7 @@
 
 "use strict";
 
-var _ = require("underscore"),
+var _ = require("lodash"),
     Step = require("step"),
     validator = require("validator"),
     dialback = require("../lib/dialback"),

@@ -19,7 +19,7 @@
 "use strict";
 
 var Step = require("step"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     assert = require("assert"),
     vows = require("vows"),
     fs = require("fs"),

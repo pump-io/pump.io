@@ -21,7 +21,7 @@
 var assert = require("assert"),
     vows = require("vows"),
     Step = require("step"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     http = require("http"),
     version = require("../lib/version").version,
     urlparse = require("url").parse,
@@ -212,7 +212,7 @@ suite.addBatch(
                             function(err, pair) {
                                 var nuke;
                                 if (err) throw err;
-                                nuke = _(cred).clone();
+                                nuke = _.clone(cred);
                                 _(nuke).extend(pair);
                                 httputil.getJSON(act.id, nuke, this);
                             },
@@ -257,7 +257,7 @@ suite.addBatch(
                 "and we GET the activity with invalid consumer key": {
                     topic: function(act, cred) {
                         var cb = this.callback,
-                            nuke = _(cred).clone();
+                            nuke = _.clone(cred);
                         nuke.consumer_key = "NOTAKEY";
                         httputil.getJSON(act.id, nuke, function(err, doc, response) {
                             if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
@@ -276,7 +276,7 @@ suite.addBatch(
                 "and we GET the activity with invalid consumer secret": {
                     topic: function(act, cred) {
                         var cb = this.callback,
-                            nuke = _(cred).clone();
+                            nuke = _.clone(cred);
                         nuke.consumer_secret = "NOTASECRET";
                         httputil.getJSON(act.id, nuke, function(err, doc, response) {
                             if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
@@ -295,7 +295,7 @@ suite.addBatch(
                 "and we GET the activity with invalid token": {
                     topic: function(act, cred) {
                         var cb = this.callback,
-                            nuke = _(cred).clone();
+                            nuke = _.clone(cred);
                         nuke.token = "NOTATOKEN";
                         httputil.getJSON(act.id, nuke, function(err, doc, response) {
                             if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
@@ -314,7 +314,7 @@ suite.addBatch(
                 "and we GET the activity with invalid token secret": {
                     topic: function(act, cred) {
                         var cb = this.callback,
-                            nuke = _(cred).clone();
+                            nuke = _.clone(cred);
                         nuke.token_secret = "NOTATOKENSECRET";
                         httputil.getJSON(act.id, nuke, function(err, doc, response) {
                             if (err && err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
@@ -364,8 +364,8 @@ suite.addBatch(
                             function(err, pair) {
                                 var nuke;
                                 if (err) throw err;
-                                nuke = _(cred).clone();
-                                _(nuke).extend(pair);
+                                nuke = _.clone(cred);
+                                _.extend(nuke, pair);
                                 httputil.putJSON(act.id, nuke, newact, this);
                             },
                             function(err, doc, res) {
@@ -422,7 +422,7 @@ suite.addBatch(
                 "and we PUT the activity with invalid consumer key": {
                     topic: function(act, cred) {
                         var cb = this.callback,
-                            nuke = _(cred).clone(),
+                            nuke = _.clone(cred),
                             newact = JSON.parse(JSON.stringify(act));
 
                         newact.mood = {
@@ -447,7 +447,7 @@ suite.addBatch(
                 "and we PUT the activity with invalid consumer secret": {
                     topic: function(act, cred) {
                         var cb = this.callback,
-                            nuke = _(cred).clone(),
+                            nuke = _.clone(cred),
                             newact = JSON.parse(JSON.stringify(act));
 
                         newact.mood = {
@@ -472,7 +472,7 @@ suite.addBatch(
                 "and we PUT the activity with invalid token": {
                     topic: function(act, cred) {
                         var cb = this.callback,
-                            nuke = _(cred).clone(),
+                            nuke = _.clone(cred),
                             newact = JSON.parse(JSON.stringify(act));
 
                         newact.mood = {
@@ -497,7 +497,7 @@ suite.addBatch(
                 "and we PUT the activity with invalid token secret": {
                     topic: function(act, cred) {
                         var cb = this.callback,
-                            nuke = _(cred).clone(),
+                            nuke = _.clone(cred),
                             newact = JSON.parse(JSON.stringify(act));
 
                         newact.mood = {
@@ -548,8 +548,8 @@ suite.addBatch(
                             function(err, pair) {
                                 var nuke;
                                 if (err) throw err;
-                                nuke = _(cred).clone();
-                                _(nuke).extend(pair);
+                                nuke = _.clone(cred);
+                                _.extend(nuke, pair);
                                 httputil.delJSON(act.id, nuke, this);
                             },
                             function(err, doc, res) {
@@ -598,7 +598,7 @@ suite.addBatch(
                 "and we DELETE the activity with invalid consumer key": {
                     topic: function(act, cred) {
                         var cb = this.callback,
-                            nuke = _(cred).clone();
+                            nuke = _.clone(cred);
 
                         nuke.consumer_key = "NOTAKEY";
 
@@ -619,7 +619,7 @@ suite.addBatch(
                 "and we DELETE the activity with invalid consumer secret": {
                     topic: function(act, cred) {
                         var cb = this.callback,
-                            nuke = _(cred).clone();
+                            nuke = _.clone(cred);
 
                         nuke.consumer_secret = "NOTASECRET";
 
@@ -640,7 +640,7 @@ suite.addBatch(
                 "and we DELETE the activity with invalid token": {
                     topic: function(act, cred) {
                         var cb = this.callback,
-                            nuke = _(cred).clone();
+                            nuke = _.clone(cred);
 
                         nuke.token = "NOTATOKEN";
 
@@ -661,7 +661,7 @@ suite.addBatch(
                 "and we DELETE the activity with invalid token secret": {
                     topic: function(act, cred) {
                         var cb = this.callback,
-                            nuke = _(cred).clone();
+                            nuke = _.clone(cred);
 
                         nuke.token_secret = "NOTATOKENSECRET";
 

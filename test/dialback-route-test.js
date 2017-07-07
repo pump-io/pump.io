@@ -21,7 +21,7 @@
 var assert = require("assert"),
     vows = require("vows"),
     Step = require("step"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
