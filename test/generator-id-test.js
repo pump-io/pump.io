@@ -37,7 +37,7 @@ var assert = require("assert"),
 
 var ignore = function(err) {};
 
-var suite = vows.describe("Activity generator attribute");
+var suite = vows.describe("Activity generator attribute identity");
 
 var makeCred = function(cl, pair) {
     return {
