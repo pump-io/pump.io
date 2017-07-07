@@ -29,24 +29,7 @@ var assert = require("assert"),
     withAppSetup = apputil.withAppSetup,
     br;
 
-vows.describe("XSS blacklist middleware").addBatch({
-    "When we require the XSS blacklist middleware": {
-        topic: function() {
-            return require("../lib/xssblacklist.js");
-        },
-        "it works": function(middleware) {
-            assert.isObject(middleware);
-        },
-        "and we get its xssCheck export": {
-            topic: function(middleware) {
-                return middleware.xssCheck;
-            },
-            "it exists": function(xssCheck) {
-                assert.isFunction(xssCheck);
-            }
-        }
-    }
-}).addBatch(
+vows.describe("XSS blacklist middleware").addBatch(
     withAppSetup({
         "and we visit the home page with an IE11 User-Agent header": {
             topic: function(app) {
