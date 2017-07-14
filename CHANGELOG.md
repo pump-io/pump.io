@@ -13,6 +13,10 @@ pump.io follows [Semantic Versioning][semver].
 * Removed 0.10/0.12-specific hacks
 * Internal refactoring to use newer ES6 features
 
+## Fixed
+
+* Fixed crash in an endpoint which prevented "login with remote account" from working (#1281)
+
 ## Breaking
 
 * Dropped support for Node.js 0.10 and 0.12 (#1234)
