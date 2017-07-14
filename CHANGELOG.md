@@ -2,6 +2,12 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 4.1.1 - 2017-07-14
+
+### Fixed
+
+* Backported fix for crash in an endpoint which prevented "login with remote account" from working (#1281)
+
 ## 4.1.0 - 2017-07-01
 
 No changes from 4.1.0 beta 0. This will be the last release to support Node.js 0.10 and 0.12.
