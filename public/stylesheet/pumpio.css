@@ -4,6 +4,10 @@ body {
   padding-top: 60px;
 }
 
+.fa {
+  color: black;
+}
+
 /*  navbar */
 
 .navbar .btn-group {
