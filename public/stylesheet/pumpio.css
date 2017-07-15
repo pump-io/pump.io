@@ -8,6 +8,10 @@ body {
   color: black;
 }
 
+.fa-envelope, .fa-exclamation-circle {
+  color: white;
+}
+
 /*  navbar */
 
 .navbar .btn-group {
