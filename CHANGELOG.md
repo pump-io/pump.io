@@ -2,6 +2,12 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 4.1.2 - 2017-07-14
+
+### Improved
+
+* Backported some improved error messages to assist in debugging a bug
+
 ## 4.1.1 - 2017-07-14
 
 ### Fixed
