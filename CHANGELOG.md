@@ -25,6 +25,12 @@ pump.io follows [Semantic Versioning][semver].
 * Upgraded Backbone to 1.3.3 (ditto) (#1382)
 * Switched from Underscore to Lodash (ditto) (#1326)
 
+## 4.1.2 - 2017-07-14
+
+### Improved
+
+* Backported some improved error messages to assist in debugging a bug
+
 ## 4.1.1 - 2017-07-14
 
 ### Fixed
