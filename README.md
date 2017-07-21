@@ -150,6 +150,7 @@ Here are the main configuration keys.
 * *urlPort* Port to use for generating URLs. Defaults to the same as `port`,
   but if you're insisting on proxying behind Apache or whatever despite
   warnings not to, you can use this.
+* *bounce* If `true`, set up a mini-server on port 80 that redirects to HTTPS
 * *secret* A session-generating secret, server-wide password.
 * *noweb* Hide the Web interface. Defaults to `false`. Set this to something
   truthy to disable the Web interface.
