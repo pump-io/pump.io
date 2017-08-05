@@ -119,7 +119,7 @@ var launchApps = function(config) {
 
         cluster.on("exit", function(worker, code, signal) {
             var exitCode = worker.process.exitCode;
-            clusterLog.warn("worker " + worker.process.pid + " died ("+exitCode+"). restarting...");
+            clusterLog.error("worker " + worker.process.pid + " died ("+exitCode+"). restarting...");
             cluster.fork();
         });
 
