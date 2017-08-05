@@ -19,6 +19,8 @@ unless object.deleted
           small
             if !headless || (activity.verb === "share" && author)
               a(href="#{author.url}")!= author.displayName
+              |  shared by 
+              a(href=activity.actor.url)= activity.actor.displayName
               |  at 
             a(href=object.url || activity.url)
               abbr.easydate(title=activity.published)= activity.published
