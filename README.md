@@ -62,7 +62,7 @@ or clone them with the following commands:
 
 You'll need four things to get started:
 
-* node.js 4.x or 6.x
+* node.js 4.x or higher
 * npm 1.1.0 or higher
 * A database server (see below)
 * The `graphicsmagick` package with the `gm` command
