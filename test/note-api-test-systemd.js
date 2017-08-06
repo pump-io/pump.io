@@ -133,7 +133,7 @@ suite.addBatch({
                         var cb = this.callback,
                             pair = pairOf(user),
                             cred = makeCred(cl, pair);
-                        // ID == JSON representation URL
+                        // ID === JSON representation URL
                         httputil.getJSON(act.object.id, cred, function(err, note) {
                             cb(err, note, act);
                         });
@@ -225,7 +225,7 @@ suite.addBatch({
                     var callback = this.callback,
                         url = del.object.id;
                     httputil.getJSON(url, cred, function(err, obj, res) {
-                        if (err && err.statusCode == 410) {
+                        if (err && err.statusCode === 410) {
                             callback(null);
                         } else if (err) {
                             callback(err);
@@ -438,7 +438,7 @@ suite.addBatch({
                 topic: function(url, cred) {
                     var callback = this.callback;
                     httputil.getJSON(url, cred, function(err, obj, res) {
-                        if (err && err.statusCode == 410) {
+                        if (err && err.statusCode === 410) {
                             callback(null);
                         } else if (err) {
                             callback(err);
