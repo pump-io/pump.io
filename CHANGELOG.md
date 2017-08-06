@@ -7,6 +7,9 @@ pump.io follows [Semantic Versioning][semver].
 ## Improved
 
 * Node 7 and 8 are now supported
+* Documented the `bounce` and `logLevel` config options
+* The web UI more clearly shows shares
+* Worker process deaths are sent to the `error` log stream, not the `warning` stream
 
 ## Changed
 
@@ -24,6 +27,7 @@ pump.io follows [Semantic Versioning][semver].
 * Switched from Glyphicons to Font Awesome (affects web UI template modifications) (#1351)
 * Upgraded Backbone to 1.3.3 (ditto) (#1382)
 * Switched from Underscore to Lodash (ditto) (#1326)
+* Enabled many systemd security restrictions in the systemd service file (#1346, #1257)
 
 ## 4.1.2 - 2017-07-14
 
