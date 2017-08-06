@@ -18,7 +18,8 @@ services:
 script: "(npm test || npm test) && sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root && npm run test:install' && npm run test:systemd"
 before_script:
   - "./test/hosts.sh"
-  - docker cp . $(docker create ubuntu):/tmp
+  - "mkdir -p /tmp/pump.io"
+  - "docker cp . $(docker create ubuntu):/tmp/pump.io"
 before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -qq graphicsmagick
