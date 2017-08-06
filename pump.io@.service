@@ -1,3 +1,35 @@
+#
+# pump.io@.service - pump.io systemd service file
+#
+# Copyright 2016, 2017 Alex Jordan <alex@strugee.net>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This file is deliberately set up to provide an extremely restricted environment for pump.io. It is strongly recommended that you keep all security options enabled - there is no good reason to disable them and doing so will make things much easier for an attacker in the event of a compromise.
+# The paths were chosen assuming that your configuration is in the usual places and relatively unchanged from the sample. If this isn't the case, you need to unprotect the relevant paths. To do this, use a service fragment in /etc (consult the systemd documentation for more information) to reset the readonly and/or read-write directories and then build them up again, like so:
+
+# ReadOnlyDirectories=''
+# ReadOnlyDirectories=/path/to/my/ssl/keys
+# ReadOnlyDirectories=/path/where/i/put/my/pump.io.json
+# ReadWriteDirectories=''
+# ReadWriteDirectories=/my/custom/directory/for/uploads
+# # Even if your logs are stored in the usual place you need to specify it again since you reset this directive
+# ReadWriteDirectories/var/log
+# # Always allow /tmp
+# ReadWriteDirectories=/tmp
+
+# See also the note below about PrivateTmp to further increase security.
+
 [Unit]
 Description=Pump.io - stream server that does most of what people really want from a social network
 After=syslog.target network.target %i.service
@@ -7,6 +39,26 @@ Requires=%i.service
 Type=simple
 ExecStart=/usr/bin/pump
 Environment=NODE_ENV=production
+
+# Security restrictions
+NoNewPrivileges=true
+InaccessibleDirectories=/
+ReadOnlyDirectories=/etc
+ReadOnlyDirectories=/root/.pump.io.json
+ReadWriteDirectories=/var/local/pump.io
+ReadWriteDirectories=/var/log
+ReadWriteDirectories=/tmp
+# These options should be irrelevant given the above configuration (which is *extremely* restrictive) but are included for completeness
+ProtectSystem=full
+ProtectHome=true
+ProtectControlGroups=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+PrivateDevices=true
+RestrictRealtime=true
+# Disabled because it may be unexpected if admins go looking for pump.io files in /tmp and find none.
+# It's recommended to override this, perhaps with an overlay fragment in /etc, if you're sure you'll remember.
+#PrivateTmp=true
 
 [Install]
 WantedBy=multi-user.target
