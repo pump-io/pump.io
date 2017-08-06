@@ -52,6 +52,3 @@ I use [Travis CI](http://travis-ci.org/) for continuous
 integration. It's pretty great.
 
 The .travis.yml file sets up the domain names and runs the root-only tests.
-
-
-
