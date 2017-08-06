@@ -76,6 +76,7 @@
     "test:vows": "vows -v test/*-test.js",
     "test:root": "vows -v test/*-test-as-root.js",
     "test:install": "npm install -g .",
+    "test:systemd": "mkdir -p /tmp/pump.io/uploads; sed 's/%i.service//g' pump.io@.service | sudo tee /etc/systemd/system/pump.io.service; sudo systemctl daemon-reload; sudo systemctl start pump.io.service; vows -v test/*-systemd.js",
     "lint": "npm run lint:jshint && npm run lint:jscs && npm run lint:jade && npm run lint:json && npm run lint:deps",
     "lint:deps": "dependency-check package.json test/*.js > /dev/null && dependency-check --unused package.json -i dependency-check -i jscs -i jshint -i jsonlint -i pug-lint test/*.js > /dev/null",
     "lint:jshint": "jshint --exclude 'public/javascript/libs' bin/* lib routes public/javascript test",

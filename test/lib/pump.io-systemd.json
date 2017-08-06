@@ -1,0 +1,18 @@
+{
+    "driver":  "memory",
+    "secret":  "my dog has fleas",
+    "noweb":  false,
+    "site":  "Awesome Sauce v2",
+    "owner":  "Awesome Inc.",
+    "ownerURL":  "http://example.com/",
+    "port": 4815,
+    "hostname":  "localhost",
+    "address":  "localhost",
+    "nologger":  false,
+    "serverUser":  "alex",
+    "uploaddir": "/tmp/pump.io/uploads",
+    "debugClient": true,
+    "sockjs": false,
+    "noCDN": true,
+    "disableRegistration": false
+}
