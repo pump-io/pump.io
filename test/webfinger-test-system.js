@@ -1,6 +1,6 @@
-// webfinger-test-systemd.js
+// webfinger-test-system.js
 //
-// Tests the Webfinger JRD endpoints - restricted systemd environment smoketest
+// Tests the Webfinger JRD endpoints - system environment smoketest
 //
 // Copyright 2012 E14N https://e14n.com/
 //

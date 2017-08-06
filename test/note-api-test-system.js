@@ -1,6 +1,6 @@
-// note-api-test-systemd.js
+// note-api-test-system.js
 //
-// Test posting a note - restricted systemd environment smoketest
+// Test posting a note - system environment smoketest
 //
 // Copyright 2012, E14N https://e14n.com/
 //

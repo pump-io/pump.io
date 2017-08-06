@@ -1,6 +1,6 @@
-// upload-file-test-systemd.js
+// upload-file-test-system.js
 //
-// Test uploading a file to a server - restricted systemd environment smoketest
+// Test uploading a file to a server - system environment smoketest
 //
 // Copyright 2012, E14N https://e14n.com/
 //
