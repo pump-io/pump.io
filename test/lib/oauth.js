@@ -21,7 +21,7 @@
 var urlfmt = require("url").format,
     path = require("path"),
     Step = require("step"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     http = require("http"),
     version = require("../../lib/version").version,
     OAuth = require("oauth-evanp").OAuth,

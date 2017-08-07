@@ -20,7 +20,7 @@
 
 var databank = require("databank"),
     Step = require("step"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     validator = require("validator"),
     Mailer = require("../lib/mailer"),
     URLMaker = require("../lib/urlmaker").URLMaker,
@@ -711,7 +711,7 @@ var reqHost = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                req.host = host;
+                req.pumphost = host;
                 next();
             }
         }
@@ -720,7 +720,7 @@ var reqHost = function(req, res, next) {
 
 var reqToken = function(req, res, next) {
     var token = req.query.oauth_token,
-        host = req.host;
+        host = req.pumphost;
 
     Step(
         function() {
@@ -740,7 +740,7 @@ var reqToken = function(req, res, next) {
 var authorized = function(req, res, next) {
 
     var rt = req.rt,
-        host = req.host,
+        host = req.pumphost,
         verifier = req.query.oauth_verifier,
         principal,
         pair;

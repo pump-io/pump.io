@@ -20,7 +20,7 @@
 
 var assert = require("assert"),
     vows = require("vows"),
-    _ = require("underscore");
+    _ = require("lodash");
 
 var DANGEROUS = "This is a <script>alert('Boo!')</script> dangerous string.";
 var HARMLESS = "This is a harmless string.";

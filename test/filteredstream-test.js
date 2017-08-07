@@ -20,7 +20,7 @@
 
 var assert = require("assert"),
     vows = require("vows"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     databank = require("databank"),
     Step = require("step"),
     fs = require("fs"),
@@ -517,7 +517,7 @@ suite.addBatch({
                                     function(err, refs) {
                                         var ids;
                                         if (err) throw err;
-                                        Person.readArray(_.pluck(refs, "id"), this);
+                                        Person.readArray(_.map(refs, "id"), this);
                                     },
                                     callback
                                 );

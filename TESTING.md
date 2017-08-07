@@ -2,6 +2,22 @@
 
 Some important stuff for testing the package.
 
+## Test suites
+
+There are a couple test suites available that test this package's
+behavior. Here's all of them:
+
+| Suite              | Command                | Description                                   |
+| ------------------ | ---------------------- | --------------------------------------------- |
+| Default suite      | `npm test`             | Runs all the linters and the main test suite  |
+| Main test suite    | `npm run test:vows`    | Runs tests for main application functionality |
+| As-root test suite | `npm run test:root`    | See "running as root" below                   |
+| System smoketests  | `npm run test:system`  | Runs selected tests from the main suite targeted at a system daemon instead of spinning up an app internally (useful for smoketesting packaging, etc.) |
+| Install smoketest  | `npm run test:install` | Runs `npm install -g .` to ensure that the package is actually installable |
+
+In general you don't need to worry about these - the right one will be
+run in Travis.
+
 ## Running as root
 
 Some of the functionality that this package provides requires
@@ -36,6 +52,3 @@ I use [Travis CI](http://travis-ci.org/) for continuous
 integration. It's pretty great.
 
 The .travis.yml file sets up the domain names and runs the root-only tests.
-
-
-

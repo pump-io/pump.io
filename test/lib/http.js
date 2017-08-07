@@ -22,7 +22,7 @@ var http = require("http"),
     https = require("https"),
     assert = require("assert"),
     querystring = require("querystring"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     Step = require("step"),
     fs = require("fs"),
     express = require("express"),
@@ -177,14 +177,19 @@ var post = function(host, port, path, params, callback) {
     req.end();
 };
 
-var head = function(url, callback) {
+var head = function(url, headers, callback) {
 
     var options = urlparse(url);
 
+    if (_.isFunction(headers)) {
+        callback = headers;
+        headers = {};
+    }
+
     options.method = "HEAD";
-    options.headers = {
+    options.headers = _.extend({
         "User-Agent": "pump.io/"+version
-    };
+    }, headers);
 
     var mod = (options.protocol === "https:") ? https : http;
 

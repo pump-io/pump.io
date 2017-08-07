@@ -2,11 +2,11 @@
   "name": "pump.io",
   "preferGlobal": "true",
   "homepage": "http://pump.io/",
-  "version": "4.1.0-beta.0",
+  "version": "5.0.0-alpha.0",
   "author": "Evan Prodromou <evan@e14n.com>",
   "description": "Social server with an ActivityStreams API",
   "devDependencies": {
-    "dependency-check": "2.8.0",
+    "dependency-check": "^2.8.0",
     "jscs": "^3.0.3",
     "jshint": "^2.9.2",
     "jsonlint": "^1.6.2",
@@ -16,13 +16,12 @@
     "simplesmtp": "^0.3.35",
     "vows": "^0.8.1",
     "xml2js": "^0.4.17",
-    "zombie": "^3.1.1"
+    "zombie": "^5.0.7"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.15.2",
     "bunyan": "^1.8.1",
-    "colors": "^1.1.2",
     "compression": "^1.6.2",
     "connect-auth-pumpio": "^0.6.0",
     "connect-databank": "^1.0.3",
@@ -40,12 +39,11 @@
     "jade": "^1.11.0",
     "jankyqueue": "0.1.x",
     "jsdom": "^9.12.0",
+    "lodash": "^4.17.4",
     "method-override": "^2.3.6",
     "mkdirp": "0.5.x",
     "oauth-evanp": "~0.9.10-evanp.2",
-    "octal": "^1.0.0",
     "optimist": "^0.6.1",
-    "sanitize-html": "^1.13.0",
     "schlock": "~0.2.1",
     "send": "^0.15.1",
     "serve-favicon": "^2.3.0",
@@ -54,10 +52,8 @@
     "ssl-config": "^1.0.0",
     "step": "^1.0.0",
     "ua-parser-js": "^0.7.10",
-    "underscore": "1.8.x",
-    "underscore-contrib": "0.3.x",
     "uuid": "^3.0.0",
-    "validator": "^7.0.0",
+    "validator": "^8.0.0",
     "webfinger": "~0.4.2",
     "yargs": "^7.0.2"
   },
@@ -80,6 +76,9 @@
     "test:vows": "vows -v test/*-test.js",
     "test:root": "vows -v test/*-test-as-root.js",
     "test:install": "npm install -g .",
+    "test:system": "vows -v test/*-test-system.js",
+    "test:systemd": "docker run -v $(pwd):/tmp/pump.io:ro -v $NVM_DIR:/.nvm:ro ubuntu sh -c \"export NVM_DIR=$NVM_DIR; . $NVM_DIR/nvm.sh; nvm use $TRAVIS_NODE_VERSION; cd /tmp/pump.io; npm run test:systemd:run\"",
+    "test:systemd:run": "mkdir -p /tmp/pump.io/uploads; sed 's/%i.service//g' pump.io@.service | sudo tee /etc/systemd/system/pump.io.service; sudo systemctl daemon-reload; sudo systemctl start pump.io.service; npm run test:system",
     "lint": "npm run lint:jshint && npm run lint:jscs && npm run lint:jade && npm run lint:json && npm run lint:deps",
     "lint:deps": "dependency-check package.json test/*.js > /dev/null && dependency-check --unused package.json -i dependency-check -i jscs -i jshint -i jsonlint -i pug-lint test/*.js > /dev/null",
     "lint:jshint": "jshint --exclude 'public/javascript/libs' bin/* lib routes public/javascript test",
@@ -93,7 +92,7 @@
     "update-docs:readme": "sed \"s/^Version .*\\..*\\..*$/Version $npm_package_version/\" README.md | sponge README.md",
     "prepublish": "npm run build",
     "version": "npm run update-docs && git add README.md doc/",
-    "postversion": "git push origin v$npm_package_version && git push"
+    "postversion": "git push origin v$npm_package_version && echo $npm_package_version | grep beta > /dev/null || git push --set-upstream origin $(git symbolic-ref --short HEAD)"
   },
   "repository": {
     "type": "git",
@@ -116,9 +115,7 @@
   },
   "greenkeeper": {
     "ignore": [
-      "connect-auth",
-      "databank",
-      "zombie"
+      "databank"
     ]
   }
 }

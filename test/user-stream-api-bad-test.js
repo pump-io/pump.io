@@ -21,7 +21,7 @@
 var assert = require("assert"),
     vows = require("vows"),
     Step = require("step"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     querystring = require("querystring"),
     http = require("http"),
     OAuth = require("oauth-evanp").OAuth,
@@ -182,7 +182,7 @@ suite.addBatch(
                                 cb(err);
                             } else {
                                 nuke = _(cred).clone();
-                                _(nuke).extend(pair);
+                                _(nuke).extend(pair).value();
 
                                 httputil.postJSON("http://localhost:4815/api/user/diego/feed", nuke, act, function(err, feed, result) {
                                     if (err) {

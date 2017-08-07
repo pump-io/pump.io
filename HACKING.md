@@ -10,7 +10,7 @@ Some quick documentation for hackery of pump.io.
 * double-quotes for strings.
 * No internal space for parentheses; so "if (foo)", not "if ( foo )".
 * Use [Step](https://github.com/creationix/step).
-* Use [Underscore](http://underscorejs.org/).
+* Use [Lodash](https://lodash.com/).
 * Use [databank](https://github.com/evanp/databank). Don't write to some storage engine's API.
 * Use [vows](http://vowsjs.org/).
 

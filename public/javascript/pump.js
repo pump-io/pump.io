@@ -36,6 +36,18 @@ if (!window.Pump) {
 
     Pump.config = {};
 
+    // Compatibility override - Backbone 1.1 got rid of the 'options' binding
+    // automatically to views in the constructor - we need to keep that.
+    // https://stackoverflow.com/a/19431552/1198896
+    Backbone.View = (function(View) {
+        return View.extend({
+            constructor: function(options) {
+                this.options = options || {};
+                View.apply(this, arguments);
+            }
+        });
+    })(Backbone.View);
+
     // Main entry point
 
     $(document).ready(function() {
@@ -359,8 +371,8 @@ if (!window.Pump) {
         "emphasis": function(locale) {
             return "<li>" +
                 "<div class='btn-group'>" +
-                "<a class='btn' data-wysihtml5-command='bold' title='"+locale.emphasis.bold+"'><i class='icon-bold'></i></a>" +
-                "<a class='btn' data-wysihtml5-command='italic' title='"+locale.emphasis.italic+"'><i class='icon-italic'></i></a>" +
+                "<a class='btn' data-wysihtml5-command='bold' title='"+locale.emphasis.bold+"'><i class='fa fa-bold'></i></a>" +
+                "<a class='btn' data-wysihtml5-command='italic' title='"+locale.emphasis.italic+"'><i class='fa fa-italic'></i></a>" +
                 "<a class='btn' data-wysihtml5-command='underline' title='"+locale.emphasis.underline+"'>_</a>" +
                 "</div>" +
                 "</li>";

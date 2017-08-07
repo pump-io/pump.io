@@ -2,11 +2,52 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 5.0.0 beta 0 - Future
+
+## Improved
+
+* Node 7 and 8 are now supported
+* Documented the `bounce` and `logLevel` config options
+* The web UI more clearly shows shares
+* Worker process deaths are sent to the `error` log stream, not the `warning` stream
+
+## Changed
+
+* Removed 0.10/0.12-specific hacks
+* Internal refactoring to use newer ES6 features
+
+## Fixed
+
+* Fixed crash in an endpoint which prevented "login with remote account" from working (#1281)
+
+## Breaking
+
+* Dropped support for Node.js 0.10 and 0.12 (#1234)
+* Added a period and space after the footer text; if you use `appendFooter` please adjust accordingly (#1349)
+* Switched from Glyphicons to Font Awesome (affects web UI template modifications) (#1351)
+* Upgraded Backbone to 1.3.3 (ditto) (#1382)
+* Switched from Underscore to Lodash (ditto) (#1326)
+* Enabled many systemd security restrictions in the systemd service file (#1346, #1257)
+
+## 4.1.2 - 2017-07-14
+
+### Improved
+
+* Backported some improved error messages to assist in debugging a bug
+
+## 4.1.1 - 2017-07-14
+
+### Fixed
+
+* Backported fix for crash in an endpoint which prevented "login with remote account" from working (#1281)
+
 ## 4.1.0 - 2017-07-01
 
 No changes from 4.1.0 beta 0. This will be the last release to support Node.js 0.10 and 0.12.
 
 ## 4.1.0 beta 0 - 2017-06-15
+
+This will be the last release to support Node.js 0.10 and 0.12.
 
 ### Improved
 

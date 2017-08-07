@@ -21,7 +21,7 @@ var assert = require("assert"),
     xml2js = require("xml2js"),
     vows = require("vows"),
     Step = require("step"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     http = require("http"),
     https = require("https");
 

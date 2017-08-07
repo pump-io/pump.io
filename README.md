@@ -54,7 +54,7 @@ wiki](https://github.com/pump-io/pump.io/wiki) and our
 or clone them with the following commands:
 
     git clone https://github.com/pump-io/pump.io.wiki.git
-    git clone clone https://gitlab.com/pump.io/pump-docs.git
+    git clone https://gitlab.com/pump.io/pump-docs.git
 
 ## Installation
 
@@ -62,7 +62,7 @@ or clone them with the following commands:
 
 You'll need four things to get started:
 
-* node.js 4.x or 6.x
+* node.js 4.x or higher
 * npm 1.1.0 or higher
 * A database server (see below)
 * The `graphicsmagick` package with the `gm` command
@@ -150,6 +150,7 @@ Here are the main configuration keys.
 * *urlPort* Port to use for generating URLs. Defaults to the same as `port`,
   but if you're insisting on proxying behind Apache or whatever despite
   warnings not to, you can use this.
+* *bounce* If `true`, set up a mini-server on port 80 that redirects to HTTPS
 * *secret* A session-generating secret, server-wide password.
 * *noweb* Hide the Web interface. Defaults to `false`. Set this to something
   truthy to disable the Web interface.
@@ -161,6 +162,8 @@ Here are the main configuration keys.
   logging. Defaults to false (leave logging on).
 * *logfile* Full path to the logfile. Logs are JSON in
   [bunyan](https://github.com/trentm/node-bunyan) format.
+* *logLevel*: Log level used by bunyan
+  ([bunyan loglevels](https://github.com/trentm/node-bunyan#levels))
 * *serverUser* If you're listening on a port lower than 1024, you need
   to be root. Set this to the name of a user to change to after the
   server is listening. `daemon` or `nobody` are good choices, or you

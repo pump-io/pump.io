@@ -18,7 +18,7 @@
 
 "use strict";
 
-var _ = require("underscore"),
+var _ = require("lodash"),
     Step = require("step"),
     cluster = require("cluster"),
     mod = require("../../lib/app"),

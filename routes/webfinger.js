@@ -20,7 +20,7 @@
 
 var urlparse = require("url").parse,
     databank = require("databank"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     Step = require("step"),
     HTTPError = require("../lib/httperror").HTTPError,
     URLMaker = require("../lib/urlmaker").URLMaker,

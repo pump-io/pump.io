@@ -21,7 +21,7 @@
 var assert = require("assert"),
     vows = require("vows"),
     Step = require("step"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     querystring = require("querystring"),
     http = require("http"),
     OAuth = require("oauth-evanp").OAuth,
@@ -37,7 +37,7 @@ var assert = require("assert"),
 
 var ignore = function(err) {};
 
-var suite = vows.describe("Activity generator attribute");
+var suite = vows.describe("Activity generator attribute identity");
 
 var makeCred = function(cl, pair) {
     return {

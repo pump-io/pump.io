@@ -3,6 +3,7 @@
 // Test the app test libraries
 //
 // Copyright 2012, E14N https://e14n.com/
+// Copyright 2017, AJ Jordan <alex@strugee.net>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,9 +23,9 @@ var assert = require("assert"),
     http = require("http"),
     vows = require("vows"),
     Step = require("step"),
-    _ = require("underscore");
+    _ = require("lodash");
 
-var suite = vows.describe("user REST API");
+var suite = vows.describe("app setup test library");
 
 suite.addBatch({
     "When we load the module": {

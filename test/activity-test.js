@@ -22,7 +22,7 @@ var assert = require("assert"),
     vows = require("vows"),
     databank = require("databank"),
     Step = require("step"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     fs = require("fs"),
     path = require("path"),
     URLMaker = require("../lib/urlmaker").URLMaker,
@@ -193,7 +193,7 @@ mb["When we require the activity module"]
 ["and we create an activity instance"]
 ["passed-in fields are there"] = function(err, created) {
     var prop, orig = testData.create, child, cprop;
-    for (prop in _(orig).keys()) {
+    for (prop in _.keys(orig)) {
         if (_.isObject(orig[prop])) {
             assert.include(created, prop);
             child = orig[prop];
