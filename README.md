@@ -54,7 +54,7 @@ wiki](https://github.com/pump-io/pump.io/wiki) and our
 or clone them with the following commands:
 
     git clone https://github.com/pump-io/pump.io.wiki.git
-    git clone clone https://gitlab.com/pump.io/pump-docs.git
+    git clone https://gitlab.com/pump.io/pump-docs.git
 
 ## Installation
 
