@@ -1,6 +1,6 @@
 // xss-blacklist-test.js
 //
-// Test the XSS blacklist middleware
+// Test the XSS blacklist middleware module
 //
 // Copyright 2016, 2017 AJ Jordan <alex@strugee.net>
 //
@@ -29,7 +29,7 @@ var assert = require("assert"),
     withAppSetup = apputil.withAppSetup,
     br;
 
-vows.describe("XSS blacklist middleware").addBatch({
+vows.describe("XSS blacklist middleware module").addBatch({
     "When we require the XSS blacklist middleware": {
         topic: function() {
             return require("../lib/xssblacklist.js");
