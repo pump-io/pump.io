@@ -28,6 +28,8 @@ var cluster = require("cluster"),
     path = require("path"),
     Logger = require("bunyan"),
     _ = require("lodash"),
+    importFresh = require("import-fresh"),
+    restartEpoch = require("../lib/zerodowntime"),
     argv = require("yargs")
            .usage("Usage: $0 -c <configfile>")
            .alias("c", "config")
@@ -118,12 +120,50 @@ var launchApps = function(config) {
         // Restart child processes when they die
 
         cluster.on("exit", function(worker, code, signal) {
-            var exitCode = worker.process.exitCode;
-            clusterLog.error("worker " + worker.process.pid + " died ("+exitCode+"). restarting...");
+            // TODO remove this when we drop Node 4
+            var zeroDowntimeRestart = worker.exitedAfterDisconnect || worker.suicide;
+
+            if (!zeroDowntimeRestart) {
+                var exitCode = worker.process.exitCode;
+                clusterLog.error("worker " + worker.process.pid + " died ("+exitCode+"). restarting...");
+            }
+
             cluster.fork();
         });
 
+        // Perform zero-downtime restart on SIGUSR2
+        // TODO handle config changes
+        process.on("SIGUSR2", function() {
+            if (config.workers <= 1) {
+                clusterLog.warn("Received SIGUSR2 but ignoring because there aren't enough workers for zero-downtime restart");
+                return;
+            }
+
+            clusterLog.info("Received SIGUSR2; starting zero-downtime restart...");
+
+            clusterLog.debug("Determining zero-downtime restart eligibility...");
+
+            var newEpoch = importFresh("../lib/zerodowntime");
+            if (newEpoch !== restartEpoch) {
+                clusterLog.warn("Refusing zero-downtime restart because the new version says it's incompatible with us");
+                return;
+            }
+
+            var workers = [];
+            for (var id in cluster.workers) {
+                workers.push(cluster.workers[id]);
+            }
+
+            restartWorker(workers.pop(), workers, clusterLog, function() {
+                clusterLog.info("Zero-downtime restart complete");
+            });
+        });
+
     } else {
+        process.on("SIGUSR2", function() {
+            clusterLog.info("Received SIGUSR2 but ignoring because we're in a worker process");
+        });
+
         makeApp(config, function(err, appServer) {
             if (err) {
                 console.error(err);
@@ -138,6 +178,30 @@ var launchApps = function(config) {
             }
         });
     }
+};
+
+// Restart a worker and schedule the next restart
+
+var restartWorker = function(worker, workerQueue, log, cb) {
+    // TODO this will kill existing SockJS connections
+    worker.kill();
+    log.debug("Killed " + worker.process.pid + " for zero-downtime restart");
+
+    // TODO error handling?
+    cluster.once("fork", function(worker) {
+        log.debug("Respawned " + worker.process.pid + " with new code");
+
+        if (workerQueue.length === 0) {
+            cb();
+            return;
+        }
+
+        // Wait for 3 seconds in-between each worker respawn
+        setTimeout(function() {
+            restartWorker(workerQueue.pop(), workerQueue, log, cb);
+        }, 3000);
+
+    });
 };
 
 // Set up a Bunyan logger that the dispatch code can send to

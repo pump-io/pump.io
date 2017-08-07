@@ -36,6 +36,7 @@
     "express-session": "^1.14.1",
     "gm": "^1.22.0",
     "helmet": "^3.3.0",
+    "import-fresh": "^2.0.0",
     "jade": "^1.11.0",
     "jankyqueue": "0.1.x",
     "jsdom": "^9.12.0",
