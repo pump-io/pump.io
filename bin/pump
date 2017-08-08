@@ -221,6 +221,8 @@ var setupLog = function(config) {
         logParams.streams = [{stream: process.stderr}];
     }
 
+    logParams.streams[0].level = config.logLevel;
+
     return new Logger(logParams);
 };
 
