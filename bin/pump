@@ -145,7 +145,7 @@ var launchApps = function(config) {
 
             var newEpoch = importFresh("../lib/zerodowntime");
             if (newEpoch !== restartEpoch) {
-                clusterLog.warn("Refusing zero-downtime restart because the new version says it's incompatible with us");
+                clusterLog.warn("Refusing zero-downtime restart because the new version says it's incompatible with us.");
                 return;
             }
 
@@ -185,11 +185,11 @@ var launchApps = function(config) {
 var restartWorker = function(worker, workerQueue, log, cb) {
     // TODO this will kill existing SockJS connections
     worker.kill();
-    log.debug("Killed " + worker.process.pid + " for zero-downtime restart");
+    log.debug("Killed " + worker.process.pid + " for zero-downtime restart.");
 
     // TODO error handling?
     cluster.once("fork", function(worker) {
-        log.debug("Respawned " + worker.process.pid + " with new code");
+        log.debug("Respawned " + worker.process.pid + " with new code.");
 
         if (workerQueue.length === 0) {
             cb();
