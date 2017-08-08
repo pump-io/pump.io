@@ -30,7 +30,7 @@ var _ = require("lodash"),
     postJSON = common.postJSON,
     delJSON = common.delJSON,
     argv = require("optimist")
-        .usage("Usage: $0 -u <username> -n <your note>")
+        .usage("Usage: $0 -u <username> -i <your note>")
         .demand(["u", "i"])
         .alias("u", "username")
         .alias("i", "id")
