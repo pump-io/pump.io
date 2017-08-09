@@ -22,7 +22,8 @@
 
 "use strict";
 
-var cluster = require("cluster"),
+var wtfnode = require("wtfnode"),
+    cluster = require("cluster"),
     os = require("os"),
     fs = require("fs"),
     path = require("path"),
