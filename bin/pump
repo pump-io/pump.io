@@ -184,7 +184,6 @@ var launchApps = function(config) {
 // Restart a worker and schedule the next restart
 
 var restartWorker = function(worker, workerQueue, log, cb) {
-    // TODO this will kill existing SockJS connections
     worker.send({cmd: "gracefulShutdown"});
     log.debug("Killed " + worker.process.pid + " for zero-downtime restart.");
 
