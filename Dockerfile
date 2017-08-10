@@ -11,7 +11,6 @@ COPY . "${PUMP_LOCATION}"
 
 RUN apk add --no-cache graphicsmagick openssl nodejs python make g++ git \
      && cd "${PUMP_LOCATION}" \
-     && sed -i 's/"bcrypt": "0.8.x"/"bcrypt": "^1.0.2"/g' package.json \
      && npm install \
      && npm run build \
      && cd node_modules/databank \
