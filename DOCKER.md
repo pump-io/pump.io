@@ -1,6 +1,6 @@
 # Dockerfile for pump.io
 
-This Dockerfile is based on Alpine Linux 3.5 and node 6.9. It build pump.io from the Git repository.
+This Dockerfile is based on Alpine Linux 3.5 and Node 6.9. It builds pump.io from the Git repository.
 
 ## Building
 
@@ -20,7 +20,7 @@ You can also use `docker-compose` to build the image: `docker-compose build`
 
 ## Running
 
-By default this Dockerfile only includes the `databank-mongodb` driver. Therefore you will have to add the configuration parameters for the MongoDB. The recommended way to configure pump.io is to configure the options via environment variables, as described in the project's README. You can see some example variables in the `docker-compose.yml` file. This file will also show a basic working version which you can expand on.
+By default this Dockerfile only includes the `databank-mongodb` driver. Therefore you will have to add the configuration parameters for MongoDB. The recommended way to configure pump.io is to configure the options via environment variables, as described in the project's README. You can see some example variables in the `docker-compose.yml` file. This file will also show a basic working version which you can expand on.
 
 Running via `docker-compose`:
 
