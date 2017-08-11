@@ -30,6 +30,7 @@ var cluster = require("cluster"),
     _ = require("lodash"),
     importFresh = require("import-fresh"),
     restartEpoch = require("../lib/zerodowntime"),
+    restartInflight = false,
     argv = require("yargs")
            .usage("Usage: $0 -c <configfile>")
            .alias("c", "config")
@@ -139,6 +140,13 @@ var launchApps = function(config) {
                 return;
             }
 
+            if (restartInflight) {
+                clusterLog.warn("Received SIGUSR2 but ignoring because there's already an in-flight zero-downtime restart");
+                return;
+            }
+
+            restartInflight = true;
+
             clusterLog.info("Received SIGUSR2; starting zero-downtime restart...");
 
             clusterLog.debug("Determining zero-downtime restart eligibility...");
@@ -156,6 +164,7 @@ var launchApps = function(config) {
 
             restartWorker(workers.pop(), workers, clusterLog, function() {
                 clusterLog.info("Zero-downtime restart complete");
+                restartInflight = false;
             });
         });
 
