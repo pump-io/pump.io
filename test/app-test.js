@@ -18,7 +18,7 @@
 
 "use strict";
 
-// TODO: this needs to be updated for Express 3.x
+// TODO: this needs to be updated/expanded for Express 3.x
 
 var assert = require("assert"),
     vows = require("vows"),
