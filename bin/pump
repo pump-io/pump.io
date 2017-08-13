@@ -31,6 +31,7 @@ var cluster = require("cluster"),
     importFresh = require("import-fresh"),
     restartEpoch = require("../lib/zerodowntime"),
     restartInflight = false,
+    abortedRestart = false,
     argv = require("yargs")
            .usage("Usage: $0 -c <configfile>")
            .alias("c", "config")
@@ -124,6 +125,10 @@ var launchApps = function(config) {
             // TODO remove this when we drop Node 4
             var zeroDowntimeRestart = worker.exitedAfterDisconnect || worker.suicide;
 
+            // Don't respawn any workers if we aborted a restart
+            // Note that even for crashes it doesn't make sense to respawn since we _know_ all new workers will be bad
+            if (abortedRestart) return;
+
             if (!zeroDowntimeRestart) {
                 var exitCode = worker.process.exitCode;
                 clusterLog.error("worker " + worker.process.pid + " died ("+exitCode+"). restarting...");
@@ -137,6 +142,11 @@ var launchApps = function(config) {
         process.on("SIGUSR2", function() {
             if (config.workers <= 1) {
                 clusterLog.warn("Received SIGUSR2 but ignoring because there aren't enough workers for zero-downtime restart");
+                return;
+            }
+
+            if (abortedRestart) {
+                clusterLog.warn("Received SIGUSR2 but refusing due to an earlier aborted restart; please restart this process");
                 return;
             }
 
@@ -200,16 +210,31 @@ var restartWorker = function(worker, workerQueue, log, cb) {
     cluster.once("fork", function(worker) {
         log.debug("Respawned " + worker.process.pid + " with new code.");
 
-        if (workerQueue.length === 0) {
-            cb();
-            return;
-        }
+        // We don't use the 'listening' event and wait for
+        // explicit notification because 'listen' would fire when
+        // the main server was listening but not the bounce server
+        worker.once("message", function(obj) {
+            switch (obj.msg) {
+            case "listening":
+                if (workerQueue.length === 0) {
+                    cb();
+                    return;
+                }
 
-        // Wait for 3 seconds in-between each worker respawn
-        setTimeout(function() {
-            restartWorker(workerQueue.pop(), workerQueue, log, cb);
-        }, 3000);
-
+                restartWorker(workerQueue.pop(), workerQueue, log, cb);
+                break;
+            case "abortRestart":
+                log.warn(obj.err, "New worker signaled error; the master is in an inconsistent state and should be restarted ASAP");
+                abortedRestart = true;
+                break;
+            default:
+                // msg is an internal Bunyan field so we rename it
+                obj.workerMsg = obj.msg;
+                delete obj.msg;
+                log.error(obj, "Received unknown restart status message from worker");
+                throw new Error("Received unknown restart status message from worker: " + obj.workerMsg);
+            }
+        });
     });
 };
 
