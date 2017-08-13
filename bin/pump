@@ -211,6 +211,15 @@ var restartWorker = function(worker, workerQueue, log, cb) {
     worker.send({cmd: "gracefulShutdown"});
     log.debug("Killed " + worker.process.pid + " for zero-downtime restart.");
 
+    var timeout = setTimeout(function() {
+        log.warn("Killed " + worker.process.pid + " because it didn't shut down within 30 seconds.");
+        worker.kill();
+    }, 30 * 1000);
+
+    worker.once("exit", function() {
+        clearTimeout(timeout);
+    });
+
     // TODO error handling?
     cluster.once("fork", function(worker) {
         log.debug("Respawned " + worker.process.pid + " with new code.");
