@@ -145,6 +145,11 @@ var launchApps = function(config) {
                 return;
             }
 
+            if (config.driver !== "mongodb") {
+                clusterLog.warn("Zero-downtime restarts are only supported on MongoDB for the time being");
+                return;
+            }
+
             if (abortedRestart) {
                 clusterLog.warn("Received SIGUSR2 but refusing due to an earlier aborted restart; please restart this process");
                 return;
