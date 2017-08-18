@@ -29,7 +29,10 @@ var assert = require("assert"),
     urlparse = require("url").parse,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
-    xrdutil = require("./lib/xrd");
+    xrdutil = require("./lib/xrd"),
+    proxyquire = require("proxyquire");
+
+function noop() {}
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -140,7 +143,15 @@ suite.addBatch({
                           nologger: true,
                           sockjs: false
                          },
-                makeApp = require("../lib/app").makeApp;
+                // lib/app.js expects to be run in a cluster worker with cluster.worker.on, etc.
+                makeApp = proxyquire("../lib/app", {
+                    cluster: {
+                        worker: {
+                            on: noop,
+                            send: noop
+                        }
+                    }
+                }).makeApp;
 
             process.env.NODE_ENV = "test";
 
