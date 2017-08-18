@@ -32,6 +32,7 @@ var cluster = require("cluster"),
     restartEpoch = require("../lib/zerodowntime"),
     restartInflight = false,
     abortedRestart = false,
+    restartedWorker = null,
     argv = require("yargs")
            .usage("Usage: $0 -c <configfile>")
            .alias("c", "config")
@@ -123,14 +124,24 @@ var launchApps = function(config) {
 
         cluster.on("exit", function(worker, code, signal) {
             // TODO remove this when we drop Node 4
-            var zeroDowntimeRestart = worker.exitedAfterDisconnect || worker.suicide;
+            var zeroDowntimeRestart = worker.exitedAfterDisconnect || worker.suicide,
+                exitCode = worker.process.exitCode;
 
             // Don't respawn any workers if we aborted a restart
             // Note that even for crashes it doesn't make sense to respawn since we _know_ all new workers will be bad
-            if (abortedRestart) return;
+            if (abortedRestart) {
+                clusterLog.error("worker " + worker.process.pid + " died ("+exitCode+") but refusing to restart due to aborted zero-downtime restart; please restart this process");
+                return;
+            }
+
+            // Check if a zero-downtime worker respawn went bad
+            if (worker.process.pid === restartedWorker) {
+                clusterLog.error("worker " + worker.process.pid + " died ("+exitCode+") directly after respawn for zero-downtime restart");
+                abortedRestart = true;
+                restartedWorker = null;
+            }
 
             if (!zeroDowntimeRestart) {
-                var exitCode = worker.process.exitCode;
                 clusterLog.error("worker " + worker.process.pid + " died ("+exitCode+"). restarting...");
             }
 
@@ -223,6 +234,7 @@ var restartWorker = function(worker, workerQueue, log, cb) {
     // TODO error handling?
     cluster.once("fork", function(worker) {
         log.debug("Respawned " + worker.process.pid + " with new code.");
+        restartedWorker = worker.process.pid;
 
         // We don't use the 'listening' event and wait for
         // explicit notification because 'listen' would fire when
@@ -236,6 +248,8 @@ var restartWorker = function(worker, workerQueue, log, cb) {
                 }
 
                 restartWorker(workerQueue.pop(), workerQueue, log, cb);
+
+                restartedWorker = null;
                 break;
             case "abortRestart":
                 log.warn(obj.err, "New worker signaled error; the master is in an inconsistent state and should be restarted ASAP");
