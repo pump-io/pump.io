@@ -1,0 +1,37 @@
+---
+version: "3"
+services:
+  pumpio:
+    build: .
+    image: pumpio:latest
+    deploy:
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - mongodb
+    ports:
+      - "31337:31337"
+    networks:
+      - pumpio_net
+    volumes:
+      - /var/local/pumpio
+    environment:
+      - NODE_ENVIRONMENT=production
+      - PUMPIO_ADDRESS=0.0.0.0
+      - PUMPIO_DATADIR=/var/local/pump.io
+      - PUMPIO_ENABLE_UPLOADS=true
+      - PUMPIO_DRIVER=mongodb
+      - PUMPIO_PARAMS__HOST=mongodb
+      - PUMPIO_PARAMS__DBNAME=pumpio
+  mongodb:
+    image: mongo:latest
+    deploy:
+      restart_policy:
+        condition: on-failure
+    networks:
+      - pumpio_net
+    volumes:
+      - /data/db
+networks:
+  pumpio_net:
+
