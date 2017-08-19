@@ -4,7 +4,7 @@ This Dockerfile is based on Alpine Linux 3.5 and Node 6.9. It builds pump.io fro
 
 ## Building
 
-The image should build without any further options. The compile-error from node-gyp during the `npm install` can be ignored, as they only affect optional dependencies.
+The image should build without any further options. The compilation error from node-gyp during the `npm install` can be ignored, as they only affect optional dependencies.
 
 ```
 docker build --tag pumpio:latest .
