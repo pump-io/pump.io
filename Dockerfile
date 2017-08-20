@@ -20,7 +20,8 @@ RUN apk add --no-cache graphicsmagick openssl nodejs python make g++ git \
      && mkdir -p /usr/local/bin "${PUMP_DATADIR}" \
      && chown "pumpio:pumpio" "${PUMP_DATADIR}" -R \
      && ln -s "${PUMP_LOCATION}/bin/pump" /usr/local/bin/pump \
-     && apk del python make g++ git
+     && rm -rf /usr/lib/node_modules/npm \
+     && apk del --purge python make g++ git libc-utils busybox
 
 WORKDIR "${PUMP_LOCATION}"
 EXPOSE 31337
