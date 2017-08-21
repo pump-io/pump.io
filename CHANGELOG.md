@@ -1,16 +1,20 @@
 # pump.io changelog
 
-pump.io follows [Semantic Versioning][semver]. Specifically, the following things are considered to be semver-major if changed:
+pump.io follows [Semantic Versioning][semver]. Specifically, the following things are considered to be semver-major if changed in a backwards-incompatible way:
 
 * Nontrivial modifications to templates
-* Required configuration changes
-* Changes that would break plugins
-* The public API
+* Configuration value names, semantics, and format
+* The plugin API
+* The public HTTP API and federation protocol
 * Supported Node.js versions
+* This list of items
 
-Changes to everything else are not considered breaking, although we may delay things until semver-major releases as a precautionary measure.
+Changes to everything else are not considered breaking, although we may delay things until semver-major releases as a precautionary measure. This includes a bunch of stuff but in particular:
 
-If you think something that isn't in the above list should be covered, file an issue and we'll either state we consider that semver-major or give a rationale as to why it isn't.
+* Log messages
+* Out-of-the-box web UI functionality
+
+If you think something that isn't in the first list should be covered, file an issue and we'll either state we consider that semver-major or give a rationale as to why it isn't. Please also feel free to ask questions in the issue tracker; this list could surely be more precise.
 
 ## 5.0.0 beta 0 - 2017-08-07
 
