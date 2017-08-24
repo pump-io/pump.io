@@ -17,7 +17,7 @@ unless object.deleted
 
         p.muted
           small
-            if !headless || (activity.verb === "share" && author)
+            if activity.verb === "share" && author
               a(href="#{author.url}")!= author.displayName
               |  shared by 
               a(href=activity.actor.url)= activity.actor.displayName
