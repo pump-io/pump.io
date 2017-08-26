@@ -2,7 +2,7 @@
 
 pump.io follows [Semantic Versioning][semver]. Specifically, the following things are considered to be semver-major if changed in a backwards-incompatible way:
 
-* Nontrivial modifications to templates
+* Ability to merge trivial local template modifications
 * Configuration value names, semantics, and format
 * The plugin API
 * The public HTTP API and federation protocol
@@ -13,6 +13,7 @@ Changes to everything else are not considered breaking, although we may delay th
 
 * Log messages
 * Out-of-the-box web UI functionality
+* Difficulty of merging in local modifications
 
 If you think something that isn't in the first list should be covered, file an issue and we'll either state we consider that semver-major or give a rationale as to why it isn't. Please also feel free to ask questions in the issue tracker; this list could surely be more precise.
 
