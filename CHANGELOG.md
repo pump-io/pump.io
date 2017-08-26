@@ -21,6 +21,11 @@ If you think something that isn't in the first list should be covered, file an i
 ### Fixed
 
 * Original posts no longer show "shared by" (#1427)
+* Fixed some minor inaccuracies in README.md's documentation of defaults
+
+### Changed
+
+* Upgrade to dompurify@1.0.1
 
 ## 5.0.0 beta 0 - 2017-08-07
 
