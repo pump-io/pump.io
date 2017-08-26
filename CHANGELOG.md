@@ -10,23 +10,23 @@ pump.io follows [Semantic Versioning][semver].
 
 ## 5.0.0 beta 0 - 2017-08-07
 
-## Improved
+### Improved
 
 * Node 7 and 8 are now supported
 * Documented the `bounce` and `logLevel` config options
 * The web UI more clearly shows shares
 * Worker process deaths are sent to the `error` log stream, not the `warning` stream
 
-## Changed
+### Changed
 
 * Removed 0.10/0.12-specific hacks
 * Internal refactoring to use newer ES6 features
 
-## Fixed
+### Fixed
 
 * Fixed crash in an endpoint which prevented "login with remote account" from working (#1281)
 
-## Breaking
+### Breaking
 
 * Dropped support for Node.js 0.10 and 0.12 (#1234)
 * Added a period and space after the footer text; if you use `appendFooter` please adjust accordingly (#1349)
