@@ -2,7 +2,13 @@
 
 pump.io follows [Semantic Versioning][semver].
 
-## 5.0.0 beta 0 - Future
+## 5.0.0 beta 1 - 2017-08-26
+
+### Fixed
+
+* Original posts no longer show "shared by" (#1427)
+
+## 5.0.0 beta 0 - 2017-08-07
 
 ## Improved
 
