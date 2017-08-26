@@ -135,11 +135,11 @@ You can override the config file location with the `-c` option.
 
 Here are the main configuration keys.
 
-* *driver* The databank driver you're using. Defaults to "disk", which
+* *driver* The databank driver you're using. Defaults to "memory", which
   is probably going to be terrible.
 * *params* Databank driver params; see the databank driver README for
    details on what to put here.
-* *hostname* The hostname of the server. Defaults to "localhost" which
+* *hostname* The hostname of the server. Defaults to "127.0.0.1" which
    doesn't do much for you.
 * *address* The address to listen on. Defaults to `hostname`, which is
    OK for most systems. Use this if you've got some kind of
@@ -154,7 +154,8 @@ Here are the main configuration keys.
 * *secret* A session-generating secret, server-wide password.
 * *noweb* Hide the Web interface. Defaults to `false`. Set this to something
   truthy to disable the Web interface.
-* *site* Name of the server, like "My great social service".
+* *site* Name of the server, like "My great social service". Defaults to
+  "pump.io".
 * *owner* Name of owning entity, if you want to link to it.
 * *ownerURL* URL of owning entity, if you want to link to it.
 * *appendFooter* a bit of custom HTML you want appended to the footer text.
@@ -163,7 +164,8 @@ Here are the main configuration keys.
 * *logfile* Full path to the logfile. Logs are JSON in
   [bunyan](https://github.com/trentm/node-bunyan) format.
 * *logLevel*: Log level used by bunyan
-  ([bunyan loglevels](https://github.com/trentm/node-bunyan#levels))
+  ([bunyan loglevels](https://github.com/trentm/node-bunyan#levels)); default
+  is "info"
 * *serverUser* If you're listening on a port lower than 1024, you need
   to be root. Set this to the name of a user to change to after the
   server is listening. `daemon` or `nobody` are good choices, or you
@@ -175,7 +177,7 @@ Here are the main configuration keys.
 * *hsts* Controls the HTTP `Strict-Transport-Security` header. It's passed
   directly to the [hsts](https://www.npmjs.com/package/hsts) module, so you can
   set `true` to use the defaults (180 days, `includeSubdomains` is on) or set
-  an object to use a longer time, enable preloading, etc.
+  an object to use a longer time, enable preloading, etc. The default is `false`.
 * *uploaddir* Obsolete; see issue #1261
 * *datadir* Directory for the server to store data in (mostly uploads). Should
   be the full path of a local directory that's readable and writeable by the
@@ -189,7 +191,7 @@ Here are the main configuration keys.
   use in production.
 * *firehose* Firehose host running the
    [ofirehose](https://github.com/e14n/ofirehose) software. Defaults
-   to "ofirehose.com". Public notices will be ping this firehose
+   to "ofirehose.com". Public notices will ping this firehose
    server and from there go out to search engines and the world. If
    you want to disconnect from the public web, set this to something
    falsy.
@@ -205,13 +207,13 @@ Here are the main configuration keys.
   server isn't configured. Default `false`.
 * *smtpserver* Server to use for sending transactional email. If it's not set up,
   no email is sent and features like password recovery and email notification won't
-  work. Defaults to `undefined`.
+  work. Defaults to `null`.
 * *smtpport* Port to connect to on SMTP server. Defaults to `25` which is really the only
   sane value.
 * *smtpuser* Username to use to connect to SMTP server. Might not be necessary for some
-  servers. Defaults to `undefined`.
+  servers. Defaults to `null`.
 * *smtppass* Password to use to connect to SMTP server. Might not be necessary for some
-  servers. Defaults to `undefined`.
+  servers. Defaults to `null`.
 * *smtpusetls* Try to negotiate using SSL with the SMTP server. Defaults to `true`, because
   it's a smart idea.
 * *smtpusessl* Only use SSL with the SMTP server. Defaults to `false`. You may need to change
