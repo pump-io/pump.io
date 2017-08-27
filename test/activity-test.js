@@ -290,6 +290,9 @@ suite.addBatch({
             },
             "it has the addReceived() method": function(activity) {
                 assert.isFunction(activity.addReceived);
+            },
+            "it has the toAS2() method": function(activity) {
+                assert.isFunction(activity.toAS2);
             }
         },
         "and we apply() a new post activity": {
@@ -1503,6 +1506,31 @@ suite.addBatch({
                         }));
                     }
                 }
+            }
+        },
+        "and we try to convert a post of a note to AS2": {
+            topic: function(Activity) {
+                var act = new Activity({
+                    id: "urn:uuid:77451568-ce6a-42eb-8a9f-60ece187725f",
+                    actor: "pacct:tim@w3.example",
+                    verb: "post",
+                    to: [{objectType: "collection",
+                          id: "http://w3.example/socialwg"}],
+                    object: {
+                        id: "urn:uuid:33166eb9-2567-477c-ad90-9352dd904712",
+                        objectType: "note"
+                    },
+                    displayName: "A note"
+                });
+                return act.toAS2();
+            },
+            "id is renamed to @id": function(act) {
+                assert.isFalse(act.hasOwnProperty("id"));
+                assert.equal(act["@id"], "urn:uuid:77451568-ce6a-42eb-8a9f-60ece187725f");
+            },
+            "displayName is renamed to name": function(act) {
+                assert.isFalse(act.hasOwnProperty("displayName"));
+                assert.equal(act.name, "A note");
             }
         }
     }
