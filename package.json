@@ -103,6 +103,7 @@
     "type": "git",
     "url": "git://github.com/pump-io/pump.io.git"
   },
+  "bugs": "https://github.com/pump-io/pump.io/issues",
   "keywords": [
     "activitystreams",
     "socialnetwork",
