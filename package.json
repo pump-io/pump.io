@@ -93,7 +93,8 @@
     "update-docs:manpage": "sed \"s/^\\.TH PUMP 1.*$/.TH PUMP 1 \\\"$(date +'%d %B %Y')\\\" \\\"$npm_package_version\\\"/\" doc/pump.1 | sponge doc/pump.1",
     "update-docs:readme": "sed \"s/^Version .*\\..*\\..*$/Version $npm_package_version/\" README.md | sponge README.md",
     "prepublish": "npm run build",
-    "version": "npm run update-docs && git add README.md doc/",
+    "version": "npm run version:check-branch && npm run update-docs && git add README.md doc/",
+    "version:check-branch": "if [ \"$(git symbolic-ref HEAD)\" = refs/heads/master ]; then echo 'refusing to run `npm version` on master; bump package.json manually' 1>&2; exit 1; fi",
     "postversion": "git push origin v$npm_package_version && echo $npm_package_version | grep beta > /dev/null || git push --set-upstream origin $(git symbolic-ref --short HEAD)"
   },
   "repository": {
