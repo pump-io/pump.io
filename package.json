@@ -95,7 +95,9 @@
     "prepublish": "npm run build",
     "version": "npm run version:check-branch && npm run update-docs && git add README.md doc/",
     "version:check-branch": "if [ \"$(git symbolic-ref HEAD)\" = refs/heads/master ]; then echo 'refusing to run `npm version` on master; bump package.json manually' 1>&2; exit 1; fi",
-    "postversion": "git push origin v$npm_package_version && echo $npm_package_version | grep beta > /dev/null || git push --set-upstream origin $(git symbolic-ref --short HEAD)"
+    "postversion": "npm run postversion:push",
+    "postversion:push": "git push origin v$npm_package_version && npm run --silent util:is-beta || git push --set-upstream origin $(git symbolic-ref --short HEAD)",
+    "util:is-beta": "echo $npm_package_version | grep beta > /dev/null"
   },
   "repository": {
     "type": "git",
