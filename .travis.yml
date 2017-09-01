@@ -28,3 +28,5 @@ notifications:
      - "chat.freenode.net#pump.io"
    on_success: change
    on_failure: change
+ webhooks:
+   - https://pumabot.strugee.net/hubot/travis-ci-events
