@@ -20,14 +20,14 @@
 
 var fs = require("fs"),
     path = require("path"),
-    _ = require("underscore"),
+    _ = require("lodash"),
     Step = require("step"),
     vows = require("vows"),
     assert = require("assert"),
     Browser = require("zombie"),
     methodContext = require("./lib/methods").methodContext,
-    oauthutil = require("./lib/oauth"),
-    setupAppConfig = oauthutil.setupAppConfig;
+    apputil = require("./lib/app"),
+    setupAppConfig = apputil.setupAppConfig;
 
 var viewsPath = path.resolve(__dirname, "../public/template"),
     suite = vows.describe("template module interface");
@@ -109,7 +109,7 @@ suite.addBatch({
                         br.window.close();
                     }
                 },
-                "it works": function(err, br, res) {
+                "it works": function(err, br) {
                     assert.ifError(err);
                     br.assert.success();
                     assert.isObject(br.window.Pump._templates);
@@ -118,7 +118,7 @@ suite.addBatch({
                     topic: function(br) {
                         var cb = this.callback,
                             browser = new Browser(),
-                            tpls = _.pairs(br.window.Pump._templates),
+                            tpls = _.toPairs(br.window.Pump._templates),
                             first = _.first(tpls),
                             urlTpl = "http://localhost:4815/template/" +
                             first[0] + ".jade.js";
@@ -157,9 +157,7 @@ suite.addBatch({
             "and we get available templates": {
                 topic: function() {
                     var cb = this.callback,
-                        browser;
-
-                    browser = new Browser();
+                        browser = new Browser();
 
                     browser.visit("http://localhost:4816/template/templates.min.js", function(err) {
                         cb(err, browser);
@@ -198,7 +196,7 @@ suite.addBatch({
                     topic: function(br) {
                         var cb = this.callback,
                             browser = new Browser(),
-                            tpls = _.pairs(br.window.Pump._templates),
+                            tpls = _.toPairs(br.window.Pump._templates),
                             first = _.first(tpls),
                             urlTpl = "http://localhost:4816/template/" +
                             first[0] + "." + first[1] + ".jade.js";
@@ -221,7 +219,7 @@ suite.addBatch({
                     topic: function(br) {
                         var cb = this.callback,
                             browser = new Browser(),
-                            tpls = _.pairs(br.window.Pump._templates),
+                            tpls = _.toPairs(br.window.Pump._templates),
                             first = _.first(tpls),
                             urlTpl = "http://localhost:4816/template/" +
                             first[0] + ".jade.js";
