@@ -1,8 +1,8 @@
-// middleware-test.js
+// template-test.js
 //
 // Test the template module
 //
-// Copyright 2012, E14N https://e14n.com/
+// Copyright 2011-2017, E14N https://e14n.com/ and contributors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
