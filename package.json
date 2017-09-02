@@ -76,8 +76,9 @@
     "./doc/pump.1"
   ],
   "scripts": {
-    "build": "jade --client --extension jade.js --no-debug public/template",
+    "build": "echo 'now the templates compile at startup' 1>&2",
     "fullbuild": "npm run build && echo 'use `npm run build` instead next time' 1>&2",
+    "jade:build": "jade --client --extension jade.js --no-debug public/template",
     "test": "npm run lint && npm run test:vows",
     "test:vows": "nyc -r lcov vows -v test/*-test.js",
     "test:root": "nyc -r lcov --report-dir coverage-root vows -v test/*-test-as-root.js",
