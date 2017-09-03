@@ -62,7 +62,8 @@ var everyAuth = function(req, res, next) {
 
 var uploadedFile = function(req, res, next) {
     var slug = req.params[0],
-        ext = slug.match(/\.(.*)$/)[1],
+        file = _.isString(slug) ? slug.match(/\.(.*)$/) : null,
+        ext = _.isArray(file) ? file[1] : null,
         type = extToType(ext),
         Cls = typeToClass(type),
         profile = req.principal,
@@ -71,6 +72,12 @@ var uploadedFile = function(req, res, next) {
     req.log.debug({profile: profile, slug: slug}, "Checking permissions");
 
     Step(
+        function() {
+            if (!ext || !type) {
+                throw new HTTPError("Not allowed", 403);
+            }
+            this();
+        },
         function() {
             Cls.search({_slug: slug}, this);
         },
