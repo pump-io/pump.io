@@ -39,7 +39,7 @@ var send = require("send"),
 var EXPIRES = 365 * 24 * 60 * 60 * 1000;
 
 var addRoutes = function(app, session) {
-    if (app.session) {
+    if (session) {
         app.get("/uploads/*", session, everyAuth, uploadedFile);
     } else {
         app.get("/uploads/*", everyAuth, uploadedFile);
