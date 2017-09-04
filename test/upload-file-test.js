@@ -26,6 +26,7 @@ var assert = require("assert"),
     path = require("path"),
     mkdirp = require("mkdirp"),
     rimraf = require("rimraf"),
+    Browser = require("zombie"),
     _ = require("lodash"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
@@ -185,6 +186,57 @@ suite.addBatch({
                                 },
                                 "it works": function(err, data) {
                                     assert.ifError(err);
+                                }
+                            },
+                            "and we get the file from web interface without login": {
+                                topic: function(doc, feed, pair, cl) {
+                                    var cred = makeCred(cl, pair),
+                                        browser = new Browser(),
+                                        callback = this.callback,
+                                        url = doc.fullImage.url;
+
+                                    browser.visit(url, function(err) {
+                                        callback(err, browser);
+                                    });
+                                },
+                                "it fails correctly": function(err, br) {
+                                    br.assert.status(403);
+                                }
+                            },
+                            "and we login for try get file": {
+                                topic: function(doc, feed, pair, cl) {
+                                    var browser = new Browser(),
+                                        callback = this.callback,
+                                        user = pair.user;
+
+                                    browser.visit("http://localhost:4815/main/login")
+                                        .then(function() {
+                                            browser.fill("#nickname", user.nickname)
+                                                .fill("#password", "stormtroopers_hittin_the_ground")
+                                                .pressButton("div#loginpage form button[type=\"submit\"]", function() {
+                                                    callback(null, browser);
+                                                }, callback);
+                                        }, callback);
+                                },
+                                "it works": function(err, br) {
+                                    assert.ifError(err);
+                                    br.assert.success();
+                                },
+                                "and we get the file from web interface with login": {
+                                    topic: function(br, doc, feed, pair, cl) {
+                                        var cred = makeCred(cl, pair),
+                                            browser = br,
+                                            callback = this.callback,
+                                            url = doc.fullImage.url;
+
+                                        browser.visit(url, function(err) {
+                                            callback(err, browser);
+                                        });
+                                    },
+                                    "it works": function(err, br) {
+                                        assert.ifError(err);
+                                        br.assert.success();
+                                    }
                                 }
                             },
                             "and we get the uploads feed again": {
