@@ -35,6 +35,10 @@ body {
   width: auto;
 }
 
+.navbar .btn-navbar span {
+    color: white;
+}
+
 .navbar .nav .dropdown-toggle .caret {
   margin-top: 10px;
 }
