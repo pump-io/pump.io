@@ -68,6 +68,30 @@ suite.addBatch({
                 assert.ifError(err);
                 br.assert.success();
                 br.assert.text("H1", "pump.io API");
+            },
+            "it not has login or register buttons": function(err, br) {
+                br.assert.success();
+                br.assert.evaluate('document.getElementById("login")', null);
+                br.assert.evaluate('document.getElementById("register")', null);
+            }
+        },
+        "and we request javascript file": {
+            topic: function() {
+                var cb = this.callback,
+                    browser = new Browser();
+
+                browser.visit("http://localhost:4815/javascript/pump.js", function(err) {
+                    cb(browser.success, browser);
+                });
+            },
+            teardown: function(br) {
+                if (br && br.window.close) {
+                    br.window.close();
+                }
+            },
+            "it should be fail": function(err, br) {
+                assert.ifError(err);
+                br.assert.status(404);
             }
         }
     }
