@@ -25,7 +25,6 @@ var assert = require("assert"),
     version = require("../lib/version").version,
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
-    apputil = require("./lib/app"),
     httputil = require("./lib/http"),
     setupApp = apputil.setupApp,
     setupAppConfig = apputil.setupAppConfig;
