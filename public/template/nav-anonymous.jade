@@ -5,10 +5,11 @@
   
   a.brand(href="/")= config.site
   
-  .nav-collapse.collapse
-    ul.nav.pull-right
-      unless config.disableRegistration
+  if !config.noweb
+    .nav-collapse.collapse
+      ul.nav.pull-right
+        unless config.disableRegistration
+          li
+            a#register(href="/main/register") Register
         li
-          a#register(href="/main/register") Register
-      li
-        a#login(href="/main/login") Login
+          a#login(href="/main/login") Login
