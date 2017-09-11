@@ -23,10 +23,5 @@ before_install:
  - npm install -g npm@5
 notifications:
  email: false
- irc:
-   channels:
-     - "chat.freenode.net#pump.io"
-   on_success: change
-   on_failure: change
  webhooks:
    - https://pumabot.strugee.net/hubot/travis-ci-events
