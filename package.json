@@ -7,6 +7,7 @@
   "description": "Social server with an ActivityStreams API",
   "devDependencies": {
     "dependency-check": "^2.8.0",
+    "gh-release": "^3.1.1",
     "jscs": "^3.0.3",
     "jshint": "^2.9.2",
     "jsonlint": "^1.6.2",
@@ -82,7 +83,7 @@
     "test:systemd": "docker run -v $(pwd):/tmp/pump.io:ro -v $NVM_DIR:/.nvm:ro ubuntu sh -c \"export NVM_DIR=$NVM_DIR; . $NVM_DIR/nvm.sh; nvm use $TRAVIS_NODE_VERSION; cd /tmp/pump.io; npm run test:systemd:run\"",
     "test:systemd:run": "mkdir -p /tmp/pump.io/uploads; sed 's/%i.service//g' pump.io@.service | sudo tee /etc/systemd/system/pump.io.service; sudo systemctl daemon-reload; sudo systemctl start pump.io.service; npm run test:system",
     "lint": "npm run lint:jshint && npm run lint:jscs && npm run lint:jade && npm run lint:json && npm run lint:deps",
-    "lint:deps": "dependency-check package.json test/*.js > /dev/null && dependency-check --unused package.json -i dependency-check -i jscs -i jshint -i jsonlint -i pug-lint test/*.js > /dev/null",
+    "lint:deps": "dependency-check package.json test/*.js > /dev/null && dependency-check --unused package.json -i dependency-check -i jscs -i jshint -i jsonlint -i pug-lint -i gh-release test/*.js > /dev/null",
     "lint:jshint": "jshint --exclude 'public/javascript/libs' bin/* lib routes public/javascript test",
     "lint:jscs": "jscs bin/* lib public/javascript/pump* routes test",
     "lint:jade": "pug-lint public/template/*.jade",
@@ -95,8 +96,9 @@
     "prepublish": "npm run build",
     "version": "npm run version:check-branch && npm run update-docs && git add README.md doc/",
     "version:check-branch": "if [ \"$(git symbolic-ref HEAD)\" = refs/heads/master ]; then echo 'refusing to run `npm version` on master; bump package.json manually' 1>&2; exit 1; fi",
-    "postversion": "npm run postversion:push",
+    "postversion": "npm run postversion:push && npm run postversion:release",
     "postversion:push": "git push origin v$npm_package_version && npm run --silent util:is-beta || git push --set-upstream origin $(git symbolic-ref --short HEAD)",
+    "postversion:release": "gh-release $(if npm run --silent util:is-beta; then printf -p; fi) -n $npm_package_version",
     "util:is-beta": "echo $npm_package_version | grep beta > /dev/null"
   },
   "repository": {
