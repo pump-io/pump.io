@@ -21,6 +21,8 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq graphicsmagick
   - npm install -g npm@5
+after_script:
+  - npm run test:report-coverage
 notifications:
   email: false
   webhooks:
