@@ -21,7 +21,9 @@
 var fs = require("fs"),
     path = require("path"),
     assert = require("assert"),
+    http = require("http"),
     express = require("express"),
+    bodyParser = require("body-parser"),
     vows = require("vows"),
     Step = require("step"),
     httputil = require("./lib/http"),
@@ -38,8 +40,13 @@ var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 suite.addBatch({
     "When we set up an activity spam dummy server": {
         topic: function() {
-            var app = express.createServer(express.bodyParser()),
+            var app = express(),
+                appServer = http.createServer(app),
                 callback = this.callback;
+
+            app.use(bodyParser.json());
+            app.use(bodyParser.urlencoded({extended: true}));
+
             app.post("/is-this-spam", function(req, res, next) {
                 if (app.callback) {
                     app.callback(null, req.body);
@@ -263,6 +270,4 @@ suite.addBatch({
     }
 });
 
-module.exports = {}; // TODO reenable this test when it's passing
-
-// suite["export"](module);
+suite["export"](module);
