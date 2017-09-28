@@ -39,6 +39,10 @@ suite.addBatch({
             assert.isTrue(_(apputil).has("setupApp"));
             assert.isFunction(apputil.setupApp);
         },
+        "it has a proxyquiredMakeApp export": function(apputil) {
+            assert.isTrue(_(apputil).has("proxyquiredMakeApp"));
+            assert.isFunction(apputil.proxyquiredMakeApp);
+        },
         "and we setup the app": {
             topic: function(apputil) {
                 apputil.setupApp(this.callback);
