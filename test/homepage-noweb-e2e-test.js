@@ -22,6 +22,7 @@ var assert = require("assert"),
     vows = require("vows"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
+    httputil = require("./lib/http"),
     Browser = require("zombie"),
     setupAppConfig = apputil.setupAppConfig;
 
@@ -77,21 +78,16 @@ suite.addBatch({
         },
         "and we request javascript file": {
             topic: function() {
-                var cb = this.callback,
-                    browser = new Browser();
-
-                browser.visit("http://localhost:4815/javascript/pump.js", function(err) {
-                    cb(browser.success, browser);
-                });
+                httputil.head("http://localhost:4815/javascript/pump.js", {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko"
+                }, this.callback);
             },
-            teardown: function(br) {
-                if (br && br.window.close) {
-                    br.window.close();
-                }
-            },
-            "it should be fail": function(err, br) {
+            "it works": function(err, res) {
                 assert.ifError(err);
-                br.assert.status(404);
+            },
+            "it has a status code of 404": function(err, res) {
+                assert.isNumber(res.statusCode);
+                assert.equal(res.statusCode, 404);
             }
         }
     }
