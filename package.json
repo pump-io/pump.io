@@ -47,7 +47,7 @@
     "optimist": "^0.6.1",
     "sanitize-html": "^1.13.0",
     "schlock": "~0.2.1",
-    "send": "^0.15.1",
+    "send": "^0.16.1",
     "serve-favicon": "^2.3.0",
     "showdown": "^1.4.1",
     "sockjs": "0.3.x",
