@@ -2,6 +2,26 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 5.0.1
+
+No changes from 5.0.1 beta 0:
+
+### Security
+
+* Fix multiple denial-of-service security vulnerabilities in indirect dependencies
+
+## 4.1.3
+
+### Security
+
+* Fix multiple denial-of-service security vulnerabilities in indirect dependencies
+
+## 4.0.2
+
+### Security
+
+* Fix multiple denial-of-service security vulnerabilities in indirect dependencies
+
 ## 5.0.1 beta 0 - 2017-09-29
 
 This release was a private beta due to the security fixes being slightly risky for stability.
