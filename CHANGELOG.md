@@ -2,6 +2,16 @@
 
 pump.io follows [Semantic Versioning][semver].
 
+## 5.0.1 beta 0 - 2017-09-29
+
+This release was a private beta due to the security fixes being slightly risky for stability.
+
+The relevant security bugs were publicly disclosed on September 30th, 2017.
+
+### Security
+
+* Fix multiple denial-of-service security vulnerabilities in indirect dependencies
+
 ## 5.0.0 - 2017-09-01
 
 No changes since 5.0.0 beta 1.
