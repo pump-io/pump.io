@@ -1,6 +1,110 @@
 # pump.io changelog
 
-pump.io follows [Semantic Versioning][semver].
+pump.io follows [Semantic Versioning][semver]. Specifically, the following things are considered to be semver-major if changed in a backwards-incompatible way:
+
+* Ability to merge trivial local template modifications
+* Configuration value names, semantics, and format
+* The plugin API
+* The public HTTP API and federation protocol
+* Supported Node.js versions
+* This list of items
+
+Changes to everything else are not considered breaking, although we may delay things until semver-major releases as a precautionary measure. This includes a bunch of stuff but in particular:
+
+* Log messages
+* Out-of-the-box web UI functionality
+* Difficulty of merging in local modifications
+
+If you think something that isn't in the first list should be covered, file an issue and we'll either state we consider that semver-major or give a rationale as to why it isn't. Please also feel free to ask questions in the issue tracker; this list could surely be more precise.
+
+## 5.0.1 beta 0 - 2017-09-29
+
+This release was a private beta due to the security fixes being slightly risky for stability.
+
+The relevant security bugs were publicly disclosed on September 30th, 2017.
+
+### Security
+
+* Fix multiple denial-of-service security vulnerabilities in indirect dependencies
+
+## 5.0.0 - 2017-09-01
+
+No changes since 5.0.0 beta 1.
+
+## 5.0.0 beta 1 - 2017-08-26
+
+### Fixed
+
+* Original posts no longer show "shared by" (#1427)
+* Fixed some minor inaccuracies in README.md's documentation of defaults
+
+### Changed
+
+* Upgrade to dompurify@1.0.1
+
+## 5.0.0 beta 0 - 2017-08-07
+
+### Improved
+
+* Node 7 and 8 are now supported
+* Documented the `bounce` and `logLevel` config options
+* The web UI more clearly shows shares
+* Worker process deaths are sent to the `error` log stream, not the `warning` stream
+
+### Changed
+
+* Removed 0.10/0.12-specific hacks
+* Internal refactoring to use newer ES6 features
+
+### Fixed
+
+* Fixed crash in an endpoint which prevented "login with remote account" from working (#1281)
+
+### Breaking
+
+* Dropped support for Node.js 0.10 and 0.12 (#1234)
+* Added a period and space after the footer text; if you use `appendFooter` please adjust accordingly (#1349)
+* Switched from Glyphicons to Font Awesome (affects web UI template modifications) (#1351)
+* Upgraded Backbone to 1.3.3 (ditto) (#1382)
+* Switched from Underscore to Lodash (ditto) (#1326)
+* Enabled many systemd security restrictions in the systemd service file (#1346, #1257)
+
+## 4.1.2 - 2017-07-14
+
+### Improved
+
+* Backported some improved error messages to assist in debugging a bug
+
+## 4.1.1 - 2017-07-14
+
+### Fixed
+
+* Backported fix for crash in an endpoint which prevented "login with remote account" from working (#1281)
+
+## 4.1.0 - 2017-07-01
+
+No changes from 4.1.0 beta 0. This will be the last release to support Node.js 0.10 and 0.12.
+
+## 4.1.0 beta 0 - 2017-06-15
+
+This will be the last release to support Node.js 0.10 and 0.12.
+
+### Improved
+
+* Added some basic styles to the LibreJS info page (#1353)
+* Minor UX improvements to the web UI (#1355, #1354)
+* Expanded the list of disallowed nicknames and warn about them in the web UI (#1345, #1347)
+* Pull our fork of connect-auth from npm instead of GitHub (#1360)
+* Use [Subresource Integrity][] for web UI resources pulled from CDNs (#1340)
+* Internal test refactoring
+
+### Changed
+
+* Switched bcrypt implementation from `bcrypt` to `bcryptjs` (#1233)
+
+### Fixed
+
+* Return the correct Content-Type for OAuth endpoints (#822)
 
 ## 4.0.1 - 2017-05-23
 
