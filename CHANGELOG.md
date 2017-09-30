@@ -17,6 +17,16 @@ Changes to everything else are not considered breaking, although we may delay th
 
 If you think something that isn't in the first list should be covered, file an issue and we'll either state we consider that semver-major or give a rationale as to why it isn't. Please also feel free to ask questions in the issue tracker; this list could surely be more precise.
 
+## 5.0.1 beta 0 - 2017-09-29
+
+This release was a private beta due to the security fixes being slightly risky for stability.
+
+The relevant security bugs were publicly disclosed on September 30th, 2017.
+
+### Security
+
+* Fix multiple denial-of-service security vulnerabilities in indirect dependencies
+
 ## 5.0.0 - 2017-09-01
 
 No changes since 5.0.0 beta 1.
