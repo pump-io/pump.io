@@ -47,7 +47,7 @@ No changes from 5.0.1 beta 0:
 
 This release was a private beta due to the security fixes being slightly risky for stability.
 
-The relevant security bugs were publicly disclosed on September 30th, 2017.
+The relevant security bugs were publicly disclosed on October 1st, 2017.
 
 ### Security
 
