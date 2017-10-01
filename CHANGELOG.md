@@ -2,7 +2,22 @@
 
 pump.io follows [Semantic Versioning][semver].
 
-## 5.0.1
+* Ability to merge trivial local template modifications
+* Configuration value names, semantics, and format
+* The plugin API
+* The public HTTP API and federation protocol
+* Supported Node.js versions
+* This list of items
+
+Changes to everything else are not considered breaking, although we may delay things until semver-major releases as a precautionary measure. This includes a bunch of stuff but in particular:
+
+* Log messages
+* Out-of-the-box web UI functionality
+* Difficulty of merging in local modifications
+
+If you think something that isn't in the first list should be covered, file an issue and we'll either state we consider that semver-major or give a rationale as to why it isn't. Please also feel free to ask questions in the issue tracker; this list could surely be more precise.
+
+## 5.0.1 - 2017-10-01
 
 No changes from 5.0.1 beta 0:
 
@@ -10,13 +25,13 @@ No changes from 5.0.1 beta 0:
 
 * Fix multiple denial-of-service security vulnerabilities in indirect dependencies
 
-## 4.1.3
+## 4.1.3 - 2017-10-01
 
 ### Security
 
 * Fix multiple denial-of-service security vulnerabilities in indirect dependencies
 
-## 4.0.2
+## 4.0.2 - 2017-10-01
 
 ### Security
 
