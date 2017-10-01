@@ -24,7 +24,7 @@
     "bunyan": "^1.8.1",
     "colors": "^1.1.2",
     "compression": "^1.6.2",
-    "connect-auth-pumpio": "github:e14n/connect-auth#a55e35ee299c2a757124c44ddbfe506960890e84",
+    "connect-auth-pumpio": "^0.6.1",
     "connect-databank": "^1.0.3",
     "connect-multiparty": "^2.0.0",
     "cookie-parser": "^1.4.3",
