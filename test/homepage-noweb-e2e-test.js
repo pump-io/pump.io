@@ -76,11 +76,9 @@ suite.addBatch({
                 br.assert.evaluate('document.getElementById("register")', null);
             }
         },
-        "and we request javascript file": {
+        "and we request JavaScript file": {
             topic: function() {
-                httputil.head("http://localhost:4815/javascript/pump.js", {
-                    "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko"
-                }, this.callback);
+                httputil.head("http://localhost:4815/javascript/pump.js", this.callback);
             },
             "it works": function(err, res) {
                 assert.ifError(err);
