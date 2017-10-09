@@ -36,11 +36,11 @@ html(lang="en")
         if page.nologin
           include ./nav-nologin.jade
         else if principalUser
-          include nav-loggedin.jade
+          include ../nav-loggedin.jade
         else if principal
-          include nav-remote.jade
+          include ../nav-remote.jade
         else
-          include nav-anonymous.jade
+          include ../nav-anonymous.jade
 
     .container
 

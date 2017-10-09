@@ -30,7 +30,7 @@
 
       if principal
         - var obj = object
-        include ./responses.jade
+        include ./lib/responses.jade
 
       - var author = object.author;
       - var coll = object.likes;
@@ -40,10 +40,10 @@
         p.muted
           small
             if object.likes.totalItems === 1 && principal && object.likes.items[0].url === principal.url
-              include ./activity-object-collection.jade
+              include ./lib/activity-object-collection.jade
               |  like this.
             else
-              include ./activity-object-collection.jade
+              include ./lib/activity-object-collection.jade
               |  likes this.
 
       - var author = object.author;
@@ -53,12 +53,12 @@
       else if object.shares.totalItems === 1
         p.muted
           small
-            include ./activity-object-collection.jade
+            include ./lib/activity-object-collection.jade
             |  shared this.
       else
         p.muted
           small
-            include ./activity-object-collection.jade
+            include ./lib/activity-object-collection.jade
             |  shared this.
 
       - var replies = object.replies;

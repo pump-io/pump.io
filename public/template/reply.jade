@@ -36,8 +36,8 @@
       p.muted
         small
           if reply.likes.totalItems === 1 && principal && reply.likes.items[0].url === principal.url
-            include ./activity-object-collection.jade
+            include ./lib/activity-object-collection.jade
             |  like this.
           else
-            include ./activity-object-collection.jade
+            include ./lib/activity-object-collection.jade
             |  likes this.
