@@ -27,6 +27,7 @@ var fs = require("fs"),
     Browser = require("zombie"),
     methodContext = require("./lib/methods").methodContext,
     apputil = require("./lib/app"),
+    httputil = require("./lib/http"),
     setupAppConfig = apputil.setupAppConfig;
 
 var viewsPath = path.resolve(__dirname, "../public/template"),
@@ -194,48 +195,36 @@ suite.addBatch({
                 },
                 "return template with hash": {
                     topic: function(br) {
-                        var cb = this.callback,
-                            browser = new Browser(),
-                            tpls = _.toPairs(br.window.Pump._templates),
+                        var tpls = _.toPairs(br.window.Pump._templates),
                             first = _.first(tpls),
                             urlTpl = "http://localhost:4816/template/" +
                             first[0] + "." + first[1] + ".jade.js";
 
-                        browser.visit(urlTpl, function(err) {
-                            cb(err, browser);
-                        });
+                        httputil.head(urlTpl, this.callback);
                     },
-                    teardown: function(br) {
-                        if (br && br.window.close) {
-                            br.window.close();
-                        }
-                    },
-                    "it works": function(err, br) {
+                    "it works": function(err, res) {
                         assert.ifError(err);
-                        br.assert.success();
+                    },
+                    "it has a status code of 200": function(err, res) {
+                        assert.isNumber(res.statusCode);
+                        assert.equal(res.statusCode, 200);
                     }
                 },
                 "should not be return a template": {
                     topic: function(br) {
-                        var cb = this.callback,
-                            browser = new Browser(),
-                            tpls = _.toPairs(br.window.Pump._templates),
+                        var tpls = _.toPairs(br.window.Pump._templates),
                             first = _.first(tpls),
                             urlTpl = "http://localhost:4816/template/" +
                             first[0] + ".jade.js";
 
-                        browser.visit(urlTpl, function() {
-                            cb(null, browser);
-                        });
+                        httputil.head(urlTpl, this.callback);
                     },
-                    teardown: function(br) {
-                        if (br && br.window.close) {
-                            br.window.close();
-                        }
-                    },
-                    "it fails correctly": function(err, br) {
+                    "it works": function(err, res) {
                         assert.ifError(err);
-                        br.assert.status(404);
+                    },
+                    "it has a status code of 404": function(err, res) {
+                        assert.isNumber(res.statusCode);
+                        assert.equal(res.statusCode, 404);
                     }
                 }
             }
