@@ -727,6 +727,7 @@ var createUser = function(req, res, next) {
             return;
         } else {
             email = props.email;
+            props.email_pending = email;
             delete props.email;
         }
     }
@@ -772,9 +773,8 @@ var createUser = function(req, res, next) {
             }
         },
         function(err) {
-            var svc;
-            // if (err) throw err;
-            svc = thisService(req.app);
+            if (err) throw err;
+            var svc = thisService(req.app);
             registrationActivity(user, svc, this.parallel());
             welcomeActivity(user, svc, this.parallel());
             defaultLists(user, this.parallel());

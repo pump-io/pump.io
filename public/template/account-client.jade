@@ -16,9 +16,21 @@
         .clearfix
           label Email
           .input
-            input.span6#email(value=principalUser.email, type="email",
-            name="email", size="16", placeholder="Your email address")
-            span.help-block For updates and password recovery
+            if principalUser.email_pending
+              input.span6#email(value=principalUser.email_pending, type="email",
+              name="email", size="16", placeholder="Your email address")
+              span.help-block Without confirmation
+              if principalUser.email
+                .clearfix
+                  label Email
+                  .input
+                    input.span6#email(value=principalUser.email, type="email",
+                    name="email", size="16", placeholder="Your email address")
+                    span.help-block For updates and password recovery
+            else
+              input.span6#email(value=principalUser.email, type="email",
+              name="email", size="16", placeholder="Your email address")
+              span.help-block For updates and password recovery
 
         .actions
           input.btn.btn-primary(type="submit", value="Change email")
