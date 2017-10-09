@@ -94,15 +94,21 @@ if (!window.Pump) {
                                                   messages: Pump.principalUser.majorDirectInbox,
                                                   notifications: Pump.principalUser.minorDirectInbox
                                               }});
-            // If we're on a login page, go to the main page or whatever
-            switch (window.location.pathname) {
-            case "/main/login":
-            case "/main/register":
-            case "/main/remote":
-                Pump.router.navigate(Pump.getContinueTo(), true);
-                break;
-            default:
-                break;
+
+            if (Pump.config.requireEmail && !Pump.principalUser.get("email")) {
+                // Redirect to account settings if email is unconfirmed
+                Pump.router.navigate("/main/account", true);
+            } else {
+                // If we're on a login page, go to the main page or whatever
+                switch (window.location.pathname) {
+                case "/main/login":
+                case "/main/register":
+                case "/main/remote":
+                    Pump.router.navigate(Pump.getContinueTo(), true);
+                    break;
+                default:
+                    break;
+                }
             }
         } else if (Pump.principal) {
             Pump.principal = Pump.Person.unique(Pump.principal);
