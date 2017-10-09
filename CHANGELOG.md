@@ -17,6 +17,18 @@ Changes to everything else are not considered breaking, although we may delay th
 
 If you think something that isn't in the first list should be covered, file an issue and we'll either state we consider that semver-major or give a rationale as to why it isn't. Please also feel free to ask questions in the issue tracker; this list could surely be more precise.
 
+## 5.1.0 beta 0 - Future
+
+### Fixed
+
+* `bin/pump-import-collection` no longer crashes due to an `underscore-contrib` reference
+* Fix the logged-out mobile homepage's menu icon being black (#1445)
+* Fix the JavaScript license page not loading Bootstrap properly (#1432)
+
+### Changed
+
+* Update deps
+
 ## 4.0.3 - 2017-10-01
 
 ### Fixed
