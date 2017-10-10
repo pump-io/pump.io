@@ -477,8 +477,6 @@ var putUser = function(req, res, next) {
     Step(
         function() {
             email = newUser.email;
-            delete newUser.email;
-
             req.user.update(newUser, this);
         }, function(err, saved) {
             if (err) throw err;

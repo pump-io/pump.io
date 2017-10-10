@@ -2461,19 +2461,16 @@
 
                 view.startSpin();
 
-                user.save("password",
-                          password,
-                          {
-                              success: function(resp, status, xhr) {
-                                  view.showSuccess("Changed password successful.");
-                                  view.stopSpin();
-                              },
-                              error: function(model, error, options) {
-                                  view.showError(error);
-                                  view.stopSpin();
-                              }
-                          }
-                         );
+                user.save("password", password, {
+                    success: function(resp, status, xhr) {
+                        view.showSuccess("Changed password successful.");
+                        view.stopSpin();
+                    },
+                    error: function(model, error, options) {
+                        view.showError(error);
+                        view.stopSpin();
+                    }
+                });
             }
 
             return false;
@@ -2481,30 +2478,53 @@
         changeEmail: function() {
             var view = this,
                 user = Pump.principalUser,
-                email = view.$("#email").val();
+                userData = user.toJSON(),
+                email = view.$("#email").val(),
+                emailPending = view.$("#emailPending").val(),
+                updateAttr = "email";
 
-            if (!email || email.length === 0) {
-                view.showError("Email input look empty.");
+            if (userData.email) {
+                if (!email || email.length === 0) {
+                    view.showError("Email input look empty.");
+                    return false;
+                } else if (!emailPending && email === userData.email) {
+                    view.showAlert("The email looks like the same.");
+                    return false;
+                } else {
+                    email = email.toLowerCase();
+                }
+            } else if (userData.email_pending) {
+                if (!emailPending || emailPending.length === 0) {
+                    view.showError("New email input look empty.");
+                    return false;
+                } else if (emailPending === userData.email_pending ||
+                           emailPending === userData.email) {
+                    view.showAlert("The email looks like the same.");
+                    return false;
+                } else {
+                    updateAttr = "email_pending";
+                    email = emailPending.toLowerCase();
+                    userData.email = email;
+                    delete userData.email_pending;
+                }
             }
-            email = email.toLowerCase();
 
-            if (email === user.get("email")) {
-                view.showAlert("The email looks like the same.");
-            } else {
-                user.save("email",
-                          email,
-                          {
-                              success: function(resp, status, xhr) {
-                                  view.showSuccess("Change email successful.");
-                                  view.stopSpin();
-                              },
-                              error: function(model, error, options) {
-                                  view.showError(error);
-                                  view.stopSpin();
-                              }
-                          }
-                         );
-            }
+            view.startSpin();
+
+            user.save(updateAttr, email, {
+                // Overwrites the data to be sent in order not to modify
+                // the model before email is confirmed
+                contentType: "application/json",
+                data: JSON.stringify(userData),
+                success: function(resp, status, xhr) {
+                    view.showSuccess("Change email successful.");
+                    view.stopSpin();
+                },
+                error: function(model, error, options) {
+                    view.showError(error);
+                    view.stopSpin();
+                }
+            });
 
             return false;
         }

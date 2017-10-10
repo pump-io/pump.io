@@ -17,8 +17,8 @@
           label Email
           .input
             if principalUser.email_pending
-              input.span6#email(value=principalUser.email_pending, type="email",
-              name="email", size="16", placeholder="Your email address")
+              input.span6#emailPending(value=principalUser.email_pending, type="email",
+              name="emailPending", size="16", placeholder="Your new email address")
               span.help-block Without confirmation
               if principalUser.email
                 .clearfix
