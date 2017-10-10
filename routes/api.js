@@ -910,9 +910,25 @@ var listUsers = function(req, res, next) {
 var sendConfirmationEmail = function(req, res, user, callback) {
     Step(
         function() {
+            Confirmation.search({nickname: user.nickname}, this);
+        },
+        function(err, confirms) {
+            if (err) throw err;
+            if (_.isArray(confirms)) {
+                var group = this.group();
+                // Cancel confirmation for allow resend
+                confirms.forEach(function(confirm) {
+                    confirm.del(group());
+                });
+            } else {
+                // No confirmations to cancel
+                this();
+            }
+        },
+        function(err) {
+            if (err) throw err;
             Confirmation.create({nickname: user.nickname,
-                                 email: user.email},
-                                this);
+                                 email: user.email}, this);
         },
         function(err, confirmation) {
             var confirmationURL;
