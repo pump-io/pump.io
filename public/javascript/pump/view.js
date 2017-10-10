@@ -770,8 +770,13 @@
                     }
                     // XXX: reload current data
                     view.stopSpin();
-                    Pump.router.navigate(continueTo, true);
-                    Pump.clearContinueTo();
+                    if (Pump.config.requireEmail && !data.email) {
+                        // Redirect to account settings when not has a email confirmed yet
+                        Pump.router.navigate("/main/account", true);
+                    } else {
+                        Pump.router.navigate(continueTo, true);
+                        Pump.clearContinueTo();
+                    }
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     var type, response;
@@ -2517,7 +2522,8 @@
                 contentType: "application/json",
                 data: JSON.stringify(userData),
                 success: function(resp, status, xhr) {
-                    view.showSuccess("Change email successful.");
+                    view.showSuccess("Instructions for confirm email change has been sent to " +
+                                     email + ". Check your inbox and spam filter.");
                     view.stopSpin();
                 },
                 error: function(model, error, options) {
