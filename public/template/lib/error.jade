@@ -1,5 +1,7 @@
 extends layout.jade
 
 block body
+  .content.error
+    h1 Error #{error.code}
 
-  include ../error-client.jade
+    p#error= error.message
