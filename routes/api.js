@@ -906,47 +906,63 @@ var listUsers = function(req, res, next) {
 };
 
 var sendConfirmationEmail = function(req, res, user, callback) {
-    var attempts = 0;
-
     Step(
         function() {
-            Confirmation.search({nickname: user.nickname}, this);
+            var key = Confirmation.makeKey({
+                nickname: user.nickname,
+                email: user.email_pending
+            });
+            Confirmation.search({nickname_email: key}, this);
         },
         function(err, confirms) {
             if (err) throw err;
             if (_.isArray(confirms)) {
-                var group = this.group();
-                // Cancel confirmation for allow resend
-                confirms.forEach(function(confirm) {
-                    if (confirm.nickname === user.nickname &&
-                        confirm.email === user.email_pending) {
-                        attempts = confirm.attempts || 0;
-                        attempts++;
-                    }
-                    confirm.del(group());
-                });
+                this(null, confirms[0]);
             } else {
-                // No confirmations to cancel
+                // No confirmations
                 this();
             }
         },
-        function(err) {
+        function(err, confirm) {
             if (err) throw err;
-            Confirmation.create({nickname: user.nickname,
-                                 email: user.email_pending,
-                                 attempts: attempts}, this);
+
+            if (confirm) {
+                // Allow attempts resend confirmation
+                confirm.attempts++;
+                confirm.update({
+                    attempts: confirm.attempts
+                }, this);
+            } else {
+                Confirmation.create({nickname: user.nickname,
+                                     email: user.email_pending,
+                                     attempts: 0}, this);
+            }
+        },
+        function(err, confirmation) {
+            var callback = this;
+            if (err instanceof AlreadyExistsError) {
+                confirmation = Confirmation.get(err.id, function(err, confirm) {
+                    if (err) callback(err, null);
+                    confirm.attempts++;
+                    confirm.update({
+                        attempts: confirm.attempts
+                    }, callback);
+                });
+            } else if (err) {
+                callback(err, null);
+            } else {
+                callback(null, confirmation);
+            }
         },
         function(err, confirmation) {
             var confirmationURL;
-            if (err instanceof AlreadyExistsError) {
-                throw new HTTPError("Already have a confirmation pending with: " +
-                                    user.email_pending, 409);
-            } else if (err) {
-                throw err;
-            } else if (attempts > 10) {
-                throw new HTTPError("You have many attempts with: " +
+            if (err) throw err;
+
+            if (confirmation.attempts > 10) {
+                throw new HTTPError("Already have many confirmation attempts with: " +
                                     user.email_pending, 403);
             }
+
             confirmationURL = URLMaker.makeURL("/main/confirm/" + confirmation.code);
             res.render("confirmation-email-html",
                        {principal: user.profile,

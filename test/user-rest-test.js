@@ -23,15 +23,20 @@ var assert = require("assert"),
     vows = require("vows"),
     Step = require("step"),
     _ = require("lodash"),
+    simplesmtp = require("simplesmtp"),
     OAuth = require("oauth-evanp").OAuth,
     version = require("../lib/version").version,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
+    emailutil = require("./lib/email"),
     setupApp = apputil.setupApp,
+    setupAppConfig = apputil.setupAppConfig,
     newClient = oauthutil.newClient,
     newPair = oauthutil.newPair,
-    register = oauthutil.register;
+    register = oauthutil.register,
+    oneEmail = emailutil.oneEmail,
+    confirmEmail = emailutil.confirmEmail;
 
 var suite = vows.describe("user REST API");
 
@@ -292,23 +297,39 @@ suite.addBatch({
 });
 
 suite.addBatch({
-    "When we set up the app": {
+    "When we set up the app with smtp config": {
 
         topic: function() {
-            var cb = this.callback;
-            setupApp(function(err, app) {
-                if (err) {
-                    cb(err, null, null);
-                } else {
-                    newClient(function(err, cl) {
-                        if (err) {
-                            cb(err, null, null);
-                        } else {
-                            cb(err, cl, app);
-                        }
-                    });
+            var cb = this.callback,
+                smtp = simplesmtp.createServer({disableDNSValidation: true});
+
+            Step(
+                function() {
+                    smtp.listen(1623, this);
+                },
+                function(err) {
+                    if (err) throw err;
+                    setupAppConfig({hostname: "localhost",
+                                    port: 4815,
+                                    smtpserver: "localhost",
+                                    smtpport: 1623
+                                   },
+                                   this);
+                },
+                function(err, app) {
+                    if (err) {
+                        cb(err, null, null, null);
+                    } else {
+                        newClient(function(err, cl) {
+                            if (err) {
+                                cb(err, null, null, null);
+                            } else {
+                                cb(err, cl, app, smtp);
+                            }
+                        });
+                    }
                 }
-            });
+            );
         },
 
         "it works": function(err, cl, app) {
@@ -316,12 +337,15 @@ suite.addBatch({
             assert.isObject(cl);
         },
 
-        teardown: function(cl, app) {
+        teardown: function(cl, app, smtp) {
             if (cl && cl.del) {
                 cl.del(function(err) {});
             }
             if (app) {
                 app.close();
+            }
+            if (smtp) {
+                smtp.end(function(err) {});
             }
         },
 
@@ -444,7 +468,7 @@ suite.addBatch({
                     httputil.putJSON("http://localhost:4815/api/user/xerxes",
                                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
                                       token: pair.token, token_secret: pair.token_secret},
-                                     {nickname: "xerxes", password: "athens+1"},
+                                     {nickname: "xerxes", password: "athens+1", email: "xerxes@pump.io"},
                                      cb);
                 },
                 "it works": function(err, doc) {
@@ -453,12 +477,123 @@ suite.addBatch({
                     assert.include(doc, "published");
                     assert.include(doc, "updated");
                     assert.include(doc, "profile");
+                    assert.include(doc, "email_pending");
                     assert.isObject(doc.profile);
                     assert.include(doc.profile, "id");
                     assert.include(doc.profile, "objectType");
                     assert.equal(doc.profile.objectType, "person");
                     assert.isFalse(_.has(doc.profile, "_uuid"));
                     assert.isFalse(_.has(doc.profile, "_user"));
+                }
+            },
+            "and we PUT only new user password with client credentials and the same user's access token": {
+                topic: function(user, cl) {
+                    var cb = this.callback,
+                        pair = pairOf(user);
+                    httputil.putJSON("http://localhost:4815/api/user/xerxes",
+                                     {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
+                                      token: pair.token, token_secret: pair.token_secret},
+                                     {nickname: "xerxes", password: "athens+2"},
+                                     cb);
+                },
+                "it works": function(err, doc) {
+                    assert.ifError(err);
+                    assert.isObject(doc);
+                    assert.isObject(doc.profile);
+                    assert.isFalse(_.has(doc, "_passwordHash"));
+                    assert.isFalse(_.has(doc, "password"));
+                }
+            },
+            "and we PUT invalid user email with client credentials and the same user's access token": {
+                topic: function(user, cl) {
+                    var cb = this.callback,
+                        pair = pairOf(user);
+                    httputil.putJSON("http://localhost:4815/api/user/xerxes",
+                                     {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
+                                      token: pair.token, token_secret: pair.token_secret},
+                                     {nickname: "xerxes", email: "xerxespump.io"},
+                                     function(err, body) {
+                                         if (err) {
+                                             cb(null, err);
+                                         } else {
+                                             cb(new Error("Unexpected status code"));
+                                         }
+                                     });
+                },
+                "it has a status code of 404": function(err, res) {
+                    assert.ifError(err);
+                    assert.isObject(res);
+                    assert.equal(res.statusCode, 400);
+                }
+            },
+            "and we PUT same user email with client credentials and the same user's access token": {
+                topic: function(user, cl) {
+                    var cb = this.callback,
+                        pair = pairOf(user);
+
+                    httputil.putJSON("http://localhost:4815/api/user/xerxes",
+                                     {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
+                                      token: pair.token, token_secret: pair.token_secret},
+                                     {nickname: "xerxes", email: "xerxes@pump.io"},
+                                     cb);
+                },
+                "it works": function(err, doc) {
+                    assert.ifError(err);
+                    assert.isObject(doc);
+                    assert.include(doc, "email_pending");
+                    assert.equal(doc.email_pending, "xerxes@pump.io");
+                }
+            },
+            "and we PUT diferent user email with client credentials and the same user's access token": {
+                topic: function(user, cl, app, smtp) {
+                    var cb = this.callback,
+                        pair = pairOf(user);
+
+                    Step(
+                        function() {
+                            oneEmail(smtp, "xerxes_test@pump.io", this.parallel());
+                            httputil.putJSON("http://localhost:4815/api/user/xerxes",
+                                             {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
+                                              token: pair.token, token_secret: pair.token_secret},
+                                             {nickname: "xerxes", email: "xerxes_test@pump.io"},
+                                             this.parallel());
+
+                        }, cb
+                    );
+                },
+                "it works": function(err, message, doc) {
+                    assert.ifError(err);
+                    assert.isObject(doc);
+                    assert.isObject(message);
+                    assert.include(doc, "email_pending");
+                    assert.include(message.to, "xerxes_test@pump.io");
+                    assert.equal(doc.email_pending, "xerxes_test@pump.io");
+                },
+                "and we confirm email and GET user with client credentials and the same user's access token": {
+                    topic: function(message, doc, user, cl) {
+                        var cb = this.callback,
+                            pair = pairOf(user);
+
+                        Step(
+                            function() {
+                                confirmEmail(message, this);
+                            },
+                            function(err) {
+                                if (err) throw err;
+                                httputil.getJSON("http://localhost:4815/api/user/xerxes",
+                                                 {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
+                                                  token: pair.token, token_secret: pair.token_secret},
+                                                 this);
+                            }, cb
+                        );
+                    },
+                    "it works": function(err, doc) {
+                        assert.ifError(err);
+                        assert.isObject(doc);
+                        assert.include(doc, "email");
+                        assert.notInclude(doc, "email_pending");
+                        assert.equal(doc.email, "xerxes_test@pump.io");
+                    }
                 }
             }
         }
@@ -616,6 +751,19 @@ suite.addBatch({
                                      {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
                                       token: pair.token, token_secret: pair.token_secret},
                                      {nickname: "willy", password: "w0nka+b4r", updated: "2003-11-10T00:00:00"},
+                                     invert(this.callback));
+                },
+                "it fails correctly": function(err) {
+                    assert.ifError(err);
+                }
+            },
+            "and we PUT a new email pendind value": {
+                topic: function(user, cl) {
+                    var pair = pairOf(user);
+                    httputil.putJSON("http://localhost:4815/api/user/willy",
+                                     {consumer_key: cl.client_id, consumer_secret: cl.client_secret,
+                                      token: pair.token, token_secret: pair.token_secret},
+                                     {nickname: "willy", password: "w0nka+b4r", email_pending: "novakud@pump.io"},
                                      invert(this.callback));
                 },
                 "it fails correctly": function(err) {
