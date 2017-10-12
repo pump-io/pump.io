@@ -129,10 +129,12 @@ suite.addBatch({
                     assert.isObject(user);
                     assert.isObject(message);
                 },
-                "the email is not included": function(err, message, user) {
-                    assert.ifError(err);
-                    assert.isObject(user);
-                    assert.isFalse(_.includes(user, "email"));
+                "the message include same register email": function(err, message, user) {
+                    assert.include(message.to, user.email_pending);
+                },
+                "the email is not include but has pending email": function(err, message, user) {
+                    assert.isFalse(_.has(user, "email"));
+                    assert.isTrue(_.has(user, "email_pending"));
                 },
                 "and we confirm the email address": {
                     topic: function(message, user, cl) {
@@ -154,9 +156,8 @@ suite.addBatch({
                             assert.isObject(user);
                         },
                         "the email address is not included": function(err, user, response) {
-                            assert.ifError(err);
-                            assert.isObject(user);
                             assert.isFalse(_.has(user, "email"));
+                            assert.isFalse(_.has(user, "email_pending"));
                         }
                     },
                     "and we fetch the user with user credentials for a different user": {
@@ -198,9 +199,8 @@ suite.addBatch({
                             assert.isObject(doc);
                         },
                         "the email address is not included": function(err, doc) {
-                            assert.ifError(err);
-                            assert.isObject(doc);
                             assert.isFalse(_.has(doc, "email"));
+                            assert.isFalse(_.has(doc, "email_pending"));
                         }
                     },
                     "and we fetch the user with user credentials for the same user": {
@@ -219,8 +219,6 @@ suite.addBatch({
                             assert.isObject(user);
                         },
                         "the email address is included": function(err, user) {
-                            assert.ifError(err);
-                            assert.isObject(user);
                             assert.include(user, "email");
                         }
                     },
@@ -344,10 +342,29 @@ suite.addBatch({
                     assert.isObject(user);
                     assert.isObject(message);
                 },
-                "the email is not included": function(err, message, user) {
-                    assert.ifError(err);
-                    assert.isObject(user);
-                    assert.isFalse(_.includes(user, "email"));
+                "the message include same register email": function(err, message, user) {
+                    assert.include(message.to, user.email_pending);
+                },
+                "the email is not included but has email pending": function(err, message, user) {
+                    assert.isFalse(_.has(user, "email"));
+                    assert.isTrue(_.has(user, "email_pending"));
+                },
+                "and we fetch the user with client credentials without confirmation": {
+                    topic: function(message, user, cl) {
+                        var cred = {
+                            consumer_key: cl.client_id,
+                            consumer_secret: cl.client_secret
+                        };
+                        httputil.getJSON("http://localhost:4815/api/user/bookman", cred, this.callback);
+                    },
+                    "it works": function(err, user, response) {
+                        assert.ifError(err);
+                        assert.isObject(user);
+                    },
+                    "the email address is not included but has email pending": function(err, user, response) {
+                        assert.isFalse(_.has(user, "email"));
+                        assert.isTrue(_.has(user, "email_pending"));
+                    }
                 },
                 "and we fetch the user with user credentials without confirmation": {
                     topic: function(message, user, cl) {
@@ -376,6 +393,37 @@ suite.addBatch({
                     },
                     "it works": function(err) {
                         assert.ifError(err);
+                    }
+                },
+                "and we PUT the user email with user credentials without confirmation": {
+                    topic: function(message, user, cl, app, smtp) {
+                        var callback = this.callback,
+                            cred = {
+                                consumer_key: cl.client_id,
+                                consumer_secret: cl.client_secret,
+                                token: user.token,
+                                token_secret: user.secret
+                            };
+
+                        Step(
+                            function() {
+                                oneEmail(smtp, "othergreatemail@pump.io", this.parallel());
+                                httputil.putJSON("http://localhost:4815/api/user/bookman", cred, _.extend({}, user, {
+                                    email: "othergreatemail@pump.io"
+                                }), this.parallel());
+                            },
+                            callback
+                        );
+                    },
+                    "it works": function(err, message, user) {
+                        assert.ifError(err);
+                        assert.isObject(message);
+                        assert.isObject(user);
+                    },
+                    "the email address is not included but has new email pending": function(err, message, user) {
+                        assert.isFalse(_.has(user, "email"));
+                        assert.isTrue(_.has(user, "email_pending"));
+                        assert.include(message.to, "othergreatemail@pump.io");
                     }
                 }
             }
