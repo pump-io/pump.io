@@ -465,28 +465,26 @@ var getUser = function(req, res, next) {
 var putUser = function(req, res, next) {
 
     var user,
-        email,
-        newUser = req.body;
+        updateUser = req.body,
+        hasEmail = _(updateUser).has("email");
 
-    if (_(newUser).has("email") &&
-        !validator.isEmail(newUser.email)) {
+    if (hasEmail && !validator.isEmail(updateUser.email)) {
         next(new HTTPError("Invalid email address provided", 400));
         return;
     }
 
     Step(
         function() {
-            email = newUser.email;
-            req.user.update(newUser, this);
+            req.user.update(updateUser, this);
         }, function(err, saved) {
             if (err) throw err;
 
             saved.sanitize();
             user = saved;
-            if (email) {
-                sendConfirmationEmail(req, res, _.extend({
-                    email: email
-                }, user), this);
+
+            if (req.app.config.haveEmail &&
+                hasEmail && user.email_pending) {
+                sendConfirmationEmail(req, res, user, this);
             } else {
                 // skip if we don't has email
                 this(null);
@@ -638,7 +636,6 @@ var thisService = function(app) {
 var createUser = function(req, res, next) {
 
     var user,
-        email,
         props = req.body,
         registrationActivity = function(user, svc, callback) {
             var act = new Activity({
@@ -714,20 +711,23 @@ var createUser = function(req, res, next) {
 
     // Email validation
 
-    if (req.app.config.requireEmail) {
-        if (!_.has(props, "email") ||
-            !_.isString(props.email) ||
-            props.email.length === 0) {
-            next(new HTTPError("No email address", 400));
-            return;
-        } else if (!validator.isEmail(props.email)) {
+    if (_.has(props, "email_pending")) {
+        next(new HTTPError("Invalid parameter", 400), null);
+        return;
+    } else if (req.app.config.requireEmail &&
+               (!_.has(props, "email") ||
+                !_.isString(props.email) ||
+                props.email.length === 0)) {
+        next(new HTTPError("No email address", 400));
+        return;
+    } else if (_.has(props, "email")) {
+        if (!validator.isEmail(props.email)) {
             next(new HTTPError("Invalid email address provided", 400));
             return;
-        } else {
-            email = props.email;
-            props.email_pending = email;
-            delete props.email;
+        } else if (req.app.config.haveEmail) {
+            props.email_pending = props.email;
         }
+        delete props.email;
     }
 
     Step(
@@ -760,11 +760,8 @@ var createUser = function(req, res, next) {
         },
         function(err) {
             if (err) throw err;
-            if (req.app.config.requireEmail) {
-
-                sendConfirmationEmail(req, res, _.extend({
-                    email: email
-                }, user), this);
+            if (user.email_pending) {
+                sendConfirmationEmail(req, res, user, this);
             } else {
                 // skip if we don't require email
                 this(null);
@@ -884,6 +881,7 @@ var listUsers = function(req, res, next) {
                 user.sanitize();
                 if (!req.principal || req.principal.id !== user.profile.id) {
                     delete user.email;
+                    delete user.email_pending;
                 }
             });
 
@@ -908,6 +906,8 @@ var listUsers = function(req, res, next) {
 };
 
 var sendConfirmationEmail = function(req, res, user, callback) {
+    var attempts = 0;
+
     Step(
         function() {
             Confirmation.search({nickname: user.nickname}, this);
@@ -918,6 +918,11 @@ var sendConfirmationEmail = function(req, res, user, callback) {
                 var group = this.group();
                 // Cancel confirmation for allow resend
                 confirms.forEach(function(confirm) {
+                    if (confirm.nickname === user.nickname &&
+                        confirm.email === user.email_pending) {
+                        attempts = confirm.attempts || 0;
+                        attempts++;
+                    }
                     confirm.del(group());
                 });
             } else {
@@ -928,15 +933,19 @@ var sendConfirmationEmail = function(req, res, user, callback) {
         function(err) {
             if (err) throw err;
             Confirmation.create({nickname: user.nickname,
-                                 email: user.email}, this);
+                                 email: user.email_pending,
+                                 attempts: attempts}, this);
         },
         function(err, confirmation) {
             var confirmationURL;
             if (err instanceof AlreadyExistsError) {
                 throw new HTTPError("Already have a confirmation pending with: " +
-                                    user.email, 409);
+                                    user.email_pending, 409);
             } else if (err) {
                 throw err;
+            } else if (attempts > 10) {
+                throw new HTTPError("You have many attempts with: " +
+                                    user.email_pending, 403);
             }
             confirmationURL = URLMaker.makeURL("/main/confirm/" + confirmation.code);
             res.render("confirmation-email-html",
@@ -954,7 +963,7 @@ var sendConfirmationEmail = function(req, res, user, callback) {
         },
         function(err, html, text) {
             if (err) throw err;
-            Mailer.sendEmail({to: user.email,
+            Mailer.sendEmail({to: user.email_pending,
                               subject: "Confirm your email address for " + req.app.config.site,
                               text: text,
                               attachment: {data: html,
