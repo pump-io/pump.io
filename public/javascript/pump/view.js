@@ -2441,13 +2441,20 @@
         modelName: "user",
         events: {
             "submit #account-password": "changePassword",
-            "submit #account-email": "changeEmail"
+            "submit #account-email": "changeEmail",
+            "click #email-resend": "resendEmail"
         },
-        changePassword: function() {
+        changePassword: function(event) {
             var view = this,
                 user = Pump.principalUser,
                 password = view.$("#password").val(),
                 repeat = view.$("#repeat").val();
+
+            // Prevent ghost clicks
+
+            event.preventDefault();
+
+            // Password validation
 
             if (password !== repeat) {
 
@@ -2480,45 +2487,45 @@
 
             return false;
         },
-        changeEmail: function() {
+        changeEmail: function(event, resend) {
             var view = this,
                 user = Pump.principalUser,
                 userData = user.toJSON(),
-                email = view.$("#email").val(),
-                emailPending = view.$("#emailPending").val(),
-                updateAttr = "email";
+                email = resend ? userData.email_pending : view.$("#email").val();
 
-            if (userData.email) {
-                if (!email || email.length === 0) {
-                    view.showError("Email input look empty.");
-                    return false;
-                } else if (!emailPending && email === userData.email) {
-                    view.showAlert("The email looks like the same.");
-                    return false;
-                } else {
-                    email = email.toLowerCase();
-                }
-            } else if (userData.email_pending) {
-                if (!emailPending || emailPending.length === 0) {
-                    view.showError("New email input look empty.");
-                    return false;
-                } else if (emailPending === userData.email_pending ||
-                           emailPending === userData.email) {
-                    view.showAlert("The email looks like the same.");
-                    return false;
-                } else {
-                    updateAttr = "email_pending";
-                    email = emailPending.toLowerCase();
-                    userData.email = email;
-                    delete userData.email_pending;
-                }
+            // Prevent ghost clicks
+
+            event.preventDefault();
+
+            // Validation
+
+            if (!email || email.length === 0) {
+
+                view.showError("Email input look empty.");
+                return false;
+
+            } else if (!resend &&
+                       (email === userData.email ||
+                        email === userData.email_pending)) {
+
+                view.showAlert("The email looks like the same.");
+                return false;
+
+            }
+
+            email = email.toLowerCase();
+            userData.email = email;
+
+            if (userData.email_pending) {
+                delete userData.email_pending;
             }
 
             view.startSpin();
 
-            user.save(updateAttr, email, {
+            user.save("email_pending", email, {
                 // Overwrites the data to be sent in order not to modify
                 // the model before email is confirmed
+
                 contentType: "application/json",
                 data: JSON.stringify(userData),
                 success: function(resp, status, xhr) {
@@ -2532,6 +2539,12 @@
                 }
             });
 
+            return false;
+        },
+        resendEmail: function(event) {
+            event.preventDefault();
+
+            this.changeEmail(event, true);
             return false;
         }
     });

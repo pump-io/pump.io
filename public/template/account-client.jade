@@ -12,25 +12,26 @@
           span.uneditable-input= principalUser.nickname
           span.help-block The name you log in with (unchangeable!)
 
-      if config.requireEmail
+      if config.haveEmail
         .clearfix
           label Email
-          .input
+          ul.list-group
             if principalUser.email_pending
-              input.span6#emailPending(value=principalUser.email_pending, type="email",
-              name="emailPending", size="16", placeholder="Your new email address")
-              span.help-block Without confirmation
-              if principalUser.email
-                .clearfix
-                  label Email
-                  .input
-                    input.span6#email(value=principalUser.email, type="email",
-                    name="email", size="16", placeholder="Your email address")
-                    span.help-block For updates and password recovery
-            else
-              input.span6#email(value=principalUser.email, type="email",
-              name="email", size="16", placeholder="Your email address")
-              span.help-block For updates and password recovery
+              li.list-group-item= principalUser.email_pending
+                span.label.label-warning Unverified
+                span.pull-right
+                  span Verification email sent.
+                    a#email-resend(href="#") Resend
+                  button.btn.btn-mini.btn-danger(type="button")
+                    i.fa.fa-times#email-cancel
+            if principalUser.email
+              li.list-group-item= principalUser.email
+                span.label.label-success Enabled
+
+          .input
+            input.span6#email(type="email",
+            name="email", size="16", placeholder="Your new email address")
+            span.help-block For updates and password recovery
 
         .actions
           input.btn.btn-primary(type="submit", value="Change email")
