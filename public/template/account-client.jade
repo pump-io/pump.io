@@ -20,10 +20,8 @@
               li.list-group-item= principalUser.email_pending
                 span.label.label-warning Unverified
                 span.pull-right
-                  span Verification email sent.
+                  span Verification email sent. 
                     a#email-resend(href="#") Resend
-                  button.btn.btn-mini.btn-danger(type="button")
-                    i.fa.fa-times#email-cancel
             if principalUser.email
               li.list-group-item= principalUser.email
                 span.label.label-success Enabled
