@@ -182,6 +182,6 @@
         ];
         return (errors.indexOf(message) !== -1 &&
                 (status === 400 || status === 401));
-    }
+    };
 
 })(window._, window.$, window.Backbone, window.Pump);
