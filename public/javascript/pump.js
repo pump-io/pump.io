@@ -227,13 +227,20 @@ if (!window.Pump) {
                         Pump.logout();
                         callback(new Error("Unauthorized"), null);
                     } else {
+                        // Restore old credentials
+
                         Pump.setUserCred(pair.token, pair.secret);
                         callback(new Error("Failed to renew"), null);
                     }
                 }
             };
 
+        // Clear user credentials from local Storage but keeps in memory
+        // for send `renew` as client, if the user not has connection
+        // or occur an unexpected error restores old credentials
+
         Pump.clearUserCred();
+
         Pump.ajax(options);
     };
 
@@ -275,6 +282,8 @@ if (!window.Pump) {
                 error: function(jqXHR, textStatus, errorThrown) {
                     if (!retry && Pump.hasOAuthError(jqXHR.responseText, jqXHR.status)) {
                         retry = true;
+                        // Send as normal request for destroy session if exist one
+
                         $.ajax(options);
                     } else if (jqXHR.status >= 400) {
                         doLogout();
