@@ -225,6 +225,46 @@ if (!window.Pump) {
         Pump.ajax(options);
     };
 
+    Pump.logout = function() {
+
+        var onSuccess = function(data, textStatus, jqXHR) {
+            var an;
+            Pump.principalUser = null;
+            Pump.principal = null;
+
+            Pump.clearNickname();
+            Pump.clearUserCred();
+
+            Pump.clearCaches();
+
+            an = new Pump.AnonymousNav({el: ".navbar-inner .container"});
+            an.render();
+
+            if (Pump.config.sockjs) {
+                // Request a new challenge
+                Pump.setupSocket();
+            }
+
+            if (window.location.pathname == "/") {
+                // If already home, reload to show main page
+                Pump.router.home();
+            } else {
+                // Go home
+                Pump.router.navigate("/", true);
+            }
+        }, options = {
+            contentType: "application/json",
+            data: "",
+            dataType: "json",
+            type: "POST",
+            url: "/main/logout",
+            success: onSuccess,
+            error: Pump.ajaxError
+        };
+
+        Pump.ajax(options);
+    };
+
     // When errors happen, and you don't know what to do with them,
     // send them here and I'll figure it out.
 
@@ -624,9 +664,9 @@ if (!window.Pump) {
             if (name == View.prototype.modelName) {
                 options.model = def.models[name].unique(value);
             } else if (def.models[name]) {
-                    options.data[name] = def.models[name].unique(value);
+                options.data[name] = def.models[name].unique(value);
             } else {
-                    options.data[name] = value;
+                options.data[name] = value;
             }
         }
 

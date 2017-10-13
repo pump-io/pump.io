@@ -580,46 +580,7 @@
             return false;
         },
         logout: function() {
-            var view = this,
-                options,
-                onSuccess = function(data, textStatus, jqXHR) {
-                    var an;
-                    Pump.principalUser = null;
-                    Pump.principal = null;
-
-                    Pump.clearNickname();
-                    Pump.clearUserCred();
-
-                    Pump.clearCaches();
-
-                    an = new Pump.AnonymousNav({el: ".navbar-inner .container"});
-                    an.render();
-
-                    if (Pump.config.sockjs) {
-                        // Request a new challenge
-                        Pump.setupSocket();
-                    }
-
-                    if (window.location.pathname == "/") {
-                        // If already home, reload to show main page
-                        Pump.router.home();
-                    } else {
-                        // Go home
-                        Pump.router.navigate("/", true);
-                    }
-                };
-
-            options = {
-                contentType: "application/json",
-                data: "",
-                dataType: "json",
-                type: "POST",
-                url: "/main/logout",
-                success: onSuccess,
-                error: Pump.ajaxError
-            };
-
-            Pump.ajax(options);
+            Pump.logout();
         },
         getStreams: function() {
             var view = this,
