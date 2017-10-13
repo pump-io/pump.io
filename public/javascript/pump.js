@@ -421,27 +421,25 @@ if (!window.Pump) {
                         err = new Error(res || msgFallback);
                     }
 
-                    if (err) {
-                        if (Pump.hasOAuthError(err.message, res.status)) {
+                    if (Pump.hasOAuthError(err.message, res.status)) {
 
-                            // Renew session if for some reason has invalid or expired tokens
-                            Pump.renewSession(function(err, data) {
+                        // Renew session if for some reason has invalid or expired tokens
+                        Pump.renewSession(function(err, data) {
 
-                                if (err) {
-                                    Pump.error(err);
-                                    return;
-                                }
+                            if (err) {
+                                Pump.error(err);
+                                return;
+                            }
 
-                                Pump.principalUser = Pump.User.unique(data);
-                                Pump.principal = Pump.principalUser.profile;
+                            Pump.principalUser = Pump.User.unique(data);
+                            Pump.principal = Pump.principalUser.profile;
 
-                                // Make same request
-                                Pump.fetchObjects(orig, callback);
-                            });
+                            // Make same request
+                            Pump.fetchObjects(orig, callback);
+                        });
 
-                        } else {
-                            callback(err, null);
-                        }
+                    } else {
+                        callback(err, null);
                     }
                 }
             };
