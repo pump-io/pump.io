@@ -54,6 +54,7 @@ var databank = require("databank"),
     clientAuth = authc.clientAuth,
     userAuth = authc.userAuth,
     someReadAuth = authc.someReadAuth,
+    userReadAuth = authc.userReadAuth,
     NoSuchThingError = databank.NoSuchThingError,
     createUser = api.createUser,
     addLiked = finishers.addLiked,
@@ -80,7 +81,7 @@ var addRoutes = function(app, session) {
 
     app.post("/main/logout", session, someReadAuth, handleLogout);
 
-    app.post("/main/renew", session, userAuth, renewSession);
+    app.post("/main/renew", session, clientAuth, userReadAuth, renewSession);
 
     app.get("/main/remote", session, principal, showRemote);
     app.post("/main/remote", session, handleRemote);
@@ -682,7 +683,7 @@ var showObject = function(req, res, next) {
 var renewSession = function(req, res, next) {
 
     var principal = req.principal,
-        user = req.principalUser;
+        user = res.locals.principalUser;
 
     Step(
         function() {
@@ -690,10 +691,17 @@ var renewSession = function(req, res, next) {
             setPrincipal(req.session, principal, this);
         },
         function(err) {
+            if (err) throw err;
+            // Generate new tokens
+            req.app.provider.newTokenPair(req.client, user, this);
+        },
+        function(err, pair) {
             if (err) {
                 next(err);
             } else {
-                // principalUser is sanitized by userAuth()
+                // principalUser is sanitized by userReadAuth
+                user.token = pair.access_token;
+                user.secret = pair.token_secret;
                 res.json(user);
             }
         }

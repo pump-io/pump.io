@@ -210,59 +210,82 @@ if (!window.Pump) {
 
     Pump.renewSession = function(callback) {
 
-        var options = {
-            dataType: "json",
-            type: "POST",
-            url: "/main/renew",
-            success: function(data, textStatus, jqXHR) {
-                callback(null, data);
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                callback(new Error("Failed to renew"), null);
-            }
-        };
+        var pair = Pump.getUserCred(),
+            options = {
+                dataType: "json",
+                type: "POST",
+                url: "/main/renew",
+                success: function(data, textStatus, jqXHR) {
+                    Pump.setNickname(data.nickname);
+                    Pump.setUserCred(data.token, data.secret);
 
+                    callback(null, data);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.status === 401) {
+                        Pump.clearAllCred();
+                        Pump.logout();
+                        callback(new Error("Unauthorized"), null);
+                    } else {
+                        Pump.setUserCred(pair.token, pair.secret);
+                        callback(new Error("Failed to renew"), null);
+                    }
+                }
+            };
+
+        Pump.clearUserCred();
         Pump.ajax(options);
     };
 
     Pump.logout = function() {
 
-        var onSuccess = function(data, textStatus, jqXHR) {
-            var an;
-            Pump.principalUser = null;
-            Pump.principal = null;
+        var retry = false,
+            doLogout = function() {
+                var an;
+                Pump.principalUser = null;
+                Pump.principal = null;
 
-            Pump.clearUserAllCred();
+                Pump.clearUserAllCred();
 
-            Pump.clearCaches();
+                Pump.clearCaches();
 
-            an = new Pump.AnonymousNav({el: ".navbar-inner .container"});
-            an.render();
+                an = new Pump.AnonymousNav({el: ".navbar-inner .container"});
+                an.render();
 
-            if (Pump.config.sockjs) {
-                // Request a new challenge
-                Pump.setupSocket();
-            }
+                if (Pump.config.sockjs) {
+                    // Request a new challenge
+                    Pump.setupSocket();
+                }
 
-            if (window.location.pathname == "/") {
-                // If already home, reload to show main page
-                Pump.router.home();
-            } else {
-                // Go home
-                Pump.router.navigate("/", true);
-            }
-        }, options = {
-            contentType: "application/json",
-            data: "",
-            dataType: "json",
-            type: "POST",
-            url: "/main/logout",
-            success: onSuccess,
-            error: Pump.ajaxError
+                if (window.location.pathname == "/") {
+                    // If already home, reload to show main page
+                    Pump.router.home();
+                } else {
+                    // Go home
+                    Pump.router.navigate("/", true);
+                }
+            },
+            options = {
+                contentType: "application/json",
+                data: "",
+                dataType: "json",
+                type: "POST",
+                url: "/main/logout",
+                success: doLogout,
+                error: function(jqXHR, textStatus, errorThrown) {
+                    if (!retry && Pump.hasOAuthError(jqXHR.responseText, jqXHR.status)) {
+                        retry = true;
+                        $.ajax(options);
+                    } else if (jqXHR.status >= 400) {
+                        doLogout();
+                    } else {
+                        Pump.ajaxError();
+                    }
+                }
         };
 
         if (Pump.hasAllCred()) {
-            Pump.ajax(options);
+            Pump.ajax(_.cloneDeep(options));
         } else {
             $.ajax(options);
         }
@@ -374,12 +397,6 @@ if (!window.Pump) {
             onError = function(xhr, res, thrown) {
                 if (!done) {
                     var msgFallback = "Unexpected error",
-                        oauthErrors = [
-                            "Invalid / expired Token",
-                            "Invalid Username/Token",
-                            "Invalid Consumer Key",
-                            "Invalid signature"
-                        ],
                         err;
 
                     done = true;
@@ -396,8 +413,7 @@ if (!window.Pump) {
                     }
 
                     if (err) {
-                        if (oauthErrors.indexOf(err.message) !== -1 &&
-                            (res.status === 400 || res.status === 401)) {
+                        if (Pump.hasOAuthError(err.message, res.status)) {
 
                             // Renew session if for some reason has invalid or expired tokens
                             Pump.renewSession(function(err, data) {

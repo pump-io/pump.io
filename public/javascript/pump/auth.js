@@ -101,14 +101,6 @@
         return;
     };
 
-    Pump.hasAllCred = function() {
-        var cred = Pump.getCred(),
-            userCred = Pump.getUserCred();
-
-        return ((cred && cred.clientID && cred.clientSecret) &&
-                (userCred && userCred.token && userCred.secret));
-    };
-
     Pump.clearUserCred = function() {
         Pump.token  = null;
         Pump.secret = null;
@@ -172,5 +164,24 @@
             });
         }
     };
+
+    Pump.hasAllCred = function() {
+        var cred = Pump.getCred(),
+            userCred = Pump.getUserCred();
+
+        return ((cred && cred.clientID && cred.clientSecret) &&
+                (userCred && userCred.token && userCred.secret));
+    };
+
+    Pump.hasOAuthError = function(message, status) {
+        var errors = [
+            "Invalid / expired Token",
+            "Invalid Username/Token",
+            "Invalid Consumer Key",
+            "Invalid signature"
+        ];
+        return (errors.indexOf(message) !== -1 &&
+                (status === 400 || status === 401));
+    }
 
 })(window._, window.$, window.Backbone, window.Pump);
