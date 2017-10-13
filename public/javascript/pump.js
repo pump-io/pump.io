@@ -97,8 +97,8 @@ if (!window.Pump) {
                                               }});
 
             if (!pair) {
+                Pump.logout();
                 Pump.error("Invalid session");
-                Pump.clearUserCred();
                 return;
             }
 
@@ -148,8 +148,8 @@ if (!window.Pump) {
                         var user, major, minor;
 
                         if (err) {
+                            Pump.logout();
                             Pump.error(err);
-                            Pump.clearUserCred();
                             return;
                         }
 
@@ -232,8 +232,7 @@ if (!window.Pump) {
             Pump.principalUser = null;
             Pump.principal = null;
 
-            Pump.clearNickname();
-            Pump.clearUserCred();
+            Pump.clearUserAllCred();
 
             Pump.clearCaches();
 
@@ -262,7 +261,11 @@ if (!window.Pump) {
             error: Pump.ajaxError
         };
 
-        Pump.ajax(options);
+        if (Pump.hasAllCred()) {
+            Pump.ajax(options);
+        } else {
+            $.ajax(options);
+        }
     };
 
     // When errors happen, and you don't know what to do with them,
@@ -401,7 +404,6 @@ if (!window.Pump) {
 
                                 if (err) {
                                     Pump.error(err);
-                                    Pump.clearUserCred();
                                     return;
                                 }
 

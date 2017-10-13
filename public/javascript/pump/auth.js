@@ -75,7 +75,7 @@
         }
     };
 
-    Pump.getUserCred = function(nickname) {
+    Pump.getUserCred = function() {
         if (Pump.token) {
             return {token: Pump.token, secret: Pump.secret};
         } else if (localStorage) {
@@ -101,6 +101,14 @@
         return;
     };
 
+    Pump.hasAllCred = function() {
+        var cred = Pump.getCred(),
+            userCred = Pump.getUserCred();
+
+        return ((cred && cred.clientID && cred.clientSecret) &&
+                (userCred && userCred.token && userCred.secret));
+    };
+
     Pump.clearUserCred = function() {
         Pump.token  = null;
         Pump.secret = null;
@@ -111,6 +119,11 @@
         return;
     };
 
+    Pump.clearUserAllCred = function() {
+        Pump.clearUserCred();
+        Pump.clearNickname();
+    };
+
     Pump.clearCred = function() {
         Pump.clientID = null;
         Pump.clientSecret = null;
@@ -118,6 +131,11 @@
             delete localStorage["cred:clientID"];
             delete localStorage["cred:clientSecret"];
         }
+    };
+
+    Pump.clearAllCred = function() {
+        Pump.clearCred();
+        Pump.clearUserAllCred();
     };
 
     Pump.ensureCred = function(callback) {
