@@ -738,8 +738,9 @@
                     var type, response;
                     // This happens when our stored OAuth credentials are
                     // invalid; usually because someone re-installed server software
-                    if (jqXHR.status == 401 && retries === 0 && jqXHR.responseText == "Invalid / used nonce") {
-                        Pump.clearCred();
+
+                    if (retries === 0 && Pump.hasOAuthError(jqXHR.responseText, jqXHR.status)) {
+                        Pump.clearAllCred();
                         retries = 1;
                         Pump.ajax(options);
                     } else {
@@ -760,7 +761,7 @@
                 error: onError
             };
 
-            Pump.ajax(options);
+            Pump.ajax(_.cloneDeep(options));
 
             return false;
         }

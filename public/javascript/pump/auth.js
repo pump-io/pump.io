@@ -176,6 +176,7 @@
     Pump.hasOAuthError = function(message, status) {
         var errors = [
             "Invalid / expired Token",
+            "Invalid / used nonce",
             "Invalid Username/Token",
             "Invalid Consumer Key",
             "Invalid signature"
