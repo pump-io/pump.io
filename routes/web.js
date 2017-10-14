@@ -697,7 +697,8 @@ var renewSession = function(req, res, next) {
                 this();
             }
         },
-        function() {
+        function(err) {
+            if (err) throw err;
             // We only need to set this if it's not already set
             user = user || res.locals.principalUser;
             principal = principal || req.principal;

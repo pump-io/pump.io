@@ -153,7 +153,7 @@ if (!window.Pump) {
                         var user, major, minor;
 
                         if (err) {
-                            Pump.logout();
+                            Pump.clearAllCred();
                             Pump.error(err);
                             return;
                         }
@@ -306,7 +306,7 @@ if (!window.Pump) {
                         Pump.ajaxError();
                     }
                 }
-        };
+            };
 
         if (Pump.hasAllCred()) {
             Pump.ajax(_.cloneDeep(options));

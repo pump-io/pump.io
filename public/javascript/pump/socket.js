@@ -82,6 +82,10 @@
                 return;
             }
 
+            if (!Pump.socket) {
+                return;
+            }
+
             message.parameters.push(["oauth_consumer_key", cred.clientID]);
             secrets = {consumerSecret: cred.clientSecret};
 
