@@ -40,13 +40,14 @@ var browserClose = function(br) {
     );
 };
 
+var browserOpts = {site: "http://localhost:4815"};
+
 var suite = vows.describe("renew OAuth in UI test");
 
 suite.addBatch({
     "When we set up the app": {
         topic: function() {
             setupAppConfig({site: "Test"}, this.callback);
-            Browser.localhost("localhost", 4815);
         },
         teardown: function(app) {
             if (app && app.close) {
@@ -66,7 +67,7 @@ suite.addBatch({
             },
             "and we visit the login user": {
                 topic: function(cred) {
-                    var browser = new Browser(),
+                    var browser = new Browser(browserOpts),
                         callback = this.callback,
                         user =  cred.user;
 
@@ -89,7 +90,7 @@ suite.addBatch({
                 },
                 "and we visit the Followers with active session in new window": {
                     topic: function(br, cred) {
-                        var browser = new Browser(),
+                        var browser = new Browser(browserOpts),
                             callback = this.callback,
                             user =  cred.user;
 
@@ -246,7 +247,7 @@ suite.addBatch({
                 "and we destroy session and renew credentials from localStorage in new window": {
                     topic: function(br, cred) {
                         var callback = this.callback,
-                            browser = new Browser(),
+                            browser = new Browser(browserOpts),
                             user = cred.user;
 
                         // Set current credentials
