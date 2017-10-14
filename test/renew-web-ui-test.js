@@ -157,7 +157,7 @@ suite.addBatch({
                             }
 
                             browser.visit("/" + user.nickname + "/favorites", function() {
-                                callback(!browser.success, browser);
+                                callback(!browser.success, browser, user);
                             });
                         },
                         teardown: function(br) {
@@ -166,17 +166,15 @@ suite.addBatch({
                         "it works": function(err, br) {
                             assert.ifError(err);
                             br.assert.success("ok");
-                            br.assert.text("#error-popup .error-message", "Invalid session");
                         },
-                        "it should be redirect to homepage": function(err, br) {
-                            br.assert.url({ pathname: "/" });
-                            br.assert.elements(".nav.pull-right li #register", 1);
+                        "it keep in favorites section": function(err, br, user) {
+                            br.assert.url({ pathname: "/" + user.nickname + "/favorites" });
                         },
-                        "it not has credentials": function(err, br) {
+                        "it has new credentials": function(err, br) {
                             assert.includes(br.window, "localStorage");
                             var localStorage = br.window.localStorage;
-                            assert.notIncludes(localStorage, "cred:token");
-                            assert.notIncludes(localStorage, "cred:screte");
+                            assert.includes(localStorage, "cred:token");
+                            assert.includes(localStorage, "cred:secret");
                         }
                     }
                 }

@@ -97,9 +97,14 @@ if (!window.Pump) {
                                               }});
 
             if (!pair) {
-                Pump.logout();
-                Pump.error("Invalid session");
-                return;
+                // Get user tokens because apparently has open session
+                Pump.renewSession(function(err, data) {
+                    if (err) {
+                        Pump.logout();
+                        Pump.error("Invalid session");
+                        return;
+                    }
+                });
             }
 
             // If we're on a login page, go to the main page or whatever
@@ -210,7 +215,8 @@ if (!window.Pump) {
 
     Pump.renewSession = function(callback) {
 
-        var pair = Pump.getUserCred(),
+        var retry = false,
+            pair = Pump.getUserCred(),
             options = {
                 dataType: "json",
                 type: "POST",
@@ -222,26 +228,35 @@ if (!window.Pump) {
                     callback(null, data);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
-                    if (jqXHR.status === 401) {
-                        Pump.clearAllCred();
-                        Pump.logout();
-                        callback(new Error("Unauthorized"), null);
-                    } else {
-                        // Restore old credentials
+                    // Restore old credentials
+                    Pump.setUserCred(pair.token, pair.secret);
 
-                        Pump.setUserCred(pair.token, pair.secret);
+                    if (jqXHR.status === 401 || jqXHR.status === 400) {
+
+                        if (!retry && Pump.hasAllCred()) {
+                            // Try with OAuth user credentials
+                            retry = true;
+                            Pump.ajax(options);
+                        } else {
+                            Pump.clearAllCred();
+                            Pump.logout();
+                            callback(new Error("Unauthorized"), null);
+                        }
+                    } else {
+
                         callback(new Error("Failed to renew"), null);
                     }
                 }
             };
 
         // Clear user credentials from local Storage but keeps in memory
-        // for send `renew` as client, if the user not has connection
-        // or occur an unexpected error restores old credentials
+        // for send `renew` as client, if the user not has active session
+        // try with all user credentials.
+        // when occur an unexpected error restores old credentials
 
         Pump.clearUserCred();
 
-        Pump.ajax(options);
+        Pump.ajax(_.cloneDeep(options));
     };
 
     Pump.logout = function() {
