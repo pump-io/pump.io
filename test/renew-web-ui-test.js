@@ -22,6 +22,7 @@ var assert = require("assert"),
     vows = require("vows"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
+    httputil = require("./lib/http"),
     Browser = require("zombie"),
     Step = require("step"),
     setupAppConfig = apputil.setupAppConfig,
@@ -123,7 +124,7 @@ suite.addBatch({
 
                         // Change section to make API requests
                         browser.clickLink("#fat-menu .dropdown-menu li a[href='/" + user.nickname + "']", function() {
-                            callback(null, browser, user, userCred);
+                            callback(!browser.success, browser, user, userCred);
                         });
                     },
                     teardown: function(br) {
@@ -134,15 +135,15 @@ suite.addBatch({
                         br.assert.success("ok");
                         br.assert.text("#profile-block .p-name", user.nickname);
                     },
-                    "it has new credentials": function(err, br, user, cred) {
+                    "it has new credentials": function(err, br, user, oldCred) {
                         assert.includes(br.window, "localStorage");
                         var localStorage = br.window.localStorage;
                         assert.includes(localStorage, "cred:token");
                         assert.includes(localStorage, "cred:secret");
                         assert.isNotNull(localStorage["cred:secret"]);
                         assert.isNotNull(localStorage["cred:token"]);
-                        assert.notEqual(localStorage["cred:token"], cred.token);
-                        assert.notEqual(localStorage["cred:secret"], cred.secret);
+                        assert.notEqual(localStorage["cred:token"], oldCred.token);
+                        assert.notEqual(localStorage["cred:secret"], oldCred.secret);
                     },
                     "and we visit Favorites section with active session but empty localStorage": {
                         topic: function(browser, user, cred) {
@@ -167,7 +168,7 @@ suite.addBatch({
                             assert.ifError(err);
                             br.assert.success("ok");
                         },
-                        "it keep in favorites section": function(err, br, user) {
+                        "it keep in Favorites section": function(err, br, user) {
                             br.assert.url({ pathname: "/" + user.nickname + "/favorites" });
                         },
                         "it has new credentials": function(err, br) {
@@ -176,6 +177,67 @@ suite.addBatch({
                             assert.includes(localStorage, "cred:token");
                             assert.includes(localStorage, "cred:secret");
                         }
+                    }
+                },
+                "and we destroy the session but restores from localStorage in new window": {
+                    //
+                    topic: function(br, cred) {
+                        var callback = this.callback,
+                            browser = new Browser(),
+                            localStorage = br.window.localStorage,
+                            userCred = {
+                                token: localStorage["cred:token"],
+                                secret: localStorage["cred:secret"]
+                            },
+                            user = cred.user;
+
+                        // Set old credentials
+                        browser.on("active", function(window) {
+                            window.localStorage["cred:token"] = localStorage["cred:token"];
+                            window.localStorage["cred:secret"] = localStorage["cred:secret"];
+                            window.localStorage["cred:clientID"] = localStorage["cred:clientID"];
+                            window.localStorage["cred:clientSecret"] = localStorage["cred:clientSecret"];
+                        });
+
+                        // Destroy session
+                        Step(
+                            function() {
+                                httputil.postJSON("http://localhost:4815/main/logout", {
+                                    consumer_key: cred.consumer_key, consumer_secret: cred.consumer_secret,
+                                    token: cred.token, token_secret: cred.token_secret
+                                }, {}, this);
+                            },
+                            function(err) {
+                                if (err) {
+                                    callback(err);
+                                    return;
+                                }
+                                browser.visit("/" + user.nickname, function(err) {
+                                    callback(!browser.success, browser, user, userCred);
+                                });
+                            }
+                        );
+
+                    },
+                    teardown: function(br) {
+                        browserClose(br);
+                    },
+                    "it works": function(err, br, user) {
+                        assert.ifError(err);
+                        br.assert.success();
+                    },
+                    "it keep in Activity section": function(err, br, user) {
+                        br.assert.url({ pathname: "/" + user.nickname});
+                    },
+                    "it has new credentials": function(err, br, user, oldCred) {
+                        assert.includes(br.window, "localStorage");
+                        var localStorage = br.window.localStorage;
+                        assert.includes(localStorage, "cred:token");
+                        assert.includes(localStorage, "cred:secret");
+                        assert.isNotNull(localStorage["cred:secret"]);
+                        assert.isNotNull(localStorage["cred:token"]);
+                        assert.notEqual(localStorage["cred:token"], oldCred.token);
+                        assert.notEqual(localStorage["cred:secret"], oldCred.secret);
                     }
                 }
             }
