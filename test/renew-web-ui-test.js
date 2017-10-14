@@ -179,57 +179,110 @@ suite.addBatch({
                         }
                     }
                 },
-                "and we destroy the session but restores from localStorage in new window": {
-                    //
+                "and we destroy session and POST to renew as client": {
                     topic: function(br, cred) {
-                        var callback = this.callback,
-                            browser = new Browser(),
-                            localStorage = br.window.localStorage,
-                            userCred = {
-                                token: localStorage["cred:token"],
-                                secret: localStorage["cred:secret"]
-                            },
-                            user = cred.user;
+                        var callback = this.callback;
 
-                        // Set old credentials
-                        browser.on("active", function(window) {
-                            window.localStorage["cred:token"] = localStorage["cred:token"];
-                            window.localStorage["cred:secret"] = localStorage["cred:secret"];
-                            window.localStorage["cred:clientID"] = localStorage["cred:clientID"];
-                            window.localStorage["cred:clientSecret"] = localStorage["cred:clientSecret"];
-                        });
-
-                        // Destroy session
                         Step(
                             function() {
-                                httputil.postJSON("http://localhost:4815/main/logout", {
-                                    consumer_key: cred.consumer_key, consumer_secret: cred.consumer_secret,
-                                    token: cred.token, token_secret: cred.token_secret
-                                }, {}, this);
+                                httputil.postJSON("http://localhost:4815/main/logout", cred, {}, this);
                             },
                             function(err) {
                                 if (err) {
                                     callback(err);
                                     return;
                                 }
-                                browser.visit("/" + user.nickname, function(err) {
-                                    callback(!browser.success, browser, user, userCred);
+                                httputil.postJSON("http://localhost:4815/main/renew", {
+                                    consumer_key: cred.consumer_key, consumer_secret: cred.consumer_secret
+                                }, {}, function(err, body) {
+                                    if (err) {
+                                        callback(null, err);
+                                    } else {
+                                        callback(new Error("Unexpected status code"));
+                                    }
                                 });
                             }
                         );
+                    },
+                    "it works": function(err, res) {
+                        assert.ifError(err);
+                    },
+                    "is has a status code of 401": function(err, res) {
+                        assert.isObject(res);
+                        assert.equal(res.statusCode, 401);
+                    }
+                },
+                "and we destroy session and POST to renew as user": {
+                    topic: function(br, cred) {
+                        var callback = this.callback;
 
+                        Step(
+                            function() {
+                                httputil.postJSON("http://localhost:4815/main/logout", cred, {}, this);
+                            },
+                            function(err) {
+                                if (err) {
+                                    callback(err);
+                                    return;
+                                }
+                                httputil.postJSON("http://localhost:4815/main/renew", cred, {}, callback);
+                            }
+                        );
+                    },
+                    "it works": function(err, user, res) {
+                        assert.ifError(err);
+                    },
+                    "it has status code of 200": function(err, user, res) {
+                        assert.isObject(res);
+                        assert.equal(res.statusCode, 200);
+                    },
+                    "is has user data and credentials": function(err, user) {
+                        assert.isObject(user);
+                        assert.includes(user, "token");
+                        assert.includes(user, "secret");
+                        assert.notIncludes(user, "_passwordHash");
+                    }
+                },
+                "and we destroy session and renew credentials from localStorage in new window": {
+                    topic: function(br, cred) {
+                        var callback = this.callback,
+                            browser = new Browser(),
+                            user = cred.user;
+
+                        // Set current credentials
+                        browser.on("active", function(window) {
+                            window.localStorage["cred:token"] = cred.token;
+                            window.localStorage["cred:secret"] = cred.token_secret;
+                            window.localStorage["cred:clientID"] = cred.consumer_key;
+                            window.localStorage["cred:clientSecret"] = cred.consumer_secret;
+                        });
+
+                        Step(
+                            function() {
+                                httputil.postJSON("http://localhost:4815/main/logout", cred, {}, this);
+                            },
+                            function(err) {
+                                if (err) {
+                                    callback(err);
+                                    return;
+                                }
+                                browser.visit("/" + user.nickname + "/lists", function(err) {
+                                    callback(!browser.success, browser, cred, user);
+                                });
+                            }
+                        );
                     },
                     teardown: function(br) {
                         browserClose(br);
                     },
-                    "it works": function(err, br, user) {
+                    "it works": function(err, br, cred, user) {
                         assert.ifError(err);
                         br.assert.success();
                     },
-                    "it keep in Activity section": function(err, br, user) {
-                        br.assert.url({ pathname: "/" + user.nickname});
+                    "it keep in Lists section": function(err, br, cred, user) {
+                        br.assert.url({ pathname: "/" + user.nickname + "/lists"});
                     },
-                    "it has new credentials": function(err, br, user, oldCred) {
+                    "it has new credentials": function(err, br, oldCred, user) {
                         assert.includes(br.window, "localStorage");
                         var localStorage = br.window.localStorage;
                         assert.includes(localStorage, "cred:token");
@@ -237,7 +290,7 @@ suite.addBatch({
                         assert.isNotNull(localStorage["cred:secret"]);
                         assert.isNotNull(localStorage["cred:token"]);
                         assert.notEqual(localStorage["cred:token"], oldCred.token);
-                        assert.notEqual(localStorage["cred:secret"], oldCred.secret);
+                        assert.notEqual(localStorage["cred:secret"], oldCred.secret_secret);
                     }
                 }
             }
