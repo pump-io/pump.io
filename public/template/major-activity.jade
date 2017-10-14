@@ -1,26 +1,31 @@
 -
   var object = activity.object,
-      author = (activity.verb === "share") ? object.author : activity.actor;
+      actor = activity.actor,
+      author = object.author,
+      default_img = "/images/default.png";
 
 unless object.deleted
-  unless !headless && !author
-    li.media.activity.major(class=headless ? 'headless' : undefined, data-activity-id="#{activity.id}")
+  unless !headless && !actor
+    li.media.activity.major(class="verb-#{activity.verb}#{headless ? ' headless' : ''}", data-activity-id="#{activity.id}")
       unless headless
-        a.pull-left(href="#{author.url}")
-          if author.image && author.image.url
-            img.img-rounded.media-object(src=(author.image.pump_io && author.image.pump_io.proxyURL) ? author.image.pump_io.proxyURL : author.image.url, width="64", height="64")
+        a.pull-left(href="#{actor.url}")
+          if actor.image && actor.image.url
+            img.img-rounded.media-object(src=(actor.image.pump_io && actor.image.pump_io.proxyURL) ? actor.image.pump_io.proxyURL : actor.image.url, width="64", height="64")
           else
-            img.img-rounded.media-object(src="/images/default.png", width="64", height="64")
+            img.img-rounded.media-object(src=default_img, width="64", height="64")
       .media-body
-        if object.displayName
+        if object.displayName && activity.verb !== "share"
           h4.media-heading!= object.displayName
 
         p.muted
           small
             if activity.verb === "share" && author
+              a(href=actor.url)= actor.displayName
+              |  shared from 
               a(href="#{author.url}")!= author.displayName
-              |  shared by 
-              a(href=activity.actor.url)= activity.actor.displayName
+              |  at 
+            else 
+              a(href=actor.url)= actor.displayName
               |  at 
             a(href=object.url || activity.url)
               abbr.easydate(title=activity.published)= activity.published
@@ -44,23 +49,40 @@ unless object.deleted
               - var objects = activity.cc;
               include ./activity-object-list.jade
 
-        if object.image && object.image.url
-          p
-            img.img-polaroid.object-image(src=(object.image.pump_io && object.image.pump_io.proxyURL) ? object.image.pump_io.proxyURL : object.image.url)
+        .activity-body
+          if activity.verb === "share"
+            if author
+              a.pull-left(href="#{author.url}")
+                if author.image && author.image.url
+                  img.img-rounded.media-object(src=(author.image.pump_io && author.image.pump_io.proxyURL) ? author.image.pump_io.proxyURL : author.image.url, width="40", height="40")
+                else
+                  img.img-rounded.media-object(src=default_img, width="40", height="40")
 
-        .activity-content!= object.content
-          if typeof object.content !== "undefined" && object.content.indexOf('www.youtube.com/watch?v=') != -1
-            - var yt = String(object.content.match(/www\.youtube\.com\/watch\?v=[a-zA-Z0-9_-]*/))
-          if yt
-            iframe(width="420", height="315", frameborder="0", src="//www.youtube.com/embed/" + yt.substring(yt.indexOf('?v=')+3, yt.length), allowfullscreen)
-            - yt = '';
+            if object.displayName
+              h4.activity-heading!= object.displayName
+
+            p.muted
+              small
+                a(href=object.url || activity.url)
+                  abbr.easydate(title=object.published)= object.published
+
+          .activity-content!= object.content
+            if object.image && object.image.url
+              p
+                img.img-polaroid.object-image(src=(object.image.pump_io && object.image.pump_io.proxyURL) ? object.image.pump_io.proxyURL : object.image.url)
+
+            if typeof object.content !== "undefined" && object.content.indexOf('www.youtube.com/watch?v=') != -1
+              - var yt = String(object.content.match(/www\.youtube\.com\/watch\?v=[a-zA-Z0-9_-]*/))
+            if yt
+              iframe(width="420", height="315", frameborder="0", src="//www.youtube.com/embed/" + yt.substring(yt.indexOf('?v=')+3, yt.length), allowfullscreen)
+              - yt = '';
 
         if principal
           - var obj = object;
           include ./responses.jade
 
         //- List out who liked the post
-        if !object.likes || object.likes.totalItems === 0
+        if !object.likes || object.likes.totalItems === 0 || !object.likes.items
           //- Object has no likes so we don't show anything
         else
           - var coll = object.likes
@@ -74,7 +96,7 @@ unless object.deleted
                 |  likes this.
 
         //- List out who shared the post
-        if !object.shares || object.shares.totalItems === 0
+        if !object.shares || object.shares.totalItems === 0 || !object.shares.items
           //- Object has no shares so we don't show anything
         else
           - var coll = object.shares
