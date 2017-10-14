@@ -1514,6 +1514,9 @@ suite.addBatch({
                     id: "urn:uuid:77451568-ce6a-42eb-8a9f-60ece187725f",
                     actor: "pacct:tim@w3.example",
                     verb: "post",
+                    title: "I am a title!",
+                    upstreamDuplicates: [],
+                    downstreamDuplicates: [],
                     to: [{objectType: "collection",
                           id: "http://w3.example/socialwg"}],
                     object: {
@@ -1531,6 +1534,15 @@ suite.addBatch({
             "displayName is renamed to name": function(act) {
                 assert.isFalse(act.hasOwnProperty("displayName"));
                 assert.equal(act.name, "A note");
+            },
+            "title is dropped": function(act) {
+                assert.isFalse(act.hasOwnProperty("title"));
+            },
+            "upstreamDuplicates is dropped": function(act) {
+                assert.isFalse(act.hasOwnProperty("upstreamDuplicates"));
+            },
+            "downstreamDuplicates is dropped": function(act) {
+                assert.isFalse(act.hasOwnProperty("downstreamDuplicates"));
             }
         }
     }
