@@ -343,17 +343,7 @@
         },
         showError: function(err) {
             var view = this,
-                msg;
-
-            if (_.isString(err)) {
-                msg = err;
-            } else if (_.isObject(err)) {
-                msg = err.message ||
-                    (err.responseJSON &&
-                     err.responseJSON.error) ||
-                    (err.status && err.status +
-                     ": " + err.statusText);
-            }
+                msg = Pump.getError(err);
 
             if (view.$(".alert").length > 0 && msg) {
                 view.showAlert(msg, "error");
