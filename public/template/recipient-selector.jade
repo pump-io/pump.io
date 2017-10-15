@@ -1,3 +1,3 @@
-mixin recipient-selector(name, id, label)
+mixin recipient-selector(name, id, label, value)
   label(for=id)= label
-  input(type="hidden", name=name id=id value=name === "cc" ? "collection:#{principal.followers.url}" : "")
+  input(type="hidden", name=name id=id value=value !== undefined ? value : name === "cc" ? "collection:#{principal.followers.url}" : "")

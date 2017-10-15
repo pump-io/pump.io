@@ -1,0 +1,34 @@
+//- <div id="modal-note" class="modal pump-modal hide fade" tabindex="-1" role="dialog" aria-labelledby="post-label" aria-hidden="true">
+//-   <div class="modal-header">
+//-     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+//-     <h3 id="post-label">Share note from <%- model.actor.displayName %></h3>
+//-   </div>
+//-   <div class="modal-body">
+//-     <form id="post-note" class="form-horizontal">
+//-       <fieldset>
+//-         <div>
+//-           <%= partial("recipient-selector-share", {name: "to", id: "share-to", label: "To"}) %>
+//-         </div>
+//-      </fieldset>
+//-     </form>
+//-   </div>
+//-   <div class="modal-footer">
+//-     <button type="submit" class="btn btn-primary" id="send-share">Share</button>
+//-   </div>
+//- </div>
+include ./recipient-selector.jade
+
+- var default_to = principal.followers.url
+
+.modal.pump-modal.hide.fade#modal-share(tabindex="-1", role="dialog", aria-labelledby="share-label", aria-hidden="true")
+  .modal-header
+    button.close(type="button", data-dismiss="modal", aria-hidden="true") &times;
+    h3#post-label Share note from #{model.actor.displayName}
+
+  .modal-body
+    form.form-horizontal#share-note
+      fieldset
+        div
++recipient-selector("to", "share-to", "To", ("collection:" +  default_to))
+  .modal-footer
+    button.btn.btn-primary#send-note(type="submit") Share
