@@ -222,20 +222,9 @@ if (!window.Pump) {
     // send them here and I'll figure it out.
 
     Pump.error = function(err) {
-        var msg;
+        var msg = Pump.getError(err);
 
-        if (_.isString(err)) {
-            msg = err;
-        } else if (_.isObject(err)) {
-            msg = err.message;
-            if (err.stack) {
-                console.log(err.stack);
-            }
-        } else {
-            msg = "An error occurred.";
-        }
-
-        console.log(msg);
+        Pump.debug(msg);
 
         if (Pump.body && Pump.body.nav) {
             var $nav = Pump.body.nav.$el,
@@ -676,7 +665,9 @@ if (!window.Pump) {
         var type = jqxhr.getResponseHeader("Content-Type"),
             response;
 
-        if (type && type.indexOf("application/json") !== -1) {
+        if (_.isString(jqxhr.responseJSON, "error")) {
+            Pump.error(new Error(jqxhr.responseJSON.error));
+        } else if (type && type.indexOf("application/json") !== -1) {
             try {
                 response = JSON.parse(jqxhr.responseText);
                 Pump.error(new Error(response.error));
@@ -686,8 +677,33 @@ if (!window.Pump) {
         } else if (jqxhr.status && jqxhr.statusText) {
             Pump.error(new Error(jqxhr.status + ": " + jqxhr.statusText));
         } else {
-            Pump.error();
+            Pump.error(jqxhr);
         }
+    };
+
+    Pump.getError = function(err) {
+
+        if (_.isString(err)) {
+            return err;
+        } else if (_.isObject(err)) {
+
+            if (err.stack) {
+                console.log(err.stack);
+            }
+
+            if (_.isString(err.error)) {
+                return err.error;
+            } else if (_.isString(err.message)) {
+                return err.message;
+            } else if (_.has(err.responseJSON, "error") &&
+                       _.isString(err.responseJSON.error)) {
+                return err.responseJSON.error;
+            } else if (err.status && err.statusText) {
+                return err.status + ": " + err.statusText;
+            }
+        }
+
+        return "An error occurred.";
     };
 
 })(window._, window.$, window.Backbone, window.Pump);
