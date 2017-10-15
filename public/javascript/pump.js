@@ -532,6 +532,17 @@ if (!window.Pump) {
         return $("<div/>").html(value).text();
     };
 
+    Pump.strToObj = function(str) {
+        var colon = str.indexOf(":"),
+            type = str.substr(0, colon),
+            id = str.substr(colon + 1);
+
+        return new Pump.ActivityObject({
+            id: id,
+            objectType: type
+        });
+    };
+
     // Sets up the initial view and sub-views
 
     Pump.initialContentView = function() {
