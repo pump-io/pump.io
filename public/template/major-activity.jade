@@ -6,14 +6,14 @@
 
 unless object.deleted
   unless !headless && !actor
-    li.media.activity.major(class="verb-#{activity.verb}#{headless ? ' headless' : ''}", data-activity-id="#{activity.id}")
+    li.media.activity.major(class=headless ? ' headless' : undefined, data-activity-id="#{activity.id}")
       unless headless
         a.pull-left(href="#{actor.url}")
           if actor.image && actor.image.url
             img.img-rounded.media-object(src=(actor.image.pump_io && actor.image.pump_io.proxyURL) ? actor.image.pump_io.proxyURL : actor.image.url, width="64", height="64")
           else
             img.img-rounded.media-object(src=default_img, width="64", height="64")
-      .media-body
+      .media-body(class='verb-' + activity.verb)
         if object.displayName && activity.verb !== "share"
           h4.media-heading!= object.displayName
 
