@@ -421,6 +421,7 @@ if (!window.Pump) {
             onError = function(xhr, res, thrown) {
                 if (!done) {
                     var msgFallback = "Unexpected error",
+                        status = _.has(res, "status") ? res.status : null,
                         err;
 
                     done = true;
@@ -436,7 +437,7 @@ if (!window.Pump) {
                         err = new Error(res || msgFallback);
                     }
 
-                    if (Pump.hasOAuthError(err.message, res.status)) {
+                    if (Pump.hasOAuthError(err.message, status)) {
 
                         // Renew session if for some reason has invalid or expired tokens
                         Pump.renewSession(function(err, data) {
