@@ -2,6 +2,7 @@
   var object = activity.object,
       actor = activity.actor,
       author = object.author,
+      note_url = object.url || activity.url,
       default_img = "/images/default.png";
 
 unless object.deleted
@@ -27,7 +28,7 @@ unless object.deleted
             else 
               a(href=actor.url)= actor.displayName
               |  at 
-            a(href=object.url || activity.url)
+            a(href=activity.verb === "share" ? activity.url : note_url)
               abbr.easydate(title=activity.published)= activity.published
             if activity.location
               |  in 
@@ -63,7 +64,7 @@ unless object.deleted
 
             p.muted
               small
-                a(href=object.url || activity.url)
+                a(href=note_url)
                   abbr.easydate(title=object.published)= object.published
 
           .activity-content!= object.content
