@@ -92,10 +92,16 @@ body {
   margin-top: 25px;
   border-bottom: 1px dotted #EEE;
   padding-bottom: 20px;
+  overflow: visible;
 }
 
 #major-stream .media:first-child {
   margin-top: 1em;
+}
+
+#major-stream .media-body {
+  overflow: visible;
+  margin-left: 75px;
 }
 
 .media-body p.muted:first-child {
@@ -118,6 +124,10 @@ body {
 
 .responses a {
   margin-right: 6px;
+}
+
+.responses .dropdown {
+  display: inline-block;
 }
 
 .responses + p.muted {
@@ -289,5 +299,6 @@ body {
   }
   #major-stream .media-body {
     display: inline;
+    margin-left: 0;
   }
 }

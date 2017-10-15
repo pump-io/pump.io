@@ -1344,7 +1344,8 @@
             "mouseleave": "maybeHideExtraMenu",
             "click .favorite": "favoriteObject",
             "click .unfavorite": "unfavoriteObject",
-            "click .share": "shareObject",
+            "click .share-menu [data-share='now']": "shareObject",
+            "click .share-menu [data-share='to']": "shareObjectModal",
             "click .unshare": "unshareObject",
             "click .comment": "openComment",
             "click .object-image": "openImage"
@@ -1419,42 +1420,45 @@
                 }
             });
         },
-        shareObject: function() {
+        shareObject: function(event, act) {
             var view = this;
-            view.showShareModal(view.model, function(err, to) {
-                var act = new Pump.Activity({
+
+            event.preventDefault();
+            view.startSpin();
+
+            if (!act) {
+                act = new Pump.Activity({
                     verb: "share",
                     object: view.model.object.toJSON()
                 });
+            }
 
-                if (_.isString(to)) {
-                    to = to.split(",");
+            Pump.newMajorActivity(act, function(err, act) {
+                if (err) {
+                    view.stopSpin();
+                    view.showError(err);
+                } else {
+                    view.$(".share")
+                        .removeClass("share")
+                        .addClass("unshare")
+                        .html("Unshare <i class=\"fa fa-times\"></i>");
+                    Pump.addMajorActivity(act);
                 }
-                if (to && to.length > 0) {
-                    act.to = new Pump.ActivityObjectBag(_.map(to, Pump.strToObj));
-                }
-                view.startSpin();
-                Pump.newMajorActivity(act, function(err, act) {
-                    if (err) {
-                        view.stopSpin();
-                        view.showError(err);
-                    } else {
-                        view.$(".share")
-                            .removeClass("share")
-                            .addClass("unshare")
-                            .html("Unshare <i class=\"fa fa-times\"></i>");
-                        Pump.addMajorActivity(act);
-                    }
-                });
             });
+
         },
-        showShareModal: function(model, callback) {
+        shareObjectModal: function(event) {
             var view = this,
+                model = view.model,
                 profile = Pump.principal,
                 lists = profile.lists;
 
+            event.preventDefault();
+            view.startSpin();
+
             Pump.fetchObjects([lists], function(err, objs) {
-                console.log(objs);
+                view.stopSpin();
+
                 if (err) {
                     view.showError(err);
                 } else {
@@ -1464,7 +1468,20 @@
                             model: model,
                             lists: lists
                         },
-                        callback: callback
+                        callback: function(err, to) {
+                            var act = new Pump.Activity({
+                                verb: "share",
+                                object: view.model.object.toJSON()
+                            });
+
+                            if (_.isString(to)) {
+                                to = to.split(",");
+                            }
+                            if (to && to.length > 0) {
+                                act.to = new Pump.ActivityObjectBag(_.map(to, Pump.strToObj));
+                            }
+                            view.shareObject(event, act);
+                        }
                     });
                 }
             });
@@ -2811,9 +2828,9 @@
             view.$("#share-to").select2(Pump.selectOpts());
         },
         events: {
-            "click #send-share": "postShare"
+            "click #send-share": "shareNote"
         },
-        postShare: function(ev) {
+        shareNote: function(ev) {
             var view = this,
                 callback = view.options.callback,
                 to = view.$("#share-to").val();

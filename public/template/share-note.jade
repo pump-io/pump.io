@@ -29,6 +29,6 @@ include ./recipient-selector.jade
     form.form-horizontal#share-note
       fieldset
         div
-+recipient-selector("to", "share-to", "To", ("collection:" +  default_to))
+          +recipient-selector("to", "share-to", "To", ("collection:" +  default_to))
   .modal-footer
-    button.btn.btn-primary#send-note(type="submit") Share
+    button.btn.btn-primary#send-share(type="submit") Share
