@@ -665,7 +665,8 @@ if (!window.Pump) {
         var type = jqxhr.getResponseHeader("Content-Type"),
             response;
 
-        if (_.isString(jqxhr.responseJSON, "error")) {
+        if (_.isObject(jqxhr.responseJSON) &&
+            _.isString(jqxhr.responseJSON.error)) {
             Pump.error(new Error(jqxhr.responseJSON.error));
         } else if (type && type.indexOf("application/json") !== -1) {
             try {
