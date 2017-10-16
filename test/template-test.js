@@ -79,30 +79,23 @@ suite.addBatch({
             },
             "and we get available templates": {
                 topic: function() {
-                    var cb = this.callback,
-                        browser = new Browser();
-
-                    browser.visit("http://localhost:4815/template/templates.js", function(err) {
-                        cb(err, browser);
-                    });
+                    httputil.head("http://localhost:4815/template/templates.js", this.callback);
                 },
-                teardown: function(br) {
-                    if (br && br.window.close) {
-                        br.window.close();
-                    }
-                },
-                "it works": function(err, br) {
+                "it works": function(err, res) {
                     assert.ifError(err);
-                    br.assert.success();
+                },
+                "it has a status code of 200": function(err, res) {
+                    assert.isNumber(res.statusCode);
+                    assert.equal(res.statusCode, 200);
                 }
             },
             "and we has global property": {
-                topic: function() {
+                topic: function(br) {
                     var cb = this.callback,
                         browser = new Browser();
 
-                    browser.visit("http://localhost:4815/", function(err) {
-                        cb(err, browser);
+                    browser.visit("http://localhost:4815/", function() {
+                        cb(!browser.success, browser, browser.window.Pump._templates);
                     });
                 },
                 teardown: function(br) {
@@ -110,16 +103,16 @@ suite.addBatch({
                         br.window.close();
                     }
                 },
-                "it works": function(err, br) {
+                "it works": function(err, br, templates) {
                     assert.ifError(err);
                     br.assert.success();
-                    assert.isObject(br.window.Pump._templates);
+                    assert.isObject(templates);
                 },
                 "returns template with hash": {
-                    topic: function(br) {
-                        var tpls = _.toPairs(br.window.Pump._templates),
+                    topic: function(br, templates) {
+                        var tpls = _.toPairs(templates),
                             first = _.first(tpls),
-                            urlTpl = "http://localhost:4816/template/" +
+                            urlTpl = "http://localhost:4815/template/" +
                             first[0] + "." + first[1] + ".jade.js";
 
                         httputil.head(urlTpl, this.callback);
@@ -133,16 +126,16 @@ suite.addBatch({
                     }
                 },
                 "returns template without hash": {
-                    topic: function(br) {
+                    topic: function(br, templates) {
                         var cb = this.callback,
-                            tpls = _.toPairs(br.window.Pump._templates),
+                            tpls = _.toPairs(templates),
                             first = _.first(tpls),
                             urlTpl = "http://localhost:4815/template/" +
                             first[0] + ".jade.js";
 
                         httputil.head(urlTpl, this.callback);
                     },
-                    "it works": function(err, br) {
+                    "it works": function(err, res) {
                         assert.ifError(err);
                     },
                     "it has a status code of 200": function(err, res) {
@@ -169,21 +162,14 @@ suite.addBatch({
             },
             "and we get available templates": {
                 topic: function() {
-                    var cb = this.callback,
-                        browser = new Browser();
-
-                    browser.visit("http://localhost:4816/template/templates.min.js", function(err) {
-                        cb(err, browser);
-                    });
+                    httputil.head("http://localhost:4816/template/templates.min.js", this.callback);
                 },
-                teardown: function(br) {
-                    if (br && br.window.close) {
-                        br.window.close();
-                    }
-                },
-                "it works": function(err, br) {
+                "it works": function(err, res) {
                     assert.ifError(err);
-                    br.assert.success();
+                },
+                "it has a status code of 200": function(err, res) {
+                    assert.isNumber(res.statusCode);
+                    assert.equal(res.statusCode, 200);
                 }
             },
             "and we has global property": {
@@ -191,8 +177,8 @@ suite.addBatch({
                     var cb = this.callback,
                         browser = new Browser();
 
-                    browser.visit("http://localhost:4816/", function(err) {
-                        cb(err, browser);
+                    browser.visit("http://localhost:4816/", function() {
+                        cb(!browser.success, browser, browser.window.Pump._templates);
                     });
                 },
                 teardown: function(br) {
@@ -200,14 +186,14 @@ suite.addBatch({
                         br.window.close();
                     }
                 },
-                "it works": function(err, br) {
+                "it works": function(err, br, templates) {
                     assert.ifError(err);
                     br.assert.success();
-                    assert.isObject(br.window.Pump._templates);
+                    assert.isObject(templates);
                 },
                 "returns template with hash": {
-                    topic: function(br) {
-                        var tpls = _.toPairs(br.window.Pump._templates),
+                    topic: function(br, templates) {
+                        var tpls = _.toPairs(templates),
                             first = _.first(tpls),
                             urlTpl = "http://localhost:4816/template/" +
                             first[0] + "." + first[1] + ".jade.js";
@@ -223,8 +209,8 @@ suite.addBatch({
                     }
                 },
                 "returns a template without hash": {
-                    topic: function(br) {
-                        var tpls = _.toPairs(br.window.Pump._templates),
+                    topic: function(br, templates) {
+                        var tpls = _.toPairs(templates),
                             first = _.first(tpls),
                             urlTpl = "http://localhost:4816/template/" +
                             first[0] + ".jade.js";
@@ -252,8 +238,8 @@ suite.addBatch({
                     }
                 },
                 "should not be returns invalid template": {
-                    topic: function(br) {
-                        var tpls = _.toPairs(br.window.Pump._templates),
+                    topic: function(br, templates) {
+                        var tpls = _.toPairs(templates),
                             first = _.first(tpls),
                             urlTpl = "http://localhost:4816/template/" +
                             first[0] + ".js.jade";
