@@ -115,27 +115,39 @@ suite.addBatch({
                     br.assert.success();
                     assert.isObject(br.window.Pump._templates);
                 },
-                "return template without hash": {
+                "returns template with hash": {
+                    topic: function(br) {
+                        var tpls = _.toPairs(br.window.Pump._templates),
+                            first = _.first(tpls),
+                            urlTpl = "http://localhost:4816/template/" +
+                            first[0] + "." + first[1] + ".jade.js";
+
+                        httputil.head(urlTpl, this.callback);
+                    },
+                    "it works": function(err, res) {
+                        assert.ifError(err);
+                    },
+                    "it has a status code of 200": function(err, res) {
+                        assert.isNumber(res.statusCode);
+                        assert.equal(res.statusCode, 200);
+                    }
+                },
+                "returns template without hash": {
                     topic: function(br) {
                         var cb = this.callback,
-                            browser = new Browser(),
                             tpls = _.toPairs(br.window.Pump._templates),
                             first = _.first(tpls),
                             urlTpl = "http://localhost:4815/template/" +
                             first[0] + ".jade.js";
 
-                        browser.visit(urlTpl, function(err) {
-                            cb(err, browser);
-                        });
-                    },
-                    teardown: function(br) {
-                        if (br && br.window.close) {
-                            br.window.close();
-                        }
+                        httputil.head(urlTpl, this.callback);
                     },
                     "it works": function(err, br) {
                         assert.ifError(err);
-                        br.assert.success();
+                    },
+                    "it has a status code of 200": function(err, res) {
+                        assert.isNumber(res.statusCode);
+                        assert.equal(res.statusCode, 200);
                     }
                 }
             }
@@ -193,7 +205,7 @@ suite.addBatch({
                     br.assert.success();
                     assert.isObject(br.window.Pump._templates);
                 },
-                "return template with hash": {
+                "returns template with hash": {
                     topic: function(br) {
                         var tpls = _.toPairs(br.window.Pump._templates),
                             first = _.first(tpls),
@@ -210,7 +222,7 @@ suite.addBatch({
                         assert.equal(res.statusCode, 200);
                     }
                 },
-                "should not be return a template": {
+                "returns a template without hash": {
                     topic: function(br) {
                         var tpls = _.toPairs(br.window.Pump._templates),
                             first = _.first(tpls),
@@ -218,6 +230,47 @@ suite.addBatch({
                             first[0] + ".jade.js";
 
                         httputil.head(urlTpl, this.callback);
+                    },
+                    "it works": function(err, res) {
+                        assert.ifError(err);
+                    },
+                    "it has a status code of 200": function(err, res) {
+                        assert.isNumber(res.statusCode);
+                        assert.equal(res.statusCode, 200);
+                    }
+                },
+                "should not be returns a blacklist template": {
+                    topic: function() {
+                        httputil.head("http://localhost:4816/template/javascript-disabled.jade.js", this.callback);
+                    },
+                    "it works": function(err, res) {
+                        assert.ifError(err);
+                    },
+                    "it has a status code of 404": function(err, res) {
+                        assert.isNumber(res.statusCode);
+                        assert.equal(res.statusCode, 404);
+                    }
+                },
+                "should not be returns invalid template": {
+                    topic: function(br) {
+                        var tpls = _.toPairs(br.window.Pump._templates),
+                            first = _.first(tpls),
+                            urlTpl = "http://localhost:4816/template/" +
+                            first[0] + ".js.jade";
+
+                        httputil.head(urlTpl, this.callback);
+                    },
+                    "it works": function(err, res) {
+                        assert.ifError(err);
+                    },
+                    "it has a status code of 404": function(err, res) {
+                        assert.isNumber(res.statusCode);
+                        assert.equal(res.statusCode, 404);
+                    }
+                },
+                "should not be returns a non-existent template": {
+                    topic: function() {
+                        httputil.head("http://localhost:4816/template/javascript-client.jade.js", this.callback);
                     },
                     "it works": function(err, res) {
                         assert.ifError(err);
