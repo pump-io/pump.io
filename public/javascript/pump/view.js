@@ -187,6 +187,10 @@
         render: function() {
             var view = this,
                 getTemplate = function(name, cb) {
+                    if (!Pump._tplCallbacks) {
+                        Pump._tplCallbacks = {};
+                    }
+
                     if (_.has(Pump.templates, name)) {
                         cb(null, Pump.templates[name]);
                     } else {
@@ -227,6 +231,15 @@
                         }
                         url += templateName + ".jade.js";
 
+                        if (Pump._tplCallbacks[templateName]) {
+                            // Prevent multiple requests for same template
+                            // until server response
+
+                            Pump._tplCallbacks[templateName].push(cb);
+                            return;
+                        }
+                        Pump._tplCallbacks[templateName] = [cb];
+
                         $.get(url, function(data) {
                             var f;
                             try {
@@ -239,7 +252,19 @@
                                 cb(err, null);
                                 return;
                             }
-                            cb(null, f);
+
+                            var tplCallbacks = Pump._tplCallbacks[templateName] || [];
+                            for (var x = 0; x < tplCallbacks.length; x++) {
+                                // Fire off all the callbacks that get a response
+
+                                tplCallbacks[x](null, f);
+                            }
+                            delete Pump._tplCallbacks[templateName];
+
+                        }).fail(function(err) {
+                            // On error only fire the first request
+                            // for prevent multiples error alerts
+                            cb(err);
                         });
                     }
                 },
