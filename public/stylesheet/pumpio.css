@@ -87,16 +87,13 @@ body {
 
 /* lightbox */
 
-.lightbox {
-  /* force center */
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%);
-}
-
 .lightbox-content .lightbox-caption {
   max-height: 200px;
   overflow: hidden;
+}
+
+.lightbox-content img {
+  margin: auto;
 }
 
 .lightbox-content .lightbox-caption a {
