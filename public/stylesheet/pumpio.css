@@ -85,6 +85,26 @@ body {
   max-height: 510px;
 }
 
+/* lightbox */
+
+.lightbox {
+  /* force center */
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%);
+}
+
+.lightbox-content .lightbox-caption {
+  max-height: 200px;
+  overflow: hidden;
+}
+
+.lightbox-content .lightbox-caption a {
+  color: #fff;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
 /* media */
 
 .media:first-child {
