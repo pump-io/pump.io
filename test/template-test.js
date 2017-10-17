@@ -2,7 +2,7 @@
 //
 // Test the template module
 //
-// Copyright 2011-2017, E14N https://e14n.com/ and contributors
+// Copyright 2017, Distopico <distopico@riseup.net>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
