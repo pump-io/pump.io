@@ -1600,8 +1600,18 @@
             });
         },
         cancelComment: function() {
-            var view = this;
-            view.remove();
+            var view = this,
+                html = view.$('textarea[name="content"]').val();
+
+            if (html.length === 0) {
+                view.remove();
+                return;
+            }
+            Pump.areYouSure("Look like have content, are you sure close this comment?", function(err, sure) {
+                if (sure) {
+                    view.remove();
+                }
+            });
         },
         saveComment: function() {
             var view = this,
