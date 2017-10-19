@@ -1598,6 +1598,15 @@
             view.$('textarea[name="content"]').wysihtml5({
                 customTemplates: Pump.wysihtml5Tmpl
             });
+
+            $(".replies .comment-form").each(function(index, el) {
+                var $el = $(el),
+                    html = $el.find('textarea[name="content"]').val();
+
+                if (!html || html.length === 0) {
+                    $el.remove();
+                }
+            });
         },
         cancelComment: function() {
             var view = this,
