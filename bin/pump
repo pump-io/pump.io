@@ -124,7 +124,7 @@ var launchApps = function(config) {
 
         cluster.on("exit", function(worker, code, signal) {
             // TODO remove this when we drop Node 4
-            var zeroDowntimeRestart = worker.exitedAfterDisconnect || worker.suicide,
+            var zeroDowntimeRestart = _.has(worker, "exitedAfterDisconnect") ? worker.exitedAfterDisconnect : worker.suicide,
                 exitCode = worker.process.exitCode;
 
             // Don't respawn any workers if we aborted a restart
