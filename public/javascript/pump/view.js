@@ -1076,8 +1076,6 @@
 
             view.startSpin();
 
-            console.log(params);
-
             options = {
                 contentType: "application/json",
                 data: JSON.stringify(params),

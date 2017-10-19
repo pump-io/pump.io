@@ -119,6 +119,10 @@ if (!window.Pump) {
                 break;
             }
         } else {
+            // If we're on a login page, and you try to login but you come from other route
+            if (Pump.getContinueTo()) {
+                Pump.saveContinueTo();
+            }
             // Check if we have stored OAuth credentials
 
             Pump.ensureCred(function(err, cred) {
@@ -433,6 +437,15 @@ if (!window.Pump) {
         }
     };
 
+    Pump.setContinueTo = function(continueTo) {
+        continueTo = continueTo || Pump.getContinueTo();
+        if (continueTo) {
+            Pump.router.navigate(window.location.pathname + "?continue=" + continueTo, {
+                replace: true
+            });
+        }
+    };
+
     Pump.saveContinueTo = function() {
         Pump.continueTo = window.location.pathname + window.location.search;
     };
@@ -577,9 +590,9 @@ if (!window.Pump) {
             if (name == View.prototype.modelName) {
                 options.model = def.models[name].unique(value);
             } else if (def.models[name]) {
-                    options.data[name] = def.models[name].unique(value);
+                options.data[name] = def.models[name].unique(value);
             } else {
-                    options.data[name] = value;
+                options.data[name] = value;
             }
         }
 
