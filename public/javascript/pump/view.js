@@ -1599,6 +1599,7 @@
                 customTemplates: Pump.wysihtml5Tmpl
             });
 
+            // Close other comments instances if are empty
             $(".replies .comment-form").each(function(index, el) {
                 var $el = $(el),
                     html = $el.find('textarea[name="content"]').val();

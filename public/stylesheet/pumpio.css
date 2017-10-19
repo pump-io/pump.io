@@ -173,6 +173,10 @@ body {
   padding-left: 20px;
 }
 
+.replies .close-btn {
+  margin-left: 5px;
+}
+
 .replies .responses {
   margin-top: 0;
 }
@@ -282,7 +286,7 @@ body {
     padding-top: 0;
   }
   .navbar {
-  position: relative;
+    position: relative;
   }
   .navbar .pull-right .btn-group {
     position: static;
