@@ -78,7 +78,7 @@
     "build": "jade --client --extension jade.js --no-debug public/template",
     "fullbuild": "npm run build && echo 'use `npm run build` instead next time' 1>&2",
     "test": "npm run lint && npm run test:vows",
-    "test:vows": "nyc -r lcov vows -v test/*-test.js",
+    "test:vows": "NODE_OPTIONS='--throw-deprecation' nyc -r lcov vows -v test/*-test.js",
     "test:root": "nyc -r lcov --report-dir coverage-root vows -v test/*-test-as-root.js",
     "test:install": "npm install -g .",
     "test:system": "vows -v test/*-test-system.js",
