@@ -57,6 +57,7 @@
     "ssl-config": "^1.0.0",
     "step": "^1.0.0",
     "ua-parser-js": "^0.7.10",
+    "uglify-js": "^3.0.28",
     "uuid": "^3.0.0",
     "validator": "^9.0.0",
     "webfinger": "~0.4.2",
@@ -75,8 +76,9 @@
     "./doc/pump.1"
   ],
   "scripts": {
-    "build": "jade --client --extension jade.js --no-debug public/template",
+    "build": "echo 'now the templates compile at startup' 1>&2",
     "fullbuild": "npm run build && echo 'use `npm run build` instead next time' 1>&2",
+    "jade:build": "jade --client --extension jade.js --no-debug public/template",
     "test": "npm run lint && npm run test:vows",
     "test:vows": "nyc -r lcov vows -v test/*-test.js",
     "test:root": "nyc -r lcov --report-dir coverage-root vows -v test/*-test-as-root.js",
