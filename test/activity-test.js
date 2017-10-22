@@ -1537,7 +1537,11 @@ suite.addBatch({
             },
             "the object's objectType is renamed to @type": function(act) {
                 assert.isFalse(act.object.hasOwnProperty("objectType"));
-                assert.equal(act.object["@type"], "like");
+                assert.equal(act.object["@type"], "note");
+            },
+            "the `to` field's collection's objectType is renamed to @type": function(act) {
+                assert.isFalse(act.to[0].hasOwnProperty("objectType"));
+                assert.equal(act.to[0]["@type"], "collection");
             },
             // XXX should we test for all objectType renames? E.g. in the `to` field?
             "displayName is renamed to name": function(act) {
@@ -1601,7 +1605,7 @@ suite.addBatch({
             },
             "the target's objectType is renamed to @type": function(act) {
                 assert.isFalse(act.target.hasOwnProperty("objectType"));
-                assert.equal(act.target["@type"], "like");
+                assert.equal(act.target["@type"], "note");
             }
         }
     }
