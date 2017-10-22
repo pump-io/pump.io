@@ -1531,6 +1531,15 @@ suite.addBatch({
                 assert.isFalse(act.hasOwnProperty("id"));
                 assert.equal(act["@id"], "urn:uuid:77451568-ce6a-42eb-8a9f-60ece187725f");
             },
+            "the `post` verb is converted specially to Create in @type": function(act) {
+                assert.isFalse(act.hasOwnProperty("verb"));
+                assert.equal(act["@type"], "Create");
+            },
+            "the object's objectType is renamed to @type": function(act) {
+                assert.isFalse(act.object.hasOwnProperty("objectType"));
+                assert.equal(act.object["@type"], "like");
+            },
+            // XXX should we test for all objectType renames? E.g. in the `to` field?
             "displayName is renamed to name": function(act) {
                 assert.isFalse(act.hasOwnProperty("displayName"));
                 assert.equal(act.name, "A note");
@@ -1543,6 +1552,56 @@ suite.addBatch({
             },
             "downstreamDuplicates is dropped": function(act) {
                 assert.isFalse(act.hasOwnProperty("downstreamDuplicates"));
+            }
+        },
+        "and we try to convert a post of a note to a collection to AS2": {
+            topic: function(Activity) {
+                var act = new Activity({
+                    id: "urn:uuid:3738fceb-9705-4fa8-a0d3-59852770dc4d",
+                    actor: "acct:chris@w3.example",
+                    verb: "post",
+                    title: "A rando note I want to categorize",
+                    to: [{objectType: "collection",
+                          id: "http://w3.example/socialwg"}],
+                    object: {
+                        id: "urn:uuid:33166eb9-2567-477c-ad90-9352dd904712",
+                        objectType: "note"
+                    },
+                    target: {
+                        id: "http://w3.example/chris/a-collection",
+                        objectType: "collection"
+                    }
+                });
+                return act.toAS2();
+            },
+            "the `post` verb is converted specially to Add in @type": function(act) {
+                assert.isFalse(act.hasOwnProperty("verb"));
+                assert.equal(act["@type"], "Add");
+            }
+        },
+        "and we try to convert a like of a note to AS2": {
+            topic: function(Activity) {
+                var act = new Activity({
+                    id: "urn:uuid:db8b4174-a321-430f-bbbe-e11c65dd48ee",
+                    actor: "acct:aj@w3.example",
+                    verb: "like",
+                    to: [{objectType: "collection",
+                          id: "http://w3.example/socialwg"}],
+                    // TODO check that this syntax is correct
+                    target: {
+                        id: "urn:uuid:77451568-ce6a-42eb-8a9f-60ece187725f",
+                        objectType: "note"
+                    }
+                });
+                return act.toAS2();
+            },
+            "verb is renamed to @type": function(act) {
+                assert.isFalse(act.hasOwnProperty("verb"));
+                assert.equal(act["@type"], "like");
+            },
+            "the target's objectType is renamed to @type": function(act) {
+                assert.isFalse(act.target.hasOwnProperty("objectType"));
+                assert.equal(act.target["@type"], "like");
             }
         }
     }
