@@ -1512,7 +1512,7 @@ suite.addBatch({
             topic: function(Activity) {
                 var act = new Activity({
                     id: "urn:uuid:77451568-ce6a-42eb-8a9f-60ece187725f",
-                    actor: "pacct:tim@w3.example",
+                    actor: "acct:tim@w3.example",
                     verb: "post",
                     title: "I am a title!",
                     upstreamDuplicates: [],
