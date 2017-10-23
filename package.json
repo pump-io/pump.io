@@ -60,7 +60,7 @@
     "uuid": "^3.0.0",
     "validator": "^9.0.0",
     "webfinger": "~0.4.2",
-    "yargs": "^9.0.1"
+    "yargs": "^10.0.3"
   },
   "bin": {
     "pump": "./bin/pump",
