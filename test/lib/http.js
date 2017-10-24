@@ -43,7 +43,7 @@ OAuthJSONError.prototype.toString = function() {
     return "OAuthJSONError (" + this.statusCode + "): " + this.data;
 };
 
-var newOAuth = function(serverURL, cred) {
+var newOAuth = function(serverURL, cred, headers) {
     var oa, parts;
 
     parts = urlparse(serverURL);
@@ -56,7 +56,7 @@ var newOAuth = function(serverURL, cred) {
                    null,
                    "HMAC-SHA1",
                    null, // nonce size; use default
-                   {"User-Agent": "pump.io/"+version});
+                   _.assign({"User-Agent": "pump.io/"+version}, headers || {}));
 
     return oa;
 };
@@ -272,11 +272,16 @@ var putJSON = function(serverUrl, cred, payload, callback) {
     oa.put(serverUrl, cred.token, cred.token_secret, toSend, "application/json", jsonHandler(callback));
 };
 
-var getJSON = function(serverUrl, cred, callback) {
+var getJSON = function(serverUrl, cred, headers, callback) {
+
+    if (!callback) {
+        callback = headers;
+        headers = {};
+    }
 
     var oa, toSend;
 
-    oa = newOAuth(serverUrl, cred);
+    oa = newOAuth(serverUrl, cred, headers);
     oa.get(serverUrl, cred.token, cred.token_secret, jsonHandler(callback));
 };
 
