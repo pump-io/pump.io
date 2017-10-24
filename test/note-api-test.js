@@ -177,6 +177,45 @@ suite.addBatch(
                             assert.equal(note.author.displayName, act.actor.displayName);
                             assert.equal(note.author.objectType, act.actor.objectType);
                         }
+                    },
+                    "and we fetch the posted note as ActivityStreams 2.0": {
+                        topic: function(act, user, cl) {
+                            var cb = this.callback,
+                                pair = pairOf(user),
+                                cred = makeCred(cl, pair);
+                            // ID === JSON representation URL
+                            httputil.getJSON(act.object.id, cred, {"Accept": "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\""}, function(err, note) {
+                                cb(err, note, act);
+                            });
+                        },
+                        "it works": function(err, note, act) {
+                            assert.ifError(err);
+                            assert.isObject(note);
+                        },
+                        "the result was converted to AS2": function(err, note, act) {
+                            assert.ifError(err);
+                            assert.isObject(note);
+                            assert.include(note, "@id");
+                            assert.isString(note["@id"]);
+                            assert.include(note, "author");
+                            assert.isObject(note.author);
+                            assert.include(note.author, "@id");
+                        },
+                        "results don't leak private members": function(err, note, act) {
+                            assert.ifError(err);
+                            assert.isObject(note);
+                            assert.isFalse(_.has(note, "_uuid"));
+                        },
+                        "results are what we posted": function(err, note, act) {
+                            assert.equal(note.content, "I'm so scared!");
+                            assert.equal(note.objectType, "note");
+                            assert.equal(note.id, act.object.id);
+                            assert.equal(note.published, act.object.published);
+                            assert.equal(note.updated, act.object.updated);
+                            assert.equal(note.author.id, act.actor.id);
+                            assert.equal(note.author.displayName, act.actor.displayName);
+                            assert.equal(note.author.objectType, act.actor.objectType);
+                        }
                     }
                 }
             },
