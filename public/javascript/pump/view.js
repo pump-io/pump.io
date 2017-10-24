@@ -1443,6 +1443,7 @@
         },
         unshareObject: function() {
             var view = this,
+                model = view.model,
                 act = new Pump.Activity({
                     verb: "unshare",
                     object: view.model.object.toJSON()
@@ -1455,11 +1456,21 @@
                     view.stopSpin();
                     view.showError(err);
                 } else {
-                    view.$(".unshare")
-                        .removeClass("unshare")
-                        .addClass("share")
-                        .html("Share <i class=\"fa fa-share\"></i>");
+                    var shared = view.$(".unshare"),
+                        original = $("[data-object-id='" +
+                                     act.object.id + "'] .unshare");
+
+                    $.each([shared, original], function(index, el) {
+                        el.removeClass("unshare")
+                            .addClass("share")
+                            .html("Share <i class=\"fa fa-share\"></i>");
+                    });
+
                     Pump.addMinorActivity(act);
+                    // Remove from the list
+                    view.remove();
+                    // Remove the model from the client-side collection
+                    model.collection.remove(model.id);
                 }
             });
         },
