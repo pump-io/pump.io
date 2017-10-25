@@ -680,11 +680,11 @@ if (!window.Pump) {
             lastNotify = _pump.notifyLast,
             everyTime = 60000 * 5,
             lastTime = _.get(lastNotify, "sended"),
-            diffTime = (Date.now() - new Date(lastTime || null).getTime()) / 100;
+            diffTime = (Date.now() - new Date(lastTime || null).getTime());
 
         if (actor.id === user.id ||
             _.get(lastNotify, "id") === activity.id ||
-            (lastTime && diffTime < everyTime && !isDirect)) {
+            (diffTime < everyTime && !isDirect)) {
             return;
         }
 
