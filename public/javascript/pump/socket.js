@@ -26,6 +26,13 @@
 
     "use strict";
 
+    // Private instance
+    var _socket = {
+        reconnecting: false,
+        retryTimeout: 30000,
+        retryAttempts: 0
+    };
+
     Pump.getStreams = function() {
 
         var streams = {};
@@ -116,9 +123,17 @@
 
         sock = new SockJS(here.protocol + "//" + here.host + "/main/realtime/sockjs");
 
-        sock.onopen = function() {
+        sock.onopen = function(e) {
             Pump.socket = sock;
             Pump.followStreams();
+
+            // Reset reconnect
+            if (_socket.retryTimer) {
+                clearTimeout(_socket.retryTimer);
+                _socket.retryTimer = null;
+            }
+            _socket.reconnecting = false;
+            _socket.retryAttempts = 0;
         };
 
         sock.onmessage = function(e) {
@@ -134,9 +149,34 @@
             }
         };
 
-        sock.onclose = function() {
-            // XXX: reconnect?
+        sock.onclose = function(e) {
             Pump.socket = null;
+            // Reconnect on broken connections, not for normal close
+            if (e.code !== 1000) {
+                sock.reconnect(e);
+            }
+        };
+
+        sock.reconnect = function(e) {
+            _socket.retryAttempts++;
+
+            if (_socket.retryTimer) {
+                clearTimeout(_socket.retryTimer);
+                _socket.retryTimer = null;
+            }
+
+            if (e.code === 2000 && _socket.retryAttempts > 10) {
+                // No more attempts if all transports failed
+                return;
+            }
+
+            if (_socket.reconnecting) {
+                _socket.retryTimer = setTimeout(Pump.setupSocket, _socket.retryTimeout);
+            } else {
+                // The first time try to reconnect immediately
+                _socket.reconnecting = true;
+                Pump.setupSocket();
+            }
         };
     };
 
