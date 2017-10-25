@@ -32,6 +32,9 @@ if (!window.Pump) {
 
     "use strict";
 
+    // Private instance
+    var _pump = {};
+
     // This is overwritten by inline script in layout.jade
 
     Pump.config = {};
@@ -84,6 +87,7 @@ if (!window.Pump) {
         }
 
         Pump.setupInfiniteScroll();
+        Pump.notifyEnable();
 
         if (Pump.principalUser) {
             Pump.principalUser = Pump.User.unique(Pump.principalUser);
@@ -636,6 +640,78 @@ if (!window.Pump) {
                 }
             }
         });
+    };
+
+    Pump.notifyEnable = function() {
+        var Notification = window.Notification;
+
+        // Check if the browser supports notifications, otherwise do nothing
+        if (!Notification) {
+            _pump.notifyPermission = "unsupported";
+        }
+
+        // respectful if the user has denied notifications
+        if (Notification.permission !== "denied") {
+
+            Notification.requestPermission(function(permission) {
+                // If the user accepts, let's create a notification
+                _pump.notifyPermission = permission;
+            });
+        }
+    };
+
+    Pump.notifySend = function(url, model) {
+        var activity = model.toJSON(),
+            userModel = Pump.principalUser || Pump.principal,
+            user = userModel ? userModel.toJSON() : null,
+            actor = activity.actor;
+
+        if (!user || !actor) {
+            return;
+        }
+
+        user = user.profile || user;
+
+        // Prevent send notification for same user or previous notification
+        // and no bother every time, only every 5 minutes
+        var isDirect = _.find(activity.to, {id: user.id}),
+            lastNotify = _pump.notifyLast,
+            everyTime = 60000 * 5,
+            lastTime = _.get(lastNotify, "sended"),
+            diffTime = (Date.now() - new Date(lastTime || null).getTime()) / 100;
+
+        if (actor.id === user.id ||
+            _.get(lastNotify, "id") === activity.id ||
+            (lastTime && diffTime < everyTime && !isDirect)) {
+            return;
+        }
+
+        // Send notification if permissions have already been granted
+        if (_pump.notifyPermission === "granted") {
+            var object = activity.object,
+                title = "New " + activity.verb + " by " + actor.preferredUsername,
+                body;
+
+            if (object.displayName) {
+                body = " Say: " + object.displayName;
+            } else if (object.content) {
+                // No all content is HTML, so ensure parse correctly
+                body = $("<p>" + object.content + "</p>").text();
+            }
+
+            _pump.notifyLast = new window.Notification(title, {
+                icon: "/images/icon-small.png",
+                body: body,
+                image: _.get(object, "image.url")
+            });
+            // Additional control parameters
+            _pump.notifyLast.id = activity.id;
+            _pump.notifyLast.sended = new Date();
+
+        } else if (_pump.notifyPermission === "default") {
+            // Try to enable again
+            Pump.notifyEnable();
+        }
     };
 
     // XXX: This POSTs with session auth; subject to XSS.
