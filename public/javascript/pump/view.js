@@ -768,6 +768,9 @@
                         // Request a new challenge
                         Pump.setupSocket();
                     }
+                    // Enable desktop notifications
+                    Pump.enableNotify();
+
                     // XXX: reload current data
                     view.stopSpin();
                     Pump.router.navigate(continueTo, true);

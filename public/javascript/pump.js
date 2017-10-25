@@ -87,9 +87,9 @@ if (!window.Pump) {
         }
 
         Pump.setupInfiniteScroll();
-        Pump.notifyEnable();
 
         if (Pump.principalUser) {
+            Pump.enableNotify();
             Pump.principalUser = Pump.User.unique(Pump.principalUser);
             Pump.principal = Pump.Person.unique(Pump.principal);
             Pump.body.nav = new Pump.UserNav({el: Pump.body.$(".navbar-inner .container"),
@@ -109,6 +109,7 @@ if (!window.Pump) {
                 break;
             }
         } else if (Pump.principal) {
+            Pump.enableNotify();
             Pump.principal = Pump.Person.unique(Pump.principal);
             Pump.body.nav = new Pump.RemoteNav({el: Pump.body.$(".navbar-inner .container"),
                                                 model: Pump.principal});
@@ -150,6 +151,7 @@ if (!window.Pump) {
                             return;
                         }
 
+                        Pump.enableNotify();
                         user = Pump.principalUser = Pump.User.unique(data);
                         Pump.principal = Pump.principalUser.profile;
 
@@ -581,9 +583,9 @@ if (!window.Pump) {
             if (name == View.prototype.modelName) {
                 options.model = def.models[name].unique(value);
             } else if (def.models[name]) {
-                    options.data[name] = def.models[name].unique(value);
+                options.data[name] = def.models[name].unique(value);
             } else {
-                    options.data[name] = value;
+                options.data[name] = value;
             }
         }
 
@@ -642,7 +644,7 @@ if (!window.Pump) {
         });
     };
 
-    Pump.notifyEnable = function() {
+    Pump.enableNotify = function() {
         var Notification = window.Notification;
 
         // Check if the browser supports notifications, otherwise do nothing
@@ -660,7 +662,7 @@ if (!window.Pump) {
         }
     };
 
-    Pump.notifySend = function(url, model) {
+    Pump.sendNotify = function(url, model) {
         var activity = model.toJSON(),
             userModel = Pump.principalUser || Pump.principal,
             user = userModel ? userModel.toJSON() : null,
@@ -710,7 +712,7 @@ if (!window.Pump) {
 
         } else if (_pump.notifyPermission === "default") {
             // Try to enable again
-            Pump.notifyEnable();
+            Pump.enableNotify();
         }
     };
 

@@ -61,7 +61,7 @@
         if (target) {
             act = Pump.Activity.unique(activity);
             target.items.unshift(act);
-            Pump.notifySend(url, act);
+            Pump.sendNotify(url, act);
         }
     };
 
