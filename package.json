@@ -120,7 +120,7 @@
   ],
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=4 <7",
+    "node": ">=4 <=8",
     "npm": ">=2"
   },
   "greenkeeper": {
