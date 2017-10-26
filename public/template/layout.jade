@@ -68,7 +68,7 @@ html(lang="en")
           a(href="/javascript/about.html", data-jslicense="1", data-bypass) JavaScript license information
 
     if config.debugClient
-      script(src="/javascript/libs/jquery-1.10.2.js")
+      script(src="/javascript/libs/jquery-2.2.4.js")
       script(src="/javascript/libs/jquery.easydate-0.2.4.js")
       script(src="/javascript/libs/bootstrap.js")
       script(src="/shared/lodash.js")
@@ -86,7 +86,7 @@ html(lang="en")
         script(src="/javascript/libs/sockjs.js")
     else
       if config.noCDN
-        script(src="/javascript/libs/jquery-1.10.2.min.js")
+        script(src="/javascript/libs/jquery-2.2.4.min.js")
         script(src="/javascript/libs/bootstrap.min.js")
         script(src="/shared/lodash-min.js")
         script(src="/javascript/libs/backbone-min.js")
@@ -97,7 +97,7 @@ html(lang="en")
         if config.sockjs
           script(src="/javascript/libs/sockjs.min.js")
       else
-        script(src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js", integrity="sha384-aBL3Lzi6c9LNDGvpHkZrrm3ZVsIwohDD7CDozL0pk8FwCrfmV7H9w8j3L7ikEv6h", crossorigin="anonymous")
+        script(src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js", integrity="sha384-rY/jv8mMhqDabXSo+UCggqKtdmBfd3qC2/KvyTDNQ6PcUJXaxK1tMepoQda4g5vB", crossorigin="anonymous")
         script(src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js", integrity="sha384-7sVK908dLMjOwvGD47EHg9cxk32sTpllx4Qqg0vzxEIlyBSsK9UauzrqZl8SPP0+", crossorigin="anonymous")
         script(src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js", integrity="sha384-FwbQ7A+X0UT99MG4WBjhZHvU0lvi67zmsIYxAREyhabGDXt1x0jDiwi3xubEYDYw", crossorigin="anonymous")
         script(src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone-min.js", integrity="sha384-NNt9ocJfZhIg2c5PbM5G2a3tTaeXhEfqCHWHNB7htzaWKn8MwFkzVyGdzLA8QMX7", crossorigin="anonymous")
