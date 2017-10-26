@@ -676,13 +676,15 @@ if (!window.Pump) {
 
         // Prevent send notification for same user or previous notification
         // and no bother every time, only every 5 minutes
-        var isDirect = _.find(activity.to, {id: user.id}),
-            lastNotify = _pump.notifyLast,
+        var lastNotify = _pump.notifyLast,
             everyTime = 60000 * 5,
             lastTime = _.get(lastNotify, "sended"),
-            diffTime = (Date.now() - new Date(lastTime || null).getTime());
+            diffUpdate =  (Date.now() - new Date(activity.updated).getTime()),
+            diffTime = (Date.now() - new Date(lastTime || null).getTime()),
+            isDirect = _.find(activity.to, {id: user.id}),
+            isRecent = diffUpdate < (60000 * 30);
 
-        if (actor.id === user.id ||
+        if (!isRecent || actor.id === user.id ||
             _.get(lastNotify, "id") === activity.id ||
             (diffTime < everyTime && !isDirect)) {
             return;
@@ -691,14 +693,14 @@ if (!window.Pump) {
         // Send notification if permissions have already been granted
         if (_pump.notifyPermission === "granted") {
             var object = activity.object,
-                title = "New " + activity.verb + " by " + actor.preferredUsername,
+                title = $(activity.content).text(),
                 body;
 
-            if (object.displayName) {
-                body = " Say: " + object.displayName;
-            } else if (object.content) {
+            if (object.content) {
                 // No all content is HTML, so ensure parse correctly
                 body = $("<p>" + object.content + "</p>").text();
+            } else if (object.displayName && object.objectType !==  "person") {
+                body = object.displayName;
             }
 
             _pump.notifyLast = new window.Notification(title, {
