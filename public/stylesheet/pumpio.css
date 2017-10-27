@@ -104,6 +104,10 @@ body {
   margin-left: 75px;
 }
 
+#major-stream .headless .media-body {
+  margin-left: 20px;
+}
+
 .media-body p.muted:first-child {
   line-height: 14px;
   margin-bottom: 8px;
@@ -279,7 +283,7 @@ body {
     padding-top: 0;
   }
   .navbar {
-  position: relative;
+    position: relative;
   }
   .navbar .pull-right .btn-group {
     position: static;
