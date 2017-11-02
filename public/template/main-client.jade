@@ -22,8 +22,9 @@
           p
             a.btn.primary.large(href="/main/register") Get Started &raquo;
 
-      .span4
-        img.img-rounded(src="images/somefriends.jpg", width="340", height="235")
+      .span4.pull-center
+        if config.mainImage
+          img.img-rounded(src="#{config.mainImage}")
 
         div
           p
