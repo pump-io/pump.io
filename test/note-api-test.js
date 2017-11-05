@@ -208,13 +208,12 @@ suite.addBatch(
                         },
                         "results are what we posted": function(err, note, act) {
                             assert.equal(note.content, "I'm so scared!");
-                            assert.equal(note.objectType, "note");
-                            assert.equal(note.id, act.object.id);
+                            assert.equal(note["@type"], "note");
+                            assert.equal(note["@id"], act.object.id);
                             assert.equal(note.published, act.object.published);
                             assert.equal(note.updated, act.object.updated);
-                            assert.equal(note.author.id, act.actor.id);
-                            assert.equal(note.author.displayName, act.actor.displayName);
-                            assert.equal(note.author.objectType, act.actor.objectType);
+                            assert.equal(note.author["@id"], act.actor.id);
+                            assert.equal(note.author["@type"], act.actor.objectType);
                         }
                     }
                 }
