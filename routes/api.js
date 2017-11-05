@@ -161,7 +161,7 @@ var addRoutes = function(app, session) {
 
     // Activities
 
-    app.get("/api/activity/:uuid", smw, defaultType, anyReadAuth, reqActivity, actorOrRecipient, getActivity);
+    app.get("/api/activity/:uuid", smw, anyReadAuth, reqActivity, actorOrRecipient, getActivity);
     app.put("/api/activity/:uuid", userWriteOAuth, reqActivity, actorOnly, putActivity);
     app.delete("/api/activity/:uuid", userWriteOAuth, reqActivity, actorOnly, delActivity);
 
@@ -191,7 +191,7 @@ var addRoutes = function(app, session) {
 
     // Other objects
 
-    app.get("/api/:type/:uuid", smw, defaultType, anyReadAuth, requestObject, authorOrRecipient, getObject);
+    app.get("/api/:type/:uuid", smw, anyReadAuth, requestObject, authorOrRecipient, getObject);
     app.put("/api/:type/:uuid", userWriteOAuth, requestObject, authorOnly, reqGenerator, putObject);
     app.delete("/api/:type/:uuid", userWriteOAuth, requestObject, authorOnly, reqGenerator, deleteObject);
 
@@ -202,23 +202,6 @@ var addRoutes = function(app, session) {
     // With foreign IDs; needs to be late for better matches
 
     app.get("/api/:type", smw, anyReadAuth, requestObjectByID, authorOrRecipient, getObject);
-};
-
-var defaultType = function(req, res, next) {
-    /*
-      We assign a default value for 'Accepts' here because we use
-      req.accepts() to determine whether to serve ActivityStreams 2.0
-      documents, but the `accepts` module which underlies this call
-      treats no `Accepts` header as equivalent to `*`.
-
-      This is highly problematic as req.accepts() with AS2 media types
-      then always returns true in the exact scenario we want it to
-      return false for - when the client needs the old default of AS1!
-
-      So we fudge this header here to make this behavior work.
-    */
-    if (!req.header("accept")) req.headers.accept = "application/stream+json";
-    next();
 };
 
 var wantAS2 = function(req) {
