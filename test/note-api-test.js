@@ -145,7 +145,6 @@ suite.addBatch(
                             assert.isObject(note);
                         },
                         "results look right": function(err, note, act) {
-                            assert.ifError(err);
                             assert.isObject(note);
                             assert.include(note, "id");
                             assert.isString(note.id);
@@ -163,7 +162,6 @@ suite.addBatch(
                             assert.isString(note.author.objectType);
                         },
                         "results don't leak private members": function(err, note, act) {
-                            assert.ifError(err);
                             assert.isObject(note);
                             assert.isFalse(_.has(note, "_uuid"));
                         },
@@ -193,7 +191,6 @@ suite.addBatch(
                             assert.isObject(note);
                         },
                         "the result was converted to AS2": function(err, note, act) {
-                            assert.ifError(err);
                             assert.isObject(note);
                             assert.include(note, "@id");
                             assert.isString(note["@id"]);
@@ -202,7 +199,6 @@ suite.addBatch(
                             assert.include(note.author, "@id");
                         },
                         "results don't leak private members": function(err, note, act) {
-                            assert.ifError(err);
                             assert.isObject(note);
                             assert.isFalse(_.has(note, "_uuid"));
                         },
@@ -399,7 +395,6 @@ suite.addBatch(
                         assert.ifError(err);
                     },
                     "it has the updated content": function(err, obj) {
-                        assert.ifError(err);
                         assert.isObject(obj);
                         assert.include(obj, "content");
                         assert.isString(obj.content);
@@ -418,7 +413,6 @@ suite.addBatch(
                         assert.ifError(err);
                     },
                     "it has the update activity": function(err, feed) {
-                        assert.ifError(err);
                         assert.isObject(feed);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
@@ -503,7 +497,6 @@ suite.addBatch(
                         assert.ifError(err);
                     },
                     "it has the delete activity": function(err, feed) {
-                        assert.ifError(err);
                         assert.isObject(feed);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
