@@ -194,6 +194,8 @@ suite.addBatch(
                             assert.isObject(note);
                             assert.include(note, "@id");
                             assert.isString(note["@id"]);
+                        },
+                        "the author was converted to AS2": function(err, note, act) {
                             assert.include(note, "author");
                             assert.isObject(note.author);
                             assert.include(note.author, "@id");
