@@ -204,11 +204,15 @@ var addRoutes = function(app, session) {
     app.get("/api/:type", smw, anyReadAuth, requestObjectByID, authorOrRecipient, getObject);
 };
 
-var wantAS2 = function(req) {
+var maybeAS2 = function(req, obj) {
     // TODO is this right?
-    return req.accepts(["application/stream+json",
-                        "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"",
-                        "application/activity+json"]) !== "application/stream+json";
+    if (req.accepts(["application/stream+json",
+                     "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"",
+                     "application/activity+json"]) !== "application/stream+json") {
+        return as2(obj);
+    }
+
+    return obj;
 };
 
 // XXX: use a common function instead of faking up params
@@ -311,7 +315,7 @@ var getObject = function(req, res, next) {
                 next(err);
             } else {
                 obj.sanitize();
-                res.json(wantAS2(req) ? as2(obj) : obj);
+                res.json(maybeAS2(req, obj));
             }
         }
     );
@@ -544,7 +548,7 @@ var getActivity = function(req, res, next) {
 
     act.sanitize(principal);
 
-    res.json(wantAS2(req) ? as2(act) : act);
+    res.json(maybeAS2(req, act));
 };
 
 var putActivity = function(req, res, next) {
