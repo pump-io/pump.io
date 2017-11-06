@@ -204,11 +204,15 @@ var addRoutes = function(app, session) {
     app.get("/api/:type", smw, anyReadAuth, requestObjectByID, authorOrRecipient, getObject);
 };
 
+var wantAS2 = function(req) {
+    // TODO are these MIME types the ones we want? In the right order?
+    return req.accepts(["application/stream+json",
+                        "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"",
+                        "application/activity+json"]) !== "application/stream+json";
+};
+
 var maybeAS2 = function(req, obj) {
-    // TODO is this right?
-    if (req.accepts(["application/stream+json",
-                     "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"",
-                     "application/activity+json"]) !== "application/stream+json") {
+    if (wantAS2(req)) {
         return as2(obj);
     }
 
@@ -380,7 +384,6 @@ var deleteObject = function(req, res, next) {
 };
 
 var contextEndpoint = function(contextifier, streamCreator) {
-
     return function(req, res, next) {
 
         var args;
@@ -396,7 +399,7 @@ var contextEndpoint = function(contextifier, streamCreator) {
             if (err) {
                 next(err);
             } else {
-                res.json(collection);
+                res.json(maybeAS2(req, collection));
             }
         });
     };
@@ -469,7 +472,7 @@ var getUser = function(req, res, next) {
                 delete req.user.settings;
             }
             req.user.sanitize();
-            res.json(req.user);
+            res.json(maybeAS2(req, req.user));
         }
     );
 };
@@ -926,7 +929,7 @@ var listUsers = function(req, res, next) {
                 }
             }
 
-            res.json(collection);
+            res.json(maybeAS2(req, collection));
         }
     );
 };
@@ -1320,7 +1323,6 @@ var newActivity = function(activity, user, callback) {
 };
 
 var streamEndpoint = function(streamCreator) {
-
     return function(req, res, next) {
 
         var args;
@@ -1336,7 +1338,7 @@ var streamEndpoint = function(streamCreator) {
             if (err) {
                 next(err);
             } else {
-                res.json(collection);
+                res.json(maybeAS2(req, collection));
             }
         });
     };
@@ -1635,7 +1637,6 @@ var reqProxy = function(req, res, next) {
 };
 
 var proxyRequest = function(req, res, next) {
-
     var principal = req.principal,
         proxy = req.proxy;
 
@@ -1700,7 +1701,7 @@ var proxyRequest = function(req, res, next) {
                 }
                 // XXX: save to local cache
                 req.log.debug({headers: pres.headers}, "Received object");
-                res.send(pbody);
+                res.send(wantAS2(req) ? JSON.stringify(as2(JSON.parse(pbody))) : pbody);
             }
         }
     );

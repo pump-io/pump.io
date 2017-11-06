@@ -110,6 +110,35 @@ suite.addBatch(
                         assert.isArray(coll.items);
                         assert.lengthOf(coll.items, 0);
                     }
+                },
+                "and we fetch the replies feed as ActivityStreams 2.0": {
+                    topic: function(act, cred) {
+                        var cb = this.callback,
+                            url = act.object.replies.url;
+
+                        httputil.getJSON(url,
+                                         cred,
+                                         {"Accept": "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\""},
+                                         function(err, coll, response) {
+                            cb(err, coll);
+                        });
+                    },
+                    "it works": function(err, coll) {
+                        assert.ifError(err);
+                        assert.isObject(coll);
+                    },
+                    "it is an empty collection": function(err, coll) {
+                        assert.ifError(err);
+                        assert.isObject(coll);
+                        assert.includes(coll, "url");
+                        assert.isString(coll.url);
+                        assert.includes(coll, "totalItems");
+                        assert.isNumber(coll.totalItems);
+                        assert.equal(coll.totalItems, 0);
+                        assert.includes(coll, "items");
+                        assert.isArray(coll.items);
+                        assert.lengthOf(coll.items, 0);
+                    }
                 }
             }
         },
@@ -216,7 +245,7 @@ suite.addBatch(
                                     httputil.getJSON(url, cred1, this);
                                 },
                                 function(err, coll, response) {
-                                    cb(err, coll);
+                                    cb(err, coll, reply, photo, cred1);
                                 }
                             );
                         },
@@ -235,7 +264,60 @@ suite.addBatch(
                             assert.includes(coll, "items");
                             assert.isArray(coll.items);
                             assert.lengthOf(coll.items, 0);
+                        },
+                        "and we re-check the feed as ActivityStreams 2.0": {
+                            topic: function(coll, reply, photo, cred1) {
+                                var cb = this.callback;
+
+                                var url = photo.object.replies.url;
+                                httputil.getJSON(url, cred1, function(err, coll, response) {
+                                        cb(err, coll);
+                                });
+                            },
+                            "it works": function(err, coll) {
+                                assert.ifError(err);
+                                assert.isObject(coll);
+                            },
+                            "it is an empty collection": function(err, coll) {
+                                assert.isObject(coll);
+                                assert.includes(coll, "url");
+                                assert.isString(coll.url);
+                                assert.includes(coll, "totalItems");
+                                assert.isNumber(coll.totalItems);
+                                assert.equal(coll.totalItems, 0);
+                                assert.includes(coll, "items");
+                                assert.isArray(coll.items);
+                                assert.lengthOf(coll.items, 0);
+                            }
                         }
+                    }
+                },
+                "and we check the replies feed while requesting ActivityStreams 2.0": {
+                    topic: function(photo, reply, cred1, cred2) {
+                        var cb = this.callback,
+                            url = photo.object.replies.url;
+
+                        httputil.getJSON(url,
+                                         cred1,
+                                         {"Accept": "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\""},
+                                         function(err, coll, response) {
+                            cb(err, coll, reply);
+                        });
+                    },
+                    "it works": function(err, coll, reply) {
+                        assert.ifError(err);
+                        assert.isObject(coll);
+                    },
+                    "it includes our reply": function(err, coll, reply) {
+                        assert.ifError(err);
+                        assert.isObject(coll);
+                        assert.includes(coll, "totalItems");
+                        assert.isNumber(coll.totalItems);
+                        assert.equal(coll.totalItems, 1);
+                        assert.includes(coll, "items");
+                        assert.isArray(coll.items);
+                        assert.lengthOf(coll.items, 1);
+                        assert.equal(coll.items[0].id, reply.object["@id"]);
                     }
                 }
             }
@@ -341,6 +423,52 @@ suite.addBatch(
                         }
                     }
                 },
+                "and we get the full replies feed as ActivityStreams 2.0": {
+                    topic: function(note, comments, cred1, cred2) {
+                        var cb = this.callback,
+                            url = note.object.replies.url + "?count=100";
+
+                        httputil.getJSON(url,
+                                         cred1,
+                                         {"Accept": "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\""},
+                                         function(err, coll, response) {
+                            cb(err, coll, comments);
+                        });
+                    },
+                    "it works": function(err, coll, comments) {
+                        assert.ifError(err);
+                        assert.isObject(coll);
+                        assert.isArray(comments);
+                    },
+                    "it has the right data": function(err, coll, comments) {
+                        var i,
+                            collIDs = {},
+                            commentIDs = {};
+                        assert.isObject(coll);
+                        assert.includes(coll, "url");
+                        assert.isString(coll.url);
+                        assert.includes(coll, "totalItems");
+                        assert.isNumber(coll.totalItems);
+                        assert.equal(coll.totalItems, 100);
+                        assert.includes(coll, "items");
+                        assert.isArray(coll.items);
+                        assert.lengthOf(coll.items, 100);
+
+                        for (i = 0; i < 100; i++) {
+                            collIDs[coll.items[i]["@id"]] = 1;
+
+                            // Note: `comments` is passed through from
+                            // previous subbatches, so it's AS1. Hence
+                            // the reference to `id` instead of `@id`.
+                            commentIDs[comments[i].object.id] = 1;
+                        }
+
+                        for (i = 0; i < 100; i++) {
+                            assert.include(collIDs, comments[i].object.id);
+                            assert.include(commentIDs, coll.items[i]["@id"]);
+                        }
+                    }
+                },
                 "and we get the original item": {
                     topic: function(note, comments, cred1, cred2) {
                         var cb = this.callback,
@@ -373,6 +501,44 @@ suite.addBatch(
 
                         for (i = 0; i < note.replies.items.length; i++) {
                             assert.include(commentIDs, note.replies.items[i].id);
+                        }
+                    }
+                },
+                "and we get the original item as ActivityStreams 2.0": {
+                    topic: function(note, comments, cred1, cred2) {
+                        var cb = this.callback,
+                            url = note.object.id;
+
+                        httputil.getJSON(url,
+                                         cred1,
+                                         {"Accept": "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\""},
+                                         function(err, note, response) {
+                            cb(err, note, comments);
+                        });
+                    },
+                    "it works": function(err, note, comments) {
+                        assert.ifError(err);
+                        assert.isObject(note);
+                        assert.isArray(comments);
+                    },
+                    "it has the correct replies": function(err, note, comments) {
+                        var i, commentIDs = {};
+
+                        assert.ifError(err);
+                        assert.isObject(note);
+                        assert.include(note, "replies");
+                        assert.include(note.replies, "totalItems");
+                        assert.isNumber(note.replies.totalItems);
+                        assert.equal(note.replies.totalItems, 100);
+                        assert.include(note.replies, "items");
+                        assert.isArray(note.replies.items);
+
+                        for (i = 0; i < 100; i++) {
+                            commentIDs[comments[i].object["@id"]] = 1;
+                        }
+
+                        for (i = 0; i < note.replies.items.length; i++) {
+                            assert.include(commentIDs, note.replies.items[i]["@id"]);
                         }
                     }
                 }
