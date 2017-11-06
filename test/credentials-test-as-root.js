@@ -26,6 +26,8 @@ var assert = require("assert"),
     fs = require("fs"),
     path = require("path"),
     express = require("express"),
+    http = require("http"),
+    multipart = require("connect-multiparty"),
     DialbackClient = require("dialback-client"),
     databank = require("databank"),
     Databank = databank.Databank,
@@ -42,13 +44,14 @@ var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 
 var tinyApp = function(port, hostname, callback) {
 
-    var app = express.createServer();
+    var app = express(),
+        appServer = http.createServer(app);
 
     app.set("port", port);
     app.use(express.json());
-    app.use(express.urlencoded());
-    app.use(express.multipart());
-    app.use(app.router);
+    app.use(express.urlencoded({extended: true}));
+    // TODO: use the multiparty API directly instead of this Connect middleware wrapper
+    app.use(multipart());
 
     app.get("/.well-known/host-meta.json", function(req, res) {
         res.json({
@@ -87,7 +90,7 @@ var tinyApp = function(port, hostname, callback) {
     });
 
     app.listen(port, hostname, function() {
-        callback(null, app);
+        callback(null, appServer);
     });
 };
 
