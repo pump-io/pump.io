@@ -39,18 +39,6 @@ documentation see our
 
 ## Installation
 
-### Prerequisites
-
-You'll need four things to get started:
-
-* node.js 4.x or higher
-* npm 1.1.0 or higher
-* A database server (see below)
-* The `graphicsmagick` package with the `gm` command
-
-Note that the requirement to have `gm` available is new for 0.3.0; if
-you're upgrading, you need to install it.
-
 ### Install with npm
 
 The easiest way is to install the software globally using npm, like
@@ -76,29 +64,6 @@ You can then install the dependencies using `npm`:
 To test the install, run:
 
     npm test
-
-### Database setup
-
-pump.io uses [databank](https://github.com/evanp/databank)
-package to abstract out the data storage for the system. Any databank
-driver should work. Couchbase, MongoDB and Redis are probably the best
-bets for production servers, but the `disk` or even `memory` drivers
-can work for testing.
-
-If you're confused, just use the MongoDB one, `databank-mongodb`.
-
-You can find other drivers like so:
-
-    npm search databank
-
-You can install in the `pump.io` directory as a normal dependency.
-For example, the databank driver for MongoDB:
-
-    npm install databank-mongodb
-
-Note that you also need to install and configure your database server.
-
- 
 
 ### Configuration
 
