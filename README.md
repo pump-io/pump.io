@@ -30,16 +30,12 @@ The software is useful for at least these scenarios:
 
 It also comes with a web UI.
 
-## Wiki
+## External documentation
 
-For more information please check out the [GitHub
-wiki](https://github.com/pump-io/pump.io/wiki) and our
-[ReadTheDocs](https://pumpio.readthedocs.io/en/latest/) documentation.
-
-or clone them with the following commands:
-
-    git clone https://github.com/pump-io/pump.io.wiki.git
-    git clone https://gitlab.com/pump.io/pump-docs.git
+For information about project policies please check out the [GitHub
+wiki](https://github.com/pump-io/pump.io/wiki), and for technical
+documentation see our
+[ReadTheDocs](https://pumpio.readthedocs.io/en/latest/) website.
 
 ## Installation
 
