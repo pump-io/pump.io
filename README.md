@@ -9,22 +9,6 @@ really want from a social network.
 [![NSP Status](https://nodesecurity.io/orgs/pumpio/projects/32213bb8-f9a6-4dd0-8fc6-5caa8ea5f8fc/badge)](https://nodesecurity.io/orgs/pumpio/projects/32213bb8-f9a6-4dd0-8fc6-5caa8ea5f8fc)
 [![Greenkeeper badge](https://badges.greenkeeper.io/pump-io/pump.io.svg)](https://greenkeeper.io/)
 
-## License
-
-Copyright 2011-2017, E14N https://e14n.com/ and contributors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
 ## What's it for?
 
 I post something and my followers see it. That's the rough idea behind
@@ -399,3 +383,19 @@ It also uses these icon sets:
 This sample photo is used for the main page:
 
 * http://www.flickr.com/photos/makelessnoise/240072395/ (CC-by)
+
+## License
+
+Copyright 2011-2017, E14N https://e14n.com/ and contributors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
