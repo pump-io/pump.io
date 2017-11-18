@@ -116,7 +116,9 @@
     "streams",
     "api",
     "app",
-    "server"
+    "server",
+    "federation",
+    "decentralization"
   ],
   "license": "Apache-2.0",
   "engines": {
