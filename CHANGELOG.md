@@ -19,15 +19,25 @@ If you think something that isn't in the first list should be covered, file an i
 
 ## 5.1.0 beta 0 - Future
 
+### Improved
+
+* Generate startup log warnings on bad configurations, including insecure `secret` values and internal parameters
+* Add a `Dockerfile`
+* Added [zero-downtime upgrade support][]
+
+### Changed
+
+* Update deps
+* Enable some more tests and start tracking code coverage with Coveralls
+* Expand package.json metadata
+* Clarify semver-major local modification policy
+
 ### Fixed
 
 * `bin/pump-import-collection` no longer crashes due to an `underscore-contrib` reference
 * Fix the logged-out mobile homepage's menu icon being black (#1445)
 * Fix the JavaScript license page not loading Bootstrap properly (#1432)
-
-### Changed
-
-* Update deps
+* Fix some README config options
 
 ## 4.0.3 - 2017-10-01
 
@@ -444,3 +454,4 @@ TODO
  [librejs]: https://www.gnu.org/software/librejs/
  [security-headers]: https://github.com/pump-io/pump.io/issues/1184#issuecomment-242264403
  [Subresource Integrity]: https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity
+ [zero-downtime upgrade support: http://pump.io/blog/2017/08/zero-downtime-restarts-have-landed
