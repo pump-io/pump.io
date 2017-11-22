@@ -62,6 +62,10 @@ suite.addBatch({
 
                 return as2(act);
             },
+            "it has an @context": function(act) {
+                assert.isTrue(act.hasOwnProperty("@context"));
+                assert.equal(act["@context"], "https://www.w3.org/ns/activitystreams");
+            },
             "id is renamed to @id": function(act) {
                 assert.isFalse(act.hasOwnProperty("id"));
                 assert.equal(act["@id"], "urn:uuid:77451568-ce6a-42eb-8a9f-60ece187725f");
