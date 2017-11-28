@@ -454,4 +454,4 @@ TODO
  [librejs]: https://www.gnu.org/software/librejs/
  [security-headers]: https://github.com/pump-io/pump.io/issues/1184#issuecomment-242264403
  [Subresource Integrity]: https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity
- [zero-downtime upgrade support: http://pump.io/blog/2017/08/zero-downtime-restarts-have-landed
+ [zero-downtime upgrade support]: http://pump.io/blog/2017/08/zero-downtime-restarts-have-landed
