@@ -222,11 +222,6 @@ You'll probably get a more reliable experience if you use
 
 ### Environment
 
-`NODE_ENVIRONMENT` determines the environment pump.io is running
-in. This should be set to `production` in production environments or
-performance will be significantly degraded. In development
-environments it should be set to `development`, which is the default.
-
 The `pump` daemon also accepts configuration values via environment
 variables. You can find available configuration values above - the
 basic idea is to start with `PUMPIO_` and append the capitalized
