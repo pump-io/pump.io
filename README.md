@@ -243,15 +243,6 @@ subkeys. For example, a `pump.io.json` with the following contents:
 can be represented by exporting `PUMPIO_PARAMS__HOST` to the
 environment with a value of `localhost`.
 
-You can also set the env variable `NODE_DEBUG` to enable debugging of
-internal libraries.
-
-Example:
-
-    export NODE_DEBUG=dev,all,net,http,fs,tls,module,timers
-
-See [How to set NODE_DEBUG](http://www.juliengilli.com/2013/05/26/Using-Node.js-NODE_DEBUG-for-fun-and-profit/).
-
 ## Using the command line tools
 
 You can use any pump.io client application you want to interact with
