@@ -374,7 +374,7 @@ This software includes the following great packages of client-side software.
 It also uses these icon sets:
 
 * Fancy Avatars, © 2009 Brandon Mathis, http://brandonmathis.com/projects/fancy-avatars/ (CC-By)
-* Glyphicons, http://glyphicons.com/ (CC-By)
+* Font Awesome by Dave Gandy, http://fontawesome.io/ (SIL Open Font License 1.1)
 
 This sample photo is used for the main page:
 
