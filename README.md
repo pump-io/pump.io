@@ -77,16 +77,6 @@ You can override the config file location with the `-c` option.
 
     pump -c <CONFIG_FILE>
 
-You can also set these by passing commandline flags starting with
-`--` - for example, `pump.io.json`'s `port` value can be set by
-passing `--port`. Camelcasing like `urlPort` should be replaced with
-`-` (i.e.  `urlPort` becomes `--url-port`). Keys whose value is an
-object can be specified using `.` to separate nested keys. For
-example, a `pump.io.json` with the following contents:
-
-    { "params": { "host": "localhost" } }
-
-can be set by passing `--params.host localhost`.
 
 ### Web server proxy
 
@@ -112,24 +102,6 @@ installed from git) or `pump` (if you installed from npm).
 
 You'll probably get a more reliable experience if you use
 [forever](https://npmjs.org/package/forever) to keep the daemon running.
-
-### Environment
-
-The `pump` daemon also accepts configuration values via environment
-variables. You can find available configuration values above - the
-basic idea is to start with `PUMPIO_` and append the capitalized
-configuration key you want to set. For example, the `port` key in
-`pump.io.json` would translate to the environment variable
-`PUMPIO_PORT`. To configure camelcased config values like `urlPort`,
-replace the camelcasing with an underscore (`_`). For example,
-`urlPort` would become `PUMPIO_URL_PORT`. Keys whose value is an
-object can be specified using `__` (two underscores) to separate
-subkeys. For example, a `pump.io.json` with the following contents:
-
-    { "params": { "host": "localhost" } }
-
-can be represented by exporting `PUMPIO_PARAMS__HOST` to the
-environment with a value of `localhost`.
 
 ## Making changes
 
