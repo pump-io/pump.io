@@ -30,7 +30,7 @@ The software is useful for at least these scenarios:
 
 It also comes with a web UI.
 
-## External documentation
+## Documentation
 
 For information about project policies please check out the [GitHub
 wiki](https://github.com/pump-io/pump.io/wiki), and for technical
