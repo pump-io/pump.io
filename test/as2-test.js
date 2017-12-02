@@ -19,17 +19,7 @@
 "use strict";
 
 var assert = require("assert"),
-    vows = require("vows"),
-    databank = require("databank"),
-    Step = require("step"),
-    _ = require("lodash"),
-    fs = require("fs"),
-    path = require("path"),
-    URLMaker = require("../lib/urlmaker").URLMaker,
-    schema = require("../lib/schema").schema,
-    modelBatch = require("./lib/model").modelBatch,
-    Databank = databank.Databank,
-    DatabankObject = databank.DatabankObject;
+    vows = require("vows");
 
 var suite = vows.describe("AS2 conversion module interface");
 
