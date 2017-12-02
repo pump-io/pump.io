@@ -138,6 +138,54 @@ suite.addBatch({
                 assert.isFalse(act.target.hasOwnProperty("objectType"));
                 assert.equal(act.target["@type"], "note");
             }
+        },
+        "and we try to convert a submission of a note to AS2": {
+            topic: function(as2) {
+                var act = {
+                    id: "urn:uuid:9e4a902d-8a3a-495d-b73c-cfa0cf32f310",
+                    actor: "acct:amy@w3.example",
+                    verb: "submit",
+                    to: [{objectType: "collection",
+                          id: "http://w3.example/socialwg"}],
+                    object: {
+                        id: "urn:uuid:404c13a3-65ba-43f0-a88d-9a2b07a21a17",
+                        objectType: "note"
+                    },
+                    displayName: "A note"
+                };
+
+                return as2(act);
+            },
+            "the `submit` verb is converted specially to Create in @type": function(act) {
+                assert.isFalse(act.hasOwnProperty("verb"));
+                assert.equal(act["@type"], "Create");
+            }
+        },
+        "and we try to convert a submission of a note to a collection to AS2": {
+            topic: function(as2) {
+                var act = {
+                    id: "urn:uuid:8e765132-414a-4535-9949-c4650f22e493",
+                    actor: "acct:evan@w3.example",
+                    verb: "submit",
+                    title: "Some other random thing",
+                    to: [{objectType: "collection",
+                          id: "http://w3.example/socialwg"}],
+                    object: {
+                        id: "urn:uuid:aa6c312c-5294-4875-9f16-cb4d586127cb",
+                        objectType: "note"
+                    },
+                    target: {
+                        id: "http://w3.example/evan/a-collection",
+                        objectType: "collection"
+                    }
+                };
+
+                return as2(act);
+            },
+            "the `submit` verb is converted specially to Add in @type": function(act) {
+                assert.isFalse(act.hasOwnProperty("verb"));
+                assert.equal(act["@type"], "Add");
+            }
         }
     }
 });
