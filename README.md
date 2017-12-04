@@ -37,24 +37,6 @@ wiki](https://github.com/pump-io/pump.io/wiki), and for technical
 documentation see our
 [ReadTheDocs](https://pumpio.readthedocs.io/en/latest/) website.
 
-## Making changes
-
-If you're connecting your pump.io site with other software (such as
-federated servers or using Web clients), please note that most of them
-save OAuth keys based on your hostname and listening port. The
-following changes may make your relationships stop working.
-
-* Change of hostname
-* Change of port (from 8000 to 80 or even from HTTP to HTTPS)
-* Clearing your database or clearing some tables
-* Changing user nicknames
-
-I realize that these kind of changes are normal when someone's
-experimenting with new software, and I'm trying to make the software
-more robust in the face of this kind of change without sacrificing
-security, but for now it's a good idea to decide on your "real" domain
-name first before making connections to other sites.
-
 ## Bugs
 
 If you find bugs, you can report them here:
