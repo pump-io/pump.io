@@ -19,9 +19,34 @@
 "use strict";
 
 var assert = require("assert"),
-    vows = require("vows");
+    vows = require("vows"),
+    uuid = require("uuid");
 
 var suite = vows.describe("AS2 conversion module interface");
+
+var testVocabConversion = function(verb, newVerb) {
+    return {
+        topic: function(as2) {
+            var act = {
+                id: "urn:uuid:" + uuid.v4(),
+                actor: "acct:evan@w3.example",
+                verb: verb,
+                to: [{objectType: "collection",
+                      id: "http://w3.example/socialwg"}],
+                target: {
+                    id: "urn:uuid:" + uuid.v4(),
+                    objectType: "note"
+                }
+            };
+
+            return as2(act);
+        },
+        "@type uses AS2 vocabulary": function(act) {
+            assert.isFalse(act.hasOwnProperty("verb"));
+            assert.equal(act["@type"], newVerb);
+        }
+    };
+};
 
 suite.addBatch({
     "When we get the AS2 conversion module": {
@@ -165,7 +190,7 @@ suite.addBatch({
             topic: function(as2) {
                 var act = {
                     id: "urn:uuid:8e765132-414a-4535-9949-c4650f22e493",
-                    actor: "acct:evan@w3.example",
+                    actor: "acct:tantek@w3.example",
                     verb: "submit",
                     title: "Some other random thing",
                     to: [{objectType: "collection",
@@ -175,7 +200,7 @@ suite.addBatch({
                         objectType: "note"
                     },
                     target: {
-                        id: "http://w3.example/evan/a-collection",
+                        id: "http://w3.example/tantek/a-collection",
                         objectType: "collection"
                     }
                 };
@@ -186,7 +211,17 @@ suite.addBatch({
                 assert.isFalse(act.hasOwnProperty("verb"));
                 assert.equal(act["@type"], "Add");
             }
-        }
+        },
+        "and we try to convert a `share` activity to AS2": testVocabConversion("share", "Announce"),
+        "and we try to convert a `attach` activity to AS2": testVocabConversion("attach", "Add"),
+        "and we try to convert a `author` activity to AS2": testVocabConversion("author", "Create"),
+        "and we try to convert a `favorite` activity to AS2": testVocabConversion("favorite", "Like"),
+        "and we try to convert a `flag-as-inappropriate` activity to AS2": testVocabConversion("flag-as-inappropriate", "Flag"),
+        "and we try to convert a `play` activity to AS2": testVocabConversion("play", "View"),
+        "and we try to convert a `rsvp-maybe` activity to AS2": testVocabConversion("rsvp-maybe", "TentativeAccept"),
+        "and we try to convert a `rsvp-no` activity to AS2": testVocabConversion("rsvp-no", "Reject"),
+        "and we try to convert a `rsvp-yes` activity to AS2": testVocabConversion("rsvp-yes", "Accept"),
+        "and we try to convert a `watch` activity to AS2": testVocabConversion("watch", "View")
     }
 });
 
