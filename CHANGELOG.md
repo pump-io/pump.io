@@ -57,19 +57,19 @@ No changes from 5.0.1 beta 0:
 
 ### Security
 
-* Fix multiple denial-of-service security vulnerabilities in indirect dependencies
+* Fix multiple denial-of-service security vulnerabilities in indirect dependencies: [advisory 1](https://nodesecurity.io/advisories/534), [advisory 2](https://nodesecurity.io/advisories/526), [advisory 3](https://nodesecurity.io/advisories/535) (no CVEs available)
 
 ## 4.1.3 - 2017-10-01
 
 ### Security
 
-* Fix multiple denial-of-service security vulnerabilities in indirect dependencies
+* Fix multiple denial-of-service security vulnerabilities in indirect dependencies: [advisory 1](https://nodesecurity.io/advisories/534), [advisory 2](https://nodesecurity.io/advisories/526), [advisory 3](https://nodesecurity.io/advisories/535) (no CVEs available)
 
 ## 4.0.2 - 2017-10-01
 
 ### Security
 
-* Fix multiple denial-of-service security vulnerabilities in indirect dependencies
+* Fix multiple denial-of-service security vulnerabilities in indirect dependencies: [advisory 1](https://nodesecurity.io/advisories/534), [advisory 2](https://nodesecurity.io/advisories/526), [advisory 3](https://nodesecurity.io/advisories/535) (no CVEs available)
 
 ## 5.0.1 beta 0 - 2017-09-29
 
@@ -79,7 +79,7 @@ The relevant security bugs were publicly disclosed on October 1st, 2017.
 
 ### Security
 
-* Fix multiple denial-of-service security vulnerabilities in indirect dependencies
+* Fix multiple denial-of-service security vulnerabilities in indirect dependencies: [advisory 1](https://nodesecurity.io/advisories/534), [advisory 2](https://nodesecurity.io/advisories/526), [advisory 3](https://nodesecurity.io/advisories/535) (no CVEs available)
 
 ## 5.0.0 - 2017-09-01
 
@@ -164,19 +164,19 @@ This will be the last release to support Node.js 0.10 and 0.12.
 
 ### Security
 
-* Increase minimum DOMPurify version to 0.9.0
+* Increase minimum DOMPurify version to 0.9.0: [0.8.9 security announcement](https://lists.ruhr-uni-bochum.de/pipermail/dompurify-security/2017-May/000006.html), [0.9.0 security announcement](https://lists.ruhr-uni-bochum.de/pipermail/dompurify-security/2017-May/000007.html)
 
 ## 3.0.3 - 2017-05-23
 
 ### Security
 
-* Increase minimum DOMPurify version to 0.9.0
+* Increase minimum DOMPurify version to 0.9.0: [0.8.9 security announcement](https://lists.ruhr-uni-bochum.de/pipermail/dompurify-security/2017-May/000006.html), [0.9.0 security announcement](https://lists.ruhr-uni-bochum.de/pipermail/dompurify-security/2017-May/000007.html)
 
 ## 2.1.2 - 2017-05-23
 
 ### Security
 
-* Increase minimum DOMPurify version to 0.9.0
+* Increase minimum DOMPurify version to 0.9.0: [0.8.9 security announcement](https://lists.ruhr-uni-bochum.de/pipermail/dompurify-security/2017-May/000006.html), [0.9.0 security announcement](https://lists.ruhr-uni-bochum.de/pipermail/dompurify-security/2017-May/000007.html)
 
 ## 4.0.0 - 2017-05-02
 
