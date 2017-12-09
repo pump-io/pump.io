@@ -140,7 +140,7 @@ suite.addBatch({
                           nologger: true,
                           sockjs: false
                          },
-                makeApp = require("../lib/app").makeApp;
+                makeApp = require("./lib/app").proxyquiredMakeApp;
 
             process.env.NODE_ENV = "test";
 

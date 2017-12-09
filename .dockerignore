@@ -14,7 +14,6 @@ lib-cov
 
 # Coverage directory used by tools like istanbul
 coverage
-coverage-root
 
 # nyc test coverage
 .nyc_output
@@ -47,8 +46,14 @@ jspm_packages
 # Yarn Integrity file
 .yarn-integrity
 
-# pump.io stuff
-
-config.js
-
-public/template/*.jade.js
+# Stuff not needed at runtime - tests, docs, etc.
+*.md
+doc
+test
+util
+pump.io@.service
+pump.io.json.sample
+.dockerignore
+.npmignore
+.gitignore
+.git

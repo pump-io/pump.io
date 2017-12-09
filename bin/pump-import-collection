@@ -26,7 +26,7 @@ var fs = require("fs"),
     path = require("path"),
     urlparse = require("url").parse,
     Step = require("step"),
-    _ = require("lodash-contrib"),
+    _ = require("lodash"),
     Logger = require("bunyan"),
     Queue = require("jankyqueue"),
     databank = require("databank"),
@@ -342,8 +342,8 @@ var importActivity = function(props, log, callback) {
             activity.actor = actor;
             activity.object = object;
             var t = this,
-                origF = _.getPath(props, ["actor", "followers", "url"]),
-                newF = _.getPath(activity, ["actor", "followers", "url"]);
+                origF = _.get(props, ["actor", "followers", "url"]),
+                newF = _.get(activity, ["actor", "followers", "url"]);
 
             _.each(["to", "cc", "bto", "bcc"], function(name) {
                 if (origF && newF && origF !== newF) {

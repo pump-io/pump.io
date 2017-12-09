@@ -18,12 +18,13 @@
 
 "use strict";
 
-// TODO: this needs to be updated for Express 3.x
+// TODO: this needs to be updated/expanded for Express 3.x
 
 var assert = require("assert"),
     vows = require("vows"),
     fs = require("fs"),
-    path = require("path");
+    path = require("path"),
+    proxyquire = require("proxyquire");
 
 var ignore = function(err) {};
 
@@ -32,7 +33,16 @@ var suite = vows.describe("app module interface");
 suite.addBatch({
     "When we get the app module": {
         topic: function() {
-            return require("../lib/app");
+            // lib/app.js expects to be run in a cluster worker with cluster.worker.on, etc.
+            return proxyquire("../lib/app", {
+                cluster: {
+                    worker: {
+                        on: ignore,
+                        // TODO test that the worker signals the master properly
+                        send: ignore
+                    }
+                }
+            });
         },
         "there is one": function(mod) {
             assert.isObject(mod);

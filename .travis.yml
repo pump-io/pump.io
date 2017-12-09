@@ -5,6 +5,7 @@ node_js:
   - "6"
   - "7"
   - "8"
+dist: trusty
 env:
   - CXX=g++-4.8
 addons:
@@ -17,13 +18,13 @@ script: "(npm test || npm test) && sudo sh -c 'export PATH=\"'\"$(dirname $(whic
 before_script:
   - "./test/hosts.sh"
 before_install:
- - sudo apt-get update -qq
- - sudo apt-get install -qq graphicsmagick
- - npm install -g npm@5
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq graphicsmagick
+  - npm install -g npm@5
+after_script:
+  # We need sudo because the coverage data from as-root tests is root:root but not world-readable
+  - "sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:report-coverage'"
 notifications:
- email: false
- irc:
-   channels:
-     - "chat.freenode.net#pump.io"
-   on_success: change
-   on_failure: change
+  email: false
+  webhooks:
+    - https://pumabot.strugee.net/hubot/travis-ci-events

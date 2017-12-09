@@ -20,7 +20,10 @@
 
 var cp = require("child_process"),
     path = require("path"),
-    assert = require("assert");
+    assert = require("assert"),
+    proxyquire = require("proxyquire");
+
+function noop() {}
 
 // Call as setupApp(port, hostname, callback)
 // setupApp(hostname, callback)
@@ -133,6 +136,17 @@ var withAppSetup = function(batchConfig) {
     };
 };
 
+// lib/app.js expects to be run in a cluster worker with cluster.worker.on, etc.
+var proxyquiredMakeApp = proxyquire("../../lib/app", {
+    cluster: {
+        worker: {
+            on: noop,
+            send: noop
+        }
+    }
+}).makeApp;
+
 exports.setupApp = setupApp;
 exports.setupAppConfig = setupAppConfig;
 exports.withAppSetup = withAppSetup;
+exports.proxyquiredMakeApp = proxyquiredMakeApp;

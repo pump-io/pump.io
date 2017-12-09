@@ -35,6 +35,12 @@ body {
   width: auto;
 }
 
+/* generic for better maintainability */
+.navbar .btn-navbar span {
+  /* color for menu icon */
+  color: white;
+}
+
 .navbar .nav .dropdown-toggle .caret {
   margin-top: 10px;
 }

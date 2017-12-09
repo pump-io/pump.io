@@ -28,6 +28,11 @@ var cluster = require("cluster"),
     path = require("path"),
     Logger = require("bunyan"),
     _ = require("lodash"),
+    importFresh = require("import-fresh"),
+    restartEpoch = require("../lib/zerodowntime"),
+    restartInflight = false,
+    abortedRestart = false,
+    restartedWorker = null,
     argv = require("yargs")
            .usage("Usage: $0 -c <configfile>")
            .alias("c", "config")
@@ -118,12 +123,83 @@ var launchApps = function(config) {
         // Restart child processes when they die
 
         cluster.on("exit", function(worker, code, signal) {
-            var exitCode = worker.process.exitCode;
-            clusterLog.error("worker " + worker.process.pid + " died ("+exitCode+"). restarting...");
+            // TODO remove this when we drop Node 4
+            var zeroDowntimeRestart = _.has(worker, "exitedAfterDisconnect") ? worker.exitedAfterDisconnect : worker.suicide,
+                exitCode = worker.process.exitCode;
+
+            // Don't respawn any workers if we aborted a restart
+            // Note that even for crashes it doesn't make sense to respawn since we _know_ all new workers will be bad
+            if (abortedRestart) {
+                clusterLog.error("worker " + worker.process.pid + " died ("+exitCode+") but refusing to restart due to aborted zero-downtime restart; please restart this process");
+                return;
+            }
+
+            // Check if a zero-downtime worker respawn went bad
+            if (worker.process.pid === restartedWorker) {
+                clusterLog.error("worker " + worker.process.pid + " died ("+exitCode+") directly after respawn for zero-downtime restart");
+                abortedRestart = true;
+                restartedWorker = null;
+            }
+
+            if (!zeroDowntimeRestart) {
+                clusterLog.error("worker " + worker.process.pid + " died ("+exitCode+"). restarting...");
+            }
+
             cluster.fork();
         });
 
+        // Perform zero-downtime restart on SIGUSR2
+        // TODO handle config changes
+        process.on("SIGUSR2", function() {
+            if (config.workers <= 1) {
+                clusterLog.warn("Received SIGUSR2 but ignoring because there aren't enough workers for zero-downtime restart");
+                return;
+            }
+
+            if (config.driver !== "mongodb") {
+                clusterLog.warn("Zero-downtime restarts are only supported on MongoDB for the time being");
+                return;
+            }
+
+            if (abortedRestart) {
+                clusterLog.warn("Received SIGUSR2 but refusing due to an earlier aborted restart; please restart this process");
+                return;
+            }
+
+            if (restartInflight) {
+                clusterLog.warn("Received SIGUSR2 but ignoring because there's already an in-flight zero-downtime restart");
+                return;
+            }
+
+            restartInflight = true;
+
+            clusterLog.info("Received SIGUSR2; starting zero-downtime restart...");
+
+            clusterLog.debug("Determining zero-downtime restart eligibility...");
+
+            var newEpoch = importFresh("../lib/zerodowntime");
+            if (newEpoch !== restartEpoch) {
+                clusterLog.warn("Refusing zero-downtime restart because the new version says it's incompatible with us.");
+                return;
+            }
+
+            var workers = [];
+            for (var id in cluster.workers) {
+                workers.push(cluster.workers[id]);
+            }
+
+            restartWorker(workers.pop(), workers, clusterLog, function() {
+                clusterLog.info("Zero-downtime restart complete");
+                restartInflight = false;
+            });
+        });
+
     } else {
+
+        process.on("SIGUSR2", function() {
+            clusterLog.debug("Received SIGUSR2 but ignoring because we're in a worker process");
+        });
+
         makeApp(config, function(err, appServer) {
             if (err) {
                 console.error(err);
@@ -138,6 +214,56 @@ var launchApps = function(config) {
             }
         });
     }
+};
+
+// Restart a worker and schedule the next restart
+
+var restartWorker = function(worker, workerQueue, log, cb) {
+    worker.send({cmd: "gracefulShutdown"});
+    log.debug("Killed " + worker.process.pid + " for zero-downtime restart.");
+
+    var timeout = setTimeout(function() {
+        log.warn("Killed " + worker.process.pid + " because it didn't shut down within 30 seconds.");
+        worker.kill();
+    }, 30 * 1000);
+
+    worker.once("exit", function() {
+        clearTimeout(timeout);
+    });
+
+    // TODO error handling?
+    cluster.once("fork", function(worker) {
+        log.debug("Respawned " + worker.process.pid + " with new code.");
+        restartedWorker = worker.process.pid;
+
+        // We don't use the 'listening' event and wait for
+        // explicit notification because 'listen' would fire when
+        // the main server was listening but not the bounce server
+        worker.once("message", function(obj) {
+            switch (obj.msg) {
+            case "listening":
+                if (workerQueue.length === 0) {
+                    cb();
+                    return;
+                }
+
+                restartWorker(workerQueue.pop(), workerQueue, log, cb);
+
+                restartedWorker = null;
+                break;
+            case "abortRestart":
+                log.warn(obj.err, "New worker signaled error; the master is in an inconsistent state and should be restarted ASAP");
+                abortedRestart = true;
+                break;
+            default:
+                // msg is an internal Bunyan field so we rename it
+                obj.workerMsg = obj.msg;
+                delete obj.msg;
+                log.error(obj, "Received unknown restart status message from worker");
+                throw new Error("Received unknown restart status message from worker: " + obj.workerMsg);
+            }
+        });
+    });
 };
 
 // Set up a Bunyan logger that the dispatch code can send to
@@ -156,6 +282,8 @@ var setupLog = function(config) {
     } else {
         logParams.streams = [{stream: process.stderr}];
     }
+
+    logParams.streams[0].level = config.logLevel;
 
     return new Logger(logParams);
 };

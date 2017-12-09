@@ -50,30 +50,36 @@ suite.addBatch({
                           bounce: true,
                           sockjs: false
                          },
-                makeApp = require("../lib/app").makeApp;
+                makeApp = require("./lib/app").proxyquiredMakeApp;
 
             process.env.NODE_ENV = "test";
 
             makeApp(config, this.callback);
         },
-        "it works": function(err, app) {
+        "it works": function(err, app, bounce) {
             assert.ifError(err);
             assert.isObject(app);
+            assert.isObject(bounce);
         },
         "and we app.run()": {
-            topic: function(app) {
+            topic: function(app, bounce) {
                 var cb = this.callback;
+
                 app.run(function(err) {
                     if (err) {
-                        cb(err, null);
+                        cb(err, null, null);
                     } else {
-                        cb(null, app);
+                        cb(null, app, bounce);
                     }
                 });
             },
-            teardown: function(app) {
+            teardown: function(app, bounce) {
                 if (app && app.close) {
                     app.close();
+                }
+
+                if (bounce && bounce.close) {
+                    bounce.close();
                 }
             },
             "it works": function(err, app) {
@@ -108,6 +114,4 @@ suite.addBatch({
     }
 });
 
-module.exports = {}; // TODO reenable this test when it's passing
-
-// suite["export"](module);
+suite["export"](module);

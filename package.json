@@ -2,15 +2,19 @@
   "name": "pump.io",
   "preferGlobal": "true",
   "homepage": "http://pump.io/",
-  "version": "5.0.0-beta.1",
+  "version": "5.1.0-alpha.0",
   "author": "Evan Prodromou <evan@e14n.com>",
   "description": "Social server with an ActivityStreams API",
   "devDependencies": {
+    "coveralls": "^3.0.0",
     "dependency-check": "^2.8.0",
     "jscs": "^3.0.3",
     "jshint": "^2.9.2",
     "jsonlint": "^1.6.2",
+    "lcov-result-merger": "^1.2.0",
     "node-mocks-http": "^1.6.1",
+    "nyc": "^11.2.1",
+    "proxyquire": "^1.8.0",
     "pug-lint": "^2.3.0",
     "rimraf": "^2.6.1",
     "simplesmtp": "^0.3.35",
@@ -21,21 +25,22 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.15.2",
-    "bunyan": "^1.8.1",
+    "bunyan": "^1.8.12",
     "compression": "^1.6.2",
-    "connect-auth-pumpio": "^0.6.0",
+    "connect-auth-pumpio": "^0.6.1",
     "connect-databank": "^1.0.3",
     "connect-multiparty": "^2.0.0",
     "cookie-parser": "^1.4.3",
     "databank": "0.19.x",
-    "dateformat": "^2.0.0",
+    "dateformat": "^3.0.0",
     "dialback-client": "0.2.x",
     "dompurify": "^1.0.1",
     "emailjs": "^1.0.8",
-    "express": "^4.14.0",
+    "express": "^4.16.0",
     "express-session": "^1.14.1",
     "gm": "^1.22.0",
     "helmet": "^3.3.0",
+    "import-fresh": "^2.0.0",
     "jade": "^1.11.0",
     "jankyqueue": "0.1.x",
     "jsdom": "^9.12.0",
@@ -45,7 +50,7 @@
     "oauth-evanp": "~0.9.10-evanp.2",
     "optimist": "^0.6.1",
     "schlock": "~0.2.1",
-    "send": "^0.15.1",
+    "send": "^0.16.1",
     "serve-favicon": "^2.3.0",
     "showdown": "^1.4.1",
     "sockjs": "0.3.x",
@@ -53,9 +58,9 @@
     "step": "^1.0.0",
     "ua-parser-js": "^0.7.10",
     "uuid": "^3.0.0",
-    "validator": "^8.0.0",
+    "validator": "^9.0.0",
     "webfinger": "~0.4.2",
-    "yargs": "^7.0.2"
+    "yargs": "^9.0.1"
   },
   "bin": {
     "pump": "./bin/pump",
@@ -73,14 +78,15 @@
     "build": "jade --client --extension jade.js --no-debug public/template",
     "fullbuild": "npm run build && echo 'use `npm run build` instead next time' 1>&2",
     "test": "npm run lint && npm run test:vows",
-    "test:vows": "vows -v test/*-test.js",
-    "test:root": "vows -v test/*-test-as-root.js",
+    "test:vows": "nyc -r lcov vows -v test/*-test.js",
+    "test:root": "nyc -r lcov --report-dir coverage-root vows -v test/*-test-as-root.js",
     "test:install": "npm install -g .",
     "test:system": "vows -v test/*-test-system.js",
     "test:systemd": "docker run -v $(pwd):/tmp/pump.io:ro -v $NVM_DIR:/.nvm:ro ubuntu sh -c \"export NVM_DIR=$NVM_DIR; . $NVM_DIR/nvm.sh; nvm use $TRAVIS_NODE_VERSION; cd /tmp/pump.io; npm run test:systemd:run\"",
     "test:systemd:run": "mkdir -p /tmp/pump.io/uploads; sed 's/%i.service//g' pump.io@.service | sudo tee /etc/systemd/system/pump.io.service; sudo systemctl daemon-reload; sudo systemctl start pump.io.service; npm run test:system",
+    "test:report-coverage": "lcov-result-merger 'coverage*/lcov.info' | coveralls",
     "lint": "npm run lint:jshint && npm run lint:jscs && npm run lint:jade && npm run lint:json && npm run lint:deps",
-    "lint:deps": "dependency-check package.json test/*.js > /dev/null && dependency-check --unused package.json -i dependency-check -i jscs -i jshint -i jsonlint -i pug-lint test/*.js > /dev/null",
+    "lint:deps": "dependency-check package.json bin/* test/*.js > /dev/null && dependency-check --unused package.json -i dependency-check -i jscs -i jshint -i jsonlint -i pug-lint -i nyc -i lcov-result-merger -i coveralls bin/* test/*.js > /dev/null",
     "lint:jshint": "jshint --exclude 'public/javascript/libs' bin/* lib routes public/javascript test",
     "lint:jscs": "jscs bin/* lib public/javascript/pump* routes test",
     "lint:jade": "pug-lint public/template/*.jade",
@@ -91,13 +97,17 @@
     "update-docs:manpage": "sed \"s/^\\.TH PUMP 1.*$/.TH PUMP 1 \\\"$(date +'%d %B %Y')\\\" \\\"$npm_package_version\\\"/\" doc/pump.1 | sponge doc/pump.1",
     "update-docs:readme": "sed \"s/^Version .*\\..*\\..*$/Version $npm_package_version/\" README.md | sponge README.md",
     "prepublish": "npm run build",
-    "version": "npm run update-docs && git add README.md doc/",
-    "postversion": "git push origin v$npm_package_version && echo $npm_package_version | grep beta > /dev/null || git push --set-upstream origin $(git symbolic-ref --short HEAD)"
+    "version": "npm run version:check-branch && npm run update-docs && git add README.md doc/",
+    "version:check-branch": "if [ \"$(git symbolic-ref HEAD)\" = refs/heads/master ]; then echo 'refusing to run `npm version` on master; bump package.json manually' 1>&2; exit 1; fi",
+    "postversion": "npm run postversion:push",
+    "postversion:push": "git push origin v$npm_package_version && npm run --silent util:is-beta || git push --set-upstream origin $(git symbolic-ref --short HEAD)",
+    "util:is-beta": "echo $npm_package_version | grep beta > /dev/null"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/pump-io/pump.io.git"
   },
+  "bugs": "https://github.com/pump-io/pump.io/issues",
   "keywords": [
     "activitystreams",
     "socialnetwork",
@@ -106,16 +116,19 @@
     "streams",
     "api",
     "app",
-    "server"
+    "server",
+    "federation",
+    "decentralization"
   ],
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=4 <7",
+    "node": ">=4 <=8",
     "npm": ">=2"
   },
   "greenkeeper": {
     "ignore": [
-      "databank"
+      "databank",
+      "jsdom"
     ]
   }
 }
