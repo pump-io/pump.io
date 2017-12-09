@@ -1,6 +1,6 @@
 # pump.io changelog
 
-pump.io follows [Semantic Versioning][semver]. Specifically, the following things are considered to be semver-major if changed in a backwards-incompatible way:
+pump.io follows [Semantic Versioning 2.0.0][semver]. Specifically, the following things are considered to be semver-major if changed in a backwards-incompatible way:
 
 * Ability to merge trivial local template modifications
 * Configuration value names, semantics, and format
@@ -452,7 +452,7 @@ TODO
 
 * Initial release
 
- [semver]: http://semver.org/
+ [semver]: https://semver.org/spec/v2.0.0.html
  [librejs]: https://www.gnu.org/software/librejs/
  [security-headers]: https://github.com/pump-io/pump.io/issues/1184#issuecomment-242264403
  [Subresource Integrity]: https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity
