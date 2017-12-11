@@ -26,7 +26,7 @@ var suite = vows.describe("AS2 conversion module interface");
 
 var testVocabConversion = function(verb, newVerb) {
     return {
-        topic: function(as2) {
+        topic: function(toAS2) {
             var act = {
                 id: "urn:uuid:" + uuid.v4(),
                 actor: "acct:evan@w3.example",
@@ -39,7 +39,7 @@ var testVocabConversion = function(verb, newVerb) {
                 }
             };
 
-            return as2(act);
+            toAS2(act, this.callback);
         },
         "@type uses AS2 vocabulary": function(act) {
             assert.isFalse(act.hasOwnProperty("verb"));
@@ -75,7 +75,7 @@ suite.addBatch({
                     displayName: "A note"
                 };
 
-                return as2(act);
+                as2(act, this.callback);
             },
             "it has an @context": function(act) {
                 assert.isTrue(act.hasOwnProperty("@context"));
@@ -131,7 +131,7 @@ suite.addBatch({
                     }
                 };
 
-                return as2(act);
+                as2(act, this.callback);
             },
             "the `post` verb is converted specially to Add in @type": function(act) {
                 assert.isFalse(act.hasOwnProperty("verb"));
@@ -153,7 +153,7 @@ suite.addBatch({
                     }
                 };
 
-                return as2(act);
+                as2(act, this.callback);
             },
             "verb is renamed to @type": function(act) {
                 assert.isFalse(act.hasOwnProperty("verb"));
@@ -179,7 +179,7 @@ suite.addBatch({
                     displayName: "A note"
                 };
 
-                return as2(act);
+                as2(act, this.callback);
             },
             "the `submit` verb is converted specially to Create in @type": function(act) {
                 assert.isFalse(act.hasOwnProperty("verb"));
@@ -205,7 +205,7 @@ suite.addBatch({
                     }
                 };
 
-                return as2(act);
+                as2(act, this.callback);
             },
             "the `submit` verb is converted specially to Add in @type": function(act) {
                 assert.isFalse(act.hasOwnProperty("verb"));
