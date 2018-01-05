@@ -71,7 +71,7 @@ This sample photo is used for the main page:
 
 ## License
 
-Copyright 2011-2017, E14N https://e14n.com/ and contributors
+Copyright 2011-2018, E14N https://e14n.com/ and contributors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
