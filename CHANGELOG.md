@@ -17,6 +17,12 @@ Changes to everything else are not considered breaking, although we may delay th
 
 If you think something that isn't in the first list should be covered, file an issue and we'll either state we consider that semver-major or give a rationale as to why it isn't. Please also feel free to ask questions in the issue tracker; this list could surely be more precise.
 
+## 5.1.0 - 2018-01-05
+
+### Changed
+
+* Bump `gm` version out of caution to pull in a fully security-patched `debug`
+
 ## 5.1.0 beta 0 - 2017-12-08
 
 ### Improved
