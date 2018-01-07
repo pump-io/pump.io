@@ -81,6 +81,7 @@
     "test:vows": "nyc -r lcov vows -v test/*-test.js",
     "test:root": "nyc -r lcov --report-dir coverage-root vows -v test/*-test-as-root.js",
     "test:install": "npm install -g .",
+    "test:security-sigs": "gpg --keyserver hkp://keys.gnupg.net --recv-keys C46D8E7A3F13AD1C8EC6784843BF769C4ACA8B96 && gpg --verify doc/SECURITY.md.gpg",
     "test:system": "vows -v test/*-test-system.js",
     "test:systemd": "docker run -v $(pwd):/tmp/pump.io:ro -v $NVM_DIR:/.nvm:ro ubuntu sh -c \"export NVM_DIR=$NVM_DIR; . $NVM_DIR/nvm.sh; nvm use $TRAVIS_NODE_VERSION; cd /tmp/pump.io; npm run test:systemd:run\"",
     "test:systemd:run": "mkdir -p /tmp/pump.io/uploads; sed 's/%i.service//g' pump.io@.service | sudo tee /etc/systemd/system/pump.io.service; sudo systemctl daemon-reload; sudo systemctl start pump.io.service; npm run test:system",
