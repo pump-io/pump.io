@@ -30,7 +30,7 @@ test", it will only run the tests that don't require root.
 
 To run the root-required tests, do:
 
-    sudo vows test/*-test-as-root.js
+    sudo npm run test:root
     
 I suggest that if you're doing development and testing the code that
 needs root, you should run it in a virtual machine.
