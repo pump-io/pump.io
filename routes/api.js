@@ -211,12 +211,18 @@ var wantAS2 = function(req) {
                         "application/activity+json"]) !== "application/stream+json";
 };
 
-var maybeAS2 = function(req, obj) {
+var maybeAS2 = function(req, res, next, obj) {
     if (wantAS2(req)) {
-        return as2(obj);
+        as2(obj, function(err, nobj) {
+            if (err) {
+                next(err);
+            } else {
+                res.json(nobj);
+            }
+        });
+    } else {
+        res.json(obj);
     }
-
-    return obj;
 };
 
 // XXX: use a common function instead of faking up params
@@ -319,7 +325,7 @@ var getObject = function(req, res, next) {
                 next(err);
             } else {
                 obj.sanitize();
-                res.json(maybeAS2(req, obj));
+                maybeAS2(req, res, next, obj);
             }
         }
     );
@@ -399,7 +405,7 @@ var contextEndpoint = function(contextifier, streamCreator) {
             if (err) {
                 next(err);
             } else {
-                res.json(maybeAS2(req, collection));
+                maybeAS2(req, res, next, collection);
             }
         });
     };
@@ -472,7 +478,7 @@ var getUser = function(req, res, next) {
                 delete req.user.settings;
             }
             req.user.sanitize();
-            res.json(maybeAS2(req, req.user));
+            maybeAS2(req, res, next, req.user);
         }
     );
 };
@@ -551,7 +557,7 @@ var getActivity = function(req, res, next) {
 
     act.sanitize(principal);
 
-    res.json(maybeAS2(req, act));
+    maybeAS2(req, res, next, act);
 };
 
 var putActivity = function(req, res, next) {
@@ -929,7 +935,7 @@ var listUsers = function(req, res, next) {
                 }
             }
 
-            res.json(maybeAS2(req, collection));
+            maybeAS2(req, res, next, collection);
         }
     );
 };
@@ -1338,7 +1344,7 @@ var streamEndpoint = function(streamCreator) {
             if (err) {
                 next(err);
             } else {
-                res.json(maybeAS2(req, collection));
+                maybeAS2(req, res, next, collection);
             }
         });
     };
