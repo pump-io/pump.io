@@ -123,7 +123,7 @@
 
         sock = new SockJS(here.protocol + "//" + here.host + "/main/realtime/sockjs");
 
-        sock.onopen = function(e) {
+        sock.onopen = function() {
             Pump.socket = sock;
             Pump.followStreams();
 
@@ -149,15 +149,15 @@
             }
         };
 
-        sock.onclose = function(e) {
+        sock.onclose = function(error) {
             Pump.socket = null;
             // Reconnect on broken connections, not for normal close
-            if (e.code !== 1000) {
-                sock.reconnect(e);
+            if (error.code !== 1000) {
+                sock.reconnect(error);
             }
         };
 
-        sock.reconnect = function(e) {
+        sock.reconnect = function(error) {
             _socket.retryAttempts++;
 
             if (_socket.retryTimer) {
@@ -165,8 +165,14 @@
                 _socket.retryTimer = null;
             }
 
-            if (e.code === 2000 && _socket.retryAttempts > 10) {
+            if (error.code === 2000 && _socket.retryAttempts > 10) {
                 // No more attempts if all transports failed
+                if (!_socket.error) {
+                    // Show alert only one time
+                    _socket.error = error;
+                    Pump.error("Looks like your browser not support any socket transport");
+                    Pump.debug(error);
+                }
                 return;
             }
 
