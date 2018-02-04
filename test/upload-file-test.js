@@ -188,7 +188,7 @@ suite.addBatch({
                                     assert.ifError(err);
                                 }
                             },
-                            "and we get the file from web interface without login": {
+                            "and we get the file from the web interface without logging in": {
                                 topic: function(doc, feed, pair, cl) {
                                     var cred = makeCred(cl, pair),
                                         browser = new Browser(),
@@ -203,7 +203,7 @@ suite.addBatch({
                                     br.assert.status(403);
                                 }
                             },
-                            "and we login for try get file": {
+                            "and we login and try to get the file": {
                                 topic: function(doc, feed, pair, cl) {
                                     var browser = new Browser(),
                                         callback = this.callback,
@@ -222,7 +222,7 @@ suite.addBatch({
                                     assert.ifError(err);
                                     br.assert.success();
                                 },
-                                "and we get the file from web interface with login": {
+                                "and we get the file from the web interface while logged in": {
                                     topic: function(br, doc, feed, pair, cl) {
                                         var cred = makeCred(cl, pair),
                                             browser = br,
