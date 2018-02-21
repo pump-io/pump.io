@@ -10,7 +10,7 @@
     "dependency-check": "^2.8.0",
     "jscs": "^3.0.3",
     "jshint": "^2.9.2",
-    "jsonlint": "^1.6.2",
+    "jsonlint2": "^1.7.0",
     "lcov-result-merger": "^1.2.0",
     "node-mocks-http": "^1.6.1",
     "nyc": "^11.2.1",
