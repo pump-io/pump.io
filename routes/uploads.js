@@ -62,7 +62,7 @@ var everyAuth = function(req, res, next) {
 
 var uploadedFile = function(req, res, next) {
     var slug = req.params[0],
-        file = _.isString(slug) ? slug.match(/\.(.*)$/) : null,
+        file = _.isString(slug) && slug.match(/\.(.*)$/),
         ext = _.isArray(file) ? file[1] : null,
         type = extToType(ext),
         Cls = typeToClass(type),
@@ -78,7 +78,8 @@ var uploadedFile = function(req, res, next) {
             }
             this();
         },
-        function() {
+        function(err) {
+            if (err) throw err;
             Cls.search({_slug: slug}, this);
         },
         function(err, objs) {
