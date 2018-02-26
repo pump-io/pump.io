@@ -204,7 +204,7 @@ suite.addBatch({
                                     assert.equal(res.statusCode, 403);
                                 }
                             },
-                            "and we try to get the non-public file with wrong extension from the web interface": {
+                            "and we try to get a private file with no extension from the web interface": {
                                 topic: function(doc) {
                                     var callback = this.callback,
                                         url = doc.fullImage.url.split(".")[0];
@@ -219,7 +219,7 @@ suite.addBatch({
                                     assert.equal(res.statusCode, 403);
                                 }
                             },
-                            "and we get the non-public file from the web interface without logging in": {
+                            "and we get a private file from the web interface without logging in": {
                                 topic: function(doc) {
                                     var browser = new Browser(),
                                         callback = this.callback,
@@ -235,7 +235,7 @@ suite.addBatch({
                                     assert.equal(res.statusCode, 403);
                                 }
                             },
-                            "and we login and try to get the non-public file": {
+                            "and we login and try to get a private file": {
                                 topic: function(doc, feed, pair, cl) {
                                     var browser = new Browser(),
                                         callback = this.callback,
@@ -270,18 +270,19 @@ suite.addBatch({
                                         browser.visit(url, function(err) {
                                             // when is false sends a new param for next test
                                             // and don't use br.assert because send a browser
-                                            // as the new parameter for next test
+                                            // as the new parameter for next test and
+                                            // and we'll a duplicate browser instance
                                             callback(err || browser.status !== 200 || null);
                                         });
                                     },
                                     "it works": function(err) {
                                         assert.ifError(err);
                                     },
-                                    "and we try to get the file with wrong extension from the web interface": {
+                                    "and we try to get the file with the wrong extension from the web interface": {
                                         topic: function(br, doc) {
                                             var browser = br,
                                                 callback = this.callback,
-                                                url = doc.fullImage.url.split(".")[0];
+                                                url = doc.fullImage.url.split(".")[0] + ".exe";
 
                                             browser.visit(url, function() {
                                                 callback(null, browser);
