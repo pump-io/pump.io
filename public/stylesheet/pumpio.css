@@ -12,6 +12,13 @@ body {
   color: white;
 }
 
+/* main */
+
+.hero-unit .span4 img {
+  max-height: 235px;
+  max-width: 340px;
+}
+
 /*  navbar */
 
 .navbar .btn-group {
@@ -251,6 +258,12 @@ body {
 
 #choose-contact {
   margin-top: 20px;
+}
+
+/* helpers */
+
+.pull-center {
+  text-align: center;
 }
 
 /* responsive */
