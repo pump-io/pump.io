@@ -508,6 +508,7 @@
                 },
                 error: function(jqxhr) {
                     if (_.isFunction(callback)) {
+                        // TODO: why pass as argument a function that returns undefined?
                         callback(Pump.jqxhrError(jqxhr), null);
                     }
                 }

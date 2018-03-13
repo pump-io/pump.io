@@ -75,7 +75,7 @@
         }
     };
 
-    Pump.getUserCred = function(nickname) {
+    Pump.getUserCred = function() {
         if (Pump.token) {
             return {token: Pump.token, secret: Pump.secret};
         } else if (localStorage) {
@@ -111,6 +111,11 @@
         return;
     };
 
+    Pump.clearUserAllCred = function() {
+        Pump.clearUserCred();
+        Pump.clearNickname();
+    };
+
     Pump.clearCred = function() {
         Pump.clientID = null;
         Pump.clientSecret = null;
@@ -118,6 +123,11 @@
             delete localStorage["cred:clientID"];
             delete localStorage["cred:clientSecret"];
         }
+    };
+
+    Pump.clearAllCred = function() {
+        Pump.clearCred();
+        Pump.clearUserAllCred();
     };
 
     Pump.ensureCred = function(callback) {
@@ -153,6 +163,26 @@
                 callback(new Error("error getting credentials"), null);
             });
         }
+    };
+
+    Pump.hasAllCred = function() {
+        var cred = Pump.getCred(),
+            userCred = Pump.getUserCred();
+
+        return ((cred && cred.clientID && cred.clientSecret) &&
+                (userCred && userCred.token && userCred.secret));
+    };
+
+    Pump.hasOAuthError = function(message, status) {
+        var errors = [
+            "Invalid / expired Token",
+            "Invalid / used nonce",
+            "Invalid Username/Token",
+            "Invalid Consumer Key",
+            "Invalid signature"
+        ];
+        return (errors.indexOf(message) !== -1 &&
+                (status === 400 || status === 401));
     };
 
 })(window._, window.$, window.Backbone, window.Pump);

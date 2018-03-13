@@ -52,8 +52,10 @@ var databank = require("databank"),
     clearPrincipal = authc.clearPrincipal,
     principalUserOnly = authc.principalUserOnly,
     clientAuth = authc.clientAuth,
+    userOrClientAuth = authc.userOrClientAuth,
     userAuth = authc.userAuth,
     someReadAuth = authc.someReadAuth,
+    userReadAuth = authc.userReadAuth,
     NoSuchThingError = databank.NoSuchThingError,
     createUser = api.createUser,
     addLiked = finishers.addLiked,
@@ -80,7 +82,7 @@ var addRoutes = function(app, session) {
 
     app.post("/main/logout", session, someReadAuth, handleLogout);
 
-    app.post("/main/renew", session, userAuth, renewSession);
+    app.post("/main/renew", session, userOrClientAuth, renewSession);
 
     app.get("/main/remote", session, principal, showRemote);
     app.post("/main/remote", session, handleRemote);
@@ -682,18 +684,38 @@ var showObject = function(req, res, next) {
 var renewSession = function(req, res, next) {
 
     var principal = req.principal,
-        user = req.principalUser;
+        user = res.locals.principalUser;
 
     Step(
-        function() {
+        function(err) {
+            if (err) throw err;
+            // If you come from OAuth as a client will
+            // not have user data, we need them !!
+            if (!user || !principal) {
+                userReadAuth(req, res, this);
+            } else {
+                this();
+            }
+        },
+        function(err) {
+            if (err) throw err;
             // We only need to set this if it's not already set
+            user = user || res.locals.principalUser;
+            principal = principal || req.principal;
             setPrincipal(req.session, principal, this);
         },
         function(err) {
+            if (err) throw err;
+            // Generate new tokens
+            req.app.provider.newTokenPair(req.client, user, this);
+        },
+        function(err, pair) {
             if (err) {
                 next(err);
             } else {
-                // principalUser is sanitized by userAuth()
+                // principalUser is sanitized by userOrClientAuth
+                user.token = pair.access_token;
+                user.secret = pair.token_secret;
                 res.json(user);
             }
         }
