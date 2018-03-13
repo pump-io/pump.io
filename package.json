@@ -31,7 +31,7 @@
     "connect-databank": "^1.0.3",
     "connect-multiparty": "^2.0.0",
     "cookie-parser": "^1.4.3",
-    "databank": "0.19.x",
+    "databank": "^1.0.1",
     "dateformat": "^3.0.0",
     "dialback-client": "0.2.x",
     "dompurify": "^1.0.1",
