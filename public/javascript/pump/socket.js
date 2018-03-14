@@ -164,14 +164,10 @@
                 _socket.retryTimer = null;
             }
 
-            if (error.code === 2000 && _socket.retryAttempts > 10) {
-                // No more attempts if all transports failed
-                if (!_socket.error) {
-                    // Show alert only one time
-                    _socket.error = error;
-                    Pump.error("Looks like your browser not support any socket transport");
-                    Pump.debug(error);
-                }
+            // No more attempts if all transports failed
+            if (error.code === 2000) {
+                Pump.error("Sorry! Your browser doesn't support realtime.");
+                Pump.debug(error);
                 return;
             }
 
