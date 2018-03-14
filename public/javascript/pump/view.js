@@ -1598,16 +1598,6 @@
             view.$('textarea[name="content"]').wysihtml5({
                 customTemplates: Pump.wysihtml5Tmpl
             });
-
-            // Close other comments instances if are empty
-            $(".replies .comment-form").each(function(index, el) {
-                var $el = $(el),
-                    html = $el.find('textarea[name="content"]').val();
-
-                if (!html || html.length === 0) {
-                    $el.remove();
-                }
-            });
         },
         cancelComment: function() {
             var view = this,
@@ -1617,7 +1607,7 @@
                 view.remove();
                 return;
             }
-            Pump.areYouSure("Look like have content, are you sure close this comment?", function(err, sure) {
+            Pump.areYouSure("You sure? You can't get this comment back!", function(err, sure) {
                 if (sure) {
                     view.remove();
                 }
