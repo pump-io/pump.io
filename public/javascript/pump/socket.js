@@ -26,7 +26,6 @@
 
     "use strict";
 
-    // Private instance
     var _socket = {
         reconnecting: false,
         retryTimeout: 30000,
