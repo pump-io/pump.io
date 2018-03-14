@@ -1396,7 +1396,7 @@
                 view.$(".favorite")
                     .removeClass("favorite")
                     .addClass("unfavorite")
-                    .html("Unlike <i class=\"fa fa-thumbs-down\"></i>");
+                    .html("Unlike <i class=\"fa fa-thumbs-o-down\"></i>");
                 Pump.addMinorActivity(act);
             });
         },
@@ -1414,7 +1414,7 @@
                     view.$(".unfavorite")
                         .removeClass("unfavorite")
                         .addClass("favorite")
-                        .html("Like <i class=\"fa fa-thumbs-up\"></i>");
+                        .html("Like <i class=\"fa fa-thumbs-o-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
             });
@@ -1680,7 +1680,7 @@
                     view.$(".favorite")
                         .removeClass("favorite")
                         .addClass("unfavorite")
-                        .html("Unlike <i class=\"fa fa-thumbs-down\"></i>");
+                        .html("Unlike <i class=\"fa fa-thumbs-o-down\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -1702,7 +1702,7 @@
                     view.$(".unfavorite")
                         .removeClass("unfavorite")
                         .addClass("favorite")
-                        .html("Like <i class=\"fa fa-thumbs-up\"></i>");
+                        .html("Like <i class=\"fa fa-thumbs-o-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -1788,7 +1788,7 @@
                     view.$(".favorite")
                         .removeClass("favorite")
                         .addClass("unfavorite")
-                        .html("Unlike <i class=\"fa fa-thumbs-down\"></i>");
+                        .html("Unlike <i class=\"fa fa-thumbs-o-down\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -1811,7 +1811,7 @@
                     view.$(".unfavorite")
                         .removeClass("unfavorite")
                         .addClass("favorite")
-                        .html("Like <i class=\"fa fa-thumbs-up\"></i>");
+                        .html("Like <i class=\"fa fa-thumbs-o-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -2521,7 +2521,7 @@
                     view.$(".favorite")
                         .removeClass("favorite")
                         .addClass("unfavorite")
-                        .html("Unlike <i class=\"fa fa-thumbs-down\"></i>");
+                        .html("Unlike <i class=\"fa fa-thumbs-o-down\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -2543,7 +2543,7 @@
                     view.$(".unfavorite")
                         .removeClass("unfavorite")
                         .addClass("favorite")
-                        .html("Like <i class=\"fa fa-thumbs-up\"></i>");
+                        .html("Like <i class=\"fa fa-thumbs-o-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
