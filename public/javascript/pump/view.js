@@ -1394,6 +1394,7 @@
 
             Pump.newMinorActivity(act, function(err, act) {
                 view.$(".favorite")
+                    .filter(":first")
                     .removeClass("favorite")
                     .addClass("unfavorite")
                     .html("Unlike <i class=\"fa fa-thumbs-o-down\"></i>");
@@ -1412,6 +1413,7 @@
                     view.showError(err);
                 } else {
                     view.$(".unfavorite")
+                        .filter(":first")
                         .removeClass("unfavorite")
                         .addClass("favorite")
                         .html("Like <i class=\"fa fa-thumbs-o-up\"></i>");
@@ -1678,6 +1680,7 @@
                     view.showError(err);
                 } else {
                     view.$(".favorite")
+                        .filter(":first")
                         .removeClass("favorite")
                         .addClass("unfavorite")
                         .html("Unlike <i class=\"fa fa-thumbs-o-down\"></i>");
@@ -1700,6 +1703,7 @@
                     view.showError(err);
                 } else {
                     view.$(".unfavorite")
+                        .filter(":first")
                         .removeClass("unfavorite")
                         .addClass("favorite")
                         .html("Like <i class=\"fa fa-thumbs-o-up\"></i>");
@@ -1786,6 +1790,7 @@
                     view.showError(err);
                 } else {
                     view.$(".favorite")
+                        .filter(":first")
                         .removeClass("favorite")
                         .addClass("unfavorite")
                         .html("Unlike <i class=\"fa fa-thumbs-o-down\"></i>");
@@ -1809,6 +1814,7 @@
                     view.showError(err);
                 } else {
                     view.$(".unfavorite")
+                        .filter(":first")
                         .removeClass("unfavorite")
                         .addClass("favorite")
                         .html("Like <i class=\"fa fa-thumbs-o-up\"></i>");
@@ -2519,6 +2525,7 @@
                     view.showError(err);
                 } else {
                     view.$(".favorite")
+                        .filter(":first")
                         .removeClass("favorite")
                         .addClass("unfavorite")
                         .html("Unlike <i class=\"fa fa-thumbs-o-down\"></i>");
@@ -2541,6 +2548,7 @@
                     view.showError(err);
                 } else {
                     view.$(".unfavorite")
+                        .filter(":first")
                         .removeClass("unfavorite")
                         .addClass("favorite")
                         .html("Like <i class=\"fa fa-thumbs-o-up\"></i>");
