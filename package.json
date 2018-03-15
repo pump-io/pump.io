@@ -25,6 +25,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.15.2",
+    "browserify-middleware": "^8.1.0",
     "bunyan": "^1.8.12",
     "compression": "^1.6.2",
     "connect-auth-pumpio": "^0.6.1",

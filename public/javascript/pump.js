@@ -688,3 +688,10 @@ if (!window.Pump) {
     };
 
 })(window._, window.$, window.Backbone, window.Pump);
+
+// XXX refactor these into *real* modules instead of just blindly including them
+require("./pump/auth.js");
+require("./pump/model.js");
+require("./pump/router.js");
+require("./pump/socket.js");
+require("./pump/view.js");
