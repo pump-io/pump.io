@@ -102,6 +102,18 @@ body {
   font-weight: bold;
 }
 
+.spinner-image::before {
+  content: "";
+  background-color: #fff;
+  display: block;
+  height: 30px;
+  width: 30px;
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  border-radius: 20px;
+}
+
 /* media */
 
 .media:first-child {
@@ -212,6 +224,10 @@ body {
   margin-right: auto;
   max-width: 98%;
   margin: 25px auto;
+}
+
+.object-image {
+  cursor: pointer;
 }
 
 .object-page .media-body > p.muted {
