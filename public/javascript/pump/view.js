@@ -1486,8 +1486,10 @@
                 modalView;
 
             if (object && object.get("fullImage")) {
+                var spinContainer = view.$el.find(".object-image").parent();
 
                 modalView = new Pump.LightboxModal({data: {object: object}});
+                spinContainer.spin({className: "spinner-image", zIndex: 10});
 
                 // When it's ready, show immediately
 
@@ -1495,6 +1497,9 @@
                     $(view.el).append(modalView.el);
                     $(modalView.el).on("hidden", function() {
                         $(modalView.el).remove();
+                    });
+                    $(modalView.el).on("shown", function() {
+                        spinContainer.spin(false);
                     });
                     $("#fullImageLightbox").lightbox();
                 });
