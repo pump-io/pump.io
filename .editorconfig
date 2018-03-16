@@ -19,4 +19,3 @@ indent_size = 2
 [*.{pug,jade}]
 indent_size = 2
 trim_trailing_whitespace = false
-insert_final_newline = false
