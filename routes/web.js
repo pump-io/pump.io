@@ -343,9 +343,13 @@ var showStream = function(req, res, next) {
             } else {
                 if (wantAS2(req)) {
                     as2(req.user.profile, function(err, user) {
-                        // XXX: handle the application/activity+json media type
-                        res.setHeader("Content-Type", "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"");
-                        res.end(JSON.stringify(user));
+                        if (err) {
+                            next(err);
+                        } else {
+                            // XXX: handle the application/activity+json media type
+                            res.setHeader("Content-Type", "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"");
+                            res.end(JSON.stringify(user));
+                        }
                     });
                 } else {
                     res.render("user", {page: {title: req.user.profile.displayName, url: req.originalUrl},
