@@ -55,6 +55,9 @@ var databank = require("databank"),
     saveUpload = require("../lib/saveupload").saveUpload,
     streams = require("../lib/streams"),
     as2 = require("../lib/as2"),
+    as2headers = require("../lib/as2headers"),
+    wantAS2 = as2headers.wantAS2,
+    maybeAS2 = as2headers.maybeAS2,
     reqUser = mw.reqUser,
     reqGenerator = mw.reqGenerator,
     sameUser = mw.sameUser,
@@ -202,27 +205,6 @@ var addRoutes = function(app, session) {
     // With foreign IDs; needs to be late for better matches
 
     app.get("/api/:type", smw, anyReadAuth, requestObjectByID, authorOrRecipient, getObject);
-};
-
-var wantAS2 = function(req) {
-    // TODO are these MIME types the ones we want? In the right order?
-    return req.accepts(["application/stream+json",
-                        "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"",
-                        "application/activity+json"]) !== "application/stream+json";
-};
-
-var maybeAS2 = function(req, res, next, obj) {
-    if (wantAS2(req)) {
-        as2(obj, function(err, nobj) {
-            if (err) {
-                next(err);
-            } else {
-                res.json(nobj);
-            }
-        });
-    } else {
-        res.json(obj);
-    }
 };
 
 // XXX: use a common function instead of faking up params
