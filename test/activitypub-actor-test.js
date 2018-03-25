@@ -28,7 +28,7 @@ var assert = require("assert"),
 
 var suite = vows.describe("ActivityPub actor");
 
-var AS2_MIME_TYPE = "application/ld+json; charset=utf-8; profile=\"https://www.w3.org/ns/activitystreams\"";
+var AS2_MIME_TYPE = "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"";
 var AS2_CONTEXT = "https://www.w3.org/ns/activitystreams";
 
 suite.addBatch(apputil.withAppSetup({
@@ -50,7 +50,6 @@ suite.addBatch(apputil.withAppSetup({
           });
         },
         "it works": function(err, res, body) {
-          console.error(err);
           assert.ifError(err);
         },
         "content type is correct": function(err, res, body) {

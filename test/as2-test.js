@@ -41,9 +41,9 @@ var testVocabConversion = function(verb, newVerb) {
 
             toAS2(act, this.callback);
         },
-        "@type uses AS2 vocabulary": function(act) {
+        "type uses AS2 vocabulary": function(act) {
             assert.isFalse(act.hasOwnProperty("verb"));
-            assert.equal(act["@type"], newVerb);
+            assert.equal(act["type"], newVerb);
         }
     };
 };
@@ -81,21 +81,17 @@ suite.addBatch({
                 assert.isTrue(act.hasOwnProperty("@context"));
                 assert.equal(act["@context"], "https://www.w3.org/ns/activitystreams");
             },
-            "id is renamed to @id": function(act) {
-                assert.isFalse(act.hasOwnProperty("id"));
-                assert.equal(act["@id"], "urn:uuid:77451568-ce6a-42eb-8a9f-60ece187725f");
-            },
-            "the `post` verb is converted specially to Create in @type": function(act) {
+            "the `post` verb is converted specially to Create in type": function(act) {
                 assert.isFalse(act.hasOwnProperty("verb"));
-                assert.equal(act["@type"], "Create");
+                assert.equal(act["type"], "Create");
             },
-            "the object's objectType is renamed to @type": function(act) {
+            "the object's objectType is renamed to type": function(act) {
                 assert.isFalse(act.object.hasOwnProperty("objectType"));
-                assert.equal(act.object["@type"], "note");
+                assert.equal(act.object["type"], "note");
             },
-            "the `to` field's collection's objectType is renamed to @type": function(act) {
+            "the `to` field's collection's objectType is renamed to type": function(act) {
                 assert.isFalse(act.to[0].hasOwnProperty("objectType"));
-                assert.equal(act.to[0]["@type"], "collection");
+                assert.equal(act.to[0]["type"], "collection");
             },
             // XXX should we test for all objectType renames? E.g. in the `to` field?
             "displayName is renamed to name": function(act) {
@@ -133,9 +129,9 @@ suite.addBatch({
 
                 as2(act, this.callback);
             },
-            "the `post` verb is converted specially to Add in @type": function(act) {
+            "the `post` verb is converted specially to Add in type": function(act) {
                 assert.isFalse(act.hasOwnProperty("verb"));
-                assert.equal(act["@type"], "Add");
+                assert.equal(act["type"], "Add");
             }
         },
         "and we try to convert a like of a note to AS2": {
@@ -155,13 +151,13 @@ suite.addBatch({
 
                 as2(act, this.callback);
             },
-            "verb is renamed to @type": function(act) {
+            "verb is renamed to type": function(act) {
                 assert.isFalse(act.hasOwnProperty("verb"));
-                assert.equal(act["@type"], "like");
+                assert.equal(act["type"], "like");
             },
-            "the target's objectType is renamed to @type": function(act) {
+            "the target's objectType is renamed to type": function(act) {
                 assert.isFalse(act.target.hasOwnProperty("objectType"));
-                assert.equal(act.target["@type"], "note");
+                assert.equal(act.target["type"], "note");
             }
         },
         "and we try to convert a submission of a note to AS2": {
@@ -181,9 +177,9 @@ suite.addBatch({
 
                 as2(act, this.callback);
             },
-            "the `submit` verb is converted specially to Create in @type": function(act) {
+            "the `submit` verb is converted specially to Create in type": function(act) {
                 assert.isFalse(act.hasOwnProperty("verb"));
-                assert.equal(act["@type"], "Create");
+                assert.equal(act["type"], "Create");
             }
         },
         "and we try to convert a submission of a note to a collection to AS2": {
@@ -207,9 +203,9 @@ suite.addBatch({
 
                 as2(act, this.callback);
             },
-            "the `submit` verb is converted specially to Add in @type": function(act) {
+            "the `submit` verb is converted specially to Add in type": function(act) {
                 assert.isFalse(act.hasOwnProperty("verb"));
-                assert.equal(act["@type"], "Add");
+                assert.equal(act["type"], "Add");
             }
         },
         "and we try to convert a `share` activity to AS2": testVocabConversion("share", "Announce"),

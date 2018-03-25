@@ -317,7 +317,7 @@ suite.addBatch(
                         assert.includes(coll, "items");
                         assert.isArray(coll.items);
                         assert.lengthOf(coll.items, 1);
-                        assert.equal(coll.items[0].id, reply.object["@id"]);
+                        assert.equal(coll.items[0].id, reply.object["id"]);
                     }
                 }
             }
@@ -455,17 +455,17 @@ suite.addBatch(
                         assert.lengthOf(coll.items, 100);
 
                         for (i = 0; i < 100; i++) {
-                            collIDs[coll.items[i]["@id"]] = 1;
+                            collIDs[coll.items[i]["id"]] = 1;
 
                             // Note: `comments` is passed through from
                             // previous subbatches, so it's AS1. Hence
-                            // the reference to `id` instead of `@id`.
+                            // the reference to `id` instead of `id`.
                             commentIDs[comments[i].object.id] = 1;
                         }
 
                         for (i = 0; i < 100; i++) {
                             assert.include(collIDs, comments[i].object.id);
-                            assert.include(commentIDs, coll.items[i]["@id"]);
+                            assert.include(commentIDs, coll.items[i]["id"]);
                         }
                     }
                 },
@@ -534,11 +534,11 @@ suite.addBatch(
                         assert.isArray(note.replies.items);
 
                         for (i = 0; i < 100; i++) {
-                            commentIDs[comments[i].object["@id"]] = 1;
+                            commentIDs[comments[i].object["id"]] = 1;
                         }
 
                         for (i = 0; i < note.replies.items.length; i++) {
-                            assert.include(commentIDs, note.replies.items[i]["@id"]);
+                            assert.include(commentIDs, note.replies.items[i]["id"]);
                         }
                     }
                 }

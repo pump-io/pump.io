@@ -185,8 +185,8 @@ suite.addBatch({
                 "it works": function(err, profile) {
                     assert.ifError(err);
                     assert.isObject(profile);
-                    assert.include(profile, "@type");
-                    assert.equal(profile["@type"], "person");
+                    assert.include(profile, "type");
+                    assert.equal(profile["type"], "person");
                 }
             }
         }
