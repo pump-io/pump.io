@@ -32,7 +32,12 @@ var testVocabConversion = function(verb, newVerb) {
                 actor: "acct:evan@w3.example",
                 verb: verb,
                 to: [{objectType: "collection",
-                      id: "http://w3.example/socialwg"}],
+                      id: "http://w3.example/socialwg",
+                      links: {
+                          "next": "http://w3.example/a/next/url",
+                          "prev": "http://w3.example/a/prev/url",
+                          "last": "http://w3.example/a/last/url"
+                      }}],
                 target: {
                     id: "urn:uuid:" + uuid.v4(),
                     objectType: "note"
@@ -67,7 +72,12 @@ suite.addBatch({
                     upstreamDuplicates: [],
                     downstreamDuplicates: [],
                     to: [{objectType: "collection",
-                          id: "http://w3.example/socialwg"}],
+                          id: "http://w3.example/socialwg",
+                          links: {
+                              "next": "http://w3.example/a/next/url",
+                              "prev": "http://w3.example/a/prev/url",
+                              "last": "http://w3.example/a/last/url"
+                          }}],
                     object: {
                         id: "urn:uuid:33166eb9-2567-477c-ad90-9352dd904712",
                         objectType: "note"
@@ -87,11 +97,11 @@ suite.addBatch({
             },
             "the object's objectType is renamed to type": function(act) {
                 assert.isFalse(act.object.hasOwnProperty("objectType"));
-                assert.equal(act.object["type"], "note");
+                assert.equal(act.object["type"], "Note");
             },
             "the `to` field's collection's objectType is renamed to type": function(act) {
                 assert.isFalse(act.to[0].hasOwnProperty("objectType"));
-                assert.equal(act.to[0]["type"], "collection");
+                assert.equal(act.to[0]["type"], "Collection");
             },
             // XXX should we test for all objectType renames? E.g. in the `to` field?
             "displayName is renamed to name": function(act) {
@@ -116,7 +126,12 @@ suite.addBatch({
                     verb: "post",
                     title: "A rando note I want to categorize",
                     to: [{objectType: "collection",
-                          id: "http://w3.example/socialwg"}],
+                          id: "http://w3.example/socialwg",
+                          links: {
+                              "next": "http://w3.example/a/next/url",
+                              "prev": "http://w3.example/a/prev/url",
+                              "last": "http://w3.example/a/last/url"
+                          }}],
                     object: {
                         id: "urn:uuid:33166eb9-2567-477c-ad90-9352dd904712",
                         objectType: "note"
@@ -141,7 +156,12 @@ suite.addBatch({
                     actor: "acct:aj@w3.example",
                     verb: "like",
                     to: [{objectType: "collection",
-                          id: "http://w3.example/socialwg"}],
+                          id: "http://w3.example/socialwg",
+                          links: {
+                              "next": "http://w3.example/a/next/url",
+                              "prev": "http://w3.example/a/prev/url",
+                              "last": "http://w3.example/a/last/url"
+                          }}],
                     // TODO check that this syntax is correct
                     target: {
                         id: "urn:uuid:77451568-ce6a-42eb-8a9f-60ece187725f",
@@ -157,7 +177,7 @@ suite.addBatch({
             },
             "the target's objectType is renamed to type": function(act) {
                 assert.isFalse(act.target.hasOwnProperty("objectType"));
-                assert.equal(act.target["type"], "note");
+                assert.equal(act.target["type"], "Note");
             }
         },
         "and we try to convert a submission of a note to AS2": {
@@ -167,7 +187,12 @@ suite.addBatch({
                     actor: "acct:amy@w3.example",
                     verb: "submit",
                     to: [{objectType: "collection",
-                          id: "http://w3.example/socialwg"}],
+                          id: "http://w3.example/socialwg",
+                          links: {
+                              "next": "http://w3.example/a/next/url",
+                              "prev": "http://w3.example/a/prev/url",
+                              "last": "http://w3.example/a/last/url"
+                          }}],
                     object: {
                         id: "urn:uuid:404c13a3-65ba-43f0-a88d-9a2b07a21a17",
                         objectType: "note"
@@ -190,7 +215,12 @@ suite.addBatch({
                     verb: "submit",
                     title: "Some other random thing",
                     to: [{objectType: "collection",
-                          id: "http://w3.example/socialwg"}],
+                          id: "http://w3.example/socialwg",
+                          links: {
+                              "next": "http://w3.example/a/next/url",
+                              "prev": "http://w3.example/a/prev/url",
+                              "last": "http://w3.example/a/last/url"
+                          }}],
                     object: {
                         id: "urn:uuid:aa6c312c-5294-4875-9f16-cb4d586127cb",
                         objectType: "note"
