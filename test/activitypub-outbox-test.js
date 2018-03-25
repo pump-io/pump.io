@@ -71,7 +71,7 @@ suite.addBatch(apputil.withAppSetup({
           },
           "it has the right content-type": function(err, res, body) {
             assert.isObject(res);
-            assert.equal(res.headers['content-type'], AS2_MIME_TYPE);
+            assert.equal(res.headers["content-type"], AS2_MIME_TYPE);
           },
           "it looks like good AS2": function(err, res, body) {
             assert.isObject(body);
@@ -87,4 +87,4 @@ suite.addBatch(apputil.withAppSetup({
         }
       }
     }
-  })).export(module)
+  })).export(module);
