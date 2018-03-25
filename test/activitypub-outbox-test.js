@@ -20,40 +20,71 @@
 
 var assert = require("assert"),
     vows = require("vows"),
-    uuid = require("uuid");
+    uuid = require("uuid"),
+    apputil = require("./lib/app"),
+    httputil = require("./lib/http"),
+    oauthutil = require("./lib/oauth"),
+    newCredentials = oauthutil.newCredentials;
 
 var suite = vows.describe("ActivityPub actor");
 
-suite.addBatch({
-  "When we request an identity URL for ActivityPub": {
-    topic() {
-      // launch server
-      // HTTP request of http://nameofhost/identity using AP content type
-    },
-    "it works": function(err, res, body) {
-      // no error
-    },
-    "it has an outbox link": function(err, res, body) {
-      // body includes outbox
-      // outbox looks like the right outbox
-    },
-    "and we request the outbox": {
-      topic: function(res, body) {
-        // http request body.outbox
+var AS2_MIME_TYPE = "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"";
+var AS2_CONTEXT = "https://www.w3.org/ns/activitystreams";
+
+suite.addBatch(apputil.withAppSetup({
+  "and we get new credentials": {
+      topic: function() {
+          newCredentials("macdonald", "the|old|flag", this.callback);
       },
-      "it works": function(err, res, body) {
-        // no error
+      "it works": function(err, cred) {
+          assert.ifError(err);
       },
-      "it has the right content-type": function(err, res, body) {
-        // content-type = ap content type
-      },
-      "it looks like good AS2": function(err, res, body) {
-        // context looks right
-        // type is OrderedCollection
-        // first property is an object
-        // first property has type OrderedCollectionPage
-        // first property has items
+      "and we request an identity URL for ActivityPub": {
+        topic(cred) {
+          var cb = this.callback;
+          var headers = {
+            Accept: AS2_MIME_TYPE
+          };
+          httputil.getJSON("http://localhost:4815/macdonald", cred, headers, function(err, body, response) {
+              cb(err, response, body);
+          });
+        },
+        "it works": function(err, res, body) {
+          assert.ifError(err);
+        },
+        "it has an outbox link": function(err, res, body) {
+          assert.isObject(body);
+          assert.isString(body.outbox);
+        },
+        "and we request the outbox": {
+          topic: function(res, body, cred) {
+            var cb = this.callback;
+            var headers = {
+              Accept: AS2_MIME_TYPE
+            };
+            httputil.getJSON(body.outbox, cred, headers, function(err, body, response) {
+                cb(err, response, body);
+            });
+          },
+          "it works": function(err, res, body) {
+            assert.ifError(err);
+          },
+          "it has the right content-type": function(err, res, body) {
+            assert.isObject(res);
+            assert.equal(res.headers['content-type'], AS2_MIME_TYPE);
+          },
+          "it looks like good AS2": function(err, res, body) {
+            assert.isObject(body);
+            assert.isString(body.type);
+            assert.equal(body.type, "OrderedCollection");
+            assert.isObject(body.first);
+            assert.isString(body.first.type);
+            assert.equal(body.first.type, "OrderedCollectionPage");
+            assert.isArray(body.first.orderedItems);
+            // XXX: check that there is an object in items
+            // XXX: check that that object is an activity
+          }
+        }
       }
     }
-  }
-}).export(module)
+  })).export(module)
