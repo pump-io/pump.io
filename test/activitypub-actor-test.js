@@ -54,14 +54,14 @@ suite.addBatch(apputil.withAppSetup({
         },
         "content type is correct": function(err, res, body) {
           assert.isObject(res);
-          assert.equal(res.headers['content-type'], AS2_MIME_TYPE);
+          assert.equal(res.headers["content-type"], AS2_MIME_TYPE);
         },
         "it looks like good AS2": function(err, res, body) {
           assert.isObject(body);
-          assert.isString(body['@context']);
-          assert.equal(body['@context'], AS2_CONTEXT);
+          assert.isString(body["@context"]);
+          assert.equal(body["@context"], AS2_CONTEXT);
           assert.isString(body.type);
-          assert.equal(body.type, 'Person'); // ???
+          assert.equal(body.type, "Person"); // ???
           assert.isString(body.id);
           assert.equal(body.id, "http://localhost:4815/macdonald");
           assert.isString(body.name);
