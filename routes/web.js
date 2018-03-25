@@ -44,6 +44,10 @@ var databank = require("databank"),
     saveAvatar = su.saveAvatar,
     streams = require("../lib/streams"),
     api = require("./api"),
+    as2headers = require("../lib/as2headers"),
+    as2 = require("../lib/as2"),
+    maybeAS2 = as2headers.maybeAS2,
+    wantAS2 = as2headers.wantAS2,
     HTTPError = he.HTTPError,
     reqUser = mw.reqUser,
     reqGenerator = mw.reqGenerator,
@@ -337,17 +341,24 @@ var showStream = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                res.render("user", {page: {title: req.user.profile.displayName, url: req.originalUrl},
-                                    major: major,
-                                    minor: minor,
-                                    profile: req.user.profile,
-                                    data: {
+                if (wantAS2(req)) {
+                    as2(req.user.profile, function(err, user) {
+                        res.setHeader("Content-Type", req.accepts(["application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"", "application/activity+json"]));
+                        res.end(JSON.stringify(user));
+                    });
+                } else {
+                    res.render("user", {page: {title: req.user.profile.displayName, url: req.originalUrl},
                                         major: major,
                                         minor: minor,
                                         profile: req.user.profile,
-                                        headless: true
-                                    }
-                                   });
+                                        data: {
+                                            major: major,
+                                            minor: minor,
+                                            profile: req.user.profile,
+                                            headless: true
+                                        }
+                                       });
+                }
             }
         }
     );
