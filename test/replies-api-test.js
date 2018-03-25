@@ -135,9 +135,11 @@ suite.addBatch(
                         assert.includes(coll, "totalItems");
                         assert.isNumber(coll.totalItems);
                         assert.equal(coll.totalItems, 0);
-                        assert.includes(coll, "items");
-                        assert.isArray(coll.items);
-                        assert.lengthOf(coll.items, 0);
+                        assert.includes(coll, "first");
+                        assert.isObject(coll.first);
+                        assert.includes(coll.first, "orderedItems");
+                        assert.isArray(coll.first.orderedItems);
+                        assert.lengthOf(coll.first.orderedItems, 0);
                     }
                 }
             }
@@ -314,10 +316,12 @@ suite.addBatch(
                         assert.includes(coll, "totalItems");
                         assert.isNumber(coll.totalItems);
                         assert.equal(coll.totalItems, 1);
-                        assert.includes(coll, "items");
-                        assert.isArray(coll.items);
-                        assert.lengthOf(coll.items, 1);
-                        assert.equal(coll.items[0].id, reply.object["id"]);
+                        assert.includes(coll, "first");
+                        assert.isObject(coll.first);
+                        assert.includes(coll.first, "orderedItems");
+                        assert.isArray(coll.first.orderedItems);
+                        assert.lengthOf(coll.first.orderedItems, 1);
+                        assert.equal(coll.first.orderedItems[0].id, reply.object["id"]);
                     }
                 }
             }
@@ -450,12 +454,14 @@ suite.addBatch(
                         assert.includes(coll, "totalItems");
                         assert.isNumber(coll.totalItems);
                         assert.equal(coll.totalItems, 100);
-                        assert.includes(coll, "items");
-                        assert.isArray(coll.items);
-                        assert.lengthOf(coll.items, 100);
+                        assert.includes(coll, "first");
+                        assert.isObject(coll.first);
+                        assert.includes(coll.first, "orderedItems");
+                        assert.isArray(coll.first.orderedItems);
+                        assert.lengthOf(coll.first.orderedItems, 100);
 
                         for (i = 0; i < 100; i++) {
-                            collIDs[coll.items[i]["id"]] = 1;
+                            collIDs[coll.first.orderedItems[i]["id"]] = 1;
 
                             // Note: `comments` is passed through from
                             // previous subbatches, so it's AS1. Hence
@@ -465,7 +471,7 @@ suite.addBatch(
 
                         for (i = 0; i < 100; i++) {
                             assert.include(collIDs, comments[i].object.id);
-                            assert.include(commentIDs, coll.items[i]["id"]);
+                            assert.include(commentIDs, coll.first.orderedItems[i]["id"]);
                         }
                     }
                 },
