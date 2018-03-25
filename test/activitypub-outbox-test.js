@@ -1,4 +1,4 @@
-// activity-test.js
+// activitypub-outbox-test.js
 //
 // Test the AS2 conversion module
 //
@@ -26,7 +26,7 @@ var assert = require("assert"),
     oauthutil = require("./lib/oauth"),
     newCredentials = oauthutil.newCredentials;
 
-var suite = vows.describe("ActivityPub actor");
+var suite = vows.describe("ActivityPub outbox");
 
 var AS2_MIME_TYPE = "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"";
 var AS2_CONTEXT = "https://www.w3.org/ns/activitystreams";
