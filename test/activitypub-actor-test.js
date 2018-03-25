@@ -28,7 +28,7 @@ var assert = require("assert"),
 
 var suite = vows.describe("ActivityPub actor");
 
-var AS2_MIME_TYPE = "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"";
+var AS2_MIME_TYPE = "application/ld+json; charset=utf-8; profile=\"https://www.w3.org/ns/activitystreams\"";
 var AS2_CONTEXT = "https://www.w3.org/ns/activitystreams";
 
 suite.addBatch(apputil.withAppSetup({
@@ -55,19 +55,19 @@ suite.addBatch(apputil.withAppSetup({
         },
         "content type is correct": function(err, res, body) {
           assert.isObject(res);
-          assert.equals(res.headers['content-type'], AS2_MIME_TYPE);
+          assert.equal(res.headers['content-type'], AS2_MIME_TYPE);
         },
         "it looks like good AS2": function(err, res, body) {
           assert.isObject(body);
           assert.isString(body['@context']);
-          assert.equals(body['@context'], AS2_CONTEXT);
+          assert.equal(body['@context'], AS2_CONTEXT);
           assert.isString(body.type);
-          assert.equals(body.type, 'Person'); // ???
+          assert.equal(body.type, 'Person'); // ???
           assert.isString(body.id);
-          assert.equals(body.id, "http://localhost:4815/macdonald");
+          assert.equal(body.id, "http://localhost:4815/macdonald");
           assert.isString(body.name);
           assert.greater(body.name.length, 0);
         }
       }
     }
-})).export(module)
+})).export(module);
