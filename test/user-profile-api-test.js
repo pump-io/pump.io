@@ -186,7 +186,7 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.isObject(profile);
                     assert.include(profile, "type");
-                    assert.equal(profile["type"], "person");
+                    assert.equal(profile.type, "Person");
                 }
             }
         }

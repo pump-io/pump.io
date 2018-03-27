@@ -193,7 +193,7 @@ suite.addBatch(
                         "the result was converted to AS2": function(err, note, act) {
                             assert.isObject(note);
                             assert.include(note, "id");
-                            assert.isString(note["id"]);
+                            assert.isString(note.id);
                         },
                         "the author was converted to AS2": function(err, note, act) {
                             assert.include(note, "author");
@@ -206,12 +206,12 @@ suite.addBatch(
                         },
                         "results are what we posted": function(err, note, act) {
                             assert.equal(note.content, "I'm so scared!");
-                            assert.equal(note["type"], "note");
-                            assert.equal(note["id"], act.object.id);
+                            assert.equal(note.type, "Note");
+                            assert.equal(note.id, act.object.id);
                             assert.equal(note.published, act.object.published);
                             assert.equal(note.updated, act.object.updated);
-                            assert.equal(note.author["id"], act.actor.id);
-                            assert.equal(note.author["type"], act.actor.objectType);
+                            assert.equal(note.author.id, "http://localhost:4815/frodo");
+                            assert.equal(note.author.type, "Person");
                         }
                     }
                 }
