@@ -23,7 +23,7 @@
     "zombie": "^5.0.7"
   },
   "dependencies": {
-    "activitystrea.ms": "^2.0.0",
+    "activitystrea.ms": "^2.1.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.15.2",
     "bunyan": "^1.8.12",
