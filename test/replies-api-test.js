@@ -34,6 +34,8 @@ var assert = require("assert"),
 
 var suite = vows.describe("Activity API test");
 
+var AS2_LD_TYPE = "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"";
+
 var assertGoodCred = function(cred) {
     assert.isObject(cred);
     assert.isString(cred.consumer_key);
@@ -118,7 +120,7 @@ suite.addBatch(
 
                         httputil.getJSON(url,
                                          cred,
-                                         {"Accept": "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\""},
+                                         {"Accept": AS2_LD_TYPE},
                                          function(err, coll, response) {
                             cb(err, coll);
                         });
@@ -130,8 +132,8 @@ suite.addBatch(
                     "it is an empty collection": function(err, coll) {
                         assert.ifError(err);
                         assert.isObject(coll);
-                        assert.includes(coll, "url");
-                        assert.isString(coll.url);
+                        assert.includes(coll, "id");
+                        assert.isString(coll.id);
                         assert.includes(coll, "totalItems");
                         assert.isNumber(coll.totalItems);
                         assert.equal(coll.totalItems, 0);
@@ -272,9 +274,14 @@ suite.addBatch(
                                 var cb = this.callback;
 
                                 var url = photo.object.replies.url;
-                                httputil.getJSON(url, cred1, function(err, coll, response) {
+                                httputil.getJSON(
+                                    url,
+                                    cred1,
+                                    {"Accept": AS2_LD_TYPE},
+                                    function(err, coll, response) {
                                         cb(err, coll);
-                                });
+                                    }
+                                );
                             },
                             "it works": function(err, coll) {
                                 assert.ifError(err);
@@ -282,8 +289,8 @@ suite.addBatch(
                             },
                             "it is an empty collection": function(err, coll) {
                                 assert.isObject(coll);
-                                assert.includes(coll, "url");
-                                assert.isString(coll.url);
+                                assert.includes(coll, "id");
+                                assert.isString(coll.id);
                                 assert.includes(coll, "totalItems");
                                 assert.isNumber(coll.totalItems);
                                 assert.equal(coll.totalItems, 0);
@@ -301,7 +308,7 @@ suite.addBatch(
 
                         httputil.getJSON(url,
                                          cred1,
-                                         {"Accept": "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\""},
+                                         {"Accept": AS2_LD_TYPE},
                                          function(err, coll, response) {
                             cb(err, coll, reply);
                         });
@@ -434,7 +441,7 @@ suite.addBatch(
 
                         httputil.getJSON(url,
                                          cred1,
-                                         {"Accept": "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\""},
+                                         {"Accept": AS2_LD_TYPE},
                                          function(err, coll, response) {
                             cb(err, coll, comments);
                         });
@@ -449,8 +456,8 @@ suite.addBatch(
                             collIDs = {},
                             commentIDs = {};
                         assert.isObject(coll);
-                        assert.includes(coll, "url");
-                        assert.isString(coll.url);
+                        assert.includes(coll, "id");
+                        assert.isString(coll.id);
                         assert.includes(coll, "totalItems");
                         assert.isNumber(coll.totalItems);
                         assert.equal(coll.totalItems, 100);
@@ -517,7 +524,7 @@ suite.addBatch(
 
                         httputil.getJSON(url,
                                          cred1,
-                                         {"Accept": "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\""},
+                                         {"Accept": AS2_LD_TYPE},
                                          function(err, note, response) {
                             cb(err, note, comments);
                         });
