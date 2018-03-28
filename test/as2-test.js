@@ -1,4 +1,4 @@
-// activity-test.js
+// as2-test.js
 //
 // Test the AS2 conversion module
 //
@@ -100,8 +100,9 @@ suite.addBatch({
                 assert.equal(act.object["type"], "Note");
             },
             "the `to` field's collection's objectType is renamed to type": function(act) {
-                assert.isFalse(act.to[0].hasOwnProperty("objectType"));
-                assert.equal(act.to[0]["type"], "Collection");
+                assert.isObject(act.to);
+                assert.isFalse(act.to.hasOwnProperty("objectType"));
+                assert.equal(act.to.type, "Collection");
             },
             // XXX should we test for all objectType renames? E.g. in the `to` field?
             "displayName is renamed to name": function(act) {
@@ -173,7 +174,7 @@ suite.addBatch({
             },
             "verb is renamed to type": function(act) {
                 assert.isFalse(act.hasOwnProperty("verb"));
-                assert.equal(act["type"], "like");
+                assert.equal(act["type"], "Like");
             },
             "the target's objectType is renamed to type": function(act) {
                 assert.isFalse(act.target.hasOwnProperty("objectType"));
