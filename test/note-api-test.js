@@ -196,9 +196,11 @@ suite.addBatch(
                             assert.isString(note.id);
                         },
                         "the author was converted to AS2": function(err, note, act) {
-                            assert.include(note, "author");
-                            assert.isObject(note.author);
-                            assert.include(note.author, "id");
+                            assert.include(note, "attributedTo");
+                            assert.isObject(note.attributedTo);
+                            assert.include(note.attributedTo, "id");
+                            assert.equal(note.attributedTo.id, "http://localhost:4815/frodo");
+                            assert.equal(note.attributedTo.type, "Person");
                         },
                         "results don't leak private members": function(err, note, act) {
                             assert.isObject(note);
@@ -208,10 +210,8 @@ suite.addBatch(
                             assert.equal(note.content, "I'm so scared!");
                             assert.equal(note.type, "Note");
                             assert.equal(note.id, act.object.id);
-                            assert.equal(note.published, act.object.published);
-                            assert.equal(note.updated, act.object.updated);
-                            assert.equal(note.author.id, "http://localhost:4815/frodo");
-                            assert.equal(note.author.type, "Person");
+                            assert.equal(Date.parse(note.published), Date.parse(act.object.published));
+                            assert.equal(Date.parse(note.updated), Date.parse(act.object.updated));
                         }
                     }
                 }
