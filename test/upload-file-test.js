@@ -271,7 +271,7 @@ suite.addBatch({
                                             // when is false sends a new param for next test
                                             // and don't use br.assert because send a browser
                                             // as the new parameter for next test and
-                                            // and we'll a duplicate browser instance
+                                            // and we'll get a duplicate browser instance
                                             callback(err || browser.status !== 200 || null);
                                         });
                                     },
