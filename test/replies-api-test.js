@@ -137,11 +137,9 @@ suite.addBatch(
                         assert.includes(coll, "totalItems");
                         assert.isNumber(coll.totalItems);
                         assert.equal(coll.totalItems, 0);
-                        assert.includes(coll, "first");
-                        assert.isObject(coll.first);
-                        assert.includes(coll.first, "orderedItems");
-                        assert.isArray(coll.first.orderedItems);
-                        assert.lengthOf(coll.first.orderedItems, 0);
+                        assert.notIncludes(coll, "first");
+                        assert.notIncludes(coll, "items");
+                        assert.notIncludes(coll, "orderedItems");
                     }
                 }
             }
@@ -294,9 +292,9 @@ suite.addBatch(
                                 assert.includes(coll, "totalItems");
                                 assert.isNumber(coll.totalItems);
                                 assert.equal(coll.totalItems, 0);
-                                assert.includes(coll, "items");
-                                assert.isArray(coll.items);
-                                assert.lengthOf(coll.items, 0);
+                                assert.notIncludes(coll, "items");
+                                assert.notIncludes(coll, "orderedItems");
+                                assert.notIncludes(coll, "first");
                             }
                         }
                     }
@@ -543,15 +541,18 @@ suite.addBatch(
                         assert.include(note.replies, "totalItems");
                         assert.isNumber(note.replies.totalItems);
                         assert.equal(note.replies.totalItems, 100);
-                        assert.include(note.replies, "items");
-                        assert.isArray(note.replies.items);
+                        assert.notIncludes(note.replies, "items");
+                        assert.notIncludes(note.replies, "orderedItems");
+                        assert.isObject(note.replies.first);
+                        assert.isArray(note.replies.first.orderedItems);
+                        assert.greater(note.replies.first.orderedItems.length, 0);
 
                         for (i = 0; i < 100; i++) {
-                            commentIDs[comments[i].object["id"]] = 1;
+                            commentIDs[comments[i].object.id] = 1;
                         }
 
-                        for (i = 0; i < note.replies.items.length; i++) {
-                            assert.include(commentIDs, note.replies.items[i]["id"]);
+                        for (i = 0; i < note.replies.first.orderedItems.length; i++) {
+                            assert.include(commentIDs, note.replies.first.orderedItems[i].id);
                         }
                     }
                 }
