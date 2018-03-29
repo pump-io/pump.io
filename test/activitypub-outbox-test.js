@@ -77,6 +77,8 @@ suite.addBatch(apputil.withAppSetup({
             assert.isObject(body);
             assert.isString(body.type);
             assert.equal(body.type, "OrderedCollection");
+            assert.isNumber(body.totalItems);
+            assert.greater(body.totalItems, 0);
             assert.isObject(body.first);
             assert.isString(body.first.type);
             assert.equal(body.first.type, "OrderedCollectionPage");
