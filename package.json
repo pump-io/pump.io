@@ -20,7 +20,7 @@
     "simplesmtp": "^0.3.35",
     "vows": "^0.8.1",
     "xml2js": "^0.4.17",
-    "zombie": "^5.0.7"
+    "zombie": "^6.0.0"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
