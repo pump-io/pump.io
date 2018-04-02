@@ -14,12 +14,13 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
-script: "(npm test || npm test) && sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root && npm run test:install'"
+script: "(npm test || npm test) && sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root && npm run test:install && npm run test:reprotest'"
 before_script:
   - "./test/hosts.sh"
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq graphicsmagick
+  - sudo apt-get install -qq reprotest
   - npm install -g npm@5
 after_script:
   # We need sudo because the coverage data from as-root tests is root:root but not world-readable
