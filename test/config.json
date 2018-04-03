@@ -31,6 +31,10 @@
                     "client_id": "UNITTESTCLIENTID"
                 }
             ]
+        },
+        {
+            "nickname": "testuser3",
+            "password": "3resutset"
         }
     ]
 }
