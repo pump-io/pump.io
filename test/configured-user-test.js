@@ -39,7 +39,7 @@ var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "config.json")));
 var suite = vows.describe("configured user and tokens");
 
 suite.addBatch({
-    "When we set up the app with a configured client": {
+    "When we set up the app with configured users": {
         topic: function() {
             setupApp(this.callback);
         },
