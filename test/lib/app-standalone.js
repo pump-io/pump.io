@@ -29,13 +29,12 @@ var _ = require("lodash"),
 
 var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "config.json")));
 
-var config = {driver: tc.driver,
-              params: tc.params,
+var config = _.extend(tc, {
               firehose: false,
               sockjs: false,
               noCDN: true,
               debugClient: true,
-              nologger: true},
+              nologger: true}),
     app = null,
     i,
     parts,

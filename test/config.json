@@ -1,5 +1,12 @@
 {
     "driver": "memory",
-    "params": {}
+    "params": {},
+    "clients": [
+      {
+        "client_id": "UNITTESTCLIENTID",
+        "client_secret": "UNITTESTCLIENTSECRET",
+        "title": "pump.io unit tests",
+        "description": "Client for the pump.io unit tests. If you see this production, something has gone very wrong!"
+      }
+    ]
 }
-
