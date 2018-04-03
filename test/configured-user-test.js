@@ -2,7 +2,7 @@
 //
 // Test the config.users array
 //
-// Copyright 2013, E14N https://e14n.com/
+// Copyright 2018, E14N https://e14n.com/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
