@@ -28,6 +28,7 @@ var types = [
     "application",
     "article",
     "audio",
+    "authorizationcode",
     "badge",
     "binary",
     "bookmark",
@@ -132,4 +133,3 @@ vows.describe("schema module interface").addBatch({
         }
     }
 })["export"](module);
-
