@@ -11,8 +11,8 @@
     ],
     "users": [
         {
-            "nickname": "testuser1",
-            "password": "1resutset",
+            "nickname": "configuser1",
+            "password": "1resugifnoc",
             "tokens": [
                 {
                     "token": "UNITTESTTOKEN1",
@@ -22,8 +22,8 @@
             ]
         },
         {
-            "nickname": "testuser2",
-            "password": "2resutset",
+            "nickname": "configuser2",
+            "password": "2resugifnoc",
             "tokens": [
                 {
                     "token": "UNITTESTTOKEN2",
