@@ -1,0 +1,34 @@
+h1 OAuth 2.0 Authorization
+
+div
+  p Do you want to give #{client.title || "the app"} the following permissions?
+  ul
+    li Know your identity (#{principalUser.nickname})
+    if (scope in ["read", "writeown", "writeall"])
+      li Read your profile, social network data like your followers, following,
+      |  and lists, and your streams including your inbox and outbox.
+    if (scope === "writeown")
+      li Write new activities to your outbox related to its own site, #{client.host},
+      | including liking or sharing, following users, and commenting on content there,
+      | as well as possibly other kinds of activities.
+    if (scope === "writeall")
+      li Write any kind of activities to your outbox related to any site anywhere,
+      | including this one.
+    
+form.form-horizontal#oauth2-authorization(action="/oauth2/authorize", method="post")
+  fieldset
+    input(type="hidden", name="response_type", value=response_type)
+    input(type="hidden", name="client_id", value=client_id)
+    input(type="hidden", name="state", value=state)
+    input(type="hidden", name="redirect_uri", value=redirect_uri)
+    input(type="hidden", name="scope", value=scope)
+    input(type="hidden", name="csrf", value=csrf)
+
+    .form-actions
+      // Show in random-ish order
+      if (Math.random() < 0.5)
+        input.btn#deny(type="submit", name="deny", value="Deny")
+        input.btn.btn-primary#allow(type="submit", name="allow", value="Allow")
+      else
+        input.btn.btn-primary#allow(type="submit", name="allow", value="Allow")
+        input.btn#deny(type="submit", name="deny", value="Deny")
