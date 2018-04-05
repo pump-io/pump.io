@@ -73,12 +73,9 @@ if (cluster.isMaster) {
         }
     });
     process.on('SIGTERM', function () {
-        console.error("Got SIGTERM in parent");
         if (_.isFunction(worker.disconnect)) {
-            console.error("Disconnecting worker");
             worker.disconnect();
         } else {
-            console.error("Killing worker");
             worker.kill();
         }
         process.exit(0);
