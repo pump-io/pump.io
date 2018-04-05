@@ -47,7 +47,8 @@
             "main/remote":            "remote",
             "main/recover":           "recover",
             "main/recover-sent":      "recoverSent",
-            "main/recover/:code":      "recoverCode"
+            "main/recover/:code":     "recoverCode",
+            "*path(?*querystring)": "loadFromServer"
         },
 
         register: function() {
@@ -403,6 +404,15 @@
                                          Pump.body.endLoad();
                                      });
             });
+        },
+
+        loadFromServer: function(path, querystring) {
+            if (querystring) {
+                window.location = "/" + path + "?" + querystring;
+            } else {
+                window.location = "/" + path;
+            }
+
         }
     });
 
