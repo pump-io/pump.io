@@ -18,27 +18,19 @@
 
 "use strict";
 
-var assert = require("assert"),
+var fs = require("fs"),
+    path = require("path"),
     vows = require("vows"),
-    oauthutil = require("./lib/oauth"),
+    assert = require("assert"),
     apputil = require("./lib/app"),
     Browser = require("zombie"),
     Step = require("step"),
-    withAppSetup = apputil.withAppSetup,
-    setupAppConfig = apputil.setupAppConfig,
-    newCredentials = oauthutil.newCredentials;
+    setupAppConfig = apputil.setupAppConfig;
 
-var browserClose = function(br) {
-    Step(
-        function() {
-            br.on("closed", this);
-            br.window.close();
-        },
-        function() {
-            // browser is closed
-        }
-    );
-};
+var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "config.json")));
+
+var REDIRECT_URI = "http://localhost:1516/done";
+var user = tc.users[0];
 
 var suite = vows.describe("login web UI test");
 
@@ -57,25 +49,24 @@ suite.addBatch({
         "it works": function(err, app) {
             assert.ifError(err);
         },
-        "and we register a user with the API": {
+        "and we create a browser": {
             topic: function() {
-                newCredentials("croach", "ihave1onus", "localhost", 4815, this.callback);
+                this.callback(null, new Browser({runScripts: true}));
+                return undefined;
             },
-            "it works": function(err, cred) {
+            "it works": function(err, br) {
                 assert.ifError(err);
-                assert.ok(cred);
+                assert.ok(br);
             },
             "and we visit the login URL": {
-                topic: function() {
-                    var cb = this.callback,
-                        browser = new Browser({runScripts: true});
-
-                    browser.visit("http://localhost:4815/main/login", function() {
-                        cb(!browser.success, browser);
+                topic: function(br) {
+                    var cb = this.callback;
+                    br.visit("http://localhost:4815/main/login", function() {
+                        cb(!br.success, br);
                     });
                 },
                 teardown: function(br) {
-                    browserClose(br);
+                    br.destroy();
                 },
                 "it works": function(err, br) {
                     assert.ifError(err);
@@ -95,6 +86,26 @@ suite.addBatch({
                 },
                 "the login form has a submit button": function(br) {
                     br.assert.element("div#loginpage form button[type=\"submit\"]");
+                },
+                "and we fill in the login form": {
+                    topic: function(br) {
+                        var callback = this.callback;
+                        br.fill('nickname', user.nickname)
+                          .fill('password', user.password)
+                          .wait({element: "button:not([disabled])[type=submit]"})
+                          .then(function() {
+                              br.pressButton("button:not([disabled])[type=submit]");
+                              br.wait({element: "a#logout"})
+                                .then(function() {
+                                    callback(null, br);
+                                });
+                          });
+                        return undefined;
+                    },
+                    "it works": function(err, br) {
+                        assert.ifError(err);
+                        assert.isObject(br);
+                    }
                 }
             }
         }

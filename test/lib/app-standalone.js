@@ -33,7 +33,7 @@ var config = _.extend(tc, {
               firehose: false,
               sockjs: false,
               noCDN: true,
-              debugClient: true,
+              debugClient: false,
               nologger: true}),
     app = null,
     i,
