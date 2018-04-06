@@ -27,6 +27,7 @@ var Browser = require("zombie");
 var qs = require("querystring");
 var Step = require("step");
 var _ = require("lodash");
+var post = require("./lib/http").post;
 
 var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "config.json")));
 
@@ -34,6 +35,7 @@ var REDIRECT_URI = "http://localhost:1516/done";
 var AUTHZ_STATE = "oauth2unittest";
 
 var user = tc.users[2];
+var client = tc.clients[0];
 
 process.on('uncaughtException', function(err) {
     console.error(err);
@@ -89,7 +91,7 @@ vows.describe("OAuth 2.0 authorization flow")
                         topic: function(br) {
                             var params = qs.stringify({
                                 response_type: "code",
-                                client_id: tc.clients[0].client_id,
+                                client_id: client.client_id,
                                 redirect_uri: REDIRECT_URI,
                                 state: AUTHZ_STATE
                             });
@@ -199,6 +201,33 @@ vows.describe("OAuth 2.0 authorization flow")
                                     assert.ok(!bup.query.error);
                                     assert.isString(bup.query.code);
                                     assert.equal(bup.query.state, AUTHZ_STATE);
+                                },
+                                "and we redeem the code": {
+                                    topic: function(br) {
+                                        var bu = br.url;
+                                        var bup = urlparse(bu, true);
+                                        var params = {
+                                            grant_type: "authorization_code",
+                                            code: bup.query.code,
+                                            redirect_uri: REDIRECT_URI,
+                                            client_id: client.client_id,
+                                            client_secret: client.client_secret
+                                        };
+                                        post(
+                                          "localhost",
+                                          4815,
+                                          "/oauth2/token",
+                                          params,
+                                          this.callback
+                                        );
+                                    },
+                                    "it works": function(err, res, body) {
+                                        assert.ifError(err);
+                                        assert.equal(res.statusCode, 200);
+                                        assert.isString(body);
+                                        var data = JSON.parse(body);
+                                        assert.isString(data.access_token);
+                                    }
                                 }
                             }
                         }

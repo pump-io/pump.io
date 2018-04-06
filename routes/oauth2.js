@@ -25,6 +25,7 @@ var authc = require("../lib/authc");
 var csrf = require("../lib/csrf").csrf;
 var User = require("../lib/model/user").User;
 var AuthorizationCode = require("../lib/model/authorizationcode").AuthorizationCode;
+var BearerToken = require("../lib/model/bearertoken").BearerToken;
 var Client = require("../lib/model/client").Client;
 var principal = authc.principal;
 
@@ -37,6 +38,7 @@ exports.addRoutes = function(app, session) {
     app.post("/oauth2/authz", session, csrf, principal, authorized);
     app.get("/oauth2/authc", session, csrf, principal, authenticate);
     app.post("/oauth2/authc", session, csrf, principal, authenticated);
+    app.post("/oauth2/token", token);
 };
 
 // GET /oauth2/authz?response_type=code&redirect_uri=...&client_id=...&scope=...&state=...
@@ -227,6 +229,59 @@ var authenticated = function(req, res, next) {
             );
         }
     });
+};
+
+var token = function(req, res, next) {
+    var keys = ["grant_type", "code", "redirect_uri", "client_id", "client_secret"];
+    var props = _.pick(req.body, keys);
+
+    for (var i in keys) {
+        var key = keys[i];
+        if (!_.isString(props[key])) {
+            return next(new Error(key + " parameter required"));
+        }
+    }
+
+    if (props.grant_type !== "authorization_code") {
+        return next(new Error("grant_type must be authorization_code"));
+    }
+
+    var ac = null;
+    var bt = null;
+
+    Step(
+        function() {
+            AuthorizationCode.get(props.code, this.parallel());
+            Client.get(props.client_id, this.parallel());
+        },
+        function(err, results, client) {
+            if (err) throw err;
+            ac = results;
+            if (ac.redirect_uri !== props.redirect_uri) {
+                throw new Error("redirect_uri doesn't match");
+            }
+            if (client.secret !== props.client_secret) {
+                throw new Error("client_secret doesn't match");
+            }
+            BearerToken.create({
+                nickname: ac.nickname,
+                client_id: client.consumer_key,
+                scope: ac.scope
+            }, this);
+        },
+        function(err, results) {
+            if (err) throw err;
+            bt = results;
+            // Now that the authorization code has been used, burn it
+            ac.del(this);
+        },
+        function(err) {
+            if (err) return next(err);
+            res.json({
+                access_token: bt.token
+            });
+        }
+    );
 };
 
 var verifyProps = function(props, callback) {
