@@ -28,70 +28,16 @@ var AuthorizationCode = require("../lib/model/authorizationcode").AuthorizationC
 var randomString = require("../lib/randomstring").randomString;
 var principal = require("../lib/authc").principal;
 
-var getProps = function(input) {
-    var params = ["client_id", "redirect_uri", "response_type", "state", "scope"];
-    return _.pick(input, params);
-};
-
-var RedirectError = function(type) {
-    this.type = type;
-};
-
-RedirectError.prototype = new Error();
-RedirectError.prototype.constructor = RedirectError;
-
-var matchRedirectURI = function(client, uri) {
-    return true;
-};
-
 var SCOPES = ["read", "writeown", "writeall"];
 
-// GET /oauth2/authorize?response_type=code&redirect_uri=...&client_id=...&scope=...&state=...
+// Initialize the app controller
 
-var verifyProps = function(props, callback) {
-
-    if (!props.client_id) {
-        return callback(new Error("No client_id parameter"));
-    }
-
-    if (!props.redirect_uri) {
-        return callback(new Error("No redirect_uri parameter"));
-    }
-
-    Step(
-        function() {
-            Client.get(props.client_id, this);
-        },
-        function(err, client) {
-
-            if (err) {
-                // If there's a problem getting the client, don't
-                // bounce the user back
-                return callback(err);
-            }
-
-            if (!matchRedirectURI(client, props.redirect_uri)) {
-                // If there's a sketchy redirect, don't
-                // bounce the user back
-                return callback(new Error("Invalid redirect_uri for this client"));
-            }
-
-            // from here on, we redirect errors
-
-            if (!props.response_type || props.response_type !== "code") {
-                return callback(new RedirectError("unsupported_response_type"));
-            }
-
-            if (props.scope && !(props.scope in SCOPES)) {
-                return callback(new RedirectError("invalid_scope"));
-            }
-
-            // Looks good
-
-            return callback(null, client);
-        }
-    );
+exports.addRoutes = function(app, session) {
+    app.get("/oauth2/authorize", session, principal, authorize);
+    app.post("/oauth2/authorize", session, principal, authorized);
 };
+
+// GET /oauth2/authorize?response_type=code&redirect_uri=...&client_id=...&scope=...&state=...
 
 var authorize = function(req, res, next) {
 
@@ -203,9 +149,63 @@ var authorized = function(req, res, next) {
     });
 };
 
-// Initialize the app controller
+var verifyProps = function(props, callback) {
 
-exports.addRoutes = function(app, session) {
-    app.get("/oauth2/authorize", session, principal, authorize);
-    app.post("/oauth2/authorize", session, principal, authorized);
+    if (!props.client_id) {
+        return callback(new Error("No client_id parameter"));
+    }
+
+    if (!props.redirect_uri) {
+        return callback(new Error("No redirect_uri parameter"));
+    }
+
+    Step(
+        function() {
+            Client.get(props.client_id, this);
+        },
+        function(err, client) {
+
+            if (err) {
+                // If there's a problem getting the client, don't
+                // bounce the user back
+                return callback(err);
+            }
+
+            if (!matchRedirectURI(client, props.redirect_uri)) {
+                // If there's a sketchy redirect, don't
+                // bounce the user back
+                return callback(new Error("Invalid redirect_uri for this client"));
+            }
+
+            // from here on, we redirect errors
+
+            if (!props.response_type || props.response_type !== "code") {
+                return callback(new RedirectError("unsupported_response_type"));
+            }
+
+            if (props.scope && !(props.scope in SCOPES)) {
+                return callback(new RedirectError("invalid_scope"));
+            }
+
+            // Looks good
+
+            return callback(null, client);
+        }
+    );
+};
+
+var getProps = function(input) {
+    var params = ["client_id", "redirect_uri", "response_type", "state", "scope"];
+    return _.pick(input, params);
+};
+
+var RedirectError = function(type) {
+    this.type = type;
+};
+
+RedirectError.prototype = new Error();
+RedirectError.prototype.constructor = RedirectError;
+
+var matchRedirectURI = function(client, uri) {
+    return true;
 };
