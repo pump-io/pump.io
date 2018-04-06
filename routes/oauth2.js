@@ -54,6 +54,7 @@ var authorize = function(req, res, next) {
     verifyProps(props, function(err, client) {
         if (err) {
             if (err instanceof RedirectError) {
+                req.log.error({err: err}, "Couldn't verify props");
                 redirectError(err.type);
             } else {
                 next(err);
@@ -67,6 +68,7 @@ var authorize = function(req, res, next) {
                 res.redirect("/oauth2/authc?" + qs.stringify(props));
             } else if (!req.principalUser) {
                 // Remote user
+                req.log.error("OAuth 2.0 authorization for remote user");
                 return redirectError("invalid_request");
             } else {
                 var aprops = _.extend(props, {
@@ -102,20 +104,24 @@ var authorized = function(req, res, next) {
             }
 
             if (req.body.denied) {
+                req.log.info("OAuth 2.0 access denied");
                 redirectError("access_denied");
             } else {
                 Step(
                     function() {
-                        var props = {
+                        var acprops = {
                             nickname: req.principalUser.nickname,
-                            client_id: client.id,
+                            client_id: client.consumer_key,
                             redirect_uri: props.redirect_uri,
                             scope: props.scope
                         };
-                        AuthorizationCode.create(props, this);
+                        AuthorizationCode.create(acprops, this);
                     },
                     function(err, ac) {
-                        if (err) return redirectError("server_error");
+                        if (err) {
+                          req.log.error({err: err}, err.message);
+                          return redirectError("server_error");
+                        }
                         var rprops = {
                             code: ac.code,
                             state: props.state

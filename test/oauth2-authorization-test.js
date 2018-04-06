@@ -17,7 +17,9 @@
 "use strict";
 
 var fs = require("fs");
+var http = require("http");
 var path = require("path");
+var urlparse = require("url").parse;
 var vows = require("vows");
 var assert = require("assert");
 var setupApp = require("./lib/app").setupApp;
@@ -29,6 +31,8 @@ var _ = require("lodash");
 var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "config.json")));
 
 var REDIRECT_URI = "http://localhost:1516/done";
+var AUTHZ_STATE = "oauth2unittest";
+
 var user = tc.users[2];
 
 process.on('uncaughtException', function(err) {
@@ -49,108 +53,154 @@ vows.describe("OAuth 2.0 authorization flow")
             "it works": function(err, app) {
                 assert.ifError(err);
             },
-            "and we create a browser": {
+            "and we start a redirect_uri server": {
                 topic: function() {
-                    var br = new Browser({runScripts: true});
-                    this.callback(null, br);
-                    return undefined;
+                    var callback = this.callback;
+                    var server = http.createServer(function(req, res) {
+                        res.writeHead(200, { 'Content-Type': 'text/plain' });
+                        res.end('ok');
+                    });
+                    server.listen(1516, function() {
+                        callback(null, server);
+                    });
                 },
-                "it works": function(err, br) {
+                "it works": function(err, server) {
                     assert.ifError(err);
-                    assert.isObject(br);
+                    assert.isObject(server);
                 },
-                teardown: function(br) {
-                    br.destroy();
+                "teardown": function(server) {
+                    server.on('close', this.callback);
+                    server.close();
                 },
-                "and we request authorization": {
-                    topic: function(br) {
-                        var params = qs.stringify({
-                            response_type: "code",
-                            client_id: tc.clients[0].client_id,
-                            redirect_uri: REDIRECT_URI,
-                            state: "oauth2unittest"
-                        });
-                        var url = "http://localhost:4815/oauth2/authz?" + params;
-
-                        Step(
-                            function() {
-                                br.visit(url, this);
-                            },
-                            function() {
-                                if (br.success) {
-                                    this(null, br);
-                                } else {
-                                    this(new Error("Unsuccessful request"), null);
-                                }
-                            },
-                            this.callback
-                        );
+                "and we create a browser": {
+                    topic: function() {
+                        var br = new Browser({runScripts: true});
+                        this.callback(null, br);
+                        return undefined;
                     },
                     "it works": function(err, br) {
                         assert.ifError(err);
                         assert.isObject(br);
-                        br.assert.success();
                     },
-                    "we were redirected to the login page": function(err, br) {
-                        assert.ifError(err);
-                        assert.isObject(br);
-                        br.assert.redirected();
-                        br.assert.element("form#oauth2-authentication");
-                        var inputs = [
-                            "nickname",
-                            "password",
-                            "response_type",
-                            "client_id",
-                            "state",
-                            "redirect_uri",
-                            "scope",
-                            "_csrf",
-                            "login",
-                            "cancel"
-                        ];
-                        _.each(inputs, function(input) {
-                            br.assert.element("input[name='" + input + "']");
-                        });
+                    teardown: function(br) {
+                        br.destroy();
                     },
-                    "and we fill in the login form": {
+                    "and we request authorization": {
                         topic: function(br) {
-                            var callback = this.callback;
-                            br.fill('nickname', user.nickname)
-                              .fill('password', user.password)
-                              .wait()
-                              .then(function() {
-                                  br.pressButton("input[name=login]");
-                                  br.wait()
-                                    .then(function() {
-                                        callback(null, br);
-                                    })
-                                    .catch(callback);
-                              })
-                              .catch(callback);
-                            return undefined;
+                            var params = qs.stringify({
+                                response_type: "code",
+                                client_id: tc.clients[0].client_id,
+                                redirect_uri: REDIRECT_URI,
+                                state: AUTHZ_STATE
+                            });
+                            var url = "http://localhost:4815/oauth2/authz?" + params;
+
+                            Step(
+                                function() {
+                                    br.visit(url, this);
+                                },
+                                function() {
+                                    if (br.success) {
+                                        this(null, br);
+                                    } else {
+                                        this(new Error("Unsuccessful request"), null);
+                                    }
+                                },
+                                this.callback
+                            );
                         },
                         "it works": function(err, br) {
                             assert.ifError(err);
                             assert.isObject(br);
+                            br.assert.success();
                         },
-                        "we were redirected to the authz page": function(err, br) {
+                        "we were redirected to the login page": function(err, br) {
                             assert.ifError(err);
                             assert.isObject(br);
                             br.assert.redirected();
-                            br.assert.element("form#oauth2-authorization");
+                            br.assert.element("form#oauth2-authentication");
                             var inputs = [
+                                "nickname",
+                                "password",
                                 "response_type",
                                 "client_id",
                                 "state",
                                 "redirect_uri",
                                 "scope",
                                 "_csrf",
-                                "allow",
-                                "deny"
+                                "login",
+                                "cancel"
                             ];
                             _.each(inputs, function(input) {
                                 br.assert.element("input[name='" + input + "']");
                             });
+                        },
+                        "and we fill in the login form": {
+                            topic: function(br) {
+                                var callback = this.callback;
+                                br.fill('nickname', user.nickname)
+                                  .fill('password', user.password)
+                                  .wait()
+                                  .then(function() {
+                                      br.pressButton("input[name=login]");
+                                      br.wait()
+                                        .then(function() {
+                                            callback(null, br);
+                                        })
+                                        .catch(callback);
+                                  })
+                                  .catch(callback);
+                                return undefined;
+                            },
+                            "it works": function(err, br) {
+                                assert.ifError(err);
+                                assert.isObject(br);
+                            },
+                            "we were redirected to the authz page": function(err, br) {
+                                assert.ifError(err);
+                                assert.isObject(br);
+                                br.assert.redirected();
+                                br.assert.element("form#oauth2-authorization");
+                                var inputs = [
+                                    "response_type",
+                                    "client_id",
+                                    "state",
+                                    "redirect_uri",
+                                    "scope",
+                                    "_csrf",
+                                    "allow",
+                                    "deny"
+                                ];
+                                _.each(inputs, function(input) {
+                                    br.assert.element("input[name='" + input + "']");
+                                });
+                            },
+                            "and we allow access": {
+                                topic: function(br) {
+                                    var callback = this.callback;
+                                    br.pressButton("input[name=allow]");
+                                    br.wait()
+                                      .then(function() {
+                                          callback(null, br);
+                                      })
+                                      .catch(callback);
+                                },
+                                "it works": function(err, br) {
+                                    assert.ifError(err);
+                                    assert.isObject(br);
+                                    assert.isObject(br.assert);
+                                    br.assert.success();
+                                    br.assert.redirected();
+                                    var bu = br.url;
+                                    var bu1 = bu.substr(0, REDIRECT_URI.length);
+                                    assert.equal(bu1, REDIRECT_URI);
+                                    var bup = urlparse(bu, true);
+                                    assert.isObject(bup.query);
+                                    assert.ok(!bup.query.error);
+                                    assert.isString(bup.query.code);
+                                    assert.equal(bup.query.state, AUTHZ_STATE);
+                                }
+                            }
                         }
                     }
                 }
