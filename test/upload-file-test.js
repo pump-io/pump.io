@@ -268,10 +268,10 @@ suite.addBatch({
                                             url = doc.fullImage.url;
 
                                         browser.visit(url, function(err) {
-                                            // when is false sends a new param for next test
-                                            // and don't use br.assert because send a browser
-                                            // as the new parameter for next test and
-                                            // and we'll get a duplicate browser instance
+                                            // When this is false, send a new param for next test
+                                            // Don't use br.assert because if we send a browser
+                                            // as the new parameter for the next test we'll get
+                                            // a duplicate browser instance
                                             callback(err || browser.status !== 200 || null);
                                         });
                                     },
