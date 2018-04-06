@@ -99,6 +99,26 @@ vows.describe("OAuth 2.0 authorization flow")
                         br.assert.elements("input[name=nickname]", 1);
                         br.assert.elements("input[name=password]", 1);
                         br.assert.elements("button[type=submit]", 1);
+                    },
+                    "and we fill in the login form": {
+                        topic: function(br) {
+                            var callback = this.callback;
+                            br.fill('nickname', user.nickname)
+                              .fill('password', user.password)
+                              .wait()
+                              .then(function() {
+                                  br.pressButton("button:not([disabled])[type=submit]");
+                                  br.wait()
+                                    .then(function() {
+                                        callback(null, br);
+                                    });
+                              });
+                            return undefined;
+                        },
+                        "it works": function(err, br) {
+                            assert.ifError(err);
+                            assert.isObject(br);
+                        }
                     }
                 }
             }
