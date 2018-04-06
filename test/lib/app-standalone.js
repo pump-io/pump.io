@@ -29,12 +29,9 @@ var _ = require("lodash"),
 
 var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "config.json")));
 
-var config = _.extend(tc, {
-              firehose: false,
-              sockjs: false,
-              noCDN: true,
-              debugClient: false,
-              nologger: true}),
+// XXX: move these to config.json?
+
+var config = tc,
     app = null,
     i,
     parts,

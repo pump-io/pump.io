@@ -1,6 +1,12 @@
 {
     "driver": "memory",
     "params": {},
+    "firehose": false,
+    "sockjs": false,
+    "noCDN": true,
+    "debugClient": false,
+    "logLevel": "error",
+    "nologger": false,
     "clients": [
       {
           "client_id": "UNITTESTCLIENTID",
