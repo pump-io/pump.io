@@ -30,7 +30,7 @@ var _ = require("lodash");
 var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "config.json")));
 var client = tc.clients[0];
 var user = tc.users[2];
-var REDIRECT_URI = "http://localhost:2112/idunno/something";
+var SCOPE = "read";
 
 vows.describe("BearerToken data type")
     .addBatch({
@@ -87,7 +87,7 @@ vows.describe("BearerToken data type")
                         var props = {
                             "nickname": user.nickname,
                             "client_id": client.client_id,
-                            "scope": "read"
+                            "scope": SCOPE
                         };
                         BearerToken.create(props, this.callback);
                     },
@@ -98,6 +98,7 @@ vows.describe("BearerToken data type")
                         assert.isString(bt.created);
                         assert.equal(bt.nickname, user.nickname);
                         assert.equal(bt.client_id, client.client_id);
+                        assert.equal(bt.scope, SCOPE);
                     },
                     "and we get the same token out": {
                         topic: function(created, bank, BearerToken) {
@@ -118,6 +119,7 @@ vows.describe("BearerToken data type")
                             assert.isString(gotten.created);
                             assert.equal(gotten.nickname, user.nickname);
                             assert.equal(gotten.client_id, client.client_id);
+                            assert.equal(gotten.scope, SCOPE);
                         }
                     }
                 }
