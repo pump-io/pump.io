@@ -30,6 +30,7 @@ var types = [
     "audio",
     "authorizationcode",
     "badge",
+    "bearertoken",
     "binary",
     "bookmark",
     "client",
