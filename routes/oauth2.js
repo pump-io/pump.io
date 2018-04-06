@@ -19,25 +19,27 @@
 "use strict";
 
 var _ = require("lodash");
-var Client = require("../lib/model/client").Client;
 var Step = require("step");
 var qs = require("querystring");
 var authc = require("../lib/authc");
+var csrf = require("../lib/csrf").csrf;
 var User = require("../lib/model/user").User;
 var AuthorizationCode = require("../lib/model/authorizationcode").AuthorizationCode;
-var randomString = require("../lib/randomstring").randomString;
-var principal = require("../lib/authc").principal;
+var Client = require("../lib/model/client").Client;
+var principal = authc.principal;
 
 var SCOPES = ["read", "writeown", "writeall"];
 
 // Initialize the app controller
 
 exports.addRoutes = function(app, session) {
-    app.get("/oauth2/authorize", session, principal, authorize);
-    app.post("/oauth2/authorize", session, principal, authorized);
+    app.get("/oauth2/authz", session, csrf, principal, authorize);
+    app.post("/oauth2/authz", session, csrf, principal, authorized);
+    app.get("/oauth2/authc", session, csrf, principal, authenticate);
+    app.post("/oauth2/authc", session, csrf, principal, authenticated);
 };
 
-// GET /oauth2/authorize?response_type=code&redirect_uri=...&client_id=...&scope=...&state=...
+// GET /oauth2/authz?response_type=code&redirect_uri=...&client_id=...&scope=...&state=...
 
 var authorize = function(req, res, next) {
 
@@ -52,44 +54,31 @@ var authorize = function(req, res, next) {
     verifyProps(props, function(err, client) {
         if (err) {
             if (err instanceof RedirectError) {
-                var qp = {error: err.type, state: props.state};
-                res.redirect(props.redirect_uri + "?" + qs.stringify(qp));
+                redirectError(err.type);
             } else {
                 next(err);
             }
         } else {
-            var authorizeURL = "/oauth2/authorize?" + qs.stringify(props);
 
             // Check login state
 
             if (!req.principal) {
                 // Not logged in; login and come back
-                var lparams = qs.stringify({continue: authorizeURL});
-                res.redirect("/main/login?" + lparams);
+                res.redirect("/oauth2/authc?" + qs.stringify(props));
             } else if (!req.principalUser) {
                 // Remote user
                 return redirectError("invalid_request");
             } else {
-                Step(
-                    function() {
-                        randomString(32, this);
-                    },
-                    function(err, csrf) {
-                        if (err) return next(err);
-                        req.session.csrf = csrf;
-                        var aprops = _.extend(props, {
-                            csrf: csrf,
-                            client: client
-                        });
-                        res.render("oauth2-authorize", aprops);
-                    }
-                );
+                var aprops = _.extend(props, {
+                    client: client
+                });
+                res.render("oauth2-authorize", aprops);
             }
         }
     });
 };
 
-// POST /oauth2/authorize
+// POST /oauth2/authz
 // response_type=code&redirect_uri=...&client_id=...&scope=...&state=...
 
 var authorized = function(req, res, next) {
@@ -105,21 +94,11 @@ var authorized = function(req, res, next) {
     verifyProps(props, function(err, client) {
 
         if (err) {
-            if (err instanceof RedirectError) {
-                redirectError(err.type);
-            } else {
-                next(err);
-            }
+            next(err);
         } else {
 
             if (!req.principal || !req.principalUser) {
                 return next(new Error("Unexpected login state"));
-            }
-
-            if (req.body.csrf !== req.session.csrf) {
-                return next(new Error("CSRF error"));
-            } else {
-                delete req.session.csrf;
             }
 
             if (req.body.denied) {
@@ -141,10 +120,105 @@ var authorized = function(req, res, next) {
                             code: ac.code,
                             state: props.state
                         };
-                        res.redirect(props.redirect_uri + "?" + qs.stringify(rprops));
+                        var rurl = props.redirect_uri +
+                            "?" +
+                             qs.stringify(rprops);
+                        res.redirect(303, rurl);
                     }
                 );
             }
+        }
+    });
+};
+
+// GET /oauth2/authc?response_type=code&redirect_uri=...&client_id=...&scope=...&state=...
+
+var authenticate = function(req, res, next) {
+
+    var props = getProps(req.query);
+
+    // if we're logged in (back button?) just go to /oauth2/authz
+
+    if (req.principal) {
+        // XXX make sure we don't have a mutual redirect loop here.
+        res.redirect("/oauth2/authz?" + qs.stringify(props));
+        return;
+    }
+
+    // Check all the passed-in properties
+
+    verifyProps(props, function(err, client) {
+        if (err) {
+            // At this point in the flow, they should have all been checked
+            // already. So any validation problem is due to naughty behaviour.
+            return next(err);
+        } else {
+            var aprops = _.extend(props, {
+                client: client,
+                error: req.session.oauth2AuthcError
+            });
+            res.render("oauth2-authenticate", aprops);
+        }
+    });
+};
+
+// POST /oauth2/authc
+// nickname=...&password=...&response_type=code&redirect_uri=...&client_id=...&scope=...&state=...
+
+var authenticated = function(req, res, next) {
+
+    var props = getProps(req.body);
+
+    var retry = function(message) {
+        req.session.oauth2AuthcError = message;
+        res.redirect(303, "/oauth2/authc?" + qs.stringify(props));
+    };
+
+    // if we're logged in (back button?) just go to /oauth2/authz
+
+    if (req.principal) {
+        // XXX make sure we don't have a mutual redirect loop here.
+        res.redirect(303, "/oauth2/authz?" + qs.stringify(props));
+        return;
+    }
+
+    // Check all the passed-in properties
+
+    verifyProps(props, function(err, client) {
+        if (err) {
+            // At this point in the flow, they should have all been checked
+            // already. So any validation problem is due to naughty behaviour.
+            return next(err);
+        } else {
+            var nickname = req.body.nickname;
+            var password = req.body.password;
+
+            if (!nickname || !password) {
+                return retry("nickname and password are required.");
+            }
+
+            Step(
+                function() {
+                    User.checkCredentials(nickname, password, this);
+                },
+                function(err, user) {
+                    if (err) throw err;
+                    if (!user) {
+                        retry("No match for that nickname and password.");
+                    } else {
+                        req.principal = user.profile;
+                        req.principalUser = user;
+                        res.locals.principal = user.profile;
+                        res.locals.principalUser = user;
+                        authc.setPrincipal(req.session, user.profile, this);
+                    }
+                },
+                function(err) {
+                    if (err) return next(err);
+                    // XXX make sure we don't have a mutual redirect loop here.
+                    res.redirect(303, "/oauth2/authz?" + qs.stringify(props));
+                }
+            );
         }
     });
 };

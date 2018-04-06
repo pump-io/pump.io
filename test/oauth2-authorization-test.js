@@ -70,7 +70,7 @@ vows.describe("OAuth 2.0 authorization flow")
                             redirect_uri: REDIRECT_URI,
                             state: "oauth2unittest"
                         });
-                        var url = "http://localhost:4815/oauth2/authorize?" + params;
+                        var url = "http://localhost:4815/oauth2/authz?" + params;
 
                         Step(
                             function() {
@@ -95,10 +95,22 @@ vows.describe("OAuth 2.0 authorization flow")
                         assert.ifError(err);
                         assert.isObject(br);
                         br.assert.redirected();
-                        br.assert.elements("form#login", 1);
-                        br.assert.elements("input[name=nickname]", 1);
-                        br.assert.elements("input[name=password]", 1);
-                        br.assert.elements("button[type=submit]", 1);
+                        br.assert.element("form#oauth2-authentication");
+                        var inputs = [
+                            "nickname",
+                            "password",
+                            "response_type",
+                            "client_id",
+                            "state",
+                            "redirect_uri",
+                            "scope",
+                            "_csrf",
+                            "login",
+                            "cancel"
+                        ];
+                        _.each(inputs, function(input) {
+                            br.assert.element("input[name='" + input + "']");
+                        });
                     },
                     "and we fill in the login form": {
                         topic: function(br) {
@@ -107,17 +119,38 @@ vows.describe("OAuth 2.0 authorization flow")
                               .fill('password', user.password)
                               .wait()
                               .then(function() {
-                                  br.pressButton("button:not([disabled])[type=submit]");
+                                  br.pressButton("input[name=login]");
                                   br.wait()
                                     .then(function() {
                                         callback(null, br);
-                                    });
-                              });
+                                    })
+                                    .catch(callback);
+                              })
+                              .catch(callback);
                             return undefined;
                         },
                         "it works": function(err, br) {
                             assert.ifError(err);
                             assert.isObject(br);
+                        },
+                        "we were redirected to the authz page": function(err, br) {
+                            assert.ifError(err);
+                            assert.isObject(br);
+                            br.assert.redirected();
+                            br.assert.element("form#oauth2-authorization");
+                            var inputs = [
+                                "response_type",
+                                "client_id",
+                                "state",
+                                "redirect_uri",
+                                "scope",
+                                "_csrf",
+                                "allow",
+                                "deny"
+                            ];
+                            _.each(inputs, function(input) {
+                                br.assert.element("input[name='" + input + "']");
+                            });
                         }
                     }
                 }
