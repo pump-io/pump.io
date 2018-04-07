@@ -11,6 +11,7 @@
       {
           "client_id": "UNITTESTCLIENTID",
           "client_secret": "UNITTESTCLIENTSECRET",
+          "host": "pumpio.test",
           "title": "pump.io unit tests",
           "description": "Client for the pump.io unit tests. If you see this production, something has gone very wrong!"
       }
