@@ -1,4 +1,4 @@
-// authc-bearertoken-middleware-test.js
+// authc-oauth2-test.js
 //
 // Copyright 2018, E14N https://e14n.com/
 //
@@ -95,33 +95,43 @@ vows.describe("Bearer token authorization")
                             consumer_key: client.client_id,
                             secret: client.client_secret,
                             title: client.title,
-                            description: client.description
+                            description: client.description,
+                            host: client.host
                         }, this.parallel());
                     },
                     function(err) {
                         if (err) throw err;
-                        BearerToken.create({
-                            nickname: user.nickname,
-                            client_id: client.client_id,
-                            scope: "read"
-                        }, this);
+                        this(null);
                     },
                     this.callback
                 );
                 return undefined;
             },
-            "it works": function(err, bt) {
+            "it works": function(err) {
                 assert.ifError(err);
-                assert.isObject(bt);
             },
-            "and we authenticate with a valid bearer token": {
-                topic: function(bt) {
+            "and we authenticate with a valid user bearer token": {
+                topic: function() {
                     var callback = this.callback;
-                    var req = fakeReq("Bearer " + bt.token);
-                    var res = fakeRes();
-                    authc.oauth2(req, res, function(err) {
-                        callback(err, req, res);
-                    });
+                    Step(
+                        function() {
+                            BearerToken.create({
+                                nickname: user.nickname,
+                                client_id: client.client_id,
+                                scope: "read"
+                            }, this);
+                        },
+                        function(err, bt) {
+                            if (err) throw err;
+                            var callback = this;
+                            var req = fakeReq("Bearer " + bt.token);
+                            var res = fakeRes();
+                            authc.oauth2(req, res, function(err) {
+                                callback(err, req, res);
+                            });
+                        },
+                        this.callback
+                    );
                 },
                 "it works": function(err, req, res) {
                     assert.ifError(err);
@@ -141,6 +151,47 @@ vows.describe("Bearer token authorization")
                     assert.isObject(res.locals.client);
                     assert.isObject(res.locals.principal);
                     assert.isObject(res.locals.principalUser);
+                }
+            },
+            "and we authenticate with a valid client bearer token": {
+                topic: function() {
+                    var callback = this.callback;
+                    Step(
+                        function() {
+                            BearerToken.create({
+                                client_id: client.client_id
+                            }, this);
+                        },
+                        function(err, bt) {
+                            if (err) throw err;
+                            var callback = this;
+                            var req = fakeReq("Bearer " + bt.token);
+                            var res = fakeRes();
+                            authc.oauth2(req, res, function(err) {
+                                callback(err, req, res);
+                            });
+                        },
+                        this.callback
+                    );
+                },
+                "it works": function(err, req, res) {
+                    assert.ifError(err);
+                    assert.isObject(req);
+                },
+                "the req properties are set": function(err, req, res) {
+                    assert.ifError(err);
+                    assert.isObject(req);
+                    assert.isObject(req.client);
+                    assert.isObject(req.principal);
+                    assert.ok(!req.principalUser);
+                },
+                "the res properties are set": function(err, req, res) {
+                    assert.ifError(err);
+                    assert.isObject(res);
+                    assert.isObject(res.locals);
+                    assert.isObject(res.locals.client);
+                    assert.isObject(res.locals.principal);
+                    assert.ok(!res.locals.principalUser);
                 }
             },
             "and we authenticate with no bearer token": {
