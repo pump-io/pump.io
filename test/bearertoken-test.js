@@ -82,7 +82,7 @@ vows.describe("BearerToken data type")
                 "teardown": function(bank) {
                     bank.disconnect(this.callback);
                 },
-                "and we create a new token": {
+                "and we create a new user token": {
                     topic: function(bank, BearerToken) {
                         var props = {
                             "nickname": user.nickname,
@@ -120,6 +120,45 @@ vows.describe("BearerToken data type")
                             assert.equal(gotten.nickname, user.nickname);
                             assert.equal(gotten.client_id, client.client_id);
                             assert.equal(gotten.scope, SCOPE);
+                        }
+                    }
+                },
+                "and we create a new client token": {
+                    topic: function(bank, BearerToken) {
+                        var props = {
+                            "client_id": client.client_id
+                        };
+                        BearerToken.create(props, this.callback);
+                    },
+                    "it works": function(err, bt) {
+                        assert.ifError(err);
+                        assert.isObject(bt);
+                        assert.isString(bt.token);
+                        assert.isString(bt.created);
+                        assert.ok(!bt.nickname);
+                        assert.equal(bt.client_id, client.client_id);
+                        assert.ok(!bt.scope);
+                    },
+                    "and we get the same token out": {
+                        topic: function(created, bank, BearerToken) {
+                            var callback = this.callback;
+                            BearerToken.get(created.token, function(err, gotten) {
+                                if (err) {
+                                    callback(err);
+                                } else {
+                                    callback(null, gotten, created);
+                                }
+                            });
+                        },
+                        "it works": function(err, gotten, created) {
+                            assert.ifError(err);
+                            assert.isObject(gotten);
+                            assert.isObject(created);
+                            assert.equal(gotten.token, created.token);
+                            assert.isString(gotten.created);
+                            assert.ok(!gotten.nickname);
+                            assert.equal(gotten.client_id, client.client_id);
+                            assert.ok(!gotten.scope);
                         }
                     }
                 }
