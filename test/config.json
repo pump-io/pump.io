@@ -6,7 +6,7 @@
     "noCDN": true,
     "debugClient": false,
     "logLevel": "error",
-    "nologger": false,
+    "nologger": true,
     "clients": [
       {
           "client_id": "UNITTESTCLIENTID",
