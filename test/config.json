@@ -1,5 +1,47 @@
 {
     "driver": "memory",
-    "params": {}
+    "params": {},
+    "firehose": false,
+    "sockjs": false,
+    "noCDN": true,
+    "debugClient": false,
+    "logLevel": "error",
+    "nologger": false,
+    "clients": [
+      {
+          "client_id": "UNITTESTCLIENTID",
+          "client_secret": "UNITTESTCLIENTSECRET",
+          "host": "pumpio.test",
+          "title": "pump.io unit tests",
+          "description": "Client for the pump.io unit tests. If you see this production, something has gone very wrong!"
+      }
+    ],
+    "users": [
+        {
+            "nickname": "configuser1",
+            "password": "1resugifnoc",
+            "tokens": [
+                {
+                    "token": "UNITTESTTOKEN1",
+                    "token_secret": "UNITTESTTOKENSECRET1",
+                    "client_id": "UNITTESTCLIENTID"
+                }
+            ]
+        },
+        {
+            "nickname": "configuser2",
+            "password": "2resugifnoc",
+            "tokens": [
+                {
+                    "token": "UNITTESTTOKEN2",
+                    "token_secret": "UNITTESTTOKENSECRET2",
+                    "client_id": "UNITTESTCLIENTID"
+                }
+            ]
+        },
+        {
+            "nickname": "configuser3",
+            "password": "3resugifnoc"
+        }
+    ]
 }
-
