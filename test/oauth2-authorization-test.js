@@ -37,7 +37,7 @@ var AUTHZ_STATE = "oauth2unittest";
 var user = tc.users[2];
 var client = tc.clients[0];
 
-process.on('uncaughtException', function(err) {
+process.on("uncaughtException", function(err) {
     console.error(err);
     process.exit(-1);
 });
@@ -59,8 +59,8 @@ vows.describe("OAuth 2.0 authorization flow")
                 topic: function() {
                     var callback = this.callback;
                     var server = http.createServer(function(req, res) {
-                        res.writeHead(200, { 'Content-Type': 'text/plain' });
-                        res.end('ok');
+                        res.writeHead(200, { "Content-Type": "text/plain" });
+                        res.end("ok");
                     });
                     server.listen(1516, function() {
                         callback(null, server);
@@ -71,7 +71,7 @@ vows.describe("OAuth 2.0 authorization flow")
                     assert.isObject(server);
                 },
                 "teardown": function(server) {
-                    server.on('close', this.callback);
+                    server.on("close", this.callback);
                     server.close();
                 },
                 "and we create a browser": {
@@ -140,8 +140,8 @@ vows.describe("OAuth 2.0 authorization flow")
                         "and we fill in the login form": {
                             topic: function(br) {
                                 var callback = this.callback;
-                                br.fill('nickname', user.nickname)
-                                  .fill('password', user.password)
+                                br.fill("nickname", user.nickname)
+                                  .fill("password", user.password)
                                   .wait()
                                   .then(function() {
                                       br.pressButton("input[name=login]");

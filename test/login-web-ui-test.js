@@ -90,8 +90,8 @@ suite.addBatch({
                 "and we fill in the login form": {
                     topic: function(br) {
                         var callback = this.callback;
-                        br.fill('nickname', user.nickname)
-                          .fill('password', user.password)
+                        br.fill("nickname", user.nickname)
+                          .fill("password", user.password)
                           .wait({element: "button:not([disabled])[type=submit]"})
                           .then(function() {
                               br.pressButton("button:not([disabled])[type=submit]");

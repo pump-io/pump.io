@@ -69,7 +69,7 @@ if (cluster.isMaster) {
             break;
         }
     });
-    process.on('SIGTERM', function () {
+    process.on("SIGTERM", function() {
         if (_.isFunction(worker.disconnect)) {
             worker.disconnect();
         } else {
