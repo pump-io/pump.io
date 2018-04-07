@@ -18,6 +18,7 @@
 
 "use strict";
 
+var assert = require("assert");
 var _ = require("lodash");
 var Step = require("step");
 var qs = require("querystring");
@@ -232,6 +233,20 @@ var authenticated = function(req, res, next) {
 };
 
 var token = function(req, res, next) {
+
+    switch (req.body.grant_type) {
+        case "authorization_code":
+            authorizationCode(req, res, next);
+            break;
+        case "client_credentials":
+            clientCredentials(req, res, next);
+            break;
+        default:
+            next(new Error("Unrecognized grant_type: " + req.body.grant_type));
+    }
+};
+
+var authorizationCode = function(req, res, next) {
     var keys = ["grant_type", "code", "redirect_uri", "client_id", "client_secret"];
     var props = _.pick(req.body, keys);
 
@@ -242,9 +257,8 @@ var token = function(req, res, next) {
         }
     }
 
-    if (props.grant_type !== "authorization_code") {
-        return next(new Error("grant_type must be authorization_code"));
-    }
+    // We don't get called unless this is the case
+    assert.strictEqual(props.grant_type, "authorization_code");
 
     var ac = null;
     var bt = null;
@@ -276,6 +290,44 @@ var token = function(req, res, next) {
             ac.del(this);
         },
         function(err) {
+            if (err) return next(err);
+            res.json({
+                access_token: bt.token
+            });
+        }
+    );
+};
+
+var clientCredentials = function(req, res, next) {
+
+    var keys = ["grant_type", "client_id", "client_secret"];
+    var props = _.pick(req.body, keys);
+
+    for (var i in keys) {
+        var key = keys[i];
+        if (!_.isString(props[key])) {
+            return next(new Error(key + " parameter required"));
+        }
+    }
+
+    // We don't get called unless this is the case
+    assert.strictEqual(props.grant_type, "client_credentials");
+    var bt = null;
+
+    Step(
+        function() {
+            Client.get(props.client_id, this);
+        },
+        function(err, client) {
+            if (err) throw err;
+            if (client.secret !== props.client_secret) {
+                throw new Error("client_secret doesn't match");
+            }
+            BearerToken.create({
+                client_id: client.consumer_key
+            }, this);
+        },
+        function(err, bt) {
             if (err) return next(err);
             res.json({
                 access_token: bt.token
