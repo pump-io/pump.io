@@ -35,10 +35,12 @@ var SCOPES = ["read", "writeown", "writeall"];
 // Initialize the app controller
 
 exports.addRoutes = function(app, session) {
-    app.get("/oauth2/authz", session, csrf, principal, authorize);
-    app.post("/oauth2/authz", session, csrf, principal, authorized);
-    app.get("/oauth2/authc", session, csrf, principal, authenticate);
-    app.post("/oauth2/authc", session, csrf, principal, authenticated);
+    if (session) {
+        app.get("/oauth2/authz", session, csrf, principal, authorize);
+        app.post("/oauth2/authz", session, csrf, principal, authorized);
+        app.get("/oauth2/authc", session, csrf, principal, authenticate);
+        app.post("/oauth2/authc", session, csrf, principal, authenticated);
+    }
     app.post("/oauth2/token", token);
 };
 
