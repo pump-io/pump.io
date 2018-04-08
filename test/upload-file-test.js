@@ -54,7 +54,7 @@ suite.addBatch({
     "When we create a temporary upload dir": {
         topic: function() {
             var callback = this.callback,
-                dirname = path.join(os.tmpDir(),
+                dirname = path.join(os.tmpdir(),
                                     "upload-file-test",
                                     ""+Date.now());
             mkdirp(path.join(dirname, "uploads"), function(err) {
