@@ -131,7 +131,8 @@
   "greenkeeper": {
     "ignore": [
       "databank",
-      "jsdom"
+      "jsdom",
+      "zombie"
     ]
   }
 }
