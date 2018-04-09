@@ -36,7 +36,7 @@ var AS2_CONTEXT = "https://www.w3.org/ns/activitystreams";
 var user = tc.users[3];
 var client = tc.clients[0];
 
-process.on('uncaughtException', function(err) {
+process.on("uncaughtException", function(err) {
     console.error(err);
     process.exit(-1);
 });

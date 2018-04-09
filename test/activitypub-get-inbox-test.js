@@ -51,7 +51,7 @@ var assertValidAS2Activity = function(act) {
     assert.isString(act.published);
 };
 
-process.on('uncaughtException', function(err) {
+process.on("uncaughtException", function(err) {
     console.error(err);
     process.exit(-1);
 });
