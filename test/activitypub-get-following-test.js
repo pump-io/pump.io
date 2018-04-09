@@ -28,17 +28,20 @@ var _ = require("lodash"),
     oauthutil = require("./lib/oauth"),
     newCredentials = oauthutil.newCredentials;
 
-var suite = vows.describe("ActivityPub following");
+var tc = require("./config.json");
 
 var AS2_MIME_TYPE = "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"";
 var AS2_CONTEXT = "https://www.w3.org/ns/activitystreams";
+
+var user = tc.users[3];
+var client = tc.clients[0];
 
 var assertValidAS2Activity = function(object) {
     assert.isObject(object);
     assert.isString(object.id);
     assert.isString(object.name || object.summary);
     assert.isString(object.type);
-    assert.isString(published);
+    assert.isString(object.published);
 };
 
 process.on('uncaughtException', function(err) {
@@ -46,39 +49,60 @@ process.on('uncaughtException', function(err) {
     process.exit(-1);
 });
 
+var suite = vows.describe("ActivityPub following");
+
 suite.addBatch(apputil.withAppSetup({
-  "and we get new credentials": {
-      topic: function() {
-          newCredentials("macdonald", "the|old|flag", this.callback);
-      },
-      "it works": function(err, cred) {
-          assert.ifError(err);
-      },
-      "and we request an identity URL for ActivityPub": {
-        topic(cred) {
-          var cb = this.callback;
-          var headers = {
-            Accept: AS2_MIME_TYPE
-          };
-          httputil.getJSON("http://localhost:4815/macdonald", cred, headers, function(err, body, response) {
-              cb(err, response, body);
-          });
-        },
-        "it works": function(err, res, body) {
-          assert.ifError(err);
-        },
-        "it has a following link": function(err, res, body) {
-          assert.isObject(body);
-          assert.isString(body.following);
-        },
-        "and we request the following link": {
-          topic: function(res, body, cred) {
+    "and we request an identity URL for ActivityPub": {
+        topic() {
             var cb = this.callback;
             var headers = {
-              Accept: AS2_MIME_TYPE
+                Accept: AS2_MIME_TYPE,
+                Authorization: "Bearer " + user.tokens[0].token
             };
-            httputil.getJSON(body.following, cred, headers, function(err, body, response) {
-                cb(err, response, body);
+            var url = "http://localhost:4815/" + user.nickname;
+            httputil.get(url, headers, function(err, response, body) {
+                if (err) {
+                    cb(err);
+                } else if (response.statusCode !== 200) {
+                    cb(new Error("Unexpected status code: " + response.statusCode));
+                } else {
+                    var data = null;
+                    try {
+                        data = JSON.parse(body);
+                    } catch (e) {
+                        return cb(e);
+                    }
+                    return cb(null, response, data);
+                }
+            });
+        },
+        "it works": function(err, res, body) {
+            assert.ifError(err);
+            assert.isObject(res);
+            assert.isObject(body);
+            assert.isString(body.following);
+        },
+        "and we request the following link": {
+          topic: function(ignore, actor) {
+            var cb = this.callback;
+            var headers = {
+              Accept: AS2_MIME_TYPE,
+              Authorization: "Bearer " + user.tokens[0].token
+            };
+            httputil.get(actor.following, headers, function(err, response, body) {
+                if (err) {
+                    cb(err);
+                } else if (response.statusCode !== 200) {
+                    cb(new Error("Unexpected status code: " + response.statusCode));
+                } else {
+                    var data = null;
+                    try {
+                        data = JSON.parse(body);
+                    } catch (e) {
+                        return cb(e);
+                    }
+                    return cb(null, response, data);
+                }
             });
           },
           "it works": function(err, res, body) {
@@ -99,6 +123,5 @@ suite.addBatch(apputil.withAppSetup({
             assert.notIncludes(body, "orderedItems");
           }
         }
-      }
     }
   })).export(module);
