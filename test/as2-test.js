@@ -248,7 +248,139 @@ suite.addBatch({
         "and we convert a `rsvp-maybe` activity to AS2": testVocabConversion("rsvp-maybe", "TentativeAccept"),
         "and we convert a `rsvp-no` activity to AS2": testVocabConversion("rsvp-no", "Reject"),
         "and we convert a `rsvp-yes` activity to AS2": testVocabConversion("rsvp-yes", "Accept"),
-        "and we convert a `watch` activity to AS2": testVocabConversion("watch", "View")
+        "and we convert a `watch` activity to AS2": testVocabConversion("watch", "View"),
+        "and we convert a `stop-following` activity to AS2": {
+            topic: function(as2) {
+                var act = {
+                    id: "urn:uuid:" + uuid.v4(),
+                    actor: {
+                        id: "urn:uuid:" + uuid.v4(),
+                        objectType: "person"
+                    },
+                    verb: "stop-following",
+                    to: "http://activityschema.org/collection/public",
+                    object: {
+                        id: "urn:uuid:" + uuid.v4(),
+                        objectType: "person"
+                    }
+                };
+
+                as2(act, this.callback);
+            },
+            "it is an Undo Follow activity": function(err, act) {
+                assert.ifError(err);
+                assert.isObject(act);
+                assert.isObject(act.actor);
+                assert.equal(act.type, "Undo");
+                assert.isObject(act.object);
+                assert.equal(act.object.type, "Follow");
+                assert.isObject(act.object.actor);
+                assert.equal(act.object.actor.type, "Person");
+                assert.isObject(act.object.object);
+                assert.equal(act.object.object.type, "Person");
+            }
+        },
+        "and we convert an `unlike` activity to AS2": {
+            topic: function(as2) {
+                var act = {
+                    id: "urn:uuid:" + uuid.v4(),
+                    actor: {
+                        id: "urn:uuid:" + uuid.v4(),
+                        objectType: "person"
+                    },
+                    verb: "unlike",
+                    to: "http://activityschema.org/collection/public",
+                    object: {
+                        id: "urn:uuid:" + uuid.v4(),
+                        objectType: "note"
+                    }
+                };
+
+                as2(act, this.callback);
+            },
+            "it is an Undo Like activity": function(err, act) {
+                assert.ifError(err);
+                assert.isObject(act);
+                assert.isObject(act.actor);
+                assert.equal(act.type, "Undo");
+                assert.isObject(act.object);
+                assert.equal(act.object.type, "Like");
+                assert.isObject(act.object.actor);
+                assert.equal(act.object.actor.type, "Person");
+                assert.isObject(act.object.object);
+                assert.equal(act.object.object.type, "Note");
+            }
+        },
+        "and we convert an `unfavorite` activity to AS2": {
+            topic: function(as2) {
+                var act = {
+                    id: "urn:uuid:" + uuid.v4(),
+                    actor: {
+                        id: "urn:uuid:" + uuid.v4(),
+                        objectType: "person"
+                    },
+                    verb: "unfavorite",
+                    to: "http://activityschema.org/collection/public",
+                    object: {
+                        id: "urn:uuid:" + uuid.v4(),
+                        objectType: "note"
+                    }
+                };
+
+                as2(act, this.callback);
+            },
+            "it is an Undo Like activity": function(err, act) {
+                assert.ifError(err);
+                assert.isObject(act);
+                assert.isObject(act.actor);
+                assert.equal(act.type, "Undo");
+                assert.isObject(act.object);
+                assert.equal(act.object.type, "Like");
+                assert.isObject(act.object.actor);
+                assert.equal(act.object.actor.type, "Person");
+                assert.isObject(act.object.object);
+                assert.equal(act.object.object.type, "Note");
+            }
+        },
+        "and we convert an `unshare` activity to AS2": {
+            topic: function(as2) {
+                var act = {
+                    id: "urn:uuid:" + uuid.v4(),
+                    actor: {
+                        id: "urn:uuid:" + uuid.v4(),
+                        objectType: "person"
+                    },
+                    verb: "unshare",
+                    to: "http://activityschema.org/collection/public",
+                    object: {
+                        id: "urn:uuid:" + uuid.v4(),
+                        actor: {
+                            id: "urn:uuid:" + uuid.v4(),
+                            objectType: "person"
+                        },
+                        verb: "post",
+                        object: {
+                            id: "urn:uuid:" + uuid.v4(),
+                            objectType: "note"
+                        }
+                    }
+                };
+
+                as2(act, this.callback);
+            },
+            "it is an Undo Announce activity": function(err, act) {
+                assert.ifError(err);
+                assert.isObject(act);
+                assert.isObject(act.actor);
+                assert.equal(act.type, "Undo");
+                assert.isObject(act.object);
+                assert.equal(act.object.type, "Announce");
+                assert.isObject(act.object.actor);
+                assert.equal(act.object.actor.type, "Person");
+                assert.isObject(act.object.object);
+                assert.equal(act.object.object.type, "Create");
+            }
+        }
     }
 });
 
