@@ -1,6 +1,6 @@
-// activitypub-likes-test.js
+// activitypub-liked-test.js
 //
-// Test the ActivityPub likes endpoint
+// Test the ActivityPub liked endpoint
 //
 // Copyright 2017 AJ Jordan <alex@strugee.net>
 // Copyright 2018 E14N <evan@e14n.com>
@@ -41,7 +41,7 @@ process.on("uncaughtException", function(err) {
     process.exit(-1);
 });
 
-var suite = vows.describe("ActivityPub likes");
+var suite = vows.describe("ActivityPub liked");
 
 suite.addBatch(apputil.withAppSetup({
     "and we request an identity URL for ActivityPub": {
@@ -72,16 +72,16 @@ suite.addBatch(apputil.withAppSetup({
             assert.ifError(err);
             assert.isObject(res);
             assert.isObject(body);
-            assert.isString(body.likes);
+            assert.isString(body.liked);
         },
-        "and we request the likes link": {
+        "and we request the liked link": {
           topic: function(ignore, actor) {
             var cb = this.callback;
             var headers = {
               Accept: AS2_MIME_TYPE,
               Authorization: "Bearer " + user.tokens[0].token
             };
-            httputil.get(actor.likes, headers, function(err, response, body) {
+            httputil.get(actor.liked, headers, function(err, response, body) {
                 if (err) {
                     cb(err);
                 } else if (response.statusCode !== 200) {
