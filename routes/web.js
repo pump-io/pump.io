@@ -104,7 +104,6 @@ var addRoutes = function(app, session) {
         app.post("/main/upload-avatar", session, principal, principalUserOnly, uploadAvatar);
     }
 
-    app.get("/:nickname", session, principal, addMessages, reqUser, showStream);
     app.get("/:nickname/favorites", session, principal, addMessages, reqUser, showFavorites);
     app.get("/:nickname/followers", session, principal, addMessages, reqUser, showFollowers);
     app.get("/:nickname/following", session, principal, addMessages, reqUser, showFollowing);
@@ -341,29 +340,17 @@ var showStream = function(req, res, next) {
             if (err) {
                 next(err);
             } else {
-                if (wantAS2(req)) {
-                    as2(req.user.profile, function(err, user) {
-                        if (err) {
-                            next(err);
-                        } else {
-                            // XXX: handle the application/activity+json media type
-                            res.setHeader("Content-Type", "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"");
-                            res.end(JSON.stringify(user));
-                        }
-                    });
-                } else {
-                    res.render("user", {page: {title: req.user.profile.displayName, url: req.originalUrl},
+                res.render("user", {page: {title: req.user.profile.displayName, url: req.originalUrl},
+                                    major: major,
+                                    minor: minor,
+                                    profile: req.user.profile,
+                                    data: {
                                         major: major,
                                         minor: minor,
                                         profile: req.user.profile,
-                                        data: {
-                                            major: major,
-                                            minor: minor,
-                                            profile: req.user.profile,
-                                            headless: true
-                                        }
-                                       });
-                }
+                                        headless: true
+                                    }
+                                   });
             }
         }
     );
@@ -1093,3 +1080,4 @@ var redeemCode = function(req, res, next) {
 };
 
 exports.addRoutes = addRoutes;
+exports.profileStack = [principal, addMessages, reqUser, showStream];

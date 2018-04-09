@@ -1736,3 +1736,4 @@ var finishObject = function(profile, obj, callback) {
 
 exports.addRoutes = addRoutes;
 exports.createUser = createUser;
+exports.profileStack = [anyReadAuth, reqUser, personType, getObject];
