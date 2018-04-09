@@ -62,7 +62,7 @@ suite.addBatch({
             assert.ifError(err);
             assert.isFunction(as2);
         },
-        "and we try to convert a post of a note to AS2": {
+        "and we convert a post of a note to AS2": {
             topic: function(as2) {
                 var act = {
                     id: "urn:uuid:77451568-ce6a-42eb-8a9f-60ece187725f",
@@ -119,7 +119,7 @@ suite.addBatch({
                 assert.isFalse(act.hasOwnProperty("downstreamDuplicates"));
             }
         },
-        "and we try to convert a post of a note to a collection to AS2": {
+        "and we convert a post of a note to a collection to AS2": {
             topic: function(as2) {
                 var act = {
                     id: "urn:uuid:3738fceb-9705-4fa8-a0d3-59852770dc4d",
@@ -150,7 +150,7 @@ suite.addBatch({
                 assert.equal(act["type"], "Add");
             }
         },
-        "and we try to convert a like of a note to AS2": {
+        "and we convert a like of a note to AS2": {
             topic: function(as2) {
                 var act = {
                     id: "urn:uuid:db8b4174-a321-430f-bbbe-e11c65dd48ee",
@@ -181,7 +181,7 @@ suite.addBatch({
                 assert.equal(act.target["type"], "Note");
             }
         },
-        "and we try to convert a submission of a note to AS2": {
+        "and we convert a submission of a note to AS2": {
             topic: function(as2) {
                 var act = {
                     id: "urn:uuid:9e4a902d-8a3a-495d-b73c-cfa0cf32f310",
@@ -208,7 +208,7 @@ suite.addBatch({
                 assert.equal(act["type"], "Create");
             }
         },
-        "and we try to convert a submission of a note to a collection to AS2": {
+        "and we convert a submission of a note to a collection to AS2": {
             topic: function(as2) {
                 var act = {
                     id: "urn:uuid:8e765132-414a-4535-9949-c4650f22e493",
@@ -239,16 +239,16 @@ suite.addBatch({
                 assert.equal(act["type"], "Add");
             }
         },
-        "and we try to convert a `share` activity to AS2": testVocabConversion("share", "Announce"),
-        "and we try to convert a `attach` activity to AS2": testVocabConversion("attach", "Add"),
-        "and we try to convert a `author` activity to AS2": testVocabConversion("author", "Create"),
-        "and we try to convert a `favorite` activity to AS2": testVocabConversion("favorite", "Like"),
-        "and we try to convert a `flag-as-inappropriate` activity to AS2": testVocabConversion("flag-as-inappropriate", "Flag"),
-        "and we try to convert a `play` activity to AS2": testVocabConversion("play", "View"),
-        "and we try to convert a `rsvp-maybe` activity to AS2": testVocabConversion("rsvp-maybe", "TentativeAccept"),
-        "and we try to convert a `rsvp-no` activity to AS2": testVocabConversion("rsvp-no", "Reject"),
-        "and we try to convert a `rsvp-yes` activity to AS2": testVocabConversion("rsvp-yes", "Accept"),
-        "and we try to convert a `watch` activity to AS2": testVocabConversion("watch", "View")
+        "and we convert a `share` activity to AS2": testVocabConversion("share", "Announce"),
+        "and we convert a `attach` activity to AS2": testVocabConversion("attach", "Add"),
+        "and we convert a `author` activity to AS2": testVocabConversion("author", "Create"),
+        "and we convert a `favorite` activity to AS2": testVocabConversion("favorite", "Like"),
+        "and we convert a `flag-as-inappropriate` activity to AS2": testVocabConversion("flag-as-inappropriate", "Flag"),
+        "and we convert a `play` activity to AS2": testVocabConversion("play", "View"),
+        "and we convert a `rsvp-maybe` activity to AS2": testVocabConversion("rsvp-maybe", "TentativeAccept"),
+        "and we convert a `rsvp-no` activity to AS2": testVocabConversion("rsvp-no", "Reject"),
+        "and we convert a `rsvp-yes` activity to AS2": testVocabConversion("rsvp-yes", "Accept"),
+        "and we convert a `watch` activity to AS2": testVocabConversion("watch", "View")
     }
 });
 
