@@ -59,6 +59,11 @@ vows.describe("BearerToken data type")
                 assert.isFunction(BearerToken);
                 assert.isFunction(BearerToken.get);
             },
+            "it has a save() method": function(err, BearerToken) {
+                assert.ifError(err);
+                assert.isFunction(BearerToken);
+                assert.isFunction(BearerToken.prototype.save);
+            },
             "and we open a database": {
                 topic: function(BearerToken) {
                     var callback = this.callback;
@@ -159,6 +164,46 @@ vows.describe("BearerToken data type")
                             assert.ok(!gotten.nickname);
                             assert.equal(gotten.client_id, client.client_id);
                             assert.ok(!gotten.scope);
+                        }
+                    }
+                },
+                "and we create a defined user token": {
+                    topic: function(bank, BearerToken) {
+                        var props = {
+                            "token": "UNITTESTBEARERTOKEN1",
+                            "nickname": user.nickname,
+                            "client_id": client.client_id,
+                            "scope": SCOPE
+                        };
+                        BearerToken.create(props, this.callback);
+                        return undefined;
+                    },
+                    "it works": function(err, bt) {
+                        assert.ifError(err);
+                        assert.isObject(bt);
+                        assert.isString(bt.created);
+                        assert.equal(bt.token, "UNITTESTBEARERTOKEN1");
+                    },
+                    "and we get the same token out": {
+                        topic: function(created, bank, BearerToken) {
+                            var callback = this.callback;
+                            BearerToken.get(created.token, function(err, gotten) {
+                                if (err) {
+                                    callback(err);
+                                } else {
+                                    callback(null, gotten, created);
+                                }
+                            });
+                        },
+                        "it works": function(err, gotten, created) {
+                            assert.ifError(err);
+                            assert.isObject(gotten);
+                            assert.isObject(created);
+                            assert.equal(gotten.token, created.token);
+                            assert.isString(gotten.created);
+                            assert.equal(gotten.nickname, created.nickname);
+                            assert.equal(gotten.client_id, client.client_id);
+                            assert.equal(gotten.scope, created.scope);
                         }
                     }
                 }
