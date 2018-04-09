@@ -40,7 +40,7 @@ var suite = vows.describe("ActivityPub actor");
 
 suite.addBatch(apputil.withAppSetup({
    "and we request an identity URL for ActivityPub": {
-    topic(cred) {
+    topic() {
         var cb = this.callback;
         var headers = {
             Accept: AS2_MIME_TYPE,
