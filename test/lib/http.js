@@ -214,6 +214,43 @@ var head = function(url, headers, callback) {
     req.end();
 };
 
+var get = function(url, headers, callback) {
+
+    var options = urlparse(url);
+
+    if (_.isFunction(headers)) {
+        callback = headers;
+        headers = {};
+    }
+
+    options.method = "GET";
+    options.headers = _.extend({
+        "User-Agent": "pump.io/"+version
+    }, headers);
+
+    var mod = (options.protocol === "https:") ? https : http;
+
+    var req = mod.request(options, function(res) {
+        var body = "";
+        res.setEncoding("utf8");
+        res.on("data", function(chunk) {
+            body = body + chunk;
+        });
+        res.on("error", function(err) {
+            callback(err, null, null);
+        });
+        res.on("end", function() {
+            callback(null, res, body);
+        });
+    });
+
+    req.on("error", function(err) {
+        callback(err, null, null);
+    });
+
+    req.end();
+};
+
 var jsonHandler = function(callback) {
     return function(err, data, response) {
         var obj;
@@ -418,6 +455,7 @@ var proxy = function(options, callback) {
 exports.options = options;
 exports.post = post;
 exports.head = head;
+exports.get = get;
 exports.postJSON = postJSON;
 exports.postFile = postFile;
 exports.getJSON = getJSON;
