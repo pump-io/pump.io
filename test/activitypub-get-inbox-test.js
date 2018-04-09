@@ -28,10 +28,13 @@ var _ = require("lodash"),
     oauthutil = require("./lib/oauth"),
     newCredentials = oauthutil.newCredentials;
 
-var suite = vows.describe("ActivityPub inbox");
+var tc = require("./config.json");
 
 var AS2_MIME_TYPE = "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"";
 var AS2_CONTEXT = "https://www.w3.org/ns/activitystreams";
+
+var user = tc.users[3];
+var client = tc.clients[0];
 
 var assertValidAS2Activity = function(act) {
     assert.isObject(act);
@@ -48,39 +51,65 @@ var assertValidAS2Activity = function(act) {
     assert.isString(act.published);
 };
 
+process.on('uncaughtException', function(err) {
+    console.error(err);
+    process.exit(-1);
+});
+
+var suite = vows.describe("ActivityPub inbox");
+
 suite.addBatch(apputil.withAppSetup({
-  "and we get new credentials": {
-      topic: function() {
-          newCredentials("macdonald", "the|old|flag", this.callback);
-      },
-      "it works": function(err, cred) {
-          assert.ifError(err);
-      },
-      "and we request an identity URL for ActivityPub": {
-        topic(cred) {
-          var cb = this.callback;
-          var headers = {
-            Accept: AS2_MIME_TYPE
-          };
-          httputil.getJSON("http://localhost:4815/macdonald", cred, headers, function(err, body, response) {
-              cb(err, response, body);
-          });
-        },
-        "it works": function(err, res, body) {
-          assert.ifError(err);
-        },
-        "it has an inbox link": function(err, res, body) {
-          assert.isObject(body);
-          assert.isString(body.inbox);
-        },
-        "and we request the inbox": {
-          topic: function(res, body, cred) {
+    "and we request an identity URL for ActivityPub": {
+        topic() {
             var cb = this.callback;
             var headers = {
-              Accept: AS2_MIME_TYPE
+                Accept: AS2_MIME_TYPE,
+                Authorization: "Bearer " + user.tokens[0].token
             };
-            httputil.getJSON(body.inbox, cred, headers, function(err, body, response) {
-                cb(err, response, body);
+            var url = "http://localhost:4815/" + user.nickname;
+            httputil.get(url, headers, function(err, response, body) {
+                if (err) {
+                    cb(err);
+                } else if (response.statusCode !== 200) {
+                    cb(new Error("Unexpected status code: " + response.statusCode));
+                } else {
+                    var data = null;
+                    try {
+                        data = JSON.parse(body);
+                    } catch (e) {
+                        return cb(e);
+                    }
+                    return cb(null, response, data);
+                }
+            });
+        },
+        "it works": function(err, res, body) {
+            assert.ifError(err);
+            assert.isObject(res);
+            assert.isObject(body);
+            assert.isString(body.inbox);
+        },
+        "and we request the inbox link": {
+          topic: function(ignore, actor) {
+            var cb = this.callback;
+            var headers = {
+              Accept: AS2_MIME_TYPE,
+              Authorization: "Bearer " + user.tokens[0].token
+            };
+            httputil.get(actor.inbox, headers, function(err, response, body) {
+                if (err) {
+                    cb(err);
+                } else if (response.statusCode !== 200) {
+                    cb(new Error("Unexpected status code: " + response.statusCode));
+                } else {
+                    var data = null;
+                    try {
+                        data = JSON.parse(body);
+                    } catch (e) {
+                        return cb(e);
+                    }
+                    return cb(null, response, data);
+                }
             });
           },
           "it works": function(err, res, body) {
@@ -94,16 +123,14 @@ suite.addBatch(apputil.withAppSetup({
             assert.isObject(body);
             assert.isString(body.type);
             assert.equal(body.type, "OrderedCollection");
+            // Because this is a fake user created during config, the
+            // default list-creation activities aren't here.
             assert.isNumber(body.totalItems);
-            assert.greater(body.totalItems, 0);
-            assert.isObject(body.first);
-            assert.isString(body.first.type);
-            assert.equal(body.first.type, "OrderedCollectionPage");
-            assert.isArray(body.first.orderedItems);
-            assert.greater(body.first.orderedItems.length, 0);
-            _.each(body.first.orderedItems, assertValidAS2Activity);
+            assert.equal(body.totalItems, 0);
+            assert.notIncludes(body, "first");
+            assert.notIncludes(body, "items");
+            assert.notIncludes(body, "orderedItems");
           }
         }
-      }
     }
   })).export(module);
