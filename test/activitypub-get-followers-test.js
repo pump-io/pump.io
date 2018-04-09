@@ -36,14 +36,6 @@ var AS2_CONTEXT = "https://www.w3.org/ns/activitystreams";
 var user = tc.users[3];
 var client = tc.clients[0];
 
-var assertValidAS2Activity = function(object) {
-    assert.isObject(object);
-    assert.isString(object.id);
-    assert.isString(object.name || object.summary);
-    assert.isString(object.type);
-    assert.isString(object.published);
-};
-
 process.on('uncaughtException', function(err) {
     console.error(err);
     process.exit(-1);
