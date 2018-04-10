@@ -15,7 +15,7 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
-script: "(npm test || npm test) && sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root && npm run test:install'"
+script: "(npm test || npm test) && npm run test:install && sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root'"
 before_script:
   - "./test/hosts.sh"
 before_install:
