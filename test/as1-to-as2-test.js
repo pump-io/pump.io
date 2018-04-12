@@ -22,7 +22,7 @@ var assert = require("assert"),
     vows = require("vows"),
     uuid = require("uuid");
 
-var suite = vows.describe("AS2 conversion module interface");
+var suite = vows.describe("AS1 -> AS2 conversion");
 
 var testVocabConversion = function(verb, newVerb) {
     return {
