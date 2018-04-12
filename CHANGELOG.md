@@ -1,6 +1,6 @@
 # pump.io changelog
 
-pump.io follows [Semantic Versioning][semver]. Specifically, the following things are considered to be semver-major if changed in a backwards-incompatible way:
+pump.io follows [Semantic Versioning 2.0.0][semver]. Specifically, the following things are considered to be semver-major if changed in a backwards-incompatible way:
 
 * Ability to merge trivial local template modifications
 * Configuration value names, semantics, and format
@@ -17,17 +17,35 @@ Changes to everything else are not considered breaking, although we may delay th
 
 If you think something that isn't in the first list should be covered, file an issue and we'll either state we consider that semver-major or give a rationale as to why it isn't. Please also feel free to ask questions in the issue tracker; this list could surely be more precise.
 
-## 5.1.0 beta 0 - Future
+## 5.1.0 - 2018-01-05
+
+### Changed
+
+* Bump `gm` version out of caution to pull in a fully security-patched `debug`
+
+## 5.1.0 beta 0 - 2017-12-08
+
+### Improved
+
+* Generate startup log warnings on bad configurations, including insecure `secret` values and internal parameters
+* Add a `Dockerfile`
+* Added [zero-downtime upgrade support][]
+
+### Changed
+
+* Update deps
+* Enable some more tests and start tracking code coverage with Coveralls
+* Expand package.json metadata
+* Clarify semver-major local modification policy
+* Move most documentation to ReadTheDocs (#1496)
 
 ### Fixed
 
 * `bin/pump-import-collection` no longer crashes due to an `underscore-contrib` reference
 * Fix the logged-out mobile homepage's menu icon being black (#1445)
 * Fix the JavaScript license page not loading Bootstrap properly (#1432)
-
-### Changed
-
-* Update deps
+* Fix some README config options
+* SockJS connections no longer fail due to authorization problems (#1475)
 
 ## 4.0.3 - 2017-10-01
 
@@ -47,19 +65,19 @@ No changes from 5.0.1 beta 0:
 
 ### Security
 
-* Fix multiple denial-of-service security vulnerabilities in indirect dependencies
+* Fix multiple denial-of-service security vulnerabilities in indirect dependencies: [advisory 1](https://nodesecurity.io/advisories/534), [advisory 2](https://nodesecurity.io/advisories/526), [advisory 3](https://nodesecurity.io/advisories/535) (no CVEs available)
 
 ## 4.1.3 - 2017-10-01
 
 ### Security
 
-* Fix multiple denial-of-service security vulnerabilities in indirect dependencies
+* Fix multiple denial-of-service security vulnerabilities in indirect dependencies: [advisory 1](https://nodesecurity.io/advisories/534), [advisory 2](https://nodesecurity.io/advisories/526), [advisory 3](https://nodesecurity.io/advisories/535) (no CVEs available)
 
 ## 4.0.2 - 2017-10-01
 
 ### Security
 
-* Fix multiple denial-of-service security vulnerabilities in indirect dependencies
+* Fix multiple denial-of-service security vulnerabilities in indirect dependencies: [advisory 1](https://nodesecurity.io/advisories/534), [advisory 2](https://nodesecurity.io/advisories/526), [advisory 3](https://nodesecurity.io/advisories/535) (no CVEs available)
 
 ## 5.0.1 beta 0 - 2017-09-29
 
@@ -69,7 +87,7 @@ The relevant security bugs were publicly disclosed on October 1st, 2017.
 
 ### Security
 
-* Fix multiple denial-of-service security vulnerabilities in indirect dependencies
+* Fix multiple denial-of-service security vulnerabilities in indirect dependencies: [advisory 1](https://nodesecurity.io/advisories/534), [advisory 2](https://nodesecurity.io/advisories/526), [advisory 3](https://nodesecurity.io/advisories/535) (no CVEs available)
 
 ## 5.0.0 - 2017-09-01
 
@@ -154,19 +172,19 @@ This will be the last release to support Node.js 0.10 and 0.12.
 
 ### Security
 
-* Increase minimum DOMPurify version to 0.9.0
+* Increase minimum DOMPurify version to 0.9.0: [0.8.9 security announcement](https://lists.ruhr-uni-bochum.de/pipermail/dompurify-security/2017-May/000006.html), [0.9.0 security announcement](https://lists.ruhr-uni-bochum.de/pipermail/dompurify-security/2017-May/000007.html)
 
 ## 3.0.3 - 2017-05-23
 
 ### Security
 
-* Increase minimum DOMPurify version to 0.9.0
+* Increase minimum DOMPurify version to 0.9.0: [0.8.9 security announcement](https://lists.ruhr-uni-bochum.de/pipermail/dompurify-security/2017-May/000006.html), [0.9.0 security announcement](https://lists.ruhr-uni-bochum.de/pipermail/dompurify-security/2017-May/000007.html)
 
 ## 2.1.2 - 2017-05-23
 
 ### Security
 
-* Increase minimum DOMPurify version to 0.9.0
+* Increase minimum DOMPurify version to 0.9.0: [0.8.9 security announcement](https://lists.ruhr-uni-bochum.de/pipermail/dompurify-security/2017-May/000006.html), [0.9.0 security announcement](https://lists.ruhr-uni-bochum.de/pipermail/dompurify-security/2017-May/000007.html)
 
 ## 4.0.0 - 2017-05-02
 
@@ -440,7 +458,8 @@ TODO
 
 * Initial release
 
- [semver]: http://semver.org/
+ [semver]: https://semver.org/spec/v2.0.0.html
  [librejs]: https://www.gnu.org/software/librejs/
  [security-headers]: https://github.com/pump-io/pump.io/issues/1184#issuecomment-242264403
  [Subresource Integrity]: https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity
+ [zero-downtime upgrade support]: http://pump.io/blog/2017/08/zero-downtime-restarts-have-landed

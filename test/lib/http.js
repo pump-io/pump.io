@@ -43,7 +43,7 @@ OAuthJSONError.prototype.toString = function() {
     return "OAuthJSONError (" + this.statusCode + "): " + this.data;
 };
 
-var newOAuth = function(serverURL, cred) {
+var newOAuth = function(serverURL, cred, headers) {
     var oa, parts;
 
     parts = urlparse(serverURL);
@@ -56,7 +56,7 @@ var newOAuth = function(serverURL, cred) {
                    null,
                    "HMAC-SHA1",
                    null, // nonce size; use default
-                   {"User-Agent": "pump.io/"+version});
+                   _.assign({"User-Agent": "pump.io/"+version}, headers || {}));
 
     return oa;
 };
@@ -214,6 +214,43 @@ var head = function(url, headers, callback) {
     req.end();
 };
 
+var get = function(url, headers, callback) {
+
+    var options = urlparse(url);
+
+    if (_.isFunction(headers)) {
+        callback = headers;
+        headers = {};
+    }
+
+    options.method = "GET";
+    options.headers = _.extend({
+        "User-Agent": "pump.io/"+version
+    }, headers);
+
+    var mod = (options.protocol === "https:") ? https : http;
+
+    var req = mod.request(options, function(res) {
+        var body = "";
+        res.setEncoding("utf8");
+        res.on("data", function(chunk) {
+            body = body + chunk;
+        });
+        res.on("error", function(err) {
+            callback(err, null, null);
+        });
+        res.on("end", function() {
+            callback(null, res, body);
+        });
+    });
+
+    req.on("error", function(err) {
+        callback(err, null, null);
+    });
+
+    req.end();
+};
+
 var jsonHandler = function(callback) {
     return function(err, data, response) {
         var obj;
@@ -272,11 +309,16 @@ var putJSON = function(serverUrl, cred, payload, callback) {
     oa.put(serverUrl, cred.token, cred.token_secret, toSend, "application/json", jsonHandler(callback));
 };
 
-var getJSON = function(serverUrl, cred, callback) {
+var getJSON = function(serverUrl, cred, headers, callback) {
+
+    if (!callback) {
+        callback = headers;
+        headers = {};
+    }
 
     var oa, toSend;
 
-    oa = newOAuth(serverUrl, cred);
+    oa = newOAuth(serverUrl, cred, headers);
     oa.get(serverUrl, cred.token, cred.token_secret, jsonHandler(callback));
 };
 
@@ -413,6 +455,7 @@ var proxy = function(options, callback) {
 exports.options = options;
 exports.post = post;
 exports.head = head;
+exports.get = get;
 exports.postJSON = postJSON;
 exports.postFile = postFile;
 exports.getJSON = getJSON;

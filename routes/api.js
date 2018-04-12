@@ -55,6 +55,10 @@ var databank = require("databank"),
     saveUpload = require("../lib/saveupload").saveUpload,
     streams = require("../lib/streams"),
     apiUtil = require("../lib/api"),
+    as2 = require("../lib/as2"),
+    as2headers = require("../lib/as2headers"),
+    wantAS2 = as2headers.wantAS2,
+    maybeAS2 = as2headers.maybeAS2,
     reqUser = mw.reqUser,
     reqGenerator = mw.reqGenerator,
     sameUser = mw.sameUser,
@@ -304,7 +308,7 @@ var getObject = function(req, res, next) {
                 next(err);
             } else {
                 obj.sanitize();
-                res.json(obj);
+                maybeAS2(req, res, next, obj);
             }
         }
     );
@@ -369,7 +373,6 @@ var deleteObject = function(req, res, next) {
 };
 
 var contextEndpoint = function(contextifier, streamCreator) {
-
     return function(req, res, next) {
 
         var args;
@@ -385,7 +388,7 @@ var contextEndpoint = function(contextifier, streamCreator) {
             if (err) {
                 next(err);
             } else {
-                res.json(collection);
+                maybeAS2(req, res, next, collection);
             }
         });
     };
@@ -458,7 +461,7 @@ var getUser = function(req, res, next) {
                 delete req.user.settings;
             }
             req.user.sanitize();
-            res.json(req.user);
+            maybeAS2(req, res, next, req.user);
         }
     );
 };
@@ -537,7 +540,7 @@ var getActivity = function(req, res, next) {
 
     act.sanitize(principal);
 
-    res.json(act);
+    maybeAS2(req, res, next, act);
 };
 
 var putActivity = function(req, res, next) {
@@ -915,7 +918,7 @@ var listUsers = function(req, res, next) {
                 }
             }
 
-            res.json(collection);
+            maybeAS2(req, res, next, collection);
         }
     );
 };
@@ -1309,7 +1312,6 @@ var newActivity = function(activity, user, callback) {
 };
 
 var streamEndpoint = function(streamCreator) {
-
     return function(req, res, next) {
 
         var args;
@@ -1325,7 +1327,7 @@ var streamEndpoint = function(streamCreator) {
             if (err) {
                 next(err);
             } else {
-                res.json(collection);
+                maybeAS2(req, res, next, collection);
             }
         });
     };
@@ -1624,7 +1626,6 @@ var reqProxy = function(req, res, next) {
 };
 
 var proxyRequest = function(req, res, next) {
-
     var principal = req.principal,
         proxy = req.proxy;
 
@@ -1689,7 +1690,7 @@ var proxyRequest = function(req, res, next) {
                 }
                 // XXX: save to local cache
                 req.log.debug({headers: pres.headers}, "Received object");
-                res.send(pbody);
+                res.send(wantAS2(req) ? JSON.stringify(as2(JSON.parse(pbody))) : pbody);
             }
         }
     );
@@ -1736,3 +1737,4 @@ var finishObject = function(profile, obj, callback) {
 
 exports.addRoutes = addRoutes;
 exports.createUser = createUser;
+exports.profileStack = [anyReadAuth, reqUser, personType, getObject];

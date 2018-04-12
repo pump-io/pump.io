@@ -1,0 +1,35 @@
+h1 OAuth 2.0 Authorization
+
+div
+  p Log into #{config.site} to give #{client.title || "the app"} access to
+  | your account.
+
+if error
+  p.alert.alert-error= error
+
+form.form-horizontal#oauth2-authentication(action="/oauth2/authc", method="post")
+  fieldset
+    input(type="hidden", name="response_type", value=response_type)
+    input(type="hidden", name="client_id", value=client_id)
+    input(type="hidden", name="state", value=state)
+    input(type="hidden", name="redirect_uri", value=redirect_uri)
+    input(type="hidden", name="scope", value=scope)
+    input(type="hidden", name="_csrf", value=_csrf)
+    .control-group
+      label.control-label(for="nickname") Username
+      .controls
+        input.input-medium#username(type="text", name="nickname")
+
+    .control-group
+      label.control-label(for="password") Password
+      .controls
+        input.input-medium#password(type="password", name="password")
+
+    .form-actions
+      // Show in random-ish order
+      if (Math.random() < 0.5)
+        input.btn.btn-primary#authenticate(type="submit", name="login", value="Login")
+        input.btn#cancel(type="submit", name="cancel", value="Cancel")
+      else
+        input.btn#cancel(type="submit", name="cancel", value="Cancel")
+        input.btn.btn-primary#authenticate(type="submit", name="login", value="Login")

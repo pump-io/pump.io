@@ -30,6 +30,10 @@ var ignore = function(err) {};
 
 var suite = vows.describe("app module interface");
 
+process.on("uncaughtException", function(err) {
+    console.error(err);
+});
+
 suite.addBatch({
     "When we get the app module": {
         topic: function() {
@@ -58,6 +62,7 @@ var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 suite.addBatch({
     "When we makeApp()": {
         topic: function() {
+            var cb = this.callback;
             var config = {port: 4815,
                           hostname: "localhost",
                           driver: tc.driver,
@@ -69,7 +74,10 @@ suite.addBatch({
 
             process.env.NODE_ENV = "test";
 
-            makeApp(config, this.callback);
+            makeApp(config, function(err, app) {
+              cb(err, app);
+            });
+            return undefined;
         },
         "it works": function(err, app) {
             assert.ifError(err);

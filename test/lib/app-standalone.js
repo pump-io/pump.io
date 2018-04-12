@@ -29,13 +29,9 @@ var _ = require("lodash"),
 
 var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "config.json")));
 
-var config = {driver: tc.driver,
-              params: tc.params,
-              firehose: false,
-              sockjs: false,
-              noCDN: true,
-              debugClient: true,
-              nologger: true},
+// XXX: move these to config.json?
+
+var config = tc,
     app = null,
     i,
     parts,
@@ -72,6 +68,14 @@ if (cluster.isMaster) {
             worker.send(msg);
             break;
         }
+    });
+    process.on("SIGTERM", function() {
+        if (_.isFunction(worker.disconnect)) {
+            worker.disconnect();
+        } else {
+            worker.kill();
+        }
+        process.exit(0);
     });
 } else {
     Step(

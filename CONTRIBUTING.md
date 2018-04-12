@@ -87,6 +87,7 @@ By making a contribution to this project, I certify that:
 
  [commits]: https://chris.beams.io/posts/git-commit/
  [CONTRIBUTING_CODE.md]: https://github.com/pump-io/pump.io/blob/master/doc/CONTRIBUTING_CODE.md
+ [HACKING.md]: https://github.com/pump-io/pump.io/blob/master/HACKING.md
  [sysadmin documentation]: https://pumpio.readthedocs.io/en/latest/sysadmins.html
  [community]: https://github.com/pump-io/pump.io/wiki/Community
  [DCO]: https://developercertificate.org/

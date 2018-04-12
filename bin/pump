@@ -7,6 +7,7 @@
 // entry point activity pump application
 //
 // Copyright 2011-2012, E14N https://e14n.com/
+// Copyright 2017, AJ Jordan <alex@strugee.net>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -124,7 +125,7 @@ var launchApps = function(config) {
 
         cluster.on("exit", function(worker, code, signal) {
             // TODO remove this when we drop Node 4
-            var zeroDowntimeRestart = worker.exitedAfterDisconnect || worker.suicide,
+            var zeroDowntimeRestart = _.has(worker, "exitedAfterDisconnect") ? worker.exitedAfterDisconnect : worker.suicide,
                 exitCode = worker.process.exitCode;
 
             // Don't respawn any workers if we aborted a restart

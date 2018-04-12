@@ -26,6 +26,12 @@
 
     "use strict";
 
+    var _socket = {
+        reconnecting: false,
+        retryTimeout: 30000,
+        retryAttempts: 0
+    };
+
     Pump.getStreams = function() {
 
         var streams = {};
@@ -119,6 +125,14 @@
         sock.onopen = function() {
             Pump.socket = sock;
             Pump.followStreams();
+
+            // Reset reconnect
+            if (_socket.retryTimer) {
+                clearTimeout(_socket.retryTimer);
+                _socket.retryTimer = null;
+            }
+            _socket.reconnecting = false;
+            _socket.retryAttempts = 0;
         };
 
         sock.onmessage = function(e) {
@@ -134,9 +148,36 @@
             }
         };
 
-        sock.onclose = function() {
-            // XXX: reconnect?
+        sock.onclose = function(error) {
             Pump.socket = null;
+            // Reconnect on broken connections, not for normal close
+            if (error.code !== 1000) {
+                sock.reconnect(error);
+            }
+        };
+
+        sock.reconnect = function(error) {
+            _socket.retryAttempts++;
+
+            if (_socket.retryTimer) {
+                clearTimeout(_socket.retryTimer);
+                _socket.retryTimer = null;
+            }
+
+            // No more attempts if all transports failed
+            if (error.code === 2000) {
+                Pump.error("Sorry! Your browser doesn't support realtime.");
+                Pump.debug(error);
+                return;
+            }
+
+            if (_socket.reconnecting) {
+                _socket.retryTimer = setTimeout(Pump.setupSocket, _socket.retryTimeout);
+            } else {
+                // The first time try to reconnect immediately
+                _socket.reconnecting = true;
+                Pump.setupSocket();
+            }
         };
     };
 

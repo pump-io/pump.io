@@ -44,6 +44,10 @@ var databank = require("databank"),
     saveAvatar = su.saveAvatar,
     streams = require("../lib/streams"),
     api = require("./api"),
+    as2headers = require("../lib/as2headers"),
+    as2 = require("../lib/as2"),
+    maybeAS2 = as2headers.maybeAS2,
+    wantAS2 = as2headers.wantAS2,
     HTTPError = he.HTTPError,
     reqUser = mw.reqUser,
     reqGenerator = mw.reqGenerator,
@@ -100,7 +104,6 @@ var addRoutes = function(app, session) {
         app.post("/main/upload-avatar", session, principal, principalUserOnly, uploadAvatar);
     }
 
-    app.get("/:nickname", session, principal, addMessages, reqUser, showStream);
     app.get("/:nickname/favorites", session, principal, addMessages, reqUser, showFavorites);
     app.get("/:nickname/followers", session, principal, addMessages, reqUser, showFollowers);
     app.get("/:nickname/following", session, principal, addMessages, reqUser, showFollowing);
@@ -1077,3 +1080,4 @@ var redeemCode = function(req, res, next) {
 };
 
 exports.addRoutes = addRoutes;
+exports.profileStack = [principal, addMessages, reqUser, showStream];

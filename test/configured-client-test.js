@@ -18,7 +18,9 @@
 
 "use strict";
 
-var assert = require("assert"),
+var fs = require("fs"),
+    path = require("path"),
+    assert = require("assert"),
     vows = require("vows"),
     Step = require("step"),
     _ = require("lodash"),
@@ -29,24 +31,20 @@ var assert = require("assert"),
     apputil = require("./lib/app"),
     actutil = require("./lib/activity"),
     validActivity = actutil.validActivity,
-    setupAppConfig = apputil.setupAppConfig,
+    setupApp = apputil.setupApp,
     newPair = oauthutil.newPair;
 
-var CLIENT_ID_1 = "AAAAAAAAAAAAAAAAAAAA",
-    CLIENT_SECRET_1 = "BBBBBBBBBBBBBBBBBBBB";
+var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "config.json")));
+
+var CLIENT_ID_1 = tc.clients[0].client_id,
+    CLIENT_SECRET_1 = tc.clients[0].client_secret;
 
 var suite = vows.describe("configured client ID");
 
 suite.addBatch({
     "When we set up the app with a configured client": {
         topic: function() {
-            var config = {
-                clients: [{
-                    client_id: CLIENT_ID_1,
-                    client_secret: CLIENT_SECRET_1
-                }]
-            };
-            setupAppConfig(config, this.callback);
+            setupApp(this.callback);
         },
         teardown: function(app) {
             app.close();

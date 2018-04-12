@@ -26,6 +26,7 @@ var assert = require("assert"),
     path = require("path"),
     mkdirp = require("mkdirp"),
     rimraf = require("rimraf"),
+    Browser = require("zombie"),
     _ = require("lodash"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
@@ -53,7 +54,7 @@ suite.addBatch({
     "When we create a temporary upload dir": {
         topic: function() {
             var callback = this.callback,
-                dirname = path.join(os.tmpDir(),
+                dirname = path.join(os.tmpdir(),
                                     "upload-file-test",
                                     ""+Date.now());
             mkdirp(path.join(dirname, "uploads"), function(err) {
@@ -74,8 +75,10 @@ suite.addBatch({
         },
         "and we set up the app": {
             topic: function(dir) {
-                setupAppConfig({datadir: dir, enableUploads: true},
-                               this.callback);
+                setupAppConfig({
+                    datadir: dir,
+                    enableUploads: true
+                }, this.callback);
             },
             teardown: function(app) {
                 if (app && app.close) {
@@ -187,6 +190,110 @@ suite.addBatch({
                                     assert.ifError(err);
                                 }
                             },
+                            "and we visit the uploads path from the web interface": {
+                                topic: function(doc) {
+                                    var callback = this.callback;
+
+                                    httputil.head("http://localhost:4815/uploads/", callback);
+                                },
+                                "it works": function(err, res) {
+                                    assert.ifError(err);
+                                },
+                                "it has a status code of 403": function(err, res) {
+                                    assert.isNumber(res.statusCode);
+                                    assert.equal(res.statusCode, 403);
+                                }
+                            },
+                            "and we try to get a private file with no extension from the web interface": {
+                                topic: function(doc) {
+                                    var callback = this.callback,
+                                        url = doc.fullImage.url.split(".")[0];
+
+                                    httputil.head(url, callback);
+                                },
+                                "it works": function(err, res) {
+                                    assert.ifError(err);
+                                },
+                                "it has a status code of 403": function(err, res) {
+                                    assert.isNumber(res.statusCode);
+                                    assert.equal(res.statusCode, 403);
+                                }
+                            },
+                            "and we get a private file from the web interface without logging in": {
+                                topic: function(doc) {
+                                    var browser = new Browser(),
+                                        callback = this.callback,
+                                        url = doc.fullImage.url;
+
+                                    httputil.head(url, callback);
+                                },
+                                "it works": function(err, res) {
+                                    assert.ifError(err);
+                                },
+                                "it has a status code of 403": function(err, res) {
+                                    assert.isNumber(res.statusCode);
+                                    assert.equal(res.statusCode, 403);
+                                }
+                            },
+                            "and we login and try to get a private file": {
+                                topic: function(doc, feed, pair, cl) {
+                                    var browser = new Browser(),
+                                        callback = this.callback,
+                                        user = pair.user;
+
+                                    Step(
+                                        function() {
+                                            browser.visit("http://localhost:4815/main/login", this);
+                                        },
+                                        function(err) {
+                                            if (err) throw err;
+
+                                            browser.fill("#nickname", user.nickname)
+                                                .fill("#password", "stormtroopers_hittin_the_ground")
+                                                .pressButton("div#loginpage form button[type=\"submit\"]", this);
+                                        },
+                                        function(err) {
+                                            callback(err, browser);
+                                        }
+                                    );
+                                },
+                                "it works": function(err, br) {
+                                    assert.ifError(err);
+                                    br.assert.success();
+                                },
+                                "and we get the file from the web interface while logged in": {
+                                    topic: function(br, doc) {
+                                        var browser = br,
+                                            callback = this.callback,
+                                            url = doc.fullImage.url;
+
+                                        browser.visit(url, function(err) {
+                                            // When this is false, send a new param for next test
+                                            // Don't use br.assert because if we send a browser
+                                            // as the new parameter for the next test we'll get
+                                            // a duplicate browser instance
+                                            callback(err || browser.status !== 200 || null);
+                                        });
+                                    },
+                                    "it works": function(err) {
+                                        assert.ifError(err);
+                                    },
+                                    "and we try to get the file with the wrong extension from the web interface": {
+                                        topic: function(br, doc) {
+                                            var browser = br,
+                                                callback = this.callback,
+                                                url = doc.fullImage.url.split(".")[0] + ".exe";
+
+                                            browser.visit(url, function() {
+                                                callback(null, browser);
+                                            });
+                                        },
+                                        "it has a status code of 403": function(err, br) {
+                                            br.assert.status(403);
+                                        }
+                                    }
+                                }
+                            },
                             "and we get the uploads feed again": {
                                 topic: function(doc, feed, pair, cl) {
                                     var cred = makeCred(cl, pair),
@@ -253,6 +360,7 @@ suite.addBatch({
                     "it works": function(err, pair) {
                         assert.ifError(err);
                         assert.isObject(pair);
+                        assert.equal(_.get(pair, "user.nickname"), "tom");
                     },
                     "and we upload a file as a Binary object": {
                         topic: function(pair, cl) {
@@ -304,6 +412,38 @@ suite.addBatch({
                             assert.isFalse(_.has(doc, "_uuid"));
                         }
                     }
+                }
+            }
+        },
+        "and we set up the app with noweb": {
+            topic: function(dir) {
+                setupAppConfig({
+                    datadir: dir,
+                    enableUploads: true,
+                    noweb: true,
+                    port: 4816
+                }, this.callback);
+            },
+            teardown: function(app) {
+                if (app && app.close) {
+                    app.close();
+                }
+            },
+            "it works": function(err, app) {
+                assert.ifError(err);
+            },
+            "and we visit the uploads path from the web interface": {
+                topic: function(doc) {
+                    var callback = this.callback;
+
+                    httputil.head("http://localhost:4816/uploads/", callback);
+                },
+                "it works": function(err, res) {
+                    assert.ifError(err);
+                },
+                "it has a status code of 403": function(err, res) {
+                    assert.isNumber(res.statusCode);
+                    assert.equal(res.statusCode, 403);
                 }
             }
         }

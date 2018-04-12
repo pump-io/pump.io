@@ -11,10 +11,10 @@
     "jscs": "^3.0.3",
     "jshint": "^2.9.2",
     "jsonlint": "^1.6.2",
-    "lcov-result-merger": "^1.2.0",
+    "lcov-result-merger": "^2.0.0",
     "node-mocks-http": "^1.6.1",
     "nyc": "^11.2.1",
-    "proxyquire": "^1.8.0",
+    "proxyquire": "2.0.0",
     "pug-lint": "^2.3.0",
     "rimraf": "^2.6.1",
     "simplesmtp": "^0.3.35",
@@ -23,6 +23,7 @@
     "zombie": "^5.0.7"
   },
   "dependencies": {
+    "activitystrea.ms": "^2.1.3",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.15.2",
     "bunyan": "^1.8.12",
@@ -31,14 +32,15 @@
     "connect-databank": "^1.0.3",
     "connect-multiparty": "^2.0.0",
     "cookie-parser": "^1.4.3",
-    "databank": "0.19.x",
+    "csurf": "^1.9.0",
+    "databank": "^1.0.1",
     "dateformat": "^3.0.0",
     "dialback-client": "0.2.x",
     "dompurify": "^1.0.1",
     "emailjs": "^1.0.8",
     "express": "^4.16.0",
     "express-session": "^1.14.1",
-    "gm": "^1.22.0",
+    "gm": "^1.23.1",
     "helmet": "^3.3.0",
     "import-fresh": "^2.0.0",
     "jade": "^1.11.0",
@@ -78,9 +80,11 @@
     "build": "jade --client --extension jade.js --no-debug public/template",
     "fullbuild": "npm run build && echo 'use `npm run build` instead next time' 1>&2",
     "test": "npm run lint && npm run test:vows",
+    "test:oauth2": "vows test/authenticationcode-test.js test/bearertoken-test.js test/oauth2-authorization-test.js test/schema-test.js test/authc-oauth2-test.js",
     "test:vows": "nyc -r lcov vows -v test/*-test.js",
     "test:root": "nyc -r lcov --report-dir coverage-root vows -v test/*-test-as-root.js",
     "test:install": "npm install -g .",
+    "test:security-sigs": "gpg --keyserver hkp://keys.gnupg.net --recv-keys C46D8E7A3F13AD1C8EC6784843BF769C4ACA8B96 && gpg --verify doc/SECURITY.md.gpg",
     "test:system": "vows -v test/*-test-system.js",
     "test:systemd": "docker run -v $(pwd):/tmp/pump.io:ro -v $NVM_DIR:/.nvm:ro ubuntu sh -c \"export NVM_DIR=$NVM_DIR; . $NVM_DIR/nvm.sh; nvm use $TRAVIS_NODE_VERSION; cd /tmp/pump.io; npm run test:systemd:run\"",
     "test:systemd:run": "mkdir -p /tmp/pump.io/uploads; sed 's/%i.service//g' pump.io@.service | sudo tee /etc/systemd/system/pump.io.service; sudo systemctl daemon-reload; sudo systemctl start pump.io.service; npm run test:system",
@@ -116,16 +120,20 @@
     "streams",
     "api",
     "app",
-    "server"
+    "server",
+    "federation",
+    "decentralization"
   ],
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=4 <7",
+    "node": ">=4 <=8",
     "npm": ">=2"
   },
   "greenkeeper": {
     "ignore": [
-      "databank"
+      "databank",
+      "jsdom",
+      "zombie"
     ]
   }
 }

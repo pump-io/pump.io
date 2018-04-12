@@ -1394,9 +1394,10 @@
 
             Pump.newMinorActivity(act, function(err, act) {
                 view.$(".favorite")
+                    .filter(":first")
                     .removeClass("favorite")
                     .addClass("unfavorite")
-                    .html("Unlike <i class=\"fa fa-thumbs-down\"></i>");
+                    .html("Unlike <i class=\"fa fa-thumbs-o-down\"></i>");
                 Pump.addMinorActivity(act);
             });
         },
@@ -1412,9 +1413,10 @@
                     view.showError(err);
                 } else {
                     view.$(".unfavorite")
+                        .filter(":first")
                         .removeClass("unfavorite")
                         .addClass("favorite")
-                        .html("Like <i class=\"fa fa-thumbs-up\"></i>");
+                        .html("Like <i class=\"fa fa-thumbs-o-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
             });
@@ -1588,12 +1590,27 @@
         tagName: "div",
         className: "row comment-form",
         events: {
-            "submit .post-comment": "saveComment"
+            "submit .post-comment": "saveComment",
+            "click .close-btn": "cancelComment"
         },
         ready: function() {
             var view = this;
             view.$('textarea[name="content"]').wysihtml5({
                 customTemplates: Pump.wysihtml5Tmpl
+            });
+        },
+        cancelComment: function() {
+            var view = this,
+                html = view.$('textarea[name="content"]').val();
+
+            if (html.length === 0) {
+                view.remove();
+                return;
+            }
+            Pump.areYouSure("You sure? You can't get this comment back!", function(err, sure) {
+                if (sure) {
+                    view.remove();
+                }
             });
         },
         saveComment: function() {
@@ -1678,9 +1695,10 @@
                     view.showError(err);
                 } else {
                     view.$(".favorite")
+                        .filter(":first")
                         .removeClass("favorite")
                         .addClass("unfavorite")
-                        .html("Unlike <i class=\"fa fa-thumbs-down\"></i>");
+                        .html("Unlike <i class=\"fa fa-thumbs-o-down\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -1700,9 +1718,10 @@
                     view.showError(err);
                 } else {
                     view.$(".unfavorite")
+                        .filter(":first")
                         .removeClass("unfavorite")
                         .addClass("favorite")
-                        .html("Like <i class=\"fa fa-thumbs-up\"></i>");
+                        .html("Like <i class=\"fa fa-thumbs-o-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -1786,9 +1805,10 @@
                     view.showError(err);
                 } else {
                     view.$(".favorite")
+                        .filter(":first")
                         .removeClass("favorite")
                         .addClass("unfavorite")
-                        .html("Unlike <i class=\"fa fa-thumbs-down\"></i>");
+                        .html("Unlike <i class=\"fa fa-thumbs-o-down\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -1809,9 +1829,10 @@
                     view.showError(err);
                 } else {
                     view.$(".unfavorite")
+                        .filter(":first")
                         .removeClass("unfavorite")
                         .addClass("favorite")
-                        .html("Like <i class=\"fa fa-thumbs-up\"></i>");
+                        .html("Like <i class=\"fa fa-thumbs-o-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -2519,9 +2540,10 @@
                     view.showError(err);
                 } else {
                     view.$(".favorite")
+                        .filter(":first")
                         .removeClass("favorite")
                         .addClass("unfavorite")
-                        .html("Unlike <i class=\"fa fa-thumbs-down\"></i>");
+                        .html("Unlike <i class=\"fa fa-thumbs-o-down\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
@@ -2541,9 +2563,10 @@
                     view.showError(err);
                 } else {
                     view.$(".unfavorite")
+                        .filter(":first")
                         .removeClass("unfavorite")
                         .addClass("favorite")
-                        .html("Like <i class=\"fa fa-thumbs-up\"></i>");
+                        .html("Like <i class=\"fa fa-thumbs-o-up\"></i>");
                     Pump.addMinorActivity(act);
                 }
                 view.stopSpin();
