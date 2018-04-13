@@ -107,4 +107,44 @@ vows.describe("AS2 -> AS1 conversion")
             }
         }
     ))
+    .addBatch(convert(
+        {
+            "@context": "https://www.w3.org/ns/activitystreams",
+            "type": "Organization",
+            "name": "Giant Co",
+            "id": "https://giant.example",
+            "image": {
+                "type": "Image",
+                "name": "Giant Co logo",
+                "url": {
+                    "type": "Link",
+                    "href": "https://giant.example/logo.png",
+                    "mediaType": "image/png",
+                    "width": 128,
+                    "height": 128
+                }
+            },
+            "summary": "Making the future happen but more gigantic",
+            "published": "2018-04-18T12:58:00Z",
+            "updated": "2018-04-25T17:21:00Z"
+        },
+        {
+            id: "https://giant.example",
+            links: {
+                self: {
+                    href: "https://giant.example"
+                }
+            },
+            objectType: "organization",
+            displayName: "Giant Co",
+            summary: "Making the future happen but more gigantic",
+            published: "2018-04-18T12:58:00.000Z",
+            updated: "2018-04-25T17:21:00.000Z",
+            image: {
+                "url": "https://giant.example/logo.png",
+                "width": 128,
+                "height": 128
+            }
+        }
+    ))
     .export(module);
