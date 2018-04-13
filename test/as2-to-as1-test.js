@@ -70,4 +70,41 @@ vows.describe("AS2 -> AS1 conversion")
             displayName: "The Test Application"
         }
     ))
+    .addBatch(convert(
+        {
+            "@context": "https://www.w3.org/ns/activitystreams",
+            "type": "Group",
+            "name": "Big Beards of Austin",
+            "id": "https://bboa.example",
+            "icon": {
+                "type": "Link",
+                "href": "https://bboa.example/logo.png",
+                "mediaType": "image/png",
+                "name": "Big Beards of Austin logo",
+                "width": 128,
+                "height": 128
+            },
+            "summary": "Austinites who have, or are fans of, big beards",
+            "published": "2018-04-18T12:58:00Z",
+            "updated": "2018-04-25T17:21:00Z"
+        },
+        {
+            id: "https://bboa.example",
+            links: {
+                self: {
+                    href: "https://bboa.example"
+                }
+            },
+            objectType: "group",
+            displayName: "Big Beards of Austin",
+            summary: "Austinites who have, or are fans of, big beards",
+            published: "2018-04-18T12:58:00.000Z",
+            updated: "2018-04-25T17:21:00.000Z",
+            image: {
+                "url": "https://bboa.example/logo.png",
+                "width": 128,
+                "height": 128
+            }
+        }
+    ))
     .export(module);
