@@ -18,13 +18,13 @@ You can check for (most) style violations with `npm run lint:jscs`, and you can 
 
 ## TEMPLATES
 
-* Templates are written in [Jade](http://jade-lang.com)
+* Templates are written in [Pug](https://pugjs.org)
 * Templates are precompiled to JS for client-side rendering. You need to recompile with `npm run build` every time you change templates.
 * 2-character indent, spaces only.
 * Use `.classname` instead of `div.classname` - ditto for `div#id` and `#id`
 * Use `#[]` interpolation
 
-You can check for style violations with `npm run lint:jade`.
+You can check for style violations with `npm run lint:pug`.
 
 ## LOGGING
 

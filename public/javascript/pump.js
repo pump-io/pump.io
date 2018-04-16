@@ -32,7 +32,7 @@ if (!window.Pump) {
 
     "use strict";
 
-    // This is overwritten by inline script in layout.jade
+    // This is overwritten by inline script in layout.pug
 
     Pump.config = {};
 

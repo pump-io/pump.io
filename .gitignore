@@ -49,4 +49,5 @@ jspm_packages
 
 # pump.io stuff
 
+public/template/*.pug.js
 public/template/*.jade.js

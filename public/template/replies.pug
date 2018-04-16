@@ -1,0 +1,8 @@
+.replies
+  if replies && replies.totalItems > 0
+    if replies.totalItems > 4
+      a.show-all-replies(href="#") Show all #{replies.totalItems} replies
+
+    if replies.items && replies.items.length
+      each reply in replies.items.slice(Math.max(0, replies.items.length - 4), replies.items.length).reverse()
+        include ./reply.pug

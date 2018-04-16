@@ -1,0 +1,17 @@
+include ./lib/recipient-selector.pug
+
+.modal.pump-modal.hide.fade#modal-note(tabindex="-1", role="dialog", aria-labelledby="post-label", aria-hidden="true")
+  .modal-header
+    button.close(type="button", data-dismiss="modal", aria-hidden="true") &times;
+    h3#post-label Post a note
+
+  .modal-body
+    form.form-horizontal#post-note
+      fieldset
+        textarea.span5#note-content(name="note" rows="6")
+        div
+          +recipient-selector("to", "note-to", "To")
+        div
+          +recipient-selector("cc", "note-cc", "CC")
+  .modal-footer
+    button.btn.btn-primary#send-note(type="submit") Send

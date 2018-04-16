@@ -1,0 +1,93 @@
+-
+  var object = activity.object,
+      author = (activity.verb === "share") ? object.author : activity.actor;
+
+unless object.deleted
+  unless !headless && !author
+    li.media.activity.major(class=headless ? 'headless' : undefined, data-activity-id="#{activity.id}")
+      unless headless
+        a.pull-left(href="#{author.url}")
+          if author.image && author.image.url
+            img.img-rounded.media-object(src=(author.image.pump_io && author.image.pump_io.proxyURL) ? author.image.pump_io.proxyURL : author.image.url, width="64", height="64")
+          else
+            img.img-rounded.media-object(src="/images/default.png", width="64", height="64")
+      .media-body
+        if object.displayName
+          h4.media-heading!= object.displayName
+
+        p.muted
+          small
+            if activity.verb === "share" && author
+              a(href="#{author.url}")!= author.displayName
+              |  shared by 
+              a(href=activity.actor.url)= activity.actor.displayName
+              |  at 
+            a(href=object.url || activity.url)
+              abbr.easydate(title=activity.published)= activity.published
+            if activity.location
+              |  in 
+              a(href=activity.location.url)!= activity.location.displayName
+            if activity.generator && activity.generator.displayName
+              |  via 
+              if activity.generator.url
+                a(href=activity.generator.url)!= activity.generator.displayName
+              else
+                span!= activity.generator.displayName
+
+            if activity.to && activity.to.length > 0
+              |  To: 
+              - var objects = activity.to;
+              include ./activity-object-list.pug
+
+            if activity.cc && activity.cc.length > 0
+              |  CC: 
+              - var objects = activity.cc;
+              include ./activity-object-list.pug
+
+        if object.image && object.image.url
+          p
+            img.img-polaroid.object-image(src=(object.image.pump_io && object.image.pump_io.proxyURL) ? object.image.pump_io.proxyURL : object.image.url)
+
+        .activity-content!= object.content
+          if typeof object.content !== "undefined" && object.content.indexOf('www.youtube.com/watch?v=') != -1
+            - var yt = String(object.content.match(/www\.youtube\.com\/watch\?v=[a-zA-Z0-9_-]*/))
+          if yt
+            iframe(width="420", height="315", frameborder="0", src="//www.youtube.com/embed/" + yt.substring(yt.indexOf('?v=')+3, yt.length), allowfullscreen)
+            - yt = '';
+
+        if principal
+          - var obj = object;
+          include ./lib/responses.pug
+
+        //- List out who liked the post
+        if !object.likes || object.likes.totalItems === 0
+          //- Object has no likes so we don't show anything
+        else
+          - var coll = object.likes
+          p.muted
+            small
+              if object.likes.totalItems === 1 && principal && object.likes.items[0].url === principal.url
+                include ./lib/activity-object-collection.pug
+                |  like this.
+              else
+                include ./lib/activity-object-collection.pug
+                |  likes this.
+
+        //- List out who shared the post
+        if !object.shares || object.shares.totalItems === 0
+          //- Object has no shares so we don't show anything
+        else
+          - var coll = object.shares
+          if object.shares.totalItems === 1
+            p.muted
+              small
+                include ./lib/activity-object-collection.pug
+                |  shared this.
+          else
+            p.muted
+              small
+                include ./lib/activity-object-collection.pug
+                |  shared this.
+
+        - var replies = object.replies;
+        include ./replies.pug

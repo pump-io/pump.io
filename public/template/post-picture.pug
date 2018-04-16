@@ -1,0 +1,24 @@
+include ./lib/recipient-selector.pug
+
+.modal.pump-modal.hide.fade#modal-picture(tabindex="-1", role="dialog", aria-labelledby="post-label", aria-hidden="true")
+  .modal-header
+    button.close(type="button", data-dismiss="modal", aria-hidden="true") &times;
+    h3#post-label Post a picture
+
+  .modal-body
+    #picture-fineupload
+    form#post-picture(action="/main/upload", enctype="multipart/form-data")
+      fieldset
+        label(for="title") Title
+        input#picture-title(type="text", placeholder="(optional)", name="title")
+        label(for="description") Description
+        textarea.span5#picture-description(name="description", placeholder="Description (optional)", rows="3")
+
+        div
+          +recipient-selector("to", "picture-to", "To")
+
+        div
+          +recipient-selector("cc", "picture-cc", "CC")
+
+  .modal-footer
+    button.btn.btn-primary#send-picture(type="submit") Send
