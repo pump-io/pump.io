@@ -28,6 +28,7 @@
 
     var _socket = {
         reconnecting: false,
+        firstConnection: true,
         retryTimeout: 30000,
         retryAttempts: 0
     };
@@ -132,6 +133,7 @@
                 _socket.retryTimer = null;
             }
             _socket.reconnecting = false;
+            _socket.firstConnection = true;
             _socket.retryAttempts = 0;
         };
 
@@ -164,10 +166,16 @@
                 _socket.retryTimer = null;
             }
 
-            // No more attempts if all transports failed
-            if (error.code === 2000) {
-                Pump.error("Sorry! Your browser doesn't support realtime.");
-                Pump.debug(error);
+            // Let's make sure it's an error browser support or a connection problem
+            if (error.code === 2000 && _socket.retryAttempts > 10) {
+                // No more attempts if all transports failed
+                if (!_socket.error) {
+                    // Show alert only one time
+                    _socket.error = error;
+                    Pump.error(_socket.firstConnection ? "You seem to be offline! Realtime is disabled." :
+                               "Sorry! Your browser doesn't support realtime.");
+                    Pump.debug(error);
+                }
                 return;
             }
 
