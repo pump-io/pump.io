@@ -4,27 +4,34 @@ node_js:
   - "5"
   - "6"
   - "7"
+  # Note: docker-candidacy.sh chooses 8 as the version to run Docker builds.
+  # That's pretty arbitrary, but I had to pick something. When you remove this
+  # from the build matrix, be sure to adjust that script too.
   - "8"
   - "9"
 dist: trusty
 env:
   - CXX=g++-4.8
+secure: "khf25UB4YniTgo4Sdz7plwzm2dfIKKPgAeoV2kGFNiS+UjfbU/p/f1/iVNl0QDHpW8B9s3+no8JZdAzzFPIUJTCs7puOUkF3Sx8F/eO8/PBo4nfzfQm87UP1rVPhg+SrGmSI7xKXIx2UfMMjtamEDOoZlGfz7KkULGYnqmjH+jM="
 addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
-script: "(npm test || npm test) && sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root && npm run test:install'"
+services:
+  - docker
+script:
+  - "./util/docker-candidacy.sh && (npm test || npm test) && sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root && npm run test:install'"
 before_script:
   - "./test/hosts.sh"
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq graphicsmagick
-  - npm install -g npm@5
+  - ./util/docker-candidacy.sh && sudo apt-get update -qq
+  - ./util/docker-candidacy.sh && sudo apt-get install -qq graphicsmagick
+  - ./util/docker-candidacy.sh && npm install -g npm@5
 after_script:
   # We need sudo because the coverage data from as-root tests is root:root but not world-readable
-  - "sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:report-coverage'"
+  - "./util/docker-candidacy.sh && sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:report-coverage'"
 notifications:
   email: false
   webhooks:
