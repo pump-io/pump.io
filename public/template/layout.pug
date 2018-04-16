@@ -55,7 +55,7 @@ html(lang="en")
             b #{config.site} 
             | brought to you by 
             if config.ownerURL
-              a(href="#{config.ownerURL}") #{config.owner}
+              a(href=config.ownerURL) #{config.owner}
             else
               | #{config.owner}
             |. 
@@ -114,7 +114,6 @@ html(lang="en")
       script(src="/javascript/libs/jquery-spin.js")
       script(src="/javascript/libs/bootstrap-wysihtml5.js")
       script(src="/javascript/libs/bootstrap-lightbox.min.js")
-    //script(src="/shared/pug-runtime.js")
     script(src="/javascript/pump.js")
     script(src="/javascript/pump/auth.js")
     script(src="/javascript/pump/model.js")
@@ -123,7 +122,7 @@ html(lang="en")
     script(src="/javascript/pump/view.js")
 
     each script in config.scripts
-      script(src="#{script}")
+      script(src=script)
 
     script.
       /* @license magnet:?xt=urn:btih:8e4f440f4c65981c5bf93c76d35135ba5064d8b7&dn=apache-2.0.txt Apache-2.0 */

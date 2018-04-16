@@ -1,7 +1,7 @@
-.media.h-card#profile-block(data-profile-id="#{profile.id}")
+.media.h-card#profile-block(data-profile-id=profile.id)
   span.pull-left
     if profile.image && profile.image.url
-      img.img-rounded.media-object.u-photo(src="#{profile.image.url}", width="128", height="128")
+      img.img-rounded.media-object.u-photo(src=profile.image.url, width="128", height="128")
     else
       img.img-rounded.media-object.u-photo(src="/images/default.png", width="128", height="128")
   .media-body

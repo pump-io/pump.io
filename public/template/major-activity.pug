@@ -4,9 +4,9 @@
 
 unless object.deleted
   unless !headless && !author
-    li.media.activity.major(class=headless ? 'headless' : undefined, data-activity-id="#{activity.id}")
+    li.media.activity.major(class=headless ? 'headless' : undefined, data-activity-id=activity.id)
       unless headless
-        a.pull-left(href="#{author.url}")
+        a.pull-left(href=author.url)
           if author.image && author.image.url
             img.img-rounded.media-object(src=(author.image.pump_io && author.image.pump_io.proxyURL) ? author.image.pump_io.proxyURL : author.image.url, width="64", height="64")
           else
@@ -18,7 +18,7 @@ unless object.deleted
         p.muted
           small
             if activity.verb === "share" && author
-              a(href="#{author.url}")!= author.displayName
+              a(href=author.url)!= author.displayName
               |  shared by 
               a(href=activity.actor.url)= activity.actor.displayName
               |  at 

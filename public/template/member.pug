@@ -6,7 +6,7 @@ li.media.person.major.member(data-person-id=person.id)
       img.img-rounded.media-object(src="/images/default.png", width="64", height="64")
   .media-body
     if principal && principal.id === list.author.id
-      button.close#remove-person(type="button", data-title="Remove #{person.displayName} from #{list.displayName}") &times;
+      button.close#remove-person(type="button", data-title=`Remove ${person.displayName} from ${list.displayName}`) &times;
 
     h4.media-heading
       a(href=person.url)!= person.displayName

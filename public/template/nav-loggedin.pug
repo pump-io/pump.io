@@ -15,7 +15,7 @@
     li.dropdown#fat-menu
       a.dropdown-toggle#profile-dropdown(href="#", role="button", data-toggle="dropdown")
         if _(principal).has("image")
-          img.pull-left.img-rounded(src="#{principal.image.url}", width="24" height="24")
+          img.pull-left.img-rounded(src=principal.image.url, width="24" height="24")
         else
           img.pull-left.img-rounded(src="/images/default.png", width="24", height="24")
         | &nbsp;
@@ -24,15 +24,15 @@
 
       ul.dropdown-menu(role="menu", aria-labelledby="profile-dropdown")
         li
-          a(tabindex="-1", href="/#{principalUser.nickname}") Activity
+          a(tabindex="-1", href=`/${principalUser.nickname}`) Activity
         li
-          a(tabindex="-1", href="/#{principalUser.nickname}/favorites") Favorites
+          a(tabindex="-1", href=`/${principalUser.nickname}/favorites`) Favorites
         li
-          a(tabindex="-1", href="/#{principalUser.nickname}/followers") Followers
+          a(tabindex="-1", href=`/${principalUser.nickname}/followers`) Followers
         li
-          a(tabindex="-1", href="/#{principalUser.nickname}/following") Following
+          a(tabindex="-1", href=`/${principalUser.nickname}/following`) Following
         li
-          a(tabindex="-1", href="/#{principalUser.nickname}/lists") Lists
+          a(tabindex="-1", href=`/${principalUser.nickname}/lists`) Lists
         li.divider
         li
           a(tabindex="-1", href="/main/settings") Profile

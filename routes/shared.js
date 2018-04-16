@@ -35,8 +35,6 @@ var addRoutes = function(app, session) {
     app.get("/shared/showdown.js", sharedFile("showdown/src/showdown.js"));
     app.get("/shared/lodash.js", sharedFile("lodash/lodash.js"));
     app.get("/shared/lodash-min.js", sharedFile("lodash/lodash.min.js"));
-    // TODO serve a minified version of this
-    app.get("/shared/pug-runtime.js", sharedFile("pug-runtime/index.js"));
 };
 
 var sharedFile = function(fname) {
