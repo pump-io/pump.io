@@ -222,4 +222,63 @@ vows.describe("AS2 -> AS1 conversion")
             }
         }
     ))
+    .addBatch(convert(
+        {
+            "@context": "https://www.w3.org/ns/activitystreams",
+            "type": "Article",
+            "name": "What a Crazy Day I Had",
+            "content": "<div>... you will never believe ...</div>",
+            "mediaType": "text/html",
+            "attributedTo": "http://sally.example.org",
+            "attachment": {
+                "type": "Link",
+                "href": "http://sally.example.org/images/disaster.jpg",
+                "name": "This is a disaster",
+                "width": 640,
+                "height": 480,
+                "mediaType": "image/jpeg",
+                "preview": {
+                    "type": "Link",
+                    "href": "http://sally.example.org/thumbs/disaster.jpg",
+                    "width": 80,
+                    "height": 60,
+                    "mediaType": "image/jpeg"
+                }
+            }
+        },
+        {
+            "objectType": "article",
+            "displayName": "What a Crazy Day I Had",
+            "content": "<div>... you will never believe ...</div>",
+            "dc": {
+                "format": "text/html"
+            },
+            "author": {
+                "id": "http://sally.example.org",
+                "links": {
+                    "self": {"href": "http://sally.example.org"}
+                }
+            },
+            "attachments": [
+                {
+                    "url": "http://sally.example.org/images/disaster.jpg",
+                    "width": 640,
+                    "height": 480,
+                    "dc": {
+                        "format": "image/jpeg",
+                        "title": "This is a disaster"
+                    },
+                    "as2": {
+                        "preview": {
+                            "type": "Link",
+                            "href": "http://sally.example.org/thumbs/disaster.jpg",
+                            "width": 80,
+                            "height": 60,
+                            "mediaType": "image/jpeg"
+                        }
+                    }
+                }
+            ]
+        }
+    ))
     .export(module);
