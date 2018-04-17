@@ -147,4 +147,47 @@ vows.describe("AS2 -> AS1 conversion")
             }
         }
     ))
+    .addBatch(convert(
+        {
+            "@context": [
+                "https://www.w3.org/ns/activitystreams",
+                {"vcard": "http://www.w3.org/2006/vcard/ns#"}
+            ],
+            "type": "Person",
+            "name": "Donald Laycock",
+            "vcard:given-name": "Donald",
+            "vcard:family-name": "Laycock",
+            "id": "https://person.example/donald-laycock",
+            "summary": "An Australian linguist and anthropologist",
+            "inbox": "https://person.example/donald-laycock/inbox",
+            "outbox": "https://person.example/donald-laycock/outbox",
+            "followers": "https://person.example/donald-laycock/followers",
+            "following": "https://person.example/donald-laycock/following",
+            "liked": "https://person.example/donald-laycock/liked"
+        },
+        {
+            "objectType": "person",
+            "displayName": "Donald Laycock",
+            "vcard": {
+                "given-name": "Donald",
+                "family-name": "Laycock"
+            },
+            "id": "https://person.example/donald-laycock",
+            "summary": "An Australian linguist and anthropologist",
+            "links": {
+                "self": {"href": "https://person.example/donald-laycock"},
+                "activity-inbox": {"href": "https://person.example/donald-laycock/inbox"},
+                "activity-outbox": {"href": "https://person.example/donald-laycock/outbox"},
+            },
+            "followers": {
+                url: "https://person.example/donald-laycock/followers"
+            },
+            "following": {
+                url: "https://person.example/donald-laycock/following"
+            },
+            "favorites": {
+                url: "https://person.example/donald-laycock/liked"
+            }
+        }
+    ))
     .export(module);
