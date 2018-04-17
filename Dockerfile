@@ -1,4 +1,4 @@
-FROM alpine:3.5
+FROM alpine:3.7
 LABEL maintainer Jan Koppe <post@jankoppe.de>
 
 ARG PUMPIO__GUID=888
