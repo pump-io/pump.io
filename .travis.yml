@@ -22,7 +22,7 @@ services:
   - docker
 script:
   - if ./util/docker-candidacy.sh; then export DOCKER_CANDIDATE=true; else export DOCKER_CANDIDATE=false; fi
-  - if $DOCKER_CANDIDATE; then ./utils/build-docker.sh; fi
+  - if $DOCKER_CANDIDATE; then ./util/build-docker.sh; fi
   - if [ $TRAVIS_EVENT_TYPE = cron ]; then travis_terminate; fi
   - "(npm test || npm test) && sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root && npm run test:install'"
 before_script:
