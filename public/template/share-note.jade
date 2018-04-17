@@ -1,0 +1,16 @@
+include ./recipient-selector.jade
+
+- var default_to = principal.followers.url
+
+.modal.pump-modal.hide.fade#modal-share(tabindex="-1", role="dialog", aria-labelledby="share-label", aria-hidden="true")
+  .modal-header
+    button.close(type="button", data-dismiss="modal", aria-hidden="true") &times;
+    h3#post-label Share note from #{model.actor.displayName}
+
+  .modal-body
+    form.form-horizontal#share-note
+      fieldset
+        div
+          +recipient-selector("to", "share-to", "To", ("collection:" +  default_to))
+  .modal-footer
+    button.btn.btn-primary#send-share(type="submit") Share

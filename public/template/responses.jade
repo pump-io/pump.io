@@ -20,5 +20,11 @@
     a.unshare(href="#") Unshare 
       i.fa.fa-times
   else
-    a.share(href="#") Share 
-      i.fa.fa-share
+    .dropdown
+      a.share.dropdown-toggle#share-dropdown(href="#", role="button", data-toggle="dropdown") Share 
+        i.fa.fa-share
+      ul.share-menu.dropdown-menu(role="menu", aria-labelledby="share-dropdown")
+        li
+          a(tabindex="-1", href="#" data-share="now") Share now
+        li
+          a(tabindex="-1", href="#" data-share="to") Share to

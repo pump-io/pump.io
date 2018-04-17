@@ -1344,7 +1344,8 @@
             "mouseleave": "maybeHideExtraMenu",
             "click .favorite": "favoriteObject",
             "click .unfavorite": "unfavoriteObject",
-            "click .share": "shareObject",
+            "click .share-menu [data-share='now']": "shareObject",
+            "click .share-menu [data-share='to']": "shareObjectModal",
             "click .unshare": "unshareObject",
             "click .comment": "openComment",
             "click .object-image": "openImage"
@@ -1421,14 +1422,18 @@
                 }
             });
         },
-        shareObject: function() {
-            var view = this,
+        shareObject: function(event, act) {
+            var view = this;
+
+            event.preventDefault();
+            view.startSpin();
+
+            if (!act) {
                 act = new Pump.Activity({
                     verb: "share",
                     object: view.model.object.toJSON()
                 });
-
-            view.startSpin();
+            }
 
             Pump.newMajorActivity(act, function(err, act) {
                 if (err) {
@@ -1442,6 +1447,47 @@
                     Pump.addMajorActivity(act);
                 }
             });
+
+        },
+        shareObjectModal: function(event) {
+            var view = this,
+                model = view.model,
+                profile = Pump.principal,
+                lists = profile.lists;
+
+            event.preventDefault();
+            view.startSpin();
+
+            Pump.fetchObjects([lists], function(err, objs) {
+                view.stopSpin();
+
+                if (err) {
+                    view.showError(err);
+                } else {
+                    Pump.showModal(Pump.ShareNoteModal, {
+                        data: {
+                            user: Pump.principalUser,
+                            model: model,
+                            lists: lists
+                        },
+                        callback: function(err, to) {
+                            var act = new Pump.Activity({
+                                verb: "share",
+                                object: view.model.object.toJSON()
+                            });
+
+                            if (_.isString(to)) {
+                                to = to.split(",");
+                            }
+                            if (to && to.length > 0) {
+                                act.to = new Pump.ActivityObjectBag(_.map(to, Pump.strToObj));
+                            }
+                            view.shareObject(event, act);
+                        }
+                    });
+                }
+            });
+            return false;
         },
         unshareObject: function() {
             var view = this,
@@ -2758,16 +2804,7 @@
                         objectType: "note",
                         content: text
                     }
-                }),
-                strToObj = function(str) {
-                    var colon = str.indexOf(":"),
-                        type = str.substr(0, colon),
-                        id = str.substr(colon+1);
-                    return new Pump.ActivityObject({
-                        id: id,
-                        objectType: type
-                    });
-                };
+                });
 
             if (_.isString(to)) {
                 to = to.split(",");
@@ -2778,11 +2815,11 @@
             }
 
             if (to && to.length > 0) {
-                act.to = new Pump.ActivityObjectBag(_.map(to, strToObj));
+                act.to = new Pump.ActivityObjectBag(_.map(to, Pump.strToObj));
             }
 
             if (cc && cc.length > 0) {
-                act.cc = new Pump.ActivityObjectBag(_.map(cc, strToObj));
+                act.cc = new Pump.ActivityObjectBag(_.map(cc, Pump.strToObj));
             }
 
             view.startSpin();
@@ -2803,7 +2840,32 @@
         }
     });
 
+    Pump.ShareNoteModal = Pump.TemplateView.extend({
+
+        tagName: "div",
+        className: "modal-holder",
+        templateName: "share-note",
+        parts: ["recipient-selector"],
+        ready: function() {
+            var view = this;
+            view.$("#share-to").select2(Pump.selectOpts());
+        },
+        events: {
+            "click #send-share": "shareNote"
+        },
+        shareNote: function(ev) {
+            var view = this,
+                callback = view.options.callback,
+                to = view.$("#share-to").val();
+
+            view.$el.modal("hide");
+            view.remove();
+            callback(null, to);
+        }
+    });
+
     Pump.PostPictureModal = Pump.TemplateView.extend({
+
         tagName: "div",
         className: "modal-holder",
         templateName: "post-picture",
@@ -2850,15 +2912,6 @@
                     var stream = Pump.principalUser.majorStream,
                         to = view.$("#post-picture #picture-to").val(),
                         cc = view.$("#post-picture #picture-cc").val(),
-                        strToObj = function(str) {
-                            var colon = str.indexOf(":"),
-                                type = str.substr(0, colon),
-                                id = str.substr(colon+1);
-                            return Pump.ActivityObject.unique({
-                                id: id,
-                                objectType: type
-                            });
-                        },
                         act = new Pump.Activity({
                             verb: "post",
                             object: responseJSON.obj
@@ -2873,11 +2926,11 @@
                     }
 
                     if (to && to.length > 0) {
-                        act.to = new Pump.ActivityObjectBag(_.map(to, strToObj));
+                        act.to = new Pump.ActivityObjectBag(_.map(to, Pump.strToObj));
                     }
 
                     if (cc && cc.length > 0) {
-                        act.cc = new Pump.ActivityObjectBag(_.map(cc, strToObj));
+                        act.cc = new Pump.ActivityObjectBag(_.map(cc, Pump.strToObj));
                     }
 
                     Pump.newMajorActivity(act, function(err, act) {
@@ -3279,17 +3332,8 @@
             minimumInputLength: 2,
             initSelection: function(element, callback) {
                 var val = element.val(),
-                    strToObj = function(str) {
-                        var colon = str.indexOf(":"),
-                            type = str.substr(0, colon),
-                            id = str.substr(colon+1);
-                        return new Pump.ActivityObject({
-                            id: id,
-                            objectType: type
-                        });
-                    },
                     selection = [],
-                    obj = (val && val.length > 0) ? strToObj(val) : null;
+                    obj = (val && val.length > 0) ? Pump.strToObj(val) : null;
 
                 if (obj) {
                     if (obj.id == "http://activityschema.org/collection/public") {
