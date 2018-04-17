@@ -114,6 +114,28 @@ body {
   margin-right: 20px;
 }
 
+.verb-share .activity-body {
+  padding: 20px 10px 20px 15px;
+  border: 1px dotted #eee;
+  background: #fafafa;
+}
+
+.verb-share .activity-body > a.pull-left {
+  padding: 0 10px 10px 0;
+  margin: 0;
+}
+
+.verb-share .activity-heading {
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
+.verb-share .activity-content,
+.verb-share .activity-heading,
+.verb-share .activity-body .muted {
+  margin-left: 55px;
+}
+
 .activity-content p:last-child {
   margin-bottom: 0;
 }
@@ -304,7 +326,18 @@ body {
   #major-stream a.pull-left, #minor-stream a.pull-left {
     float: left;
   }
+  .major > .media-body {
+    margin-right: 0;
+  }
   #major-stream .media-body {
     display: inline;
+  }
+  .verb-share .activity-body {
+    margin-top: 40px;
+  }
+  .verb-share .activity-content,
+  .verb-share .activity-heading,
+  .verb-share > .muted {
+    margin-left: 0;
   }
 }
