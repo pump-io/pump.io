@@ -11,7 +11,7 @@ if git describe --exact-match >/dev/null &>/dev/null; then
 	exit 0
 fi
 
-BRANCH=$(git symbolic-ref --short HEAD)
+BRANCH=$TRAVIS_BRANCH
 
 if [ $BRANCH = master ]; then
 	echo alpha
