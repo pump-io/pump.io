@@ -33,8 +33,9 @@ before_install:
   - sudo apt-get install -qq graphicsmagick
   - npm install -g npm@5
 after_script:
-  # We need sudo because the coverage data from as-root tests is root:root but not world-readable
-  - "sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:report-coverage'"
+  # The coverage data from as-root tests is root:root but not world-readable
+  - sudo chown -R $(whoami) coverage
+  - npm run test:report-coverage
 notifications:
   email: false
   webhooks:
