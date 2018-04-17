@@ -177,7 +177,7 @@ vows.describe("AS2 -> AS1 conversion")
             "links": {
                 "self": {"href": "https://person.example/donald-laycock"},
                 "activity-inbox": {"href": "https://person.example/donald-laycock/inbox"},
-                "activity-outbox": {"href": "https://person.example/donald-laycock/outbox"},
+                "activity-outbox": {"href": "https://person.example/donald-laycock/outbox"}
             },
             "followers": {
                 url: "https://person.example/donald-laycock/followers"
