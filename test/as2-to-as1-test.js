@@ -190,4 +190,36 @@ vows.describe("AS2 -> AS1 conversion")
             }
         }
     ))
+    .addBatch(convert(
+        {
+            "@context": "https://www.w3.org/ns/activitystreams",
+            "type": "Service",
+            "nameMap": {
+                en: "Social Network",
+                fr: "Réseau social"
+            },
+            "id": "http://social.example/",
+            "attributedTo": {
+                "type": "Organization",
+                "name": "Giant Co",
+                "id": "https://giant.example"
+            }
+        },
+        {
+            "objectType": "service",
+            "displayName": "Social Network",
+            "id": "http://social.example/",
+            "links": {
+                "self": {"href": "http://social.example/"}
+            },
+            "author": {
+                "objectType": "organization",
+                "displayName": "Giant Co",
+                "id": "https://giant.example",
+                "links": {
+                    "self": {"href": "https://giant.example"}
+                }
+            }
+        }
+    ))
     .export(module);
