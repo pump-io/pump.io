@@ -21,16 +21,20 @@ addons:
 services:
   - docker
 script:
-  - "./util/docker-candidacy.sh && (npm test || npm test) && sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root && npm run test:install'"
+  - if ./util/docker-candidacy.sh; then export DOCKER_CANDIDATE=true; else export DOCKER_CANDIDATE=false; fi
+  - if $DOCKER_CANDIDATE; then ./utils/build-docker.sh; fi
+  # We don't use build-docker && travis_terminate or anything like that because then a failure in build-docker.sh wouldn't fail the build
+  - if $DOCKER_CANDIDATE; then travis_terminate; fi
+  - "(npm test || npm test) && sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root && npm run test:install'"
 before_script:
   - "./test/hosts.sh"
 before_install:
-  - ./util/docker-candidacy.sh && sudo apt-get update -qq
-  - ./util/docker-candidacy.sh && sudo apt-get install -qq graphicsmagick
-  - ./util/docker-candidacy.sh && npm install -g npm@5
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq graphicsmagick
+  - npm install -g npm@5
 after_script:
   # We need sudo because the coverage data from as-root tests is root:root but not world-readable
-  - "./util/docker-candidacy.sh && sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:report-coverage'"
+  - "sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:report-coverage'"
 notifications:
   email: false
   webhooks:
