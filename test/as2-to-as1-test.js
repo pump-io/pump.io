@@ -322,4 +322,30 @@ vows.describe("AS2 -> AS1 conversion")
             "url": "http://example.org/podcast/episode.html"
         }
     ))
+    .addBatch(convert(
+        {
+            "@context": "https://www.w3.org/ns/activitystreams",
+            "type": "Document",
+            "name": "4Q Sales Forecast",
+            "url": [
+                {
+                    "type": "Link",
+                    "href": "http://example.org/4q-sales-forecast.pdf",
+                    "mediaType": "application/pdf"
+                },
+                {
+                    "type": "Link",
+                    "href": "http://example.org/4q-sales-forecast.html",
+                    "mediaType": "text/html"
+                }
+            ]
+        },
+        {
+            "objectType": "file",
+            "displayName": "4Q Sales Forecast",
+            "fileUrl": "http://example.org/4q-sales-forecast.pdf",
+            "mimeType": "application/pdf",
+            "url": "http://example.org/4q-sales-forecast.html"
+        }
+    ))
     .export(module);
