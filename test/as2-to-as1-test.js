@@ -281,4 +281,45 @@ vows.describe("AS2 -> AS1 conversion")
             ]
         }
     ))
+    .addBatch(convert(
+        {
+            "@context": "https://www.w3.org/ns/activitystreams",
+            "type": "Audio",
+            "name": "Interview With A Famous Technologist",
+            "url": [
+                {
+                    "type": "Link",
+                    "href": "http://example.org/podcast/episode.mp3",
+                    "mediaType": "audio/mp3"
+                },
+                {
+                    "type": "Link",
+                    "href": "http://example.org/podcast/episode.html",
+                    "mediaType": "text/html"
+                },
+                {
+                    "type": "Link",
+                    "href": "http://example.org/podcast/episode.atom",
+                    "mediaType": "application/atom+xml"
+                }
+            ]
+        },
+        {
+            "objectType": "audio",
+            "displayName": "Interview With A Famous Technologist",
+            "links": {
+                "alternate": {
+                    "href": "http://example.org/podcast/episode.atom",
+                    "type": "application/atom+xml"
+                }
+            },
+            "stream": {
+                "url": "http://example.org/podcast/episode.mp3",
+                "dc": {
+                    "format": "audio/mp3"
+                }
+            },
+            "url": "http://example.org/podcast/episode.html"
+        }
+    ))
     .export(module);
