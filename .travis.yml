@@ -12,7 +12,6 @@ node_js:
 dist: trusty
 env:
   - CXX=g++-4.8
-secure: "khf25UB4YniTgo4Sdz7plwzm2dfIKKPgAeoV2kGFNiS+UjfbU/p/f1/iVNl0QDHpW8B9s3+no8JZdAzzFPIUJTCs7puOUkF3Sx8F/eO8/PBo4nfzfQm87UP1rVPhg+SrGmSI7xKXIx2UfMMjtamEDOoZlGfz7KkULGYnqmjH+jM="
 addons:
   apt:
     sources:
