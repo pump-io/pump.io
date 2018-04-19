@@ -363,4 +363,35 @@ vows.describe("AS2 -> AS1 conversion")
             "endTime": "2015-01-01T14:00:00.000Z"
         }
     ))
+    .addBatch(convert(
+        {
+            "@context": "https://www.w3.org/ns/activitystreams",
+            "type": "Image",
+            "name": "Cat Jumping on Wagon",
+            "url": [
+                {
+                    "type": "Link",
+                    "href": "http://example.org/image.jpeg",
+                    "mediaType": "image/jpeg"
+                },
+                {
+                    "type": "Link",
+                    "href": "http://example.org/image.png",
+                    "mediaType": "image/png"
+                }
+            ]
+        },
+        {
+            "objectType": "image",
+            "displayName": "Cat Jumping on Wagon",
+            "fileUrl": "http://example.org/image.jpeg",
+            "mimeType": "image/jpeg",
+            "links": {
+                "alternate": {
+                    "href": "http://example.org/image.png",
+                    "type": "image/png"
+                }
+            }
+        }
+    ))
     .export(module);
