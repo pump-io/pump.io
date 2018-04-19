@@ -348,4 +348,19 @@ vows.describe("AS2 -> AS1 conversion")
             "url": "http://example.org/4q-sales-forecast.html"
         }
     ))
+    .addBatch(convert(
+        {
+            "@context": "https://www.w3.org/ns/activitystreams",
+            "type": "Event",
+            "name": "Going-Away Party for Jim",
+            "startTime": "2014-12-31T23:00:00-08:00",
+            "endTime": "2015-01-01T06:00:00-08:00"
+        },
+        {
+            "objectType": "event",
+            "displayName": "Going-Away Party for Jim",
+            "startTime": "2015-01-01T07:00:00.000Z",
+            "endTime": "2015-01-01T14:00:00.000Z"
+        }
+    ))
     .export(module);
