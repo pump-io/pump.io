@@ -14,7 +14,7 @@ RUN apk add --no-cache graphicsmagick openssl nodejs python make g++ git \
      && npm install \
      && npm run build \
      && cd node_modules/databank \
-     && npm install databank-mongodb@0.19.2 \
+     && npm install databank-mongodb@1 \
      && addgroup -S -g "${PUMPIO__GUID}" "pumpio" \
      && adduser -S -D -H -G "pumpio" -h "${PUMP_LOCATION}" -u "${PUMPIO__UID}" "pumpio" \
      && mkdir -p /usr/local/bin "${PUMP_DATADIR}" \
