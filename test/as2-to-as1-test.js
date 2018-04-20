@@ -394,4 +394,45 @@ vows.describe("AS2 -> AS1 conversion")
             }
         }
     ))
+    .addBatch(convert(
+        {
+            "@context": "https://www.w3.org/ns/activitystreams",
+            "summary": "A simple note",
+            "type": "Note",
+            "id": "http://www.test.example/notes/1",
+            "content": "I am fine.",
+            "replies": {
+                "type": "Collection",
+                "totalItems": 1,
+                "items": [
+                    {
+                        "summary": "A response to the note",
+                        "type": "Note",
+                        "content": "I am glad to hear it.",
+                        "inReplyTo": "http://www.test.example/notes/1"
+                    }
+                ]
+            }
+        },
+        {
+            "summary": "A simple note",
+            "objectType": "note",
+            "id": "http://www.test.example/notes/1",
+            "content": "I am fine.",
+            "links": {
+                "self": {"href": "http://www.test.example/notes/1"}
+            },
+            "replies": {
+                "totalItems": 1,
+                "items": [
+                    {
+                        "summary": "A response to the note",
+                        "objectType": "note",
+                        "content": "I am glad to hear it.",
+                        "inReplyTo": "http://www.test.example/notes/1"
+                    }
+                ]
+            }
+        }
+    ))
     .export(module);
