@@ -4,7 +4,7 @@ LABEL maintainer Jan Koppe <post@jankoppe.de>
 ARG PUMPIO__GUID=888
 ARG PUMPIO__UID=888
 
-ENV PUMP_LOCATION="/usr/local/lib/pumpio"
+ENV PUMP_LOCATION="/opt/pumpio"
 ENV PUMP_DATADIR="/var/local/pump.io"
 
 COPY . "${PUMP_LOCATION}"
