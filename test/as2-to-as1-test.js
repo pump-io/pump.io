@@ -443,4 +443,29 @@ vows.describe("AS2 -> AS1 conversion")
             "url": "http://example.org/weather-in-omaha.html"
         }
     ))
+    .addBatch(convert(
+        {
+            "@context": "https://www.w3.org/ns/activitystreams",
+            "type": "Place",
+            "name": "Fresno Area",
+            "latitude": 36.75,
+            "longitude": 119.7667,
+            "radius": 80000,
+            "altitude": 300,
+            "units": "feet"
+        },
+        {
+            "objectType": "place",
+            "displayName": "Fresno Area",
+            "position": {
+                "latitude": 36.75,
+                "longitude": 119.7667,
+                "altitude": 91.44
+            },
+            "as2": {
+                "radius": 80000,
+                "units": "feet"
+            }
+        }
+    ))
     .export(module);
