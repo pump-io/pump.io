@@ -253,12 +253,7 @@ vows.describe("AS2 -> AS1 conversion")
             "dc": {
                 "format": "text/html"
             },
-            "author": {
-                "id": "http://sally.example.org",
-                "links": {
-                    "self": {"href": "http://sally.example.org"}
-                }
-            },
+            "author": "http://sally.example.org",
             "attachments": [
                 {
                     "url": "http://sally.example.org/images/disaster.jpg",
