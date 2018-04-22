@@ -430,4 +430,17 @@ vows.describe("AS2 -> AS1 conversion")
             }
         }
     ))
+    .addBatch(convert(
+        {
+            "@context": "https://www.w3.org/ns/activitystreams",
+            "type": "Page",
+            "name": "Omaha Weather Report",
+            "url": "http://example.org/weather-in-omaha.html"
+        },
+        {
+            "objectType": "page",
+            "displayName": "Omaha Weather Report",
+            "url": "http://example.org/weather-in-omaha.html"
+        }
+    ))
     .export(module);
