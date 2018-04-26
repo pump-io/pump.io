@@ -26,6 +26,8 @@ RUN apk add --no-cache graphicsmagick openssl nodejs python make g++ git \
      && rm -rf ~/.npm \
      && apk del --purge python make g++ git libc-utils
 
+VOLUME "${PUMP_DATADIR}"
+
 WORKDIR "${PUMP_LOCATION}"
 EXPOSE 80
 USER pumpio
