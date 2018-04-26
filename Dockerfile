@@ -7,6 +7,7 @@ ARG PUMPIO__UID=888
 ENV PUMP_LOCATION="/opt/pumpio"
 ENV PUMP_DATADIR="/var/local/pump.io"
 ENV PUMP_LOGFILE="/dev/stdout"
+ENV PUMP_PORT="80"
 
 COPY . "${PUMP_LOCATION}"
 
@@ -26,6 +27,6 @@ RUN apk add --no-cache graphicsmagick openssl nodejs python make g++ git \
      && apk del --purge python make g++ git libc-utils
 
 WORKDIR "${PUMP_LOCATION}"
-EXPOSE 31337
+EXPOSE 80
 USER pumpio
 CMD ["pump"]
