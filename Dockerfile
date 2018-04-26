@@ -6,6 +6,7 @@ ARG PUMPIO__UID=888
 
 ENV PUMP_LOCATION="/opt/pumpio"
 ENV PUMP_DATADIR="/var/local/pump.io"
+ENV PUMP_LOGFILE="/dev/stdout"
 
 COPY . "${PUMP_LOCATION}"
 
