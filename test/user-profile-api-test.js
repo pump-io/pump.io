@@ -160,6 +160,34 @@ suite.addBatch({
                         assert.equal(profile.summary, "007");
                     }
                 }
+            },
+            "and we GET the user profile data as ActivityStreams 2.0": {
+                topic: function(pair, cl) {
+                    var cb = this.callback,
+                        user = pair.user;
+
+                    Step(
+                        function() {
+                            httputil.getJSON("http://localhost:4815/api/user/jamesbond/profile",
+                                             makeCred(cl, pair),
+                                             {"Accept": "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\""},
+                                             this);
+                        },
+                        function(err, results) {
+                            if (err) {
+                                cb(err, null);
+                            } else {
+                                cb(null, results);
+                            }
+                        }
+                    );
+                },
+                "it works": function(err, profile) {
+                    assert.ifError(err);
+                    assert.isObject(profile);
+                    assert.include(profile, "type");
+                    assert.equal(profile.type, "Person");
+                }
             }
         }
     }

@@ -145,7 +145,6 @@ suite.addBatch(
                             assert.isObject(note);
                         },
                         "results look right": function(err, note, act) {
-                            assert.ifError(err);
                             assert.isObject(note);
                             assert.include(note, "id");
                             assert.isString(note.id);
@@ -163,7 +162,6 @@ suite.addBatch(
                             assert.isString(note.author.objectType);
                         },
                         "results don't leak private members": function(err, note, act) {
-                            assert.ifError(err);
                             assert.isObject(note);
                             assert.isFalse(_.has(note, "_uuid"));
                         },
@@ -176,6 +174,44 @@ suite.addBatch(
                             assert.equal(note.author.id, act.actor.id);
                             assert.equal(note.author.displayName, act.actor.displayName);
                             assert.equal(note.author.objectType, act.actor.objectType);
+                        }
+                    },
+                    "and we fetch the posted note as ActivityStreams 2.0": {
+                        topic: function(act, user, cl) {
+                            var cb = this.callback,
+                                pair = pairOf(user),
+                                cred = makeCred(cl, pair);
+                            // ID === JSON representation URL
+                            httputil.getJSON(act.object.id, cred, {"Accept": "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\""}, function(err, note) {
+                                cb(err, note, act);
+                            });
+                        },
+                        "it works": function(err, note, act) {
+                            assert.ifError(err);
+                            assert.isObject(note);
+                        },
+                        "the result was converted to AS2": function(err, note, act) {
+                            assert.isObject(note);
+                            assert.include(note, "id");
+                            assert.isString(note.id);
+                        },
+                        "the author was converted to AS2": function(err, note, act) {
+                            assert.include(note, "attributedTo");
+                            assert.isObject(note.attributedTo);
+                            assert.include(note.attributedTo, "id");
+                            assert.equal(note.attributedTo.id, "http://localhost:4815/frodo");
+                            assert.equal(note.attributedTo.type, "Person");
+                        },
+                        "results don't leak private members": function(err, note, act) {
+                            assert.isObject(note);
+                            assert.isFalse(_.has(note, "_uuid"));
+                        },
+                        "results are what we posted": function(err, note, act) {
+                            assert.equal(note.content, "I'm so scared!");
+                            assert.equal(note.type, "Note");
+                            assert.equal(note.id, act.object.id);
+                            assert.equal(Date.parse(note.published), Date.parse(act.object.published));
+                            assert.equal(Date.parse(note.updated), Date.parse(act.object.updated));
                         }
                     }
                 }
@@ -361,7 +397,6 @@ suite.addBatch(
                         assert.ifError(err);
                     },
                     "it has the updated content": function(err, obj) {
-                        assert.ifError(err);
                         assert.isObject(obj);
                         assert.include(obj, "content");
                         assert.isString(obj.content);
@@ -380,7 +415,6 @@ suite.addBatch(
                         assert.ifError(err);
                     },
                     "it has the update activity": function(err, feed) {
-                        assert.ifError(err);
                         assert.isObject(feed);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);
@@ -465,7 +499,6 @@ suite.addBatch(
                         assert.ifError(err);
                     },
                     "it has the delete activity": function(err, feed) {
-                        assert.ifError(err);
                         assert.isObject(feed);
                         assert.include(feed, "items");
                         assert.isArray(feed.items);

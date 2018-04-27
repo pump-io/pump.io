@@ -42,6 +42,17 @@
         {
             "nickname": "configuser3",
             "password": "3resugifnoc"
+        },
+        {
+            "nickname": "configuser4",
+            "password": "4resugifnoc",
+            "tokens": [
+                {
+                    "token": "UNITTESTBEARERTOKEN4",
+                    "client_id": "UNITTESTCLIENTID",
+                    "scope": "writeall"
+                }
+            ]
         }
     ]
 }
