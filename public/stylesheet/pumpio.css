@@ -114,6 +114,10 @@ body {
   margin-right: 20px;
 }
 
+.activity-content {
+  word-wrap: break-word;
+}
+
 .activity-content p:last-child {
   margin-bottom: 0;
 }

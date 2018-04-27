@@ -4,6 +4,9 @@ node_js:
   - "5"
   - "6"
   - "7"
+  # Note: docker-candidacy.sh chooses 8 as the version to run Docker builds.
+  # That's pretty arbitrary, but I had to pick something. When you remove this
+  # from the build matrix, be sure to adjust that script too.
   - "8"
   - "9"
 dist: trusty
@@ -15,7 +18,13 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
-script: "(npm test || npm test) && npm run test:install && sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root'"
+services:
+  - docker
+script:
+  - if ./util/docker-candidacy.sh; then export DOCKER_CANDIDATE=true; else export DOCKER_CANDIDATE=false; fi
+  - if $DOCKER_CANDIDATE; then ./util/build-docker.sh; fi
+  - if [ $TRAVIS_EVENT_TYPE = cron ]; then travis_terminate; fi
+  - "(npm test || npm test) && npm run test:install && sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root'"
 before_script:
   - "./test/hosts.sh"
 before_install:
@@ -23,8 +32,9 @@ before_install:
   - sudo apt-get install -qq graphicsmagick
   - npm install -g npm@5
 after_script:
-  # We need sudo because the coverage data from as-root tests is root:root but not world-readable
-  - "sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:report-coverage'"
+  # The coverage data from as-root tests is root:root but not world-readable
+  - sudo chown -R $(whoami) coverage
+  - npm run test:report-coverage
 notifications:
   email: false
   webhooks:
