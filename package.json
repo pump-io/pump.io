@@ -131,7 +131,6 @@
   },
   "greenkeeper": {
     "ignore": [
-      "databank",
       "zombie"
     ]
   }
