@@ -45,7 +45,7 @@
     "import-fresh": "^2.0.0",
     "jade": "^1.11.0",
     "jankyqueue": "0.1.x",
-    "jsdom": "^10.1.0",
+    "jsdom": "^11.10.0",
     "lodash": "^4.17.4",
     "method-override": "^2.3.6",
     "mkdirp": "0.5.x",
@@ -132,7 +132,6 @@
   "greenkeeper": {
     "ignore": [
       "databank",
-      "jsdom",
       "zombie"
     ]
   }
