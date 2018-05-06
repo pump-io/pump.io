@@ -29,11 +29,15 @@ If you think something that isn't in the first list should be covered, file an i
 
 ## 5.1.0 - 2018-01-05
 
+This will be the last release line to support Node.js 4, 5 and 7.
+
 ### Changed
 
 * Bump `gm` version out of caution to pull in a fully security-patched `debug`
 
 ## 5.1.0 beta 0 - 2017-12-08
+
+This will be the last release line to support Node.js 4, 5 and 7.
 
 ### Improved
 
