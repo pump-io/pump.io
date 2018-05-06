@@ -6,6 +6,7 @@ node_js:
   # from the build matrix, be sure to adjust that script too.
   - "8"
   - "9"
+  - "10"
 dist: trusty
 env:
   - CXX=g++-4.8
