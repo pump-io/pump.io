@@ -2,7 +2,7 @@
   "name": "pump.io",
   "preferGlobal": "true",
   "homepage": "http://pump.io/",
-  "version": "5.1.0-alpha.0",
+  "version": "6.0.0-alpha.0",
   "author": "Evan Prodromou <evan@e14n.com>",
   "description": "Social server with an ActivityStreams API",
   "devDependencies": {
