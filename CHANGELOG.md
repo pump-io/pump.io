@@ -17,7 +17,9 @@ Changes to everything else are not considered breaking, although we may delay th
 
 If you think something that isn't in the first list should be covered, file an issue and we'll either state we consider that semver-major or give a rationale as to why it isn't. Please also feel free to ask questions in the issue tracker; this list could surely be more precise.
 
-## 5.1.1 - future
+## 5.1.1 - 2018-05-05
+
+This will be the last release line to support Node.js 4, 5 and 7.
 
 ### Improved
 
