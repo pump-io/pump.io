@@ -3,7 +3,7 @@
 This is pump.io. It's a stream server that does most of what people
 really want from a social network.
 
-[![Build Status](https://travis-ci.org/pump-io/pump.io.svg?branch=master)](http://travis-ci.org/pump-io/pump.io)
+[![Build Status](https://travis-ci.org/pump-io/pump.io.svg?branch=master)](https://travis-ci.org/pump-io/pump.io)
 [![Coverage Status](https://coveralls.io/repos/github/pump-io/pump.io/badge.svg?branch=master)](https://coveralls.io/github/pump-io/pump.io?branch=master)
 [![npm](https://img.shields.io/npm/v/pump.io.svg)](https://npmjs.com/package/pump.io)
 [![NSP Status](https://nodesecurity.io/orgs/pumpio/projects/32213bb8-f9a6-4dd0-8fc6-5caa8ea5f8fc/badge)](https://nodesecurity.io/orgs/pumpio/projects/32213bb8-f9a6-4dd0-8fc6-5caa8ea5f8fc)
