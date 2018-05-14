@@ -101,6 +101,12 @@ suite.addBatch({
                 assert.equal(user.profile.id, "http://localhost:4815/api/user/jamesbond/profile");
             },
 
+            "the email address is not included": function(err, pair) {
+                var user = pair.user;
+                assert.notInclude(user, "email");
+                assert.notInclude(user, "email_pending");
+            },
+
             "and we get the options on the user profile api endpoint":
             httputil.endpoint("/api/user/jamesbond/profile", ["GET", "PUT"]),
 

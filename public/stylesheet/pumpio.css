@@ -8,7 +8,10 @@ body {
   color: black;
 }
 
-.fa-envelope, .fa-exclamation-circle {
+
+.btn-primary .fa, .btn-info .fa,
+.btn-success .fa, .btn-warning .fa,
+.btn-danger .fa, .btn-danger .fa {
   color: white;
 }
 
@@ -83,6 +86,39 @@ body {
 
 .modal-body {
   max-height: 510px;
+}
+
+/* list-group */
+.list-group {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  padding-left: 0;
+  margin-top: 0;
+  margin-left: 0;
+  margin-bottom: 1rem;
+  max-width: 570px;
+}
+
+.list-group-item:first-child {
+  border-top-left-radius: .25rem;
+  border-top-right-radius: .25rem;
+}
+
+.list-group-item {
+  position: relative;
+  display: block;
+  padding: .75rem 1.25rem;
+  margin-bottom: -1px;
+  background-color: #fff;
+  border: 1px solid #fefefe;
+  border: 1px solid rgba(0,0,0,.125);
+}
+
+.list-group-item span,
+.list-group-item .btn {
+  margin-left: 10px;
 }
 
 /* media */

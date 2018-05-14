@@ -65,7 +65,9 @@ var confirm = function(req, res, next) {
                 throw new HTTPError("This is someone else's confirmation.", 400);
             }
             user.email = confirm.email;
+            delete user.email_pending;
             user.save(this.parallel());
+
             confirm.confirmed = true;
             confirm.save(this.parallel());
         },

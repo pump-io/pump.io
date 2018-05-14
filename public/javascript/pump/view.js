@@ -770,8 +770,13 @@
                     }
                     // XXX: reload current data
                     view.stopSpin();
-                    Pump.router.navigate(continueTo, true);
-                    Pump.clearContinueTo();
+                    if (Pump.config.requireEmail && !data.email) {
+                        // Redirect to account settings when not has a email confirmed yet
+                        Pump.router.navigate("/main/account", true);
+                    } else {
+                        Pump.router.navigate(continueTo, true);
+                        Pump.clearContinueTo();
+                    }
                 },
                 onError = function(jqXHR, textStatus, errorThrown) {
                     var type, response;
@@ -2456,13 +2461,21 @@
         templateName: "account",
         modelName: "user",
         events: {
-            "submit #account": "saveAccount"
+            "submit #account-password": "changePassword",
+            "submit #account-email": "changeEmail",
+            "click #email-resend": "resendEmail"
         },
-        saveAccount: function() {
+        changePassword: function(event) {
             var view = this,
                 user = Pump.principalUser,
                 password = view.$("#password").val(),
                 repeat = view.$("#repeat").val();
+
+            // Prevent ghost clicks
+
+            event.preventDefault();
+
+            // Password validation
 
             if (password !== repeat) {
 
@@ -2481,21 +2494,78 @@
 
                 view.startSpin();
 
-                user.save("password",
-                          password,
-                          {
-                              success: function(resp, status, xhr) {
-                                  view.showSuccess("Saved.");
-                                  view.stopSpin();
-                              },
-                              error: function(model, error, options) {
-                                  view.showError(error.message);
-                                  view.stopSpin();
-                              }
-                          }
-                         );
+                user.save("password", password, {
+                    success: function(resp, status, xhr) {
+                        view.showSuccess("Changed password successful.");
+                        view.stopSpin();
+                    },
+                    error: function(model, error, options) {
+                        view.showError(error);
+                        view.stopSpin();
+                    }
+                });
             }
 
+            return false;
+        },
+        changeEmail: function(event, resend) {
+            var view = this,
+                user = Pump.principalUser,
+                userData = user.toJSON(),
+                email = resend ? userData.email_pending : view.$("#email").val();
+
+            // Prevent ghost clicks
+
+            event.preventDefault();
+
+            // Validation
+
+            if (!email || email.length === 0) {
+
+                view.showError("Email input look empty.");
+                return false;
+
+            } else if (!resend &&
+                       (email === userData.email ||
+                        email === userData.email_pending)) {
+
+                view.showAlert("The email looks like the same.");
+                return false;
+
+            }
+
+            email = email.toLowerCase();
+            userData.email = email;
+
+            if (userData.email_pending) {
+                delete userData.email_pending;
+            }
+
+            view.startSpin();
+
+            user.save("email_pending", email, {
+                // Overwrites the data to be sent in order not to modify
+                // the model before email is confirmed
+
+                contentType: "application/json",
+                data: JSON.stringify(userData),
+                success: function(resp, status, xhr) {
+                    view.showSuccess("Instructions for confirm email change has been sent to " +
+                                     email + ". Check your inbox and spam filter.");
+                    view.stopSpin();
+                },
+                error: function(model, error, options) {
+                    view.showError(error);
+                    view.stopSpin();
+                }
+            });
+
+            return false;
+        },
+        resendEmail: function(event) {
+            event.preventDefault();
+
+            this.changeEmail(event, true);
             return false;
         }
     });

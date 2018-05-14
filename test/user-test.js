@@ -247,6 +247,21 @@ suite.addBatch({
                     assert.isNull(found);
                 }
             },
+            "and we update the email user": {
+                topic: function(user, User) {
+                    user.update({
+                        nickname: user.nickname,
+                        email: "tomemail@pump.io"
+                    }, this.callback);
+                },
+                "it has email pending": function(err, user) {
+                    assert.ifError(err);
+                    assert.isObject(user);
+                    assert.include(user, "email_pending");
+                    assert.notInclude(user, "email");
+                    assert.equal(user.email_pending, "tomemail@pump.io");
+                }
+            },
             "and we try to retrieve it from the person id": {
                 topic: function(user, User) {
                     User.fromPerson(user.profile.id, this.callback);
