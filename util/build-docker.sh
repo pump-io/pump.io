@@ -29,10 +29,7 @@ elif [ $TYPE = beta ]; then
 	docker build .. --tag pumpio/pump.io:beta --tag pumpio/pump.io:$PKGVER
 	docker push pumpio/pump.io
 elif [ $TYPE = release ]; then
-	# If we're not on an exact tag, bail
-	git describe --exact-match >/dev/null &>/dev/null || exit 0
-	# See the really long comment above for why we do this
-	git symbolic-ref HEAD >/dev/null &>/dev/null && exit 0
+	# TODO don't build on tags, only on branches (which saves Travis some work)
 	docker_login
 	docker build .. --tag pumpio/pump.io:release --tag pumpio/pump.io:$PKGVER
 	docker push pumpio/pump.io
