@@ -52,4 +52,3 @@ jspm_packages
 config.js
 
 public/template/*.jade.js
-package-lock.json
