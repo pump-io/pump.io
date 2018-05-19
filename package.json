@@ -83,7 +83,7 @@
     "test:oauth2": "vows test/authenticationcode-test.js test/bearertoken-test.js test/oauth2-authorization-test.js test/schema-test.js test/authc-oauth2-test.js",
     "test:vows": "nyc -r lcov vows -v test/*-test.js",
     "test:root": "nyc -r lcov --report-dir coverage-root vows -v test/*-test-as-root.js",
-    "test:install": "npm install -g .",
+    "test:install": "npm pack && npm install -g pump.io-*.tgz # npm/npm#20241",
     "test:security-sigs": "gpg --keyserver hkp://keys.gnupg.net --recv-keys C46D8E7A3F13AD1C8EC6784843BF769C4ACA8B96 && gpg --verify doc/SECURITY.md.gpg",
     "test:system": "vows -v test/*-test-system.js",
     "test:systemd": "docker run -v $(pwd):/tmp/pump.io:ro -v $NVM_DIR:/.nvm:ro ubuntu sh -c \"export NVM_DIR=$NVM_DIR; . $NVM_DIR/nvm.sh; nvm use $TRAVIS_NODE_VERSION; cd /tmp/pump.io; npm run test:systemd:run\"",
