@@ -19,6 +19,7 @@ services:
   - docker
 script:
   - if ./util/docker-candidacy.sh; then export DOCKER_CANDIDATE=true; else export DOCKER_CANDIDATE=false; fi
+  - echo 'DOCKER_CANDIDATE='$DOCKER_CANDIDATE
   - if $DOCKER_CANDIDATE; then ./util/build-docker.sh; fi
   - if [ $TRAVIS_EVENT_TYPE = cron ]; then travis_terminate; fi
   - "(npm test || npm test) && npm run test:install && sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root'"
@@ -28,6 +29,7 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq graphicsmagick
   - npm install -g npm@5
+  - npm --version
 after_script:
   # The coverage data from as-root tests is root:root but not world-readable
   - sudo chown -R $(whoami) coverage
