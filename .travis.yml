@@ -28,7 +28,7 @@ before_script:
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq graphicsmagick
-  - npm install -g npm@5
+  - npm install -g npm@6
   - npm --version
 after_script:
   # The coverage data from as-root tests is root:root but not world-readable
