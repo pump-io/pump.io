@@ -19,6 +19,22 @@ If you think something that isn't in the first list should be covered, file an i
 
 ## 6.0.0 beta 0 - future
 
+### Added
+
+* Ship an `npm-shrinkwrap.json` file with the package, ensuring that everyone gets the same version of all dependencies
+* Public endpoints will now content-negotiate ActivityStreams 2.0
+* OAuth 2.0 can be used for authentication and is now preferred
+
+### Changed
+
+* Don't link to OpenFarmGame in the intro text since the domain is dead
+* Dependency updates
+
+### Fixed
+
+* Fix layout error in the Lists view left over from 1.0's utml -> Jade transition
+
+
 ### Breaking 
 
 * Drop support for Node.js 4, 5, and 7 (#1502)
