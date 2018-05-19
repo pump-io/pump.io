@@ -123,6 +123,45 @@ suite.addBatch({
                 assert.equal(config.urlPort, 31337);
             }
         },
+        "and we build a config with an unclustered Databank driver": {
+            topic: function(mod) {
+                return mod.buildConfig({driver: "memory"});
+            },
+            "it works": function(err, config) {
+                assert.ifError(err);
+                assert.isObject(config);
+            },
+            "we choose to use only 1 worker": function(err, config) {
+                assert.isNumber(config.workers);
+                assert.equal(config.workers, 1);
+            }
+        },
+        "and we build a config with a clustered Databank driver": {
+            topic: function(mod) {
+                return mod.buildConfig({"driver": "mongodb"});
+            },
+            "it works": function(err, config) {
+                assert.ifError(err);
+                assert.isObject(config);
+            },
+            "we choose to use >1 worker": function(err, config) {
+                assert.isNumber(config.workers);
+                assert.greater(config.workers, 1);
+            }
+        },
+        "and we build a config with an explicit config.children": {
+            topic: function(mod) {
+                return mod.buildConfig({children: 1337});
+            },
+            "it works": function(err, config) {
+                assert.ifError(err);
+                assert.isObject(config);
+            },
+            "our choice was respected": function(err, config) {
+                assert.isNumber(config.workers);
+                assert.equal(config.workers, 1337);
+            }
+        },
         "and we try to build a config with uploaddir specified": tryToBuild({uploaddir: "/some/directory"}),
         "and we try to build a config with uploads enabled but no datadir": tryToBuild({enableUploads: true}),
         "and we try to build a config with port < 1024 while we're not root": tryToBuild({port: 80}),
