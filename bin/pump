@@ -104,6 +104,10 @@ var launchApps = function(configBase) {
 
     if (cluster.isMaster) {
 
+        // We pass configBase because we want what the user originally gave
+        // The only reason we waited this long (and until after parsing) was to get a log
+        configUtil.validateConfig(configBase, log);
+
         Dispatch.start(log);
 
         for (i = 0; i < config.workers; i++) {
@@ -190,8 +194,7 @@ var launchApps = function(configBase) {
             clusterLog.debug("Received SIGUSR2 but ignoring because we're in a worker process");
         });
 
-        // configBase because app.js is going to rebuild the config itself, then validate it
-        makeApp(configBase, function(err, appServer) {
+        makeApp(config, function(err, appServer) {
             if (err) {
                 console.error(err);
                 process.exit(1);
