@@ -374,6 +374,27 @@ suite.addBatch({
                 assert.ifError(err);
             }
         },
+        "and we try to ensureObject with an identi.ca upstreamDuplicates object": {
+            topic: function(ActivityObject) {
+                var props = {
+                        id: "urn:uuid:cb8e1f0c-898d-45e5-b155-5d3e1bf0be72",
+                        objectType: "person",
+                        upstreamDuplicates: {0: "http://identi.ca/user/1"}
+                    };
+
+                ActivityObject.ensureObject(props, this.callback);
+            },
+            "it works": function(err, obj) {
+                assert.ifError(err);
+            },
+            "it patched up the data": function(err, obj) {
+                assert.isObject(obj);
+                assert.isArray(obj.upstreamDuplicates);
+                assert.equal(obj.upstreamDuplicates.length, 1);
+                assert.isString(obj.upstreamDuplicates[0]);
+                assert.equal(obj.upstreamDuplicates[0], "http://identi.ca/user/1");
+            }
+        },
         "and we try to ensureObject with non-string member of upstreamDuplicates": {
             topic: function(ActivityObject) {
                 var callback = this.callback,
