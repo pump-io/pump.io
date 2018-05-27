@@ -22,6 +22,7 @@
 
 [Unit]
 Description=Pump.io - stream server that does most of what people really want from a social network
+Documentation=https://pumpio.readthedocs.io/en/latest/
 After=syslog.target network.target %i.service
 Requires=%i.service
 
