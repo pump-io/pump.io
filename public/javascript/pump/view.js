@@ -89,7 +89,6 @@
             }
         },
         templateName: null,
-        parts: null,
         subs: {},
         ready: function() {
             // setup subViews
@@ -519,8 +518,6 @@
         className: "container",
         modelName: "user",
         templateName: "nav-loggedin",
-        parts: ["messages",
-                "notifications"],
         subs: {
             "#messages": {
                 attr: "majorStreamView",
@@ -1100,20 +1097,6 @@
 
     Pump.UserPageContent = Pump.ContentView.extend({
         templateName: "user",
-        parts: ["profile-block",
-                "profile-nav",
-                "user-content-activities",
-                "major-stream",
-                "minor-stream",
-                "major-activity",
-                "minor-activity",
-                "responses",
-                "reply",
-                "replies",
-                "profile-responses",
-                "activity-object-list",
-                "activity-object-collection"
-               ],
         addMajorActivity: function(act) {
             var view = this,
                 profile = this.options.data.profile;
@@ -1170,16 +1153,6 @@
 
     Pump.ActivitiesUserContent = Pump.TemplateView.extend({
         templateName: "user-content-activities",
-        parts: ["major-stream",
-                "minor-stream",
-                "major-activity",
-                "minor-activity",
-                "responses",
-                "reply",
-                "replies",
-                "profile-responses",
-                "activity-object-list",
-                "activity-object-collection"],
         subs: {
             "#major-stream": {
                 attr: "majorStreamView",
@@ -1203,12 +1176,6 @@
     Pump.MajorStreamView = Pump.TemplateView.extend({
         templateName: "major-stream",
         modelName: "activities",
-        parts: ["major-activity",
-                "responses",
-                "reply",
-                "replies",
-                "activity-object-list",
-                "activity-object-collection"],
         subs: {
             ".activity.major": {
                 map: "activities",
@@ -1224,7 +1191,6 @@
     Pump.MinorStreamView = Pump.TemplateView.extend({
         templateName: "minor-stream",
         modelName: "activities",
-        parts: ["minor-activity"],
         subs: {
             ".activity.minor": {
                 map: "activities",
@@ -1239,15 +1205,6 @@
 
     Pump.InboxContent = Pump.ContentView.extend({
         templateName: "inbox",
-        parts: ["major-stream",
-                "minor-stream",
-                "major-activity",
-                "minor-activity",
-                "responses",
-                "reply",
-                "replies",
-                "activity-object-list",
-                "activity-object-collection"],
         addMajorActivity: function(act) {
             var view = this;
             view.majorStreamView.showAdded(act);
@@ -1293,15 +1250,6 @@
 
     Pump.MessagesContent = Pump.ContentView.extend({
         templateName: "messages-content",
-        parts: ["major-stream",
-                "minor-stream",
-                "major-activity",
-                "minor-activity",
-                "responses",
-                "reply",
-                "replies",
-                "activity-object-list",
-                "activity-object-collection"],
         addMajorActivity: function(act) {
             var view = this;
             view.majorStreamView.showAdded(act);
@@ -1333,11 +1281,6 @@
 
     Pump.MajorActivityView = Pump.TemplateView.extend({
         templateName: "major-activity",
-        parts: ["activity-object-list",
-                "responses",
-                "replies",
-                "reply",
-                "activity-object-collection"],
         modelName: "activity",
         events: {
             "mouseenter": "maybeShowExtraMenu",
@@ -1508,7 +1451,6 @@
 
     Pump.ReplyStreamView = Pump.TemplateView.extend({
         templateName: "replies",
-        parts: ["reply"],
         modelName: "replies",
         subs: {
             ".reply": {
@@ -1560,7 +1502,6 @@
 
     Pump.FullReplyStreamView = Pump.TemplateView.extend({
         templateName: "full-replies",
-        parts: ["reply"],
         modelName: "replies",
         subs: {
             ".reply": {
@@ -1661,7 +1602,6 @@
 
     Pump.MajorObjectView = Pump.TemplateView.extend({
         templateName: "major-object",
-        parts: ["responses", "reply"],
         events: {
             "click .favorite": "favoriteObject",
             "click .unfavorite": "unfavoriteObject",
@@ -1906,7 +1846,6 @@
     Pump.ProfileBlock = Pump.PersonView.extend({
         templateName: "profile-block",
         modelName: "profile",
-        parts: ["profile-responses"],
         initialize: function(options) {
             Pump.debug("Initializing profile-block #" + this.cid);
             Pump.PersonView.prototype.initialize.apply(this);
@@ -1915,16 +1854,6 @@
 
     Pump.FavoritesContent = Pump.ContentView.extend({
         templateName: "favorites",
-        parts: ["profile-block",
-                "profile-nav",
-                "user-content-favorites",
-                "object-stream",
-                "major-object",
-                "responses",
-                "reply",
-                "profile-responses",
-                "activity-object-list",
-                "activity-object-collection"],
         subs: {
             "#profile-block": {
                 attr: "profileBlock",
@@ -1947,12 +1876,6 @@
     Pump.FavoritesUserContent = Pump.TemplateView.extend({
         templateName: "user-content-favorites",
         modelName: "favorites",
-        parts: ["object-stream",
-                "major-object",
-                "responses",
-                "reply",
-                "profile-responses",
-                "activity-object-collection"],
         subs: {
             ".object.major": {
                 map: "favorites",
@@ -1964,12 +1887,6 @@
 
     Pump.FollowersContent = Pump.ContentView.extend({
         templateName: "followers",
-        parts: ["profile-block",
-                "profile-nav",
-                "user-content-followers",
-                "people-stream",
-                "major-person",
-                "profile-responses"],
         subs: {
             "#profile-block": {
                 attr: "profileBlock",
@@ -1999,9 +1916,6 @@
     Pump.FollowersUserContent = Pump.TemplateView.extend({
         templateName: "user-content-followers",
         modelName: "followers",
-        parts: ["people-stream",
-                "major-person",
-                "profile-responses"],
         subs: {
             "#people-stream": {
                 attr: "peopleStreamView",
@@ -2027,12 +1941,6 @@
 
     Pump.FollowingContent = Pump.ContentView.extend({
         templateName: "following",
-        parts: ["profile-block",
-                "profile-nav",
-                "user-content-following",
-                "people-stream",
-                "major-person",
-                "profile-responses"],
         subs: {
             "#profile-block": {
                 attr: "profileBlock",
@@ -2062,9 +1970,6 @@
     Pump.FollowingUserContent = Pump.TemplateView.extend({
         templateName: "user-content-following",
         modelName: "following",
-        parts: ["people-stream",
-                "major-person",
-                "profile-responses"],
         subs: {
             "#people-stream": {
                 attr: "peopleStreamView",
@@ -2078,13 +1983,6 @@
 
     Pump.ListsContent = Pump.ContentView.extend({
         templateName: "lists",
-        parts: ["profile-block",
-                "profile-nav",
-                "user-content-lists",
-                "list-content-lists",
-                "list-menu",
-                "list-menu-item",
-                "profile-responses"],
         subs: {
             "#profile-block": {
                 attr: "profileBlock",
@@ -2105,9 +2003,6 @@
 
     Pump.ListsUserContent = Pump.TemplateView.extend({
         templateName: "user-content-lists",
-        parts: ["list-menu",
-                "list-menu-item",
-                "list-content-lists"],
         subs: {
             "#list-menu-inner": {
                 attr: "listMenu",
@@ -2123,7 +2018,6 @@
     Pump.ListMenu = Pump.TemplateView.extend({
         templateName: "list-menu",
         modelName: "lists",
-        parts: ["list-menu-item"],
         el: ".list-menu-block",
         events: {
             "click .new-list": "newList"
@@ -2153,16 +2047,6 @@
 
     Pump.ListContent = Pump.ContentView.extend({
         templateName: "list",
-        parts: ["profile-block",
-                "profile-nav",
-                "profile-responses",
-                "user-content-list",
-                "list-content-list",
-                "people-stream",
-                "major-person",
-                "list-menu",
-                "list-menu-item"
-               ],
         subs: {
             "#profile-block": {
                 attr: "profileBlock",
@@ -2195,12 +2079,6 @@
 
     Pump.ListUserContent = Pump.TemplateView.extend({
         templateName: "user-content-list",
-        parts: ["people-stream",
-                "list-content-list",
-                "major-person",
-                "list-menu-item",
-                "list-menu"
-               ],
         subs: {
             "#list-menu-inner": {
                 attr: "listMenu",
@@ -2224,8 +2102,6 @@
     Pump.ListListContent = Pump.TemplateView.extend({
         templateName: "list-content-list",
         modelName: "list",
-        parts: ["member-stream",
-                "member"],
         subs: {
             "#member-stream": {
                 attr: "memberStreamView",
@@ -2503,10 +2379,6 @@
     Pump.ObjectContent = Pump.ContentView.extend({
         templateName: "object",
         modelName: "object",
-        parts: ["responses",
-                "reply",
-                "replies",
-                "activity-object-collection"],
         events: {
             "click .favorite": "favoriteObject",
             "click .unfavorite": "unfavoriteObject",
@@ -2733,7 +2605,6 @@
         tagName: "div",
         className: "modal-holder",
         templateName: "post-note",
-        parts: ["recipient-selector"],
         ready: function() {
             var view = this;
 
@@ -2807,7 +2678,6 @@
         tagName: "div",
         className: "modal-holder",
         templateName: "post-picture",
-        parts: ["recipient-selector"],
         events: {
             "click #send-picture": "postPicture"
         },

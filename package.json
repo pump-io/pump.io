@@ -77,7 +77,7 @@
     "./doc/pump.1"
   ],
   "scripts": {
-    "build": "jade --client --extension jade.js --no-debug public/template",
+    "build": "jade --client --extension jade.js --no-debug public/template/*.jade",
     "fullbuild": "npm run build && echo 'use `npm run build` instead next time' 1>&2",
     "test": "npm run lint && npm run test:vows",
     "test:oauth2": "vows test/authenticationcode-test.js test/bearertoken-test.js test/oauth2-authorization-test.js test/schema-test.js test/authc-oauth2-test.js",
