@@ -23,8 +23,9 @@ var assert = require("assert"),
     _ = require("lodash"),
     Logger = require("bunyan"),
     simplesmtp = require("simplesmtp"),
-    emailutil = require("./lib/email"),
     Step = require("step"),
+    emailutil = require("./lib/email"),
+    configutil = require("../lib/config"),
     oneEmail = emailutil.oneEmail;
 
 var suite = vows.describe("mailer module interface").addBatch({
@@ -81,6 +82,8 @@ var suite = vows.describe("mailer module interface").addBatch({
                             hostname: "pump.localhost"
                         },
                         callback = this.callback;
+
+                    config = configutil.buildConfig(config);
 
                     try {
                         Mailer.setup(config, log);

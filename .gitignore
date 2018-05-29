@@ -49,6 +49,4 @@ jspm_packages
 
 # pump.io stuff
 
-config.js
-
 public/template/*.jade.js
