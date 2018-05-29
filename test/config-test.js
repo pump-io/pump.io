@@ -19,7 +19,9 @@
 "use strict";
 
 var assert = require("assert"),
-    vows = require("vows");
+    vows = require("vows"),
+    os = require("os"),
+    cpus = os.cpus;
 
 var suite = vows.describe("config module");
 
@@ -53,9 +55,13 @@ function tryToValidate(obj) {
 }
 
 suite.addBatch({
-    "When we get the config module": {
+    "When we get the config module and mock out os.cpus()": {
         topic: function() {
+            os.cpus = () => [{}, {}, {}, {}];
             return require("../lib/config");
+        },
+        teardown: function() {
+            os.cpus = cpus;
         },
         "there is one": function(mod) {
             assert.isObject(mod);
