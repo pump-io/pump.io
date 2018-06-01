@@ -42,7 +42,7 @@ var a2m = function(arr, prop) {
 
 var suite = vows.describe("user favorite interface");
 
-var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
+var tc = _.clone(require("./config.json"));
 
 suite.addBatch({
     "When we get the User class": {

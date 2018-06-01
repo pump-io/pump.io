@@ -36,7 +36,7 @@ var assert = require("assert"),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
-var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
+var tc = _.clone(require("./config.json"));
 
 var testClient = null;
 var ignore = function(err) {};

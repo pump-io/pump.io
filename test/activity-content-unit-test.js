@@ -33,7 +33,7 @@ var assert = require("assert"),
 
 var suite = vows.describe("activity module content generation");
 
-var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
+var tc = _.clone(require("./config.json"));
 
 var contentCheck = function(actor, verb, object, expected) {
     return {

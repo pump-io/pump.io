@@ -43,7 +43,7 @@ var assert = require("assert"),
 
 var suite = vows.describe("test discovery of endpoint for a user");
 
-var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
+var tc = _.clone(require("./config.json"));
 
 suite.addBatch({
     "When we set up the app": {

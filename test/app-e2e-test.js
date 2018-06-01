@@ -53,7 +53,7 @@ suite.addBatch({
     }
 });
 
-var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
+var tc = _.clone(require("./config.json"));
 
 suite.addBatch({
     "When we makeApp()": {

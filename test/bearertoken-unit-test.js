@@ -27,7 +27,7 @@ var Databank = databank.Databank;
 var DatabankObject = databank.DatabankObject;
 var _ = require("lodash");
 
-var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "config.json")));
+var tc = _.clone(require("./config.json"));
 var client = tc.clients[0];
 var user = tc.users[2];
 var SCOPE = "read";

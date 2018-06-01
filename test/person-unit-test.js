@@ -33,7 +33,7 @@ var assert = require("assert"),
 
 var suite = vows.describe("person module interface");
 
-var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
+var tc = _.clone(require("./config.json"));
 
 var testSchema = {
     pkey: "id",

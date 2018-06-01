@@ -34,7 +34,7 @@ var assert = require("assert"),
 
 var suite = vows.describe("user list API");
 
-var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
+var tc = _.clone(require("./config.json"));
 
 var invert = function(callback) {
     return function(err) {

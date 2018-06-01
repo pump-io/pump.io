@@ -29,7 +29,7 @@ var Step = require("step");
 var _ = require("lodash");
 var post = require("./lib/http").post;
 
-var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "config.json")));
+var tc = _.clone(require("./config.json"));
 
 var REDIRECT_URI = "http://localhost:1516/done";
 var AUTHZ_STATE = "oauth2unittest";

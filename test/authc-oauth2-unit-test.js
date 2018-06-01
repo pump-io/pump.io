@@ -32,7 +32,7 @@ var URLMaker = require("../lib/urlmaker").URLMaker;
 var Databank = db.Databank;
 var DatabankObject = db.DatabankObject;
 
-var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "config.json")));
+var tc = _.clone(require("./config.json"));
 
 var user = tc.users[0];
 var client = tc.clients[0];

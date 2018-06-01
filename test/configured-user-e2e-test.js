@@ -34,7 +34,7 @@ var fs = require("fs"),
     setupApp = apputil.setupApp,
     newPair = oauthutil.newPair;
 
-var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "config.json")));
+var tc = _.clone(require("./config.json"));
 
 var suite = vows.describe("configured user and tokens");
 

@@ -34,7 +34,7 @@ var fs = require("fs"),
     setupApp = apputil.setupApp,
     newPair = oauthutil.newPair;
 
-var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "config.json")));
+var tc = _.clone(require("./config.json"));
 
 var CLIENT_ID_1 = tc.clients[0].client_id,
     CLIENT_SECRET_1 = tc.clients[0].client_secret;
