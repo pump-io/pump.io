@@ -24,7 +24,7 @@ var assert = require("assert"),
 vows.describe("idmaker module interface").addBatch({
     "When we require the idmaker module": {
         topic: function() {
-            return require("../lib/idmaker");
+            return require("../dist/lib/idmaker");
         },
         "it works": function(idmaker) {
             assert.isObject(idmaker);

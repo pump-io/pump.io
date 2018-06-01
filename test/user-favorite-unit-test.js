@@ -25,8 +25,8 @@ var assert = require("assert"),
     Step = require("step"),
     fs = require("fs"),
     path = require("path"),
-    schema = require("../lib/schema").schema,
-    URLMaker = require("../lib/urlmaker").URLMaker,
+    schema = require("../dist/lib/schema").schema,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
@@ -64,7 +64,7 @@ suite.addBatch({
 
                 DatabankObject.bank = db;
 
-                User = require("../lib/model/user").User || null;
+                User = require("../dist/lib/model/user").User || null;
 
                 cb(null, User);
             });
@@ -91,7 +91,7 @@ suite.addBatch({
             "and it favorites a known object": {
                 topic: function(user) {
                     var cb = this.callback,
-                        Image = require("../lib/model/image").Image,
+                        Image = require("../dist/lib/model/image").Image,
                         obj;
 
                     Step(
@@ -146,7 +146,7 @@ suite.addBatch({
             "and it unfavorites an object it never favorited": {
                 topic: function(user) {
                     var cb = this.callback,
-                        Audio = require("../lib/model/audio").Audio;
+                        Audio = require("../dist/lib/model/audio").Audio;
 
                     Step(
                         function() {
@@ -276,7 +276,7 @@ suite.addBatch({
                         User.create({nickname: "ernie", password: "rubber duckie"}, this);
                     },
                     function(err, results) {
-                        var Image = require("../lib/model/image").Image;
+                        var Image = require("../dist/lib/model/image").Image;
                         if (err) throw err;
                         user = results;
                         Image.create({displayName: "Evan's avatar",
@@ -347,7 +347,7 @@ suite.addBatch({
                         User.create({nickname: "count", password: "one,two,three,four"}, this);
                     },
                     function(err, results) {
-                        var Image = require("../lib/model/image").Image,
+                        var Image = require("../dist/lib/model/image").Image,
                             i = 0,
                             group = this.group();
                         if (err) throw err;

@@ -23,7 +23,7 @@ var assert = require("assert"),
     databank = require("databank"),
     _ = require("lodash"),
     Step = require("step"),
-    Activity = require("../lib/model/activity").Activity,
+    Activity = require("../dist/lib/model/activity").Activity,
     modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
@@ -87,7 +87,7 @@ suite.addBatch(mb);
 suite.addBatch({
     "When we get the User class": {
         topic: function() {
-            return require("../lib/model/user").User;
+            return require("../dist/lib/model/user").User;
         },
         "it exists": function(User) {
             assert.isFunction(User);
@@ -225,7 +225,7 @@ suite.addBatch({
             },
             "it has a profile attribute": function(user) {
                 assert.isObject(user.profile);
-                assert.instanceOf(user.profile, require("../lib/model/person").Person);
+                assert.instanceOf(user.profile, require("../dist/lib/model/person").Person);
                 assert.isString(user.profile.id);
             },
             "and we check the credentials with the right password": {
@@ -265,7 +265,7 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.isObject(profile);
                     assert.instanceOf(profile,
-                                      require("../lib/model/person").Person);
+                                      require("../dist/lib/model/person").Person);
                 }
             }
         },
@@ -368,7 +368,7 @@ suite.addBatch({
                                 }
                             }
                         },
-                        Activity = require("../lib/model/activity").Activity,
+                        Activity = require("../dist/lib/model/activity").Activity,
                         act = new Activity(props);
 
                     Step(
@@ -583,7 +583,7 @@ suite.addBatch({
                                 content: "Remember to get eggs, bread, and milk."
                             }
                         },
-                        Activity = require("../lib/model/activity").Activity,
+                        Activity = require("../dist/lib/model/activity").Activity,
                         act = new Activity(props);
 
                     Step(
@@ -1080,7 +1080,7 @@ var notInStreamContext = function(streamgetter) {
 suite.addBatch({
     "When we create a new user": {
         topic: function() {
-            var User = require("../lib/model/user").User,
+            var User = require("../dist/lib/model/user").User,
                 props = {
                     nickname: "archie",
                     password: "B0Y|the/way|Glenn+Miller|played"
@@ -1109,7 +1109,7 @@ suite.addBatch({
     },
     "When we create another user": {
         topic: function() {
-            var User = require("../lib/model/user").User,
+            var User = require("../dist/lib/model/user").User,
                 props = {
                     nickname: "edith",
                     password: "s0ngz|that|made|Th3|h1t|P4r4de"
@@ -1174,7 +1174,7 @@ suite.addBatch({
     },
     "When we create yet another user": {
         topic: function() {
-            var User = require("../lib/model/user").User,
+            var User = require("../dist/lib/model/user").User,
                 props = {
                     nickname: "gloria",
                     password: "0h,d4DDY!"
@@ -1244,7 +1244,7 @@ suite.addBatch({
 var goodNickname = function(nickname) {
     return {
         topic: function() {
-            var User = require("../lib/model/user").User,
+            var User = require("../dist/lib/model/user").User,
                 props = {
                     nickname: nickname,
                     password: "Kei1goos"
@@ -1266,7 +1266,7 @@ var goodNickname = function(nickname) {
 var badNickname = function(nickname) {
     return {
         topic: function() {
-            var User = require("../lib/model/user").User,
+            var User = require("../dist/lib/model/user").User,
                 props = {
                     nickname: nickname,
                     password: "AQuah5co"
@@ -1320,7 +1320,7 @@ var activityMakerContext = function(maker, rest) {
     var ctx = {
 
         topic: function(toUser, fromUser) {
-            var Activity = require("../lib/model/activity").Activity,
+            var Activity = require("../dist/lib/model/activity").Activity,
                 callback = this.callback,
                 theAct;
 
@@ -1355,7 +1355,7 @@ var activityMakerContext = function(maker, rest) {
 suite.addBatch({
     "When we get the User class": {
         topic: function() {
-            return require("../lib/model/user").User;
+            return require("../dist/lib/model/user").User;
         },
         "it works": function(User) {
             assert.isFunction(User);
@@ -1609,7 +1609,7 @@ suite.addBatch({
 suite.addBatch({
     "When we get the User class": {
         topic: function() {
-            return require("../lib/model/user").User;
+            return require("../dist/lib/model/user").User;
         },
         "it works": function(User) {
             assert.isFunction(User);
@@ -1638,7 +1638,7 @@ suite.addBatch({
 suite.addBatch({
     "When we get the User class": {
         topic: function() {
-            return require("../lib/model/user").User;
+            return require("../dist/lib/model/user").User;
         },
         "it works": function(User) {
             assert.isFunction(User);

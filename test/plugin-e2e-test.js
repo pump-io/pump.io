@@ -34,7 +34,7 @@ var suite = vows.describe("plugin system");
 suite.addBatch({
     "When we get the app module": {
         topic: function() {
-            return require("../lib/app");
+            return require("../dist/lib/app");
         },
         "there is one": function(mod) {
             assert.isObject(mod);
@@ -58,7 +58,7 @@ suite.addBatch({
                           sockjs: false,
                           plugins: ["../test/lib/plugin"]
                          },
-                makeApp = require("../lib/app").makeApp;
+                makeApp = require("../dist/lib/app").makeApp;
 
             process.env.NODE_ENV = "test";
 

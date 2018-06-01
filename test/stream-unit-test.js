@@ -25,9 +25,9 @@ var _ = require("lodash"),
     Step = require("step"),
     fs = require("fs"),
     path = require("path"),
-    URLMaker = require("../lib/urlmaker").URLMaker,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
     modelBatch = require("./lib/model").modelBatch,
-    schema = require("../lib/schema").schema,
+    schema = require("../dist/lib/schema").schema,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
@@ -109,7 +109,7 @@ suite.addBatch({
 
                 DatabankObject.bank = db;
 
-                mod = require("../lib/model/stream");
+                mod = require("../dist/lib/model/stream");
 
                 if (!mod) {
                     cb(new Error("No module"), null);
@@ -150,7 +150,7 @@ suite.addBatch({
         },
         "and we create a single activity": {
             topic: function(stream) {
-                var Activity = require("../lib/model/activity").Activity,
+                var Activity = require("../dist/lib/model/activity").Activity,
                     props = {
                         actor: {
                             id: "urn:uuid:8f64087d-fffc-4fe0-9848-c18ae611cafd",
@@ -207,7 +207,7 @@ suite.addBatch({
                 },
                 "and we count the stream's activities with Stream.count()": {
                     topic: function(activity, stream) {
-                        var Stream = require("../lib/model/stream").Stream;
+                        var Stream = require("../dist/lib/model/stream").Stream;
                         Stream.count(stream.name, this.callback);
                     },
                     "it works": function(err, cnt) {
@@ -249,7 +249,7 @@ suite.addBatch({
 
                 DatabankObject.bank = db;
 
-                var Stream = require("../lib/model/stream").Stream;
+                var Stream = require("../dist/lib/model/stream").Stream;
                 cb(null, Stream);
             });
         },
@@ -389,7 +389,7 @@ suite.addBatch({
     "When we deliver a lot of activities to a stream": {
         topic: function() {
             var cb = this.callback,
-                Activity = require("../lib/model/activity").Activity,
+                Activity = require("../dist/lib/model/activity").Activity,
                 actor = {
                     id: "urn:uuid:c484d84e-6afa-4c51-ac9a-f8738d48569c",
                     displayName: "Counter",
@@ -417,7 +417,7 @@ suite.addBatch({
 
                     DatabankObject.bank = db;
 
-                    var Stream = require("../lib/model/stream").Stream;
+                    var Stream = require("../dist/lib/model/stream").Stream;
 
                     Stream.create({name: "scale-test"}, this);
                 },

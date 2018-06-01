@@ -30,8 +30,8 @@ var cluster = require("cluster"),
     Logger = require("bunyan"),
     _ = require("lodash"),
     importFresh = require("import-fresh"),
-    configUtil = require("../lib/config"),
-    restartEpoch = require("../lib/zerodowntime"),
+    configUtil = require("../dist/lib/config"),
+    restartEpoch = require("../dist/lib/zerodowntime"),
     restartInflight = false,
     abortedRestart = false,
     restartedWorker = null,
@@ -84,8 +84,8 @@ var cluster = require("cluster"),
            .alias("version", "v")
            .version()
            .argv,
-    Dispatch = require("../lib/dispatch"),
-    makeApp = require("../lib/app").makeApp;
+    Dispatch = require("../dist/lib/dispatch"),
+    makeApp = require("../dist/lib/app").makeApp;
 
 // We first get config files and launch some cluster apps
 
@@ -171,7 +171,7 @@ var launchApps = function(configBase) {
 
             clusterLog.debug("Determining zero-downtime restart eligibility...");
 
-            var newEpoch = importFresh("../lib/zerodowntime");
+            var newEpoch = importFresh("../dist/lib/zerodowntime");
             if (newEpoch !== restartEpoch) {
                 clusterLog.warn("Refusing zero-downtime restart because the new version says it's incompatible with us.");
                 return;

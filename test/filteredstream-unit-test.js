@@ -26,10 +26,10 @@ var assert = require("assert"),
     fs = require("fs"),
     path = require("path"),
     Queue = require("jankyqueue"),
-    schema = require("../lib/schema").schema,
-    URLMaker = require("../lib/urlmaker").URLMaker,
-    Stream = require("../lib/model/stream").Stream,
-    Activity = require("../lib/model/activity").Activity,
+    schema = require("../dist/lib/schema").schema,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
+    Stream = require("../dist/lib/model/stream").Stream,
+    Activity = require("../dist/lib/model/activity").Activity,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
@@ -65,7 +65,7 @@ suite.addBatch({
         },
         "and we load the filteredstream module": {
             topic: function() {
-                return require("../lib/filteredstream");
+                return require("../dist/lib/filteredstream");
             },
             "it works": function(mod) {
                 assert.isObject(mod);
@@ -396,7 +396,7 @@ suite.addBatch({
                 "and we create a stream with a lot of objects": {
                     topic: function(FilteredStream) {
                         var callback = this.callback,
-                            Person = require("../lib/model/person").Person,
+                            Person = require("../dist/lib/model/person").Person,
                             names = {
                                 "Norma Lakin": "f",
                                 "Jason Pegram": "m",
@@ -476,7 +476,7 @@ suite.addBatch({
                     },
                     "and we create a filtered stream of those objects": {
                         topic: function(str, FilteredStream) {
-                            var Person = require("../lib/model/person").Person,
+                            var Person = require("../dist/lib/model/person").Person,
                                 isFemale = function(item, callback) {
                                     var ref;
                                     try {
@@ -508,7 +508,7 @@ suite.addBatch({
                         "and we try to get 10 items": {
                             topic: function(filtered) {
                                 var callback = this.callback,
-                                    Person = require("../lib/model/person").Person;
+                                    Person = require("../dist/lib/model/person").Person;
 
                                 Step(
                                     function() {

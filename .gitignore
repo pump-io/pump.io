@@ -50,3 +50,4 @@ jspm_packages
 # pump.io stuff
 
 public/template/*.jade.js
+dist/

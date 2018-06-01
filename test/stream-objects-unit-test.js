@@ -25,8 +25,8 @@ var assert = require("assert"),
     fs = require("fs"),
     path = require("path"),
     _ = require("lodash"),
-    URLMaker = require("../lib/urlmaker").URLMaker,
-    schema = require("../lib/schema").schema,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
+    schema = require("../dist/lib/schema").schema,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
@@ -63,7 +63,7 @@ suite.addBatch({
 
                 DatabankObject.bank = db;
 
-                mod = require("../lib/model/stream");
+                mod = require("../dist/lib/model/stream");
 
                 if (!mod) {
                     cb(new Error("No module"), null);
@@ -123,7 +123,7 @@ suite.addBatch({
             "and we get objects with indexes greater than some object": {
                 topic: function(stream) {
                     var cb = this.callback,
-                        NotInStreamError = require("../lib/model/stream").NotInStreamError;
+                        NotInStreamError = require("../dist/lib/model/stream").NotInStreamError;
 
                     stream.getObjectsGreaterThan({a: "b"}, 10, function(err, objects) {
                         if (err && err instanceof NotInStreamError) {
@@ -142,7 +142,7 @@ suite.addBatch({
             "and we get objects with indexes less than some object": {
                 topic: function(stream) {
                     var cb = this.callback,
-                        NotInStreamError = require("../lib/model/stream").NotInStreamError;
+                        NotInStreamError = require("../dist/lib/model/stream").NotInStreamError;
 
                     stream.getObjectsLessThan({a: "b"}, 10, function(err, objects) {
                         if (err && err instanceof NotInStreamError) {
@@ -161,7 +161,7 @@ suite.addBatch({
             "and we remove an object that doesn't exist": {
                 topic: function(stream) {
                     var cb = this.callback,
-                        NotInStreamError = require("../lib/model/stream").NotInStreamError;
+                        NotInStreamError = require("../dist/lib/model/stream").NotInStreamError;
 
                     stream.removeObject({a: "b"}, function(err) {
                         if (err && err instanceof NotInStreamError) {

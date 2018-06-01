@@ -28,7 +28,7 @@
 var urlfmt = require("url").format,
     _ = require("lodash"),
     Step = require("step"),
-    common = require("../lib/pumpclient"),
+    common = require("../dist/lib/pumpclient"),
     clientCred = common.clientCred,
     setUserCred = common.setUserCred,
     OAuth = require("oauth-evanp").OAuth,

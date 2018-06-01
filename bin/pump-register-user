@@ -26,7 +26,7 @@
 var _ = require("lodash"),
     url = require("url"),
     Step = require("step"),
-    common = require("../lib/pumpclient"),
+    common = require("../dist/lib/pumpclient"),
     clientCred = common.clientCred,
     setUserCred = common.setUserCred,
     postJSON = common.postJSON,

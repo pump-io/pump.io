@@ -9,10 +9,13 @@ Some quick documentation for hackery of pump.io.
 * 4-character indent, spaces only (no tabs).
 * double-quotes for strings.
 * No internal space for parentheses; so "if (foo)", not "if ( foo )".
+* Use [TypeScript](http://www.typescriptlang.org/).
 * Use [Step](https://github.com/creationix/step).
 * Use [Lodash](https://lodash.com/).
 * Use [databank](https://github.com/evanp/databank). Don't write to some storage engine's API.
 * Use [vows](http://vowsjs.org/).
+
+TypeScript is built with `npm run build`.
 
 You can check for (most) style violations with `npm run lint:jscs`, and you can check for JSHint errors with `npm run lint:jshint`.
 

@@ -30,7 +30,7 @@ var assert = require("assert"),
     databank = require("databank"),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
-    Credentials = require("../lib/model/credentials").Credentials,
+    Credentials = require("../dist/lib/model/credentials").Credentials,
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
@@ -194,7 +194,7 @@ suite.addBatch({
         "and we try to get host credentials for a valid Host object": {
             topic: function() {
                 var callback = this.callback,
-                    Host = require("../lib/model/host").Host;
+                    Host = require("../dist/lib/model/host").Host;
 
                 Step(
                     function() {

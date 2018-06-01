@@ -21,7 +21,7 @@
 var assert = require("assert"),
     vows = require("vows"),
     databank = require("databank"),
-    URLMaker = require("../lib/urlmaker").URLMaker,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
     modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
@@ -80,7 +80,7 @@ suite.addBatch(mb);
 suite.addBatch({
     "When we get the Host class": {
         topic: function() {
-            return require("../lib/model/host").Host;
+            return require("../dist/lib/model/host").Host;
         },
         "it works": function(Host) {
             assert.isFunction(Host);

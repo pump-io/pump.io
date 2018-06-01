@@ -7333,6 +7333,11 @@
         "mime-types": "~2.1.18"
       }
     },
+    "typescript": {
+      "version": "2.9.1",
+      "resolved": "https://registry.npmjs.org/typescript/-/typescript-2.9.1.tgz",
+      "integrity": "sha512-h6pM2f/GDchCFlldnriOhs1QHuwbnmj6/v7499eMHqPeW4V2G0elua2eIc2nu8v2NdHV0Gm+tzX83Hr6nUFjQA=="
+    },
     "ua-parser-js": {
       "version": "0.7.18",
       "resolved": "https://registry.npmjs.org/ua-parser-js/-/ua-parser-js-0.7.18.tgz",

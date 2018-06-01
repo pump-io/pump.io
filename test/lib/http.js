@@ -26,7 +26,7 @@ var http = require("http"),
     Step = require("step"),
     fs = require("fs"),
     express = require("express"),
-    version = require("../../lib/version").version,
+    version = require("../../dist/lib/version").version,
     OAuth = require("oauth-evanp").OAuth,
     urlparse = require("url").parse;
 

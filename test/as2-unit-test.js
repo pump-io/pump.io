@@ -56,7 +56,7 @@ var testVocabConversion = function(verb, newVerb) {
 suite.addBatch({
     "When we get the AS2 conversion module": {
         topic: function() {
-            return require("../lib/as2");
+            return require("../dist/lib/as2");
         },
         "it works": function(err, as2) {
             assert.ifError(err);

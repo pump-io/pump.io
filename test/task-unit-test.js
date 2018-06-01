@@ -21,8 +21,8 @@
 var assert = require("assert"),
     vows = require("vows"),
     databank = require("databank"),
-    version = require("../lib/version").version,
-    URLMaker = require("../lib/urlmaker").URLMaker,
+    version = require("../dist/lib/version").version,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
     modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;

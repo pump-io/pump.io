@@ -30,7 +30,7 @@ var suite = vows.describe("firehose module interface");
 suite.addBatch({
     "When we require the firehose module": {
         topic: function() {
-            return require("../lib/firehose");
+            return require("../dist/lib/firehose");
         },
         "it returns an object": function(Firehose) {
             assert.isObject(Firehose);

@@ -27,7 +27,7 @@ var suite = vows.describe("dispatch module interface");
 suite.addBatch({
     "When we require the dispatch module": {
         topic: function() {
-            return require("../lib/dispatch");
+            return require("../dist/lib/dispatch");
         },
         "it returns an object": function(Dispatch) {
             assert.isObject(Dispatch);

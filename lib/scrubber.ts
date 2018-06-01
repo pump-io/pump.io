@@ -19,15 +19,19 @@
 
 "use strict";
 
-var _ = require("lodash"),
-    jsdom = require("jsdom/lib/old-api.js"),
-    window = jsdom.jsdom("", {
+import _ = require("lodash");
+import jsdom = require("jsdom/lib/old-api.js");
+
+var window = jsdom.jsdom("", {
         features: {
             FetchExternalResources: false,
             ProcessExternalResources: false
         }
-    }).defaultView,
-    DOMPurify = require("dompurify")(window);
+    }).defaultView;
+
+import DOMPurifyInit = require("dompurify")
+
+var DOMPurify = DOMPurifyInit(window);
 
 var Scrubber = {
     scrub: DOMPurify.sanitize,
@@ -124,8 +128,5 @@ var Scrubber = {
     }
 };
 
-// So you can require("scrubber").Scrubber or just require("scrubber")
+export = Scrubber;
 
-Scrubber.Scrubber = Scrubber;
-
-module.exports = Scrubber;

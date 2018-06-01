@@ -28,7 +28,7 @@ var HARMLESS = "This is a harmless string.";
 vows.describe("scrubber module interface").addBatch({
     "When we require the scrubber module": {
         topic: function() {
-            return require("../lib/scrubber");
+            return require("../dist/lib/scrubber");
         },
         "it works": function(stamper) {
             assert.isObject(stamper);

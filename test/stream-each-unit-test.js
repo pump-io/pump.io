@@ -25,9 +25,9 @@ var _ = require("lodash"),
     Step = require("step"),
     fs = require("fs"),
     path = require("path"),
-    URLMaker = require("../lib/urlmaker").URLMaker,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
     modelBatch = require("./lib/model").modelBatch,
-    schema = require("../lib/schema").schema,
+    schema = require("../dist/lib/schema").schema,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
@@ -62,7 +62,7 @@ suite.addBatch({
 
                 DatabankObject.bank = db;
 
-                var Stream = require("../lib/model/stream").Stream;
+                var Stream = require("../dist/lib/model/stream").Stream;
                 cb(null, Stream);
             });
         },

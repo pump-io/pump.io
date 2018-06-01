@@ -21,7 +21,7 @@
 var assert = require("assert"),
     vows = require("vows"),
     databank = require("databank"),
-    URLMaker = require("../lib/urlmaker").URLMaker,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
     modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
@@ -88,7 +88,7 @@ var TIMESTAMP4 = Math.floor(Date.now()/1000) + 15;
 suite.addBatch({
     "When we get the Nonce class": {
         topic: function() {
-            return require("../lib/model/nonce").Nonce;
+            return require("../dist/lib/model/nonce").Nonce;
         },
         "it works": function(Nonce) {
             assert.isFunction(Nonce);

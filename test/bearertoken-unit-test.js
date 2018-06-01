@@ -37,7 +37,7 @@ vows.describe("BearerToken data type")
         "When we load the module": {
             topic: function() {
                 try {
-                    var mod = require("../lib/model/bearertoken");
+                    var mod = require("../dist/lib/model/bearertoken");
                     var BearerToken = mod.BearerToken;
                     this.callback(null, BearerToken);
                 } catch (err) {

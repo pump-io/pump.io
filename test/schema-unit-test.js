@@ -87,7 +87,7 @@ var types = [
 vows.describe("schema module interface").addBatch({
     "When we require the schema module": {
         topic: function() {
-            return require("../lib/schema");
+            return require("../dist/lib/schema");
         },
         "we get a module": function(schemamodule) {
             assert.isObject(schemamodule);

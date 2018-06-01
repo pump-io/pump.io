@@ -34,7 +34,7 @@ var suite = vows.describe("pumpclient module interface");
 suite.addBatch({
     "When we get the pumpclient module": {
         topic: function() {
-            return require("../lib/pumpclient");
+            return require("../dist/lib/pumpclient");
         },
         "it exports an object": function(err, pumpclient) {
             assert.isObject(pumpclient);

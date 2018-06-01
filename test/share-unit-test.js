@@ -74,7 +74,7 @@ suite.addBatch(mb);
 suite.addBatch({
     "When we get the Share class": {
         topic: function() {
-            return require("../lib/model/share").Share;
+            return require("../dist/lib/model/share").Share;
         },
         "it exists": function(Share) {
             assert.isFunction(Share);

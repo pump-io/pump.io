@@ -21,10 +21,10 @@
 var _ = require("lodash"),
     Step = require("step"),
     cluster = require("cluster"),
-    mod = require("../../lib/app"),
+    mod = require("../../dist/lib/app"),
     fs = require("fs"),
     path = require("path"),
-    Dispatch = require("../../lib/dispatch"),
+    Dispatch = require("../../dist/lib/dispatch"),
     makeApp = mod.makeApp;
 
 var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "config.json")));
@@ -104,7 +104,7 @@ if (cluster.isMaster) {
             // so we essentially do that.
             Step(
                 function() {
-                    var client = require("../../lib/model/client"),
+                    var client = require("../../dist/lib/model/client"),
                         Client = client.Client;
                     Client.search({webfinger: msg.webfinger}, this);
                 },

@@ -24,7 +24,7 @@ var assert = require("assert"),
 vows.describe("uuidv5 module interface").addBatch({
     "When we require the uuidv5 module": {
         topic: function() {
-            return require("../lib/uuidv5");
+            return require("../dist/lib/uuidv5");
         },
         "it works": function(uuidv5) {
             assert.isFunction(uuidv5);

@@ -22,7 +22,7 @@ var assert = require("assert"),
     vows = require("vows"),
     databank = require("databank"),
     Step = require("step"),
-    URLMaker = require("../lib/urlmaker").URLMaker,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
     modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
@@ -75,7 +75,7 @@ suite.addBatch(mb);
 suite.addBatch({
     "When we get the Client class": {
         topic: function() {
-            return require("../lib/model/client").Client;
+            return require("../dist/lib/model/client").Client;
         },
         "it works": function(Client) {
             assert.isFunction(Client);
