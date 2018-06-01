@@ -16,6 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// XXX should this run with the "fast" unit tests since it sets up HTTP?
+
 "use strict";
 
 var fs = require("fs"),

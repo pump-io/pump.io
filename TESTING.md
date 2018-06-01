@@ -19,6 +19,27 @@ behavior. Here's all of them:
 In general you don't need to worry about these - the right one will be
 run in Travis.
 
+## The main test suite
+
+The main test suite is broken up into subsuites. There's the unit test
+subsuite, and the end-to-end test subsuite. The unit test subsuite is
+fast and the end-to-end test subsuite is slow.
+
+There's also some tests that test the utilities used in the rest of
+the test suite.
+
+When you run `npm test`, it will run the linters and then, in order:
+
+* The test suite utilities tests, because if these fail everything
+  else will definitely blow up with confusing errors
+* The unit test subsuite, because if there's failures in it they'll be
+  reported faster
+* The end-to-end test subsuite
+
+You can also run these individually with `npm run
+test:vows:testsuite`, `npm run test:vows:unit`, and `npm run
+test:vows:e2e`, respectively.
+
 ## Running as root
 
 Some of the functionality that this package provides requires
