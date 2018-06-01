@@ -39,8 +39,7 @@ var suite = vows.describe("automatic repair of user profile");
 var tc = JSON.parse(fs.readFileSync(path.resolve(__dirname, "config.json")));
 
 suite.addBatch({
-
-    "When we set up the app": {
+    "When we initialize the environment": {
         topic: function() {
 
             var cb = this.callback;
