@@ -1,4 +1,4 @@
-// activitypub-inbox-test.js
+// activitypub-inbox-e2e-test.js
 //
 // Test the ActivityPub inbox endpoint
 //

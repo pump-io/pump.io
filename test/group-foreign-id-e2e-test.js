@@ -1,4 +1,4 @@
-// group-foreign-id-test.js
+// group-foreign-id-e2e-test.js
 //
 // Add a group with an externally-created ID
 //

@@ -1,4 +1,4 @@
-// place-test.js
+// place-unit-test.js
 //
 // Test the place module
 //

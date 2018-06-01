@@ -1,4 +1,4 @@
-// activity-test.js
+// activity-e2e-test.js
 //
 // Test the AS2 conversion module
 //

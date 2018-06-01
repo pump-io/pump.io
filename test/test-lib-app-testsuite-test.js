@@ -1,4 +1,4 @@
-// test-lib-app-test.js
+// test-lib-app-testsuite-test.js
 //
 // Test the app test libraries
 //

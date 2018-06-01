@@ -1,4 +1,4 @@
-// generator-test.js
+// generator-e2e-test.js
 //
 // Test that generator has the same ID twice
 //

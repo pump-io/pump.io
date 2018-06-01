@@ -1,4 +1,4 @@
-// requesttoken-test.js
+// requesttoken-unit-test.js
 //
 // Test the requesttoken module
 //

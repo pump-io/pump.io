@@ -1,4 +1,4 @@
-// config-test.js
+// config-unit-test.js
 //
 // Test the config module
 //

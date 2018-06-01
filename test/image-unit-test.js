@@ -1,4 +1,4 @@
-// image-test.js
+// image-unit-test.js
 //
 // Test the image module
 //

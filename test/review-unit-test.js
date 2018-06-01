@@ -1,4 +1,4 @@
-// review-test.js
+// review-unit-test.js
 //
 // Test the review module
 //

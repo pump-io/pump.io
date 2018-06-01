@@ -1,4 +1,4 @@
-// activity-content-test.js
+// activity-content-unit-test.js
 //
 // Test the content generation for an activity
 //

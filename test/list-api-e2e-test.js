@@ -1,4 +1,4 @@
-// list-api-test.js
+// list-api-e2e-test.js
 //
 // Test user collections of people
 //

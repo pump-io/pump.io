@@ -1,4 +1,4 @@
-// badge-test.js
+// badge-unit-test.js
 //
 // Test the badge module
 //

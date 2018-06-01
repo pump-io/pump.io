@@ -1,4 +1,4 @@
-// activity-api-test.js
+// activity-api-e2e-test.js
 //
 // Test activity REST API
 //

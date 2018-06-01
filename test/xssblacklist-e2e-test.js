@@ -1,4 +1,4 @@
-// xss-blacklist-test.js
+// xss-blacklist-e2e-test.js
 //
 // Test the XSS blacklist middleware module
 //

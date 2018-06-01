@@ -1,4 +1,4 @@
-// activityobject-foreign-id-test.js
+// activityobject-foreign-id-e2e-test.js
 //
 // Add an activity object with an externally-created ID
 //

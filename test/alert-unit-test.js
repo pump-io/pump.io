@@ -1,4 +1,4 @@
-// alert-test.js
+// alert-unit-test.js
 //
 // Test the alert module
 //

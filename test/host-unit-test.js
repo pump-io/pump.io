@@ -1,4 +1,4 @@
-// host-test.js
+// host-unit-test.js
 //
 // Test the host module
 //

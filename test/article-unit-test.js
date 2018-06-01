@@ -1,4 +1,4 @@
-// article-test.js
+// article-unit-test.js
 //
 // Test the article module
 //

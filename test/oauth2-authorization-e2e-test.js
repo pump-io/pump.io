@@ -1,4 +1,4 @@
-// oauth2-authorization-test.js
+// oauth2-authorization-e2e-test.js
 //
 // Copyright 2018, E14N https://e14n.com/
 //

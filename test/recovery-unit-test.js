@@ -1,4 +1,4 @@
-// recovery-test.js
+// recovery-unit-test.js
 //
 // Test the recovery module
 //

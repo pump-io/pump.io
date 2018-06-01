@@ -1,4 +1,4 @@
-// user-test.js
+// user-unit-test.js
 //
 // Test the user module
 //

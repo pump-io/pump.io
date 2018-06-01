@@ -1,4 +1,4 @@
-// device-test.js
+// device-unit-test.js
 //
 // Test the device module
 //

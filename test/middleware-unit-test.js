@@ -1,4 +1,4 @@
-// middleware-test.js
+// middleware-unit-test.js
 //
 // Test the middleware module
 //

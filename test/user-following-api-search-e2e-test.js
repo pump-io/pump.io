@@ -1,4 +1,4 @@
-// user-following-api-search-test.js
+// user-following-api-search-e2e-test.js
 //
 // Test searching the following endpoint
 //

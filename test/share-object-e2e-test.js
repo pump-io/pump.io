@@ -1,4 +1,4 @@
-// share-object-test.js
+// share-object-e2e-test.js
 //
 // Test sharing an activity object
 //

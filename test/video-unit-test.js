@@ -1,4 +1,4 @@
-// video-test.js
+// video-unit-test.js
 //
 // Test the video module
 //

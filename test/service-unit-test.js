@@ -1,4 +1,4 @@
-// service-test.js
+// service-unit-test.js
 //
 // Test the service module
 //

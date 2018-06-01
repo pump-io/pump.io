@@ -1,4 +1,4 @@
-// edge-test.js
+// edge-unit-test.js
 //
 // Test the edge module
 //

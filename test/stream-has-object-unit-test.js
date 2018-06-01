@@ -1,4 +1,4 @@
-// stream-test.js
+// stream-unit-test.js
 //
 // Test the stream module
 //

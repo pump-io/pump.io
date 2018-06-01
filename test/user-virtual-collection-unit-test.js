@@ -1,4 +1,4 @@
-// user-virtual-collection-test.js
+// user-virtual-collection-unit-test.js
 //
 // Test the followers, following collections for a new user
 //

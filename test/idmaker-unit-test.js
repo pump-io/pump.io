@@ -1,4 +1,4 @@
-// idmaker-test.js
+// idmaker-unit-test.js
 //
 // Test the idmaker module
 //

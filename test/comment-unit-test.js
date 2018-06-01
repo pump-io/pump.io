@@ -1,4 +1,4 @@
-// comment-test.js
+// comment-unit-test.js
 //
 // Test the comment module
 //

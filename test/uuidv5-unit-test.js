@@ -1,4 +1,4 @@
-// uuidv5-test.js
+// uuidv5-unit-test.js
 //
 // Test the uuidv5 module
 //

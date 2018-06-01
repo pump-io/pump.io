@@ -1,4 +1,4 @@
-// favicon-test.js
+// favicon-e2e-test.js
 //
 // Test that a favicon is provided
 //

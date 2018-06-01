@@ -1,4 +1,4 @@
-// shared-library-test.js
+// shared-library-e2e-test.js
 //
 // Test that files used server- and client-side shared correctly
 //

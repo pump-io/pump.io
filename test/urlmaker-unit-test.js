@@ -1,4 +1,4 @@
-// urlmaker-test.js
+// urlmaker-unit-test.js
 //
 // Test the urlmaker module
 //

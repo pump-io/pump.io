@@ -1,4 +1,4 @@
-// configured-user-test.js
+// configured-user-e2e-test.js
 //
 // Test the config.users array
 //

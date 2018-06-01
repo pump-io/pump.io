@@ -1,4 +1,4 @@
-// issue-test.js
+// issue-unit-test.js
 //
 // Test the issue module
 //

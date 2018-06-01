@@ -1,4 +1,4 @@
-// register-web-ui-test.js
+// register-web-ui-e2e-test.js
 //
 // Test that the home page shows an invitation to join
 //

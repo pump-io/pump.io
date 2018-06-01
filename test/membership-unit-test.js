@@ -1,4 +1,4 @@
-// membership-test.js
+// membership-unit-test.js
 //
 // Test the membership module
 //

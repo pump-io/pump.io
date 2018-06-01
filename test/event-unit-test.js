@@ -1,4 +1,4 @@
-// event-test.js
+// event-unit-test.js
 //
 // Test the event module
 //

@@ -1,4 +1,4 @@
-// activityobject-feeds-test.js
+// activityobject-feeds-unit-test.js
 //
 // Test that activity object creates the right feeds at the right time
 //

@@ -1,4 +1,4 @@
-// repair-user-profile-test.js
+// repair-user-profile-unit-test.js
 //
 // Test automatic repair of user profile data
 //

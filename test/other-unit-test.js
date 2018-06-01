@@ -1,4 +1,4 @@
-// other-test.js
+// other-unit-test.js
 //
 // Test the other module
 //

@@ -1,4 +1,4 @@
-// nonce-test.js
+// nonce-unit-test.js
 //
 // Test the nonce module
 //

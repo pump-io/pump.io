@@ -1,4 +1,4 @@
-// share-test.js
+// share-unit-test.js
 //
 // Test the share module
 //

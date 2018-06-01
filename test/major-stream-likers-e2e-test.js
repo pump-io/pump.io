@@ -1,4 +1,4 @@
-// major-stream-likes-test.js
+// major-stream-likes-e2e-test.js
 //
 // Test that liked objects have "liked" flag in */major streams
 //

@@ -1,4 +1,4 @@
-// offer-test.js
+// offer-unit-test.js
 //
 // Test the offer module
 //

@@ -1,4 +1,4 @@
-// game-test.js
+// game-unit-test.js
 //
 // Test the game module
 //

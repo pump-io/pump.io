@@ -1,4 +1,4 @@
-// activityobject-test.js
+// activityobject-unit-test.js
 //
 // Test the activityobject module's class methods
 //

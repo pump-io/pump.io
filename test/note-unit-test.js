@@ -1,4 +1,4 @@
-// note-test.js
+// note-unit-test.js
 //
 // Test the note module
 //

@@ -1,4 +1,4 @@
-// user-followers-api-test.js
+// user-followers-api-e2e-test.js
 //
 // Test the user followers/following endpoints for the API
 //

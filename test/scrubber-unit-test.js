@@ -1,4 +1,4 @@
-// scrubber-test.js
+// scrubber-unit-test.js
 //
 // Test the scrubber module
 //

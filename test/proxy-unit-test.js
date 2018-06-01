@@ -1,4 +1,4 @@
-// proxy-test.js
+// proxy-unit-test.js
 //
 // Test the proxy module
 //

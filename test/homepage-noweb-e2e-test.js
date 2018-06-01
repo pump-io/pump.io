@@ -1,4 +1,4 @@
-// homepage-noweb-test.js
+// homepage-noweb-e2e-test.js
 //
 // Test that the home page shows API documentation when noweb is enabled
 //

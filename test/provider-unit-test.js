@@ -1,4 +1,4 @@
-// provider-test.js
+// provider-unit-test.js
 //
 // Test the provider module
 //

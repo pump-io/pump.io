@@ -1,4 +1,4 @@
-// audio-test.js
+// audio-unit-test.js
 //
 // Test the audio module
 //

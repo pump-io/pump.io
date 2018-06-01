@@ -1,4 +1,4 @@
-// page-test.js
+// page-unit-test.js
 //
 // Test the page module
 //

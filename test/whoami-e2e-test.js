@@ -1,4 +1,4 @@
-// whoami-test.js
+// whoami-e2e-test.js
 //
 // Test checking who you are
 //

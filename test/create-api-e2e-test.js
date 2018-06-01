@@ -1,4 +1,4 @@
-// create-api-test.js
+// create-api-e2e-test.js
 //
 // Test the 'create' verb
 //

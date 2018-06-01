@@ -1,4 +1,4 @@
-// process-test.js
+// process-unit-test.js
 //
 // Test the process module
 //

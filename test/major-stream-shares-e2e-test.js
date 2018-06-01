@@ -1,4 +1,4 @@
-// major-stream-shares-test.js
+// major-stream-shares-e2e-test.js
 //
 // Test that objects have "shares" stream in */major streams
 //

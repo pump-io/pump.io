@@ -1,4 +1,4 @@
-// client-registration-test.js
+// client-registration-e2e-test.js
 //
 // Test the client registration API
 //

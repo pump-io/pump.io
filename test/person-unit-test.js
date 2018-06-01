@@ -1,4 +1,4 @@
-// person-test.js
+// person-unit-test.js
 //
 // Test the person module
 //

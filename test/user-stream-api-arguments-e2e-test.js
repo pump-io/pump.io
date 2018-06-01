@@ -1,4 +1,4 @@
-// user-stream-api-test.js
+// user-stream-api-e2e-test.js
 //
 // Test user streams API
 //

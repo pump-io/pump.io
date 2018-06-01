@@ -1,4 +1,4 @@
-// replies-test.js
+// replies-unit-test.js
 //
 // Test adding and removing replies
 //

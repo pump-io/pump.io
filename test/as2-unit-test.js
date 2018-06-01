@@ -1,4 +1,4 @@
-// as2-test.js
+// as2-unit-test.js
 //
 // Test the AS2 conversion module
 //

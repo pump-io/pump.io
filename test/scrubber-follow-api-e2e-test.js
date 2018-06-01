@@ -1,4 +1,4 @@
-// scrubber-follow-api-test.js
+// scrubber-follow-api-e2e-test.js
 //
 // Test posting filthy HTML to the follows endpoint
 //

@@ -1,4 +1,4 @@
-// email-notification-test.js
+// email-notification-e2e-test.js
 //
 // Test email notifications
 //

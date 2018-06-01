@@ -1,4 +1,4 @@
-// favorite-object-api-test.js
+// favorite-object-api-e2e-test.js
 //
 // Test favoriting a posted object
 //

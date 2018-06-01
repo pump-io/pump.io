@@ -1,4 +1,4 @@
-// activityobject-test.js
+// activityobject-unit-test.js
 //
 // Test that activityobjects are validated
 //

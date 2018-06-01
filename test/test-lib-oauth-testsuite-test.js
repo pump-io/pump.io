@@ -1,4 +1,4 @@
-// test-lib-oauth-test.js
+// test-lib-oauth-testsuite-test.js
 //
 // Test the test libraries
 //

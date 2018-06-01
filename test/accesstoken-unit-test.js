@@ -1,4 +1,4 @@
-// accesstoken-test.js
+// accesstoken-unit-test.js
 //
 // Test the accesstoken module
 //

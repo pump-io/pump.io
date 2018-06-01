@@ -1,4 +1,4 @@
-// activitypub-outbox-test.js
+// activitypub-outbox-e2e-test.js
 //
 // Test the ActivityPub outbox endpoint
 //

@@ -1,4 +1,4 @@
-// credentials-test.js
+// credentials-unit-test.js
 //
 // Test the credentials module
 //

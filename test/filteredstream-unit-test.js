@@ -1,4 +1,4 @@
-// filteredstream-test.js
+// filteredstream-unit-test.js
 //
 // Test the filteredstream module
 //

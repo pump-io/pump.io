@@ -1,4 +1,4 @@
-// follow-person-test.js
+// follow-person-e2e-test.js
 //
 // Test posting an activity to follow a person
 //

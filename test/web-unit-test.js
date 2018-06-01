@@ -1,4 +1,4 @@
-// web-test.js
+// web-unit-test.js
 //
 // Test the web module
 //

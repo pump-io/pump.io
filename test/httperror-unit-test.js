@@ -1,4 +1,4 @@
-// httperror-test.js
+// httperror-unit-test.js
 //
 // Test the httperror module
 //

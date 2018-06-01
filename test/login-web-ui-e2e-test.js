@@ -1,4 +1,4 @@
-// login-web-ui-test.js
+// login-web-ui-e2e-test.js
 //
 // Test that the home page shows an invitation to join
 //

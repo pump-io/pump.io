@@ -1,4 +1,4 @@
-// collection-test.js
+// collection-unit-test.js
 //
 // Test the collection module
 //

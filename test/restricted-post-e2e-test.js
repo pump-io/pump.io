@@ -1,4 +1,4 @@
-// restricted-post-test.js
+// restricted-post-e2e-test.js
 //
 // Test setting default recipients for an activity
 //

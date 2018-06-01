@@ -1,4 +1,4 @@
-// bcc-api-test.js
+// bcc-api-e2e-test.js
 //
 // Test visibility of bcc and bto
 //

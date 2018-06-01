@@ -1,4 +1,4 @@
-// file-test.js
+// file-unit-test.js
 //
 // Test the file module
 //

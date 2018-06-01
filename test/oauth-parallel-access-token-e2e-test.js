@@ -1,4 +1,4 @@
-// oauth-parallel-access-token-test.js
+// oauth-parallel-access-token-e2e-test.js
 //
 // Test the client registration API
 //

@@ -1,4 +1,4 @@
-// upload-file-test.js
+// upload-file-e2e-test.js
 //
 // Test uploading a file to a server
 //

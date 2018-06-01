@@ -1,4 +1,4 @@
-// mailer-test.js
+// mailer-unit-test.js
 //
 // Test the mailer tool
 //

@@ -1,4 +1,4 @@
-// server-header-test.js
+// server-header-e2e-test.js
 //
 // Test that HSTS headers are set
 //

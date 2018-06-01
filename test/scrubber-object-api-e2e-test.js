@@ -1,4 +1,4 @@
-// scrubber-object-api-test.js
+// scrubber-object-api-e2e-test.js
 //
 // Test posting objects then trying to squidge in bad HTML with PUT
 //

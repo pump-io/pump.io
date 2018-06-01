@@ -1,4 +1,4 @@
-// user-list-test.js
+// user-list-unit-test.js
 //
 // Test the user module's list methods
 //

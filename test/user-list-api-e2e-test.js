@@ -1,4 +1,4 @@
-// user-list-test.js
+// user-list-e2e-test.js
 //
 // Test the API for the global list of registered users
 //

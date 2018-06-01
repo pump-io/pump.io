@@ -1,4 +1,4 @@
-// favorite-test.js
+// favorite-unit-test.js
 //
 // Test the favorite module
 //

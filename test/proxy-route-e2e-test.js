@@ -1,4 +1,4 @@
-// proxy-route-test.js
+// proxy-route-e2e-test.js
 //
 // Test the proxy route
 //

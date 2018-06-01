@@ -1,4 +1,4 @@
-// scrubber-favorite-api-test.js
+// scrubber-favorite-api-e2e-test.js
 //
 // Test posting filthy HTML to the favorites endpoint
 //

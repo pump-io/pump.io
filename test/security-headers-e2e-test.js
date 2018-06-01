@@ -1,4 +1,4 @@
-// security-headers-test.js
+// security-headers-e2e-test.js
 //
 // Test that security headers are being sent
 //

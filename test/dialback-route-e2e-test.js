@@ -1,4 +1,4 @@
-// dialback-route-test.js
+// dialback-route-e2e-test.js
 //
 // Test the dialback route for the app
 //

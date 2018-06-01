@@ -1,4 +1,4 @@
-// client-test.js
+// client-unit-test.js
 //
 // Test the client module
 //

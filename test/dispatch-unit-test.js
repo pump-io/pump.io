@@ -1,4 +1,4 @@
-// dispatch-test.js
+// dispatch-unit-test.js
 //
 // Test for dispatch module
 //

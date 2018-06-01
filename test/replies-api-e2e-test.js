@@ -1,4 +1,4 @@
-// replies-api-test.js
+// replies-api-e2e-test.js
 //
 // Test replies over the API
 //

@@ -1,4 +1,4 @@
-// oauth-request-token-test.js
+// oauth-request-token-e2e-test.js
 //
 // Test the OAuth request token interface
 //

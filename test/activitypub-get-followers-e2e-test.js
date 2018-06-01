@@ -1,4 +1,4 @@
-// activitypub-followers-test.js
+// activitypub-followers-e2e-test.js
 //
 // Test the ActivityPub followers endpoint
 //

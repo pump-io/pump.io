@@ -1,4 +1,4 @@
-// register-email-required-test.js
+// register-email-required-e2e-test.js
 //
 // Test behavior when email registration is required
 //

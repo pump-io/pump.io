@@ -1,4 +1,4 @@
-// authc-oauth2-test.js
+// authc-oauth2-unit-test.js
 //
 // Copyright 2018, E14N https://e14n.com/
 //

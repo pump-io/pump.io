@@ -1,4 +1,4 @@
-// schema-test.js
+// schema-unit-test.js
 //
 // Test the schema module
 //

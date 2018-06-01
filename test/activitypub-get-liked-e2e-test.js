@@ -1,4 +1,4 @@
-// activitypub-liked-test.js
+// activitypub-liked-e2e-test.js
 //
 // Test the ActivityPub liked endpoint
 //

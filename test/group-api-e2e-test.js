@@ -1,4 +1,4 @@
-// group-api-test.js
+// group-api-e2e-test.js
 //
 // Test group API
 //

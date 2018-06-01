@@ -1,4 +1,4 @@
-// list-address-api-test.js
+// list-address-api-e2e-test.js
 //
 // Test addressing a list
 //

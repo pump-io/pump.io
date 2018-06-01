@@ -1,4 +1,4 @@
-// product-test.js
+// product-unit-test.js
 //
 // Test the product module
 //

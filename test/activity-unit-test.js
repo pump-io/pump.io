@@ -1,4 +1,4 @@
-// activity-test.js
+// activity-unit-test.js
 //
 // Test the activity module
 //

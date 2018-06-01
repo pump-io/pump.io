@@ -1,4 +1,4 @@
-// binary-test.js
+// binary-unit-test.js
 //
 // Test the binary module
 //

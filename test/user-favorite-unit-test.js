@@ -1,4 +1,4 @@
-// user-favorite-test.js
+// user-favorite-unit-test.js
 //
 // Test the user favoriting mechanism
 //

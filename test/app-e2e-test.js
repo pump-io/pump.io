@@ -1,4 +1,4 @@
-// app-test.js
+// app-e2e-test.js
 //
 // Test the app module
 //

@@ -1,4 +1,4 @@
-// group-test.js
+// group-unit-test.js
 //
 // Test the group module
 //

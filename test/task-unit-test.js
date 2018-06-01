@@ -1,4 +1,4 @@
-// task-test.js
+// task-unit-test.js
 //
 // Test the task module
 //

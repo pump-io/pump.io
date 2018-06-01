@@ -1,4 +1,4 @@
-// scrubber-activity-api-test.js
+// scrubber-activity-api-e2e-test.js
 //
 // Test posting various bits of filthy HTML in hopes they can ruin someone's life
 //

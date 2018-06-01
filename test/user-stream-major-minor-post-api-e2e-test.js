@@ -1,4 +1,4 @@
-// user-stream-major-minor-post-api-test.js
+// user-stream-major-minor-post-api-e2e-test.js
 //
 // Test user streams API
 //

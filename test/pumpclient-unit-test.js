@@ -1,4 +1,4 @@
-// app-test.js
+// app-unit-test.js
 //
 // Test the client utilities
 //

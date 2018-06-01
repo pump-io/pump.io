@@ -1,4 +1,4 @@
-// bookmark-test.js
+// bookmark-unit-test.js
 //
 // Test the bookmark module
 //

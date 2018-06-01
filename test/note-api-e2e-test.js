@@ -1,4 +1,4 @@
-// note-api-test.js
+// note-api-e2e-test.js
 //
 // Test posting a note
 //

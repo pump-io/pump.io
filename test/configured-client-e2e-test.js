@@ -1,4 +1,4 @@
-// configured-client-test.js
+// configured-client-e2e-test.js
 //
 // Test the config.clients array
 //

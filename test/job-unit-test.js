@@ -1,4 +1,4 @@
-// job-test.js
+// job-unit-test.js
 //
 // Test the job module
 //

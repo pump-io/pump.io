@@ -1,4 +1,4 @@
-// application-test.js
+// application-unit-test.js
 //
 // Test the application module
 //

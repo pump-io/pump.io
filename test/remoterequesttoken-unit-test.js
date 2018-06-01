@@ -1,4 +1,4 @@
-// remoterequesttoken-test.js
+// remoterequesttoken-unit-test.js
 //
 // Test the remoterequesttoken module
 //

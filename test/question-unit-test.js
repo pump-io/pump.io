@@ -1,4 +1,4 @@
-// question-test.js
+// question-unit-test.js
 //
 // Test the question module
 //

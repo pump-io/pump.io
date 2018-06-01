@@ -1,4 +1,4 @@
-// randomstring-test.js
+// randomstring-unit-test.js
 //
 // Test the randomstring module
 //

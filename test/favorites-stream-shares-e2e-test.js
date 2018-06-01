@@ -1,4 +1,4 @@
-// major-stream-replies-test.js
+// major-stream-replies-e2e-test.js
 //
 // Test that objects have "replies" stream in */major streams
 //

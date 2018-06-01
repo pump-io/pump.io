@@ -1,4 +1,4 @@
-// stream-each-test.js
+// stream-each-unit-test.js
 //
 // Test the iterator interface to a stream
 //

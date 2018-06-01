@@ -1,4 +1,4 @@
-// activitypub-following-test.js
+// activitypub-following-e2e-test.js
 //
 // Test the ActivityPub following endpoint
 //

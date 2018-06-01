@@ -1,4 +1,4 @@
-// organization-test.js
+// organization-unit-test.js
 //
 // Test the organization module
 //

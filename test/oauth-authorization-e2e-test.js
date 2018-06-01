@@ -1,4 +1,4 @@
-// oauth-test.js
+// oauth-e2e-test.js
 //
 // Test the client registration API
 //

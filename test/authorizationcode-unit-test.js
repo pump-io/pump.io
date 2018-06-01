@@ -1,4 +1,4 @@
-// authorizationcode-test.js
+// authorizationcode-unit-test.js
 //
 // Test that the AuthorizationCode class works as expected
 //

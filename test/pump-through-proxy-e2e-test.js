@@ -1,4 +1,4 @@
-// pump-through-proxy-test.js
+// pump-through-proxy-e2e-test.js
 //
 // Test running the app via a proxy
 //

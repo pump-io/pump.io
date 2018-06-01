@@ -1,4 +1,4 @@
-// user-rest-test.js
+// user-rest-e2e-test.js
 //
 // Test the client registration API
 //

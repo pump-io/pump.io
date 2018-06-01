@@ -1,4 +1,4 @@
-// update-object-test.js
+// update-object-e2e-test.js
 //
 // Test that updated data is reflected in earlier activities
 //

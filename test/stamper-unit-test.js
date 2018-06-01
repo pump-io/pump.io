@@ -1,4 +1,4 @@
-// stamper-test.js
+// stamper-unit-test.js
 //
 // Test the stamper module
 //

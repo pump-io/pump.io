@@ -1,4 +1,4 @@
-// bearertoken-test.js
+// bearertoken-unit-test.js
 //
 // Test that the BearerToken class works as expected
 //

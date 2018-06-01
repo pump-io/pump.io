@@ -1,4 +1,4 @@
-// user-profile-api-test.js
+// user-profile-api-e2e-test.js
 //
 // Test the /api/user/:nickname/profile endpoint
 //

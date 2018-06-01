@@ -1,4 +1,4 @@
-// firehose-test.js
+// firehose-unit-test.js
 //
 // Test the firehose module
 //

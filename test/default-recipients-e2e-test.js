@@ -1,4 +1,4 @@
-// default-recipient-test.js
+// default-recipient-e2e-test.js
 //
 // Test setting default recipients for an activity
 //
