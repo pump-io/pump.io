@@ -37,11 +37,6 @@ var AUTHZ_STATE = "oauth2unittest";
 var user = tc.users[2];
 var client = tc.clients[0];
 
-process.on("uncaughtException", function(err) {
-    console.error(err);
-    process.exit(-1);
-});
-
 vows.describe("OAuth 2.0 authorization flow")
     .addBatch({
         "When we start the app": {

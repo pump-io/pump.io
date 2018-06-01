@@ -35,11 +35,6 @@ var AUTHZ_STATE = "oauth2unittest";
 
 var client = tc.clients[0];
 
-process.on("uncaughtException", function(err) {
-    console.error(err);
-    process.exit(-1);
-});
-
 vows.describe("OAuth 2.0 client bearer token")
     .addBatch({
         "When we start the app": {

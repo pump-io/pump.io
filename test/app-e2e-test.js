@@ -30,10 +30,6 @@ var ignore = function(err) {};
 
 var suite = vows.describe("app module interface");
 
-process.on("uncaughtException", function(err) {
-    console.error(err);
-});
-
 suite.addBatch({
     "When we get the app module": {
         topic: function() {
