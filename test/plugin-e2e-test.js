@@ -1,4 +1,4 @@
-// app-e2e-test.js
+// plugin-e2e-test.js
 //
 // Test that plugin endpoints are called
 //
@@ -29,7 +29,7 @@ var Step = require("step"),
 
 var ignore = function(err) {};
 
-var suite = vows.describe("app module interface");
+var suite = vows.describe("plugin system");
 
 suite.addBatch({
     "When we get the app module": {

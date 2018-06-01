@@ -1,6 +1,6 @@
 // user-rest-e2e-test.js
 //
-// Test the client registration API
+// Test the user settings API
 //
 // Copyright 2012, E14N https://e14n.com/
 //

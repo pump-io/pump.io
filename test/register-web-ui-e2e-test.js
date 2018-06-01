@@ -1,6 +1,6 @@
 // register-web-ui-e2e-test.js
 //
-// Test that the home page shows an invitation to join
+// Test that the registration page has the right buttons and such
 //
 // Copyright 2012, E14N https://e14n.com/
 //
