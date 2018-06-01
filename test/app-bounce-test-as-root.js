@@ -27,6 +27,7 @@ var assert = require("assert"),
     http = require("http"),
     https = require("https"),
     urlparse = require("url").parse,
+    _ = require("lodash"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     xrdutil = require("./lib/xrd");

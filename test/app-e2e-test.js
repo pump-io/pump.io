@@ -24,7 +24,8 @@ var assert = require("assert"),
     vows = require("vows"),
     fs = require("fs"),
     path = require("path"),
-    proxyquire = require("proxyquire");
+    proxyquire = require("proxyquire"),
+    _ = require("lodash");
 
 var ignore = function(err) {};
 

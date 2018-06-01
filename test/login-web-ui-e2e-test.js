@@ -25,6 +25,7 @@ var fs = require("fs"),
     apputil = require("./lib/app"),
     Browser = require("zombie"),
     Step = require("step"),
+    _ = require("lodash"),
     setupAppConfig = apputil.setupAppConfig;
 
 var tc = _.clone(require("./config.json"));
