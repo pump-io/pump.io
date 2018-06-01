@@ -24,6 +24,7 @@ var fs = require("fs"),
     express = require("express"),
     vows = require("vows"),
     Step = require("step"),
+    _ = require("lodash"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
@@ -33,7 +34,7 @@ var fs = require("fs"),
 
 var suite = vows.describe("spamicity module interface");
 
-var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
+var tc = _.clone(require("./config.json"));
 
 suite.addBatch({
     "When we set up an activity spam dummy server": {

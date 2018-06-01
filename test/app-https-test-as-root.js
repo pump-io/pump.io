@@ -27,6 +27,7 @@ var assert = require("assert"),
     http = require("http"),
     https = require("https"),
     urlparse = require("url").parse,
+    _ = require("lodash"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
     xrdutil = require("./lib/xrd");
@@ -35,7 +36,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 var suite = vows.describe("smoke test app interface over https");
 
-var tc = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
+var tc = _.clone(require("./config.json"));
 
 var clientCred = function(cl) {
     return {
