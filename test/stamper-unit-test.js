@@ -24,7 +24,7 @@ var assert = require("assert"),
 vows.describe("stamper module interface").addBatch({
     "When we require the stamper module": {
         topic: function() {
-            return require("../lib/stamper");
+            return require("../dist/lib/stamper");
         },
         "it works": function(stamper) {
             assert.isObject(stamper);

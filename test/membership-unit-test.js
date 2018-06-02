@@ -73,7 +73,7 @@ suite.addBatch(mb);
 suite.addBatch({
     "When we get the Membership class": {
         topic: function() {
-            return require("../lib/model/membership").Membership;
+            return require("../dist/lib/model/membership").Membership;
         },
         "it exists": function(Membership) {
             assert.isFunction(Membership);
@@ -96,8 +96,8 @@ suite.addBatch({
         },
         "and we check for a membership that doesn't exist": {
             topic: function(Membership) {
-                var Person = require("../lib/model/person").Person,
-                    Group = require("../lib/model/group").Group,
+                var Person = require("../dist/lib/model/person").Person,
+                    Group = require("../dist/lib/model/group").Group,
                     person = new Person({id: "http://example.com/user/2"}),
                     group = new Group({id: "http://example.net/group/42"});
 
@@ -110,8 +110,8 @@ suite.addBatch({
         },
         "and we check for a membership that exists": {
             topic: function(Membership) {
-                var Person = require("../lib/model/person").Person,
-                    Group = require("../lib/model/group").Group,
+                var Person = require("../dist/lib/model/person").Person,
+                    Group = require("../dist/lib/model/group").Group,
                     person = new Person({id: "http://example.com/user/3", objectType: "person"}),
                     group = new Group({id: "http://example.net/group/23", objectType: "group"}),
                     callback = this.callback;

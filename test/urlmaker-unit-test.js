@@ -28,7 +28,7 @@ var suite = vows.describe("urlmaker module interface");
 suite.addBatch({
     "When we require the urlmaker module": {
         topic: function() {
-            return require("../lib/urlmaker");
+            return require("../dist/lib/urlmaker");
         },
         "it exists": function(urlmaker) {
             assert.isObject(urlmaker);
@@ -57,7 +57,7 @@ suite.addBatch({
 suite.addBatch({
     "When we set up the URLMaker": {
         topic: function() {
-            var URLMaker = require("../lib/urlmaker").URLMaker;
+            var URLMaker = require("../dist/lib/urlmaker").URLMaker;
             URLMaker.hostname = "example.com";
             URLMaker.port     = 3001;
             return URLMaker;
@@ -91,7 +91,7 @@ suite.addBatch({
 suite.addBatch({
     "When we set up the URLMaker with the default port": {
         topic: function() {
-            var URLMaker = require("../lib/urlmaker").URLMaker;
+            var URLMaker = require("../dist/lib/urlmaker").URLMaker;
             URLMaker.hostname = "example.com";
             URLMaker.port     = 80;
             return URLMaker;
@@ -126,7 +126,7 @@ suite.addBatch({
 suite.addBatch({
     "When we set up the URLMaker": {
         topic: function() {
-            var URLMaker = require("../lib/urlmaker").URLMaker;
+            var URLMaker = require("../dist/lib/urlmaker").URLMaker;
             URLMaker.hostname = "example.com";
             URLMaker.port     = 2342;
             return URLMaker;
@@ -174,7 +174,7 @@ suite.addBatch({
 suite.addBatch({
     "When we set up the URLMaker with a prefix path": {
         topic: function() {
-            var URLMaker = require("../lib/urlmaker").URLMaker;
+            var URLMaker = require("../dist/lib/urlmaker").URLMaker;
             URLMaker.hostname = "example.com";
             URLMaker.port     = 3001;
             URLMaker.path     = "pumpio";
@@ -209,7 +209,7 @@ suite.addBatch({
 suite.addBatch({
     "When we set up the URLMaker": {
         topic: function() {
-            var URLMaker = require("../lib/urlmaker").URLMaker;
+            var URLMaker = require("../dist/lib/urlmaker").URLMaker;
             URLMaker.hostname = "example.com";
             URLMaker.port     = 3001;
             return URLMaker;
@@ -236,7 +236,7 @@ suite.addBatch({
 suite.addBatch({
     "When we set up the URLMaker with a prefix path": {
         topic: function() {
-            var URLMaker = require("../lib/urlmaker").URLMaker;
+            var URLMaker = require("../dist/lib/urlmaker").URLMaker;
             URLMaker.hostname = "example.com";
             URLMaker.port     = 3001;
             URLMaker.path     = "pumpio";
@@ -264,7 +264,7 @@ suite.addBatch({
 suite.addBatch({
     "When we set up URLMaker": {
         topic: function() {
-            var URLMaker = require("../lib/urlmaker").URLMaker;
+            var URLMaker = require("../dist/lib/urlmaker").URLMaker;
             URLMaker.hostname = "example.com";
             URLMaker.port     = 3001;
             return URLMaker;
@@ -319,7 +319,7 @@ suite.addBatch({
 suite.addBatch({
     "When we set up URLMaker": {
         topic: function() {
-            var URLMaker = require("../lib/urlmaker").URLMaker;
+            var URLMaker = require("../dist/lib/urlmaker").URLMaker;
             URLMaker.hostname = "example.com";
             URLMaker.port     = 3001;
             return URLMaker;
@@ -365,7 +365,7 @@ suite.addBatch({
 suite.addBatch({
     "When we set up URLMaker": {
         topic: function() {
-            var URLMaker = require("../lib/urlmaker").URLMaker;
+            var URLMaker = require("../dist/lib/urlmaker").URLMaker;
             URLMaker.hostname = "example.com";
             URLMaker.port     = 3001;
             return URLMaker;

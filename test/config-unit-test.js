@@ -58,7 +58,7 @@ suite.addBatch({
     "When we get the config module and mock out os.cpus()": {
         topic: function() {
             os.cpus = () => [{}, {}, {}, {}];
-            return require("../lib/config");
+            return require("../dist/lib/config");
         },
         teardown: function() {
             os.cpus = cpus;

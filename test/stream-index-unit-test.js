@@ -25,8 +25,8 @@ var _ = require("lodash"),
     Step = require("step"),
     fs = require("fs"),
     path = require("path"),
-    URLMaker = require("../lib/urlmaker").URLMaker,
-    schema = require("../lib/schema").schema,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
+    schema = require("../dist/lib/schema").schema,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
@@ -62,7 +62,7 @@ suite.addBatch({
 
                 DatabankObject.bank = db;
 
-                mod = require("../lib/model/stream");
+                mod = require("../dist/lib/model/stream");
 
                 if (!mod) {
                     cb(new Error("No module"), null);

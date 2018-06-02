@@ -73,7 +73,7 @@ suite.addBatch(mb);
 suite.addBatch({
     "When we get the Edge class": {
         topic: function() {
-            return require("../lib/model/edge").Edge;
+            return require("../dist/lib/model/edge").Edge;
         },
         "it exists": function(Edge) {
             assert.isFunction(Edge);

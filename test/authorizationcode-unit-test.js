@@ -37,7 +37,7 @@ vows.describe("AuthorizationCode data type")
         "When we load the module": {
             topic: function() {
                 try {
-                    var mod = require("../lib/model/authorizationcode");
+                    var mod = require("../dist/lib/model/authorizationcode");
                     var AuthorizationCode = mod.AuthorizationCode;
                     this.callback(null, AuthorizationCode);
                 } catch (err) {

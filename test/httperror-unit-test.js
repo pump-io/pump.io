@@ -24,7 +24,7 @@ var assert = require("assert"),
 vows.describe("httperror module interface").addBatch({
     "When we require the http error module": {
         topic: function() {
-            return require("../lib/httperror");
+            return require("../dist/lib/httperror");
         },
         "we get an object": function(httperror) {
             assert.isObject(httperror);

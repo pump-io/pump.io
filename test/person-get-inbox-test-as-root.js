@@ -26,7 +26,7 @@ var assert = require("assert"),
     _ = require("lodash"),
     fs = require("fs"),
     path = require("path"),
-    Person = require("../lib/model/person").Person,
+    Person = require("../dist/lib/model/person").Person,
     databank = require("databank"),
     httputil = require("./lib/http"),
     oauthutil = require("./lib/oauth"),
@@ -39,7 +39,7 @@ var assert = require("assert"),
     setupAppConfig = apputil.setupAppConfig,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
-    URLMaker = require("../lib/urlmaker").URLMaker;
+    URLMaker = require("../dist/lib/urlmaker").URLMaker;
 
 var suite = vows.describe("test discovery of endpoint for a user");
 

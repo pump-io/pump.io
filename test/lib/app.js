@@ -137,7 +137,7 @@ var withAppSetup = function(batchConfig) {
 };
 
 // lib/app.js expects to be run in a cluster worker with cluster.worker.on, etc.
-var proxyquiredMakeApp = proxyquire("../../lib/app", {
+var proxyquiredMakeApp = proxyquire("../../dist/lib/app", {
     cluster: {
         worker: {
             on: noop,

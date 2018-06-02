@@ -25,8 +25,8 @@ var assert = require("assert"),
     Step = require("step"),
     fs = require("fs"),
     path = require("path"),
-    schema = require("../lib/schema").schema,
-    URLMaker = require("../lib/urlmaker").URLMaker,
+    schema = require("../dist/lib/schema").schema,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
@@ -63,7 +63,7 @@ suite.addBatch({
         },
         "and we create a new object": {
             topic: function() {
-                var Note = require("../lib/model/note").Note;
+                var Note = require("../dist/lib/model/note").Note;
                 Note.create({content: "This sucks."}, this.callback);
             },
             "it works": function(err, note) {
@@ -88,9 +88,9 @@ suite.addBatch({
         },
         "and we create a new object and post a reply": {
             topic: function() {
-                var Note = require("../lib/model/note").Note,
+                var Note = require("../dist/lib/model/note").Note,
                     note = null,
-                    Comment = require("../lib/model/comment").Comment,
+                    Comment = require("../dist/lib/model/comment").Comment,
                     cb = this.callback;
 
                 Step(
@@ -137,9 +137,9 @@ suite.addBatch({
         },
         "and we create a new object and post a reply and remove the reply": {
             topic: function() {
-                var Note = require("../lib/model/note").Note,
+                var Note = require("../dist/lib/model/note").Note,
                     note = null,
-                    Comment = require("../lib/model/comment").Comment,
+                    Comment = require("../dist/lib/model/comment").Comment,
                     cb = this.callback;
 
                 Step(
@@ -185,9 +185,9 @@ suite.addBatch({
         },
         "and we create a new object and post a reply and post a reply to that": {
             topic: function() {
-                var Note = require("../lib/model/note").Note,
+                var Note = require("../dist/lib/model/note").Note,
                     note = null,
-                    Comment = require("../lib/model/comment").Comment,
+                    Comment = require("../dist/lib/model/comment").Comment,
                     cb = this.callback,
                     comment1 = null;
 
@@ -237,9 +237,9 @@ suite.addBatch({
         },
         "and we create a new object and post a lot of replies": {
             topic: function() {
-                var Note = require("../lib/model/note").Note,
+                var Note = require("../dist/lib/model/note").Note,
                     note = null,
-                    Comment = require("../lib/model/comment").Comment,
+                    Comment = require("../dist/lib/model/comment").Comment,
                     cb = this.callback,
                     comments = null;
 
@@ -296,7 +296,7 @@ suite.addBatch({
         },
         "and we create a new object and expand its feeds": {
             topic: function() {
-                var Note = require("../lib/model/note").Note,
+                var Note = require("../dist/lib/model/note").Note,
                     note = null,
                     cb = this.callback;
 
@@ -334,9 +334,9 @@ suite.addBatch({
         },
         "and we create a new object and post a reply and expand the object's feeds": {
             topic: function() {
-                var Note = require("../lib/model/note").Note,
+                var Note = require("../dist/lib/model/note").Note,
                     note = null,
-                    Comment = require("../lib/model/comment").Comment,
+                    Comment = require("../dist/lib/model/comment").Comment,
                     cb = this.callback,
                     comment = null;
 

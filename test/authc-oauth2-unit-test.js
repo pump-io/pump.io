@@ -23,11 +23,11 @@ var assert = require("assert");
 var Step = require("step");
 var _ = require("lodash");
 var db = require("databank");
-var authc = require("../lib/authc");
-var User = require("../lib/model/user").User;
-var Client = require("../lib/model/client").Client;
-var BearerToken = require("../lib/model/bearertoken").BearerToken;
-var URLMaker = require("../lib/urlmaker").URLMaker;
+var authc = require("../dist/lib/authc");
+var User = require("../dist/lib/model/user").User;
+var Client = require("../dist/lib/model/client").Client;
+var BearerToken = require("../dist/lib/model/bearertoken").BearerToken;
+var URLMaker = require("../dist/lib/urlmaker").URLMaker;
 
 var Databank = db.Databank;
 var DatabankObject = db.DatabankObject;

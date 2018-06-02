@@ -35,7 +35,7 @@ suite.addBatch({
     "When we get the app module": {
         topic: function() {
             // lib/app.js expects to be run in a cluster worker with cluster.worker.on, etc.
-            return proxyquire("../lib/app", {
+            return proxyquire("../dist/lib/app", {
                 cluster: {
                     worker: {
                         on: ignore,
@@ -67,7 +67,7 @@ suite.addBatch({
                           nologger: true,
                           sockjs: false
                          },
-                makeApp = require("../lib/app").makeApp;
+                makeApp = require("../dist/lib/app").makeApp;
 
             process.env.NODE_ENV = "test";
 

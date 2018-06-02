@@ -25,9 +25,9 @@ var assert = require("assert"),
     databank = require("databank"),
     _ = require("lodash"),
     Step = require("step"),
-    Collection = require("../lib/model/collection").Collection,
-    URLMaker = require("../lib/urlmaker").URLMaker,
-    schema = require("../lib/schema").schema,
+    Collection = require("../dist/lib/model/collection").Collection,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
+    schema = require("../dist/lib/schema").schema,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
@@ -56,7 +56,7 @@ suite.addBatch({
 
                 DatabankObject.bank = db;
 
-                User = require("../lib/model/user").User || null;
+                User = require("../dist/lib/model/user").User || null;
 
                 cb(null, User);
             });

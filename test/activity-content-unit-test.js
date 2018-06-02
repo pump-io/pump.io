@@ -25,8 +25,8 @@ var assert = require("assert"),
     _ = require("lodash"),
     fs = require("fs"),
     path = require("path"),
-    URLMaker = require("../lib/urlmaker").URLMaker,
-    schema = require("../lib/schema").schema,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
+    schema = require("../dist/lib/schema").schema,
     modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
@@ -39,7 +39,7 @@ var contentCheck = function(actor, verb, object, expected) {
     return {
         topic: function(Activity) {
             var callback = this.callback,
-                Collection = require("../lib/model/collection").Collection,
+                Collection = require("../dist/lib/model/collection").Collection,
                 thePublic = {
                     objectType: "collection",
                     id: Collection.PUBLIC
@@ -110,7 +110,7 @@ suite.addBatch({
 
                 DatabankObject.bank = db;
 
-                mod = require("../lib/model/activity");
+                mod = require("../dist/lib/model/activity");
 
                 if (!mod) {
                     cb(new Error("No module"), null);
@@ -180,7 +180,7 @@ suite.addBatch({
                      "Lorrie Tynan posted a comment in reply to an image"),
         "and we create a person": {
             topic: function(Activity) {
-                var Person = require("../lib/model/person").Person,
+                var Person = require("../dist/lib/model/person").Person,
                     callback = this.callback;
                 Person.create({id: "urn:uuid:3e2273f4-fec7-11e2-9db1-32b36b1a1850",
                                displayName: "Endicott Pettibone"},
@@ -202,7 +202,7 @@ suite.addBatch({
         },
         "and we create an image": {
             topic: function(Activity) {
-                var Image = require("../lib/model/image").Image,
+                var Image = require("../dist/lib/model/image").Image,
                     callback = this.callback;
                 Image.create({id: "urn:uuid:1731d374-fec8-11e2-87ba-32b36b1a1850",
                               displayName: "John the Baptist"},
@@ -224,7 +224,7 @@ suite.addBatch({
         },
         "and we create an article": {
             topic: function(Activity) {
-                var Article = require("../lib/model/article").Article,
+                var Article = require("../dist/lib/model/article").Article,
                     callback = this.callback;
                 Article.create({id: "urn:uuid:af6ecc82-fec8-11e2-ac18-32b36b1a1850",
                                 displayName: "The End of History"},

@@ -27,8 +27,8 @@ var assert = require("assert"),
     path = require("path"),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
-    schema = require("../lib/schema").schema,
-    URLMaker = require("../lib/urlmaker").URLMaker;
+    schema = require("../dist/lib/schema").schema,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker;
 
 var suite = vows.describe("activityobject class interface");
 
@@ -53,7 +53,7 @@ suite.addBatch({
 
                 DatabankObject.bank = db;
 
-                mod = require("../lib/model/activityobject") || null;
+                mod = require("../dist/lib/model/activityobject") || null;
 
                 cb(null, mod);
             });
@@ -163,7 +163,7 @@ suite.addBatch({
                     return ActivityObject.toClass(ActivityObject.VIDEO);
                 },
                 "it returns the right one": function(Video) {
-                    assert.equal(Video, require("../lib/model/video").Video);
+                    assert.equal(Video, require("../dist/lib/model/video").Video);
                 }
             },
             "and we get a class by unknown typename": {
@@ -171,7 +171,7 @@ suite.addBatch({
                     return ActivityObject.toClass("http://underwear.example/type/boxer-briefs");
                 },
                 "it returns the Other": function(Other) {
-                    assert.equal(Other, require("../lib/model/other").Other);
+                    assert.equal(Other, require("../dist/lib/model/other").Other);
                 }
             },
             "and we get an object by properties": {
@@ -187,7 +187,7 @@ suite.addBatch({
                     assert.isObject(review);
                 },
                 "it is the right type": function(review) {
-                    assert.instanceOf(review, require("../lib/model/review").Review);
+                    assert.instanceOf(review, require("../dist/lib/model/review").Review);
                 },
                 "it has the right properties": function(review) {
                     assert.equal(review.objectType, "review");
@@ -234,7 +234,7 @@ suite.addBatch({
                     return ActivityObject.toObject(props);
                 },
                 "it is an Other": function(user) {
-                    assert.instanceOf(user, require("../lib/model/other").Other);
+                    assert.instanceOf(user, require("../dist/lib/model/other").Other);
                     assert.equal(user.objectType, "user");
                 }
             },
@@ -247,7 +247,7 @@ suite.addBatch({
                     return ActivityObject.toObject(props);
                 },
                 "it is an Other": function(cinnamon) {
-                    assert.instanceOf(cinnamon, require("../lib/model/other").Other);
+                    assert.instanceOf(cinnamon, require("../dist/lib/model/other").Other);
                     assert.equal(cinnamon.objectType, "http://condiment.example/type/spice");
                 }
             },
@@ -271,7 +271,7 @@ suite.addBatch({
                     assert.isObject(article);
                 },
                 "it has the right class": function(err, article) {
-                    assert.instanceOf(article, require("../lib/model/article").Article);
+                    assert.instanceOf(article, require("../dist/lib/model/article").Article);
                 },
                 "it has the right passed-in attributes": function(err, article) {
                     assert.equal(article.objectType, "article");
@@ -293,7 +293,7 @@ suite.addBatch({
                         assert.isObject(article);
                     },
                     "it has the right class": function(err, article) {
-                        assert.instanceOf(article, require("../lib/model/article").Article);
+                        assert.instanceOf(article, require("../dist/lib/model/article").Article);
                     },
                     "it has the right passed-in attributes": function(err, article) {
                         assert.equal(article.objectType, "article");
@@ -317,7 +317,7 @@ suite.addBatch({
                 "it works": function(err, seed) {
                     assert.ifError(err);
                     assert.isObject(seed);
-                    assert.instanceOf(seed, require("../lib/model/other").Other);
+                    assert.instanceOf(seed, require("../dist/lib/model/other").Other);
                     assert.equal(seed.objectType, "http://orange.example/type/seed");
                 }
             },
@@ -342,7 +342,7 @@ suite.addBatch({
                     assert.isObject(group);
                 },
                 "it has the right class": function(err, group) {
-                    assert.instanceOf(group, require("../lib/model/group").Group);
+                    assert.instanceOf(group, require("../dist/lib/model/group").Group);
                 },
                 "it has the right passed-in attributes": function(err, group) {
                     assert.equal(group.objectType, "group");
@@ -355,7 +355,7 @@ suite.addBatch({
             "and we ensure an existing activityobject object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Comment = require("../lib/model/comment").Comment,
+                        Comment = require("../dist/lib/model/comment").Comment,
                         props = {
                             objectType: ActivityObject.COMMENT,
                             content: "FIRST POST",
@@ -387,7 +387,7 @@ suite.addBatch({
                     assert.isObject(comment);
                 },
                 "it has the right class": function(err, comment) {
-                    assert.instanceOf(comment, require("../lib/model/comment").Comment);
+                    assert.instanceOf(comment, require("../dist/lib/model/comment").Comment);
                 },
                 "it has the right passed-in attributes": function(err, comment) {
                     assert.equal(comment.objectType, "comment");
@@ -419,15 +419,15 @@ suite.addBatch({
                     assert.isObject(spoon);
                 },
                 "it has the right class": function(err, spoon) {
-                    assert.instanceOf(spoon, require("../lib/model/other").Other);
+                    assert.instanceOf(spoon, require("../dist/lib/model/other").Other);
                     assert.equal(spoon.objectType, "http://utensil.example/type/spoon");
                 }
             },
             "and we ensure an existing object property of an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Image = require("../lib/model/image").Image,
-                        Person = require("../lib/model/person").Person,
+                        Image = require("../dist/lib/model/image").Image,
+                        Person = require("../dist/lib/model/person").Person,
                         image = new Image({
                             author: {
                                 id: "urn:uuid:c3a7bd6e-fecb-11e2-ae9d-32b36b1a1850",
@@ -451,7 +451,7 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.include(image, "author");
                     assert.isObject(image.author);
-                    assert.instanceOf(image.author, require("../lib/model/person").Person);
+                    assert.instanceOf(image.author, require("../dist/lib/model/person").Person);
                     assert.include(image.author, "id");
                     assert.isString(image.author.id);
                     assert.equal(image.author.id, "urn:uuid:c3a7bd6e-fecb-11e2-ae9d-32b36b1a1850");
@@ -464,8 +464,8 @@ suite.addBatch({
             "and we compress an existing object property of an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Image = require("../lib/model/image").Image,
-                        Person = require("../lib/model/person").Person,
+                        Image = require("../dist/lib/model/image").Image,
+                        Person = require("../dist/lib/model/person").Person,
                         image = new Image({
                             author: {
                                 id: "urn:uuid:8a9d0e92-3210-4ea3-920f-3950ca8d5306",
@@ -489,7 +489,7 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.include(image, "author");
                     assert.isObject(image.author);
-                    assert.instanceOf(image.author, require("../lib/model/person").Person);
+                    assert.instanceOf(image.author, require("../dist/lib/model/person").Person);
                     assert.include(image.author, "id");
                     assert.isString(image.author.id);
                     assert.equal(image.author.id, "urn:uuid:8a9d0e92-3210-4ea3-920f-3950ca8d5306");
@@ -502,7 +502,7 @@ suite.addBatch({
             "and we compress a non-existent object property of an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Image = require("../lib/model/image").Image,
+                        Image = require("../dist/lib/model/image").Image,
                         image = new Image({
                             url: "http://example.net/images/2.jpg"
                         });
@@ -525,8 +525,8 @@ suite.addBatch({
             "and we expand an existing object property of an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Image = require("../lib/model/image").Image,
-                        Person = require("../lib/model/person").Person,
+                        Image = require("../dist/lib/model/image").Image,
+                        Person = require("../dist/lib/model/person").Person,
                         image;
 
                     Step(
@@ -559,7 +559,7 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.include(image, "author");
                     assert.isObject(image.author);
-                    assert.instanceOf(image.author, require("../lib/model/person").Person);
+                    assert.instanceOf(image.author, require("../dist/lib/model/person").Person);
                     assert.include(image.author, "id");
                     assert.isString(image.author.id);
                     assert.equal(image.author.id, "urn:uuid:bbd313d1-6f8d-4d72-bc05-bde69ba795d7");
@@ -574,7 +574,7 @@ suite.addBatch({
             "and we expand a non-existent object property of an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Image = require("../lib/model/image").Image,
+                        Image = require("../dist/lib/model/image").Image,
                         image = new Image({
                             url: "http://example.net/images/4.jpg"
                         });
@@ -597,7 +597,7 @@ suite.addBatch({
             "and we compress a scalar property of an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Image = require("../lib/model/image").Image,
+                        Image = require("../dist/lib/model/image").Image,
                         image = new Image({
                             url: "http://example.net/images/5.jpg"
                         });
@@ -621,7 +621,7 @@ suite.addBatch({
             "and we expand a scalar property of an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Image = require("../lib/model/image").Image,
+                        Image = require("../dist/lib/model/image").Image,
                         image = new Image({
                             url: "http://example.net/images/6.jpg"
                         });
@@ -645,8 +645,8 @@ suite.addBatch({
             "and we create an activityobject with an author": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Note = require("../lib/model/note").Note,
-                        Person = require("../lib/model/person").Person,
+                        Note = require("../dist/lib/model/note").Note,
+                        Person = require("../dist/lib/model/person").Person,
                         props = {
                             objectType: ActivityObject.NOTE,
                             content: "HELLO WORLD"
@@ -683,8 +683,8 @@ suite.addBatch({
             "and we create an activityobject with an author reference": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Note = require("../lib/model/note").Note,
-                        Person = require("../lib/model/person").Person,
+                        Note = require("../dist/lib/model/note").Note,
+                        Person = require("../dist/lib/model/person").Person,
                         props = {
                             objectType: ActivityObject.NOTE,
                             content: "HELLO WORLD"
@@ -722,8 +722,8 @@ suite.addBatch({
             "and we update an activityobject with an author": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Note = require("../lib/model/note").Note,
-                        Person = require("../lib/model/person").Person,
+                        Note = require("../dist/lib/model/note").Note,
+                        Person = require("../dist/lib/model/person").Person,
                         props = {
                             objectType: ActivityObject.NOTE,
                             content: "HELLO WORLD"
@@ -764,8 +764,8 @@ suite.addBatch({
             "and we update an activityobject with an author reference": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Note = require("../lib/model/note").Note,
-                        Person = require("../lib/model/person").Person,
+                        Note = require("../dist/lib/model/note").Note,
+                        Person = require("../dist/lib/model/person").Person,
                         props = {
                             objectType: ActivityObject.NOTE,
                             content: "HELLO WORLD"
@@ -821,7 +821,7 @@ suite.addBatch({
             "and we get an empty object stream": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Stream = require("../lib/model/stream").Stream;
+                        Stream = require("../dist/lib/model/stream").Stream;
 
                     Step(
                         function() {
@@ -845,8 +845,8 @@ suite.addBatch({
             "and we get an object stream with stuff in it": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Stream = require("../lib/model/stream").Stream,
-                        Service = require("../lib/model/service").Service,
+                        Stream = require("../dist/lib/model/stream").Stream,
+                        Service = require("../dist/lib/model/service").Service,
                         stream;
 
                     Step(
@@ -883,7 +883,7 @@ suite.addBatch({
                     assert.lengthOf(objects, 20);
                 },
                 "members are the correct type": function(err, objects) {
-                    var Service = require("../lib/model/service").Service;
+                    var Service = require("../dist/lib/model/service").Service;
                     assert.ifError(err);
                     for (var i = 0; i < objects.length; i++) {
                         assert.isObject(objects[i]);
@@ -894,7 +894,7 @@ suite.addBatch({
             "and we get the favoriters of a brand-new object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Place = require("../lib/model/place").Place;
+                        Place = require("../dist/lib/model/place").Place;
 
                     Step(
                         function() {
@@ -927,7 +927,7 @@ suite.addBatch({
             "and we get the favoriters count of a brand-new object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Place = require("../lib/model/place").Place;
+                        Place = require("../dist/lib/model/place").Place;
 
                     Step(
                         function() {
@@ -959,8 +959,8 @@ suite.addBatch({
             "and we add a favoriter for an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Place = require("../lib/model/place").Place,
-                        Person = require("../lib/model/person").Person,
+                        Place = require("../dist/lib/model/place").Place,
+                        Person = require("../dist/lib/model/person").Person,
                         place = null,
                         person = null;
 
@@ -1026,8 +1026,8 @@ suite.addBatch({
             "and we add then remove a favoriter for an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Place = require("../lib/model/place").Place,
-                        Person = require("../lib/model/person").Person,
+                        Place = require("../dist/lib/model/place").Place,
+                        Person = require("../dist/lib/model/person").Person,
                         place = null,
                         person = null;
 
@@ -1090,7 +1090,7 @@ suite.addBatch({
             "and we expand the feeds for an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Place = require("../lib/model/place").Place,
+                        Place = require("../dist/lib/model/place").Place,
                         place = null;
 
                     Step(
@@ -1129,7 +1129,7 @@ suite.addBatch({
             "and we create then efface an object": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Comment = require("../lib/model/comment").Comment,
+                        Comment = require("../dist/lib/model/comment").Comment,
                         comment;
 
                     Step(
@@ -1219,7 +1219,7 @@ suite.addBatch({
             },
             "and we check if a person is followable": {
                 topic: function(ActivityObject) {
-                    var Person = require("../lib/model/person").Person,
+                    var Person = require("../dist/lib/model/person").Person,
                         joey = new Person({displayName: "Joey", objectType: "person"});
                     return joey.isFollowable();
                 },
@@ -1229,7 +1229,7 @@ suite.addBatch({
             },
             "and we check if a review is followable": {
                 topic: function(ActivityObject) {
-                    var Review = require("../lib/model/review").Review,
+                    var Review = require("../dist/lib/model/review").Review,
                         badReview = new Review({displayName: "You suck", objectType: "review"});
                     return badReview.isFollowable();
                 },
@@ -1239,7 +1239,7 @@ suite.addBatch({
             },
             "and we check if an object with an activity outbox is followable": {
                 topic: function(ActivityObject) {
-                    var Review = require("../lib/model/review").Review,
+                    var Review = require("../dist/lib/model/review").Review,
                         badReview = new Review({displayName: "You suck",
                                                 objectType: "review",
                                                 links: {
@@ -1306,7 +1306,7 @@ suite.addBatch({
             "and we get a stream of favoriters": {
                 topic: function(ActivityObject) {
                     var cb = this.callback,
-                        Place = require("../lib/model/place").Place,
+                        Place = require("../dist/lib/model/place").Place,
                         place = null;
 
                     Step(
@@ -1336,7 +1336,7 @@ suite.addBatch({
             },
             "and we get the string of an object with no id": {
                 topic: function(ActivityObject) {
-                    var Game = require("../lib/model/game").Game,
+                    var Game = require("../dist/lib/model/game").Game,
                         game = new Game({objectType: "game"});
 
                     return game.toString();
@@ -1347,7 +1347,7 @@ suite.addBatch({
             },
             "and we get the string of an object with an id": {
                 topic: function(ActivityObject) {
-                    var Game = require("../lib/model/game").Game,
+                    var Game = require("../dist/lib/model/game").Game,
                         game = new Game({objectType: "game",
                                          id: "urn:uuid:c52b69b6-b717-11e2-9d1e-2c8158efb9e9"});
 

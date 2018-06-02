@@ -27,7 +27,7 @@ var assert = require("assert"),
     simplesmtp = require("simplesmtp"),
     Step = require("step"),
     emailutil = require("./lib/email"),
-    configutil = require("../lib/config"),
+    configutil = require("../dist/lib/config"),
     oneEmail = emailutil.oneEmail;
 
 var suite = vows.describe("mailer module interface").addBatch({
@@ -59,7 +59,7 @@ var suite = vows.describe("mailer module interface").addBatch({
         },
         "and we require the mailer module": {
             topic: function() {
-                return require("../lib/mailer");
+                return require("../dist/lib/mailer");
             },
             "it works": function(Mailer) {
                 assert.isObject(Mailer);

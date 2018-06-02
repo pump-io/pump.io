@@ -36,7 +36,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 suite.addBatch({
     "When we require the web module": {
         topic: function() {
-            return require("../lib/web");
+            return require("../dist/lib/web");
         },
         "it returns an object": function(web) {
             assert.isObject(web);

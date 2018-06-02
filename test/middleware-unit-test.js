@@ -26,9 +26,9 @@ var assert = require("assert"),
     path = require("path"),
     httpMocks = require("node-mocks-http"),
     _ = require("lodash"),
-    schema = require("../lib/schema"),
-    URLMaker = require("../lib/urlmaker").URLMaker,
-    User = require("../lib/model/user").User,
+    schema = require("../dist/lib/schema"),
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
+    User = require("../dist/lib/model/user").User,
     methodContext = require("./lib/methods").methodContext,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
@@ -71,7 +71,7 @@ vows.describe("middleware module interface").addBatch({
                     } else {
                         robby = user1;
                         maya = user2;
-                        mw = require("../lib/middleware");
+                        mw = require("../dist/lib/middleware");
                         cb(null, mw);
                     }
                 }

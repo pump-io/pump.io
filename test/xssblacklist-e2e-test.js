@@ -32,7 +32,7 @@ var assert = require("assert"),
 vows.describe("XSS blacklist middleware module").addBatch({
     "When we require the XSS blacklist middleware": {
         topic: function() {
-            return require("../lib/xssblacklist.js");
+            return require("../dist/lib/xssblacklist.js");
         },
         "it works": function(middleware) {
             assert.isObject(middleware);

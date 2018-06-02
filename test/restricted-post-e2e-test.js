@@ -618,7 +618,7 @@ suite.addBatch(
                             httputil.postJSON(url, cred, act, this);
                         },
                         function(err, doc, resp) {
-                            var url, cred, act, Collection = require("../lib/model/collection").Collection;
+                            var url, cred, act, Collection = require("../dist/lib/model/collection").Collection;
                             if (err) throw err;
                             cred = makeCred(cl, users.captain.pair);
                             act = {

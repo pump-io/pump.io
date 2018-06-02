@@ -25,10 +25,10 @@ var assert = require("assert"),
     Step = require("step"),
     fs = require("fs"),
     path = require("path"),
-    URLMaker = require("../lib/urlmaker").URLMaker,
-    schema = require("../lib/schema").schema,
-    Stream = require("../lib/model/stream").Stream,
-    NotInStreamError = require("../lib/model/stream").NotInStreamError,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
+    schema = require("../dist/lib/schema").schema,
+    Stream = require("../dist/lib/model/stream").Stream,
+    NotInStreamError = require("../dist/lib/model/stream").NotInStreamError,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
@@ -56,7 +56,7 @@ suite.addBatch({
 
                 DatabankObject.bank = db;
 
-                User = require("../lib/model/user").User || null;
+                User = require("../dist/lib/model/user").User || null;
 
                 cb(null, User);
             });

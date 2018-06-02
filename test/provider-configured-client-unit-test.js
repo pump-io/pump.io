@@ -25,13 +25,13 @@ var assert = require("assert"),
     _ = require("lodash"),
     fs = require("fs"),
     path = require("path"),
-    schema = require("../lib/schema"),
-    URLMaker = require("../lib/urlmaker").URLMaker,
-    randomString = require("../lib/randomstring").randomString,
-    Client = require("../lib/model/client").Client,
-    RequestToken = require("../lib/model/requesttoken").RequestToken,
-    AccessToken = require("../lib/model/accesstoken").AccessToken,
-    User = require("../lib/model/user").User,
+    schema = require("../dist/lib/schema"),
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
+    randomString = require("../dist/lib/randomstring").randomString,
+    Client = require("../dist/lib/model/client").Client,
+    RequestToken = require("../dist/lib/model/requesttoken").RequestToken,
+    AccessToken = require("../dist/lib/model/accesstoken").AccessToken,
+    User = require("../dist/lib/model/user").User,
     methodContext = require("./lib/methods").methodContext,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
@@ -56,7 +56,7 @@ vows.describe("provider module interface").addBatch({
 
             db.connect({}, function(err) {
 
-                var mod = require("../lib/provider");
+                var mod = require("../dist/lib/provider");
 
                 DatabankObject.bank = db;
 

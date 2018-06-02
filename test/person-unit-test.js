@@ -25,8 +25,8 @@ var assert = require("assert"),
     path = require("path"),
     Step = require("step"),
     _ = require("lodash"),
-    schema = require("../lib/schema").schema,
-    URLMaker = require("../lib/urlmaker").URLMaker,
+    schema = require("../dist/lib/schema").schema,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
     modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
@@ -103,7 +103,7 @@ suite.addBatch({
 
                 DatabankObject.bank = db;
 
-                mod = require("../lib/model/person");
+                mod = require("../dist/lib/model/person");
 
                 if (!mod) {
                     cb(new Error("No module"), null);
@@ -124,7 +124,7 @@ suite.addBatch({
             "it works": function(err, person) {
                 assert.ifError(err);
                 assert.isObject(person);
-                assert.instanceOf(person, require("../lib/model/person").Person);
+                assert.instanceOf(person, require("../dist/lib/model/person").Person);
             },
             "it has a followersURL() method": function(err, person) {
                 assert.ifError(err);
@@ -151,7 +151,7 @@ suite.addBatch({
         },
         "and we create a user": {
             topic: function(Person) {
-                var User = require("../lib/model/user").User;
+                var User = require("../dist/lib/model/user").User;
 
                 User.create({nickname: "evan", password: "one23four56"},
                             this.callback);
@@ -190,7 +190,7 @@ suite.addBatch({
         },
         "and we create a user and expand the profile": {
             topic: function(Person) {
-                var User = require("../lib/model/user").User,
+                var User = require("../dist/lib/model/user").User,
                     user,
                     callback = this.callback;
 

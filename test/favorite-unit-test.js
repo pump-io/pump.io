@@ -73,7 +73,7 @@ suite.addBatch(mb);
 suite.addBatch({
     "When we get the Favorite class": {
         topic: function() {
-            return require("../lib/model/favorite").Favorite;
+            return require("../dist/lib/model/favorite").Favorite;
         },
         "it exists": function(Favorite) {
             assert.isFunction(Favorite);

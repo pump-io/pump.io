@@ -25,8 +25,8 @@ var assert = require("assert"),
     Step = require("step"),
     fs = require("fs"),
     path = require("path"),
-    URLMaker = require("../../lib/urlmaker").URLMaker,
-    schema = require("../../lib/schema").schema,
+    URLMaker = require("../../dist/lib/urlmaker").URLMaker,
+    schema = require("../../dist/lib/schema").schema,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
 
@@ -64,7 +64,7 @@ var modelBatch = function(typeName, className, testSchema, testData) {
 
                 DatabankObject.bank = db;
 
-                mod = require("../../lib/model/"+typeName) || null;
+                mod = require("../../dist/lib/model/"+typeName) || null;
 
                 cb(null, mod);
             });

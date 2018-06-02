@@ -27,8 +27,8 @@ var assert = require("assert"),
     path = require("path"),
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject,
-    schema = require("../lib/schema").schema,
-    URLMaker = require("../lib/urlmaker").URLMaker;
+    schema = require("../dist/lib/schema").schema,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker;
 
 var suite = vows.describe("activityobject feeds interface");
 
@@ -53,7 +53,7 @@ suite.addBatch({
 
                 DatabankObject.bank = db;
 
-                cls = require("../lib/model/activityobject").ActivityObject;
+                cls = require("../dist/lib/model/activityobject").ActivityObject;
 
                 cb(null, cls);
             });

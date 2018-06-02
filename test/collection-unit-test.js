@@ -22,7 +22,7 @@ var assert = require("assert"),
     vows = require("vows"),
     databank = require("databank"),
     Step = require("step"),
-    URLMaker = require("../lib/urlmaker").URLMaker,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
     modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
@@ -75,7 +75,7 @@ suite.addBatch(modelBatch("collection", "Collection", testSchema, testData));
 suite.addBatch({
     "When we get the Collection class": {
         topic: function() {
-            return require("../lib/model/collection").Collection;
+            return require("../dist/lib/model/collection").Collection;
         },
         "it exists": function(Collection) {
             assert.isFunction(Collection);
@@ -92,7 +92,7 @@ suite.addBatch({
         },
         "and we create a user": {
             topic: function(Collection) {
-                var User = require("../lib/model/user").User;
+                var User = require("../dist/lib/model/user").User;
                 Step(
                     function() {
                         var props = {

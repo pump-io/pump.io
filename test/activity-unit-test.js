@@ -25,8 +25,8 @@ var assert = require("assert"),
     _ = require("lodash"),
     fs = require("fs"),
     path = require("path"),
-    URLMaker = require("../lib/urlmaker").URLMaker,
-    schema = require("../lib/schema").schema,
+    URLMaker = require("../dist/lib/urlmaker").URLMaker,
+    schema = require("../dist/lib/schema").schema,
     modelBatch = require("./lib/model").modelBatch,
     Databank = databank.Databank,
     DatabankObject = databank.DatabankObject;
@@ -234,7 +234,7 @@ suite.addBatch({
 
                 DatabankObject.bank = db;
 
-                mod = require("../lib/model/activity");
+                mod = require("../dist/lib/model/activity");
 
                 if (!mod) {
                     cb(new Error("No module"), null);
@@ -322,7 +322,7 @@ suite.addBatch({
             },
             "and we fetch its object": {
                 topic: function(activity) {
-                    var Note = require("../lib/model/note").Note;
+                    var Note = require("../dist/lib/model/note").Note;
                     Note.get(activity.object.id, this.callback);
                 },
                 "it exists": function(err, note) {
@@ -348,7 +348,7 @@ suite.addBatch({
                     assert.ifError(err);
                     assert.isObject(activity);
                     assert.instanceOf(activity,
-                                      require("../lib/model/activity").Activity);
+                                      require("../dist/lib/model/activity").Activity);
                 },
                 "its object properties have ids": function(err, activity) {
                     assert.isString(activity.actor.id);
@@ -356,9 +356,9 @@ suite.addBatch({
                 },
                 "its object properties are objects": function(err, activity) {
                     assert.isObject(activity.actor);
-                    assert.instanceOf(activity.actor, require("../lib/model/person").Person);
+                    assert.instanceOf(activity.actor, require("../dist/lib/model/person").Person);
                     assert.isObject(activity.object);
-                    assert.instanceOf(activity.object, require("../lib/model/note").Note);
+                    assert.instanceOf(activity.object, require("../dist/lib/model/note").Note);
                 },
                 "its object properties are expanded": function(err, activity) {
                     assert.isString(activity.actor.displayName);
@@ -387,9 +387,9 @@ suite.addBatch({
                     },
                     "its object properties are objects": function(err, activity) {
                         assert.isObject(activity.actor);
-                        assert.instanceOf(activity.actor, require("../lib/model/person").Person);
+                        assert.instanceOf(activity.actor, require("../dist/lib/model/person").Person);
                         assert.isObject(activity.object);
-                        assert.instanceOf(activity.object, require("../lib/model/note").Note);
+                        assert.instanceOf(activity.object, require("../dist/lib/model/note").Note);
                     },
                     "its object property has a likes property": function(err, activity) {
                         assert.ifError(err);
@@ -405,7 +405,7 @@ suite.addBatch({
         },
         "and we apply() a new follow activity": {
             topic: function(Activity) {
-                var User = require("../lib/model/user").User,
+                var User = require("../dist/lib/model/user").User,
                     users = {},
                     cb = this.callback;
 
@@ -540,7 +540,7 @@ suite.addBatch({
         },
         "and we sanitize() an activity for the actor": {
             topic: function(Activity) {
-                var User = require("../lib/model/user").User,
+                var User = require("../dist/lib/model/user").User,
                     user,
                     cb = this.callback;
 
@@ -606,7 +606,7 @@ suite.addBatch({
         },
         "and we sanitize() an activity for another user": {
             topic: function(Activity) {
-                var User = require("../lib/model/user").User,
+                var User = require("../dist/lib/model/user").User,
                     user1, user2,
                     cb = this.callback;
 
@@ -674,7 +674,7 @@ suite.addBatch({
         },
         "and we sanitize() an activity for anonymous user": {
             topic: function(Activity) {
-                var User = require("../lib/model/user").User,
+                var User = require("../dist/lib/model/user").User,
                     cb = this.callback;
 
                 Step(
@@ -738,7 +738,7 @@ suite.addBatch({
         },
         "and we check if a direct addressee is a recipient": {
             topic: function(Activity) {
-                var User = require("../lib/model/user").User,
+                var User = require("../dist/lib/model/user").User,
                     cb = this.callback,
                     p1 = {
                         objectType: "person",
@@ -781,8 +781,8 @@ suite.addBatch({
         },
         "and we check if empty user is a recipient of a public activity": {
             topic: function(Activity) {
-                var User = require("../lib/model/user").User,
-                    Collection = require("../lib/model/collection").Collection,
+                var User = require("../dist/lib/model/user").User,
+                    Collection = require("../dist/lib/model/collection").Collection,
                     cb = this.callback,
                     p1 = {
                         objectType: "person",
@@ -825,8 +825,8 @@ suite.addBatch({
         },
         "and we check if a random user is a recipient of a public activity": {
             topic: function(Activity) {
-                var User = require("../lib/model/user").User,
-                    Collection = require("../lib/model/collection").Collection,
+                var User = require("../dist/lib/model/user").User,
+                    Collection = require("../dist/lib/model/collection").Collection,
                     cb = this.callback,
                     p1 = {
                         objectType: "person",
@@ -873,7 +873,7 @@ suite.addBatch({
         },
         "and we check if a random person is a recipient of a directed activity": {
             topic: function(Activity) {
-                var User = require("../lib/model/user").User,
+                var User = require("../dist/lib/model/user").User,
                     cb = this.callback,
                     p1 = {
                         objectType: "person",
@@ -920,8 +920,8 @@ suite.addBatch({
         },
         "and we check if a list member is a recipient of an activity sent to a list": {
             topic: function(Activity) {
-                var User = require("../lib/model/user").User,
-                    Collection = require("../lib/model/collection").Collection,
+                var User = require("../dist/lib/model/user").User,
+                    Collection = require("../dist/lib/model/collection").Collection,
                     cb = this.callback,
                     user1,
                     user2,
@@ -993,7 +993,7 @@ suite.addBatch({
         },
         "and we check if a follower is a recipient of an activity sent to followers": {
             topic: function(Activity) {
-                var User = require("../lib/model/user").User,
+                var User = require("../dist/lib/model/user").User,
                     cb = this.callback,
                     user1,
                     user2;
@@ -1058,7 +1058,7 @@ suite.addBatch({
         },
         "and we check if a non-follower is a recipient of an activity sent to followers": {
             topic: function(Activity) {
-                var User = require("../lib/model/user").User,
+                var User = require("../dist/lib/model/user").User,
                     cb = this.callback,
                     user1,
                     user2;
@@ -1119,8 +1119,8 @@ suite.addBatch({
         },
         "and we check if a list non-member is a recipient of an activity sent to a list": {
             topic: function(Activity) {
-                var User = require("../lib/model/user").User,
-                    Collection = require("../lib/model/collection").Collection,
+                var User = require("../dist/lib/model/user").User,
+                    Collection = require("../dist/lib/model/collection").Collection,
                     cb = this.callback,
                     user1,
                     user2,
@@ -1182,7 +1182,7 @@ suite.addBatch({
         },
         "and we look for the post activity of a known object": {
             topic: function(Activity) {
-                var Note = require("../lib/model/note").Note,
+                var Note = require("../dist/lib/model/note").Note,
                     cb = this.callback,
                     p1 = {
                         objectType: "person",
@@ -1231,7 +1231,7 @@ suite.addBatch({
         },
         "and we look for the post activity of an unposted object": {
             topic: function(Activity) {
-                var Note = require("../lib/model/note").Note,
+                var Note = require("../dist/lib/model/note").Note,
                     cb = this.callback;
 
                 Step(
@@ -1417,7 +1417,7 @@ suite.addBatch({
 
                 DatabankObject.bank = db;
 
-                mod = require("../lib/model/activity");
+                mod = require("../dist/lib/model/activity");
 
                 if (!mod) {
                     cb(new Error("No module"), null);

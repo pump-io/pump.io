@@ -24,7 +24,7 @@ var assert = require("assert"),
 vows.describe("randomstring module interface").addBatch({
     "When we require the randomstring module": {
         topic: function() {
-            return require("../lib/randomstring");
+            return require("../dist/lib/randomstring");
         },
         "we get a module back": function(rs) {
             assert.ok(rs);
