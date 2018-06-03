@@ -1,6 +1,6 @@
-// app-https-test-as-root.js
+// app-bounce-test-as-root.js
 //
-// Test running the app over HTTPS
+// Test the HTTP -> HTTPS bounce server
 //
 // Copyright 2012, E14N https://e14n.com/
 //
