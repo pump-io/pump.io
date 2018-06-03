@@ -65,13 +65,7 @@
     "yargs": "^9.0.1"
   },
   "bin": {
-    "pump": "./bin/pump",
-    "pump-authorize": "./bin/pump-authorize",
-    "pump-follow": "./bin/pump-follow",
-    "pump-post-note": "./bin/pump-post-note",
-    "pump-register-app": "./bin/pump-register-app",
-    "pump-register-user": "./bin/pump-register-user",
-    "pump-stop-following": "./bin/pump-stop-following"
+    "pump": "./bin/pump"
   },
   "man": [
     "./doc/pump.1"
