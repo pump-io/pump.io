@@ -13,7 +13,7 @@
     "jsonlint": "^1.6.2",
     "lcov-result-merger": "^3.0.0",
     "node-mocks-http": "^1.6.1",
-    "nyc": "^11.2.1",
+    "nyc": "^12.0.2",
     "proxyquire": "2.0.0",
     "pug-lint": "^2.3.0",
     "rimraf": "^2.6.1",
