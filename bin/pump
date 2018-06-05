@@ -194,7 +194,7 @@ var launchApps = function(configBase) {
             clusterLog.debug("Received SIGUSR2 but ignoring because we're in a worker process");
         });
 
-        makeApp(config, function(err, appServer) {
+        makeApp(configBase, function(err, appServer) {
             if (err) {
                 console.error(err);
                 process.exit(1);
