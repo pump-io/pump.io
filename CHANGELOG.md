@@ -21,23 +21,37 @@ If you think something that isn't in the first list should be covered, file an i
 
 ### Added
 
+* Support Node 9
 * Ship an `npm-shrinkwrap.json` file with the package, ensuring that everyone gets the same version of all dependencies
 * Public endpoints will now content-negotiate ActivityStreams 2.0
 * OAuth 2.0 can be used for authentication and is now preferred
+* The systemd unit now links to online ReadTheDocs documentation
+* Web UI realtime now automatically recovers if it disconnects (#1479)
+* Web UI comments can now be canceled (#1471)
+* The front page image can now be changed with the `mainImage` config option (#1486)
 
 ### Changed
 
 * Don't link to OpenFarmGame in the intro text since the domain is dead
 * Dependency updates
+* Internal test suite refactoring
 
 ### Fixed
 
+* Work around `upstreamDuplicates is an object, not an array` error on remote login with some profiles
+* bin/pump now crashes immediately on configuration problems instead of infinitely spawning workers (#1642)
 * Fix layout error in the Lists view left over from 1.0's utml -> Jade transition
-
+* Long lines no longer overflow in the web UI (#1157)
+* Fix crash when directly visiting `/uploads/` (#1397)
+* Fix non-public images always returning 403 Forbidden (#1438)
+* Fix multiple web UI Like buttons turning to Unlike when just one is clicked (#768)
+* Other miscellaneous bugfixes (#1535, #1520)
 
 ### Breaking 
 
 * Drop support for Node.js 4, 5, and 7 (#1502)
+* Extract the CLI client tools to pump.io-cli and drop from this package (#381)
+* Reorganize Jade files to reduce npm package size (affects custom templates) (#1457)
 
 ## 5.1.1 - 2018-05-05
 
