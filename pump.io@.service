@@ -36,9 +36,9 @@ Environment=NODE_ENV=production
 # Instead, we blacklist what we almost for sure don't need. This is obviously much worse, but what're you gonna do?
 InaccessiblePaths=/bin
 InaccessiblePaths=/boot
-InaccessiblePaths=/dev
+ReadOnlyPaths=/dev
 InaccessiblePaths=/mnt
-InaccessiblePaths=/proc
+ReadOnlyPaths=/proc
 InaccessiblePaths=/sbin
 InaccessiblePaths=/sys
 NoNewPrivileges=true

@@ -38,6 +38,7 @@ If you think something that isn't in the first list should be covered, file an i
 
 ### Fixed
 
+* The systemd unit now works on Debian Stretch
 * Work around `upstreamDuplicates is an object, not an array` error on remote login with some profiles
 * bin/pump now crashes immediately on configuration problems instead of infinitely spawning workers (#1642)
 * Fix layout error in the Lists view left over from 1.0's utml -> Jade transition
