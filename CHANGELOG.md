@@ -46,13 +46,15 @@ If you think something that isn't in the first list should be covered, file an i
 * Fix crash when directly visiting `/uploads/` (#1397)
 * Fix non-public images always returning 403 Forbidden (#1438)
 * Fix multiple web UI Like buttons turning to Unlike when just one is clicked (#768)
-* Other miscellaneous bugfixes (#1535, #1520)
+* Other miscellaneous bugfixes (#1535, #1520,  #1465))
 
 ### Breaking 
 
 * Drop support for Node.js 4, 5, and 7 (#1502)
 * Extract the CLI client tools to pump.io-cli and drop from this package (#381)
 * Reorganize Jade files to reduce npm package size (affects custom templates) (#1457)
+* Crash instead of logging a warning when admins set internal parameters (#1396)
+* Make the CLI options parsing better aware of boolean flags and string flags (#1334)
 
 ## 5.1.1 - 2018-05-05
 
