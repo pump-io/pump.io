@@ -171,9 +171,9 @@ suite.addBatch({
         "and we try to build a config with uploaddir specified": tryToBuild({uploaddir: "/some/directory"}),
         "and we try to build a config with uploads enabled but no datadir": tryToBuild({enableUploads: true}),
         "and we try to build a config with port < 1024 while we're not root": tryToBuild({port: 80}),
-        "and we try to validate a config with nicknameBlacklist defined": tryToValidate({nicknameBlacklist: [], secret: "foobar"}),
-        "and we try to validate a config with canUpload defined": tryToValidate({canUpload: [], secret: "foobar"}),
-        "and we try to validate a config with haveEmail defined": tryToValidate({haveEmail: [], secret: "foobar"}),
+        "and we try to build a config with nicknameBlacklist defined": tryToBuild({nicknameBlacklist: [], secret: "foobar"}),
+        "and we try to build a config with canUpload defined": tryToBuild({canUpload: [], secret: "foobar"}),
+        "and we try to build a config with haveEmail defined": tryToBuild({haveEmail: [], secret: "foobar"}),
         "and we try to validate a config with secret undefined": {
             topic: function(mod) {
                 var that = this,
