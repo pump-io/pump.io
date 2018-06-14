@@ -174,6 +174,7 @@ suite.addBatch({
         "and we try to build a config with nicknameBlacklist defined": tryToBuild({nicknameBlacklist: [], secret: "foobar"}),
         "and we try to build a config with canUpload defined": tryToBuild({canUpload: [], secret: "foobar"}),
         "and we try to build a config with haveEmail defined": tryToBuild({haveEmail: [], secret: "foobar"}),
+        "and we try to build a config with workers defined": tryToBuild({workers: 1, secret: "foobar"}),
         "and we try to validate a config with secret undefined": {
             topic: function(mod) {
                 var that = this,
