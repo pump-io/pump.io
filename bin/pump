@@ -27,9 +27,11 @@ var cluster = require("cluster"),
     os = require("os"),
     fs = require("fs"),
     path = require("path"),
+    net = require("net"),
     Logger = require("bunyan"),
     _ = require("lodash"),
     importFresh = require("import-fresh"),
+    split = require("split"),
     configUtil = require("../lib/config"),
     restartEpoch = require("../lib/zerodowntime"),
     restartInflight = false,
@@ -141,6 +143,25 @@ var launchApps = function(configBase) {
             }
 
             cluster.fork();
+        });
+
+        var ctl = net.createServer(function(con) {
+            con.pipe(split()).on("data", function(line) {
+                switch (line.toLowerCase()) {
+                case "restart":
+                    triggerRestart(clusterLog, config);
+                    con.write("ACK\n");
+                    clusterLog.info("Received command over control socket.", line);
+                    break;
+                default:
+                    clusterLog.info("Received unknown command over control socket; reject.", line);
+                    con.write("NACK\n");
+                }
+            });
+        });
+
+        ctl.listen(config.controlSocket, function() {
+            clusterLog.info("Listening for control commands on path " + config.controlSocket + ".");
         });
 
         // Perform zero-downtime restart on SIGUSR2
