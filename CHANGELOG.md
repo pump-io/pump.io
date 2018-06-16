@@ -54,7 +54,7 @@ If you think something that isn't in the first list should be covered, file an i
 * Extract the CLI client tools to pump.io-cli and drop from this package (#381)
 * Reorganize Jade files to reduce npm package size (affects custom templates) (#1457)
 * Crash instead of logging a warning when admins set internal parameters (#1396)
-* Make the CLI options parsing better aware of boolean flags and string flags (#1334)
+* Make the CLI options parsing more aware of boolean flags and string flags (#1334)
 
 ## 5.1.1 - 2018-05-05
 
