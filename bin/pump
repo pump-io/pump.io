@@ -146,49 +146,7 @@ var launchApps = function(configBase) {
 
         // Perform zero-downtime restart on SIGUSR2
         // TODO handle config changes
-        process.on("SIGUSR2", function() {
-            if (config.workers <= 1) {
-                clusterLog.warn("Received SIGUSR2 but ignoring because there aren't enough workers for zero-downtime restart");
-                return;
-            }
-
-            if (config.driver !== "mongodb") {
-                clusterLog.warn("Zero-downtime restarts are only supported on MongoDB for the time being");
-                return;
-            }
-
-            if (abortedRestart) {
-                clusterLog.warn("Received SIGUSR2 but refusing due to an earlier aborted restart; please restart this process");
-                return;
-            }
-
-            if (restartInflight) {
-                clusterLog.warn("Received SIGUSR2 but ignoring because there's already an in-flight zero-downtime restart");
-                return;
-            }
-
-            restartInflight = true;
-
-            clusterLog.info("Received SIGUSR2; starting zero-downtime restart...");
-
-            clusterLog.debug("Determining zero-downtime restart eligibility...");
-
-            var newEpoch = importFresh("../lib/zerodowntime");
-            if (newEpoch !== restartEpoch) {
-                clusterLog.warn("Refusing zero-downtime restart because the new version says it's incompatible with us.");
-                return;
-            }
-
-            var workers = [];
-            for (var id in cluster.workers) {
-                workers.push(cluster.workers[id]);
-            }
-
-            restartWorker(workers.pop(), workers, clusterLog, function() {
-                clusterLog.info("Zero-downtime restart complete");
-                restartInflight = false;
-            });
-        });
+        process.on("SIGUSR2", triggerRestart.bind(null, clusterLog, config));
 
     } else {
 
@@ -210,6 +168,52 @@ var launchApps = function(configBase) {
             }
         });
     }
+};
+
+// Initialize a zero-downtime restart
+
+var triggerRestart = function(clusterLog, config) {
+    if (config.workers <= 1) {
+        clusterLog.warn("Received SIGUSR2 but ignoring because there aren't enough workers for zero-downtime restart");
+        return;
+    }
+
+    if (config.driver !== "mongodb") {
+        clusterLog.warn("Zero-downtime restarts are only supported on MongoDB for the time being");
+        return;
+    }
+
+    if (abortedRestart) {
+        clusterLog.warn("Received SIGUSR2 but refusing due to an earlier aborted restart; please restart this process");
+        return;
+    }
+
+    if (restartInflight) {
+        clusterLog.warn("Received SIGUSR2 but ignoring because there's already an in-flight zero-downtime restart");
+        return;
+    }
+
+    restartInflight = true;
+
+    clusterLog.info("Received SIGUSR2; starting zero-downtime restart...");
+
+    clusterLog.debug("Determining zero-downtime restart eligibility...");
+
+    var newEpoch = importFresh("../lib/zerodowntime");
+    if (newEpoch !== restartEpoch) {
+        clusterLog.warn("Refusing zero-downtime restart because the new version says it's incompatible with us.");
+        return;
+    }
+
+    var workers = [];
+    for (var id in cluster.workers) {
+        workers.push(cluster.workers[id]);
+    }
+
+    restartWorker(workers.pop(), workers, clusterLog, function() {
+        clusterLog.info("Zero-downtime restart complete");
+        restartInflight = false;
+    });
 };
 
 // Restart a worker and schedule the next restart
