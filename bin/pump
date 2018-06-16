@@ -119,8 +119,7 @@ var launchApps = function(configBase) {
         // Restart child processes when they die
 
         cluster.on("exit", function(worker, code, signal) {
-            // TODO remove this when we drop Node 4
-            var zeroDowntimeRestart = _.has(worker, "exitedAfterDisconnect") ? worker.exitedAfterDisconnect : worker.suicide,
+            var zeroDowntimeRestart = worker.exitedAfterDisconnect,
                 exitCode = worker.process.exitCode;
 
             // Don't respawn any workers if we aborted a restart
