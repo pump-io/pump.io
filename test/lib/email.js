@@ -21,7 +21,6 @@
 var assert = require("assert"),
     vows = require("vows"),
     _ = require("lodash"),
-    simplesmtp = require("simplesmtp"),
     oauthutil = require("./oauth"),
     apputil = require("./app"),
     httputil = require("./http"),
@@ -38,13 +37,13 @@ var oneEmail = function(smtp, addr, callback) {
     var data,
         timeoutID,
         isOurs = function(envelope) {
-            return _.includes(envelope.to, addr);
+            return _.includes(envelope.rcptTo, addr);
         },
         starter = function(envelope) {
             if (isOurs(envelope)) {
                 data = "";
                 smtp.on("data", accumulator);
-                smtp.once("dataReady", ender);
+                smtp.once("end", ender);
             }
         },
         accumulator = function(envelope, chunk) {
@@ -70,7 +69,7 @@ var oneEmail = function(smtp, addr, callback) {
         callback(new Error("Timeout waiting for email"), null);
     }, 5000);
 
-    smtp.on("startData", starter);
+    smtp.on("connect", console.error);
 };
 
 var confirmEmail = function(message, callback) {

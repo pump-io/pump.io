@@ -24,7 +24,7 @@ var assert = require("assert"),
     vows = require("vows"),
     _ = require("lodash"),
     Logger = require("bunyan"),
-    simplesmtp = require("simplesmtp"),
+    SMTPServer = require("smtp-server").SMTPServer,
     Step = require("step"),
     emailutil = require("./lib/email"),
     configutil = require("../lib/config"),
@@ -34,11 +34,7 @@ var suite = vows.describe("mailer module interface").addBatch({
     "When we set up a dummy server": {
         topic: function() {
             var callback = this.callback,
-                smtp = simplesmtp.createServer({disableDNSValidation: true});
-
-            if (_.isFunction(smtp.setMaxListeners)) {
-                smtp.setMaxListeners(100);
-            }
+                smtp = new SMTPServer({disableDNSValidation: true});
 
             smtp.listen(1623, function(err) {
                 if (err) {
@@ -54,7 +50,9 @@ var suite = vows.describe("mailer module interface").addBatch({
         },
         "teardown": function(smtp) {
             if (smtp) {
-                smtp.end(function(err) {});
+                smtp.close(function(err) {
+                    throw err;
+                });
             }
         },
         "and we require the mailer module": {

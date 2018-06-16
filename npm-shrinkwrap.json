@@ -373,6 +373,12 @@
       "resolved": "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.0.tgz",
       "integrity": "sha1-ibTRmasr7kneFk6gK4nORi1xt2c="
     },
+    "base32.js": {
+      "version": "0.1.0",
+      "resolved": "https://registry.npmjs.org/base32.js/-/base32.js-0.1.0.tgz",
+      "integrity": "sha1-tYLexpPC8R6JPPBk7mrFthMaIgI=",
+      "dev": true
+    },
     "bcrypt-pbkdf": {
       "version": "1.0.1",
       "resolved": "https://registry.npmjs.org/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.1.tgz",
@@ -386,6 +392,79 @@
       "version": "2.4.3",
       "resolved": "https://registry.npmjs.org/bcryptjs/-/bcryptjs-2.4.3.tgz",
       "integrity": "sha1-mrVie5PmBiH/fNrF2pczAn3x0Ms="
+    },
+    "bitcore-lib": {
+      "version": "0.13.19",
+      "resolved": "https://registry.npmjs.org/bitcore-lib/-/bitcore-lib-0.13.19.tgz",
+      "integrity": "sha1-SK8em9oQBnwasWJjRyta3SAA89w=",
+      "requires": {
+        "bn.js": "=2.0.4",
+        "bs58": "=2.0.0",
+        "buffer-compare": "=1.0.0",
+        "elliptic": "=3.0.3",
+        "inherits": "=2.0.1",
+        "lodash": "=3.10.1"
+      },
+      "dependencies": {
+        "bn.js": {
+          "version": "2.0.4",
+          "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-2.0.4.tgz",
+          "integrity": "sha1-Igp81nf38b+pNif/QZN3b+eBlIA="
+        },
+        "bs58": {
+          "version": "2.0.0",
+          "resolved": "https://registry.npmjs.org/bs58/-/bs58-2.0.0.tgz",
+          "integrity": "sha1-crcTvtIjoKxRi72g484/SBfznrU="
+        },
+        "buffer-compare": {
+          "version": "1.0.0",
+          "resolved": "https://registry.npmjs.org/buffer-compare/-/buffer-compare-1.0.0.tgz",
+          "integrity": "sha1-rKp6lm6Y7un64Usxw5pfFY+zxKI="
+        },
+        "elliptic": {
+          "version": "3.0.3",
+          "resolved": "http://registry.npmjs.org/elliptic/-/elliptic-3.0.3.tgz",
+          "integrity": "sha1-hlybQgv75VAGuflp+XoNLESWZZU=",
+          "requires": {
+            "bn.js": "^2.0.0",
+            "brorand": "^1.0.1",
+            "hash.js": "^1.0.0",
+            "inherits": "^2.0.1"
+          },
+          "dependencies": {
+            "brorand": {
+              "version": "1.0.5",
+              "resolved": "https://registry.npmjs.org/brorand/-/brorand-1.0.5.tgz",
+              "integrity": "sha1-B7VMowKGq9Fxig4qgwgD79yb+gQ="
+            },
+            "hash.js": {
+              "version": "1.0.3",
+              "resolved": "https://registry.npmjs.org/hash.js/-/hash.js-1.0.3.tgz",
+              "integrity": "sha1-EzL/ABVsCg/92CNgE9B7d6BFFXM=",
+              "requires": {
+                "inherits": "^2.0.1"
+              }
+            }
+          }
+        },
+        "inherits": {
+          "version": "2.0.1",
+          "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz",
+          "integrity": "sha1-sX0I0ya0Qj5Wjv9xn5GwscvfafE="
+        },
+        "lodash": {
+          "version": "3.10.1",
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz",
+          "integrity": "sha1-W/Rejkm6QYnhfUgnid/RW9FAt7Y="
+        }
+      }
+    },
+    "bitcore-message": {
+      "version": "github:CoMakery/bitcore-message#8799cc327029c3d34fc725f05b2cf981363f6ebf",
+      "from": "github:CoMakery/bitcore-message#dist",
+      "requires": {
+        "bitcore-lib": "^0.13.7"
+      }
     },
     "bluebird": {
       "version": "3.5.1",
@@ -2204,6 +2283,12 @@
       "resolved": "https://registry.npmjs.org/ipaddr.js/-/ipaddr.js-1.6.0.tgz",
       "integrity": "sha1-4/o1e3c9phnybpXwSdBVxyeW+Gs="
     },
+    "ipv6-normalize": {
+      "version": "1.0.1",
+      "resolved": "https://registry.npmjs.org/ipv6-normalize/-/ipv6-normalize-1.0.1.tgz",
+      "integrity": "sha1-GzJYKQ02X6gyOeiZB93kWS52IKg=",
+      "dev": true
+    },
     "is-absolute": {
       "version": "1.0.0",
       "resolved": "https://registry.npmjs.org/is-absolute/-/is-absolute-1.0.0.tgz",
@@ -2704,6 +2789,7 @@
       "integrity": "sha1-ST3135zTqfGxyylrvT0IFnnyDKg=",
       "requires": {
         "async": "^1.5.2",
+        "bitcore-message": "github:CoMakery/bitcore-message#8799cc327029c3d34fc725f05b2cf981363f6ebf",
         "commander": "~2.9.0",
         "es6-promise": "~4.0.5",
         "jsonld": "0.4.3",
@@ -3101,6 +3187,12 @@
         "range-parser": "^1.2.0",
         "type-is": "^1.6.14"
       }
+    },
+    "nodemailer": {
+      "version": "4.6.5",
+      "resolved": "https://registry.npmjs.org/nodemailer/-/nodemailer-4.6.5.tgz",
+      "integrity": "sha512-+bt+BgmnOXDz1uIaWXfXuTESth8UHkhtu7+X8+X2W+CHAn0AuuCyCk854qnathYQLWEC2jkpx7/pkVHcfmLKDw==",
+      "dev": true
     },
     "nomnom": {
       "version": "1.8.1",
@@ -5654,12 +5746,6 @@
       "integrity": "sha512-eTPo5t/4bgaMNZxyjWx6N2a6AuE0mq51KWvpc7nU/MAqixcI6v6KrGUKES0HaomdnolQBBXU/++X6/QQ9KL4tw==",
       "dev": true
     },
-    "rai": {
-      "version": "0.1.12",
-      "resolved": "https://registry.npmjs.org/rai/-/rai-0.1.12.tgz",
-      "integrity": "sha1-jM/QFND5YIYw3XPBm45LBXdUpqY=",
-      "dev": true
-    },
     "ramda": {
       "version": "0.25.0",
       "resolved": "https://registry.npmjs.org/ramda/-/ramda-0.25.0.tgz",
@@ -6142,14 +6228,15 @@
       "resolved": "https://registry.npmjs.org/signal-exit/-/signal-exit-3.0.2.tgz",
       "integrity": "sha1-tf3AjxKH6hF4Yo5BXiUTK3NkbG0="
     },
-    "simplesmtp": {
-      "version": "0.3.35",
-      "resolved": "https://registry.npmjs.org/simplesmtp/-/simplesmtp-0.3.35.tgz",
-      "integrity": "sha1-AXseuLJjF6w20qKoqTJjGIBzagM=",
+    "smtp-server": {
+      "version": "3.4.5",
+      "resolved": "https://registry.npmjs.org/smtp-server/-/smtp-server-3.4.5.tgz",
+      "integrity": "sha512-0XcQHi4BUUMSUuZWsm+PX7jE3BeXMX57E6ch2LO0C9F8Ri+IAgfeG0INGxgC5LWex2SoKF5RfqCSBfPRdaS86A==",
       "dev": true,
       "requires": {
-        "rai": "~0.1.11",
-        "xoauth2": "~0.1.8"
+        "base32.js": "0.1.0",
+        "ipv6-normalize": "1.0.1",
+        "nodemailer": "4.6.5"
       }
     },
     "sntp": {
@@ -7144,12 +7231,6 @@
       "version": "0.1.19",
       "resolved": "https://registry.npmjs.org/xmldom/-/xmldom-0.1.19.tgz",
       "integrity": "sha1-Yx/Ad3bv2EEYvyUXGzftTQdaCrw="
-    },
-    "xoauth2": {
-      "version": "0.1.8",
-      "resolved": "https://registry.npmjs.org/xoauth2/-/xoauth2-0.1.8.tgz",
-      "integrity": "sha1-uRb/EOz7VDIPFvJKPpdRIGU6sNI=",
-      "dev": true
     },
     "xtend": {
       "version": "4.0.1",
