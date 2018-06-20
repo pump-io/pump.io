@@ -238,7 +238,7 @@ var launchApps = function(configBase) {
 var triggerRestart = function(clusterLog, config) {
     restartInflight = true;
 
-    clusterLog.info("Received SIGUSR2; starting zero-downtime restart...");
+    clusterLog.info("Starting zero-downtime restart...");
 
     clusterLog.debug("Determining zero-downtime restart eligibility...");
 
