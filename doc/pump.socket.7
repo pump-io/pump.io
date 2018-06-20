@@ -55,6 +55,8 @@ or
 .Ql NACK
 response before sending another command unless it either needs information from the first command before proceeding or wants to be sure that the first command succeeded before sending the second.
 Command names are case-insensitive but traditionally written in uppercase.
+.Pp
+Blank lines are silently ignored.
 .Ss Available commands
 .Bl -tag -width Ds
 .It Ic CMDS

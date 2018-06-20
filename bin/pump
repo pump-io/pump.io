@@ -196,6 +196,9 @@ var launchApps = function(configBase) {
                     triggerRestart(clusterLog, config);
                     con.write("ACK\n");
                     break;
+                case "":
+                    // Ignore this because clients apparently send it when closing the socket connection
+                    break;
                 default:
                     clusterLog.info("Received unknown command over control socket; rejecting.", {socketCmd: line});
                     con.write("NACK unknown\n");
