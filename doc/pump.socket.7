@@ -57,6 +57,11 @@ response before sending another command unless it either needs information from 
 Command names are case-insensitive but traditionally written in uppercase.
 .Pp
 Blank lines are silently ignored.
+The client is not required to close the connection in any way besides disconnecting from the socket; it is also not required to wait for
+.Ql ACK
+or
+.Ql NACK
+responses from the server.
 .Ss Available commands
 .Bl -tag -width Ds
 .It Ic CMDS
