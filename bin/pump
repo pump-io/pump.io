@@ -32,6 +32,7 @@ var cluster = require("cluster"),
     _ = require("lodash"),
     split = require("split"),
     onExit = require("signal-exit"),
+    pkg = require("../package"),
     configUtil = require("../lib/config"),
     restartUtil = require("../lib/restartutil"),
     restartInflight = false,
@@ -148,6 +149,17 @@ var launchApps = function(configBase) {
         var ctl = net.createServer(function(con) {
             con.pipe(split()).on("data", function(line) {
                 switch (line.toLowerCase()) {
+                case "cmds":
+                    clusterLog.info("Received CMDS command over control socket.");
+                    con.write("ACK CMDS VERSION RESTART\n");
+                    break;
+                case "version":
+                    clusterLog.info("Received VERSION command over control socket.");
+                    con.write("ACK " + pkg.version + "\n");
+                    break;
+                case "easter":
+                    con.write("ACK EGG\n");
+                    break;
                 case "restart":
                     clusterLog.info("Received RESTART command over control socket.");
                     var restartCheck = restartUtil.checkRequirements(config, abortedRestart, restartInflight);

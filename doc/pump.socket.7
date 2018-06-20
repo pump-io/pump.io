@@ -57,6 +57,14 @@ response before sending another command unless it either needs information from 
 Command names are case-insensitive but traditionally written in uppercase.
 .Ss Available commands
 .Bl -tag -width Ds
+.It Ic CMDS
+Returns a space-separated, uppercase list of commands the daemon understands.
+Does not return
+.Ql NACK .
+.It Ic VERSION
+Returns the version of the running daemon.
+Does not return
+.Ql NACK .
 .It Ic RESTART
 Triggers a zero-downtime restart.
 Receipt of an
