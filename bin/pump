@@ -7,7 +7,7 @@
 // entry point activity pump application
 //
 // Copyright 2011-2012, E14N https://e14n.com/
-// Copyright 2017, AJ Jordan <alex@strugee.net>
+// Copyright 2017-2018 AJ Jordan <alex@strugee.net>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ var cluster = require("cluster"),
     _ = require("lodash"),
     importFresh = require("import-fresh"),
     split = require("split"),
+    onExit = require("signal-exit"),
     configUtil = require("../lib/config"),
     restartEpoch = require("../lib/zerodowntime"),
     restartInflight = false,
@@ -162,6 +163,14 @@ var launchApps = function(configBase) {
 
         ctl.listen(config.controlSocket, function() {
             clusterLog.info("Listening for control commands on path " + config.controlSocket + ".");
+        });
+
+        onExit(function() {
+            try {
+                fs.unlinkSync(config.controlSocket);
+            } catch (e) {
+                if (e.code !== "ENOENT") throw e;
+            }
         });
 
         // Perform zero-downtime restart on SIGUSR2

@@ -55,6 +55,7 @@
     "send": "^0.16.1",
     "serve-favicon": "^2.3.0",
     "showdown": "^1.4.1",
+    "signal-exit": "^3.0.2",
     "sockjs": "0.3.x",
     "split": "^1.0.1",
     "ssl-config": "^1.0.0",
