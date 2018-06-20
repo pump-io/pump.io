@@ -176,6 +176,8 @@ var launchApps = function(configBase) {
                         default:
                             throw new Error("Unknown failure reason " + restartCheck.reason);
                         }
+                        con.write("\n");
+                        return;
                     }
 
                     triggerRestart(clusterLog, config);
@@ -184,7 +186,7 @@ var launchApps = function(configBase) {
                     break;
                 default:
                     clusterLog.info("Received unknown command over control socket; rejecting.", {socketCmd: line});
-                    con.write("NACK\n");
+                    con.write("NACK unknown\n");
                 }
             });
         });
