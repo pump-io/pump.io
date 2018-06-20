@@ -149,6 +149,7 @@ var launchApps = function(configBase) {
             con.pipe(split()).on("data", function(line) {
                 switch (line.toLowerCase()) {
                 case "restart":
+                    clusterLog.info("Received RESTART command over control socket.");
                     var restartCheck = restartUtil.checkRequirements(config, abortedRestart, restartInflight);
                     if (!restartCheck.ok) {
                         con.write("NACK ");
@@ -182,7 +183,6 @@ var launchApps = function(configBase) {
 
                     triggerRestart(clusterLog, config);
                     con.write("ACK\n");
-                    clusterLog.info("Received RESTART command over control socket.");
                     break;
                 default:
                     clusterLog.info("Received unknown command over control socket; rejecting.", {socketCmd: line});
