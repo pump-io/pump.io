@@ -173,15 +173,7 @@ var launchApps = function(configBase) {
             }
         });
 
-        // Perform zero-downtime restart on SIGUSR2
-        // TODO handle config changes
-        process.on("SIGUSR2", triggerRestart.bind(null, clusterLog, config));
-
     } else {
-
-        process.on("SIGUSR2", function() {
-            clusterLog.debug("Received SIGUSR2 but ignoring because we're in a worker process");
-        });
 
         makeApp(configBase, function(err, appServer) {
             if (err) {
