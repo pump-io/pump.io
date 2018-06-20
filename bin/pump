@@ -180,10 +180,10 @@ var launchApps = function(configBase) {
 
                     triggerRestart(clusterLog, config);
                     con.write("ACK\n");
-                    clusterLog.info("Received command over control socket.", line);
+                    clusterLog.info("Received RESTART command over control socket.");
                     break;
                 default:
-                    clusterLog.info("Received unknown command over control socket; reject.", line);
+                    clusterLog.info("Received unknown command over control socket; rejecting.", {socketCmd: line});
                     con.write("NACK\n");
                 }
             });
