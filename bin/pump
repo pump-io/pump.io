@@ -30,11 +30,10 @@ var cluster = require("cluster"),
     net = require("net"),
     Logger = require("bunyan"),
     _ = require("lodash"),
-    importFresh = require("import-fresh"),
     split = require("split"),
     onExit = require("signal-exit"),
     configUtil = require("../lib/config"),
-    restartEpoch = require("../lib/zerodowntime"),
+    restartUtil = require("../lib/restartutil"),
     restartInflight = false,
     abortedRestart = false,
     restartedWorker = null,
@@ -150,6 +149,35 @@ var launchApps = function(configBase) {
             con.pipe(split()).on("data", function(line) {
                 switch (line.toLowerCase()) {
                 case "restart":
+                    var restartCheck = restartUtil.checkRequirements(config, abortedRestart, restartInflight);
+                    if (!restartCheck.ok) {
+                        con.write("NACK ");
+                        switch (restartCheck.reason) {
+                        case "no workers":
+                            log.warn("Received restart request but ignoring because there aren't enough workers for zero-downtime restart");
+                            con.write("no workers");
+                            break;
+                        case "bad driver":
+                            log.warn("Zero-downtime restarts are only supported on MongoDB for the time being");
+                            con.write("bad driver");
+                            break;
+                        case "aborted restart":
+                            log.warn("Received restart request but refusing due to an earlier aborted restart; please restart this process");
+                            con.write("aborted restart");
+                            break;
+                        case "restart inflight":
+                            log.warn("Received restart request but ignoring because there's already an in-flight zero-downtime restart");
+                            con.write("restart in flight");
+                            break;
+                        case "bad epoch":
+                            log.warn("Refusing zero-downtime restart because the new version says it's incompatible with us");
+                            con.write("incompatibility");
+                            break;
+                        default:
+                            throw new Error("Unknown failure reason " + restartCheck.reason);
+                        }
+                    }
+
                     triggerRestart(clusterLog, config);
                     con.write("ACK\n");
                     clusterLog.info("Received command over control socket.", line);
@@ -194,37 +222,14 @@ var launchApps = function(configBase) {
 // Initialize a zero-downtime restart
 
 var triggerRestart = function(clusterLog, config) {
-    if (config.workers <= 1) {
-        clusterLog.warn("Received SIGUSR2 but ignoring because there aren't enough workers for zero-downtime restart");
-        return;
-    }
-
-    if (config.driver !== "mongodb") {
-        clusterLog.warn("Zero-downtime restarts are only supported on MongoDB for the time being");
-        return;
-    }
-
-    if (abortedRestart) {
-        clusterLog.warn("Received SIGUSR2 but refusing due to an earlier aborted restart; please restart this process");
-        return;
-    }
-
-    if (restartInflight) {
-        clusterLog.warn("Received SIGUSR2 but ignoring because there's already an in-flight zero-downtime restart");
-        return;
-    }
-
     restartInflight = true;
 
     clusterLog.info("Received SIGUSR2; starting zero-downtime restart...");
 
     clusterLog.debug("Determining zero-downtime restart eligibility...");
 
-    var newEpoch = importFresh("../lib/zerodowntime");
-    if (newEpoch !== restartEpoch) {
-        clusterLog.warn("Refusing zero-downtime restart because the new version says it's incompatible with us.");
-        return;
-    }
+    var reqs = restartUtil.checkRequirements(config, abortedRestart, restartInflight);
+    if (!reqs.ok) return;
 
     var workers = [];
     for (var id in cluster.workers) {
