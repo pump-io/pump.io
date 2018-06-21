@@ -62,9 +62,7 @@ The client is not required to close the connection in any way besides disconnect
 or
 .Ql NACK
 responses from the server.
-Note however that the server may leave the connection in a half-open state and write queued responses even after the client has sent a
-.Ql FIN
-packet.
+Any responses that would have been written after the socket is closed will be silently dropped.
 .Ss Available commands
 .Bl -tag -width Ds
 .It Ic CMDS
