@@ -109,10 +109,6 @@ var launchApps = function(configBase) {
 
     if (cluster.isMaster) {
 
-        // We pass configBase because we want what the user originally gave
-        // The only reason we waited this long (and until after parsing) was to get a log
-        configUtil.validateConfig(configBase, log);
-
         Dispatch.start(log);
 
         for (i = 0; i < config.workers; i++) {
