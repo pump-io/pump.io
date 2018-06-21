@@ -1,0 +1,75 @@
+.\" pumpctl.8
+.\"
+.\" pumpctl(8) manual page
+.\"
+.\" Copyright 2018 AJ Jordan <alex@strugee.net>
+.\"
+.\" Licensed under the Apache License, Version 2.0 (the "License");
+.\" you may not use this file except in compliance with the License.
+.\" You may obtain a copy of the License at
+.\"
+.\"     https://www.apache.org/licenses/LICENSE-2.0
+.\"
+.\" Unless required by applicable law or agreed to in writing, software
+.\" distributed under the License is distributed on an "AS IS" BASIS,
+.\" WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+.\" See the License for the specific language governing permissions and
+.\" limitations under the License.
+.Dd June 20, 2018
+.Dt PUMPCTL 8
+.Os
+.Sh NAME
+.Nm pumpctl
+.Nd admin CLI to interact with a running pump.io daemon
+.Sh SYNOPSIS
+.Nm
+.Op Fl s Pa socket
+.Ar action
+.Sh DESCRIPTION
+The
+.Nm
+utility speaks to the
+.Xr pump.socket 7
+file of a running
+.Xr pump 8
+daemon.
+It supports all features that the underlying protocol supports.
+.Pp
+The options are as follows:
+.Bl -tag -width Ds
+.It Fl h
+Print help.
+.It Fl s Pa socket
+Use
+.Pa socket
+as the socket to talk to instead of the default
+.Pa /var/run/pump.socket .
+.It Fl vp
+Print version.
+.El
+.\" .Sh ENVIRONMENT
+.\" For sections 1, 6, 7, and 8 only.
+.\" .Sh FILES
+.\" .Sh EXIT STATUS
+.\" For sections 1, 6, and 8 only.
+.\" .Sh EXAMPLES
+.\" .Sh DIAGNOSTICS
+.\" For sections 1, 4, 6, 7, 8, and 9 printf/stderr messages only.
+.Sh SEE ALSO
+.Xr pump.socket 7 ,
+.Xr pump 8
+.Sh HISTORY
+The
+.Nm
+command first appeared in pump.io 6.0.
+.Sh AUTHORS
+.An AJ Jordan Aq Mt alex@strugee.net
+.Sh CAVEATS
+.Nm
+does not parse any configuration files.
+As such, if the admin has specified a different
+.Cm controlSocket
+in the config, the socket path must be passed on the commandline.
+.Sh BUGS
+Bugs are tracked in GitHub:
+.Lk https://github.com/pump-io/pump.io/issues

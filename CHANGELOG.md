@@ -19,6 +19,8 @@ If you think something that isn't in the first list should be covered, file an i
 
 ## 6.0.0 beta 0 - future
 
+You cannot upgrade to this release with a zero-downtime restart.
+
 ### Added
 
 * Support Node 9

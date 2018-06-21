@@ -171,6 +171,8 @@ suite.addBatch({
         "and we try to build a config with uploaddir specified": tryToBuild({uploaddir: "/some/directory"}),
         "and we try to build a config with uploads enabled but no datadir": tryToBuild({enableUploads: true}),
         "and we try to build a config with port < 1024 while we're not root": tryToBuild({port: 80}),
+        "and we try to build a config with controlSocket set to a TCP port number": tryToBuild({controlSocket: 9000}),
+        "and we try to build a config with controlSocket set to a string that looks like a TCP port number": tryToBuild({controlSocket: "9000"}),
         "and we try to build a config with nicknameBlacklist defined": tryToBuild({nicknameBlacklist: [], secret: "foobar"}),
         "and we try to build a config with canUpload defined": tryToBuild({canUpload: [], secret: "foobar"}),
         "and we try to build a config with haveEmail defined": tryToBuild({haveEmail: [], secret: "foobar"}),

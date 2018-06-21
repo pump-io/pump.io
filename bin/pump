@@ -7,7 +7,7 @@
 // entry point activity pump application
 //
 // Copyright 2011-2012, E14N https://e14n.com/
-// Copyright 2017, AJ Jordan <alex@strugee.net>
+// Copyright 2017-2018 AJ Jordan <alex@strugee.net>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,11 +27,14 @@ var cluster = require("cluster"),
     os = require("os"),
     fs = require("fs"),
     path = require("path"),
+    net = require("net"),
     Logger = require("bunyan"),
     _ = require("lodash"),
-    importFresh = require("import-fresh"),
+    split = require("split"),
+    onExit = require("signal-exit"),
+    pkg = require("../package"),
     configUtil = require("../lib/config"),
-    restartEpoch = require("../lib/zerodowntime"),
+    restartUtil = require("../lib/restartutil"),
     restartInflight = false,
     abortedRestart = false,
     restartedWorker = null,
@@ -79,7 +82,7 @@ var cluster = require("cluster"),
            .env("PUMPIO")
            // TODO more validation of booleans, etc. here
            .number(["port", "urlPort", "smtpport", "smtptimeout", "cleanupSession", "cleanupNonce"])
-           .string(["driver", "hostname", "address", "secret", "site", "owner", "ownerURL", "mainImage", "appendFooter", "logfile", "logLevel", "serverUser", "key", "cert", "datadir", "firehose", "spamhost", "spamclientid", "spamclientsecret", "smtpserver", "smtpuser", "smtppass", "smtpfrom", "favicon"])
+    .string(["driver", "hostname", "address", "secret", "site", "owner", "ownerURL", "mainImage", "appendFooter", "logfile", "logLevel", "serverUser", "key", "cert", "datadir", "firehose", "spamhost", "spamclientid", "spamclientsecret", "smtpserver", "smtpuser", "smtppass", "smtpfrom", "favicon", "controlSocket"])
            .boolean(["bounce", "noweb", "nologger", "enableUploads", "debugClient", "disableRegistration", "noCDN", "requireEmail", "smtpusetls", "smtpusessl", "compress", "sockjs"])
            .alias("help", "h")
            .help()
@@ -143,15 +146,98 @@ var launchApps = function(configBase) {
             cluster.fork();
         });
 
-        // Perform zero-downtime restart on SIGUSR2
-        // TODO handle config changes
-        process.on("SIGUSR2", triggerRestart.bind(null, clusterLog, config));
+        var ctl = net.createServer(function(con) {
+            con.on("error", function(err) {
+                /*
+                  Suppress errors when we write() after the
+                  connection is closed. This is just easier than
+                  guarding all write() calls on con.writable.
+                */
+                if (err.code !== "EPIPE") throw err;
+            });
+
+            /*
+              Note that we are totally abusing Writable#write() by not
+              checking the return value (and potentially waiting for
+              the "drain" event), but it's okay because we're only
+              writing a small amount of data and it makes stuff
+              easier, and also since we're the original source we'd
+              just buffer it in memory anyway and we'd have the exact
+              same memory problem that backpressure is supposed to
+              solve so who cares.
+            */
+            con.pipe(split()).on("data", function(line) {
+                switch (line.toLowerCase()) {
+                case "cmds":
+                    clusterLog.info("Received CMDS command over control socket.");
+                    con.write("ACK CMDS VERSION RESTART\n");
+                    break;
+                case "version":
+                    clusterLog.info("Received VERSION command over control socket.");
+                    con.write("ACK " + pkg.version + "\n");
+                    break;
+                case "easter":
+                    con.write("ACK EGG\n");
+                    break;
+                case "restart":
+                    clusterLog.info("Received RESTART command over control socket.");
+                    var restartCheck = restartUtil.checkRequirements(config, abortedRestart, restartInflight);
+                    if (!restartCheck.ok) {
+                        con.write("NACK ");
+                        switch (restartCheck.reason) {
+                        case "no workers":
+                            log.warn("Received restart request but ignoring because there aren't enough workers for zero-downtime restart");
+                            con.write("no workers");
+                            break;
+                        case "bad driver":
+                            log.warn("Zero-downtime restarts are only supported on MongoDB for the time being");
+                            con.write("bad driver");
+                            break;
+                        case "aborted restart":
+                            log.warn("Received restart request but refusing due to an earlier aborted restart; please restart this process");
+                            con.write("aborted restart");
+                            break;
+                        case "restart inflight":
+                            log.warn("Received restart request but ignoring because there's already an in-flight zero-downtime restart");
+                            con.write("restart in flight");
+                            break;
+                        case "bad epoch":
+                            log.warn("Refusing zero-downtime restart because the new version says it's incompatible with us");
+                            con.write("incompatibility");
+                            break;
+                        default:
+                            throw new Error("Unknown failure reason " + restartCheck.reason);
+                        }
+                        con.write("\n");
+                        return;
+                    }
+
+                    triggerRestart(clusterLog, config);
+                    con.write("ACK\n");
+                    break;
+                case "":
+                    // Ignore this because clients apparently send it when closing the socket connection
+                    break;
+                default:
+                    clusterLog.info("Received unknown command over control socket; rejecting.", {socketCmd: line});
+                    con.write("NACK unknown\n");
+                }
+            });
+        });
+
+        ctl.listen(config.controlSocket, function() {
+            clusterLog.info("Listening for control commands on path " + config.controlSocket + ".");
+        });
+
+        onExit(function() {
+            try {
+                fs.unlinkSync(config.controlSocket);
+            } catch (e) {
+                if (e.code !== "ENOENT") throw e;
+            }
+        });
 
     } else {
-
-        process.on("SIGUSR2", function() {
-            clusterLog.debug("Received SIGUSR2 but ignoring because we're in a worker process");
-        });
 
         makeApp(configBase, function(err, appServer) {
             if (err) {
@@ -172,37 +258,14 @@ var launchApps = function(configBase) {
 // Initialize a zero-downtime restart
 
 var triggerRestart = function(clusterLog, config) {
-    if (config.workers <= 1) {
-        clusterLog.warn("Received SIGUSR2 but ignoring because there aren't enough workers for zero-downtime restart");
-        return;
-    }
-
-    if (config.driver !== "mongodb") {
-        clusterLog.warn("Zero-downtime restarts are only supported on MongoDB for the time being");
-        return;
-    }
-
-    if (abortedRestart) {
-        clusterLog.warn("Received SIGUSR2 but refusing due to an earlier aborted restart; please restart this process");
-        return;
-    }
-
-    if (restartInflight) {
-        clusterLog.warn("Received SIGUSR2 but ignoring because there's already an in-flight zero-downtime restart");
-        return;
-    }
-
     restartInflight = true;
 
-    clusterLog.info("Received SIGUSR2; starting zero-downtime restart...");
+    clusterLog.info("Starting zero-downtime restart...");
 
     clusterLog.debug("Determining zero-downtime restart eligibility...");
 
-    var newEpoch = importFresh("../lib/zerodowntime");
-    if (newEpoch !== restartEpoch) {
-        clusterLog.warn("Refusing zero-downtime restart because the new version says it's incompatible with us.");
-        return;
-    }
+    var reqs = restartUtil.checkRequirements(config, abortedRestart, restartInflight);
+    if (!reqs.ok) return;
 
     var workers = [];
     for (var id in cluster.workers) {

@@ -1,0 +1,95 @@
+#!/usr/bin/env node
+
+// -*- mode: javascript -*-
+
+// pumpctl
+//
+// admin CLI that talks to a running pump.io daemon
+//
+// Copyright 2018 AJ Jordan <alex@strugee.net>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+"use strict";
+
+var net = require("net"),
+    split = require("split"),
+    pkg = require("../package"),
+    argv = require("yargs")
+           .usage("Usage: $0")
+           .help("h")
+           // Specify the version manually so Yargs doesn't think
+           // we're passing a version string
+           .version("v", pkg.version)
+           .describe("s", "UNIX domain socket to connect to")
+           .default("s", "/var/run/pump.socket")
+           .command("restart", "Trigger a zero-downtime restart", _restart)
+           .command("version", "Query the running master process version", _version)
+           .argv;
+
+// Annoyingly we have to defer command execution until the current
+// event queue phase completes so that the yargs buildup can finish
+// running and argv therefore isn't undefined.
+
+function _restart() {
+        process.nextTick(restart);
+}
+
+function _version() {
+        process.nextTick(version);
+}
+
+function restart() {
+        var socket = net.connect(argv.socketPath, function() {
+                socket.write("RESTART\n");
+                socket.pipe(split()).on("data", function(line) {
+                        if (line === "ACK\n") return;
+
+                        if (line.slice(0, 4) !== "NACK") throw new Error("Invalid response from control server: " + JSON.stringify(line));
+
+                        switch (line.slice(5).trim()) {
+                        case "bad driver":
+                                console.error("pumpctl: server indicated unsupported Databank driver");
+                                process.exitCode = 1;
+                                socket.end();
+                                break;
+                        case "aborted restart":
+                                console.error("pumpctl: server indicated that a previous restart failed and is in an unknown state");
+                                console.error("This is a dangerous condition; please restart pump.io as soon as possible.");
+                                process.exitCode = 1;
+                                socket.end();
+                                break;
+                        case "restart in flight":
+                                console.error("pumpctl: restart already in progress");
+                                process.exitCode = 1;
+                                socket.end();
+                                break;
+                        case "incompatibility":
+                                console.error("pumpctl: new codebase indicates incompatibility");
+                                process.exitCode = 1;
+                                socket.end();
+                                break;
+                        }
+                });
+        });
+}
+
+function version() {
+        var socket = net.connect(argv.socketPath, function() {
+                socket.write("VERSION\n");
+                socket.pipe(split()).on("data", function(line) {
+                        console.log(line.slice(4).trim());
+                        socket.end();
+                });
+        });
+}

@@ -1,0 +1,147 @@
+.\" pump.socket.7
+.\"
+.\" pump.socket(7) manual page
+.\"
+.\" Copyright 2018 AJ Jordan <alex@strugee.net>
+.\"
+.\" Licensed under the Apache License, Version 2.0 (the "License");
+.\" you may not use this file except in compliance with the License.
+.\" You may obtain a copy of the License at
+.\"
+.\"     https://www.apache.org/licenses/LICENSE-2.0
+.\"
+.\" Unless required by applicable law or agreed to in writing, software
+.\" distributed under the License is distributed on an "AS IS" BASIS,
+.\" WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+.\" See the License for the specific language governing permissions and
+.\" limitations under the License.
+.Dd June 19, 2018
+.Dt PUMP.SOCKET 7
+.Os
+.Sh NAME
+.Nm pump.socket
+.Nd protocol for pump.io's control socket
+.Sh DESCRIPTION
+.Nm
+is a Unix domain socket that uses a simple line-based protocol to control a running pump.io daemon.
+This protocol can be used to request actions and query information.
+.Ss Protocol semantics
+Command names are written directly to the socket followed by a newline and will be responded to with either
+.Ql ACK
+or
+.Ql NACK
+for success or failure, respectively.
+.Ql NACK
+responses will always append a space followed by a reason string for the failure; exactly what these reasons can be will depend on the command.
+However, any unrecognized command will always return the reason string
+.Ql unknown .
+Reason strings may contain any character except newline and null, including whitespace, and are terminated by a newline character.
+Reason strings may be assumed to be stable across pump.io versions.
+.Pp
+Certain commands may also return data.
+In this case, a space followed by the data is appended to the
+.Ql ACK
+response.
+Like
+.Ql NACK
+reason strings, the may contain any character except newline and null, and is terminated by a newline.
+Commands that don't return data will respond with
+.Ql ACK
+directly followed by a newline.
+.Pp
+The client is not required to wait for an
+.Ql ACK
+or
+.Ql NACK
+response before sending another command unless it either needs information from the first command before proceeding or wants to be sure that the first command succeeded before sending the second.
+Command names are case-insensitive but traditionally written in uppercase.
+.Pp
+Blank lines are silently ignored.
+The client is not required to close the connection in any way besides disconnecting from the socket; it is also not required to wait for
+.Ql ACK
+or
+.Ql NACK
+responses from the server.
+Any responses that would have been written after the socket is closed will be silently dropped.
+.Ss Available commands
+.Bl -tag -width Ds
+.It Ic CMDS
+Returns a space-separated, uppercase list of commands the daemon understands.
+Does not return
+.Ql NACK .
+.It Ic VERSION
+Returns the version of the running daemon's master process.
+Does not return
+.Ql NACK .
+.It Ic RESTART
+Triggers a zero-downtime restart.
+Receipt of an
+.Ql ACK
+does not indicate that the restart has completed; merely that it has been queued for processing.
+.Ql NACK
+reason strings may be one of
+.Ql no workers
+if there aren't enough workers available;
+.Ql bad driver
+if zero-downtime restarts aren't available on the current Databank driver;
+.Ql aborted restart
+if a previous restart attempt failed;
+.Ql restart in flight
+if there's already an ongoing restart attempt; or
+.Ql incompatibility
+if the new version indicates an incompatibility.
+If the reason string is
+.Ql aborted restart ,
+the program should warn the user to restart pump.io as soon as possible.
+.Pp
+Other reason strings may be added to this command in the future.
+.El
+.Sh FILES
+By default the control socket is created owner read-write at
+.Pa /var/run/pump.socket .
+The owner will depend on whoever started the daemon.
+.Pp
+The location can be influenced by the
+.Cm controlSocket
+config option.
+.Sh EXAMPLES
+Trigger a restart using
+.Xr nc 1 :
+.Bd -literal -offset Dl
+$ echo RESTART | nc -U pump.socket
+ACK
+.Ed
+.Pp
+Same as above, but where the server is using an unsupported Databank driver:
+.Bd -literal -offset Dl
+$ echo RESTART | nc -U pump.socket
+NACK bad driver
+.Ed
+.Sh SEE ALSO
+.Xr pump 8
+.Sh HISTORY
+The
+.Pa pump.socket
+file first appeared in pump.io 6.0.
+.Sh AUTHORS
+.An AJ Jordan Aq Mt alex@strugee.net
+designed, implemented and documented this control protocol.
+.Sh BUGS
+The command set is somewhat incomplete.
+.Pp
+Other bugs are tracked in GitHub:
+.Lk https://github.com/pump-io/pump.io/issues
+.Sh SECURITY CONSIDERATIONS
+This protocol does not have any authentication or authorization features.
+Instead, it relies on
+.Pa pump.socket
+having the appropriate permissions.
+The socket is created read-write by owner only and is owned by the user invoking
+.Xr pump 8 ;
+usually this is either
+.Ql root
+or the
+.Ql serverUser .
+Both of these are decent choices although
+.Ql root
+is preferred because compromised pump processes shouldn't be able to talk to their own control sockets.
