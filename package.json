@@ -71,7 +71,8 @@
   },
   "man": [
     "./doc/pump.socket.7",
-    "./doc/pump.8"
+    "./doc/pump.8",
+    "./doc/pumpctl.8"
   ],
   "scripts": {
     "build": "jade --client --extension jade.js --no-debug public/template/*.jade",
