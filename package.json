@@ -70,7 +70,7 @@
     "pump": "./bin/pump"
   },
   "man": [
-    "./doc/pump.1"
+    "./doc/pump.8"
   ],
   "scripts": {
     "build": "jade --client --extension jade.js --no-debug public/template/*.jade",
@@ -96,8 +96,8 @@
     "lint:json": "jsonlint -q package.json pump.io.json.sample",
     "start": "./bin/pump",
     "update-docs": "for doc in copyright manpage readme; do npm run update-docs:$doc; done",
-    "update-docs:copyright": "for i in README.md doc/pump.1; do sed -E \"s/2011-20[[:digit:]]{2}/2011-$(date +%Y)/g\" $i | sponge $i; done",
-    "update-docs:manpage": "sed \"s/^\\.TH PUMP 1.*$/.TH PUMP 1 \\\"$(date +'%d %B %Y')\\\" \\\"$npm_package_version\\\"/\" doc/pump.1 | sponge doc/pump.1",
+    "update-docs:copyright": "for i in README.md doc/pump.8; do sed -E \"s/2011-20[[:digit:]]{2}/2011-$(date +%Y)/g\" $i | sponge $i; done",
+    "update-docs:manpage": "sed \"s/^\\.TH PUMP 8.*$/.TH PUMP 8 \\\"$(date +'%d %B %Y')\\\" \\\"$npm_package_version\\\"/\" doc/pump.8 | sponge doc/pump.8",
     "update-docs:readme": "sed \"s/^Version .*\\..*\\..*$/Version $npm_package_version/\" README.md | sponge README.md",
     "prepublish": "npm run build",
     "version": "npm run version:check-branch && npm run update-docs && git add README.md doc/",
