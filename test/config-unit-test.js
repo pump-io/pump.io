@@ -25,6 +25,11 @@ var assert = require("assert"),
 
 var suite = vows.describe("config module");
 
+function withSecret(obj) {
+    obj.secret = "sekkret";
+    return obj;
+}
+
 function tryToBuild(obj) {
     return {
         topic: function(mod) {
@@ -32,24 +37,6 @@ function tryToBuild(obj) {
         },
         "it throws an error": function(err, fn) {
             assert.throws(fn);
-        }
-    };
-}
-
-function tryToValidate(obj) {
-    return {
-        topic: function(mod) {
-            var that = this;
-            // We fake it so the "logger" is actually a Vows callback
-            mod.validateConfig(obj, {warn: function(msg) {
-                process.nextTick(function() {
-                    that.callback(null, msg);
-                });
-            }});
-        },
-        "it logged a warning": function(err, msg) {
-            assert.isString(msg);
-            assert.isTrue(msg.includes("internal config value"));
         }
     };
 }
@@ -68,11 +55,10 @@ suite.addBatch({
         },
         "it has the right exports": function(mod) {
             assert.isFunction(mod.buildConfig);
-            assert.isFunction(mod.validateConfig);
         },
-        "and we build a config from an empty object": {
+        "and we build a config from an object with just the secret": {
             topic: function(mod) {
-                return mod.buildConfig({});
+                return mod.buildConfig(withSecret({}));
             },
             "it works": function(err, config) {
                 assert.ifError(err);
@@ -88,7 +74,10 @@ suite.addBatch({
         },
         "and we build a config that enables uploads": {
             topic: function(mod) {
-                return mod.buildConfig({enableUploads: true, datadir: "/some/directory"});
+                return mod.buildConfig(withSecret({
+                    enableUploads: true,
+                    datadir: "/some/directory"
+                }));
             },
             "it works": function(err, config) {
                 assert.ifError(err);
@@ -101,7 +90,7 @@ suite.addBatch({
         },
         "and we build a config that sets hostname but not address or smtpfrom": {
             topic: function(mod) {
-                return mod.buildConfig({hostname: "example.net"});
+                return mod.buildConfig(withSecret({hostname: "example.net"}));
             },
             "it works": function(err, config) {
                 assert.ifError(err);
@@ -118,7 +107,7 @@ suite.addBatch({
         },
         "and we build a config that sets port but not urlPort": {
             topic: function(mod) {
-                return mod.buildConfig({port: 31337});
+                return mod.buildConfig(withSecret({port: 31337}));
             },
             "it works": function(err, config) {
                 assert.ifError(err);
@@ -131,7 +120,7 @@ suite.addBatch({
         },
         "and we build a config with an unclustered Databank driver": {
             topic: function(mod) {
-                return mod.buildConfig({driver: "memory"});
+                return mod.buildConfig(withSecret({driver: "memory"}));
             },
             "it works": function(err, config) {
                 assert.ifError(err);
@@ -144,7 +133,7 @@ suite.addBatch({
         },
         "and we build a config with a clustered Databank driver": {
             topic: function(mod) {
-                return mod.buildConfig({"driver": "mongodb"});
+                return mod.buildConfig(withSecret({"driver": "mongodb"}));
             },
             "it works": function(err, config) {
                 assert.ifError(err);
@@ -157,7 +146,7 @@ suite.addBatch({
         },
         "and we build a config with an explicit config.children": {
             topic: function(mod) {
-                return mod.buildConfig({children: 1337});
+                return mod.buildConfig(withSecret({children: 1337}));
             },
             "it works": function(err, config) {
                 assert.ifError(err);
@@ -170,45 +159,15 @@ suite.addBatch({
         },
         "and we try to build a config with uploaddir specified": tryToBuild({uploaddir: "/some/directory"}),
         "and we try to build a config with uploads enabled but no datadir": tryToBuild({enableUploads: true}),
-        "and we try to build a config with port < 1024 while we're not root": tryToBuild({port: 80}),
+        "and we try to build a config with port < 1024 while we're not root": tryToBuild({secret: "p4ssword", port: 80}),
         "and we try to build a config with controlSocket set to a TCP port number": tryToBuild({controlSocket: 9000}),
         "and we try to build a config with controlSocket set to a string that looks like a TCP port number": tryToBuild({controlSocket: "9000"}),
         "and we try to build a config with nicknameBlacklist defined": tryToBuild({nicknameBlacklist: [], secret: "foobar"}),
         "and we try to build a config with canUpload defined": tryToBuild({canUpload: [], secret: "foobar"}),
         "and we try to build a config with haveEmail defined": tryToBuild({haveEmail: [], secret: "foobar"}),
         "and we try to build a config with workers defined": tryToBuild({workers: 1, secret: "foobar"}),
-        "and we try to validate a config with secret undefined": {
-            topic: function(mod) {
-                var that = this,
-                    config = {};
-                // We fake it so the "logger" is actually a Vows callback
-                mod.validateConfig(config, {warn: function(msg) {
-                    process.nextTick(function() {
-                        that.callback(null, msg);
-                    });
-                }});
-            },
-            "it logged a warning": function(err, msg) {
-                assert.isString(msg);
-                assert.isTrue(msg.includes("very insecure"));
-            }
-        },
-        "and we try to validate a config with the example secret": {
-            topic: function(mod) {
-                var that = this,
-                    config = {secret: "my dog has fleas"};
-                // We fake it so the "logger" is actually a Vows callback
-                mod.validateConfig(config, {warn: function(msg) {
-                    process.nextTick(function() {
-                        that.callback(null, msg);
-                    });
-                }});
-            },
-            "it logged a warning": function(err, msg) {
-                assert.isString(msg);
-                assert.isTrue(msg.includes("very insecure"));
-            }
-        }
+        "and we try to build a config with secret undefined": tryToBuild({}),
+        "and we try to build a config with the example secret": tryToBuild({secret: "my dog has fleas"})
     }
 });
 
