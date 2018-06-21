@@ -146,8 +146,39 @@ var launchApps = function(configBase) {
             cluster.fork();
         });
 
-        var ctl = net.createServer(function(con) {
-            con.pipe(split()).on("data", function(line) {
+        var ctl = net.createServer({allowHalfOpen: true}, function(con) {
+            /*
+              Don't close the connection until we're good and ready
+              and have written everything we had to write.
+
+              Note that this can get pretty tricky. EventEmitters call
+              listeners synchronously and we don't do anything
+              asynchronous in them, so we know that when we've
+              consumed all the data we were sent, we have for sure
+              queued all the writes we might do.
+
+              However, the socket connection itself being drained is
+              actually not good enough to determine whether we've
+              processed all the incoming data, because we pipe it to
+              split(). So instead we check *that* resulting stream for
+              when it closes, indicating we've for sure processed
+              everything and therefore all our writes are queued.
+            */
+            con.on("close", function() {
+                // In case the "end" event was already emitted
+                if (lineStream.readable) con.end();
+                lineStream.on("end", con.end);
+            });
+
+            /*
+              Note that we are totally abusing Writable#write() by
+              not checking the return value (and potentially waiting
+              for the "drain" event), but it's okay because we're
+              only writing a small amount of data and it makes stuff
+              easier.
+            */
+            var lineStream = con.pipe(split());
+            lineStream.on("data", function(line) {
                 switch (line.toLowerCase()) {
                 case "cmds":
                     clusterLog.info("Received CMDS command over control socket.");
