@@ -70,6 +70,7 @@
     "pump": "./bin/pump"
   },
   "man": [
+    "./doc/pump.socket.7",
     "./doc/pump.8"
   ],
   "scripts": {
