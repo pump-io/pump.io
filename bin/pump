@@ -82,7 +82,7 @@ var cluster = require("cluster"),
            .env("PUMPIO")
            // TODO more validation of booleans, etc. here
            .number(["port", "urlPort", "smtpport", "smtptimeout", "cleanupSession", "cleanupNonce"])
-           .string(["driver", "hostname", "address", "secret", "site", "owner", "ownerURL", "mainImage", "appendFooter", "logfile", "logLevel", "serverUser", "key", "cert", "datadir", "firehose", "spamhost", "spamclientid", "spamclientsecret", "smtpserver", "smtpuser", "smtppass", "smtpfrom", "favicon"])
+    .string(["driver", "hostname", "address", "secret", "site", "owner", "ownerURL", "mainImage", "appendFooter", "logfile", "logLevel", "serverUser", "key", "cert", "datadir", "firehose", "spamhost", "spamclientid", "spamclientsecret", "smtpserver", "smtpuser", "smtppass", "smtpfrom", "favicon", "controlSocket"])
            .boolean(["bounce", "noweb", "nologger", "enableUploads", "debugClient", "disableRegistration", "noCDN", "requireEmail", "smtpusetls", "smtpusessl", "compress", "sockjs"])
            .alias("help", "h")
            .help()
