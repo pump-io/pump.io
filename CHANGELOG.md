@@ -24,6 +24,7 @@ You cannot upgrade to this release with a zero-downtime restart.
 ### Added
 
 * Support Node 9
+* The master process now listens on a control socket controllable by `pumpctl(8)`; see `pump.socket(7)` for protocol documentation (#1643)
 * Ship an `npm-shrinkwrap.json` file with the package, ensuring that everyone gets the same version of all dependencies
 * Public endpoints will now content-negotiate ActivityStreams 2.0
 * OAuth 2.0 can be used for authentication and is now preferred
@@ -35,6 +36,7 @@ You cannot upgrade to this release with a zero-downtime restart.
 ### Changed
 
 * Don't link to OpenFarmGame in the intro text since the domain is dead
+* `pump(1)` has been renamed to `pump(8)`
 * Dependency updates
 * Internal test suite refactoring
 
@@ -48,6 +50,7 @@ You cannot upgrade to this release with a zero-downtime restart.
 * Fix crash when directly visiting `/uploads/` (#1397)
 * Fix non-public images always returning 403 Forbidden (#1438)
 * Fix multiple web UI Like buttons turning to Unlike when just one is clicked (#768)
+* `pump(8)` documents `NODE_ENV`, which actually does something, as opposed to `NODE_ENVIRONMENT`, which does absolutely nothing
 * Other miscellaneous bugfixes (#1535, #1520,  #1465))
 
 ### Breaking 
@@ -56,7 +59,9 @@ You cannot upgrade to this release with a zero-downtime restart.
 * Extract the CLI client tools to pump.io-cli and drop from this package (#381)
 * Reorganize Jade files to reduce npm package size (affects custom templates) (#1457)
 * Crash instead of logging a warning when admins set internal parameters (#1396)
+* Crash instead of logging a warning when admins do not set `config.secret`, or set it to a well-known value (#1387)
 * Make the CLI options parsing more aware of boolean flags and string flags (#1334)
+* Remove the SIGUSR2 handler for zero-downtime restarts; use `pumpctl(8)` with `pump.socket(7)` instead (#1643)
 
 ## 5.1.1 - 2018-05-05
 
