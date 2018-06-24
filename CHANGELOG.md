@@ -6,6 +6,8 @@ pump.io follows [Semantic Versioning 2.0.0][semver]. Specifically, the following
 * Configuration value names, semantics, and format
 * The plugin API
 * The public HTTP API and federation protocol
+* `pump.socket(7)` protocol semantics
+* `pump.socket(7)` commands and their semantics, except where explicitly documented otherwise in `pump.socket(7)`
 * Supported Node.js versions
 * This list of items
 
