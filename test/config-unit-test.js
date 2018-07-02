@@ -71,6 +71,10 @@ suite.addBatch({
             },
             "the nickname blacklist is loaded": function(err, config) {
                 assert.isArray(config.nicknameBlacklist);
+            },
+            "`/tmp` is chosen for the `controlSocket`": function(err, config) {
+                assert.isString(config.controlSocket);
+                assert.equal(config.controlSocket, "/tmp/pump.socket");
             }
         },
         "and we build a config that enables uploads": {
