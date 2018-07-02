@@ -198,9 +198,9 @@ suite.addBatch({
                 assert.ifError(err);
                 assert.isObject(config);
             },
-            "`controlSocket` was set to `/run/pump.socket`": function(err, config) {
+            "`controlSocket` was set to `/var/run/pump.socket`": function(err, config) {
                 assert.isString(config.controlSocket);
-                assert.equal(config.controlSocket, "/run/pump.socket");
+                assert.equal(config.controlSocket, "/var/run/pump.socket");
             }
         }
     }
