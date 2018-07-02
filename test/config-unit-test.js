@@ -21,7 +21,8 @@
 var assert = require("assert"),
     vows = require("vows"),
     os = require("os"),
-    cpus = os.cpus;
+    cpus = os.cpus,
+    getuid = process.getuid;
 
 var suite = vows.describe("config module");
 
@@ -168,6 +169,72 @@ suite.addBatch({
         "and we try to build a config with workers defined": tryToBuild({workers: 1, secret: "foobar"}),
         "and we try to build a config with secret undefined": tryToBuild({}),
         "and we try to build a config with the example secret": tryToBuild({secret: "my dog has fleas"})
+    }
+});
+
+suite.addBatch({
+    "When we get the config module and mock out process.getuid() to return 0": {
+        topic: function() {
+            process.getuid = function() {
+                return 0;
+            };
+
+            return require("../lib/config");
+        },
+        teardown: function() {
+            process.getuid = getuid;
+        },
+        "it works": function(err, mod) {
+            assert.ifError(err);
+            assert.isObject(mod);
+        },
+        "and we try building a config": {
+            topic: function(mod) {
+                return mod.buildConfig({
+                    secret: "foobar"
+                });
+            },
+            "it works": function(err, config) {
+                assert.ifError(err);
+                assert.isObject(config);
+            },
+            "`controlSocket` was set to `/run/pump.socket`": function(err, config) {
+                assert.isString(config.controlSocket);
+                assert.equal(config.controlSocket, "/run/pump.socket");
+            }
+        }
+    }
+});
+
+suite.addBatch({
+    "When we get the config module and we pretend we don't have process.getuid()": {
+        topic: function() {
+            process.getuid = undefined;
+
+            return require("../lib/config");
+        },
+        teardown: function() {
+            process.getuid = getuid;
+        },
+        "it works": function(err, mod) {
+            assert.ifError(err);
+            assert.isObject(mod);
+        },
+        "and we try building a config": {
+            topic: function(mod) {
+                return mod.buildConfig({
+                    secret: "foobar"
+                });
+            },
+            "it works": function(err, config) {
+                assert.ifError(err);
+                assert.isObject(config);
+            },
+            "`controlSocket` was set to `/tmp/pump.socket`": function(err, config) {
+                assert.isString(config.controlSocket);
+                assert.equal(config.controlSocket, "/tmp/pump.socket");
+            }
+        }
     }
 });
 
