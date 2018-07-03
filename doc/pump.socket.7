@@ -49,6 +49,9 @@ Commands that don't return data will respond with
 .Ql ACK
 directly followed by a newline.
 .Pp
+Certain commands take parameters.
+These parameters are prefixed with a space and then appended to the base command string.
+.Pp
 The client is not required to wait for an
 .Ql ACK
 or
@@ -73,6 +76,25 @@ Does not return
 Returns the version of the running daemon's master process.
 Does not return
 .Ql NACK .
+.It Ic LOGLEVEL Ar level
+Sets the global loglevel.
+Valid values of
+.Ar level
+include anything that can be set in the
+.Cm logLevel
+config option, or the special string
+.Ql restore
+to restore to the original value used at startup.
+Receipt of an
+.Ql ACK
+does not indicate that the change has completed; merely that it has been queued for processing.
+The only
+.Ql NACK
+reason string that this command returns is
+.Ql invalid ,
+indicating that the provided
+.Ar level
+is not a valid log level.
 .It Ic RESTART
 Triggers a zero-downtime restart.
 Receipt of an
