@@ -42,54 +42,54 @@ var net = require("net"),
 // running and argv therefore isn't undefined.
 
 function _restart() {
-        process.nextTick(restart);
+    process.nextTick(restart);
 }
 
 function _version() {
-        process.nextTick(version);
+    process.nextTick(version);
 }
 
 function restart() {
-        var socket = net.connect(argv.socketPath, function() {
-                socket.write("RESTART\n");
-                socket.pipe(split()).on("data", function(line) {
-                        if (line === "ACK\n") return;
+    var socket = net.connect(argv.socketPath, function() {
+        socket.write("RESTART\n");
+        socket.pipe(split()).on("data", function(line) {
+            if (line === "ACK\n") return;
 
-                        if (line.slice(0, 4) !== "NACK") throw new Error("Invalid response from control server: " + JSON.stringify(line));
+            if (line.slice(0, 4) !== "NACK") throw new Error("Invalid response from control server: " + JSON.stringify(line));
 
-                        switch (line.slice(5).trim()) {
-                        case "bad driver":
-                                console.error("pumpctl: server indicated unsupported Databank driver");
-                                process.exitCode = 1;
-                                socket.end();
-                                break;
-                        case "aborted restart":
-                                console.error("pumpctl: server indicated that a previous restart failed and is in an unknown state");
-                                console.error("This is a dangerous condition; please restart pump.io as soon as possible.");
-                                process.exitCode = 1;
-                                socket.end();
-                                break;
-                        case "restart in flight":
-                                console.error("pumpctl: restart already in progress");
-                                process.exitCode = 1;
-                                socket.end();
-                                break;
-                        case "incompatibility":
-                                console.error("pumpctl: new codebase indicates incompatibility");
-                                process.exitCode = 1;
-                                socket.end();
-                                break;
-                        }
-                });
+            switch (line.slice(5).trim()) {
+            case "bad driver":
+                console.error("pumpctl: server indicated unsupported Databank driver");
+                process.exitCode = 1;
+                socket.end();
+                break;
+            case "aborted restart":
+                console.error("pumpctl: server indicated that a previous restart failed and is in an unknown state");
+                console.error("This is a dangerous condition; please restart pump.io as soon as possible.");
+                process.exitCode = 1;
+                socket.end();
+                break;
+            case "restart in flight":
+                console.error("pumpctl: restart already in progress");
+                process.exitCode = 1;
+                socket.end();
+                break;
+            case "incompatibility":
+                console.error("pumpctl: new codebase indicates incompatibility");
+                process.exitCode = 1;
+                socket.end();
+                break;
+            }
         });
+    });
 }
 
 function version() {
-        var socket = net.connect(argv.socketPath, function() {
-                socket.write("VERSION\n");
-                socket.pipe(split()).on("data", function(line) {
-                        console.log(line.slice(4).trim());
-                        socket.end();
-                });
+    var socket = net.connect(argv.socketPath, function() {
+        socket.write("VERSION\n");
+        socket.pipe(split()).on("data", function(line) {
+            console.log(line.slice(4).trim());
+            socket.end();
         });
+    });
 }
