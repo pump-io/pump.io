@@ -34,8 +34,11 @@ var net = require("net"),
            .describe("s", "UNIX domain socket to connect to")
            .default("s", "/var/run/pump.socket")
            .command("restart", "Trigger a zero-downtime restart", _restart)
+           .command("loglevel <level>", "Adjust the loglevel", _loglevel)
            .command("version", "Query the running master process version", _version)
            .argv;
+
+var socketPath = argv.s;
 
 // Annoyingly we have to defer command execution until the current
 // event queue phase completes so that the yargs buildup can finish
@@ -47,6 +50,13 @@ function _restart() {
 
 function _version() {
     process.nextTick(version);
+}
+
+function _loglevel(yargs) {
+    yargs.positional("level", {
+        describe: "Bunyan-compatible loglevel to set to, or `restore`"
+    });
+    process.nextTick(loglevel);
 }
 
 function restart() {
@@ -91,5 +101,22 @@ function version() {
             console.log(line.slice(4).trim());
             socket.end();
         });
+    });
+}
+
+function loglevel() {
+    var levels = ["fatal", "error", "warn", "info", "debug", "trace", "restore"];
+
+    if (!levels.includes(argv.level)) {
+        console.error("pumpctl: " + argv.level + ": invalid loglevel");
+        process.exitCode = 1;
+        return;
+    }
+
+    var socket = net.connect(argv.socketPath, function() {
+        socket.write("LOGLEVEL ");
+        socket.write(argv.level);
+        socket.write("\n");
+        socket.end();
     });
 }
