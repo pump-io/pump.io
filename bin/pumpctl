@@ -104,6 +104,8 @@ function version() {
     });
 }
 
+// XXX error handling?
+
 function loglevel() {
     var levels = ["fatal", "error", "warn", "info", "debug", "trace", "restore"];
 
