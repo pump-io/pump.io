@@ -47,12 +47,63 @@ as the socket to talk to instead of the default
 .It Fl v
 Print version.
 .El
-.\" .Sh ENVIRONMENT
-.\" For sections 1, 6, 7, and 8 only.
-.\" .Sh FILES
-.\" .Sh EXIT STATUS
-.\" For sections 1, 6, and 8 only.
-.\" .Sh EXAMPLES
+.Pp
+The available actions are as follows:
+.Bl -tag -width Ds
+.It Cm version
+Query the version of the server's master process.
+.It Cm loglevel Pa level
+Set the log level of the server.
+Can be a Bunyan-compatible log level string (that is, one of
+.Ql fatal ,
+.Ql error ,
+.Ql warning ,
+.Ql info ,
+.Ql debug ,
+or
+.Ql trace ) ,
+or the special string
+.Ql restore
+to restore the log level to the value originally used at startup.
+.It Cm restart
+Trigger a zero-downtime restart.
+.Ed
+.Sh FILES
+.Bl -tag -width /var/run/pump.socket -compact
+.It Pa /var/run/pump.socket
+The default socket file to talk to.
+.Ed
+.Sh EXIT STATUS
+.Ex -std
+.Sh EXAMPLES
+Trigger a zero-downtime restart:
+.Bd -literal -offset Dl
+$ pumpctl restart
+.Ed
+.Pp
+Trigger a zero-downtime restart, but it fails due to the Databank driver:
+.Bd -literal -offset Dl
+$ pumpctl restart
+pumpctl: server indicated unsupported Databank driver
+.Ed
+.Pp
+Query the master process version, specifying a different socket path:
+.Bd -literal -offset Dl
+$ pumpctl -s /tmp/pump.socket version
+6.0.0
+.Ed
+.Pp
+Increase the server log level all the way up to
+.Ql trace :
+.Bd -literal -offset Dl
+$ pumpctl loglevel trace
+.Ed
+.Pp
+Restore the server to its original log level:
+.Bd -literal -offset Dl
+$ pumpctl loglevel restore
+.Ed
+.Pp
 .\" .Sh DIAGNOSTICS
 .\" For sections 1, 4, 6, 7, 8, and 9 printf/stderr messages only.
 .Sh SEE ALSO
