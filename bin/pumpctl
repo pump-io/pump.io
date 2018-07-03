@@ -60,7 +60,7 @@ function _loglevel(yargs) {
 }
 
 function restart() {
-    var socket = net.connect(argv.socketPath, function() {
+    var socket = net.connect(socketPath, function() {
         socket.write("RESTART\n");
         socket.pipe(split()).on("data", function(line) {
             if (line === "ACK\n") return;
@@ -95,7 +95,7 @@ function restart() {
 }
 
 function version() {
-    var socket = net.connect(argv.socketPath, function() {
+    var socket = net.connect(socketPath, function() {
         socket.write("VERSION\n");
         socket.pipe(split()).on("data", function(line) {
             console.log(line.slice(4).trim());
@@ -113,7 +113,7 @@ function loglevel() {
         return;
     }
 
-    var socket = net.connect(argv.socketPath, function() {
+    var socket = net.connect(socketPath, function() {
         socket.write("LOGLEVEL ");
         socket.write(argv.level);
         socket.write("\n");
