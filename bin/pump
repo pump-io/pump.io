@@ -177,6 +177,7 @@ var launchApps = function(configBase) {
                 case "easter":
                     con.write("ACK EGG\n");
                     break;
+                case "shelvacuisawesome":
                 case "loglevel":
                     var level = line[1];
 
