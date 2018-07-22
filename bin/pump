@@ -164,7 +164,7 @@ var launchApps = function(configBase) {
               solve so who cares.
             */
             con.pipe(split()).on("data", function(line) {
-                line = line.split(' ');
+                line = line.split(" ");
                 switch (line[0].toLowerCase()) {
                 case "cmds":
                     clusterLog.info("Received CMDS command over control socket.");
