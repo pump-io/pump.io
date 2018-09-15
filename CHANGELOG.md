@@ -65,6 +65,12 @@ You cannot upgrade to this release with a zero-downtime restart.
 * Make the CLI options parsing more aware of boolean flags and string flags (#1334)
 * Remove the SIGUSR2 handler for zero-downtime restarts; use `pumpctl(8)` with `pump.socket(7)` instead (#1643)
 
+## 5.1.2 - 2018-09-14
+
+### Security
+
+* Bump Dockerfile base image to Alpine 3.8.1 to fix an [`apk` remote code execution vulnerability](https://justi.cz/security/2018/09/13/alpine-apk-rce.html)
+
 ## 5.1.1 - 2018-05-05
 
 This will be the last release line to support Node.js 4, 5 and 7.
