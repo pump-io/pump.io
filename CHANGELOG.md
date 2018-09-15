@@ -17,6 +17,12 @@ Changes to everything else are not considered breaking, although we may delay th
 
 If you think something that isn't in the first list should be covered, file an issue and we'll either state we consider that semver-major or give a rationale as to why it isn't. Please also feel free to ask questions in the issue tracker; this list could surely be more precise.
 
+## 5.1.2 - 2018-09-14
+
+### Security
+
+* Bump Dockerfile base image to Alpine 3.8.1 to fix an [`apk` remote code execution vulnerability](https://justi.cz/security/2018/09/13/alpine-apk-rce.html)
+
 ## 5.1.1 - 2018-05-05
 
 This will be the last release line to support Node.js 4, 5 and 7.
