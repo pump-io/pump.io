@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM alpine:3.8
 LABEL maintainer Jan Koppe <post@jankoppe.de>
 
 ARG PUMPIO__GUID=888
@@ -9,7 +9,7 @@ ENV PUMP_DATADIR="/var/local/pump.io"
 
 COPY . "${PUMP_LOCATION}"
 
-RUN apk add --no-cache graphicsmagick openssl nodejs python make g++ git \
+RUN apk add --no-cache graphicsmagick openssl nodejs npm python make g++ git \
      && cd "${PUMP_LOCATION}" \
      && npm install \
      && npm run build \
