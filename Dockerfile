@@ -9,6 +9,8 @@ ENV PUMP_DATADIR="/var/local/pump.io"
 ENV PUMP_LOGFILE="/dev/stdout"
 ENV PUMP_PORT="80"
 
+ENV NODE_ENV="production"
+
 COPY . "${PUMP_LOCATION}"
 
 RUN apk add --no-cache graphicsmagick openssl nodejs npm python make g++ git \
