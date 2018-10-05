@@ -168,7 +168,7 @@ var launchApps = function(configBase) {
                 switch (line[0].toLowerCase()) {
                 case "cmds":
                     clusterLog.info("Received CMDS command over control socket.");
-                    con.write("ACK CMDS VERSION LOGLEVEL RESTART\n");
+                    con.write("ACK CMDS VERSION EASTER LOGLEVEL RESTART\n");
                     break;
                 case "version":
                     clusterLog.info("Received VERSION command over control socket.");
