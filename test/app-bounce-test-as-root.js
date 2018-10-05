@@ -43,6 +43,7 @@ suite.addBatch({
         topic: function() {
             var config = {port: 443,
                           hostname: "bounce.localhost",
+                          secret: "look ma a bounce server",
                           key: path.join(__dirname, "data", "bounce.localhost.key"),
                           cert: path.join(__dirname, "data", "bounce.localhost.crt"),
                           driver: tc.driver,
