@@ -59,6 +59,7 @@ var setupAppConfig = function(config, callback) {
 
     config.port = config.port || 4815;
     config.hostname = config.hostname || "localhost";
+    config.secret = config.secret || "oooo scandalous";
 
     for (prop in config) {
         args.push(prop + "=" + JSON.stringify(config[prop]));
