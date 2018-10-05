@@ -132,6 +132,10 @@
     "npm": ">=2"
   },
   "greenkeeper": {
+    "commitMessages": {
+      "dependencyUpdate": "Update to ${dependency}@${version}",
+      "devDependencyUpdate": "Update to ${dependency}@${version}"
+    },
     "ignore": [
       "zombie"
     ]
