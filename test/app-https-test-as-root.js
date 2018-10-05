@@ -134,6 +134,7 @@ suite.addBatch({
         topic: function() {
             var config = {port: 443,
                           hostname: "secure.localhost",
+                          secret: "look ma an https!",
                           key: path.join(__dirname, "data", "secure.localhost.key"),
                           cert: path.join(__dirname, "data", "secure.localhost.crt"),
                           driver: tc.driver,
