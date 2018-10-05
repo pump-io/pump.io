@@ -70,13 +70,13 @@ suite.addBatch({
                 br.assert.success();
                 br.assert.text("H1", "pump.io API");
             },
-            "it not has login or register buttons": function(err, br) {
+            "it doesn't have login or register buttons": function(err, br) {
                 br.assert.success();
                 br.assert.evaluate('document.getElementById("login")', null);
                 br.assert.evaluate('document.getElementById("register")', null);
             }
         },
-        "and we request JavaScript file": {
+        "and we request a JavaScript file": {
             topic: function() {
                 httputil.head("http://localhost:4815/javascript/pump.js", this.callback);
             },
