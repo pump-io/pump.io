@@ -89,7 +89,11 @@ if (cluster.isMaster) {
         },
         function(err) {
             if (err) {
-                process.send({cmd: "error", value: err});
+                // `JSON.stringify(err)` results in '{}', and process.send()
+                // uses JSON.stringify() to serialize objects going over the IPC
+                // channel, so using plain `err` here ends up being pretty
+                // useless. Therefore, send the stack trace string instead.
+                process.send({cmd: "error", value: err.stack});
             } else {
                 process.send({cmd: "listening"});
             }
