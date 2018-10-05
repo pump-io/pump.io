@@ -90,8 +90,7 @@ var cluster = require("cluster"),
            .alias("version", "v")
            .version()
            .argv,
-    Dispatch = require("../lib/dispatch"),
-    makeApp = require("../lib/app").makeApp;
+    Dispatch = require("../lib/dispatch");
 
 // We first get config files and launch some cluster apps
 
@@ -257,6 +256,9 @@ var launchApps = function(configBase) {
         });
 
     } else {
+
+        // We load this down here instead of at the top so we don't implicitly execute all this code as root
+        var makeApp = require("../lib/app").makeApp;
 
         makeApp(configBase, function(err, appServer) {
             if (err) {
