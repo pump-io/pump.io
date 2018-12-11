@@ -221,8 +221,8 @@ if (!window.Pump) {
     // When errors happen, and you don't know what to do with them,
     // send them here and I'll figure it out.
 
-    Pump.error = function(err) {
-        var msg = Pump.getError(err);
+    Pump.error = function(err, textStatus) {
+        var msg = Pump.getError(err, textStatus);
 
         Pump.debug(msg);
 
@@ -657,39 +657,14 @@ if (!window.Pump) {
         $("title").text(title + " - " + Pump.config.site);
     };
 
-    Pump.ajaxError = function(jqXHR, textStatus, errorThrown) {
-        Pump.jqxhrError(jqXHR);
-    };
-
-    Pump.jqxhrError = function(jqxhr) {
-        var type = jqxhr.getResponseHeader("Content-Type"),
-            response;
-
-        if (_.isObject(jqxhr.responseJSON) &&
-            _.isString(jqxhr.responseJSON.error)) {
-            Pump.error(new Error(jqxhr.responseJSON.error));
-        } else if (type && type.indexOf("application/json") !== -1) {
-            try {
-                response = JSON.parse(jqxhr.responseText);
-                Pump.error(new Error(response.error));
-            } catch (err) {
-                Pump.error(new Error(jqxhr.status + ": " + jqxhr.statusText));
-            }
-        } else if (jqxhr.status && jqxhr.statusText) {
-            Pump.error(new Error(jqxhr.status + ": " + jqxhr.statusText));
-        } else {
-            Pump.error(jqxhr);
-        }
-    };
-
-    Pump.getError = function(err) {
+    Pump.getError = function(err, textStatus) {
+        var defaultMsg = "An error occurred.";
 
         if (_.isString(err)) {
             return err;
         } else if (_.isObject(err)) {
-
             if (err.stack) {
-                console.log(err.stack);
+                console.error(err.stack);
             }
 
             if (_.isString(err.error)) {
@@ -699,12 +674,24 @@ if (!window.Pump) {
             } else if (_.has(err.responseJSON, "error") &&
                        _.isString(err.responseJSON.error)) {
                 return err.responseJSON.error;
+            } else if (err.getResponseHeader &&
+                       err.getResponseHeader("Content-Type").indexOf("application/json") !== -1) {
+                try {
+                    var response = JSON.parse(err.responseText);
+                    return response.error;
+                } catch (error) {
+                    return error.status + ": " + err.statusText;
+                }
             } else if (err.status && err.statusText) {
                 return err.status + ": " + err.statusText;
             }
         }
 
-        return "An error occurred.";
+        if (textStatus && textStatus !== "error") {
+            defaultMsg = textStatus + ": " + defaultMsg;
+        }
+
+        return defaultMsg;
     };
 
 })(window._, window.$, window.Backbone, window.Pump);
