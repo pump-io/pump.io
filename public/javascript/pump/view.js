@@ -615,7 +615,7 @@
                 type: "POST",
                 url: "/main/logout",
                 success: onSuccess,
-                error: Pump.ajaxError
+                error: Pump.error
             };
 
             Pump.ajax(options);
@@ -677,7 +677,7 @@
                 type: "POST",
                 url: "/main/logout",
                 success: onSuccess,
-                error: Pump.ajaxError
+                error: Pump.error
             };
 
             // Don't use Pump.ajax; it uses client auth
@@ -782,7 +782,7 @@
                         Pump.ajax(options);
                     } else {
                         view.stopSpin();
-                        Pump.ajaxError(jqXHR, textStatus, errorThrown);
+                        Pump.error(jqXHR, textStatus);
                     }
                 };
 
@@ -876,7 +876,7 @@
                         retries = 1;
                     } else {
                         view.stopSpin();
-                        Pump.ajaxError(jqXHR, textStatus, errorThrown);
+                        Pump.error(jqXHR, textStatus);
                     }
                 };
 
@@ -992,7 +992,7 @@
                         Pump.ajax(options);
                     } else {
                         view.stopSpin();
-                        Pump.ajaxError(jqXHR, textStatus, errorThrown);
+                        Pump.error(jqXHR, textStatus);
                     }
                 };
 
@@ -1069,7 +1069,7 @@
                         Pump.ajax(options);
                     } else {
                         view.stopSpin();
-                        Pump.ajaxError(jqXHR, textStatus, errorThrown);
+                        Pump.error(jqXHR, textStatus);
                     }
                 };
 
