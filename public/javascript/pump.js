@@ -32,6 +32,9 @@ if (!window.Pump) {
 
     "use strict";
 
+    // Private instance
+    var _pump = {};
+
     // This is overwritten by inline script in layout.jade
 
     Pump.config = {};
@@ -86,6 +89,7 @@ if (!window.Pump) {
         Pump.setupInfiniteScroll();
 
         if (Pump.principalUser) {
+            Pump.enableNotify();
             Pump.principalUser = Pump.User.unique(Pump.principalUser);
             Pump.principal = Pump.Person.unique(Pump.principal);
             Pump.body.nav = new Pump.UserNav({el: Pump.body.$(".navbar-inner .container"),
@@ -105,6 +109,7 @@ if (!window.Pump) {
                 break;
             }
         } else if (Pump.principal) {
+            Pump.enableNotify();
             Pump.principal = Pump.Person.unique(Pump.principal);
             Pump.body.nav = new Pump.RemoteNav({el: Pump.body.$(".navbar-inner .container"),
                                                 model: Pump.principal});
@@ -146,6 +151,7 @@ if (!window.Pump) {
                             return;
                         }
 
+                        Pump.enableNotify();
                         user = Pump.principalUser = Pump.User.unique(data);
                         Pump.principal = Pump.principalUser.profile;
 
@@ -577,9 +583,9 @@ if (!window.Pump) {
             if (name == View.prototype.modelName) {
                 options.model = def.models[name].unique(value);
             } else if (def.models[name]) {
-                    options.data[name] = def.models[name].unique(value);
+                options.data[name] = def.models[name].unique(value);
             } else {
-                    options.data[name] = value;
+                options.data[name] = value;
             }
         }
 
@@ -636,6 +642,80 @@ if (!window.Pump) {
                 }
             }
         });
+    };
+
+    Pump.enableNotify = function() {
+        var Notification = window.Notification;
+
+        // Check if the browser supports notifications, otherwise do nothing
+        if (!Notification) {
+            _pump.notifyPermission = "unsupported";
+        }
+
+        // respectful if the user has denied notifications
+        if (Notification.permission !== "denied") {
+
+            Notification.requestPermission(function(permission) {
+                // If the user accepts, let's create a notification
+                _pump.notifyPermission = permission;
+            });
+        }
+    };
+
+    Pump.sendNotify = function(url, model) {
+        var activity = model.toJSON(),
+            userModel = Pump.principalUser || Pump.principal,
+            user = userModel ? userModel.toJSON() : null,
+            actor = activity.actor;
+
+        if (!user || !actor) {
+            return;
+        }
+
+        user = user.profile || user;
+
+        // Prevent send notification for same user or previous notification
+        // and no bother every time, only every 5 minutes
+        var lastNotify = _pump.notifyLast,
+            everyTime = 60000 * 5,
+            lastTime = _.get(lastNotify, "sended"),
+            diffUpdate =  (Date.now() - new Date(activity.updated).getTime()),
+            diffTime = (Date.now() - new Date(lastTime || null).getTime()),
+            isDirect = _.find(activity.to, {id: user.id}),
+            isRecent = diffUpdate < (60000 * 30);
+
+        if (!isRecent || actor.id === user.id ||
+            _.get(lastNotify, "id") === activity.id ||
+            (diffTime < everyTime && !isDirect)) {
+            return;
+        }
+
+        // Send notification if permissions have already been granted
+        if (_pump.notifyPermission === "granted") {
+            var object = activity.object,
+                title = $(activity.content).text(),
+                body;
+
+            if (object.content) {
+                // No all content is HTML, so ensure parse correctly
+                body = $("<p>" + object.content + "</p>").text();
+            } else if (object.displayName && object.objectType !==  "person") {
+                body = object.displayName;
+            }
+
+            _pump.notifyLast = new window.Notification(title, {
+                icon: "/images/icon-small.png",
+                body: body,
+                image: _.get(object, "image.url")
+            });
+            // Additional control parameters
+            _pump.notifyLast.id = activity.id;
+            _pump.notifyLast.sended = new Date();
+
+        } else if (_pump.notifyPermission === "default") {
+            // Try to enable again
+            Pump.enableNotify();
+        }
     };
 
     // XXX: This POSTs with session auth; subject to XSS.

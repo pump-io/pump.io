@@ -348,6 +348,11 @@
                 Pump.debug("Resetting items of " + str.url() + " to new array of length " + items.length);
                 str.items.reset(items);
             });
+
+            str.items.on("add", function(model) {
+                var str = this;
+                Pump.sendNotify(str.url(), model);
+            });
         },
         url: function() {
             var str = this;
