@@ -11,7 +11,7 @@ unless object.deleted
             img.img-rounded.media-object(src=(author.image.pump_io && author.image.pump_io.proxyURL) ? author.image.pump_io.proxyURL : author.image.url, width="64", height="64")
           else
             img.img-rounded.media-object(src="/images/default.png", width="64", height="64")
-      .media-body
+      .media-body(data-object-id="#{object.id}")
         if object.displayName
           h4.media-heading!= object.displayName
 
