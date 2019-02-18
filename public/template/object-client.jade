@@ -20,11 +20,22 @@ mixin authorship(object)
 
     .media-body
       if object.inReplyTo
-        - var irt = object.inReplyTo, content = irt.content;
+        - var irt = object.inReplyTo;
         blockquote
           i.fa.fa-reply.inreplyto-icon
+
+          //- XXX this is author-then-title, but everything else is title-then-author
+          //- I think it looks better this way in this particular context but maybe it should be consistent?
           +authorship(irt)
-          != content.length <= 80 ? content : content.substr(0, 80) + '…'
+
+          if !irt.content && irt.displayName
+            h2.inreplyto-heading!= irt.displayName
+            br
+
+          if irt.content
+            != irt.content.length <= 80 ? irt.content : irt.content.substr(0, 80) + "…"
+          else if irt.objectType === "image"
+            span.inreplyto-image (Image)
 
       if object.displayName
         h2.media-heading.p-name!= object.displayName

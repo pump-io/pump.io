@@ -244,6 +244,17 @@ body {
   float: left;
 }
 
+.inreplyto-heading {
+  font-size: initial;
+  display: inline;
+}
+
+.inreplyto-image {
+  color: gray;
+  font-style: italic;
+  margin-top: 4px;
+}
+
 blockquote small::before {
   /* Bootstrap override */
   content: '';
