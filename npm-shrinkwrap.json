@@ -417,7 +417,7 @@
         },
         "elliptic": {
           "version": "3.0.3",
-          "resolved": "http://registry.npmjs.org/elliptic/-/elliptic-3.0.3.tgz",
+          "resolved": "https://registry.npmjs.org/elliptic/-/elliptic-3.0.3.tgz",
           "integrity": "sha1-hlybQgv75VAGuflp+XoNLESWZZU=",
           "requires": {
             "bn.js": "^2.0.0",
@@ -652,9 +652,9 @@
       },
       "dependencies": {
         "glob": {
-          "version": "7.1.2",
-          "resolved": "https://registry.npmjs.org/glob/-/glob-7.1.2.tgz",
-          "integrity": "sha512-MJTUg1kjuLeQCJ+ccE4Vpa6kKVXkPYJ2mOCQyUuKLcLQsdrMCpBPUi8qVE6+YuaJkozeA9NusTAw3hLr8Xe5EQ==",
+          "version": "7.1.3",
+          "resolved": "https://registry.npmjs.org/glob/-/glob-7.1.3.tgz",
+          "integrity": "sha512-vcfuiIxogLV4DlGBHIUOwI0IbrJ8HWPc4MU7HzviGeNho/UJDfi6B5p3sHeWIQ0KGIU0Jpxi5ZHxemQfLkkAwQ==",
           "dev": true,
           "requires": {
             "fs.realpath": "^1.0.0",
@@ -976,9 +976,9 @@
       }
     },
     "cryptiles": {
-      "version": "3.1.2",
-      "resolved": "https://registry.npmjs.org/cryptiles/-/cryptiles-3.1.2.tgz",
-      "integrity": "sha1-qJ+7Ig9c4l7FboxKqKT9e1sNKf4=",
+      "version": "3.1.4",
+      "resolved": "https://registry.npmjs.org/cryptiles/-/cryptiles-3.1.4.tgz",
+      "integrity": "sha512-8I1sgZHfVwcSOY6mSGpVU3lw/GSIZvusg8dD2+OGehCJpOhQRLNcH0qb9upQnOH4XhgxxFJSg6E2kx95deb1Tw==",
       "requires": {
         "boom": "5.x.x"
       },
@@ -2698,27 +2698,19 @@
       "dev": true
     },
     "jshint": {
-      "version": "2.9.5",
-      "resolved": "https://registry.npmjs.org/jshint/-/jshint-2.9.5.tgz",
-      "integrity": "sha1-HnJSkVzmgbQIJ+4UJIxG006apiw=",
+      "version": "2.10.1",
+      "resolved": "https://registry.npmjs.org/jshint/-/jshint-2.10.1.tgz",
+      "integrity": "sha512-9GpPfKeffYBl7oBDX2lHPG16j0AM7D2bn3aLy9DaWTr6CWa0i/7UGhX8WLZ7V14QQnnr4hXbjauTLYg06F+HYw==",
       "dev": true,
       "requires": {
         "cli": "~1.0.0",
         "console-browserify": "1.1.x",
         "exit": "0.1.x",
         "htmlparser2": "3.8.x",
-        "lodash": "3.7.x",
+        "lodash": "~4.17.10",
         "minimatch": "~3.0.2",
         "shelljs": "0.3.x",
         "strip-json-comments": "1.0.x"
-      },
-      "dependencies": {
-        "lodash": {
-          "version": "3.7.0",
-          "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.7.0.tgz",
-          "integrity": "sha1-Nni9irmVBXwHreg27S7wh9qBHUU=",
-          "dev": true
-        }
       }
     },
     "json-parse-helpfulerror": {
@@ -2924,9 +2916,9 @@
       }
     },
     "lodash": {
-      "version": "4.17.10",
-      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.10.tgz",
-      "integrity": "sha512-UejweD1pDoXu+AD825lWwp4ZGtSwgnpZxb3JDViD7StjQz+Nb/6l093lx4OQ0foGWNRoc19mWy7BzL+UAK2iVg=="
+      "version": "4.17.11",
+      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.11.tgz",
+      "integrity": "sha512-cQKh8igo5QUhZ7lg38DYWAxMvjSAKG0A8wGSVimP07SIUEK2UO+arSRKbRZWtelMtN5V0Hkwh5ryOto/SshYIg=="
     },
     "lodash.reduce": {
       "version": "4.6.0",
