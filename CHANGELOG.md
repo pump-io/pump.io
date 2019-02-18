@@ -34,6 +34,7 @@ You cannot upgrade to this release with a zero-downtime restart.
 * Web UI realtime now automatically recovers if it disconnects (#1479)
 * Web UI comments can now be canceled (#1471)
 * The front page image can now be changed with the `mainImage` config option (#1486)
+* Improved startup performance and security by loading less code in the master process running as root (#1555)
 
 ### Changed
 
@@ -41,6 +42,8 @@ You cannot upgrade to this release with a zero-downtime restart.
 * `pump(1)` has been renamed to `pump(8)`
 * Dependency updates
 * Internal test suite refactoring
+* "Settings" is renamed to "Profile" in the web UI (#1680)
+* Docker images automatically set `NODE_ENV=production`
 
 ### Fixed
 
@@ -54,6 +57,7 @@ You cannot upgrade to this release with a zero-downtime restart.
 * Fix multiple web UI Like buttons turning to Unlike when just one is clicked (#768)
 * `pump(8)` documents `NODE_ENV`, which actually does something, as opposed to `NODE_ENVIRONMENT`, which does absolutely nothing
 * Other miscellaneous bugfixes (#1535, #1520,  #1465))
+* Don't load or serve JavaScript, or show the "Login"/"Register" buttons, with `noweb` set to true (#1398)
 
 ### Breaking 
 
