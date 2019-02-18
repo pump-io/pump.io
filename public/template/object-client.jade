@@ -1,3 +1,15 @@
+mixin authorship(object)
+  p.muted
+    small
+      if object.author
+        a(href=object.author.url)!= object.author.displayName
+        |  at 
+      a(href=object.url)
+        time.dt-published(datetime=object.published)= object.published
+      if object.location
+        |  in  
+        a(href=object.location.url)!= object.location.displayName
+
 .object-page.h-entry
   .media
     a.pull-left.h-card.p-author(href=object.author.url)
@@ -7,19 +19,17 @@
         img.img-rounded.media-object(src="/images/default.png", width="96", height="96", alt=object.author.displayName)
 
     .media-body
+      if object.inReplyTo
+        - var irt = object.inReplyTo, content = irt.content;
+        blockquote
+          i.fa.fa-reply.inreplyto-icon
+          +authorship(irt)
+          != content.length <= 80 ? content : content.substr(0, 80) + '…'
+
       if object.displayName
         h2.media-heading.p-name!= object.displayName
 
-      p.muted
-        small 
-          if object.author
-            a(href=object.author.url)!= object.author.displayName
-            |  at 
-          a(href=object.url)
-            time.dt-published(datetime=object.published)= object.published
-          if object.location
-            |  in  
-            a(href=object.location.url)!= object.location.displayName
+      +authorship(object)
 
       .e-content
         if object.image && object.image.url

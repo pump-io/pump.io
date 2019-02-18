@@ -238,6 +238,17 @@ body {
   margin-top: 10px;
 }
 
+.inreplyto-icon {
+  font-size: 170%;
+  margin-right: 13px;
+  float: left;
+}
+
+blockquote small::before {
+  /* Bootstrap override */
+  content: '';
+}
+
 /* sidebar */
 
 #sidebar > h3 {
