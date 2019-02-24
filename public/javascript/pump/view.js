@@ -1540,10 +1540,17 @@
             "click .close-btn": "cancelComment"
         },
         ready: function() {
-            var view = this;
+            var view = this,
+                orig = view.options.original;
+
+            if (orig.inReplyTo) {
+                $(view.el).prepend('<div class="alert">Your comment will appear on the original post.</div>');
+            }
+
             view.$('textarea[name="content"]').wysihtml5({
                 customTemplates: Pump.wysihtml5Tmpl
             });
+
         },
         cancelComment: function() {
             var view = this,
@@ -1571,7 +1578,7 @@
                     }
                 });
 
-            act.object.inReplyTo = orig;
+            act.object.inReplyTo = orig.inReplyTo || orig;
 
             view.startSpin();
 
