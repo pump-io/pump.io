@@ -21,7 +21,7 @@ script:
   - if ./util/docker-candidacy.sh; then export DOCKER_CANDIDATE=true; else export DOCKER_CANDIDATE=false; fi
   - echo 'DOCKER_CANDIDATE='$DOCKER_CANDIDATE
   - if $DOCKER_CANDIDATE; then ./util/build-docker.sh; fi
-  - if [ $TRAVIS_EVENT_TYPE = cron ]; then travis_terminate; fi
+  - if [ $TRAVIS_EVENT_TYPE = cron ]; then travis_terminate 0; fi
   - "(npm test || npm test) && npm run test:install && sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root'"
 before_script:
   - "./test/hosts.sh"
