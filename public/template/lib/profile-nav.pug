@@ -1,0 +1,19 @@
+ul.nav.nav-tabs
+  li
+    a(href=`/${profile.preferredUsername}`) Activity 
+  li
+    a(href=`/${profile.preferredUsername}/favorites`) Favorites 
+      if profile.favorites && _.has(profile.favorites, "totalItems")
+        span.label= profile.favorites.totalItems
+  li
+    a(href=`/${profile.preferredUsername}/followers`) Followers 
+      if profile.followers && _.has(profile.followers, "totalItems")
+        span.label= profile.followers.totalItems
+  li
+    a(href=`/${profile.preferredUsername}/following`) Following 
+      if profile.following && _.has(profile.following, "totalItems")
+        span.label= profile.following.totalItems
+  li
+    a(href=`/${profile.preferredUsername}/lists`) Lists 
+      if profile.lists && _.has(profile.lists, "totalItems")
+        span.label= profile.lists.totalItems

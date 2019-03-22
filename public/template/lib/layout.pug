@@ -35,13 +35,13 @@ html(lang="en")
     .navbar.navbar-inverse.navbar-fixed-top
       .navbar-inner
         if page.nologin
-          include ./nav-nologin.jade
+          include ./nav-nologin.pug
         else if principalUser
-          include ../nav-loggedin.jade
+          include ../nav-loggedin.pug
         else if principal
-          include ../nav-remote.jade
+          include ../nav-remote.pug
         else
-          include ../nav-anonymous.jade
+          include ../nav-anonymous.pug
 
     .container
 

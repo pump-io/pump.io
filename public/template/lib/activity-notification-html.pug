@@ -1,0 +1,12 @@
+p!= principal.displayName + ","
+
+p!= activity.content
+
+if activity.verb === "post"
+  blockquote
+    a(href=activity.object.url)!= activity.object.displayName || activity.object.objectType
+else
+  blockquote
+    a(href=activity.url) more information
+
+p If you think you received this email in error, you can safely ignore it.

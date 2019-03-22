@@ -1,0 +1,24 @@
+each object, index in coll.items
+  if index !== 0
+    | , 
+  //- TODO this is hacky
+  if _.has(object, "url")
+    | <a href="#{object.url}">
+  if principal && principal.id === object.id
+    | You
+  else if object.id === "http://activityschema.org/collection/public"
+    | Public
+  else if author && author.followers && object.id === author.followers.url
+    | Followers
+  else if object.displayName
+    | #{object.displayName}
+  else if object.objectType
+    // #{object.id}
+    | a(n) #{object.objectType}
+  if _.has(object, "url")
+    | </a>
+
+if !_.has(coll, "items") || !coll.items || coll.items.length === 0
+  | #{coll.totalItems} people
+else if coll.totalItems > coll.items.length
+  |  and #{coll.totalItems - coll.items.length} others

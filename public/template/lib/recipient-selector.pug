@@ -1,0 +1,3 @@
+mixin recipient-selector(name, id, label)
+  label(for=id)= label
+  input(type="hidden", name=name id=id value=name === "cc" ? `collection:${principal.followers.url}` : "")
