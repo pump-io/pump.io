@@ -56,9 +56,9 @@ html(lang="en")
             b #{config.site} 
             | brought to you by 
             if config.ownerURL
-              a(href="#{config.ownerURL}") #{config.owner}
+              a(href=config.ownerURL) #{config.owner}
             else
-              | #{config.owner}
+              | config.owner
             |. 
             if config.appendFooter
               | !{config.appendFooter}
@@ -126,7 +126,7 @@ html(lang="en")
       script(src="/javascript/pump/view.js")
 
       each script in config.scripts
-        script(src="#{script}")
+        script(src=script)
 
       script.
         /* @license magnet:?xt=urn:btih:8e4f440f4c65981c5bf93c76d35135ba5064d8b7&dn=apache-2.0.txt Apache-2.0 */

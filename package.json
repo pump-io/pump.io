@@ -96,7 +96,7 @@
     "lint:filenames": "REGEX='(-(unit|e2e|testsuite)-test|-test-as-root|test-system).js$'; test $(ls test/*.js | wc -l) = $(ls test/*.js | grep -E $REGEX | wc -l) || { echo test files won\\'t be run: $(ls test/*.js | grep -Ev $REGEX); exit 1; }",
     "lint:jshint": "jshint --exclude 'public/javascript/libs' bin/* lib routes public/javascript test",
     "lint:jscs": "jscs bin/* lib public/javascript/pump* routes test",
-    "lint:pug": "pug-lint public/template/*.pug",
+    "lint:pug": "pug-lint public/template/**/*.pug",
     "lint:json": "jsonlint -q package.json pump.io.json.sample",
     "start": "./bin/pump",
     "update-docs": "for doc in copyright manpage readme; do npm run update-docs:$doc; done",
