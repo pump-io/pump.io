@@ -58,7 +58,7 @@ html(lang="en")
             if config.ownerURL
               a(href=config.ownerURL) #{config.owner}
             else
-              | config.owner
+              | #{config.owner}
             |. 
             if config.appendFooter
               | !{config.appendFooter}
