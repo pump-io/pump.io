@@ -16,7 +16,7 @@ li.media.person.major(data-person-id=person.id)
           = person.preferredUsername
 
     .pull-right
-      include ./lib/profile-responses.pug
+      include ./lib/profile-responses
 
     if person.location
       p.location!= person.location.displayName

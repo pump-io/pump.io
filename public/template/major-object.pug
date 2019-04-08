@@ -26,7 +26,7 @@ li.media.object.major(data-object-id=obj.id)
     .object-content!= obj.content
 
     if principal
-      include ./lib/responses.pug
+      include ./lib/responses
 
     //- List out who liked the object
     - var author = obj.author;
@@ -37,10 +37,10 @@ li.media.object.major(data-object-id=obj.id)
       p.muted
         small
           if obj.likes.totalItems === 1 && principal && obj.likes.items[0].url === principal.url
-            include ./lib/activity-object-collection.pug
+            include ./lib/activity-object-collection
             |  like this.
           else
-            include ./lib/activity-object-collection.pug
+            include ./lib/activity-object-collection
             |  likes this.
 
     //- List out who shared the object
@@ -51,13 +51,13 @@ li.media.object.major(data-object-id=obj.id)
     else if obj.shares.totalItems === 1
       p.muted
         small
-          include ./lib/activity-object-collection.pug
+          include ./lib/activity-object-collection
           |  shared this.
     else
       p.muted
         small
-          include ./lib/activity-object-collection.pug
+          include ./lib/activity-object-collection
           |  shared this.
 
     - var replies = obj.replies;
-    include ./replies.pug
+    include ./replies

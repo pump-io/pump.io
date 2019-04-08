@@ -35,13 +35,13 @@ html(lang="en")
     .navbar.navbar-inverse.navbar-fixed-top
       .navbar-inner
         if page.nologin
-          include ./nav-nologin.pug
+          include ./nav-nologin
         else if principalUser
-          include ../nav-loggedin.pug
+          include ../nav-loggedin
         else if principal
-          include ../nav-remote.pug
+          include ../nav-remote
         else
-          include ../nav-anonymous.pug
+          include ../nav-anonymous
 
     .container
 

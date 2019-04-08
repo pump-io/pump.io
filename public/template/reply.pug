@@ -36,8 +36,8 @@
       p.muted
         small
           if reply.likes.totalItems === 1 && principal && reply.likes.items[0].url === principal.url
-            include ./lib/activity-object-collection.pug
+            include ./lib/activity-object-collection
             |  like this.
           else
-            include ./lib/activity-object-collection.pug
+            include ./lib/activity-object-collection
             |  likes this.

@@ -37,12 +37,12 @@ unless object.deleted
             if activity.to && activity.to.length > 0
               |  To: 
               - var objects = activity.to;
-              include ./activity-object-list.pug
+              include ./activity-object-list
 
             if activity.cc && activity.cc.length > 0
               |  CC: 
               - var objects = activity.cc;
-              include ./activity-object-list.pug
+              include ./activity-object-list
 
         if object.image && object.image.url
           p
@@ -57,7 +57,7 @@ unless object.deleted
 
         if principal
           - var obj = object;
-          include ./lib/responses.pug
+          include ./lib/responses
 
         //- List out who liked the post
         if !object.likes || object.likes.totalItems === 0
@@ -67,10 +67,10 @@ unless object.deleted
           p.muted
             small
               if object.likes.totalItems === 1 && principal && object.likes.items[0].url === principal.url
-                include ./lib/activity-object-collection.pug
+                include ./lib/activity-object-collection
                 |  like this.
               else
-                include ./lib/activity-object-collection.pug
+                include ./lib/activity-object-collection
                 |  likes this.
 
         //- List out who shared the post
@@ -81,13 +81,13 @@ unless object.deleted
           if object.shares.totalItems === 1
             p.muted
               small
-                include ./lib/activity-object-collection.pug
+                include ./lib/activity-object-collection
                 |  shared this.
           else
             p.muted
               small
-                include ./lib/activity-object-collection.pug
+                include ./lib/activity-object-collection
                 |  shared this.
 
         - var replies = object.replies;
-        include ./replies.pug
+        include ./replies

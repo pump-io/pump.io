@@ -51,7 +51,7 @@ mixin authorship(object)
 
       if principal
         - var obj = object
-        include ./lib/responses.pug
+        include ./lib/responses
 
       - var author = object.author;
       - var coll = object.likes;
@@ -61,10 +61,10 @@ mixin authorship(object)
         p.muted
           small
             if object.likes.totalItems === 1 && principal && object.likes.items[0].url === principal.url
-              include ./lib/activity-object-collection.pug
+              include ./lib/activity-object-collection
               |  like this.
             else
-              include ./lib/activity-object-collection.pug
+              include ./lib/activity-object-collection
               |  likes this.
 
       - var author = object.author;
@@ -74,13 +74,13 @@ mixin authorship(object)
       else if object.shares.totalItems === 1
         p.muted
           small
-            include ./lib/activity-object-collection.pug
+            include ./lib/activity-object-collection
             |  shared this.
       else
         p.muted
           small
-            include ./lib/activity-object-collection.pug
+            include ./lib/activity-object-collection
             |  shared this.
 
       - var replies = object.replies;
-      include ./replies.pug
+      include ./replies
