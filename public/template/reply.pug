@@ -1,0 +1,43 @@
+.media.reply(data-activity-id=reply.id)
+  a.pull-left(href="#")
+    if reply.author.image && reply.author.image.url
+      img.img-rounded.media-object(src=(reply.author.image.pump_io && reply.author.image.pump_io.proxyURL) ? reply.author.image.pump_io.proxyURL : reply.author.image.url, width="32", height="32")
+    else
+      img.img-rounded.media-object(src="/images/default.png", width="32", height="32")
+
+
+  .media-body!= reply.content
+    p
+      small
+        a(href=reply.author.url)!= reply.author.displayName
+        |  at 
+        a(href=reply.url)
+          abbr.easydate(title=reply.published)= reply.published
+        if reply.location
+          |  in 
+          a(href=reply.location.url)!= reply.location.displayName
+
+    if principal
+      .responses
+        if reply.liked
+          a.unfavorite(href="#")
+            | Unlike 
+            i.fa.fa-thumbs-o-down
+        else
+          a.favorite(href="#")
+            | Like 
+            i.fa.fa-thumbs-o-up
+    
+    - var author = reply.author;
+    - var coll = reply.likes;
+    if !reply.likes || reply.likes.totalItems === 0
+      //- No likes, so we don't display anything
+    else
+      p.muted
+        small
+          if reply.likes.totalItems === 1 && principal && reply.likes.items[0].url === principal.url
+            include ./lib/activity-object-collection
+            |  like this.
+          else
+            include ./lib/activity-object-collection
+            |  likes this.

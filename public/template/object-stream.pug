@@ -1,0 +1,6 @@
+ul.media-list#object-stream
+  each object in objects.items
+    - var obj = object;
+    include ./major-object
+    if err
+      // Error showing object #{obj.id}: #{err.message}

@@ -1,0 +1,24 @@
+.media.h-card#profile-block(data-profile-id=profile.id)
+  span.pull-left
+    if profile.image && profile.image.url
+      img.img-rounded.media-object.u-photo(src=profile.image.url, width="128", height="128")
+    else
+      img.img-rounded.media-object.u-photo(src="/images/default.png", width="128", height="128")
+  .media-body
+    .pull-right
+      - var person = profile
+      include ./lib/profile-responses
+    h1.media-header
+      span.p-name!= profile.displayName
+      |  
+      small.p-nickname
+        if profile.id && profile.id.substr(0, 5) === 'acct:'
+          = profile.id.substr(5)
+        else
+          = profile.preferredUsername
+
+    if profile.location
+      p.location.p-locality!= profile.location.displayName
+    if profile.summary
+      p.summary.p-note!= profile.summary
+    // a.u-url(href="HOME PAGE")= TODO: HOME PAGE HERE

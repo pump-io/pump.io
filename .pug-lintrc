@@ -1,4 +1,5 @@
 {
+    "disallowAttributeInterpolation": true,
     "disallowClassAttributeWithStaticValue": true,
     "disallowDuplicateAttributes": true,
     "disallowIdAttributeWithStaticValue": true,

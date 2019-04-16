@@ -1,0 +1,8 @@
+ul.nav.nav-tabs.nav-stacked#list-menu-inner(profile-id=profile.id)
+  each list in lists.items
+    - var listItem = list;
+    include ./list-menu-item
+
+  if principal && principal.id === profile.id
+    li.add-a-list
+      a.new-list(href="#") New list...

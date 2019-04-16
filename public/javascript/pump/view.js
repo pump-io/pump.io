@@ -219,7 +219,7 @@
                         if (clientUrls.indexOf(name) !== -1) {
                             url += "-client";
                         }
-                        url += ".jade.js";
+                        url += ".pug.js";
 
                         $.get(url, function(data) {
                             var f;
@@ -242,7 +242,7 @@
                     if (_.has(Pump.templates, name)) {
                         return Pump.templates[name];
                     } else {
-                        res = $.ajax({url: "/template/"+name+"-client.jade.js",
+                        res = $.ajax({url: "/template/"+name+"-client.pug.js",
                                       async: false});
                         if (res.readyState === 4 &&
                             ((res.status >= 200 && res.status < 300) || res.status === 304)) {
