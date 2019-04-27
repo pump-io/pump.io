@@ -52,6 +52,7 @@ You cannot upgrade to this release with a zero-downtime restart.
 * bin/pump now crashes immediately on configuration problems instead of infinitely spawning workers (#1642)
 * Fix layout error in the Lists view left over from 1.0's utml -> Jade transition
 * Long lines no longer overflow in the web UI (#1157)
+* Display the proper alert/error message in the web UI (#1352) 
 * Fix crash when directly visiting `/uploads/` (#1397)
 * Fix non-public images always returning 403 Forbidden (#1438)
 * Fix multiple web UI Like buttons turning to Unlike when just one is clicked (#768)
@@ -64,6 +65,7 @@ You cannot upgrade to this release with a zero-downtime restart.
 * Drop support for Node.js 4, 5, and 7 (#1502)
 * Extract the CLI client tools to pump.io-cli and drop from this package (#381)
 * Reorganize Jade files to reduce npm package size (affects custom templates) (#1457)
+* Upgrade from jade@1 to pug@2 (affects custom templates) (#1580)
 * Crash instead of logging a warning when admins set internal parameters (#1396)
 * Crash instead of logging a warning when admins do not set `config.secret`, or set it to a well-known value (#1387)
 * Make the CLI options parsing more aware of boolean flags and string flags (#1334)
