@@ -65,7 +65,8 @@
     "uuid": "^3.0.0",
     "validator": "^10.0.0",
     "webfinger": "~0.4.2",
-    "yargs": "^11.0.0"
+    "yargs": "^11.0.0",
+    "snyk": "^1.189.0"
   },
   "bin": {
     "pump": "./bin/pump"
@@ -104,12 +105,13 @@
     "update-docs:copyright": "for i in README.md doc/pump.8; do sed -E \"s/2011-20[[:digit:]]{2}/2011-$(date +%Y)/g\" $i | sponge $i; done",
     "update-docs:manpage": "sed \"s/^\\.TH PUMP 8.*$/.TH PUMP 8 \\\"$(date +'%d %B %Y')\\\" \\\"$npm_package_version\\\"/\" doc/pump.8 | sponge doc/pump.8",
     "update-docs:readme": "sed \"s/^Version .*\\..*\\..*$/Version $npm_package_version/\" README.md | sponge README.md",
-    "prepublish": "npm run build",
+    "prepublish": "npm run snyk-protect; npm run build",
     "version": "npm run version:check-branch && npm run update-docs && git add README.md doc/",
     "version:check-branch": "if [ \"$(git symbolic-ref HEAD)\" = refs/heads/master ]; then echo 'refusing to run `npm version` on master; bump package.json manually' 1>&2; exit 1; fi",
     "postversion": "npm run postversion:push",
     "postversion:push": "git push origin v$npm_package_version && npm run --silent util:is-beta || git push --set-upstream origin $(git symbolic-ref --short HEAD)",
-    "util:is-beta": "echo $npm_package_version | grep beta > /dev/null"
+    "util:is-beta": "echo $npm_package_version | grep beta > /dev/null",
+    "snyk-protect": "snyk protect"
   },
   "repository": {
     "type": "git",
@@ -141,5 +143,6 @@
     "ignore": [
       "zombie"
     ]
-  }
+  },
+  "snyk": true
 }
