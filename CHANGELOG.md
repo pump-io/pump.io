@@ -71,6 +71,18 @@ You cannot upgrade to this release with a zero-downtime restart.
 * Make the CLI options parsing more aware of boolean flags and string flags (#1334)
 * Remove the SIGUSR2 handler for zero-downtime restarts; use `pumpctl(8)` with `pump.socket(7)` instead (#1643)
 
+## 5.1.3 - 2019-10-15
+
+### Security
+
+* Increase minimum DOMPurify version to 2.0.6 due to recent upstream security advisories
+
+## 4.1.4 - 2019-10-15
+
+### Security
+
+* Increase minimum DOMPurify version to 2.0.6 due to recent upstream security advisories
+
 ## 5.1.2 - 2018-09-14
 
 ### Security
