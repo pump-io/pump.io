@@ -34,7 +34,7 @@
     "databank": "0.19.x",
     "dateformat": "^3.0.0",
     "dialback-client": "0.2.x",
-    "dompurify": "^1.0.1",
+    "dompurify": "^2.0.6",
     "emailjs": "^1.0.8",
     "express": "^4.16.0",
     "express-session": "^1.14.1",
