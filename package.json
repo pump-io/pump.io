@@ -47,7 +47,7 @@
     "jsdom": "^11.10.0",
     "lodash": "^4.17.11",
     "method-override": "^3.0.0",
-    "mkdirp": "0.5.x",
+    "mkdirp": "1.0.0",
     "oauth-evanp": "~0.9.10-evanp.2",
     "optimist": "^0.6.1",
     "pug": "^2.0.3",
