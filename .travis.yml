@@ -15,9 +15,10 @@ addons:
 services:
   - docker
 stages:
-  - test
+  - name: test
+    if: (type = pull_request) OR (head_branch = master) OR (head_branch = beta)
   - name: docker-build
-    if: (tag = ^v) OR (head_branch = master) OR (head_branch = beta)
+    if: (tag =~ ^v) OR (head_branch = master) OR (head_branch = beta)
 
 before_script:
   - "./test/hosts.sh"
