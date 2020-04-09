@@ -35,7 +35,9 @@ jobs:
   include:
     - stage: test
       script:
-        - "(npm test || npm test) && npm run test:install && sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root'"
+        - npm test
+        - npm run test:install
+        - sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root'
     - stage: docker-build
       node_js: '12'
       script:
