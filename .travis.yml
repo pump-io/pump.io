@@ -16,9 +16,9 @@ services:
   - docker
 stages:
   - name: test
-    if: type = pull_request OR env(TRAVIS_BRANCH) =~ /^(master|beta)$/
+    if: type = pull_request OR branch =~ /^(master|beta)$/
   - name: docker-build
-    if: type = cron OR tag =~ ^v OR env(TRAVIS_BRANCH) =~ /^(master|beta)$/
+    if: type = cron OR tag =~ ^v OR (type = push AND branch =~ /^(master|beta)$/)
 
 before_script:
   - "./test/hosts.sh"
