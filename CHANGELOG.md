@@ -25,7 +25,7 @@ You cannot upgrade to this release with a zero-downtime restart.
 
 ### Added
 
-* Support Node 10, 12 and 13
+* Support Node.js 10, 12 and 13
 * The master process now listens on a control socket controllable by `pumpctl(8)`; see `pump.socket(7)` for protocol documentation (#1643)
 * Ship an `npm-shrinkwrap.json` file with the package, ensuring that everyone gets the same version of all dependencies
 * Public endpoints will now content-negotiate ActivityStreams 2.0
@@ -44,6 +44,7 @@ You cannot upgrade to this release with a zero-downtime restart.
 * Internal test suite refactoring
 * "Settings" is renamed to "Profile" in the web UI (#1680)
 * Docker images automatically set `NODE_ENV=production`
+* Docker images now use Node.js 12
 
 ### Fixed
 
