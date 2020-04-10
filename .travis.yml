@@ -16,7 +16,7 @@ services:
   - docker
 stages:
   - name: test
-    if: (type = pull_request) OR (head_branch = master) OR (head_branch = beta)
+    if: (type = pull_request) OR (branch = master) OR (branch = beta)
   - name: docker-build
     if: (tag =~ ^v) OR (branch = master) OR (branch = beta)
 
