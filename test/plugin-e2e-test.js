@@ -54,6 +54,7 @@ suite.addBatch({
                           hostname: "localhost",
                           driver: tc.driver,
                           params: tc.params,
+                          secret: "real secret",
                           nologger: true,
                           sockjs: false,
                           plugins: ["../test/lib/plugin"]
