@@ -24,21 +24,20 @@ var assert = require("assert"),
     vows = require("vows"),
     _ = require("lodash"),
     Logger = require("bunyan"),
-    simplesmtp = require("simplesmtp"),
     Step = require("step"),
     emailutil = require("./lib/email"),
     configutil = require("../lib/config"),
+    createSmtpServer = emailutil.createSmtpServer,
     oneEmail = emailutil.oneEmail;
 
 var suite = vows.describe("mailer module interface").addBatch({
     "When we set up a dummy server": {
         topic: function() {
             var callback = this.callback,
-                smtp = simplesmtp.createServer({disableDNSValidation: true});
-
-            if (_.isFunction(smtp.setMaxListeners)) {
-                smtp.setMaxListeners(100);
-            }
+                smtp = createSmtpServer({
+                    maxClients: 100,
+                    disabledCommands: ["AUTH"]
+                });
 
             smtp.listen(1623, function(err) {
                 if (err) {
@@ -54,7 +53,7 @@ var suite = vows.describe("mailer module interface").addBatch({
         },
         "teardown": function(smtp) {
             if (smtp) {
-                smtp.end(function(err) {});
+                smtp.close();
             }
         },
         "and we require the mailer module": {
@@ -75,6 +74,7 @@ var suite = vows.describe("mailer module interface").addBatch({
                     var log = new Logger({name: "mailer-test",
                                           streams: [{path: "/dev/null"}]}),
                         config = {
+                            secret: "real secret",
                             smtpuser: null,
                             smtppass: null,
                             smtpserver: "localhost",
@@ -108,7 +108,7 @@ var suite = vows.describe("mailer module interface").addBatch({
 
                         Step(
                             function() {
-                                oneEmail(smtp, message.to, this.parallel());
+                                oneEmail(message.to, this.parallel());
                                 Mailer.sendEmail(message, this.parallel());
                             },
                             callback
@@ -137,7 +137,7 @@ var suite = vows.describe("mailer module interface").addBatch({
                                             subject: "Have you seen the perp?",
                                             text: "We sent an email and the perp ran."
                                         };
-                                        oneEmail(smtp, to, rgroup());
+                                        oneEmail(to, rgroup());
                                         Mailer.sendEmail(message, sgroup());
                                     }
                                 },
