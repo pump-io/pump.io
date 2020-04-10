@@ -16,29 +16,28 @@ services:
   - docker
 stages:
   - name: test
-    if: (type = pull_request) OR (head_branch = master) OR (head_branch = beta)
+    if: type = pull_request OR branch =~ /^(master|beta)$/
   - name: docker-build
-    if: (tag =~ ^v) OR (head_branch = master) OR (head_branch = beta)
-
-before_script:
-  - "./test/hosts.sh"
+    if: type = cron OR tag =~ ^v OR (type = push AND branch =~ /^(master|beta)$/)
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq graphicsmagick
   - npm install -g npm@6
   - npm --version
+before_script:
+  - "./test/hosts.sh"
 after_script:
   # The coverage data from as-root tests is root:root but not world-readable
   - sudo chown -R $(whoami) coverage
   - npm run test:report-coverage
+script:
+  - npm test
+  - npm run test:install
+  - sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root'
 jobs:
   include:
-    - stage: test
-      script:
-        - npm test
-        - npm run test:install
-        - sudo sh -c 'export PATH=\"'\"$(dirname $(which node)):$PATH\"'\" && npm run test:root'
     - stage: docker-build
+      name: "Docker Build"
       node_js: '12'
       script:
         - if ./util/docker-candidacy.sh; then export DOCKER_CANDIDATE=true; else export DOCKER_CANDIDATE=false; fi

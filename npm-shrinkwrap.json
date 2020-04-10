@@ -5773,12 +5773,6 @@
       "integrity": "sha512-eTPo5t/4bgaMNZxyjWx6N2a6AuE0mq51KWvpc7nU/MAqixcI6v6KrGUKES0HaomdnolQBBXU/++X6/QQ9KL4tw==",
       "dev": true
     },
-    "rai": {
-      "version": "0.1.12",
-      "resolved": "https://registry.npmjs.org/rai/-/rai-0.1.12.tgz",
-      "integrity": "sha1-jM/QFND5YIYw3XPBm45LBXdUpqY=",
-      "dev": true
-    },
     "ramda": {
       "version": "0.25.0",
       "resolved": "https://registry.npmjs.org/ramda/-/ramda-0.25.0.tgz",
@@ -6294,16 +6288,6 @@
       "version": "3.0.2",
       "resolved": "https://registry.npmjs.org/signal-exit/-/signal-exit-3.0.2.tgz",
       "integrity": "sha1-tf3AjxKH6hF4Yo5BXiUTK3NkbG0="
-    },
-    "simplesmtp": {
-      "version": "0.3.35",
-      "resolved": "https://registry.npmjs.org/simplesmtp/-/simplesmtp-0.3.35.tgz",
-      "integrity": "sha1-AXseuLJjF6w20qKoqTJjGIBzagM=",
-      "dev": true,
-      "requires": {
-        "rai": "~0.1.11",
-        "xoauth2": "~0.1.8"
-      }
     },
     "slash": {
       "version": "1.0.0",
@@ -7569,12 +7553,6 @@
       "version": "0.1.19",
       "resolved": "https://registry.npmjs.org/xmldom/-/xmldom-0.1.19.tgz",
       "integrity": "sha1-Yx/Ad3bv2EEYvyUXGzftTQdaCrw="
-    },
-    "xoauth2": {
-      "version": "0.1.8",
-      "resolved": "https://registry.npmjs.org/xoauth2/-/xoauth2-0.1.8.tgz",
-      "integrity": "sha1-uRb/EOz7VDIPFvJKPpdRIGU6sNI=",
-      "dev": true
     },
     "xtend": {
       "version": "4.0.1",
