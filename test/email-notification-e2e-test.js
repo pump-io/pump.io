@@ -21,7 +21,6 @@
 var assert = require("assert"),
     vows = require("vows"),
     _ = require("lodash"),
-    simplesmtp = require("simplesmtp"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
     httputil = require("./lib/http"),
@@ -34,6 +33,7 @@ var assert = require("assert"),
     registerEmail = oauthutil.registerEmail,
     withAppSetup = apputil.withAppSetup,
     setupAppConfig = apputil.setupAppConfig,
+    createSmtpServer = emailutil.createSmtpServer,
     oneEmail = emailutil.oneEmail,
     confirmEmail = emailutil.confirmEmail;
 
@@ -48,13 +48,13 @@ var userCred = function(cl, user) {
 
 var suite = vows.describe("email notifications");
 
-var registerAndConfirm = function(smtp, cl, email, nickname, password, callback) {
+var registerAndConfirm = function(cl, email, nickname, password, callback) {
 
     var user;
 
     Step(
         function() {
-            oneEmail(smtp, email, this.parallel());
+            oneEmail(email, this.parallel());
             registerEmail(cl, nickname, password, email, this.parallel());
         },
         function(err, message, results) {
@@ -76,20 +76,22 @@ suite.addBatch({
     "When we set up the app": {
         topic: function() {
             var callback = this.callback,
-                smtp = simplesmtp.createServer({disableDNSValidation: true});
+                smtp = createSmtpServer();
             Step(
                 function() {
                     smtp.listen(1623, this);
                 },
                 function(err) {
                     if (err) throw err;
-                    setupAppConfig({hostname: "localhost",
-                                    port: 4815,
-                                    requireEmail: true,
-                                    smtpserver: "localhost",
-                                    smtpport: 1623
-                                   },
-                                   this);
+                    setupAppConfig({
+                        hostname: "localhost",
+                        port: 4815,
+                        requireEmail: true,
+                        smtpserver: "localhost",
+                        smtpport: 1623,
+                        smtpuser: 'smtpuser',
+                        smtppass: 'smtppass',
+                    }, this);
                 },
                 function(err, app) {
                     if (err) {
@@ -105,7 +107,7 @@ suite.addBatch({
                 app.close();
             }
             if (smtp) {
-                smtp.end(function(err) {});
+                smtp.close();
             }
         },
         "it works": function(err, app, smtp) {
@@ -123,8 +125,8 @@ suite.addBatch({
                 topic: function(cl, app, smtp) {
                     Step(
                         function() {
-                            registerAndConfirm(smtp, cl, "tony@pump.test", "tony", "you*can*tell", this.parallel());
-                            registerAndConfirm(smtp, cl, "stephanie@pump.test", "stephanie", "luv2dance", this.parallel());
+                            registerAndConfirm(cl, "tony@pump.test", "tony", "you*can*tell", this.parallel());
+                            registerAndConfirm(cl, "stephanie@pump.test", "stephanie", "luv2dance", this.parallel());
                         },
                         this.callback
                     );
@@ -150,12 +152,10 @@ suite.addBatch({
 
                         Step(
                             function() {
-                                oneEmail(smtp, "stephanie@pump.test", this.parallel());
+                                oneEmail("stephanie@pump.test", this.parallel());
                                 httputil.postJSON(url, cred, act, this.parallel());
                             },
-                            function(err, message, body, response) {
-                                callback(err, message, body);
-                            }
+                            callback
                         );
                     },
                     "it works": function(err, message, body) {

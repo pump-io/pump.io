@@ -21,7 +21,7 @@
 var assert = require("assert"),
     vows = require("vows"),
     _ = require("lodash"),
-    simplesmtp = require("simplesmtp"),
+    smtpserver = require("smtp-server"),
     oauthutil = require("./oauth"),
     apputil = require("./app"),
     httputil = require("./http"),
@@ -34,43 +34,60 @@ var assert = require("assert"),
     setupApp = apputil.setupApp,
     setupAppConfig = apputil.setupAppConfig;
 
-var oneEmail = function(smtp, addr, callback) {
+var SMTPServer = smtpserver.SMTPServer,
+    emailAccumulator = [];
+
+var createSmtpServer = function(options) {
+    return new SMTPServer(_.extend({
+        onData: onDataEmail,
+        onAuth(auth, session, callback) {
+            callback(null, { user: auth.username });
+        }
+    }, options));
+};
+
+var oneEmail = function(addr, callback) {
+    var onEmailCallback = function(err, msg) {
+        clearTimeout(timeoutID);
+        callback(err, msg);
+    }, timeoutID = setTimeout(function() {
+        onEmailCallback(new Error("Timeout waiting for email"), null);
+    }, 5000);
+
+    emailAccumulator.push({ addr, callback: onEmailCallback });
+};
+
+var onDataEmail = function(stream, session, callback) {
     var data,
         timeoutID,
-        isOurs = function(envelope) {
-            return _.includes(envelope.to, addr);
-        },
-        starter = function(envelope) {
-            if (isOurs(envelope)) {
-                data = "";
-                smtp.on("data", accumulator);
-                smtp.once("dataReady", ender);
-            }
-        },
-        accumulator = function(envelope, chunk) {
-            if (isOurs(envelope)) {
+        envelope = session.envelope,
+        emailIndex = emailAccumulator.findIndex((email) => {
+            return envelope.rcptTo.find((to) => (to.address === email.addr));
+        }),
+        accumulator = function(chunk) {
+            if (emailIndex > -1) {
                 data = data + chunk.toString();
             }
         },
-        ender = function(envelope, cb) {
-            var msg;
-            if (isOurs(envelope)) {
-                clearTimeout(timeoutID);
-                smtp.removeListener("data", accumulator);
+        ender = function() {
+            var msg,
+                emailData = emailAccumulator[emailIndex];
+
+            if (emailData) {
                 msg = _.clone(envelope);
                 msg.data = data;
-                callback(null, msg);
+                if (typeof emailData.callback === "function") {
+                    emailData.callback(null, msg);
+                }
+                emailAccumulator.splice(emailIndex, 1);
                 process.nextTick(function() {
-                    cb(null);
+                    callback(null, emailData);
                 });
             }
         };
 
-    timeoutID = setTimeout(function() {
-        callback(new Error("Timeout waiting for email"), null);
-    }, 5000);
-
-    smtp.on("startData", starter);
+    stream.on("data", accumulator);
+    stream.on("end", ender);
 };
 
 var confirmEmail = function(message, callback) {
@@ -100,5 +117,7 @@ var confirmEmail = function(message, callback) {
     });
 };
 
+exports.createSmtpServer = createSmtpServer;
 exports.oneEmail = oneEmail;
+exports.onDataEmail = onDataEmail;
 exports.confirmEmail = confirmEmail;

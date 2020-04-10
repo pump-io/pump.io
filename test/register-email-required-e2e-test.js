@@ -21,7 +21,6 @@
 var assert = require("assert"),
     vows = require("vows"),
     _ = require("lodash"),
-    simplesmtp = require("simplesmtp"),
     oauthutil = require("./lib/oauth"),
     apputil = require("./lib/app"),
     httputil = require("./lib/http"),
@@ -35,6 +34,7 @@ var assert = require("assert"),
     withAppSetup = apputil.withAppSetup,
     setupAppConfig = apputil.setupAppConfig,
     oneEmail = emailutil.oneEmail,
+    createSmtpServer = emailutil.createSmtpServer,
     confirmEmail = emailutil.confirmEmail;
 
 var makeCred = function(cl, pair) {
@@ -54,20 +54,22 @@ suite.addBatch({
     "When we set up the app": {
         topic: function() {
             var callback = this.callback,
-                smtp = simplesmtp.createServer({disableDNSValidation: true});
+                smtp = createSmtpServer();
             Step(
                 function() {
                     smtp.listen(1623, this);
                 },
                 function(err) {
                     if (err) throw err;
-                    setupAppConfig({hostname: "localhost",
-                                    port: 4815,
-                                    requireEmail: true,
-                                    smtpserver: "localhost",
-                                    smtpport: 1623
-                                   },
-                                   this);
+                    setupAppConfig({
+                        hostname: "localhost",
+                        port: 4815,
+                        requireEmail: true,
+                        smtpserver: "localhost",
+                        smtpport: 1623,
+                        smtppass: 'smtppass',
+                        smtpuser: 'smtpuser'
+                    }, this);
                 },
                 function(err, app) {
                     if (err) {
@@ -83,7 +85,7 @@ suite.addBatch({
                 app.close();
             }
             if (smtp) {
-                smtp.end(function(err) {});
+                smtp.close();
             }
         },
         "it works": function(err, app, smtp) {
@@ -117,7 +119,7 @@ suite.addBatch({
                     var callback = this.callback;
                     Step(
                         function() {
-                            oneEmail(smtp, "jamesjr@pump.test", this.parallel());
+                            oneEmail("jamesjr@pump.test", this.parallel());
                             registerEmail(cl, "jj", "dyn|o|mite!", "jamesjr@pump.test", this.parallel());
                         },
                         callback
@@ -166,7 +168,7 @@ suite.addBatch({
 
                             Step(
                                 function() {
-                                    oneEmail(smtp, "jamessr@pump.test", this.parallel());
+                                    oneEmail("jamessr@pump.test", this.parallel());
                                     registerEmail(cl, "james", "work|hard", "jamessr@pump.test", this.parallel());
                                 },
                                 function(err, message, results) {
@@ -255,7 +257,7 @@ suite.addBatch({
 
                             Step(
                                 function() {
-                                    oneEmail(smtp, "thelma@pump.test", this.parallel());
+                                    oneEmail("thelma@pump.test", this.parallel());
                                     registerEmail(cl, "thelma", "dance4fun", "thelma@pump.test", this.parallel());
                                 },
                                 function(err, message, results) {
@@ -332,7 +334,7 @@ suite.addBatch({
                     var callback = this.callback;
                     Step(
                         function() {
-                            oneEmail(smtp, "bookman@pump.test", this.parallel());
+                            oneEmail("bookman@pump.test", this.parallel());
                             registerEmail(cl, "bookman", "i*am*super.", "bookman@pump.test", this.parallel());
                         },
                         callback
