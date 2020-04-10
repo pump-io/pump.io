@@ -67,8 +67,8 @@ suite.addBatch({
                         requireEmail: true,
                         smtpserver: "localhost",
                         smtpport: 1623,
-                        smtppass: 'smtppass',
-                        smtpuser: 'smtpuser'
+                        smtppass: "smtppass",
+                        smtpuser: "smtpuser"
                     }, this);
                 },
                 function(err, app) {

@@ -74,7 +74,7 @@ var suite = vows.describe("mailer module interface").addBatch({
                     var log = new Logger({name: "mailer-test",
                                           streams: [{path: "/dev/null"}]}),
                         config = {
-                            secret: 'real secret',
+                            secret: "real secret",
                             smtpuser: null,
                             smtppass: null,
                             smtpserver: "localhost",
