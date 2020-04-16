@@ -250,10 +250,16 @@ var handleRemote = function(req, res, next) {
             host.getRequestToken(this);
         },
         function(err, rt) {
-            if (err) {
-                next(err);
-            } else {
+            if (!err) {
                 res.redirect(host.authorizeURL(rt));
+            } else if (err.statusCode) {
+                if (host && err.statusCode === 400) {
+                    req.log.warn("Invalid or old host credentials", err);
+                    host.destroyHost(req.log.error);
+                }
+                next(new HTTPError(err.data, err.statusCode));
+            } else {
+                next(err);
             }
         }
     );
