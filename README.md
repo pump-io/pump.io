@@ -24,7 +24,6 @@ and so on.
 
 The software is useful for at least these scenarios:
 
-* Mobile-first social networking
 * Activity stream functionality for an existing app
 * Experimenting with social software
 
@@ -42,8 +41,6 @@ documentation see our
 If you find bugs, you can report them here:
 
 https://github.com/pump-io/pump.io/issues
-
-You can also email me at evan@e14n.com.
 
 ## Colophon
 
