@@ -44,7 +44,7 @@ var fs = require("fs"),
     ActivityObject = require("../lib/model/activityobject").ActivityObject,
     URLMaker = require("../lib/urlmaker").URLMaker,
     User = require("../lib/model/user").User,
-    argv = require('yargs')
+    argv = require("yargs")
         .usage("Usage: $0 -f <collection file> or $0 -d <divided directory>")
         .alias("f", "file")
         .alias("d", "directory")
