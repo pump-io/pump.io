@@ -34,12 +34,10 @@ Environment=NODE_ENV=production
 # Security restrictions
 # We can't do a whitelist-based {Inaccessible,ReadOnly,ReadWrite}Paths setup because it muddles execute perms
 # Instead, we blacklist what we almost for sure don't need. This is obviously much worse, but what're you gonna do?
-InaccessiblePaths=/bin
 InaccessiblePaths=/boot
 ReadOnlyPaths=/dev
 InaccessiblePaths=/mnt
 ReadOnlyPaths=/proc
-InaccessiblePaths=/sbin
 InaccessiblePaths=/sys
 NoNewPrivileges=true
 ProtectSystem=full
