@@ -1664,9 +1664,9 @@
       }
     },
     "dompurify": {
-      "version": "2.0.6",
-      "resolved": "https://registry.npmjs.org/dompurify/-/dompurify-2.0.6.tgz",
-      "integrity": "sha512-1+AOpCYIKoLER/Ykd/Q/i11slhYy6T29/mmDrTsALH0JcMPB0pt9++8eDTGT70tv6ofmmeptrdqzZpmjMfFLRg=="
+      "version": "2.0.16",
+      "resolved": "https://registry.npmjs.org/dompurify/-/dompurify-2.0.16.tgz",
+      "integrity": "sha512-MMNzUQdlvmbXhD0NVxME4hNI72eOlcz9TzO9L8KfmUcI+h97ISON5XagIUm40+JRwV4fGHYqxRpSy844fT9iow=="
     },
     "domutils": {
       "version": "1.5.1",
@@ -3358,7 +3358,7 @@
       "integrity": "sha1-ST3135zTqfGxyylrvT0IFnnyDKg=",
       "requires": {
         "async": "^1.5.2",
-        "bitcore-message": "github:CoMakery/bitcore-message#8799cc327029c3d34fc725f05b2cf981363f6ebf",
+        "bitcore-message": "bitcore-message@github:CoMakery/bitcore-message#8799cc327029c3d34fc725f05b2cf981363f6ebf",
         "commander": "~2.9.0",
         "es6-promise": "~4.0.5",
         "jsonld": "0.4.3",
