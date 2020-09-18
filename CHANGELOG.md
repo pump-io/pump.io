@@ -17,6 +17,18 @@ Changes to everything else are not considered breaking, although we may delay th
 
 If you think something that isn't in the first list should be covered, file an issue and we'll either state we consider that semver-major or give a rationale as to why it isn't. Please also feel free to ask questions in the issue tracker; this list could surely be more precise.
 
+## 5.1.4 - 2020-09-18
+
+### Security
+
+* Increase minimum DOMPurify version to 2.0.16 due to recent upstream security advisories
+
+## 5.0.4 - 2020-09-18
+
+### Security
+
+* Increase minimum DOMPurify version to 2.0.16 due to recent upstream security advisories
+
 ## 5.1.3 - 2019-10-15
 
 ### Security
