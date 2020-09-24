@@ -561,7 +561,8 @@
         },
         "kind-of": {
           "version": "6.0.2",
-          "resolved": "",
+          "resolved": "https://registry.npmjs.org/kind-of/-/kind-of-6.0.2.tgz",
+          "integrity": "sha512-s5kLOcnH0XqDO+FvuaLX8DDjZ18CGFk7VygH40QoKPUQhW4e2rvM0rwUq0t8IQDOwYSeLK01U90OjzBTme2QqA==",
           "dev": true
         }
       }
@@ -650,13 +651,6 @@
           "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz",
           "integrity": "sha1-W/Rejkm6QYnhfUgnid/RW9FAt7Y="
         }
-      }
-    },
-    "bitcore-message": {
-      "version": "github:CoMakery/bitcore-message#8799cc327029c3d34fc725f05b2cf981363f6ebf",
-      "from": "bitcore-message@github:CoMakery/bitcore-message#8799cc327029c3d34fc725f05b2cf981363f6ebf",
-      "requires": {
-        "bitcore-lib": "^0.13.7"
       }
     },
     "bluebird": {
@@ -2156,7 +2150,8 @@
         },
         "kind-of": {
           "version": "6.0.2",
-          "resolved": "",
+          "resolved": "https://registry.npmjs.org/kind-of/-/kind-of-6.0.2.tgz",
+          "integrity": "sha512-s5kLOcnH0XqDO+FvuaLX8DDjZ18CGFk7VygH40QoKPUQhW4e2rvM0rwUq0t8IQDOwYSeLK01U90OjzBTme2QqA==",
           "dev": true
         }
       }
@@ -3372,13 +3367,20 @@
       "integrity": "sha1-ST3135zTqfGxyylrvT0IFnnyDKg=",
       "requires": {
         "async": "^1.5.2",
-        "bitcore-message": "bitcore-message@github:CoMakery/bitcore-message#8799cc327029c3d34fc725f05b2cf981363f6ebf",
+        "bitcore-message": "github:CoMakery/bitcore-message#dist",
         "commander": "~2.9.0",
         "es6-promise": "~4.0.5",
         "jsonld": "0.4.3",
         "node-forge": "~0.6.45"
       },
       "dependencies": {
+        "bitcore-message": {
+          "version": "github:CoMakery/bitcore-message#8799cc327029c3d34fc725f05b2cf981363f6ebf",
+          "from": "github:CoMakery/bitcore-message#dist",
+          "requires": {
+            "bitcore-lib": "^0.13.7"
+          }
+        },
         "es6-promise": {
           "version": "4.0.5",
           "resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-4.0.5.tgz",
@@ -3648,6 +3650,11 @@
         "brace-expansion": "^1.1.7"
       }
     },
+    "minimist": {
+      "version": "1.2.5",
+      "resolved": "https://registry.npmjs.org/minimist/-/minimist-1.2.5.tgz",
+      "integrity": "sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw=="
+    },
     "minimum-tls-version": {
       "version": "0.0.1",
       "resolved": "https://registry.npmjs.org/minimum-tls-version/-/minimum-tls-version-0.0.1.tgz",
@@ -3676,6 +3683,14 @@
             "is-plain-object": "^2.0.4"
           }
         }
+      }
+    },
+    "mkdirp": {
+      "version": "0.5.5",
+      "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.5.tgz",
+      "integrity": "sha512-NKmAlESf6jMGym1++R0Ra7wvhV+wFW63FaSOFPwRahvea0gMUcGUhVeAg/0BC0wiv9ih5NYPB1Wn1UEI1/L+xQ==",
+      "requires": {
+        "minimist": "^1.2.5"
       }
     },
     "module-not-found-error": {
@@ -6231,7 +6246,8 @@
         },
         "kind-of": {
           "version": "6.0.2",
-          "resolved": "",
+          "resolved": "https://registry.npmjs.org/kind-of/-/kind-of-6.0.2.tgz",
+          "integrity": "sha512-s5kLOcnH0XqDO+FvuaLX8DDjZ18CGFk7VygH40QoKPUQhW4e2rvM0rwUq0t8IQDOwYSeLK01U90OjzBTme2QqA==",
           "dev": true
         }
       }
