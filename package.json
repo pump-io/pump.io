@@ -52,7 +52,7 @@
     "pug": "^2.0.3",
     "pug-cli": "^1.0.0-alpha6",
     "schlock": "~0.2.1",
-    "send": "^0.16.1",
+    "send": "^0.17.1",
     "serve-favicon": "^2.3.0",
     "showdown": "^1.9.1",
     "signal-exit": "^3.0.2",
