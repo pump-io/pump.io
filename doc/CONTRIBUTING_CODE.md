@@ -113,9 +113,9 @@ happy to help you.
 
 [Here's a couple ways][community] that you can get in touch. The
 easiest way is probably IRC - you can download a client, but for your
-first time it'll be easier to use https://webchat.freenode.net/. You
+first time it'll be easier to use https://web.libera.chat/. You
 need to join the `#pump.io` channel; make up a nickname and don't
-check the "auth to services" checkbox. Be aware that it's normal to
+check the "I have a password" checkbox. Be aware that it's normal to
 not receive an immediate reply on IRC - people often leave their IRC
 clients open while they do other things and come back and read the
 history later. This is also why it's important to not say things like
