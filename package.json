@@ -44,7 +44,7 @@
     "helmet": "^3.3.0",
     "import-fresh": "^2.0.0",
     "jankyqueue": "0.1.x",
-    "jsdom": "^11.10.0",
+    "jsdom": "^15.1.1",
     "lodash": "^4.17.20",
     "method-override": "^3.0.0",
     "mkdirp": "0.5.x",
