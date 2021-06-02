@@ -51,6 +51,28 @@
             "*path(?*querystring)": "loadFromServer"
         },
 
+        execute: function(callback, args, name) {
+            switch (name) {
+            case "login":
+            case "register":
+            case "remote":
+                var continueTo = Pump.getContinueTo();
+
+                if (continueTo && !continueTo.match(name)) {
+                    // Replace navigation state
+                    Pump.setContinueTo(continueTo);
+                }
+
+                break;
+            default:
+                break;
+            }
+
+            if (callback) {
+                callback.apply(this, args);
+            }
+        },
+
         register: function() {
             Pump.body.startLoad();
             Pump.body.setContent({contentView: Pump.RegisterContent,
