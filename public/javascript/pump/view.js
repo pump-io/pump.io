@@ -724,6 +724,11 @@
             view.setupSubs();
             // Initialize state of login button
             view.onKey();
+
+            // Waiting to the view is completely ready before focus the username field
+            setTimeout(function() {
+                view.$('#login input[name="nickname"]').focus();
+            }, 500);
         },
         "onKey": function(event) {
             var view = this,
