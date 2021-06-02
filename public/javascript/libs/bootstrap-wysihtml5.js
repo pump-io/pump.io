@@ -272,7 +272,7 @@
             var insertLinkModal = toolbar.find('.bootstrap-wysihtml5-insert-link-modal');
             var urlInput = insertLinkModal.find('.bootstrap-wysihtml5-insert-link-url');
             var insertButton = insertLinkModal.find('a.btn-primary');
-            var initialValue = urlInput.val();
+            var initialValue = "";
 
             var insertLink = function() {
                 var url = urlInput.val();
@@ -296,6 +296,7 @@
             insertButton.click(insertLink);
 
             insertLinkModal.on('shown', function() {
+                urlInput.val(initialValue);
                 urlInput.focus();
             });
 
@@ -303,11 +304,21 @@
                 self.editor.currentView.element.focus();
             });
 
+            $(urlInput).attr("placeholder", "https://");
+
             toolbar.find('a[data-wysihtml5-command=createLink]').click(function() {
                 var activeButton = $(this).hasClass("wysihtml5-command-active");
+                var currentModal = $(".bootstrap-wysihtml5-insert-link-modal");
+                var existBbackdrop = $(".modal-backdrop.fade.in").length !== 0 ? true : false;
 
                 if (!activeButton) {
-                    insertLinkModal.appendTo('body').modal('show');
+                    if (currentModal.length !== 0) {
+                        insertLinkModal = currentModal;
+                    } else {
+                        insertLinkModal.appendTo('body');
+                    }
+                    insertLinkModal.modal({backdrop: !existBbackdrop});
+                    insertLinkModal.modal('show');
                     insertLinkModal.on('click.dismiss.modal', '[data-dismiss="modal"]', function(e) {
                         e.stopPropagation();
                     });
