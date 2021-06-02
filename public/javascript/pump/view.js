@@ -2921,6 +2921,85 @@
         templateName: "lightbox-modal"
     });
 
+    Pump.InfiniteScrollView = Backbone.View.extend({
+        tagName: "div",
+        className: "infinite-scroll",
+        events: {
+            "click button": "getStreams"
+        },
+        initialize: function() {
+            this.didScroll = true;
+            this.lastScroll = null;
+            this.allowScrollTimer = null;
+            _.bindAll(this, "onScroll");
+
+            // bind to window but
+            $(window).scroll(this.onScroll);
+        },
+        startSpin: function() {
+            Pump.body.startLoad();
+            this.$el.find(".loading").addClass("visible").spin(true);
+        },
+        stopSpin: function() {
+            Pump.body.endLoad();
+            this.$el.find(".loading").removeClass("visible").spin(false);
+        },
+        showRetry: function() {
+            this.$el.find(".retry").addClass("visible");
+        },
+        hideRetry: function() {
+            this.$el.find(".retry").removeClass("visible");
+        },
+        allowScrolTimeout: function(err) {
+            var view = this;
+
+            // Scroll fires too fast
+            // so allow a new request after timeout
+            view.allowScrollTimer = setTimeout(function() {
+                view.didScroll = true;
+                view.allowScrollTimer = null;
+                view.stopSpin();
+
+                if (err) {
+                    view.showRetry();
+                }
+            }, 250);
+        },
+        getStreams: function() {
+            var view = this,
+                streams = Pump.getStreams();
+
+            view.didScroll = false;
+            view.hideRetry();
+
+            if (streams.major && streams.major.nextLink()) {
+
+                view.startSpin();
+
+                streams.major.getNext(function(err) {
+                    view.allowScrolTimeout(err);
+                });
+
+            } else {
+                view.allowScrolTimeout();
+            }
+        },
+        onScroll: function() {
+            var view = this,
+                scrollTop = $(window).scrollTop();
+
+            // Only when allow scroll and on down direction
+            if (view.didScroll && scrollTop > view.lastScroll &&
+                scrollTop >= ($(document).height() - $(window).height() - 10)) {
+
+                view.getStreams();
+            }
+
+            // For detect scroll direction
+            view.lastScroll = scrollTop;
+        }
+    });
+
     Pump.BodyView = Backbone.View.extend({
         initialize: function(options) {
             _.bindAll(this, "navigateToHref");
