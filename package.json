@@ -49,7 +49,7 @@
     "method-override": "^3.0.0",
     "mkdirp": "0.5.x",
     "oauth-evanp": "~0.9.10-evanp.2",
-    "pug": "^2.0.3",
+    "pug": "^3.0.1",
     "pug-cli": "^1.0.0-alpha6",
     "schlock": "~0.2.1",
     "send": "^0.17.1",
