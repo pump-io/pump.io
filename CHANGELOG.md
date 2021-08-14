@@ -66,7 +66,7 @@ You cannot upgrade to this release with a zero-downtime restart.
 * Drop support for Node.js 4 to 10 (#1502)
 * Extract the CLI client tools to pump.io-cli and drop from this package (#381)
 * Reorganize Jade files to reduce npm package size (affects custom templates) (#1457)
-* Upgrade from jade@1 to pug@2 (affects custom templates) (#1580)
+* Upgrade from jade@1 to pug@3 (affects custom templates) (#1580)
 * Crash instead of logging a warning when admins set internal parameters (#1396)
 * Crash instead of logging a warning when admins do not set `config.secret`, or set it to a well-known value (#1387)
 * Make the CLI options parsing more aware of boolean flags and string flags (#1334)
