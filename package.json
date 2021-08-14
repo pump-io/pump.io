@@ -47,7 +47,7 @@
     "jsdom": "^17.0.0",
     "lodash": "^4.17.20",
     "method-override": "^3.0.0",
-    "mkdirp": "0.5.x",
+    "mkdirp": "1.0.4",
     "oauth-evanp": "~0.9.10-evanp.2",
     "pug": "^3.0.2",
     "@anduh/pug-cli": "^1.0.0-alpha8",
