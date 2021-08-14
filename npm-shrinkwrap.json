@@ -34,7 +34,7 @@
         "method-override": "^3.0.0",
         "mkdirp": "0.5.x",
         "oauth-evanp": "~0.9.10-evanp.2",
-        "pug": "^3.0.1",
+        "pug": "^3.0.2",
         "pug-cli": "^1.0.0-alpha6",
         "schlock": "~0.2.1",
         "send": "^0.17.1",
@@ -47,7 +47,7 @@
         "step": "^1.0.0",
         "ua-parser-js": "^0.7.10",
         "uuid": "^3.0.0",
-        "validator": "^10.0.0",
+        "validator": "^13.6.0",
         "webfinger": "~0.4.2",
         "yargs": "^15.3.1"
       },
@@ -8982,9 +8982,9 @@
       }
     },
     "node_modules/validator": {
-      "version": "10.11.0",
-      "resolved": "https://registry.npmjs.org/validator/-/validator-10.11.0.tgz",
-      "integrity": "sha512-X/p3UZerAIsbBfN/IwahhYaBbY68EN/UQBWHtsbXGT5bfrH/p4NQzUCG1kF/rtKaNpnJ7jAu6NGTdSNtyNIXMw==",
+      "version": "13.6.0",
+      "resolved": "https://registry.npmjs.org/validator/-/validator-13.6.0.tgz",
+      "integrity": "sha512-gVgKbdbHgtxpRyR8K0O6oFZPhhB5tT1jeEHZR0Znr9Svg03U0+r9DXWMrnRAB+HtCStDQKlaIZm42tVsVjqtjg==",
       "engines": {
         "node": ">= 0.10"
       }
@@ -10705,6 +10705,7 @@
     },
     "bitcore-message": {
       "version": "git+ssh://git@github.com/comakery/bitcore-message.git#8799cc327029c3d34fc725f05b2cf981363f6ebf",
+      "integrity": "sha512-orPnsRjGglt2P1AEk5dAn2uHfPceOKd/Ghr1atF22+SsODy0008K6RudpNHcf/omchV6uvMBIqBw3sxBs8Mvpg==",
       "from": "bitcore-message@github:comakery/bitcore-message#dist",
       "requires": {
         "bitcore-lib": "^0.13.7"
@@ -14057,6 +14058,7 @@
         },
         "async": {
           "version": "2.6.2",
+          "integrity": "sha512-H1qVYh1MYhEEFLsP97cVKqCGo7KfCyTt6uEWqsTBr9SO84oK9Uwbyd/yCW+6rKJLHksBNUVWZDAjfS+Ccx0Bbg==",
           "bundled": true,
           "dev": true,
           "requires": {
@@ -14110,6 +14112,7 @@
         },
         "commander": {
           "version": "2.17.1",
+          "integrity": "sha512-wPMUt6FnH2yzG95SA6mzjQOEKUU3aLaDEmzs1ti+1E9h+CsrZghRlqEM/EJ4KscsQVG8uNN4uVreUeT8+drlgg==",
           "bundled": true,
           "dev": true,
           "optional": true
@@ -14276,6 +14279,7 @@
         },
         "handlebars": {
           "version": "4.1.0",
+          "integrity": "sha512-l2jRuU1NAWK6AW5qqcTATWQJvNPEwkM7NEKSiv/gqOsoSQbVoWyqVEY5GS+XPQ88zLNmqASRpzfdm8d79hJS+w==",
           "bundled": true,
           "dev": true,
           "requires": {
@@ -14287,6 +14291,7 @@
           "dependencies": {
             "source-map": {
               "version": "0.6.1",
+              "integrity": "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==",
               "bundled": true,
               "dev": true
             }
@@ -14408,6 +14413,7 @@
         },
         "istanbul-reports": {
           "version": "2.1.1",
+          "integrity": "sha512-FzNahnidyEPBCI0HcufJoSEoKykesRlFcSzQqjH9x0+LC8tnnE/p/90PBLu8iZTxr8yYZNyTtiAujUqyN+CIxw==",
           "bundled": true,
           "dev": true,
           "requires": {
@@ -14449,6 +14455,7 @@
         },
         "lodash": {
           "version": "4.17.11",
+          "integrity": "sha512-cQKh8igo5QUhZ7lg38DYWAxMvjSAKG0A8wGSVimP07SIUEK2UO+arSRKbRZWtelMtN5V0Hkwh5ryOto/SshYIg==",
           "bundled": true,
           "dev": true
         },
@@ -14522,11 +14529,13 @@
         },
         "minimist": {
           "version": "0.0.10",
+          "integrity": "sha1-3j+YVD2/lggr5IrRoMfNqDYwHc8=",
           "bundled": true,
           "dev": true
         },
         "mkdirp": {
           "version": "0.5.1",
+          "integrity": "sha1-MAV0OOrGz3+MR2fzhkjWaX11yQM=",
           "bundled": true,
           "dev": true,
           "requires": {
@@ -14535,6 +14544,7 @@
           "dependencies": {
             "minimist": {
               "version": "0.0.8",
+              "integrity": "sha1-hX/Kv8M5fSYluCKCYuhqp6ARsF0=",
               "bundled": true,
               "dev": true
             }
@@ -14584,6 +14594,7 @@
         },
         "optimist": {
           "version": "0.6.1",
+          "integrity": "sha1-2j6nRob6IaGaERwybpDrFaAZZoY=",
           "bundled": true,
           "dev": true,
           "requires": {
@@ -14593,6 +14604,7 @@
         },
         "os-homedir": {
           "version": "1.0.2",
+          "integrity": "sha1-/7xJiDNuDoM94MFox+8VISGqf7M=",
           "bundled": true,
           "dev": true
         },
@@ -14810,6 +14822,7 @@
         },
         "spawn-wrap": {
           "version": "1.4.2",
+          "integrity": "sha512-vMwR3OmmDhnxCVxM8M+xO/FtIp6Ju/mNaDfCMMW7FDcLRTPFWUswec4LXJHTJE2hwTI9O0YBfygu4DalFl7Ylg==",
           "bundled": true,
           "dev": true,
           "requires": {
@@ -14889,6 +14902,7 @@
         },
         "uglify-js": {
           "version": "3.4.9",
+          "integrity": "sha512-8CJsbKOtEbnJsTyv6LE6m6ZKniqMiFWmm9sRbopbkGs3gMPPfd3Fh8iIA4Ykv5MgaTbqHr4BaoGLJLZNhsrW1Q==",
           "bundled": true,
           "dev": true,
           "optional": true,
@@ -14899,6 +14913,7 @@
           "dependencies": {
             "source-map": {
               "version": "0.6.1",
+              "integrity": "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==",
               "bundled": true,
               "dev": true,
               "optional": true
@@ -14934,6 +14949,7 @@
         },
         "wordwrap": {
           "version": "0.0.3",
+          "integrity": "sha1-o9XabNXAvAAI03I0u68b7WMFkQc=",
           "bundled": true,
           "dev": true
         },
@@ -17159,9 +17175,9 @@
       }
     },
     "validator": {
-      "version": "10.11.0",
-      "resolved": "https://registry.npmjs.org/validator/-/validator-10.11.0.tgz",
-      "integrity": "sha512-X/p3UZerAIsbBfN/IwahhYaBbY68EN/UQBWHtsbXGT5bfrH/p4NQzUCG1kF/rtKaNpnJ7jAu6NGTdSNtyNIXMw=="
+      "version": "13.6.0",
+      "resolved": "https://registry.npmjs.org/validator/-/validator-13.6.0.tgz",
+      "integrity": "sha512-gVgKbdbHgtxpRyR8K0O6oFZPhhB5tT1jeEHZR0Znr9Svg03U0+r9DXWMrnRAB+HtCStDQKlaIZm42tVsVjqtjg=="
     },
     "value-or-function": {
       "version": "3.0.0",
