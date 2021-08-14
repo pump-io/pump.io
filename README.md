@@ -7,7 +7,6 @@ really want from a social network.
 [![Coverage Status](https://coveralls.io/repos/github/pump-io/pump.io/badge.svg?branch=master)](https://coveralls.io/github/pump-io/pump.io?branch=master)
 [![npm](https://img.shields.io/npm/v/pump.io.svg)](https://npmjs.com/package/pump.io)
 [![Vulnerabilities](https://snyk.io/test/github/pump-io/pump.io/badge.svg?targetFile=package.json)](https://snyk.io/test/github/pump-io/pump.io?targetFile=package.json)
-[![Greenkeeper badge](https://badges.greenkeeper.io/pump-io/pump.io.svg)](https://greenkeeper.io/)
 
 ## What's it for?
 
