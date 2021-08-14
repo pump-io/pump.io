@@ -25,7 +25,7 @@ You cannot upgrade to this release with a zero-downtime restart.
 
 ### Added
 
-* Support Node.js 10, 12 and 13
+* Support Node.js 12, 14 and 16
 * The master process now listens on a control socket controllable by `pumpctl(8)`; see `pump.socket(7)` for protocol documentation (#1643)
 * Ship an `npm-shrinkwrap.json` file with the package, ensuring that everyone gets the same version of all dependencies
 * Public endpoints will now content-negotiate ActivityStreams 2.0
@@ -63,7 +63,7 @@ You cannot upgrade to this release with a zero-downtime restart.
 
 ### Breaking
 
-* Drop support for Node.js 4 to 9 (#1502)
+* Drop support for Node.js 4 to 10 (#1502)
 * Extract the CLI client tools to pump.io-cli and drop from this package (#381)
 * Reorganize Jade files to reduce npm package size (affects custom templates) (#1457)
 * Upgrade from jade@1 to pug@2 (affects custom templates) (#1580)
