@@ -54,7 +54,7 @@
     "schlock": "~0.2.1",
     "send": "^0.17.1",
     "serve-favicon": "^2.3.0",
-    "showdown": "^1.9.1",
+    "showdown": "^2.0.0",
     "signal-exit": "^3.0.2",
     "sockjs": "0.3.x",
     "split": "^1.0.1",
