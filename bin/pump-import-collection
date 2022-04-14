@@ -960,7 +960,7 @@ var isUser = function(object) {
 
 var betterID = function(activity) {
     var dt = new Date(activity.published),
-        tagDate = dt.toISOString().substr(0, 10);
+        tagDate = dt.toISOString().slice(0, 10);
 
     return "tag:"+URLMaker.hostname+","+tagDate+":"+activity.verb+":"+activity.object.id;
 };

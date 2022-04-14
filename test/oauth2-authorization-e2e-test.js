@@ -189,7 +189,7 @@ vows.describe("OAuth 2.0 authorization flow")
                                     br.assert.success();
                                     br.assert.redirected();
                                     var bu = br.url;
-                                    var bu1 = bu.substr(0, REDIRECT_URI.length);
+                                    var bu1 = bu.slice(0, REDIRECT_URI.length);
                                     assert.equal(bu1, REDIRECT_URI);
                                     var bup = urlparse(bu, true);
                                     assert.isObject(bup.query);

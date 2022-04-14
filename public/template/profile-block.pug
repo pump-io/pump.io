@@ -12,8 +12,8 @@
       span.p-name!= profile.displayName
       |  
       small.p-nickname
-        if profile.id && profile.id.substr(0, 5) === 'acct:'
-          = profile.id.substr(5)
+        if profile.id && profile.id.slice(0, 5) === 'acct:'
+          = profile.id.slice(5)
         else
           = profile.preferredUsername
 

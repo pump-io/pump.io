@@ -422,7 +422,7 @@ var proxy = function(options, callback) {
 
     app.all(front.path + "/*", function(req, res, next) {
         var full = req.originalUrl,
-            rel = full.substr(front.path.length + 1),
+            rel = full.slice(front.path.length + 1),
             options = {
                 hostname: back.hostname,
                 port: back.port,
