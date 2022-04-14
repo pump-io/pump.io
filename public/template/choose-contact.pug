@@ -8,8 +8,8 @@
       ul.thumbnails
         each person in people.items
           -
-            var abbrev = (person.id && person.id.substr(0, 5) === 'acct:') ?
-            person.id.substr(5) : person.preferredUsername,
+            var abbrev = (person.id && person.id.slice(0, 5) === 'acct:') ?
+            person.id.slice(5) : person.preferredUsername,
             imgUrl = (person.image && person.image.url) ? person.image.url : "/images/default.png";
           li.thumbnail.span1(data-person-id=person.id, data-title=abbrev)
           img.img-rounded(src=imgUrl, width="64", height="64", alt=abbrev)

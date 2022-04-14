@@ -10,8 +10,8 @@ li.media.person.major(data-person-id=person.id)
       a(href=person.url)!= person.displayName
       |  
       small
-        if person.id && person.id.substr(0, 5) === 'acct:'
-          = person.id.substr(5)
+        if person.id && person.id.slice(0, 5) === 'acct:'
+          = person.id.slice(5)
         else
           = person.preferredUsername
 

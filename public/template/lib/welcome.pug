@@ -9,7 +9,7 @@ ul
 
   li
     | Your account id is 
-    strong= (profile.id && profile.id.substr(0, 5) === 'acct:') ? profile.id.substr(5) : profile.id
+    strong= (profile.id && profile.id.slice(0, 5) === 'acct:') ? profile.id.slice(5) : profile.id
     | . You can use it with 
     a(href="https://pumpio.readthedocs.org/en/latest/clients.html") pump.io-enabled applications
     | .

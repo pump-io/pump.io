@@ -46,7 +46,7 @@ var deepProperty = function(object, property) {
     } else if (i === -1) { // no dots
         return object[property];
     } else {
-        return deepProperty(object[property.substr(0, i)], property.substr(i + 1));
+        return deepProperty(object[property.slice(0, i)], property.slice(i + 1));
     }
 };
 

@@ -2646,8 +2646,8 @@
                 }),
                 strToObj = function(str) {
                     var colon = str.indexOf(":"),
-                        type = str.substr(0, colon),
-                        id = str.substr(colon+1);
+                        type = str.slice(0, colon !== -1 ? colon : 0),
+                        id = str.slice(colon+1);
                     return new Pump.ActivityObject({
                         id: id,
                         objectType: type
@@ -2736,8 +2736,8 @@
                         cc = view.$("#post-picture #picture-cc").val(),
                         strToObj = function(str) {
                             var colon = str.indexOf(":"),
-                                type = str.substr(0, colon),
-                                id = str.substr(colon+1);
+                                type = str.slice(0, colon !== -1 ? colon : 0),
+                                id = str.slice(colon+1);
                             return Pump.ActivityObject.unique({
                                 id: id,
                                 objectType: type
@@ -3165,8 +3165,8 @@
                 var val = element.val(),
                     strToObj = function(str) {
                         var colon = str.indexOf(":"),
-                            type = str.substr(0, colon),
-                            id = str.substr(colon+1);
+                            type = str.slice(0, colon !== -1 ? colon : 0),
+                            id = str.slice(colon+1);
                         return new Pump.ActivityObject({
                             id: id,
                             objectType: type

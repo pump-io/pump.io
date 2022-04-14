@@ -127,7 +127,7 @@ suite.addBatch({
                 assert.equal(res.statusCode, 200);
                 assert.isObject(res.headers);
                 assert.include(res.headers, "content-type");
-                assert.equal("text/html", res.headers["content-type"].substr(0, "text/html".length));
+                assert.equal("text/html", res.headers["content-type"].slice(0, "text/html".length));
             }
         },
         "and we register a client": {
@@ -193,7 +193,7 @@ suite.addBatch({
                 assert.equal(res.statusCode, 200);
                 assert.isObject(res.headers);
                 assert.include(res.headers, "content-type");
-                assert.equal("text/html", res.headers["content-type"].substr(0, "text/html".length));
+                assert.equal("text/html", res.headers["content-type"].slice(0, "text/html".length));
             }
         },
         "and we register a client directly": {

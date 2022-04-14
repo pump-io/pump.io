@@ -259,10 +259,10 @@ if (!window.Pump) {
         var here = window.location;
 
         if (url.indexOf(":") == -1) {
-            if (url.substr(0, 1) == "/") {
+            if (url.slice(0, 1) == "/") {
                 url = here.protocol + "//" + here.host + url;
             } else {
-                url = here.href.substr(0, here.href.lastIndexOf("/") + 1) + url;
+                url = here.href.slice(0, here.href.lastIndexOf("/") + 1) + url;
             }
         }
 
@@ -391,7 +391,7 @@ if (!window.Pump) {
             str = window.location.search;
         }
 
-        pairs = str.substr(1).split("&");
+        pairs = str.slice(1).split("&");
 
         _.each(pairs, function(pairStr) {
             var pair = pairStr.split("=", 2),

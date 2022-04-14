@@ -33,7 +33,7 @@ mixin authorship(object)
             br
 
           if irt.content
-            != irt.content.length <= 80 ? irt.content : irt.content.substr(0, 80) + "…"
+            != irt.content.length <= 80 ? irt.content : irt.content.slice(0, 80) + "…"
           else if irt.objectType === "image"
             span.inreplyto-image (Image)
 
