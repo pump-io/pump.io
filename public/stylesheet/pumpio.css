@@ -139,7 +139,7 @@ body {
   margin-bottom: 8px;
 }
 
-.major > .media-body {
+.major .activity-content, .reply .media-body {
   margin-right: 20px;
 }
 
