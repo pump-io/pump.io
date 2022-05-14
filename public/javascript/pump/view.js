@@ -571,6 +571,15 @@
                     Pump.showModal(Cls, {data: {user: Pump.principalUser,
                                                 lists: lists},
                                          ready: function() {
+                                                $('#modal-note').bind('hide', function (e) {
+                                                 if ($('#note-content').val()) {
+                                                    if (window.confirm("Are you sure?")) {
+                                                        $('#modal-note').remove();
+                                                    } else {
+                                                        e.preventDefault();
+                                                    }
+                                                } else $('#modal-note').remove();
+                                               });
                                              stopSpin();
                                          }});
                 }
@@ -2633,6 +2642,7 @@
             "click #send-note": "postNote"
         },
         postNote: function(ev) {
+            $('#modal-note').unbind();
             var view = this,
                 text = view.$("#post-note #note-content").val(),
                 to = view.$("#post-note #note-to").val(),
