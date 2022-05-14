@@ -79,6 +79,22 @@ body {
   line-height: 15px;
 }
 
+/* infinite-scroll */
+
+.infinite-scroll {
+  width: 100%;
+}
+
+.infinite-scroll .btn {
+  width: 100px;
+  margin: 0 auto;
+  display: none;
+}
+
+.infinite-scroll .visible {
+  display: block;
+}
+
 /* modals */
 
 .modal-body {
